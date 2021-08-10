@@ -1,5 +1,6 @@
 # cypress
 instrument integration with CLSA Pine
+<<<<<<< HEAD
 
 How to build: 
 Windows:
@@ -11,3 +12,5 @@ Windows:
   - Copy all files from the extracted QtUSB into their respective locations at C:\Qt\5.15.2  (should have matching sub directories)
   - Cypress should now build and run 
   - To run Cypress.exe from the command line, update your path to include C:\Qt\5.15.2\msvc2019_64\bin, this ensures that Windows can locate .dlls at runtime 
+=======
+>>>>>>> 34eb6c7 (ENH: update repo name)
