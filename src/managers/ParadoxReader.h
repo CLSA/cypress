@@ -156,8 +156,8 @@ private:
             int leftShift = (bytes.size() - 1) * 8;
             int mask = 0x000000FF;
             for (int i = 0; i < bytes.size(); i++) {
-                value |= fixed[i] << leftShift & (mask << leftShift);
-                leftShift = -8;
+                value |= (fixed[i] << leftShift) & (mask << leftShift);
+                leftShift -= 8;
             }
             output = (bytes[0] & 0x80) == 0x80 ? value : (value == 0 ? NULL : -value);
             break;
@@ -176,8 +176,7 @@ private:
     // Using QByteArray instead of QByteArray& because a copy 
     // is required and do not want to alias
     QByteArray fixSign(QByteArray bytes) {
-        if (bytes[0] & 0x80) {
-            //bytes[0] &= 0x7f; This is the java code. not too sure about &=
+        if ((bytes[0] & 0x80) == 0x80) {
             bytes[0] = bytes[0] & 0x7f;
         }
         return bytes;
