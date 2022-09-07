@@ -2,6 +2,7 @@
 
 #include "Constants.h"
 #include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -17,7 +18,7 @@ CommandLineParser::CommandLineParser(QObject* parent) : QObject(parent)
 
 CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
         const QCoreApplication &app,
-         QString *errMessage)
+         QString* errMessage)
 {
     // process command line args
     // if the run mode arg is 'test' and no UI is required
@@ -31,28 +32,32 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
     // which contains the minimum necessary input data to
     // run the device (eg., barcode, gender etc.)
 
+    // Input
     QCommandLineOption inputOption(
       QStringList() << "i" << "input",
       QCoreApplication::translate(
-        "main", "Read json input from <file>"),"file");
+        "main", "Read JSON input from 'relative_path/filename'"),"file");
     m_parser.addOption(inputOption);
 
+    // Output
     QCommandLineOption outputOption(
       QStringList() << "o" << "output",
       QCoreApplication::translate(
-        "main", "Write json output to <file>"),"file");
+        "main", "Write JSON output to 'relative path/filename'"),"file");
     m_parser.addOption(outputOption);
 
+    // Type [type, none]?
     QCommandLineOption typeOption(
       QStringList() << "t" << "type",
       QCoreApplication::translate(
-        "main", "Measure type <type>"),"type","none");
+        "main", "Measure type [Unknown, Audiometer, Blood_Pressure, Body_Composition, CDTT, Choice_Reaction, ECG, Frax, Retinal_Camera, Spirometer, Thermometer, Tonometer, Weigh_Scale, Ultrasound, DEXA]"),"type","none");
     m_parser.addOption(typeOption);
 
+    // Mode [default, live, simulate]
     QCommandLineOption modeOption(
       QStringList() << "m" << "mode",
       QCoreApplication::translate(
-        "main", "Run mode <default,live,simulate>"),"mode","default");
+        "main", "Run mode [Unknown,Default,Live,Simulate,Headless]"),"mode","default");
     m_parser.addOption(modeOption);
 
     QCommandLineOption verboseOption(
@@ -61,7 +66,14 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
          "main","Verbose mode. Prints out verbose debug information."));
     m_parser.addOption(verboseOption);
 
-    m_parser.process(app);
+    ParseResult result = parseOk;
+
+    const bool successfulParse = m_parser.parse(app.arguments());
+
+    if (!successfulParse) {
+        result = parseError;
+        *errMessage = m_parser.errorText();
+    }
 
     if (m_parser.isSet(versionOption))
         return parseVersionRequested;
@@ -80,7 +92,6 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
 
     // Catch the first parser error
     //
-    ParseResult result = parseOk;
 
     // Default mode is "default"
     // - simulate runs the app with GUI interaction but without
@@ -108,11 +119,14 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
         else
         {
           result = parseRunModeError;
-          *errMessage = "Invalid run mode: " + s;
+          *errMessage = "Error: Invalid run mode: " + s;
         }
     }
     else
     {
+        result = parseRunModeError;
+        *errMessage = "Error: Mode option not set";
+
         qDebug() << "run mode option not set";
     }
 
@@ -134,7 +148,7 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
         {
             qCritical() << "ERROR: input file does not exist: " <<  s;
             result = parseInputFileError;
-            *errMessage = "Invalid input file " + s;
+            *errMessage = "Error: Invalid input file " + s;
         }
     }
     else
@@ -160,7 +174,7 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
         {
             qCritical() << "ERROR: output file path does not exist: " <<  info.dir().canonicalPath();
             result = parseOutputPathError;
-            *errMessage = "Invalid output file path " + info.dir().canonicalPath();
+            *errMessage = "Error: Invalid output file path " + info.dir().canonicalPath();
         }
     }
     else
@@ -203,6 +217,8 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
     else
     {
         qDebug() << "measure type option not set";
+        result = parseError;
+        *errMessage = "Measure type option not set";
     }
 
     if(parseOk == result)
@@ -212,7 +228,7 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
             if(!(hasValidInput && hasValidOutput))
             {
                result = parseError;
-               *errMessage = "One or more expected arguments are missng";
+               *errMessage = "One or more expected arguments are missing";
             }
         }
         else if(Constants::RunMode::modeHeadless == m_args["runMode"].value<Constants::RunMode>())
@@ -220,7 +236,7 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
             if(!(hasValidInput && hasValidOutput))
             {
                result = parseError;
-               *errMessage = "One or more expected arguments are missng";
+               *errMessage = "One or more expected arguments are missing";
             }
         }
     }
