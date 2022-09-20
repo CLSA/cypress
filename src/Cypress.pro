@@ -27,6 +27,8 @@ SOURCES += \
     data/ExcelQueryHelper.cpp \
     data/FraxMeasurement.cpp \
     data/FraxTest.cpp \
+    data/GripStrengthMeasurement.cpp \
+    data/GripStrengthTest.cpp \
     data/HearingMeasurement.cpp \
     data/HearingTest.cpp \
     data/Measurement.cpp \
@@ -49,11 +51,15 @@ SOURCES += \
     managers/BPMMessage.cpp \
     managers/ECGManager.cpp \
     managers/FraxManager.cpp \
+    managers/GripStrengthManager.cpp \
     managers/ManagerBase.cpp \
+    managers/ParadoxReader.cpp \
     managers/SerialPortManager.cpp \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+    prototype/GripStrength/MainWindow.cpp \
+    prototype/GripStrength/main.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -91,6 +97,8 @@ HEADERS += \
     data/ExcelQueryHelper.h \
     data/FraxMeasurement.h \
     data/FraxTest.h \
+    data/GripStrengthMeasurement.h \
+    data/GripStrengthTest.h \
     data/HearingMeasurement.h \
     data/HearingTest.h \
     data/Measurement.h \
@@ -114,11 +122,14 @@ HEADERS += \
     managers/ECGManager.h \
     managers/EMRPluginWriter.h \
     managers/FraxManager.h \
+    managers/GripStrengthManager.h \
     managers/ManagerBase.h \
+    managers/ParadoxReader.h \
     managers/SerialPortManager.h \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+    prototype/GripStrength/MainWindow.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -147,6 +158,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
+    prototype/GripStrength/MainWindow.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
@@ -157,3 +169,5 @@ FORMS += \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
+
+

@@ -128,6 +128,77 @@ bool ParadoxReader::headerDataValid()
     return true;
 }
 
+QJsonObject ParadoxDbBlock::readRecord(QFile& dbFile)
+{
+        QJsonObject jsonRecord;
+        for (int i = 0; i < m_dbHeader->numFields; i++) {
+            DbHeaderField field = m_dbHeader->fields[i];
+            FieldType type = field.getType();
+            QByteArray bytes = dbFile.read(field.getSize());
+            QVariant value = getValue(bytes, type);
+            jsonRecord.insert(field.getName(), QJsonValue::fromVariant(value));
+        }
+        return jsonRecord;
+}
+
+QList<QJsonObject> ParadoxDbBlock::readRecords(QFile& dbFile)
+{
+        int numRecords = getNumRecords();
+        QList<QJsonObject> records;
+        dbFile.seek(m_fileOffset);
+        for (int i = 0; i < numRecords; i++) {
+            QJsonObject record = readRecord(dbFile);
+            records.append(record);
+        }
+        return records;
+}
+
+QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
+        QVariant output;
+
+        switch (type) {
+        case FieldType::Alpha:
+        {
+            QString result;
+            result.reserve(bytes.size());
+            for (int i = 0; i < bytes.size(); i++) {
+                result.append((char)bytes[i]);
+            }
+            output = result;
+            break;
+        }
+        case FieldType::LongInteger:
+        {
+            QByteArray fixed = fixSign(bytes);
+            long value = 0;
+            int leftShift = (bytes.size() - 1) * 8;
+            int mask = 0x000000FF;
+            for (int i = 0; i < bytes.size(); i++) {
+                value |= fixed[i] << leftShift & (mask << leftShift);
+                leftShift = -8;
+            }
+            output = (bytes[0] & 0x80) == 0x80 ? value : (value == 0 ? NULL : -value);
+            break;
+        }
+        // These two are in the data set, but ONYX has them return null
+        // So likely not needed to use the data from these types
+        case FieldType::Logical:
+        case FieldType::MemoBlob:
+            break;
+        default:
+            break;
+        }
+        return output;
+    }
+
+
+QByteArray ParadoxDbBlock::fixSign(QByteArray bytes) {
+        if (bytes[0] & 0x80) {
+            //bytes[0] &= 0x7f; This is the java code. not too sure about &=
+            bytes[0] = bytes[0] & 0x7f;
+        }
+        return bytes;
+    }
 /*
 * Seek to the start of the header field info stored in the paradox database
 * Expects that the dbFile will be set to the end of the refIntegrity
@@ -205,16 +276,16 @@ void ParadoxReader::readHeaderFieldNames()
 */
 QList<ParadoxDbBlock> ParadoxReader::readBlocks()
 {
-    long curFileOffest = m_header.headerSize;
-    m_dbFile.seek(curFileOffest);
+    long curFileOffset = m_header.headerSize;
+    m_dbFile.seek(curFileOffset);
     QList<ParadoxDbBlock> blocks;
     blocks.reserve(m_header.fileBlocks);
     for (int i = 0; i < m_header.fileBlocks; i++) {
         int nextBlock = readUShort();
         int prevBlock = readUShort();
         int offsetToLastRecord = readShort();
-        curFileOffest += 2 * 3; // 2 byte read 3 times
-        ParadoxDbBlock block(i + 1, nextBlock, prevBlock, offsetToLastRecord, curFileOffest, &m_header);
+        curFileOffset += 2 * 3; // 2 byte read 3 times
+        ParadoxDbBlock block(i + 1, nextBlock, prevBlock, offsetToLastRecord, curFileOffset, &m_header);
         blocks.append(block);
     }
     return blocks;
