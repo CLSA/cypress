@@ -40,6 +40,7 @@ SOURCES += \
     data/TonometerTest.cpp \
     data/WeightMeasurement.cpp \
     data/WeighScaleTest.cpp \
+    dialogs/GripStrengthDialog.cpp \
     managers/AudiometerManager.cpp \
     managers/CDTTManager.cpp \
     managers/ChoiceReactionManager.cpp \
@@ -58,8 +59,6 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
-    prototype/GripStrength/MainWindow.cpp \
-    prototype/GripStrength/main.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -111,6 +110,7 @@ HEADERS += \
 #    data/TemperatureTest.h \
     data/WeightMeasurement.h \
     data/WeighScaleTest.h \
+    dialogs/GripStrengthDialog.h \
     managers/AudiometerManager.h \
     managers/BloodPressureManager.h \
 #    managers/BluetoothLEManager.h \
@@ -129,7 +129,6 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
-    prototype/GripStrength/MainWindow.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -158,7 +157,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    prototype/GripStrength/MainWindow.ui \
+    dialogs/gripstrengthdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
