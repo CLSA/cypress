@@ -11,3 +11,10 @@ Windows:
   - Copy all files from the extracted QtUSB into their respective locations at C:\Qt\5.15.2  (should have matching sub directories)
   - Cypress should now build and run 
   - To run Cypress.exe from the command line, update your path to include C:\Qt\5.15.2\msvc2019_64\bin, this ensures that Windows can locate .dlls at runtime 
+
+
+Release
+
+The release build of the application won't run / find any of the .dll files unless you run the Qt tool "windeployqt.exe" inside the directory with the Cypress.exe, the tool will build a 
+dependency tree and copy the .dll files into the directory. 
+ 
