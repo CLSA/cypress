@@ -73,10 +73,8 @@ int main(int argc, char *argv[])
     CypressApplication cypress;
     try
     {
-        qDebug() << "initialize start";
         cypress.setArgs(parser.getArgs());
         cypress.initialize();
-        qDebug() << "initialize end";
     }
     catch (std::exception& e)
     {

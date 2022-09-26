@@ -37,6 +37,11 @@ public:
 
     bool isDefined(const QString&, const GripStrengthManager::FileType&) const;
 
+    void setRunnableName(const QString&);
+    void setRunnablePath(const QString&);
+    void setDatabasePath(const QString&);
+    void setTestPath(const QString&);
+
 public slots:
 
     // what the manager does in response to the main application
@@ -53,12 +58,15 @@ public slots:
     //
     void finish() override;
 
+signals:
+    void processInitialized();
+    void measureStart();
+
 private:
     QString m_runnableName = "C:/Program Files (x86)/Tracker 5/WTS.exe";// full pathspec to WTS.exe
     QString m_runnablePath = "C:/Program Files (x86)/Tracker 5"; // path to WTS.exe directory
-    QString m_gripTestDbPath = "C:/Users/clsa/Desktop/ZGripTest.DB";
-    QString m_gripTestDataDbPath = "C:/Users/clsa/Desktop/ZGripTestData.DB";
-
+    QString m_gripTestDbPath = "C:/work/clsa/cypress/GripStrengthData/ZGripTest_After_Test.DB";
+    QString m_gripTestDataDbPath = "C:/work/clsa/cypress/GripStrengthData/ZGripTestData_After_Test.DB";
     //QString getEMRInXmlName() const { return QString("%1/%2").arg(m_dataPath, "CypressIn.xml"); }
     //QString getEMROutXmlName() const { return QString("%1/%2").arg(m_dataPath, "CypressOut.xml"); }
     //QString getEWPDbName() const { return QString("%1/%2").arg(m_dataPath, "EasyWarePro.mdb"); }
@@ -70,9 +78,13 @@ private:
 
     GripStrengthTest m_test;
 
-    void clearData() override;
 
+    void clearData() override;
+    void readOutput();
+
+    void initializeConnections();
     void configureProcess();
+    void processStart();
 };
 
 #endif // GRIPSTRENGTHMANAGER_H
