@@ -16,14 +16,11 @@
     <height>600</height>
    </size>
   </property>
-  <property name="maximumSize">
-   <size>
-    <width>900</width>
-    <height>600</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>Grip Strength</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>

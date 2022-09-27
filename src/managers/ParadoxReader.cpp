@@ -15,7 +15,7 @@ ParadoxReader::~ParadoxReader()
 /*
 * Reads in the data stored in a paradox database
 */
-q_paradoxBlocks ParadoxReader::Read()
+q_paradoxRecords ParadoxReader::Read()
 {
     // seek to start of database
     m_dbFile.seek(0);
@@ -32,7 +32,7 @@ q_paradoxBlocks ParadoxReader::Read()
     // Report error if header could not be read or if header data is not valid
     if (errorReadingHeader || !headerDataValid()) {
         qDebug() << "Error: Valid header data could not be read";
-        return q_paradoxBlocks();
+        return q_paradoxRecords();
     }
 
     // Read the actual data
@@ -42,20 +42,20 @@ q_paradoxBlocks ParadoxReader::Read()
     // Return error if there is no data found
     if (blocks.isEmpty()) {
         qDebug() << "Error: No data stored in database blocks";
-        return q_paradoxBlocks();
+        return q_paradoxRecords();
     }
 
-    q_paradoxBlocks dataBlocks;
+    q_paradoxRecords records;
     for (int i = 0; i < blocks.count(); i++) {
-        q_paradoxRecords records = blocks[i].readRecords(m_dbFile);
-        dataBlocks.append(records);
+        q_paradoxRecords _records = blocks[i].readRecords(m_dbFile);
+        records.append(_records);
     }
 
     // Close Database connection
     closeDatabase();
     qDebug() << "Databases read in";
 
-    return dataBlocks;
+    return records;
 }
 
 /*
@@ -145,6 +145,7 @@ QJsonObject ParadoxDbBlock::readRecord(QFile& dbFile)
 QList<QJsonObject> ParadoxDbBlock::readRecords(QFile& dbFile)
 {
         int numRecords = getNumRecords();
+        qDebug() << numRecords;
         QList<QJsonObject> records;
         dbFile.seek(m_fileOffset);
         for (int i = 0; i < numRecords; i++) {
@@ -152,6 +153,10 @@ QList<QJsonObject> ParadoxDbBlock::readRecords(QFile& dbFile)
             records.append(record);
         }
         return records;
+}
+
+void printVal(qint32 val) {
+    qDebug() << QString::number(val, 2).rightJustified(32, '0');
 }
 
 QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
@@ -172,21 +177,28 @@ QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
         }
         case FieldType::LongInteger:
         {
-            QByteArray fixed = fixSign(bytes);
-            qint32 value = 0;
-            int leftShift = (fixed.size() - 1) * 8;
-            for (int i = 0; i < fixed.size(); i++) {
-                value |= fixed[i] << leftShift;
-                leftShift -= 8;
+            qint32 value = NULL;
+            unsigned char sign = (bytes[0] & 0x80) ? (bytes[0] & 0x7f) : (bytes[0] | 0x80);
+
+            if (bytes[0] & 0x80) { // positive
+                value  = (qint32) ((unsigned char) sign << 24);
+                value |= (qint32) ((unsigned char) bytes[1] << 16);
+                value |= (qint32) ((unsigned char) bytes[2] << 8);
+                value |= (qint32) ((unsigned char) bytes[3]);
+            }
+            else if (bytes[0] & 0x7F) { // negative
+                value  = (qint32) ((unsigned char) sign << 24);
+                value |= (qint32) ((unsigned char) bytes[1] << 16);
+                value |= (qint32) ((unsigned char) bytes[2] << 8);
+                value |= (qint32) ((unsigned char) bytes[3]);
             }
 
-            output = (bytes[0] & 0x80) == 0x80 ? value : (value == 0 ? NULL : -value);
+            output = value;
             break;
         }
         // These two are in the data set, but ONYX has them return null
         // So likely not needed to use the data from these types
         case FieldType::Logical:
-            qDebug() << "logical: " << bytes;
             output = (bytes[0] & 0x81) == 0x81 ? true : false;
             break;
         case FieldType::MemoBlob:
@@ -201,6 +213,7 @@ QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
 QByteArray ParadoxDbBlock::fixSign(QByteArray bytes) {
         if (bytes[0] & 0x80) {
             //bytes[0] &= 0x7f; This is the java code. not too sure about &=
+            // Flip the most significant bit to 0 (remove sign bit)
             bytes[0] = bytes[0] & 0x7f;
         }
         return bytes;
@@ -232,7 +245,6 @@ void ParadoxReader::readHeaderFieldInfo()
         bytes = m_dbFile.read(1);
         quint8 size = (quint8)bytes[0];
 
-        qDebug() << i << ". " << "type: " << type << " size: " << size;
         DbHeaderField headerField(static_cast<FieldType>(type), size);
         m_header.fields.append(headerField);
     }
@@ -287,11 +299,11 @@ QList<ParadoxDbBlock> ParadoxReader::readBlocks()
     QList<ParadoxDbBlock> blocks;
     blocks.reserve(m_header.fileBlocks);
     for (int i = 0; i < m_header.fileBlocks; i++) {
-        int nextBlock = readUShort();
-        int prevBlock = readUShort();
-        int offsetToLastRecord = readShort();
+        quint16 nextBlock = readUShort(curFileOffset);
+        quint16 prevBlock = readUShort(curFileOffset + 2);
+        quint16 addDataSize = readUShort(curFileOffset + 4);
         curFileOffset += 2 * 3; // 2 byte read 3 times
-        ParadoxDbBlock block(i + 1, nextBlock, prevBlock, offsetToLastRecord, curFileOffset, &m_header);
+        ParadoxDbBlock block(i + 1, nextBlock, prevBlock, 0, curFileOffset, addDataSize, &m_header);
         blocks.append(block);
     }
 
@@ -336,7 +348,8 @@ qint32 ParadoxReader::readInt(int offset)
     if (-1 != offset)
         m_dbFile.seek(offset);
     QByteArray bytes = m_dbFile.read(4);
-    qint32 value = (qint32)(((qint32)bytes[3]) << 24 | ((qint32)bytes[2]) << 16 | ((qint32)bytes[1]) << 8 | bytes[0]);
+    qint32 value = (qint32)(((qint32)bytes[3]) << 24 | ((qint32)bytes[2]) << 16 | ((qint16) bytes[1]) << 8 | (qint8) bytes[0]);
+
     return value;
 }
 
@@ -350,7 +363,9 @@ quint16 ParadoxReader::readUShort(int offset)
     if (-1 != offset)
         m_dbFile.seek(offset);
     QByteArray bytes = m_dbFile.read(2);
-    quint16 value = (quint16)(((quint16)bytes[1]) << 8 | bytes[0]);
+
+    quint16 value = (quint16) (((quint16) bytes[1]) << 8) | ((quint8) bytes[0]);
+
     return value;
 }
 

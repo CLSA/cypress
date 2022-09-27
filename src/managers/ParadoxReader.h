@@ -87,19 +87,20 @@ class DbHeader
 class ParadoxDbBlock {
     public:
         ParadoxDbBlock(const qint32& blockNumber, const qint32& nextBlock, const qint32& prevBlock,
-        const int& offsetToLastRecord, const long& fileOffset, const DbHeader* header) :
+        const int& offsetToLastRecord, const long& fileOffset, const qint32& addDataSize, const DbHeader* header) :
         m_blockNumber(blockNumber),
         m_nextBlock(nextBlock),
         m_prevBlock(prevBlock),
         m_offsetToLastRecord(offsetToLastRecord),
         m_fileOffset(fileOffset),
+        m_addDataSize(addDataSize),
         m_dbHeader(header)
         {
         }
 
         // offsetToLastRecord is set to -header.recordSize when the block is empty.
         // this method will thus return 0 in this case
-        int getNumRecords() { return (m_offsetToLastRecord / m_dbHeader->recordSize) + 1; }
+        int getNumRecords() { return (m_addDataSize / m_dbHeader->recordSize) + 1; }
 
         QList<QJsonObject> readRecords(QFile& dbFile);
 
@@ -109,6 +110,7 @@ class ParadoxDbBlock {
         const qint32 m_prevBlock;
         const qint32 m_offsetToLastRecord;
         const qint32 m_fileOffset;
+        const qint32 m_addDataSize;
         const DbHeader* m_dbHeader;
 
         QJsonObject readRecord(QFile& dbFile);
@@ -125,7 +127,7 @@ class ParadoxReader
         ParadoxReader(const QString& filePath, QWidget* parent = Q_NULLPTR);
         ~ParadoxReader();
 
-        q_paradoxBlocks Read();
+        q_paradoxRecords Read();
         void closeDatabase();
     private:
         void openDatabase(const QString& filePath);

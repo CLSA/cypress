@@ -49,14 +49,12 @@ void GripStrengthTest::fromParadox(const QString& gripTestPath, const QString& g
 
     //Read in measurements
     ParadoxReader gripTestDataReader(gripTestDataPath);
-    q_paradoxBlocks testDataBlocks = gripTestDataReader.Read();
-    foreach(const auto block, testDataBlocks) {
-        foreach(const auto record, block) {
-            GripStrengthMeasurement measurement;
-            measurement.fromRecord(&record);
-            if (measurement.isValid()) {
-                addMeasurement(measurement);
-            }
+    q_paradoxRecords testDataRecords = gripTestDataReader.Read();
+    foreach(const auto record, testDataRecords) {
+        GripStrengthMeasurement measurement;
+        measurement.fromRecord(&record);
+        if (measurement.isValid()) {
+            addMeasurement(measurement);
         }
     }
 }
