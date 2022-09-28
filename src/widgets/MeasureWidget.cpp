@@ -10,6 +10,7 @@ MeasureWidget::MeasureWidget(QWidget *parent)
     ui->setupUi(this);
 
     auto h = ui->testdataTableView->horizontalHeader();
+
     h->setSectionResizeMode(QHeaderView::Fixed);
     ui->testdataTableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     ui->testdataTableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
