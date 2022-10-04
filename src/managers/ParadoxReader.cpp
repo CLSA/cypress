@@ -12,6 +12,23 @@ ParadoxReader::~ParadoxReader()
     closeDatabase();
 }
 
+
+DbHeader ParadoxReader::getHeader()
+{
+    return m_header;
+}
+
+
+void ParadoxReader::backupDatabase()
+{
+
+}
+
+void ParadoxReader::restoreDatabase()
+{
+
+}
+
 /*
 * Reads in the data stored in a paradox database
 */
@@ -28,7 +45,7 @@ q_paradoxRecords ParadoxReader::Read()
     catch(...){
         errorReadingHeader = true;
     }
-    
+
     // Report error if header could not be read or if header data is not valid
     if (errorReadingHeader || !headerDataValid()) {
         qDebug() << "Error: Valid header data could not be read";

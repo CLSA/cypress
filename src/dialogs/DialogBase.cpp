@@ -15,7 +15,7 @@
 
 DialogBase::DialogBase(QWidget *parent)
     : QDialog(parent)
-    , m_verbose(true)
+    , m_verbose(false)
 {
 }
 
