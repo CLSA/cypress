@@ -18,13 +18,14 @@ public:
     void initialize();
 
 private:
-    QString m_inputFileName;
-    QString m_outputFileName;
+    QString m_inputFileName; // TODO this data should be from POST request in production
+    QString m_outputFileName; // TODO ""
+
     Constants::RunMode m_mode { Constants::RunMode::modeUnknown };
     Constants::MeasureType m_type { Constants::MeasureType::typeUnknown };
-    bool m_verbose;
-
     QScopedPointer<DialogBase> m_dialog;
+
+    bool m_verbose = true;
 };
 
 #endif // CYPRESSAPPLICATION_H

@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QQueue>
 #include <QTime>
-#include <QUsb>
+#include <QtUsb/QtUsb>
 #include <functional>
 
 QT_FORWARD_DECLARE_CLASS(BPMMessage)

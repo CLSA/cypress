@@ -41,7 +41,7 @@ void GripStrengthDialog::initializeConnections()
 
     connect(ui->measureWidget, &MeasureWidget::closeApplication, this, &GripStrengthDialog::handleClose);
     connect(ui->measureWidget, &MeasureWidget::measure, derived.get(), &GripStrengthManager::measure);
-    connect(ui->measureWidget, &MeasureWidget::writeToFile, derived.get(), &GripStrengthManager::finish);
+    connect(ui->measureWidget, &MeasureWidget::writeToFile, this, &GripStrengthDialog::writeOutput);
 
     connect(ui->barcodeWidget,&BarcodeWidget::validated,
           this,[this](const bool& valid)

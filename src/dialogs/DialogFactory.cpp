@@ -68,26 +68,20 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
         dialog = new BloodPressureDialog();
         break;
       case Constants::MeasureType::typeGrip_Strength:
-        qDebug() << "grip strength";
         dialog = new GripStrengthDialog();
         break;
       case Constants::MeasureType::typeRetinal_Camera:
-        //dialog = Q_NULLPTR;
         break;
       case Constants::MeasureType::typeECG:
         dialog = new ECGDialog();
         break;
       case Constants::MeasureType::typeUltrasound:
-        //dialog = Q_NULLPTR;
         break;
       case Constants::MeasureType::typeDexa:
-        //dialog = Q_NULLPTR;
         break;
       case Constants::MeasureType::typeUnknown:
-        //dialog = Q_NULLPTR;
         break;
       default:
-        //dialog = Q_NULLPTR;
         break;
     }
     return dialog;

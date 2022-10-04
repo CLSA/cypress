@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <stdexcept>
 
 #include "./auxiliary/Constants.h"
@@ -36,8 +37,9 @@ void CypressApplication::initialize()
     DialogFactory *factory = DialogFactory::instance();
 
     m_dialog.reset(factory->instantiate(m_type));
-    if(m_dialog.isNull())
-        throw std::runtime_error("FATAL ERROR: failed to initialize a dialog");
+    if(m_dialog.isNull()) {
+        QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
+    }
 
     m_dialog->setInputFileName(m_inputFileName);
     m_dialog->setOutputFileName(m_outputFileName);
@@ -45,4 +47,11 @@ void CypressApplication::initialize()
     m_dialog->setVerbose(m_verbose);
     m_dialog->initialize();
     m_dialog->show();
+
+    if (!m_verbose)
+        return;
+    qDebug() << "Input: " << m_inputFileName;
+    qDebug() << "Output: " << m_outputFileName;
+    qDebug() << "Mode: " << m_mode;
+    qDebug() << "Type: " << m_type;
 }

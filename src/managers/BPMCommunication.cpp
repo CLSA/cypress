@@ -4,7 +4,7 @@
 #include "../auxiliary/Utilities.h"
 
 #include <QCoreApplication>
-#include <QHidDevice>
+#include <QtUsb/QHidDevice>
 #include <QThread>
 
 BPMCommunication::BPMCommunication(QObject* parent) : QObject(parent)
