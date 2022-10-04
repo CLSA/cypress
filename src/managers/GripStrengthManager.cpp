@@ -52,8 +52,9 @@ void GripStrengthManager::finish()
 
 void GripStrengthManager::initializeConnections() {
     connect(&m_process, &QProcess::started, this, [this]() {
+        if (m_verbose)
             qDebug() << "process started: " << m_process.arguments().join(" ");
-        });
+    });
 
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         this, &GripStrengthManager::canMeasure);
@@ -81,94 +82,63 @@ void GripStrengthManager::initializeModel()
     QStandardItem* item;
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 0, item);
     m_model->setHeaderData(0, Qt::Horizontal, "Exam ID", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 1, item);
     m_model->setHeaderData(1, Qt::Horizontal, "Test ID", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 2, item);
     m_model->setHeaderData(2, Qt::Horizontal, "Position", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 3, item);
     m_model->setHeaderData(3, Qt::Horizontal, "Side", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 4, item);
     m_model->setHeaderData(4, Qt::Horizontal, "Rep1", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 5, item);
     m_model->setHeaderData(5, Qt::Horizontal, "Rep2", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 6, item);
     m_model->setHeaderData(6, Qt::Horizontal, "Rep3", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 7, item);
-    m_model->setHeaderData(7, Qt::Horizontal, "Rep4", Qt::DisplayRole);
+    m_model->setHeaderData(7, Qt::Horizontal, "Average", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 8, item);
-    m_model->setHeaderData(8, Qt::Horizontal, "Rep5", Qt::DisplayRole);
+    m_model->setHeaderData(8, Qt::Horizontal, "Max", Qt::DisplayRole);
 
     item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
     m_model->setItem(0, 9, item);
-    m_model->setHeaderData(9, Qt::Horizontal, "Rep6", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 10, item);
-    m_model->setHeaderData(10, Qt::Horizontal, "Rep7", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 11, item);
-    m_model->setHeaderData(11, Qt::Horizontal, "Rep8", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 12, item);
-    m_model->setHeaderData(12, Qt::Horizontal, "Rep9", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 13, item);
-    m_model->setHeaderData(13, Qt::Horizontal, "Rep10", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 14, item);
-    m_model->setHeaderData(14, Qt::Horizontal, "Average", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 15, item);
-    m_model->setHeaderData(15, Qt::Horizontal, "Max", Qt::DisplayRole);
-
-    item = new QStandardItem();
-    item->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-    m_model->setItem(0, 16, item);
-    m_model->setHeaderData(16, Qt::Horizontal, "CV", Qt::DisplayRole);
+    m_model->setHeaderData(9, Qt::Horizontal, "CV", Qt::DisplayRole);
 }
 
 void GripStrengthManager::readOutput() {
-   m_test.fromParadox(m_gripTestDbPath, m_gripTestDataDbPath);
+   m_test.readGripTestOptions(m_gripTestDbPath);
+   m_test.readGripTestResults(m_gripTestDataDbPath);
+
+   toJsonObject();
 }
+
 
 void GripStrengthManager::loadSettings(const QSettings& settings)
 {
@@ -183,11 +153,11 @@ void GripStrengthManager::saveSettings(QSettings* settings) const
 QJsonObject GripStrengthManager::toJsonObject() const
 {
     QJsonObject json = m_test.toJsonObject();
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        // simulate mode code
-    }
     json.insert("test_input", QJsonObject::fromVariantMap(m_inputData));
+
+    if (m_verbose)
+        qDebug() << json;
+
     return json;
 }
 
@@ -201,7 +171,7 @@ void GripStrengthManager::updateModel()
         if (Q_NULLPTR == exam_id)
         {
             exam_id = new QStandardItem();
-            exam_id->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+            exam_id->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
             m_model->setItem(row, 0, exam_id);
         }
         if (exam_id) {
@@ -213,98 +183,71 @@ void GripStrengthManager::updateModel()
         if (Q_NULLPTR == test_id)
         {
             test_id = new QStandardItem();
-            test_id->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
+            test_id->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
             m_model->setItem(row, 1, test_id);
         }
         if (test_id) {
             test_id->setData(measurement.getAttribute("test_id").value(), Qt::DisplayRole);
         }
 
-        //QStandardItem* position = m_model->item(row, 2);
-        //if (Q_NULLPTR == position)
-        //{
-        //    position = new QStandardItem();
-        //    position->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-        //    m_model->setItem(row, 2, position);
-        //}
-        //if (position) {
-        //    qDebug() << "position: " << measurement.getAttribute("position").value();
-        //    position->setData(measurement.getAttribute("position").value(), Qt::DisplayRole);
-        //}
+        QStandardItem* position = m_model->item(row, 2);
+        if (Q_NULLPTR == position)
+        {
+            position = new QStandardItem();
+            position->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+            m_model->setItem(row, 2, position);
+        }
+        if (position) {
+            qDebug() << "position: " << measurement.getAttribute("position").value();
+            position->setData(measurement.getAttribute("position").value(), Qt::DisplayRole);
+        }
 
-        //QStandardItem* side = m_model->item(row, 3);
-        //if(Q_NULLPTR == side)
-        //{
-        //    side = new QStandardItem();
-        //    side->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-        //    m_model->setItem(row, 3, side);
-        //}
-        //if (side) {
-        //    side->setData(measurement.getAttribute("side").value(), Qt::DisplayRole);
-        //}
+        QStandardItem* trial_side = m_model->item(row, 3);
+        if(Q_NULLPTR == trial_side)
+        {
+            trial_side = new QStandardItem();
+            trial_side ->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+            m_model->setItem(row, 3, trial_side);
+        }
+        if (trial_side) {
+            trial_side->setData(measurement.getAttribute("trial_side").value(), Qt::DisplayRole);
+        }
 
-        //QStandardItem* rep1 = m_model->item(row, 4);
-        //if(Q_NULLPTR == rep1)
-        //{
-        //    rep1 = new QStandardItem();
-        //    rep1->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-        //    m_model->setItem(row, 3, rep1);
-        //}
-        //if (rep1) {
-        //    rep1->setData(measurement.getAttribute("Rep1").value(), Qt::DisplayRole);
-        //}
-        //rep1->setData(measurement.getAttribute("Rep1").value(), Qt::DisplayRole);
+        QStandardItem* rep1 = m_model->item(row, 4);
+        if(Q_NULLPTR == rep1)
+        {
+            rep1 = new QStandardItem();
+            rep1->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+            m_model->setItem(row, 4, rep1);
+        }
+        if (rep1) {
+            rep1->setData(measurement.getAttribute("rep1").value(), Qt::DisplayRole);
+        }
+        rep1->setData(measurement.getAttribute("rep1").value(), Qt::DisplayRole);
 
-        //QStandardItem* rep2 = m_model->item(row, 4);
-        //if(Q_NULLPTR == side)
-        //{
-        //    rep2 = new QStandardItem();
-        //    rep2->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-        //    m_model->setItem(row, 3, rep2);
-        //}
-        //if (rep2) {
-        //    rep2->setData(measurement.getAttribute("Rep2").value(), Qt::DisplayRole);
-        //}
-        //rep2->setData(measurement.getAttribute("Rep2").value(), Qt::DisplayRole);
+        QStandardItem* rep2 = m_model->item(row, 5);
+        if(Q_NULLPTR == rep2)
+        {
+            rep2 = new QStandardItem();
+            rep2->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+            m_model->setItem(row, 5, rep2);
+        }
+        if (rep2) {
+            rep2->setData(measurement.getAttribute("rep2").value(), Qt::DisplayRole);
+        }
+        rep2->setData(measurement.getAttribute("rep2").value(), Qt::DisplayRole);
 
-        //QStandardItem* rep3 = m_model->item(row, 4);
-        //if(Q_NULLPTR == side)
-        //{
-        //    rep1 = new QStandardItem();
-        //    rep1->setTextAlignment(Qt::AlignRight | Qt::AlignCenter);
-        //    m_model->setItem(row, 3, rep1);
-        //}
-        //if (rep1) {
-        //    rep1->setData(measurement.getAttribute("side").value(), Qt::DisplayRole);
-        //}
-        //rep1->setData(measurement.getAttribute("Rep1").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep2 = m_model->item(row, 5);
-        //rep2->setData(measurement.getAttribute("Rep2").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep3 = m_model->item(row, 6);
-        //rep3->setData(measurement.getAttribute("Rep3").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep4 = m_model->item(row, 7);
-        //rep4->setData(measurement.getAttribute("Rep4").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep5 = m_model->item(row, 8);
-        //rep5->setData(measurement.getAttribute("Rep5").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep6 = m_model->item(row, 9);
-        //rep6->setData(measurement.getAttribute("Rep6").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep7 = m_model->item(row, 10);
-        //rep7->setData(measurement.getAttribute("Rep7").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep8 = m_model->item(row, 11);
-        //rep8->setData(measurement.getAttribute("Rep8").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep9 = m_model->item(row, 12);
-        //rep9->setData(measurement.getAttribute("Rep9").value(), Qt::DisplayRole);
-
-        //QStandardItem* rep10= m_model->item(row, 13);
-        //rep10->setData(measurement.getAttribute("Rep10").value(), Qt::DisplayRole);
+        QStandardItem* rep3 = m_model->item(row, 6);
+        if(Q_NULLPTR == rep3)
+        {
+            rep3 = new QStandardItem();
+            rep3->setTextAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+            m_model->setItem(row, 6, rep1);
+        }
+        if (rep3) {
+            rep3->setData(measurement.getAttribute("rep3").value(), Qt::DisplayRole);
+        }
+        rep3->setData(measurement.getAttribute("rep3").value(), Qt::DisplayRole);
 
         //QStandardItem* average= m_model->item(row, 14);
         //average->setData(measurement.getAttribute("Average").value(), Qt::DisplayRole);
@@ -473,5 +416,5 @@ void GripStrengthManager::setTestPath(const QString& path)
     if (!pathDir.isDir())
         throw "Database path is not a file";
 
-    m_gripTestDbPath = "C:/Users/clsa/Desktop/ZGripTest.DB";
+    m_gripTestDbPath = path;
 }

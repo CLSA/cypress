@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QList>
+#include <QTemporaryFile>
 
 typedef QList<QJsonObject> q_paradoxRecords;
 typedef QList<q_paradoxRecords> q_paradoxBlocks;
@@ -129,8 +130,13 @@ class ParadoxReader
 
         q_paradoxRecords Read();
         void closeDatabase();
+
+        DbHeader getHeader();
     private:
         void openDatabase(const QString& filePath);
+
+        void backupDatabase();
+        void restoreDatabase();
 
         // Methods for reading in header data
         void readHeader();
@@ -152,6 +158,9 @@ class ParadoxReader
 
         void handleError(QJsonObject* json, const QString& errorMsg);
        // void writeBlockInJson(QJsonObject* json, QList<ParadoxRecord> records, int blockNum);
+
+        QTemporaryFile examDbBackup;
+        QTemporaryFile resultsDbBackup;
 
         QFile m_dbFile;
         DbHeader m_header;

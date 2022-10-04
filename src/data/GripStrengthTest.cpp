@@ -3,19 +3,32 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "../auxiliary/tracker5util.h"
 
 const q_stringMap GripStrengthTest::testMetaMap = {
-    {"ExamID","exam_id"},
-    {"TestID","test_id"},
-    {"Rung","rung"},
-    {"MaxReps","max_reps"},
-    {"Sequence","sequence"},
-    {"RestTime","rest_time"},
-    {"Threshold","threshold"},
-    {"Units","units"},
+    {"Sequence", "sequence"},
+    {"Comparison", "comparison"},
+    {"MMDescription", "mm_description"},
+    {"MaxReps", "max_reps"},
+    {"NormType", "norm_type"},
+    {"Notes", "notes"},
+    {"PrimaryStat", "primary_stat"},
+    {"Rate", "rate"},
+    {"RestTime", "rest_time"},
+    {"Rung", "rung"},
+    {"Side", "side"},
+    {"Test", "test"},
+    {"TestID", "test_id"},
+    {"Threshold", "threshold"},
+    {"Units", "units"},
+    {"Position", "position"},
+    {"Rep", "rep"},
+    {"Max", "max"},
+    {"Avg", "avg"},
+    {"CV", "cv"},
 };
 
-// the minimum output data keys required from a successful a test
+// the minimum output data keys required from a successful Grip Strength test
 //
 GripStrengthTest::GripStrengthTest()
 {
@@ -23,35 +36,46 @@ GripStrengthTest::GripStrengthTest()
     m_outputKeyList.append(testMetaMap.values());
 }
 
-void GripStrengthTest::fromParadox(const QString& gripTestPath, const QString& gripTestDataPath)
+void GripStrengthTest::readGripTestOptions(const QString& gripTestPath)
 {
-    int participantId = 16777216;
     // Read in test information
     ParadoxReader gripTestReader(gripTestPath);
+    QList<QJsonObject> records = gripTestReader.Read();
+    foreach(const auto record, records) {
+        foreach(const auto tag, testMetaMap.toStdMap()){
+            if (record.contains(tag.first)) {
+                addMetaData(tag.second, record[tag.first].toVariant());
+            }
+        }
+    }
+}
 
-    //q_paradoxBlocks testBlocks = gripTestReader.Read();
-    //foreach(const auto block, testBlocks) {
-    //    if (block.count() == 1){
-    //        QJsonObject record = block[0];
-    //        if (record["TestID"].toInt() == participantId && record["Test"].toString().contains("Five Position Grip")) {
-    //            foreach(const auto tag, testMetaMap.toStdMap()){
-    //                if (record.contains(tag.first)) {
-    //                    addMetaData(tag.second, record[tag.first].toVariant());
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-
-    // TODO: figure out what the expected measurement count is
-    // For now set way higher than expected so measurements arent lost
-    setExpectedMeasurementCount(1000);
-
-    //Read in measurements
+void GripStrengthTest::readGripTestResults(const QString& gripTestDataPath)
+{
+    // Read test metadata
     ParadoxReader gripTestDataReader(gripTestDataPath);
+
+    // Read test results
     q_paradoxRecords testDataRecords = gripTestDataReader.Read();
-    foreach(const auto record, testDataRecords) {
+
+    foreach(QJsonObject record, testDataRecords) {
         GripStrengthMeasurement measurement;
+
+        QString unit = m_metaData.getAttribute(QString("units")).value().toString();
+        if (record.contains("Rep1")) {
+            qDebug() << Tracker5Util::asKg(record["Rep1"].toInt());
+            record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toInt());
+        }
+        if (record.contains("Rep2")) {
+            qDebug() << Tracker5Util::asKg(record["Rep2"].toInt());
+            record["Rep2"] = Tracker5Util::asKg(record["Rep2"].toInt());
+        }
+        if (record.contains("Rep3")) {
+            qDebug() << Tracker5Util::asKg(record["Rep3"].toInt());
+            record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toInt());
+        }
+
+        qDebug() << record;
         measurement.fromRecord(&record);
         if (measurement.isValid()) {
             addMeasurement(measurement);

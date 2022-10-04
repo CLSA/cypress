@@ -11,7 +11,7 @@ public:
     GripStrengthTest();
     ~GripStrengthTest() = default;
 
-    void fromParadox(const QString& gripTestPath, const QString& gripTestDataPath);
+    static const q_stringMap testMetaMap;
 
     // String representation for debug and GUI display purposes
     //
@@ -21,9 +21,10 @@ public:
 
     // String keys are converted to snake_case
     //
-    QJsonObject toJsonObject() const override;
+    void readGripTestOptions(const QString& gripTestPath);
+    void readGripTestResults(const QString& gripTestDataPath);
 
-    static const q_stringMap testMetaMap;
+    QJsonObject toJsonObject() const override;
 
 private:
     QStringList m_outputKeyList;
