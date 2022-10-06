@@ -1,6 +1,6 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql usb xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql usb xml network testlib
 
 CONFIG += c++11
 
@@ -13,7 +13,7 @@ SOURCES += \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
-    auxiliary/tracker5util.cpp \
+    #auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
@@ -60,6 +60,9 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+    server/server.cpp \
+    #tests/server/testserver.cpp \
+    tests/server/testserver.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -83,7 +86,7 @@ HEADERS += \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
-    auxiliary/tracker5util.h \
+    #auxiliary/tracker5util.h \
     data/AccessQueryHelper.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
@@ -131,6 +134,7 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+    server/server.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -142,7 +146,6 @@ HEADERS += \
     dialogs/DialogFactory.h \
     dialogs/ECGDialog.h \
     dialogs/FraxDialog.h \
-#    dialogs/ThermometerDialog.h \
     dialogs/SpirometerDialog.h \
     dialogs/TonometerDialog.h \
     dialogs/WeighScaleDialog.h \
@@ -159,7 +162,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    dialogs/gripstrengthdialog.ui \
+  dialogs/gripstrengthdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
@@ -170,5 +173,3 @@ FORMS += \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
-
-

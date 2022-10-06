@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
-#include "../auxiliary/tracker5util.h"
+//#include "../auxiliary/tracker5util.h"
 
 const q_stringMap GripStrengthTest::testMetaMap = {
     {"Sequence", "sequence"},
@@ -61,19 +61,19 @@ void GripStrengthTest::readGripTestResults(const QString& gripTestDataPath)
     foreach(QJsonObject record, testDataRecords) {
         GripStrengthMeasurement measurement;
 
-        QString unit = m_metaData.getAttribute(QString("units")).value().toString();
-        if (record.contains("Rep1")) {
-            qDebug() << Tracker5Util::asKg(record["Rep1"].toInt());
-            record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toInt());
-        }
-        if (record.contains("Rep2")) {
-            qDebug() << Tracker5Util::asKg(record["Rep2"].toInt());
-            record["Rep2"] = Tracker5Util::asKg(record["Rep2"].toInt());
-        }
-        if (record.contains("Rep3")) {
-            qDebug() << Tracker5Util::asKg(record["Rep3"].toInt());
-            record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toInt());
-        }
+        //QString unit = m_metaData.getAttribute(QString("units")).value().toString();
+        //if (record.contains("Rep1")) {
+        //    qDebug() << Tracker5Util::asKg(record["Rep1"].toInt());
+        //    record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toInt());
+        //}
+        //if (record.contains("Rep2")) {
+        //    qDebug() << Tracker5Util::asKg(record["Rep2"].toInt());
+        //    record["Rep2"] = Tracker5Util::asKg(record["Rep2"].toInt());
+        //}
+        //if (record.contains("Rep3")) {
+        //    qDebug() << Tracker5Util::asKg(record["Rep3"].toInt());
+        //    record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toInt());
+        //}
 
         qDebug() << record;
         measurement.fromRecord(&record);
