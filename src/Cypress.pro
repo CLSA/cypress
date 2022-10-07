@@ -1,6 +1,6 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql usb xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql usb xml network testlib
 
 CONFIG += c++11
 
@@ -60,6 +60,11 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+    server/GripStrengthRequestHandler.cpp \
+    server/InstrumentRequestHandlerFactory.cpp \
+    server/server.cpp \
+    #tests/server/testserver.cpp \
+    #tests/server/testserver.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -76,7 +81,7 @@ SOURCES += \
     dialogs/TonometerDialog.cpp \
     dialogs/WeighScaleDialog.cpp \
     CypressApplication.cpp \
-    main.cpp 
+    main.cpp
 
 HEADERS += \
     auxiliary/CommandLineParser.h \
@@ -131,6 +136,9 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+    server/GripStrengthRequestHandler.h \
+    server/InstrumentRequestHandlerFactory.h \
+    server/server.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -142,7 +150,6 @@ HEADERS += \
     dialogs/DialogFactory.h \
     dialogs/ECGDialog.h \
     dialogs/FraxDialog.h \
-#    dialogs/ThermometerDialog.h \
     dialogs/SpirometerDialog.h \
     dialogs/TonometerDialog.h \
     dialogs/WeighScaleDialog.h \
@@ -159,7 +166,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    dialogs/gripstrengthdialog.ui \
+  dialogs/gripstrengthdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
@@ -171,4 +178,26 @@ FORMS += \
 
 RESOURCES += \
 
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation #-lPocoFoundationd
+else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation
 
+INCLUDEPATH += $$PWD/../../poco/Foundation/include
+DEPENDPATH += $$PWD/../../poco/Foundation/include
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet #-lPocoNetd
+else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet
+
+INCLUDEPATH += $$PWD/../../poco/Net/include
+DEPENDPATH += $$PWD/../../poco/Net/include
+
+DISTFILES += \
+    index.html
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
+else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
+
+INCLUDEPATH += $$PWD/../../poco/Util/include
+DEPENDPATH += $$PWD/../../poco/Util/include
