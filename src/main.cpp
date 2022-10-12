@@ -1,14 +1,11 @@
-#include "CypressApplication.h"
-
-#include "./auxiliary/CommandLineParser.h"
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
 #include <QMessageBox>
 #include <QDebug>
-#include "./server/server.h"
-#include "./auxiliary/Constants.h"
 
+#include "CypressApplication.h"
+#include "./auxiliary/CommandLineParser.h"
 
 void displayError(const QString errMessage, CommandLineParser& parser) {
     QMessageBox::warning(
@@ -34,9 +31,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion("1.0.0");
 
     QApplication app(argc, argv);
-
-    Server server;
-    server.start();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

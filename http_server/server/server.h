@@ -15,19 +15,10 @@ class Server: public Poco::Util::ServerApplication
         Server();
         ~Server();
 
-        void start();
-        void end();
-
-        std::string getAddress();
-        int getPort();
-
-        void setConfig();
-        void getConfig();
-
-        void addHandler();
-        void removeHandler();
-
-        std::string toString();
+    protected:
+        void initialize(Application& self);
+        void uninitialize();
+        int main(const std::vector<std::string>& args);
 
     private:
         Poco::Net::HTTPServer* m_httpServer;

@@ -87,8 +87,8 @@ class DbHeader
 
 class ParadoxDbBlock {
     public:
-        ParadoxDbBlock(const qint32& blockNumber, const qint32& nextBlock, const qint32& prevBlock,
-        const int& offsetToLastRecord, const long& fileOffset, const qint32& addDataSize, const DbHeader* header) :
+        ParadoxDbBlock(qint32 blockNumber, qint32 nextBlock, qint32 prevBlock,
+        int offsetToLastRecord, long fileOffset, qint32 addDataSize, DbHeader* header) :
         m_blockNumber(blockNumber),
         m_nextBlock(nextBlock),
         m_prevBlock(prevBlock),
@@ -106,13 +106,13 @@ class ParadoxDbBlock {
         QList<QJsonObject> readRecords(QFile& dbFile);
 
     private:
-        const qint32 m_blockNumber;
-        const qint32 m_nextBlock;
-        const qint32 m_prevBlock;
-        const qint32 m_offsetToLastRecord;
-        const qint32 m_fileOffset;
-        const qint32 m_addDataSize;
-        const DbHeader* m_dbHeader;
+        qint32 m_blockNumber;
+        qint32 m_nextBlock;
+        qint32 m_prevBlock;
+        qint32 m_offsetToLastRecord;
+        qint32 m_fileOffset;
+        qint32 m_addDataSize;
+        DbHeader* m_dbHeader;
 
         QJsonObject readRecord(QFile& dbFile);
 

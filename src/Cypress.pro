@@ -60,9 +60,9 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
-    server/GripStrengthRequestHandler.cpp \
-    server/InstrumentRequestHandlerFactory.cpp \
-    server/server.cpp \
+    #server/GripStrengthRequestHandler.cpp \
+    #server/InstrumentRequestHandlerFactory.cpp \
+    #server/server.cpp \
     #tests/server/testserver.cpp \
     #tests/server/testserver.cpp \
     widgets/BarcodeWidget.cpp \
@@ -136,9 +136,6 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
-    server/GripStrengthRequestHandler.h \
-    server/InstrumentRequestHandlerFactory.h \
-    server/server.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -155,8 +152,8 @@ HEADERS += \
     dialogs/WeighScaleDialog.h \
     CypressApplication.h
 
-TRANSLATIONS += \
-    Cypress_en_CA.ts
+#TRANSLATIONS += \
+#    Cypress_en_CA.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
@@ -177,27 +174,3 @@ FORMS += \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation #-lPocoFoundationd
-else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation
-
-INCLUDEPATH += $$PWD/../../poco/Foundation/include
-DEPENDPATH += $$PWD/../../poco/Foundation/include
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet #-lPocoNetd
-else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet
-
-INCLUDEPATH += $$PWD/../../poco/Net/include
-DEPENDPATH += $$PWD/../../poco/Net/include
-
-DISTFILES += \
-    index.html
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
-else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
-
-INCLUDEPATH += $$PWD/../../poco/Util/include
-DEPENDPATH += $$PWD/../../poco/Util/include
