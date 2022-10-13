@@ -9,6 +9,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    RetinalCameraDialog.cpp \
     auxiliary/CommandLineParser.cpp \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
@@ -56,15 +57,11 @@ SOURCES += \
     managers/GripStrengthManager.cpp \
     managers/ManagerBase.cpp \
     managers/ParadoxReader.cpp \
+    managers/RetinalCameraManager.cpp \
     managers/SerialPortManager.cpp \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
-    #server/GripStrengthRequestHandler.cpp \
-    #server/InstrumentRequestHandlerFactory.cpp \
-    #server/server.cpp \
-    #tests/server/testserver.cpp \
-    #tests/server/testserver.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -76,14 +73,15 @@ SOURCES += \
     dialogs/DialogFactory.cpp \
     dialogs/FraxDialog.cpp \
     dialogs/ECGDialog.cpp \
-#    dialogs/ThermometerDialog.cpp \
     dialogs/SpirometerDialog.cpp \
     dialogs/TonometerDialog.cpp \
     dialogs/WeighScaleDialog.cpp \
+    RetinalCameraDialog.cpp \
     CypressApplication.cpp \
     main.cpp
 
 HEADERS += \
+    RetinalCameraDialog.h \
     auxiliary/CommandLineParser.h \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
@@ -132,6 +130,7 @@ HEADERS += \
     managers/GripStrengthManager.h \
     managers/ManagerBase.h \
     managers/ParadoxReader.h \
+    managers/RetinalCameraManager.h \
     managers/SerialPortManager.h \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
@@ -150,6 +149,7 @@ HEADERS += \
     dialogs/SpirometerDialog.h \
     dialogs/TonometerDialog.h \
     dialogs/WeighScaleDialog.h \
+    RetinalCameraDialog.h \
     CypressApplication.h
 
 #TRANSLATIONS += \
@@ -163,6 +163,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
+    RetinalCameraDialog.ui \
   dialogs/gripstrengthdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \

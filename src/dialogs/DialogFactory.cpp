@@ -11,6 +11,7 @@
 #include "TonometerDialog.h"
 #include "WeighScaleDialog.h"
 #include "GripStrengthDialog.h"
+#include "RetinalCameraDialog.h"
 //#include "ThermometerDialog.h"
 
 #include <QDebug>
@@ -71,6 +72,7 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
         dialog = new GripStrengthDialog();
         break;
       case Constants::MeasureType::typeRetinal_Camera:
+        dialog = new RetinalCameraDialog();
         break;
       case Constants::MeasureType::typeECG:
         dialog = new ECGDialog();

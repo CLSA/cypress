@@ -60,7 +60,6 @@ void GripStrengthDialog::initializeConnections()
 }
 
 bool GripStrengthDialog::handleClose() {
-    qDebug() << "closing grip strength";
     return this -> close();
 }
 
