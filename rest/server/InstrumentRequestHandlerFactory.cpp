@@ -1,52 +1,69 @@
-#include "InstrumentRequestHandlerFactory.h"
-
-#include <QDebug>
+#include <iostream>
+#include <string>
 
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
-
-#include <QString>
-#include <iostream>
-
-#include "GripStrengthRequestHandler.h"
-#include "DefaultRequestHandler.h"
+#include <QDebug>
+#include <QMap>
 
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 
+#include "DefaultRequestHandler.h"
+#include "InstrumentRequestHandlerFactory.h"
+#include "GripStrengthRequestHandler.h"
 
-InstrumentRequestHandlerFactory::InstrumentRequestHandlerFactory()
+using namespace Poco::Net;
+
+InstrumentRequestHandlerFactory::InstrumentRequestHandlerFactory() {}
+InstrumentRequestHandlerFactory::~InstrumentRequestHandlerFactory() {}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
-
-}
-
-InstrumentRequestHandlerFactory::~InstrumentRequestHandlerFactory()
-{
-
-}
-
-Poco::Net::HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest &request)
-{
-    static QRegularExpression gripStrength(R"(^/grip-strength/?$)");
-    static QRegularExpression retinalScan(R"(^/retinal-scan/?$)");
-
-    if (!gripStrength.isValid()) {
-        qDebug() << gripStrength.errorString();
-    }
+    // Iterate through the URL map and match the URI with a defined regex, returning the appropriate handler,
+    // if there is no match, return the default (404) request handler.
+    //
 
     QString uri = QString::fromStdString(request.getURI());
-
     QRegularExpressionMatch match;
-    match = gripStrength.match(uri);
+    QMap<QString, createRequestHandlerImpl>::const_iterator i = urlMap.constBegin();
+    while (i != urlMap.constEnd())
+    {
+        QString regexStr = i.key();
+        QRegularExpression regex(regexStr);
+        createRequestHandlerImpl requestHandlerFactoryFunc = i.value();
 
-    if (match.hasMatch()) {
-        return new GripStrengthRequestHandler;
-    }
+        match = regex.match(uri);
+        if (match.hasMatch())
+        {
+            return requestHandlerFactoryFunc();
+        }
 
-    match = retinalScan.match(uri);
-    if (match.hasMatch()) {
-        return new DefaultRequestHandler;
+        ++i;
     }
 
     return new DefaultRequestHandler;
 }
+
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createGripStrengthHandler()
+{
+   return new GripStrengthRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createRetinalCameraHandler()
+{
+   return new GripStrengthRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createUltrasoundHandler()
+{
+   return new GripStrengthRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createDXAHandler()
+{
+   return new GripStrengthRequestHandler;
+}
+
+

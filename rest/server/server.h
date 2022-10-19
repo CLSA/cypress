@@ -2,11 +2,14 @@
 #define SERVER_H
 
 #include "Poco/Net/HTTPServer.h"
-#include "Poco/Util/ServerApplication.h"
-#include <string>
 
-class Server: public Poco::Util::ServerApplication
+#include <QObject>
+#include <QThread>
+
+class Server: public QObject
 {
+    Q_OBJECT
+
     enum Ports {
         DEFAULT_PORT = 8000
     };
@@ -14,18 +17,13 @@ class Server: public Poco::Util::ServerApplication
     public:
         Server();
         ~Server();
-
-    protected:
-        void initialize(Application& self);
-        void uninitialize();
-        int main(const std::vector<std::string>& args);
+        void start();
+        void stop();
 
     private:
-        Poco::Net::HTTPServer* m_httpServer;
+        Poco::Net::HTTPServer* server;
+        QThread serverThread;
 
-        void listen();
-        void parse();
-        void route();
 };
 
 #endif // SERVER_H
