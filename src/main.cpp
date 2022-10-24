@@ -25,14 +25,54 @@ void displayHelp(CommandLineParser& parser) {
     );
 }
 
+// On windows, .ini file can be found at C:\Users\<User>\AppData\Roaming\CLSA\Cypress.ini
+//
+void initializeDefaultSettings(QSettings& settings) {
+    // .ini file already exists on system, don't overwrite
+    //if (settings.value("dicom/port").toInt())
+    //{
+    //    qDebug() << ".ini file exists";
+    //    return;
+    //}
+    settings.setValue("pine/host", "");
+    settings.setValue("pine/port", "");
+
+    settings.setValue("rest_api/host", "127.0.0.1");
+    settings.setValue("rest_api/port", 9000);
+    settings.setValue("rest_api/args", "");
+
+    settings.setValue("dicom/port", 9000);
+    settings.setValue("dicom/host", "127.0.0.1");
+    settings.setValue("dicom/args", "");
+
+    settings.setValue("instruments/grip_strength/exe", "WTS.exe");
+    settings.setValue("instruments/grip_strength/dir", "C:/Program Files (x86)/Tracker 5");
+    settings.setValue("instruments/grip_strength/tests", "C:/work/clsa/cypress/GripStrengthData/ZGripTest_After_Test.DB");
+    settings.setValue("instruments/grip_strength/results", "C:/work/clsa/cypress/GripStrengthData/ZGripTestData_After_Test.DB");
+
+
+    // default patient id to use (db is cleared each time)
+    settings.setValue("instruments/retinal_scan/patient_id", "11111111-2222-3333-4444-555555555555");
+    settings.setValue("instruments/retinal_scan/exe", "C:/Program Files/Mozilla Firefox/firefox.exe");
+    settings.setValue("instruments/retinal_scan/database/version", "MSSQL Server 2008 R2 Express");
+    settings.setValue("instruments/retinal_scan/database/driver", "QODBC");
+    settings.setValue("instruments/retinal_scan/database/host", "127.0.0.1");
+    settings.setValue("instruments/retinal_scan/database/port", 9000);
+    settings.setValue("instruments/retinal_scan/database/user", "Anthony");
+    settings.setValue("instruments/retinal_scan/database/password", "");
+    settings.setValue("instruments/retinal_scan/database/database", "dbo");
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setOrganizationName("CLSA");
     QCoreApplication::setOrganizationDomain("clsa-elcv.ca");
     QCoreApplication::setApplicationName("Cypress");
     QCoreApplication::setApplicationVersion("1.0.0");
+
     QApplication app(argc, argv);
-    QSettings settings;
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    initializeDefaultSettings(settings);
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

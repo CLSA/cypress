@@ -48,6 +48,7 @@ void GripStrengthDialog::initializeConnections()
       {
           // launch the manager
           //
+          qDebug() << "run";
           this->run();
       }
       else

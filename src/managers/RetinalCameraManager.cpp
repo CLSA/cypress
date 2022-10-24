@@ -1,8 +1,9 @@
 #include <QProcess>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-
+#include <QJsonDocument>
 #include <QFileInfo>
+#include <QSettings>
 
 #include "RetinalCameraManager.h"
 #include "qsqlerror.h"
@@ -11,7 +12,26 @@
 RetinalCameraManager::RetinalCameraManager(QObject *parent)
     : ManagerBase{parent}
 {
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 
+    m_runnableName      = settings.value("instruments/retinal_scan/exe").toString();
+    m_defaultPatientUid = settings.value("instruments/retinal_scan/patient_id").toString();
+    m_databaseVersion   = settings.value("instruments/retinal_scan/database/version").toString();
+    m_databaseDriver    = settings.value("instruments/retinal_scan/database/driver").toString();
+    m_database		    = settings.value("instruments/retinal_scan/database/database").toString();
+    m_databaseHost      = settings.value("instruments/retinal_scan/database/host").toString();
+    m_databasePort      = settings.value("instruments/retinal_scan/database/port").toString();
+    m_databaseUser      = settings.value("instruments/retinal_scan/database/user").toString();
+    m_databasePassword  = settings.value("instruments/retinal_scan/database/password").toString();
+
+    qInfo() << m_runnableName;
+    qInfo() << m_defaultPatientUid;
+    qInfo() << m_databaseVersion;
+    qInfo() << m_databaseDriver;
+    qInfo() << m_databaseHost;
+    qInfo() << m_databasePort;
+    qInfo() << m_databaseUser;
+    qInfo() << m_databasePassword;
 }
 
 // load and save device, paths and other constant settings to .ini
@@ -29,10 +49,12 @@ void RetinalCameraManager::saveSettings(QSettings*) const
 }
 
 
-void RetinalCameraManager::setInputData(const QVariantMap &)
+void RetinalCameraManager::setInputData(const QVariantMap &data)
 {
     if (m_verbose)
         qDebug() << "RetinalCameraManager::setInputData";
+
+    m_inputData = data;
 }
 
 // collate test results and device and other meta data
@@ -43,7 +65,7 @@ QJsonObject RetinalCameraManager::toJsonObject() const
     if (m_verbose)
         qDebug() << "RetinalCameraManager::toJsonObject";
 
-    return QJsonObject();
+    return QJsonDocument::fromVariant(m_inputData).object();
 }
 
 // build a model from test and measurement data for UI display
@@ -79,17 +101,17 @@ void RetinalCameraManager::start()
     if (m_verbose)
         qDebug() << "RetinalCameraManager::start";
 
-    QString program = "C:/Program Files/Mozilla Firefox/firefox.exe";
-    QFileInfo info(program);
+    QFileInfo info(m_runnableName);
     QStringList arguments;
 
 
     // Open DB connection and clean up database
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-    db.setHostName("dbo");
-    db.setDatabaseName("dbo");
-    db.setUserName("Anthony");
-    db.setPassword("");
+    QSqlDatabase db = QSqlDatabase::addDatabase(m_databaseDriver);
+    db.setHostName(m_databaseHost);
+    db.setDatabaseName(m_database);
+    db.setUserName(m_databaseUser);
+    db.setPassword(m_databasePassword);
+
     bool ok = db.open();
 
     if (!ok)
@@ -103,9 +125,8 @@ void RetinalCameraManager::start()
     // clean up
     //
 
-    const QString patientId = "11111111-2222-3333-4444-555555555555";
     // delete all images returned
-    ok = query.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + patientId + "'");
+    ok = query.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
     if (!ok) qDebug() << query.lastError();
     while (query.next()) {
         QString fileName = query.value(0).toString();
@@ -124,16 +145,16 @@ void RetinalCameraManager::start()
         qDebug() << fileName << " " << fileExt << " " << storagePathUid;
     }
 
-    ok = query.exec("DELETE FROM dbo.Exams WHERE PatientUid = '" + patientId + "'");
+    ok = query.exec("DELETE FROM dbo.Exams WHERE PatientUid = '" + m_defaultPatientUid + "'");
     if (!ok) qDebug() << query.lastError();
 
-    ok = query.exec("DELETE FROM dbo.Media WHERE PatientUid = '" + patientId + "'");
+    ok = query.exec("DELETE FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
     if (!ok) qDebug() << query.lastError();
 
-    ok = query.exec("DELETE FROM dbo.Patients WHERE PatientUid = '" + patientId + "'");
+    ok = query.exec("DELETE FROM dbo.Patients WHERE PatientUid = '" + m_defaultPatientUid + "'");
     if (!ok) qDebug() << query.lastError();
 
-    ok = query.exec("DELETE FROM dbo.Persons WHERE PersonUid = '" + patientId + "'");
+    ok = query.exec("DELETE FROM dbo.Persons WHERE PersonUid = '" + m_defaultPatientUid + "'");
     if (!ok) qDebug() << query.lastError();
 
     // initialize DB data
@@ -145,13 +166,13 @@ void RetinalCameraManager::start()
 
     if (!info.exists())
     {
-       qDebug() << "Program does not exist: " << program;
+       qDebug() << "Program does not exist: " << m_runnableName;
        return;
     }
 
     if (!info.isExecutable())
     {
-        qDebug() << "Program is not executable: " << program;
+        qDebug() << "Program is not executable: " << m_runnableName;
         return;
     }
 
@@ -161,7 +182,7 @@ void RetinalCameraManager::start()
         qDebug() << "cleaning database..";
 
 
-    m_process.setProgram(program);
+    m_process.setProgram(m_runnableName);
     m_process.start();
 
     bool started = m_process.waitForStarted();
@@ -196,7 +217,7 @@ void RetinalCameraManager::start()
     //
     QSqlQuery dataQuery;
 
-    ok = dataQuery.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + patientId + "'");
+    ok = dataQuery.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
     if (!ok) qDebug() << dataQuery.lastError();
 
     while (dataQuery.next()) {
@@ -204,7 +225,7 @@ void RetinalCameraManager::start()
         QString fileExt = dataQuery.value(1).toString();
         QString storagePathUid = dataQuery.value(2).toString();
 
-        ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + storagePathUid + "'");
+        ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + m_defaultPatientUid + "'");
 
         if (!ok) qDebug() << query.lastError();
 
