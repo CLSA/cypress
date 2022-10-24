@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QThread>
 
+using namespace Poco::Net;
+
 class Server: public QObject
 {
     Q_OBJECT
@@ -17,11 +19,15 @@ class Server: public QObject
     public:
         Server();
         ~Server();
+
         void start();
         void stop();
 
+        const QThread& getThread();
+        HTTPServer* getHTTPServer();
+
     private:
-        Poco::Net::HTTPServer* server;
+        HTTPServer* server;
         QThread serverThread;
 
 };

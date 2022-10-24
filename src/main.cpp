@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QSettings>
 #include <QLocale>
 #include <QTranslator>
 #include <QMessageBox>
@@ -6,6 +7,7 @@
 
 #include "CypressApplication.h"
 #include "./auxiliary/CommandLineParser.h"
+
 
 void displayError(const QString errMessage, CommandLineParser& parser) {
     QMessageBox::warning(
@@ -29,8 +31,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("clsa-elcv.ca");
     QCoreApplication::setApplicationName("Cypress");
     QCoreApplication::setApplicationVersion("1.0.0");
-
     QApplication app(argc, argv);
+    QSettings settings;
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -67,6 +69,12 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
     }
 
+    // Runs in separate thread
+    //Server restApiServer;
+    //const QThread& thread = restApiServer.getThread();
+
+
+
     CypressApplication cypress;
     try
     {
@@ -81,5 +89,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    //restApiServer.start();
     return app.exec();
 }
