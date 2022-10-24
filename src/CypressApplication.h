@@ -17,6 +17,9 @@ public:
     void setArgs(const QVariantMap&);
     void initialize();
 
+public slots:
+    bool startTest();
+
 private:
     QString m_inputFileName; // TODO this data should be from POST request in production
     QString m_outputFileName; // TODO ""

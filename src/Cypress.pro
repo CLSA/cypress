@@ -62,6 +62,11 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+    rest/DefaultRequestHandler.cpp \
+    rest/RetinalCameraRequestHandler.cpp \
+    rest/server/GripStrengthRequestHandler.cpp \
+    rest/server/InstrumentRequestHandlerFactory.cpp \
+    rest/server/server.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -135,6 +140,11 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+    rest/DefaultRequestHandler.h \
+    rest/RetinalCameraRequestHandler.h \
+    rest/server/GripStrengthRequestHandler.h \
+    rest/server/InstrumentRequestHandlerFactory.h \
+    rest/server/server.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -180,3 +190,9 @@ FORMS += \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
+
+SUBDIRS += \
+    rest/rest.pro
+
+DISTFILES += \
+    rest/server/pages/index.html
