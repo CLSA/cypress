@@ -35,6 +35,7 @@ void initializeDefaultSettings(QSettings& settings) {
     //    qDebug() << ".ini file exists";
     //    return;
     //}
+
     settings.setValue("pine/host", "");
     settings.setValue("pine/port", "");
 
@@ -44,13 +45,15 @@ void initializeDefaultSettings(QSettings& settings) {
 
     settings.setValue("dicom/port", 9000);
     settings.setValue("dicom/host", "127.0.0.1");
-    settings.setValue("dicom/args", "");
+    settings.setValue("dicom/asc_config", "./storescp.cfg");
+    settings.setValue("dicom/log_config", "./logger.cfg");
+    settings.setValue("dicom/out_dir", "C:/Users/Anthony/Documents/PACS");
+    settings.setValue("dicom/args", "--series-date-subdir --short-unique-names --filename-extension .dcm");
 
     settings.setValue("instruments/grip_strength/exe", "WTS.exe");
     settings.setValue("instruments/grip_strength/dir", "C:/Program Files (x86)/Tracker 5");
     settings.setValue("instruments/grip_strength/tests", "C:/work/clsa/cypress/GripStrengthData/ZGripTest_After_Test.DB");
     settings.setValue("instruments/grip_strength/results", "C:/work/clsa/cypress/GripStrengthData/ZGripTestData_After_Test.DB");
-
 
     // default patient id to use (db is cleared each time)
     settings.setValue("instruments/retinal_scan/patient_id", "11111111-2222-3333-4444-555555555555");
