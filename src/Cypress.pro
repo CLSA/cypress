@@ -16,6 +16,7 @@ SOURCES += \
     auxiliary/Utilities.cpp \
     auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
+    data/ApSpineTest.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
     data/BodyCompositionMeasurement.cpp \
@@ -24,13 +25,17 @@ SOURCES += \
     data/CDTTTest.cpp \
     data/ChoiceReactionMeasurement.cpp \
     data/ChoiceReactionTest.cpp \
+    data/DXATest.cpp \
     data/ECGMeasurement.cpp \
     data/ECGTest.cpp \
     data/ExcelQueryHelper.cpp \
+    data/ForearmTest.cpp \
     data/FraxMeasurement.cpp \
     data/FraxTest.cpp \
-    data/GripStrengthMeasurement.cpp \
-    data/GripStrengthTest.cpp \
+    data/HipTest.cpp \
+    data/WholeBodyScanTest.cpp \
+    data/grip_strength/GripStrengthMeasurement.cpp \
+    data/grip_strength/GripStrengthTest.cpp \
     data/HearingMeasurement.cpp \
     data/HearingTest.cpp \
     data/Measurement.cpp \
@@ -46,6 +51,8 @@ SOURCES += \
     managers/AudiometerManager.cpp \
     managers/CDTTManager.cpp \
     managers/ChoiceReactionManager.cpp \
+    managers/dxa/ApSpineScanManager.cpp \
+    managers/dxa/DXAManager.cpp \
     managers/EMRPluginWriter.cpp \
     managers/BodyCompositionManager.cpp \
 #    managers/BluetoothLEManager.cpp \
@@ -54,14 +61,19 @@ SOURCES += \
     managers/BPMMessage.cpp \
     managers/ECGManager.cpp \
     managers/FraxManager.cpp \
-    managers/GripStrengthManager.cpp \
     managers/ManagerBase.cpp \
-    managers/ParadoxReader.cpp \
-    managers/RetinalCameraManager.cpp \
     managers/SerialPortManager.cpp \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+    managers/dxa/DXAManager.cpp \
+    managers/dxa/ForearmScanManager.cpp \
+    managers/dxa/HipScanManager.cpp \
+    managers/dxa/IVAImagingScanManager.cpp \
+    managers/dxa/WholeBodyScanManager.cpp \
+    managers/grip_strength/GripStrengthManager.cpp \
+    managers/grip_strength/ParadoxReader.cpp \
+    managers/retinal_camera/RetinalCameraManager.cpp \
     rest/DefaultRequestHandler.cpp \
     rest/RetinalCameraRequestHandler.cpp \
     rest/server/GripStrengthRequestHandler.cpp \
@@ -93,6 +105,7 @@ HEADERS += \
     auxiliary/Utilities.h \
     auxiliary/tracker5util.h \
     data/AccessQueryHelper.h \
+    data/ApSpineTest.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
     data/BodyCompositionMeasurement.h \
@@ -101,13 +114,17 @@ HEADERS += \
     data/CDTTTest.h \
     data/ChoiceReactionMeasurement.h \
     data/ChoiceReactionTest.h \
+    data/DXATest.h \
     data/ECGMeasurement.h \
     data/ECGTest.h \
     data/ExcelQueryHelper.h \
+    data/ForearmTest.h \
     data/FraxMeasurement.h \
     data/FraxTest.h \
-    data/GripStrengthMeasurement.h \
-    data/GripStrengthTest.h \
+    data/HipTest.h \
+    data/WholeBodyScanTest.h \
+    data/grip_strength/GripStrengthMeasurement.h \
+    data/grip_strength/GripStrengthTest.h \
     data/HearingMeasurement.h \
     data/HearingTest.h \
     data/Measurement.h \
@@ -129,17 +146,25 @@ HEADERS += \
     managers/BPMMessage.h \
     managers/CDTTManager.h \
     managers/ChoiceReactionManager.h \
+    managers/dxa/ApSpineScanManager.h \
+    managers/dxa/DXAManager.h \
     managers/ECGManager.h \
     managers/EMRPluginWriter.h \
     managers/FraxManager.h \
-    managers/GripStrengthManager.h \
+    managers/dxa/ForearmScanManager.h \
+    managers/dxa/HipScanManager.h \
+    managers/dxa/IVAImagingScanManager.h \
+    managers/dxa/WholeBodyScanManager.h \
+    managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
-    managers/ParadoxReader.h \
-    managers/RetinalCameraManager.h \
     managers/SerialPortManager.h \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+    managers/dxa/DXAManager.h \
+    managers/grip_strength/GripStrengthManager.h \
+    managers/grip_strength/ParadoxReader.h \
+    managers/retinal_camera/RetinalCameraManager.h \
     rest/DefaultRequestHandler.h \
     rest/RetinalCameraRequestHandler.h \
     rest/server/GripStrengthRequestHandler.h \

@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include <QJsonObject>
-#include "../auxiliary/Utilities.h"
 
 const q_stringMap GripStrengthMeasurement::trialMap =
 {

@@ -1,8 +1,8 @@
 #ifndef GRIPSTRENGTHMANAGER_H
 #define GRIPSTRENGTHMANAGER_H
 
-#include "ManagerBase.h"
-#include "../data/GripStrengthTest.h"
+#include "../ManagerBase.h"
+#include "data/grip_strength/GripStrengthTest.h"
 
 #include <QProcess>
 

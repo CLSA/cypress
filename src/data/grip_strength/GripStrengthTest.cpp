@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
-#include "../auxiliary/tracker5util.h"
+#include "auxiliary/tracker5util.h"
 
 const q_stringMap GripStrengthTest::testMetaMap = {
     {"Sequence", "sequence"},

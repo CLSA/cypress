@@ -4,6 +4,7 @@
 #include <QTranslator>
 #include <QMessageBox>
 #include <QDebug>
+#include <QProcess>
 
 #include "CypressApplication.h"
 #include "rest/server/server.h"
@@ -120,7 +121,6 @@ int main(int argc, char *argv[])
 
     // Runs in separate thread
     server->start();
-
 
     return app.exec();
 }
