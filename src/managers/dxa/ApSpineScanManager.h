@@ -2,6 +2,7 @@
 #define APSPINESCANMANAGER_H
 
 #include "DXAManager.h"
+#include "data/dxa/tests/ApSpineTest.h"
 
 class APSpineScanManager : public DXAManager
 {
@@ -17,6 +18,9 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+private:
+    ApSpineTest m_test;
 };
 
 #endif // APSPINESCANMANAGER_H

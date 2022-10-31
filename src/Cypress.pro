@@ -16,7 +16,6 @@ SOURCES += \
     auxiliary/Utilities.cpp \
     auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
-    data/ApSpineTest.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
     data/BodyCompositionMeasurement.cpp \
@@ -25,17 +24,25 @@ SOURCES += \
     data/CDTTTest.cpp \
     data/ChoiceReactionMeasurement.cpp \
     data/ChoiceReactionTest.cpp \
-    data/DXATest.cpp \
     data/ECGMeasurement.cpp \
     data/ECGTest.cpp \
     data/ExcelQueryHelper.cpp \
-    data/ForearmTest.cpp \
     data/FraxMeasurement.cpp \
     data/FraxTest.cpp \
-    data/HipTest.cpp \
-    data/WholeBodyScanTest.cpp \
-    data/grip_strength/GripStrengthMeasurement.cpp \
-    data/grip_strength/GripStrengthTest.cpp \
+    data/dxa/PatScanQueryHelper.cpp \
+    data/dxa/ReferenceQueryHelper.cpp \
+    data/dxa/measurements/ApSpineMeasurement.cpp \
+    data/dxa/measurements/DXAMeasurement.cpp \
+    data/dxa/measurements/ForearmMeasurement.cpp \
+    data/dxa/measurements/HipMeasurement.cpp \
+    data/dxa/measurements/IVAImagingMeasurement.cpp \
+    data/dxa/measurements/WholeBodyScanMeasurement.cpp \
+    data/dxa/tests/ApSpineTest.cpp \
+    data/dxa/tests/DXATest.cpp \
+    data/dxa/tests/ForearmTest.cpp \
+    data/dxa/tests/HipTest.cpp \
+    data/dxa/tests/IVAImagingTest.cpp \
+    data/dxa/tests/WholeBodyScanTest.cpp \
     data/HearingMeasurement.cpp \
     data/HearingTest.cpp \
     data/Measurement.cpp \
@@ -47,6 +54,8 @@ SOURCES += \
     data/TonometerTest.cpp \
     data/WeightMeasurement.cpp \
     data/WeighScaleTest.cpp \
+    data/grip_strength/measurements/GripStrengthMeasurement.cpp \
+    data/grip_strength/tests/GripStrengthTest.cpp \
     dialogs/GripStrengthDialog.cpp \
     managers/AudiometerManager.cpp \
     managers/CDTTManager.cpp \
@@ -71,6 +80,7 @@ SOURCES += \
     managers/dxa/HipScanManager.cpp \
     managers/dxa/IVAImagingScanManager.cpp \
     managers/dxa/WholeBodyScanManager.cpp \
+    managers/dxa/dicom/DicomSCP.cpp \
     managers/grip_strength/GripStrengthManager.cpp \
     managers/grip_strength/ParadoxReader.cpp \
     managers/retinal_camera/RetinalCameraManager.cpp \
@@ -105,7 +115,6 @@ HEADERS += \
     auxiliary/Utilities.h \
     auxiliary/tracker5util.h \
     data/AccessQueryHelper.h \
-    data/ApSpineTest.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
     data/BodyCompositionMeasurement.h \
@@ -114,17 +123,24 @@ HEADERS += \
     data/CDTTTest.h \
     data/ChoiceReactionMeasurement.h \
     data/ChoiceReactionTest.h \
-    data/DXATest.h \
     data/ECGMeasurement.h \
     data/ECGTest.h \
     data/ExcelQueryHelper.h \
-    data/ForearmTest.h \
     data/FraxMeasurement.h \
     data/FraxTest.h \
-    data/HipTest.h \
-    data/WholeBodyScanTest.h \
-    data/grip_strength/GripStrengthMeasurement.h \
-    data/grip_strength/GripStrengthTest.h \
+    data/dxa/PatScanQueryHelper.h \
+    data/dxa/ReferenceQueryHelper.h \
+    data/dxa/measurements/ApSpineMeasurement.h \
+    data/dxa/measurements/DXAMeasurement.h \
+    data/dxa/measurements/ForearmMeasurement.h \
+    data/dxa/measurements/HipMeasurement.h \
+    data/dxa/measurements/IVAImagingMeasurement.h \
+    data/dxa/measurements/WholeBodyScanMeasurement.h \
+    data/dxa/tests/ApSpineTest.h \
+    data/dxa/tests/ForearmTest.h \
+    data/dxa/tests/HipTest.h \
+    data/dxa/tests/IVAImagingTest.h \
+    data/dxa/tests/WholeBodyScanTest.h \
     data/HearingMeasurement.h \
     data/HearingTest.h \
     data/Measurement.h \
@@ -137,6 +153,8 @@ HEADERS += \
 #    data/TemperatureTest.h \
     data/WeightMeasurement.h \
     data/WeighScaleTest.h \
+    data/grip_strength/measurements/GripStrengthMeasurement.h \
+    data/grip_strength/tests/GripStrengthTest.h \
     dialogs/GripStrengthDialog.h \
     managers/AudiometerManager.h \
     managers/BloodPressureManager.h \
@@ -155,6 +173,7 @@ HEADERS += \
     managers/dxa/HipScanManager.h \
     managers/dxa/IVAImagingScanManager.h \
     managers/dxa/WholeBodyScanManager.h \
+    managers/dxa/dicom/DicomSCP.h \
     managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
     managers/SerialPortManager.h \

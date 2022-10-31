@@ -54,5 +54,6 @@ QMap<QString, QVariant> WholeBodyScanManager::extractData()
     //   m_test.data[key] = analysisData[key];
     //}
 
-    return m_test.data;
+    //return m_test.data;
+    return QMap<QString, QVariant> {{}};
 }

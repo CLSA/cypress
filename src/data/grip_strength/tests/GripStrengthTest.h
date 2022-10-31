@@ -2,7 +2,7 @@
 #define GRIPSTRENGTHTEST_H
 
 #include "data/TestBase.h"
-#include "GripStrengthMeasurement.h"
+#include "data/grip_strength/measurements/GripStrengthMeasurement.h"
 #include "managers/grip_strength/ParadoxReader.h"
 
 class GripStrengthTest : public TestBase<GripStrengthMeasurement>

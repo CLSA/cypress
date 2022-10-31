@@ -1,8 +1,10 @@
 #ifndef HIPSCANMANAGER_H
 #define HIPSCANMANAGER_H
 
-#include "DXAManager.h"
 #include <QObject>
+
+#include "managers/dxa/DXAManager.h"
+#include "data/dxa/tests/HipTest.h"
 
 class HipScanManager : public DXAManager
 {
@@ -17,6 +19,9 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+private:
+    HipTest m_test;
 };
 
 #endif // HIPSCANMANAGER_H

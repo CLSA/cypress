@@ -2,7 +2,7 @@
 #define GRIPSTRENGTHMANAGER_H
 
 #include "../ManagerBase.h"
-#include "data/grip_strength/GripStrengthTest.h"
+#include "data/grip_strength/tests/GripStrengthTest.h"
 
 #include <QProcess>
 
