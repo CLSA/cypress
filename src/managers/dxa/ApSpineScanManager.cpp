@@ -56,3 +56,13 @@ QMap<QString, QVariant> APSpineScanManager::extractData()
 
     return QMap<QString, QVariant> {{}};
 }
+
+QMap<QString, QVariant> APSpineScanManager::extractScanAnalysisData(const QString& tableName)
+{
+    return QMap<QString, QVariant> {{}};
+}
+
+QMap<QString, QVariant> APSpineScanManager::computeTandZScores()
+{
+    return QMap<QString, QVariant> {{}};
+}

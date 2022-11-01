@@ -1,8 +1,10 @@
 #include "managers/dxa/DXAManager.h"
+
 #include <QMap>
 #include <QVariant>
 #include <QString>
 #include <QSql>
+#include <QProcess>
 
 const QMap<QString, QString> DXAManager::ranges = {
     // forearm
@@ -52,10 +54,15 @@ const QMap<QString, QString> DXAManager::ranges = {
 };
 
 DXAManager::DXAManager(QObject *parent)
-    : ManagerBase{parent}
+    : ManagerBase{parent}, m_dicomSCP(new DicomSCP(parent))
 {
-
 };
+
+DXAManager::~DXAManager()
+{
+    m_dicomSCP->stop();
+    delete m_dicomSCP;
+}
 
 void DXAManager::loadSettings(const QSettings &)
 {
@@ -67,6 +74,37 @@ void DXAManager::saveSettings(QSettings*) const
 
 };
 
+void loadSettings(const QSettings &)
+{
+
+};
+
+void saveSettings(QSettings*)
+{
+
+}
+
+bool DXAManager::startDicomServer()
+{
+    return m_dicomSCP->start();
+}
+
+bool DXAManager::endDicomServer()
+{
+    //return m_dicomSCP->stop();
+    return true;
+}
+
+void DXAManager::dicomServerExitNormal()
+{
+    qDebug() << "DXAManager::dicomServerExitNormal";
+}
+
+void DXAManager::dicomServerExitCrash()
+{
+    qDebug() << "DXAManager::dicomServerExitCrash";
+}
+
 QMap<QString, QVariant> DXAManager::extractScanAnalysisData(const QString& tableName)
 {
     // make connection to PatScan.mdb
@@ -74,3 +112,9 @@ QMap<QString, QVariant> DXAManager::extractScanAnalysisData(const QString& table
 
     return QMap<QString, QVariant>{{"", ""}};
 }
+
+QMap<QString, QVariant> DXAManager::computeTandZScores()
+{
+    return QMap<QString, QVariant> {{}};
+}
+

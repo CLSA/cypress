@@ -56,6 +56,7 @@ SOURCES += \
     data/WeighScaleTest.cpp \
     data/grip_strength/measurements/GripStrengthMeasurement.cpp \
     data/grip_strength/tests/GripStrengthTest.cpp \
+    dialogs/DXADialog.cpp \
     dialogs/GripStrengthDialog.cpp \
     managers/AudiometerManager.cpp \
     managers/CDTTManager.cpp \
@@ -81,6 +82,7 @@ SOURCES += \
     managers/dxa/IVAImagingScanManager.cpp \
     managers/dxa/WholeBodyScanManager.cpp \
     managers/dxa/dicom/DicomSCP.cpp \
+    managers/dxa/dicom/LogWorker.cpp \
     managers/grip_strength/GripStrengthManager.cpp \
     managers/grip_strength/ParadoxReader.cpp \
     managers/retinal_camera/RetinalCameraManager.cpp \
@@ -155,6 +157,7 @@ HEADERS += \
     data/WeighScaleTest.h \
     data/grip_strength/measurements/GripStrengthMeasurement.h \
     data/grip_strength/tests/GripStrengthTest.h \
+    dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
     managers/AudiometerManager.h \
     managers/BloodPressureManager.h \
@@ -174,6 +177,7 @@ HEADERS += \
     managers/dxa/IVAImagingScanManager.h \
     managers/dxa/WholeBodyScanManager.h \
     managers/dxa/dicom/DicomSCP.h \
+    managers/dxa/dicom/LogWorker.h \
     managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
     managers/SerialPortManager.h \
@@ -223,6 +227,7 @@ win32: LIBS += -L$$PWD/../poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
 
 FORMS += \
     RetinalCameraDialog.ui \
+    dialogs/dxadialog.ui \
   dialogs/gripstrengthdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \

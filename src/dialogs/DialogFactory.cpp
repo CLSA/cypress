@@ -12,6 +12,8 @@
 #include "WeighScaleDialog.h"
 #include "GripStrengthDialog.h"
 #include "RetinalCameraDialog.h"
+#include "DXADialog.h"
+#include "managers/dxa/HipScanManager.h"
 //#include "ThermometerDialog.h"
 
 #include <QDebug>
@@ -80,6 +82,7 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
       case Constants::MeasureType::typeUltrasound:
         break;
       case Constants::MeasureType::typeDexa:
+        dialog = new DXADialog(new HipScanManager);
         break;
       case Constants::MeasureType::typeUnknown:
         break;

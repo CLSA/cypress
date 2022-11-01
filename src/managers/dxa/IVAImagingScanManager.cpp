@@ -54,3 +54,16 @@ QMap<QString, QVariant> IVAImagingScanManager::extractData()
 
     return QMap<QString, QVariant> {{}};
 }
+
+QMap<QString, QVariant> IVAImagingScanManager::extractScanAnalysisData(const QString& tableName)
+{
+    // make connection to PatScan.mdb
+    // query data
+
+    return QMap<QString, QVariant>{{"", ""}};
+}
+
+QMap<QString, QVariant> IVAImagingScanManager::computeTandZScores()
+{
+    return QMap<QString, QVariant> {{}};
+}
