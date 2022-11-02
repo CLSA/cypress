@@ -28,6 +28,9 @@ public slots:
     void dicomServerEnded();
     void dicomLogUpdate(QString line);
 
+private slots:
+    void on_openFileExplorer_released();
+
 private:
     std::unique_ptr<DXAManager> m_manager;
     void initializeModel() override {};

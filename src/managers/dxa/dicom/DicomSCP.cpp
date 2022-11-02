@@ -4,8 +4,6 @@
 #include <QFile>
 #include <signal.h>
 
-#include "LogWorker.h"
-
 DicomSCP::DicomSCP(QObject *parent)
     : QObject{parent}
 {
@@ -13,41 +11,30 @@ DicomSCP::DicomSCP(QObject *parent)
 }
 
 DicomSCP::~DicomSCP() {
-    //m_process->close();
-    //m_process->waitForFinished();
-    //delete m_process;
-
-    //m_logWorker->terminate();
-    //m_logWorker->wait();
-    //delete m_logWorker;
-
-    //QProcess process;
-    //process.execute("taskkill /im dcmrecv.exe /f");
-    //process.waitForFinished();
 }
 
-void DicomSCP::initConnections()
+void DicomSCP::initProcess()
 {
-    m_logWorker.reset(new LogWorker());
     m_process.reset(new QProcess());
 
     QStringList args;
     args
         << "-xf" << "../etc/dcmtk/storescp.cfg"
         << "default"
-        << "--series-date-subdir"
-        << "--short-unique-names"
         << "--filename-extension" << ".dcm"
-        << "-od" << "C:/Users/Anthony/Documents/PACS"
-        << "-lc" << "../etc/dcmtk/logger.cfg"
+        << "-od" << "../storage"
+        << "-lc" << "../etc/dcmtk/filelog.cfg"
         << "9001";
-    m_process->setWorkingDirectory("C:/work/clsa/cypress/dcmtk-3.6.7-win64-chocolatey/bin");
-    m_process->setProgram("C:/work/clsa/cypress/dcmtk-3.6.7-win64-chocolatey/bin/dcmrecv.exe");
-    m_process->setArguments(args);
 
-    // Move worker object onto thread
-    //connect(m_logWorker, &LogWorker::finished, m_logWorker, &QObject::deleteLater);
-    connect(m_logWorker.get(), &LogWorker::updateLog, this, &DicomSCP::readLog);
+    m_process->setWorkingDirectory("C:/work/clsa/cypress/dcmtk-3.6.7/bin");
+    m_process->setProgram("C:/work/clsa/cypress/dcmtk-3.6.7/bin/dcmrecv.exe");
+    m_process->setArguments(args);
+}
+
+void DicomSCP::initConnections()
+{
+    initProcess();
+    start();
 
     connect(m_process.get(), &QProcess::stateChanged, this, [this]() {
         const QProcess::ProcessState state = this->m_process->state();
@@ -60,10 +47,16 @@ void DicomSCP::initConnections()
                 emit starting();
                 break;
             case QProcess::ProcessState::Running:
-                m_logWorker->start();
+                qDebug() << "log worker";
+                //m_logWorker->start();
                 emit running();
                 break;
         }
+    });
+
+    connect(m_process.get(), &QProcess::readyReadStandardOutput, this, [this]() {
+        QString output = m_process->readAllStandardOutput();
+        emit logUpdate(output);
     });
 
     connect(m_process.get(),
@@ -83,25 +76,16 @@ void DicomSCP::initConnections()
     );
 }
 
-void DicomSCP::readLog(QString line)
-{
-    emit logUpdate(line);
-}
-
 bool DicomSCP::start()
 {
     m_process->start();
+
     return m_process->waitForStarted();
 }
 
 bool DicomSCP::stop()
 {
     m_process->close();
-    m_process->waitForFinished();
-
-    m_logWorker->terminate();
-    m_logWorker->wait();
-
-    return true;
+    return m_process->waitForFinished();
 }
 

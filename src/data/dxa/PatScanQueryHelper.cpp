@@ -37,6 +37,9 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientK
     }
 
     QSqlQuery query;
+    QString scanId;
+    QString scanMode;
+    QString scanDate;
 
     query.prepare("SELECT SCANID, SCAN_MODE, SCAN_DATE FROM ScanAnalysis WHERE PATIENT_KEY = ? AND SCAN_TYPE = ?");
     query.bindValue(0, patientKey);
@@ -49,17 +52,13 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientK
         throw std::exception("PatScanQueryHelper:: Query error");
     }
 
-    query.last(); // only interested in most recent scan?
-
-    QString scanId;
-    QString scanMode;
-    QString scanDate;
-
+    // only interested in most recent scan?
+    query.last();
     scanId = query.value(0).toString();
     scanMode = query.value(1).toString();
     scanDate = query.value(2).toString();
 
-    // Check stored DICOM files
+
     return QMap<QString, QVariant> {
         { "scanId", scanId },
         { "scanMode", scanMode },
@@ -71,5 +70,23 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientK
 
 QMap<QString, QVariant> PatScanQueryHelper::getScanData(QString patientKey, QString scanType)
 {
-    return QMap<QString, QVariant> {{}};
+    QByteArray dicomBlobs[10]; // num of files for scan
+    QMap<QString, QVariant> data;
+
+    try {
+        data = getScanAnalysisData(patientKey, scanType);
+        // Get dicom files based on patientKey and scanType
+        // check if dicom files valid (compare tags)
+        // if valid:
+            // convert to binary blobs, encode as base64, and add to data
+
+        // compute t and z scores, add to metadata or measurement?
+        // compress using gzip and send to pine server
+
+        return data;
+    }
+    catch (...)
+    {
+
+    }
 }
