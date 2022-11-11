@@ -1,5 +1,5 @@
 #include "CDTTDialog.h"
-#include "../managers/CDTTManager.h"
+#include "managers/cdtt/CDTTManager.h"
 
 #include <QDebug>
 #include <QFileDialog>

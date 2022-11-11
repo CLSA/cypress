@@ -1,5 +1,5 @@
 #include "ChoiceReactionDialog.h"
-#include "../managers/ChoiceReactionManager.h"
+#include "managers/choice_reaction/ChoiceReactionManager.h"
 
 #include <QDebug>
 #include <QFileDialog>

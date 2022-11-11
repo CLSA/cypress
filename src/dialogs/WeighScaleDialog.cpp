@@ -1,5 +1,5 @@
 #include "WeighScaleDialog.h"
-#include "../managers/WeighScaleManager.h"
+#include "managers/weigh_scale/WeighScaleManager.h"
 
 #include <QDebug>
 #include <QMessageBox>

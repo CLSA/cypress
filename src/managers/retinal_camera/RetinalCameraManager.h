@@ -5,7 +5,7 @@
 #include <QProcess>
 #include <QSettings>
 
-#include "../ManagerBase.h"
+#include "managers/ManagerBase.h"
 
 
 class RetinalCameraManager : public ManagerBase
@@ -16,8 +16,8 @@ public:
 
     // load and save device, paths and other constant settings to .ini
     //
-    void loadSettings(const QSettings &) ;
-    void saveSettings(QSettings*) const ;
+    void loadSettings(const QSettings &) override;
+    void saveSettings(QSettings*) const override;
 
     // collate test results and device and other meta data
     // for the main application to write to .json

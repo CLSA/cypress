@@ -1,5 +1,5 @@
 #include "FraxDialog.h"
-#include "../managers/FraxManager.h"
+#include "managers/frax/FraxManager.h"
 
 #include <QDebug>
 #include <QFileDialog>

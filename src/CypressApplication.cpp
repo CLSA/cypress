@@ -6,10 +6,10 @@
 #include <QMessageBox>
 #include <stdexcept>
 
-#include "./auxiliary/Constants.h"
-#include "./dialogs/DialogFactory.h"
-#include "./dialogs/DialogBase.h"
-#include "./rest/server/server.h"
+#include "auxiliary/Constants.h"
+#include "dialogs/DialogFactory.h"
+#include "dialogs/DialogBase.h"
+#include "server/Server.h"
 
 extern Server* server;
 

@@ -1,5 +1,4 @@
 #include "DialogFactory.h"
-
 #include "AudiometerDialog.h"
 #include "BloodPressureDialog.h"
 #include "BodyCompositionDialog.h"

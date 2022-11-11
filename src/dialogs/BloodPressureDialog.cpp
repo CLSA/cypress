@@ -1,5 +1,5 @@
 #include "BloodPressureDialog.h"
-#include "../managers/BloodPressureManager.h"
+#include "managers/blood_pressure/BloodPressureManager.h"
 
 #include <QDebug>
 #include <QMessageBox>
