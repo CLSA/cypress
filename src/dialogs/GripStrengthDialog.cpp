@@ -9,6 +9,8 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent):
     ui(new Ui::GripStrengthDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::Window);
+
     m_manager.reset(new GripStrengthManager(this));
 }
 

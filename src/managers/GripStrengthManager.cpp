@@ -31,6 +31,7 @@ void GripStrengthManager::start()
 void GripStrengthManager::measure() {
     try {
         readOutput();
+        updateModel();
     }
     catch (QException &e) {
         qDebug() << e.what();
@@ -75,14 +76,31 @@ void GripStrengthManager::initializeConnections() {
 
 void GripStrengthManager::initializeModel()
 {
-    // example of 1 row 1 column display of 1 measurement test
-    //
     for (int row = 0; row < m_row; row++)
     {
-        QStandardItem* item = new QStandardItem();
-        m_model->setItem(row, 0, item);
+        for (int col = 0; col < 16; col++) {
+            QStandardItem* item = new QStandardItem();
+            m_model->setItem(row, col, item);
+        }
     }
-    m_model->setHeaderData(0, Qt::Horizontal, "Weight Tests", Qt::DisplayRole);
+
+    m_model->setHeaderData(0, Qt::Horizontal, "Exam ID", Qt::DisplayRole);
+    m_model->setHeaderData(1, Qt::Horizontal, "Test ID", Qt::DisplayRole);
+    m_model->setHeaderData(2, Qt::Horizontal, "Position", Qt::DisplayRole);
+    m_model->setHeaderData(3, Qt::Horizontal, "Side", Qt::DisplayRole);
+    m_model->setHeaderData(4, Qt::Horizontal, "Rep1", Qt::DisplayRole);
+    m_model->setHeaderData(5, Qt::Horizontal, "Rep2", Qt::DisplayRole);
+    m_model->setHeaderData(6, Qt::Horizontal, "Rep3", Qt::DisplayRole);
+    m_model->setHeaderData(7, Qt::Horizontal, "Rep4", Qt::DisplayRole);
+    m_model->setHeaderData(8, Qt::Horizontal, "Rep5", Qt::DisplayRole);
+    m_model->setHeaderData(9, Qt::Horizontal, "Rep6", Qt::DisplayRole);
+    m_model->setHeaderData(10, Qt::Horizontal, "Rep7", Qt::DisplayRole);
+    m_model->setHeaderData(11, Qt::Horizontal, "Rep8", Qt::DisplayRole);
+    m_model->setHeaderData(12, Qt::Horizontal, "Rep9", Qt::DisplayRole);
+    m_model->setHeaderData(13, Qt::Horizontal, "Rep10", Qt::DisplayRole);
+    m_model->setHeaderData(14, Qt::Horizontal, "Average", Qt::DisplayRole);
+    m_model->setHeaderData(15, Qt::Horizontal, "Max", Qt::DisplayRole);
+    m_model->setHeaderData(16, Qt::Horizontal, "CV", Qt::DisplayRole);
 }
 
 void GripStrengthManager::readOutput() {
@@ -112,20 +130,72 @@ QJsonObject GripStrengthManager::toJsonObject() const
 
 void GripStrengthManager::updateModel()
 {
-    //TODO: Update, this is from BuildModel class
-    // example of a 1 row 1 column model displaying one measurement
-    //
     for (int row = 0; row < m_test.getMeasurementCount(); row++)
     {
-        QStandardItem* item = m_model->item(row, 0);
-        if (Q_NULLPTR == item)
-        {
-            item = new QStandardItem();
-            m_model->setItem(row, 0, item);
+        GripStrengthMeasurement measurement = m_test.getMeasurement(row);
+
+        QStandardItem* exam_id = m_model->item(row, 0);
+        if (exam_id) {
+            GripStrengthMeasurement::Value value = measurement.getAttribute("exam_id");
+            exam_id->setData(value.value().toString(), Qt::DisplayRole);
         }
-        item->setData(m_test.getMeasurement(row).toString(), Qt::DisplayRole);
+
+        QStandardItem* test_id = m_model->item(row, 1);
+        if (test_id) {
+            test_id->setData(measurement.getAttribute("test_id").value(), Qt::DisplayRole);
+        }
+
+        QStandardItem* position = m_model->item(row, 2);
+        if (position) {
+            qDebug() << "position: " << measurement.getAttribute("position").value();
+            position->setData(measurement.getAttribute("position").value(), Qt::DisplayRole);
+        }
+
+        QStandardItem* side = m_model->item(row, 3);
+        if (side) {
+            side->setData(measurement.getAttribute("side").value(), Qt::DisplayRole);
+        }
+
+        //QStandardItem* rep1 = m_model->item(row, 4);
+        //rep1->setData(measurement.getAttribute("Rep1").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep2 = m_model->item(row, 5);
+        //rep2->setData(measurement.getAttribute("Rep2").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep3 = m_model->item(row, 6);
+        //rep3->setData(measurement.getAttribute("Rep3").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep4 = m_model->item(row, 7);
+        //rep4->setData(measurement.getAttribute("Rep4").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep5 = m_model->item(row, 8);
+        //rep5->setData(measurement.getAttribute("Rep5").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep6 = m_model->item(row, 9);
+        //rep6->setData(measurement.getAttribute("Rep6").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep7 = m_model->item(row, 10);
+        //rep7->setData(measurement.getAttribute("Rep7").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep8 = m_model->item(row, 11);
+        //rep8->setData(measurement.getAttribute("Rep8").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep9 = m_model->item(row, 12);
+        //rep9->setData(measurement.getAttribute("Rep9").value(), Qt::DisplayRole);
+
+        //QStandardItem* rep10= m_model->item(row, 13);
+        //rep10->setData(measurement.getAttribute("Rep10").value(), Qt::DisplayRole);
+
+        //QStandardItem* average= m_model->item(row, 14);
+        //average->setData(measurement.getAttribute("Average").value(), Qt::DisplayRole);
+
+        //QStandardItem* max = m_model->item(row, 14);
+        //max->setData(measurement.getAttribute("Maximum").value(), Qt::DisplayRole);
+
+        //QStandardItem* cv = m_model->item(row, 15);
+        //cv->setData(measurement.getAttribute("CV").value(), Qt::DisplayRole);
     }
-    emit dataChanged();
+    //emit dataChanged();
 }
 
 bool GripStrengthManager::isDefined(const QString& value, const GripStrengthManager::FileType& fileType) const
