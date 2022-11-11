@@ -9,11 +9,12 @@ DXADialog::DXADialog(DXAManager* manager, QWidget *parent) :
     ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowStaysOnTopHint | Qt::WindowFullscreenButtonHint);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager -> start();
 
     connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
+    connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
 }
 
 DXADialog::~DXADialog()
@@ -60,7 +61,15 @@ void DXADialog::dicomLogUpdate(QString line)
     ui->logBrowser->append(line);
 }
 
-
+void DXADialog::dicomFilesReceived(QStringList& dicomFilePaths)
+{
+    ui->filesList->clear();
+    QStringList::Iterator iterator;
+    for (iterator = dicomFilePaths.begin(); iterator != dicomFilePaths.end(); ++iterator)
+    {
+       ui->filesList->append((*iterator).toLocal8Bit().constData());
+    }
+}
 void DXADialog::on_openFileExplorer_released()
 {
     QDesktopServices::openUrl(QUrl("C:/work/clsa/cypress/dcmtk-3.6.7/storage"));

@@ -8,7 +8,6 @@ WholeBodyScanManager::WholeBodyScanManager(QObject *parent)
 
 }
 
-
 QString WholeBodyScanManager::getName()
 {
     return "";

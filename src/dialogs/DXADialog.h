@@ -24,6 +24,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 public slots:
+    void dicomFilesReceived(QStringList& dicomFilePaths);
     void dicomServerStarted();
     void dicomServerEnded();
     void dicomLogUpdate(QString line);

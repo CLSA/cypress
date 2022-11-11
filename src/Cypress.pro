@@ -112,6 +112,7 @@ SOURCES += \
     rest/RetinalCameraRequestHandler.cpp \
     rest/server/GripStrengthRequestHandler.cpp \
     rest/server/InstrumentRequestHandlerFactory.cpp \
+    rest/server/retinalcamerarequesthandler.cpp \
     rest/server/server.cpp \
 >>>>>>> cf61d48 (moved rest server into main project, server now opens dialog on request. WIP: closing dialog shouldn't exit event loop)
     widgets/BarcodeWidget.cpp \
@@ -228,6 +229,7 @@ HEADERS += \
     rest/RetinalCameraRequestHandler.h \
     rest/server/GripStrengthRequestHandler.h \
     rest/server/InstrumentRequestHandlerFactory.h \
+    rest/server/retinalcamerarequesthandler.h \
     rest/server/server.h \
 >>>>>>> cf61d48 (moved rest server into main project, server now opens dialog on request. WIP: closing dialog shouldn't exit event loop)
     widgets/BarcodeWidget.h \
@@ -281,5 +283,6 @@ SUBDIRS += \
     rest/rest.pro
 
 DISTFILES += \
+    ../README.md \
     favicon.ico \
     rest/server/pages/index.html

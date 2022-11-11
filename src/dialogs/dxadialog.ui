@@ -21,9 +21,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QVBoxLayout" name="page">
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="form">
        <property name="title">
         <string>DEXA</string>
        </property>
@@ -132,7 +132,7 @@
         <item>
          <layout class="QVBoxLayout" name="buttons">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <layout class="QHBoxLayout" name="buttonRow">
             <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
@@ -174,7 +174,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QTabWidget" name="tabs">
        <property name="tabPosition">
         <enum>QTabWidget::North</enum>
        </property>
@@ -193,6 +193,16 @@
        <property name="movable">
         <bool>true</bool>
        </property>
+       <widget class="QWidget" name="filesTab">
+        <attribute name="title">
+         <string>Files</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QTextBrowser" name="filesList"/>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="logTab">
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>

@@ -12,6 +12,7 @@
 RetinalCameraManager::RetinalCameraManager(QObject *parent)
     : ManagerBase{parent}
 {
+    QSettings qSettings;
 }
 
 // load and save device, paths and other constant settings to .ini
