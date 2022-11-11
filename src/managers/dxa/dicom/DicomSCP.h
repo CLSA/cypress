@@ -5,8 +5,6 @@
 #include <QProcess>
 #include <QThread>
 
-#include "LogWorker.h"
-
 
 class DicomSCP : public QObject
 {
@@ -18,14 +16,6 @@ public:
     bool start();
     bool stop();
 
-private:
-    void initConnections();
-    QScopedPointer<QProcess> m_process;
-    QScopedPointer<LogWorker>  m_logWorker;
-
-private slots:
-    void readLog(QString line);
-
 signals:
     void logUpdate(QString line);
 
@@ -35,6 +25,12 @@ signals:
 
     void exitNormal();
     void exitCrash();
+
+private:
+    void initConnections();
+    void initProcess();
+
+    QScopedPointer<QProcess> m_process;
 };
 
 #endif // DICOMSCP_H

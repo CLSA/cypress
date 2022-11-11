@@ -2,13 +2,15 @@
 #include "ui_dxadialog.h"
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 DXADialog::DXADialog(DXAManager* manager, QWidget *parent) :
     DialogBase(parent), m_manager(manager),
     ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
-    qDebug() << "manager name: " << m_manager->getName();
+    setWindowFlags(Qt::WindowStaysOnTopHint | Qt::WindowFullscreenButtonHint);
+
     m_manager -> start();
 
     connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
@@ -55,9 +57,12 @@ void DXADialog::dicomServerEnded()
 
 void DXADialog::dicomLogUpdate(QString line)
 {
-    qInfo() << "DXADialog::dicomLogUpdate: " << line;
-    ui->textBrowser->append(line);
+    ui->logBrowser->append(line);
 }
 
 
+void DXADialog::on_openFileExplorer_released()
+{
+    QDesktopServices::openUrl(QUrl("C:/work/clsa/cypress/dcmtk-3.6.7/storage"));
+}
 

@@ -15,8 +15,12 @@
 
 using namespace Poco::Net;
 
-InstrumentRequestHandlerFactory::InstrumentRequestHandlerFactory() {}
-InstrumentRequestHandlerFactory::~InstrumentRequestHandlerFactory() {}
+QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap = {{
+    { QString(R"(^/grip_strength/?$)"),  &InstrumentRequestHandlerFactory::createGripStrengthHandler  },
+    { QString(R"(^/retinal_camera/?$)"), &InstrumentRequestHandlerFactory::createRetinalCameraHandler },
+    { QString(R"(^/dxa/?$)"), 			 &InstrumentRequestHandlerFactory::createDXAHandler 		  },
+    { QString(R"(^/ultrasound/?$)"), 	 &InstrumentRequestHandlerFactory::createUltrasoundHandler    },
+}};
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
