@@ -9,13 +9,42 @@
 #include "./auxiliary/Constants.h"
 #include "./dialogs/DialogFactory.h"
 #include "./dialogs/DialogBase.h"
+#include "./rest/server/server.h"
+
+extern Server* server;
 
 CypressApplication::CypressApplication(QObject *parent) : QObject(parent)
 {
+    connect(server, &Server::testStart, this, &CypressApplication::startTest);
 }
 
 CypressApplication::~CypressApplication()
 {
+}
+
+bool CypressApplication::startTest()
+{
+    qDebug() << "start test";
+    QVariantMap args;
+
+    args["inputFileName"] = "";
+    args["outputFileName"] = "";
+    args["measureType"] = 9;
+    args["runMode"] = "default";
+    args["verbose"] = true;
+
+    try
+    {
+        setArgs(args);
+        initialize();
+    }
+    catch (std::exception& e)
+    {
+        qDebug() << e.what();
+        return false;
+    }
+
+    return true;
 }
 
 void CypressApplication::setArgs(const QVariantMap& args)
@@ -30,6 +59,8 @@ void CypressApplication::setArgs(const QVariantMap& args)
       m_mode = args["runMode"].value<Constants::RunMode>();
     if(args.contains("verbose"))
       m_verbose = args["verbose"].toBool();
+
+    qDebug() << m_type;
 }
 
 void CypressApplication::initialize()

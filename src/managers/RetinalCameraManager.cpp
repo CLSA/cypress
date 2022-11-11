@@ -12,7 +12,14 @@
 RetinalCameraManager::RetinalCameraManager(QObject *parent)
     : ManagerBase{parent}
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+}
+
+// load and save device, paths and other constant settings to .ini
+//
+void RetinalCameraManager::loadSettings(const QSettings& settings)
+{
+    if (m_verbose)
+        qDebug() << "RetinalCameraManager::loadSettings";
 
     m_runnableName      = settings.value("instruments/retinal_scan/exe").toString();
     m_defaultPatientUid = settings.value("instruments/retinal_scan/patient_id").toString();
@@ -24,22 +31,17 @@ RetinalCameraManager::RetinalCameraManager(QObject *parent)
     m_databaseUser      = settings.value("instruments/retinal_scan/database/user").toString();
     m_databasePassword  = settings.value("instruments/retinal_scan/database/password").toString();
 
-    qInfo() << m_runnableName;
-    qInfo() << m_defaultPatientUid;
-    qInfo() << m_databaseVersion;
-    qInfo() << m_databaseDriver;
-    qInfo() << m_databaseHost;
-    qInfo() << m_databasePort;
-    qInfo() << m_databaseUser;
-    qInfo() << m_databasePassword;
-}
-
-// load and save device, paths and other constant settings to .ini
-//
-void RetinalCameraManager::loadSettings(const QSettings &)
-{
     if (m_verbose)
-        qDebug() << "RetinalCameraManager::loadSettings";
+    {
+        qInfo() << m_runnableName;
+        qInfo() << m_defaultPatientUid;
+        qInfo() << m_databaseVersion;
+        qInfo() << m_databaseDriver;
+        qInfo() << m_databaseHost;
+        qInfo() << m_databasePort;
+        qInfo() << m_databaseUser;
+        qInfo() << m_databasePassword;
+    }
 }
 
 void RetinalCameraManager::saveSettings(QSettings*) const
@@ -85,21 +87,15 @@ void RetinalCameraManager::updateModel()
         qDebug() << "RetinalCameraManager::updateModel";
 }
 
-// subclasses call methods after main initialization just prior
-// to running (eg., emit dataChanged signal)
-//
 
-// org.obiba.onyx.jade.instrument.topcon.imagenetr4lite.workDir=C:/Program\ Files/TOPCON/IMAGEnet\ R4/
-// org.obiba.onyx.jade.instrument.topcon.imagenetr4lite.executable=imagenet.exe
-//
-// org.obiba.onyx.jade.instrument.topcon.imagenetr4lite.driver=net.sourceforge.jtds.jdbc.Driver
-// org.obiba.onyx.jade.instrument.topcon.imagenetr4lite.url=jdbc:jtds:sqlserver://localhost:1433/IMAGEnet_R4
-// org.obiba.onyx.jade.instrument.topcon.imagenetr4lite.username=
-// org.obiba.onyx.jade.instrument.topcon.imagenetr4lite.password=
+
 void RetinalCameraManager::start()
 {
     if (m_verbose)
         qDebug() << "RetinalCameraManager::start";
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    loadSettings(settings);
 
     QFileInfo info(m_runnableName);
     QStringList arguments;
@@ -184,6 +180,12 @@ void RetinalCameraManager::start()
 
     m_process.setProgram(m_runnableName);
     m_process.start();
+    m_process.waitForStarted();
+
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, [this] {
+        finish();
+    });
 
     bool started = m_process.waitForStarted();
     if (!started)
@@ -193,58 +195,7 @@ void RetinalCameraManager::start()
         return;
     }
 
-    // enter participant data to database
-    //
-    if (m_verbose)
-        qDebug() << "entering new participant data..";
 
-    // launch process
-    //
-    if (m_verbose)
-        qDebug() << "launching process..";
-
-    // wait for process to finish
-    //
-    if (m_verbose)
-        qDebug() << "started, now waiting..";
-
-    m_process.waitForFinished(360000);
-
-    if (m_verbose)
-        qDebug() << "process finished..";
-
-    // process data for left and right eye
-    //
-    QSqlQuery dataQuery;
-
-    ok = dataQuery.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << dataQuery.lastError();
-
-    while (dataQuery.next()) {
-        QString fileName = dataQuery.value(0).toString();
-        QString fileExt = dataQuery.value(1).toString();
-        QString storagePathUid = dataQuery.value(2).toString();
-
-        ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + m_defaultPatientUid + "'");
-
-        if (!ok) qDebug() << query.lastError();
-
-        while (locationQuery.next()) {
-            QString location = locationQuery.value(0).toString();
-            qInfo() << "Located image: " << location << "/" << fileName + fileExt;
-
-            // get image bytes and put into json
-            // get eye side name and put into json
-
-        }
-
-        qDebug() << fileName << " " << fileExt << " " << storagePathUid;
-    }
-
-    // save json data locally and send to Pine
-    //
-    if (m_verbose)
-        qDebug() << "submit..";
 }
 
 // SLOT
@@ -263,7 +214,47 @@ void RetinalCameraManager::measure()
 void RetinalCameraManager::finish()
 {
     if (m_verbose)
+    {
         qDebug() << "RetinalCameraManager::finish";
+        qDebug() << "	process finished";
+        qDebug() << "	finalizing results";
+    }
+
+    // process data for left and right eye
+    //
+    QSqlQuery dataQuery;
+    QSqlQuery locationQuery;
+
+    bool ok = dataQuery.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
+    if (!ok) qDebug() << dataQuery.lastError();
+
+    while (dataQuery.next()) {
+        QString fileName = dataQuery.value(0).toString();
+        QString fileExt = dataQuery.value(1).toString();
+        QString storagePathUid = dataQuery.value(2).toString();
+
+        ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + m_defaultPatientUid + "'");
+
+        if (!ok) qDebug() << locationQuery.lastError();
+
+        while (locationQuery.next()) {
+            QString location = locationQuery.value(0).toString();
+
+            if (m_verbose)
+                qInfo() << "Located image: " << location << "/" << fileName + fileExt;
+            // get image bytes and put into json
+            // get eye side name and put into json
+
+        }
+
+        if (m_verbose)
+            qDebug() << fileName << " " << fileExt << " " << storagePathUid;
+    }
+
+    // save json data locally and send to Pine
+    //
+    if (m_verbose)
+        qDebug() << "saved";
 }
 
 // SLOT

@@ -12,6 +12,7 @@
 >>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
 
 #include "CypressApplication.h"
+#include "rest/server/server.h"
 #include "./auxiliary/CommandLineParser.h"
 
 
@@ -69,6 +70,9 @@ void initializeDefaultSettings(QSettings& settings) {
     settings.setValue("instruments/retinal_scan/database/database", "dbo");
 }
 
+// WIP extern
+Server* server = new Server();
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setOrganizationName("CLSA");
@@ -92,49 +96,34 @@ int main(int argc, char *argv[])
 
     // process command line args
     //
-    CommandLineParser parser;
-    QString errMessage;
-    switch(parser.parseCommandLine(app, &errMessage))
-    {
-        case CommandLineParser::parseHelpRequested:
-            displayHelp(parser);
-            return EXIT_SUCCESS;
-        case CommandLineParser::parseVersionRequested:
-            displayHelp(parser);
-            return EXIT_SUCCESS;
-        case CommandLineParser::parseOk:
-            break;
+    //CommandLineParser parser;
+    //QString errMessage;
+    //switch(parser.parseCommandLine(app, &errMessage))
+    //{
+    //    case CommandLineParser::parseHelpRequested:
+    //        displayHelp(parser);
+    //        return EXIT_SUCCESS;
+    //    case CommandLineParser::parseVersionRequested:
+    //        displayHelp(parser);
+    //        return EXIT_SUCCESS;
+    //    case CommandLineParser::parseOk:
+    //        break;
 
-        case CommandLineParser::parseError:
-        case CommandLineParser::parseInputFileError:
-        case CommandLineParser::parseOutputPathError:
-        case CommandLineParser::parseMissingArg:
-        case CommandLineParser::parseMeasureTypeError:
-        case CommandLineParser::parseRunModeError:
-            displayError(errMessage, parser);
-            return EXIT_FAILURE;
-    }
-
-    // Runs in separate thread
-    //Server restApiServer;
-    //const QThread& thread = restApiServer.getThread();
-
-
+    //    case CommandLineParser::parseError:
+    //    case CommandLineParser::parseInputFileError:
+    //    case CommandLineParser::parseOutputPathError:
+    //    case CommandLineParser::parseMissingArg:
+    //    case CommandLineParser::parseMeasureTypeError:
+    //    case CommandLineParser::parseRunModeError:
+    //        displayError(errMessage, parser);
+    //        return EXIT_FAILURE;
+    //}
 
     CypressApplication cypress;
-    try
-    {
-        cypress.setArgs(parser.getArgs());
-        cypress.initialize();
-    }
-    catch (std::exception& e)
-    {
-        qDebug() << e.what();
-        QMessageBox::critical(0, QGuiApplication::applicationDisplayName(),
-                              "<html><head/><body><h2>" + QString(e.what()) + "</h2></body></html>");
-        return EXIT_FAILURE;
-    }
 
-    //restApiServer.start();
+    // Runs in separate thread
+    server->start();
+
+
     return app.exec();
 }

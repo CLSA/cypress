@@ -68,6 +68,7 @@ SOURCES += \
     managers/WeighScaleManager.cpp \
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     server/server.cpp \
 =======
     #server/GripStrengthRequestHandler.cpp \
@@ -78,6 +79,13 @@ SOURCES += \
     #tests/server/testserver.cpp \
 =======
 >>>>>>> 60bc3a9 (retinal camera intregration, configuring MS SQL server)
+=======
+    rest/DefaultRequestHandler.cpp \
+    rest/RetinalCameraRequestHandler.cpp \
+    rest/server/GripStrengthRequestHandler.cpp \
+    rest/server/InstrumentRequestHandlerFactory.cpp \
+    rest/server/server.cpp \
+>>>>>>> cf61d48 (moved rest server into main project, server now opens dialog on request. WIP: closing dialog shouldn't exit event loop)
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -156,9 +164,17 @@ HEADERS += \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
 <<<<<<< HEAD
+<<<<<<< HEAD
     server/server.h \
 =======
 >>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
+=======
+    rest/DefaultRequestHandler.h \
+    rest/RetinalCameraRequestHandler.h \
+    rest/server/GripStrengthRequestHandler.h \
+    rest/server/InstrumentRequestHandlerFactory.h \
+    rest/server/server.h \
+>>>>>>> cf61d48 (moved rest server into main project, server now opens dialog on request. WIP: closing dialog shouldn't exit event loop)
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -204,3 +220,9 @@ FORMS += \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
+
+SUBDIRS += \
+    rest/rest.pro
+
+DISTFILES += \
+    rest/server/pages/index.html
