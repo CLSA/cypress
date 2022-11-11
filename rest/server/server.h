@@ -1,9 +1,17 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+<<<<<<< HEAD
 #include <QObject>
 #include <QTcpServer>
 
+=======
+#include "Poco/Net/HTTPServer.h"
+
+#include <QObject>
+#include <QThread>
+
+>>>>>>> 1499770 (REST server now runs in its own thread, added new request handlers, organized grip strength documentation)
 class Server: public QObject
 {
     Q_OBJECT
@@ -15,6 +23,7 @@ class Server: public QObject
     public:
         Server();
         ~Server();
+<<<<<<< HEAD
 
 <<<<<<< HEAD:src/server/server.h
 
@@ -43,10 +52,15 @@ class Server: public QObject
 
     private:
         QTcpServer m_tcpServer;
+=======
+        void start();
+        void stop();
 
-        void listen();
-        void parse();
-        void route();
+    private:
+        Poco::Net::HTTPServer* server;
+        QThread serverThread;
+>>>>>>> 1499770 (REST server now runs in its own thread, added new request handlers, organized grip strength documentation)
+
 };
 
 #endif // SERVER_H

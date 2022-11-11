@@ -9,6 +9,7 @@ CONFIG -= app_bundle
 
 SOURCES += \
         DefaultRequestHandler.cpp \
+        RetinalCameraRequestHandler.cpp \
         main.cpp \
         server/GripStrengthRequestHandler.cpp \
         server/InstrumentRequestHandlerFactory.cpp \
@@ -23,16 +24,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 unix: INCLUDEPATH += /usr/local/include
 unix: LIBS += -L/usr/local/lib -lPocoFoundation -lPocoNet -lPocoUtil
 
-win32: INCLUDEPATH += $$PWD/poco/Foundation/include
-win32: INCLUDEPATH += $$PWD/poco/Net/include
-win32: INCLUDEPATH += $$PWD/poco/Util/include
-win32: LIBS += -L$$PWD/poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
+win32: INCLUDEPATH += $$PWD/../poco/Foundation/include
+win32: INCLUDEPATH += $$PWD/../poco/Net/include
+win32: INCLUDEPATH += $$PWD/../poco/Util/include
+win32: LIBS += -L$$PWD/../poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
 
 DISTFILES += \
     server/pages/index.html
 
 HEADERS += \
     DefaultRequestHandler.h \
+    RetinalCameraRequestHandler.h \
     server/GripStrengthRequestHandler.h \
     server/InstrumentRequestHandlerFactory.h \
     server/server.h

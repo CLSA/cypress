@@ -1,40 +1,40 @@
-#include "server.h"
-
-#include "InstrumentRequestHandlerFactory.h"
-
-#include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/ServerSocket.h"
 #include <string>
 #include <iostream>
+#include <QThread>
+
+#include "Poco/Net/HTTPServer.h"
+#include "InstrumentRequestHandlerFactory.h"
+#include "server.h"
+
 
 using namespace Poco::Net;
 
 Server::Server()
 {
+    Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
+    Poco::UInt16 portNumber = 8000;
+    Poco::Net::HTTPServerParams::Ptr pParams = new Poco::Net::HTTPServerParams;
+
+    server = new HTTPServer(pFactory, portNumber, pParams);
+    moveToThread(&serverThread);
 }
 
 Server::~Server()
 {
+    serverThread.quit();
+    serverThread.wait();
+    delete server;
 }
 
-void Server::initialize(Application& self)
+void Server::start()
 {
-        loadConfiguration();
-        ServerApplication::initialize(self);
+    serverThread.start();
+    server->start();
 }
 
-void Server::uninitialize()
+void Server::stop()
 {
-        ServerApplication::uninitialize();
-}
-
-int Server::main(const std::vector<std::string>& args)
-{
-        HTTPServer serv(new InstrumentRequestHandlerFactory, ServerSocket(Server::DEFAULT_PORT), new HTTPServerParams);
-
-        serv.start();
-        waitForTerminationRequest();
-        serv.stop();
-
-        return Application::EXIT_OK;
+    server->stop();
+    serverThread.quit();
+    serverThread.wait();
 }
