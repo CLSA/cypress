@@ -1,15 +1,17 @@
-#include "CypressApplication.h"
-
-#include "./auxiliary/CommandLineParser.h"
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
 #include <QMessageBox>
 #include <QDebug>
+<<<<<<< HEAD
 #include "./server/server.h"
 
 #include "./auxiliary/Constants.h"
+=======
+>>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
 
+#include "CypressApplication.h"
+#include "./auxiliary/CommandLineParser.h"
 
 void displayError(const QString errMessage, CommandLineParser& parser) {
     QMessageBox::warning(
@@ -35,9 +37,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion("1.0.0");
 
     QApplication app(argc, argv);
-
-    Server server;
-    server.start();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
