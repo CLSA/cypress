@@ -1,5 +1,5 @@
 #include "GripStrengthDialog.h"
-#include "../managers/GripStrengthManager.h"
+#include "../managers/grip_strength/GripStrengthManager.h"
 
 #include <QDebug>
 #include <QMessageBox>

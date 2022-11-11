@@ -1,7 +1,7 @@
 #include <QMessageBox>
 
 #include "RetinalCameraDialog.h"
-#include "managers/RetinalCameraManager.h"
+#include "managers/retinal_camera/RetinalCameraManager.h"
 #include "ui_RetinalCameraDialog.h"
 
 RetinalCameraDialog::RetinalCameraDialog(QWidget *parent) :

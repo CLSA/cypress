@@ -5,11 +5,15 @@
 #include <QMessageBox>
 #include <QDebug>
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "./server/server.h"
 
 #include "./auxiliary/Constants.h"
 =======
 >>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
+=======
+#include <QProcess>
+>>>>>>> d8613bb (WIP: migrating hologic data extractors)
 
 #include "CypressApplication.h"
 #include "rest/server/server.h"
@@ -126,7 +130,6 @@ int main(int argc, char *argv[])
 
     // Runs in separate thread
     server->start();
-
 
     return app.exec();
 }

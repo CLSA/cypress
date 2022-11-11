@@ -1,9 +1,9 @@
 #ifndef GRIPSTRENGTHTEST_H
 #define GRIPSTRENGTHTEST_H
 
-#include "../../src/data/TestBase.h"
+#include "data/TestBase.h"
 #include "GripStrengthMeasurement.h"
-#include "../managers/ParadoxReader.h"
+#include "managers/grip_strength/ParadoxReader.h"
 
 class GripStrengthTest : public TestBase<GripStrengthMeasurement>
 {

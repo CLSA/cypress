@@ -3,11 +3,15 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
+<<<<<<< HEAD:src/data/GripStrengthTest.cpp
 <<<<<<< HEAD
 #include "../auxiliary/tracker5util.h"
 =======
 //#include "../auxiliary/tracker5util.h"
 >>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
+=======
+#include "auxiliary/tracker5util.h"
+>>>>>>> d8613bb (WIP: migrating hologic data extractors):src/data/grip_strength/GripStrengthTest.cpp
 
 const q_stringMap GripStrengthTest::testMetaMap = {
     {"Sequence", "sequence"},

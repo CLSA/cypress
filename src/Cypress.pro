@@ -20,6 +20,7 @@ SOURCES += \
     #auxiliary/tracker5util.cpp \
 >>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.cpp \
+    data/ApSpineTest.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
     data/BodyCompositionMeasurement.cpp \
@@ -28,13 +29,17 @@ SOURCES += \
     data/CDTTTest.cpp \
     data/ChoiceReactionMeasurement.cpp \
     data/ChoiceReactionTest.cpp \
+    data/DXATest.cpp \
     data/ECGMeasurement.cpp \
     data/ECGTest.cpp \
     data/ExcelQueryHelper.cpp \
+    data/ForearmTest.cpp \
     data/FraxMeasurement.cpp \
     data/FraxTest.cpp \
-    data/GripStrengthMeasurement.cpp \
-    data/GripStrengthTest.cpp \
+    data/HipTest.cpp \
+    data/WholeBodyScanTest.cpp \
+    data/grip_strength/GripStrengthMeasurement.cpp \
+    data/grip_strength/GripStrengthTest.cpp \
     data/HearingMeasurement.cpp \
     data/HearingTest.cpp \
     data/Measurement.cpp \
@@ -50,6 +55,8 @@ SOURCES += \
     managers/AudiometerManager.cpp \
     managers/CDTTManager.cpp \
     managers/ChoiceReactionManager.cpp \
+    managers/dxa/ApSpineScanManager.cpp \
+    managers/dxa/DXAManager.cpp \
     managers/EMRPluginWriter.cpp \
     managers/BodyCompositionManager.cpp \
 #    managers/BluetoothLEManager.cpp \
@@ -58,14 +65,12 @@ SOURCES += \
     managers/BPMMessage.cpp \
     managers/ECGManager.cpp \
     managers/FraxManager.cpp \
-    managers/GripStrengthManager.cpp \
     managers/ManagerBase.cpp \
-    managers/ParadoxReader.cpp \
-    managers/RetinalCameraManager.cpp \
     managers/SerialPortManager.cpp \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -80,6 +85,16 @@ SOURCES += \
 =======
 >>>>>>> 60bc3a9 (retinal camera intregration, configuring MS SQL server)
 =======
+=======
+    managers/dxa/DXAManager.cpp \
+    managers/dxa/ForearmScanManager.cpp \
+    managers/dxa/HipScanManager.cpp \
+    managers/dxa/IVAImagingScanManager.cpp \
+    managers/dxa/WholeBodyScanManager.cpp \
+    managers/grip_strength/GripStrengthManager.cpp \
+    managers/grip_strength/ParadoxReader.cpp \
+    managers/retinal_camera/RetinalCameraManager.cpp \
+>>>>>>> d8613bb (WIP: migrating hologic data extractors)
     rest/DefaultRequestHandler.cpp \
     rest/RetinalCameraRequestHandler.cpp \
     rest/server/GripStrengthRequestHandler.cpp \
@@ -116,6 +131,7 @@ HEADERS += \
     #auxiliary/tracker5util.h \
 >>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.h \
+    data/ApSpineTest.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
     data/BodyCompositionMeasurement.h \
@@ -124,13 +140,17 @@ HEADERS += \
     data/CDTTTest.h \
     data/ChoiceReactionMeasurement.h \
     data/ChoiceReactionTest.h \
+    data/DXATest.h \
     data/ECGMeasurement.h \
     data/ECGTest.h \
     data/ExcelQueryHelper.h \
+    data/ForearmTest.h \
     data/FraxMeasurement.h \
     data/FraxTest.h \
-    data/GripStrengthMeasurement.h \
-    data/GripStrengthTest.h \
+    data/HipTest.h \
+    data/WholeBodyScanTest.h \
+    data/grip_strength/GripStrengthMeasurement.h \
+    data/grip_strength/GripStrengthTest.h \
     data/HearingMeasurement.h \
     data/HearingTest.h \
     data/Measurement.h \
@@ -152,23 +172,34 @@ HEADERS += \
     managers/BPMMessage.h \
     managers/CDTTManager.h \
     managers/ChoiceReactionManager.h \
+    managers/dxa/ApSpineScanManager.h \
+    managers/dxa/DXAManager.h \
     managers/ECGManager.h \
     managers/EMRPluginWriter.h \
     managers/FraxManager.h \
-    managers/GripStrengthManager.h \
+    managers/dxa/ForearmScanManager.h \
+    managers/dxa/HipScanManager.h \
+    managers/dxa/IVAImagingScanManager.h \
+    managers/dxa/WholeBodyScanManager.h \
+    managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
-    managers/ParadoxReader.h \
-    managers/RetinalCameraManager.h \
     managers/SerialPortManager.h \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     server/server.h \
 =======
 >>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
 =======
+=======
+    managers/dxa/DXAManager.h \
+    managers/grip_strength/GripStrengthManager.h \
+    managers/grip_strength/ParadoxReader.h \
+    managers/retinal_camera/RetinalCameraManager.h \
+>>>>>>> d8613bb (WIP: migrating hologic data extractors)
     rest/DefaultRequestHandler.h \
     rest/RetinalCameraRequestHandler.h \
     rest/server/GripStrengthRequestHandler.h \
