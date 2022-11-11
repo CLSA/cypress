@@ -1,8 +1,11 @@
 #include <QProcess>
 #include <QSqlDatabase>
+#include <QSqlQuery>
+
 #include <QFileInfo>
 
 #include "RetinalCameraManager.h"
+#include "qsqlerror.h"
 
 
 RetinalCameraManager::RetinalCameraManager(QObject *parent)
@@ -76,26 +79,69 @@ void RetinalCameraManager::start()
     if (m_verbose)
         qDebug() << "RetinalCameraManager::start";
 
-    QString program = "C:\\Users\\antho\\OneDrive\\Desktop\\qt-unified-windows-x64-4.4.1-online.exe";
+    QString program = "C:/Program Files/Mozilla Firefox/firefox.exe";
     QFileInfo info(program);
     QStringList arguments;
 
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC3");
-    QString connectString = "Driver={SQL Server Native Client 11.0};";                     // Driver is now {SQL Server Native Client 11.0}
-    connectString.append("Server=localhost:1433");   // Hostname,SQL-Server Instance
-    connectString.append("Database=IMAGEnet_R4;");  // Schema
-    connectString.append("Uid=;");           // User
-    connectString.append("Pwd=;");           // Pass
-
-    db.setDatabaseName(connectString);
-
+    // Open DB connection and clean up database
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setHostName("dbo");
+    db.setDatabaseName("dbo");
+    db.setUserName("Anthony");
+    db.setPassword("");
     bool ok = db.open();
 
     if (!ok)
     {
         qDebug() << "could not open db";
     }
+
+    QSqlQuery query;
+    QSqlQuery locationQuery;
+
+    // clean up
+    //
+
+    const QString patientId = "11111111-2222-3333-4444-555555555555";
+    // delete all images returned
+    ok = query.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + patientId + "'");
+    if (!ok) qDebug() << query.lastError();
+    while (query.next()) {
+        QString fileName = query.value(0).toString();
+        QString fileExt = query.value(1).toString();
+        QString storagePathUid = query.value(2).toString();
+
+        ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + storagePathUid + "'");
+
+        if (!ok) qDebug() << query.lastError();
+
+        while (locationQuery.next()) {
+            QString location = locationQuery.value(0).toString();
+            qInfo() << "Deleting: " << location << "/" << fileName + fileExt;
+        }
+
+        qDebug() << fileName << " " << fileExt << " " << storagePathUid;
+    }
+
+    ok = query.exec("DELETE FROM dbo.Exams WHERE PatientUid = '" + patientId + "'");
+    if (!ok) qDebug() << query.lastError();
+
+    ok = query.exec("DELETE FROM dbo.Media WHERE PatientUid = '" + patientId + "'");
+    if (!ok) qDebug() << query.lastError();
+
+    ok = query.exec("DELETE FROM dbo.Patients WHERE PatientUid = '" + patientId + "'");
+    if (!ok) qDebug() << query.lastError();
+
+    ok = query.exec("DELETE FROM dbo.Persons WHERE PersonUid = '" + patientId + "'");
+    if (!ok) qDebug() << query.lastError();
+
+    // initialize DB data
+    ok = query.exec("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) values('11111111-2222-3333-4444-555555555555', 'Anthony', 'Hoare')");
+    if (!ok) qDebug() << query.lastError();
+
+    ok = query.exec("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) values('11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555')");
+    if (!ok) qDebug() << query.lastError();
 
     if (!info.exists())
     {
@@ -136,12 +182,6 @@ void RetinalCameraManager::start()
     if (m_verbose)
         qDebug() << "launching process..";
 
-
-
-
-
-
-
     // wait for process to finish
     //
     if (m_verbose)
@@ -154,14 +194,33 @@ void RetinalCameraManager::start()
 
     // process data for left and right eye
     //
-    if (m_verbose)
-        qDebug() << "reading left eye data..";
+    QSqlQuery dataQuery;
 
+    ok = dataQuery.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + patientId + "'");
+    if (!ok) qDebug() << dataQuery.lastError();
 
-    if (m_verbose)
-        qDebug() << "reading right eye data..";
+    while (dataQuery.next()) {
+        QString fileName = dataQuery.value(0).toString();
+        QString fileExt = dataQuery.value(1).toString();
+        QString storagePathUid = dataQuery.value(2).toString();
 
-    // send data to server
+        ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + storagePathUid + "'");
+
+        if (!ok) qDebug() << query.lastError();
+
+        while (locationQuery.next()) {
+            QString location = locationQuery.value(0).toString();
+            qInfo() << "Located image: " << location << "/" << fileName + fileExt;
+
+            // get image bytes and put into json
+            // get eye side name and put into json
+
+        }
+
+        qDebug() << fileName << " " << fileExt << " " << storagePathUid;
+    }
+
+    // save json data locally and send to Pine
     //
     if (m_verbose)
         qDebug() << "submit..";

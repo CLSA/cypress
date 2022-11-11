@@ -186,6 +186,11 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+win32: INCLUDEPATH += $$PWD/../poco/Foundation/include
+win32: INCLUDEPATH += $$PWD/../poco/Net/include
+win32: INCLUDEPATH += $$PWD/../poco/Util/include
+win32: LIBS += -L$$PWD/../poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
+
 FORMS += \
     RetinalCameraDialog.ui \
   dialogs/gripstrengthdialog.ui \

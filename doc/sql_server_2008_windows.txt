@@ -1,0 +1,8 @@
+Install MS Sql Server Express 2008 R2
+Install most recent version of SQL Server Management Studio
+Use defaults for everything
+Launch ODBC data sources
+Add System DSN data source
+Choose SQL Server driver
+Enter hostname
+Connection test should pass

@@ -11,7 +11,12 @@
 #include <QObject>
 #include <QThread>
 
+<<<<<<< HEAD
 >>>>>>> 1499770 (REST server now runs in its own thread, added new request handlers, organized grip strength documentation)
+=======
+using namespace Poco::Net;
+
+>>>>>>> 408bad4 (retinal camera queries, just need to read file bytes and send now)
 class Server: public QObject
 {
     Q_OBJECT
@@ -23,6 +28,7 @@ class Server: public QObject
     public:
         Server();
         ~Server();
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 <<<<<<< HEAD:src/server/server.h
@@ -53,11 +59,17 @@ class Server: public QObject
     private:
         QTcpServer m_tcpServer;
 =======
+=======
+
+>>>>>>> 408bad4 (retinal camera queries, just need to read file bytes and send now)
         void start();
         void stop();
 
+        const QThread& getThread();
+        HTTPServer* getHTTPServer();
+
     private:
-        Poco::Net::HTTPServer* server;
+        HTTPServer* server;
         QThread serverThread;
 >>>>>>> 1499770 (REST server now runs in its own thread, added new request handlers, organized grip strength documentation)
 

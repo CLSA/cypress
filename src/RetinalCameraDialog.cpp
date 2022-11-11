@@ -43,22 +43,23 @@ void RetinalCameraDialog::initializeConnections()
 
     connect(ui->measureWidget, &MeasureWidget::closeApplication, this, &RetinalCameraDialog::handleClose);
 
-    connect(ui->barcodeWidget, &BarcodeWidget::validated,
-          this,[this](const bool& valid)
-    {
-      if(valid)
-      {
-          // launch the manager
-          //
-          this->run();
-      }
-      else
-      {
-          QMessageBox::critical(
-            this, QApplication::applicationName(),
-            tr("The input does not match the expected barcode for this participant."));
-      }
-  });
+    this->run();
+   // connect(ui->barcodeWidget, &BarcodeWidget::validated,
+   //       this,[this](const bool& valid)
+   // {
+   //   if(valid)
+   //   {
+   //       // launch the manager
+   //       //
+   //       this->run();
+   //   }
+   //   else
+   //   {
+   //       QMessageBox::critical(
+   //         this, QApplication::applicationName(),
+   //         tr("The input does not match the expected barcode for this participant."));
+   //   }
+    //});
 }
 
 bool RetinalCameraDialog::handleClose()
