@@ -17,6 +17,9 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+    QMap<QString, QVariant> computeTandZScores() override;
+    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
 private:
     IVAImagingTest m_test;
 };

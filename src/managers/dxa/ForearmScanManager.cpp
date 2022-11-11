@@ -66,4 +66,17 @@ QMap<QString, QVariant> ForearmScanManager::extractData()
     return QMap<QString, QVariant> {{}};
 }
 
+QMap<QString, QVariant> ForearmScanManager::extractScanAnalysisData(const QString& tableName)
+{
+    // make connection to PatScan.mdb
+    // query data
+
+    return QMap<QString, QVariant>{{"", ""}};
+}
+
+QMap<QString, QVariant> ForearmScanManager::computeTandZScores()
+{
+    return QMap<QString, QVariant> {{}};
+}
+
 

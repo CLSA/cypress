@@ -77,6 +77,7 @@ void CypressApplication::initialize()
     m_dialog->setRunMode(m_mode);
     m_dialog->setVerbose(m_verbose);
     m_dialog->initialize();
+    qDebug() << "show?";
     m_dialog->show();
 
     if (!m_verbose)

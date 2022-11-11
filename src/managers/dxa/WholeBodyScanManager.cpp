@@ -57,3 +57,16 @@ QMap<QString, QVariant> WholeBodyScanManager::extractData()
     //return m_test.data;
     return QMap<QString, QVariant> {{}};
 }
+
+QMap<QString, QVariant> WholeBodyScanManager::extractScanAnalysisData(const QString& tableName)
+{
+    // make connection to PatScan.mdb
+    // query data
+
+    return QMap<QString, QVariant>{{"", ""}};
+}
+
+QMap<QString, QVariant> WholeBodyScanManager::computeTandZScores()
+{
+    return QMap<QString, QVariant> {{}};
+}

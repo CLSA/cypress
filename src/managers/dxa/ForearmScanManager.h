@@ -10,6 +10,8 @@ public:
     explicit ForearmScanManager(QObject *parent = nullptr);
 
     QMap<QString, QVariant> extractData() override;
+    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
+    QMap<QString, QVariant> computeTandZScores() override;
 
     QString getName() override;
     QString getBodyPartName() override;
@@ -17,7 +19,6 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
-
 private:
     ForearmTest m_test;
 };

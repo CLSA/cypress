@@ -52,10 +52,11 @@ void DialogBase::closeEvent(QCloseEvent *event)
     if(m_verbose)
         qDebug() << "Close event called";
 
-    QDir dir = QCoreApplication::applicationDirPath();
-    QSettings settings(dir.filePath(m_manager->getGroup() + ".json"), JsonSettings::JsonFormat);
+    //QDir dir = QCoreApplication::applicationDirPath();
+    //QSettings settings(dir.filePath(m_manager->getGroup() + ".json"), JsonSettings::JsonFormat);
 
-    m_manager->saveSettings(&settings);
+    qDebug() << "m_manager finish";
+    //m_manager->saveSettings(&settings);
     m_manager->finish();
 
     event->accept();

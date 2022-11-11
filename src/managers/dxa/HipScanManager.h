@@ -8,17 +8,43 @@
 
 class HipScanManager : public DXAManager
 {
+    Q_OBJECT
+
 public:
     explicit HipScanManager(QObject *parent = nullptr);
 
-    QMap<QString, QVariant> extractData() override;
+    void initializeModel() override;
+    void updateModel() override;
+    void setInputData(const QVariantMap& inputData) override;
+    void clearData() override;
 
-    QString getName() override;
-    QString getBodyPartName() override;
+    QMap<QString, QVariant> extractData() override;
+    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
+    QMap<QString, QVariant> computeTandZScores() override;
+    QJsonObject toJsonObject() const override;
+
     Side getSide() override;
     quint8 getScanType() override;
+    QString getName() override;
+    QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+
+public slots:
+    // what the manager does in response to the main application
+    // window invoking its run method
+    //
+    void start() override;
+
+    // retrieve a measurement from the device
+    //
+    void measure() override;
+
+    // implementation of final clean up of device after disconnecting and all
+    // data has been retrieved and processed by any upstream classes
+    //
+    void finish() override;
 
 private:
     HipTest m_test;

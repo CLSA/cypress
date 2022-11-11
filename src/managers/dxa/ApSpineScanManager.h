@@ -19,6 +19,9 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
+    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
+    QMap<QString, QVariant> computeTandZScores() override;
+
 private:
     ApSpineTest m_test;
 };

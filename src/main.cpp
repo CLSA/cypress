@@ -49,12 +49,12 @@ void initializeDefaultSettings(QSettings& settings) {
     settings.setValue("pine/host", "");
     settings.setValue("pine/port", "");
 
-    settings.setValue("rest_api/host", "127.0.0.1");
+    settings.setValue("rest_api/host", "0.0.0.0");
     settings.setValue("rest_api/port", 9000);
     settings.setValue("rest_api/args", "");
 
-    settings.setValue("dicom/port", 9000);
-    settings.setValue("dicom/host", "127.0.0.1");
+    settings.setValue("dicom/port", 9001);
+    settings.setValue("dicom/host", "0.0.0.0");
     settings.setValue("dicom/asc_config", "./storescp.cfg");
     settings.setValue("dicom/log_config", "./logger.cfg");
     settings.setValue("dicom/out_dir", "C:/Users/Anthony/Documents/PACS");
@@ -64,6 +64,22 @@ void initializeDefaultSettings(QSettings& settings) {
     settings.setValue("instruments/grip_strength/dir", "C:/Program Files (x86)/Tracker 5");
     settings.setValue("instruments/grip_strength/tests", "C:/work/clsa/cypress/GripStrengthData/ZGripTest_After_Test.DB");
     settings.setValue("instruments/grip_strength/results", "C:/work/clsa/cypress/GripStrengthData/ZGripTestData_After_Test.DB");
+
+    settings.setValue("instruments/dxa/patscandb/version", "MS Access");
+    settings.setValue("instruments/dxa/patscandb/driver", "QODBC");
+    settings.setValue("instruments/dxa/patscandb/host", "");
+    settings.setValue("instruments/dxa/patscandb/port", "");
+    settings.setValue("instruments/dxa/patscandb/user", "");
+    settings.setValue("instruments/dxa/patscandb/password", "");
+    settings.setValue("instruments/dxa/patscandb/database", "");
+
+    settings.setValue("instruments/dxa/refscandb/version", "MS Access");
+    settings.setValue("instruments/dxa/refscandb/driver", "QODBC");
+    settings.setValue("instruments/dxa/refscandb/host", "");
+    settings.setValue("instruments/dxa/refscandb/port", "");
+    settings.setValue("instruments/dxa/refscandb/user", "");
+    settings.setValue("instruments/dxa/refscandb/password", "");
+    settings.setValue("instruments/dxa/refscandb/database", "");
 
     // default patient id to use (db is cleared each time)
     settings.setValue("instruments/retinal_scan/patient_id", "11111111-2222-3333-4444-555555555555");
@@ -103,30 +119,32 @@ int main(int argc, char *argv[])
 
     // process command line args
     //
-    //CommandLineParser parser;
-    //QString errMessage;
-    //switch(parser.parseCommandLine(app, &errMessage))
-    //{
-    //    case CommandLineParser::parseHelpRequested:
-    //        displayHelp(parser);
-    //        return EXIT_SUCCESS;
-    //    case CommandLineParser::parseVersionRequested:
-    //        displayHelp(parser);
-    //        return EXIT_SUCCESS;
-    //    case CommandLineParser::parseOk:
-    //        break;
+    CommandLineParser parser;
+    QString errMessage;
+    switch(parser.parseCommandLine(app, &errMessage))
+    {
+        case CommandLineParser::parseHelpRequested:
+            displayHelp(parser);
+            return EXIT_SUCCESS;
+        case CommandLineParser::parseVersionRequested:
+            displayHelp(parser);
+            return EXIT_SUCCESS;
+        case CommandLineParser::parseOk:
+            break;
 
-    //    case CommandLineParser::parseError:
-    //    case CommandLineParser::parseInputFileError:
-    //    case CommandLineParser::parseOutputPathError:
-    //    case CommandLineParser::parseMissingArg:
-    //    case CommandLineParser::parseMeasureTypeError:
-    //    case CommandLineParser::parseRunModeError:
-    //        displayError(errMessage, parser);
-    //        return EXIT_FAILURE;
-    //}
+        case CommandLineParser::parseError:
+        case CommandLineParser::parseInputFileError:
+        case CommandLineParser::parseOutputPathError:
+        case CommandLineParser::parseMissingArg:
+        case CommandLineParser::parseMeasureTypeError:
+        case CommandLineParser::parseRunModeError:
+            displayError(errMessage, parser);
+            return EXIT_FAILURE;
+    }
 
     CypressApplication cypress;
+    cypress.setArgs(parser.getArgs());
+    cypress.initialize();
 
     // Runs in separate thread
     server->start();

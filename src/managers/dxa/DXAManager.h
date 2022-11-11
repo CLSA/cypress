@@ -8,6 +8,8 @@
 #include <QVariant>
 #include <QString>
 
+#include "managers/dxa/dicom/DicomSCP.h"
+
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
  * PatScanDb table (eg., Hip) and the corresponding bonerange code in the RefScanDb ReferenceCurve table (eg., 123.).
@@ -24,7 +26,8 @@ class DXAManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit DXAManager(QObject *parent = nullptr);
+    DXAManager(QObject *parent = nullptr);
+    ~DXAManager();
 
     const static QMap<QString, QString> ranges;
 
@@ -36,13 +39,20 @@ public:
     virtual QString getRefSource() = 0;
 
     virtual QMap<QString, QVariant> extractData() = 0;
+    virtual QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName);
+    virtual QMap<QString, QVariant> computeTandZScores();
+
+    bool startDicomServer();
+    bool endDicomServer();
 
     void loadSettings(const QSettings &) override;
     void saveSettings(QSettings*) const override;
 
-protected:
-    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName);
-    QMap<QString, QVariant> computeTandZScores();
+    DicomSCP* m_dicomSCP;
+
+private slots:
+    void dicomServerExitNormal();
+    void dicomServerExitCrash();
 };
 
 #endif // DXAMANAGER_H
