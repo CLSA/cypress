@@ -62,7 +62,7 @@ SOURCES += \
     managers/WeighScaleManager.cpp \
     server/server.cpp \
     #tests/server/testserver.cpp \
-    tests/server/testserver.cpp \
+    #tests/server/testserver.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \

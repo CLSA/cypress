@@ -20,18 +20,15 @@ void TestServer::initTestCase()
 void TestServer::startServer()
 {
     Server server;
-    server.start();
-
-    QVERIFY(server.toString() == "server: toString()");
-    // QCOMPARE(1, 1); // compare two values
+    const bool success = server.start();
+    server.end();
+    QVERIFY(success);
 }
 
 void TestServer::endServer()
 {
-    QVERIFY(true);
-    QVERIFY(1 != 2);
     Server server;
-    server.start();
+    const bool success = server.start();
     server.end();
 }
 
