@@ -68,7 +68,9 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
 
     ParseResult result = parseOk;
 
+    qDebug() << "arguments: " << app.arguments();
     const bool successfulParse = m_parser.parse(app.arguments());
+
 
     if (!successfulParse) {
         result = parseError;
@@ -135,6 +137,7 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
 
     if(m_parser.isSet(inputOption) && parseOk == result)
     {
+        qDebug() << "input option";
         QString s = m_parser.value(inputOption);
         QFileInfo info(s);
         if(info.exists(s))
@@ -182,10 +185,10 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
         qDebug() << "output file option not set";
     }
 
+    qDebug() << "measure type option parsing " << m_parser.value(typeOption);
     if(m_parser.isSet(typeOption) && parseOk == result)
     {
         QString s = m_parser.value(typeOption);
-        qDebug() << "measure type option parsing " << s;
         // determine which manager and dialog is needed based on measure type
         //
         if(s.contains("_"))

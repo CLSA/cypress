@@ -12,8 +12,14 @@ public:
     explicit GripStrengthDialog(QWidget *parent = nullptr);
     ~GripStrengthDialog();
 
+    QString getVerificationBarcode() const override;
+    void setVerificationBarcode(const QString&) override;
 private:
     Ui::GripStrengthDialog *ui;
+    void initializeConnections() override;
+    void initializeModel() override;
+    void enableMeasure();
+    bool handleClose();
 };
 
 #endif // GRIPSTRENGTHDIALOG_H

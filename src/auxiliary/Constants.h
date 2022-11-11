@@ -27,6 +27,7 @@ public:
         typeChoice_Reaction,
         typeECG,
         typeFrax,
+        typeGrip_Strength,
         typeRetinal_Camera,
         typeSpirometer,
         typeThermometer,

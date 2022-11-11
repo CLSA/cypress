@@ -11,7 +11,7 @@ public:
     GripStrengthTest();
     ~GripStrengthTest() = default;
 
-    void fromParradox(const QString& gripTestPath, const QString& gripTestDataPath);
+    void fromParadox(const QString& gripTestPath, const QString& gripTestDataPath);
 
     // String representation for debug and GUI display purposes
     //

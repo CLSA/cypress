@@ -7,10 +7,11 @@
 #include "ChoiceReactionDialog.h"
 #include "ECGDialog.h"
 #include "FraxDialog.h"
-//#include "ThermometerDialog.h"
 #include "SpirometerDialog.h"
 #include "TonometerDialog.h"
 #include "WeighScaleDialog.h"
+#include "GripStrengthDialog.h"
+//#include "ThermometerDialog.h"
 
 #include <QDebug>
 
@@ -65,6 +66,10 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
         break;
       case Constants::MeasureType::typeBlood_Pressure:
         dialog = new BloodPressureDialog();
+        break;
+      case Constants::MeasureType::typeGrip_Strength:
+        qDebug() << "grip strength";
+        dialog = new GripStrengthDialog();
         break;
       case Constants::MeasureType::typeRetinal_Camera:
         //dialog = Q_NULLPTR;

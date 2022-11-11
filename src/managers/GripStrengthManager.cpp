@@ -7,6 +7,7 @@
 #include <QProcess>
 #include <QSettings>
 #include <QStandardItemModel>
+#include <QException>
 
 GripStrengthManager::GripStrengthManager(QObject* parent) : ManagerBase(parent)
 {
@@ -19,26 +20,42 @@ GripStrengthManager::GripStrengthManager(QObject* parent) : ManagerBase(parent)
     m_inputKeyList << "barcode";
 }
 
+
 void GripStrengthManager::start()
 {
-    // TODO: Process not launching app. Likely due to admin access requirement of app
-    QProcess process;
-    process.setProgram(m_runnableName);
-    process.setWorkingDirectory(m_runnablePath);
-    process.start();
+    initializeConnections();
+    initializeModel();
+    configureProcess();
+}
 
-    /*emit dataChanged();
-    m_test.fromParradox(m_gripTestDbPath, m_gripTestDataDbPath);*/
+void GripStrengthManager::measure() {
+    try {
+        readOutput();
+    }
+    catch (QException &e) {
+        qDebug() << e.what();
+    }
+}
 
-    // connect signals and slots to QProcess one time only
-    //
-    connect(&m_process, &QProcess::started,
-        this, [this]() {
+void GripStrengthManager::finish()
+{
+    try {
+        m_test.reset();
+    }
+    catch (QException &e) {
+        qDebug() << e.what();
+    }
+}
+
+void GripStrengthManager::initializeConnections() {
+    connect(&m_process, &QProcess::started, this, [this]() {
             qDebug() << "process started: " << m_process.arguments().join(" ");
         });
 
-    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-    //    this, &GripStrengthManager::readOutput);
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        this, &GripStrengthManager::canMeasure);
+
+    connect(this, &GripStrengthManager::canMeasure, this, &GripStrengthManager::measureStart);
 
     connect(&m_process, &QProcess::errorOccurred,
         this, [](QProcess::ProcessError error)
@@ -53,8 +70,23 @@ void GripStrengthManager::start()
             qDebug() << "process state: " << s.join(" ").toLower();
         });
 
-    configureProcess();
-    emit dataChanged();
+    connect(this, &GripStrengthManager::processInitialized, this, &GripStrengthManager::processStart);
+}
+
+void GripStrengthManager::initializeModel()
+{
+    // example of 1 row 1 column display of 1 measurement test
+    //
+    for (int row = 0; row < m_row; row++)
+    {
+        QStandardItem* item = new QStandardItem();
+        m_model->setItem(row, 0, item);
+    }
+    m_model->setHeaderData(0, Qt::Horizontal, "Weight Tests", Qt::DisplayRole);
+}
+
+void GripStrengthManager::readOutput() {
+   m_test.fromParadox(m_gripTestDbPath, m_gripTestDataDbPath);
 }
 
 void GripStrengthManager::loadSettings(const QSettings& settings)
@@ -76,18 +108,6 @@ QJsonObject GripStrengthManager::toJsonObject() const
     }
     json.insert("test_input",QJsonObject::fromVariantMap(m_inputData));
     return json;
-}
-
-void GripStrengthManager::initializeModel()
-{
-    // example of 1 row 1 column display of 1 measurement test
-    //
-    for (int row = 0; row < m_row; row++)
-    {
-        QStandardItem* item = new QStandardItem();
-        m_model->setItem(row, 0, item);
-    }
-    m_model->setHeaderData(0, Qt::Horizontal, "Weight Tests", Qt::DisplayRole);
 }
 
 void GripStrengthManager::updateModel()
@@ -133,21 +153,14 @@ bool GripStrengthManager::isDefined(const QString& value, const GripStrengthMana
     return ok;
 }
 
-void GripStrengthManager::measure()
+void GripStrengthManager::processStart()
 {
-    if (Constants::RunMode::modeSimulate == m_mode)
-    {
-        return;
+    try {
+        m_process.start();
     }
-    clearData();
-    // launch the process
-    if (m_verbose)
-        qDebug() << "Starting process from measure";
-
-    qDebug() << "Program: " << m_process.program();
-    qDebug() << "Working Directory: " << m_process.workingDirectory();
-
-    m_process.start();
+    catch (const std::exception& e) {
+        qDebug() << e.what();
+    }
 }
 
 void GripStrengthManager::setInputData(const QVariantMap& input)
@@ -208,37 +221,67 @@ void GripStrengthManager::clearData()
 
 void GripStrengthManager::configureProcess()
 {
-    if (m_inputData.isEmpty()) return;
-
-    if (Constants::RunMode::modeSimulate == m_mode)
-    {
-        emit message(tr("Ready to measure..."));
-        emit canMeasure();
-        return;
-    }
-
     QDir working(m_runnablePath);
     if (isDefined(m_runnableName, GripStrengthManager::FileType::Tracker5Exe) &&
         isDefined(m_gripTestDbPath, GripStrengthManager::FileType::GripTestDbPath) &&
         isDefined(m_gripTestDataDbPath, GripStrengthManager::FileType::GripTestDataDbPath) &&
         working.exists())
     {
-        qDebug() << "OK: configuring command";
-
         m_process.setProgram(m_runnableName);
         m_process.setWorkingDirectory(m_runnablePath);
 
-        /*removeXmlFiles();
-        backupDatabases();*/
-
-        emit message(tr("Ready to measure..."));
-        emit canMeasure();
+        emit processInitialized();
     }
-    else
-        qDebug() << "failed to configure process";
 }
 
-void GripStrengthManager::finish()
+
+
+void GripStrengthManager::setRunnablePath(const QString& path)
 {
-    m_test.reset();
+    //QString m_runnablepath = "C:/Program Files (x86)/Tracker 5"; // path to WTS.exe directory
+    const QFileInfo pathDir(path);
+    //if (!pathDir.exists())
+    //    throw "Runnable path does not exist";
+    //if (!pathDir.isDir())
+    //    throw "Runnable path is not a directory";
+
+    m_runnablePath = path;
+}
+
+void GripStrengthManager::setRunnableName(const QString& path)
+{
+    // "C:/Program Files (x86)/Tracker 5/WTS.exe";// full pathspec to WTS.exe
+    const QFileInfo pathDir(path);
+    //if (!pathDir.exists())
+    //    throw "Runnable does not exist";
+    //if (!pathDir.isExecutable())
+    //    throw "Runnable is not an executable";
+
+    m_runnableName = path;
+}
+
+void GripStrengthManager::setDatabasePath(const QString& path)
+{
+    // "C:/Users/clsa/Desktop/ZGripTestData.DB"
+    const QFileInfo pathDir(path);
+    if (!pathDir.exists())
+        throw "Database path does not exist";
+    if (!pathDir.isDir())
+        throw "Database path is not a file";
+
+    m_gripTestDataDbPath = path;
+}
+
+
+
+void GripStrengthManager::setTestPath(const QString& path)
+{
+    // "C:/Users/clsa/Desktop/ZGripTestData.DB"
+    const QFileInfo pathDir(path);
+    if (!pathDir.exists())
+        throw "Database path does not exist";
+    if (!pathDir.isDir())
+        throw "Database path is not a file";
+
+    m_gripTestDbPath = "C:/Users/clsa/Desktop/ZGripTest.DB";
 }

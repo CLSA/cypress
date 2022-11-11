@@ -30,7 +30,7 @@ q_paradoxBlocks ParadoxReader::Read()
     }
     
     // Report error if header could not be read or if header data is not valid
-    if (errorReadingHeader || false == headerDataValid()) {
+    if (errorReadingHeader || !headerDataValid()) {
         qDebug() << "Error: Valid header data could not be read";
         return q_paradoxBlocks();
     }
@@ -136,6 +136,7 @@ QJsonObject ParadoxDbBlock::readRecord(QFile& dbFile)
             FieldType type = field.getType();
             QByteArray bytes = dbFile.read(field.getSize());
             QVariant value = getValue(bytes, type);
+            qDebug() << field.getName() << " " << value;
             jsonRecord.insert(field.getName(), QJsonValue::fromVariant(value));
         }
         return jsonRecord;
@@ -162,7 +163,9 @@ QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
             QString result;
             result.reserve(bytes.size());
             for (int i = 0; i < bytes.size(); i++) {
-                result.append((char)bytes[i]);
+                if ((char) bytes[i] != 0) {
+                    result.append((char)bytes[i]);
+                }
             }
             output = result;
             break;
@@ -170,19 +173,22 @@ QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
         case FieldType::LongInteger:
         {
             QByteArray fixed = fixSign(bytes);
-            long value = 0;
-            int leftShift = (bytes.size() - 1) * 8;
-            int mask = 0x000000FF;
-            for (int i = 0; i < bytes.size(); i++) {
-                value |= fixed[i] << leftShift & (mask << leftShift);
-                leftShift = -8;
+            qint32 value = 0;
+            int leftShift = (fixed.size() - 1) * 8;
+            for (int i = 0; i < fixed.size(); i++) {
+                value |= fixed[i] << leftShift;
+                leftShift -= 8;
             }
+
             output = (bytes[0] & 0x80) == 0x80 ? value : (value == 0 ? NULL : -value);
             break;
         }
         // These two are in the data set, but ONYX has them return null
         // So likely not needed to use the data from these types
         case FieldType::Logical:
+            qDebug() << "logical: " << bytes;
+            output = (bytes[0] & 0x81) == 0x81 ? true : false;
+            break;
         case FieldType::MemoBlob:
             break;
         default:
@@ -288,6 +294,7 @@ QList<ParadoxDbBlock> ParadoxReader::readBlocks()
         ParadoxDbBlock block(i + 1, nextBlock, prevBlock, offsetToLastRecord, curFileOffset, &m_header);
         blocks.append(block);
     }
+
     return blocks;
 }
 
