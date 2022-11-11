@@ -34,8 +34,8 @@ void CypressApplication::setArgs(const QVariantMap& args)
 void CypressApplication::initialize()
 {
     DialogFactory *factory = DialogFactory::instance();
-    m_dialog.reset(factory->instantiate(m_type));
 
+    m_dialog.reset(factory->instantiate(m_type));
     if(m_dialog.isNull())
         throw std::runtime_error("FATAL ERROR: failed to initialize a dialog");
 
