@@ -17,23 +17,23 @@ const q_stringMap GripStrengthMeasurement::trialMap =
     {"Rep1", "rep1"},
     {"Rep2", "rep2"},
     {"Rep3", "rep3"},
-    {"Rep4", "rep4"},
-    {"Rep5", "rep5"},
-    {"Rep6", "rep6"},
-    {"Rep7", "rep7"},
-    {"Rep8", "rep8"},
-    {"Rep9", "rep9"},
-    {"Rep10", "rep10"},
+    //{"Rep4", "rep4"},
+    //{"Rep5", "rep5"},
+    //{"Rep6", "rep6"},
+    //{"Rep7", "rep7"},
+    //{"Rep8", "rep8"},
+    //{"Rep9", "rep9"},
+    //{"Rep10", "rep10"},
     {"Rep1Exclude", "rep1Exclude"},
     {"Rep2Exclude", "rep2Exclude"},
     {"Rep3Exclude", "rep3Exclude"},
-    {"Rep4Exclude", "rep4Exclude"},
-    {"Rep5Exclude", "rep5Exclude"},
-    {"Rep6Exclude", "rep6Exclude"},
-    {"Rep7Exclude", "rep7Exclude"},
-    {"Rep8Exclude", "rep8Exclude"},
-    {"Rep9Exclude", "rep9Exclude"},
-    {"Rep10Exclude", "rep10Exclude"},
+    //{"Rep4Exclude", "rep4Exclude"},
+    //{"Rep5Exclude", "rep5Exclude"},
+    //{"Rep6Exclude", "rep6Exclude"},
+    //{"Rep7Exclude", "rep7Exclude"},
+    //{"Rep8Exclude", "rep8Exclude"},
+    //{"Rep9Exclude", "rep9Exclude"},
+    //{"Rep10Exclude", "rep10Exclude"},
 };
 
 void GripStrengthMeasurement::fromRecord(const QJsonObject* record)
@@ -47,17 +47,15 @@ void GripStrengthMeasurement::fromRecord(const QJsonObject* record)
 
 bool GripStrengthMeasurement::isValid() const
 {
-    bool okResult = true;
     foreach(const auto key, trialMap.values())
     {
         if (!hasAttribute(key))
         {
-            qDebug() << "trial measurement missing trial attribute" << key;
-            okResult = false;
-            break;
+            return false;
         }
     }
-    return okResult;
+
+    return true;
 }
 
 QString GripStrengthMeasurement::toString() const
