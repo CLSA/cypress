@@ -55,6 +55,17 @@ protected:
 
 private:
     QProcess m_process;
+
+    QString m_runnableName;
+    QString m_defaultPatientUid;
+
+    QString m_database;
+    QString m_databaseVersion;
+    QString m_databaseDriver;
+    QString m_databaseHost;
+    QString m_databasePort;
+    QString m_databaseUser;
+    QString m_databasePassword;
 };
 
 #endif // RETINALCAMERAMANAGER_H

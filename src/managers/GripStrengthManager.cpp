@@ -18,6 +18,12 @@ GripStrengthManager::GripStrengthManager(QObject* parent) : ManagerBase(parent)
     // all managers must check for barcode and language input values
     //
     m_inputKeyList << "barcode";
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    m_runnableName = settings.value("instruments/grip_strength/exe").toString();
+    m_runnablePath = settings.value("instruments/grip_strength/dir").toString();
+    m_gripTestDbPath = settings.value("instruments/grip_strength/tests").toString();
+    m_gripTestDataDbPath = settings.value("instruments/grip_strength/results").toString();
 }
 
 
@@ -298,19 +304,19 @@ void GripStrengthManager::processStart()
 
 void GripStrengthManager::setInputData(const QVariantMap& input)
 {
-    m_inputData = input;
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-      if(!input.contains("barcode"))
+    if(!input.contains("barcode"))
         m_inputData["barcode"] = Constants::DefaultBarcode;
-      if(!input.contains("language"))
+
+    if(!input.contains("language"))
         m_inputData["language"] = "english";
-    }
+
     bool ok = true;
     QMap<QString,QMetaType::Type> typeMap {
         {"barcode",QMetaType::Type::QString},
         {"language",QMetaType::Type::QString}
     };
+
+    qDebug() << m_inputData;
     foreach(auto key, m_inputKeyList)
     {
       if(!m_inputData.contains(key))
@@ -354,17 +360,19 @@ void GripStrengthManager::clearData()
 
 void GripStrengthManager::configureProcess()
 {
-    QDir working(m_runnablePath);
-    if (isDefined(m_runnableName, GripStrengthManager::FileType::Tracker5Exe) &&
-        isDefined(m_gripTestDbPath, GripStrengthManager::FileType::GripTestDbPath) &&
-        isDefined(m_gripTestDataDbPath, GripStrengthManager::FileType::GripTestDataDbPath) &&
-        working.exists())
-    {
-        m_process.setProgram(m_runnableName);
-        m_process.setWorkingDirectory(m_runnablePath);
+    //QDir working(m_runnablePath);
+    //if (isDefined(m_runnableName, GripStrengthManager::FileType::Tracker5Exe) &&
+    //    isDefined(m_gripTestDbPath, GripStrengthManager::FileType::GripTestDbPath) &&
+    //    isDefined(m_gripTestDataDbPath, GripStrengthManager::FileType::GripTestDataDbPath) &&
+    //    working.exists())
+    //{
+    m_process.setProgram(m_runnablePath + "/" + m_runnableName);
+    m_process.setWorkingDirectory(m_runnablePath);
 
-        emit processInitialized();
-    }
+    emit processInitialized();
+
+    qDebug() << m_runnablePath + "/" + m_runnableName;
+    //}
 }
 
 
