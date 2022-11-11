@@ -13,6 +13,7 @@ SOURCES += \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
+    auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
+    auxiliary/tracker5util.h \
     data/AccessQueryHelper.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
