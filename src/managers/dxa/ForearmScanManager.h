@@ -2,8 +2,7 @@
 #define FOREARMSCANMANAGER_H
 
 #include "DXAManager.h"
-#include "data/DXATest.h"
-#include "data/ForearmTest.h"
+#include "data/dxa/tests/ForearmTest.h"
 
 class ForearmScanManager : public DXAManager
 {
@@ -19,11 +18,8 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-protected:
-    ForearmTest m_test;
-
-
 private:
+    ForearmTest m_test;
 };
 
 #endif // FOREARMSCANMANAGER_H

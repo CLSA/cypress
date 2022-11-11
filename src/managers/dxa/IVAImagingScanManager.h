@@ -2,6 +2,7 @@
 #define IVAIMAGINGSCANMANAGER_H
 
 #include "DXAManager.h"
+#include "data/dxa/tests/IVAImagingTest.h"
 
 class IVAImagingScanManager : public DXAManager
 {
@@ -16,6 +17,8 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
+private:
+    IVAImagingTest m_test;
 };
 
 #endif // IVAIMAGINGSCANMANAGER_H

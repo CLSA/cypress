@@ -1,8 +1,9 @@
-#include "DXAManager.h"
-#include "HipScanManager.h"
 #include <QVariant>
 #include <QString>
 #include <QObject>
+
+#include "managers/dxa/DXAManager.h"
+#include "managers/dxa/HipScanManager.h"
 
 HipScanManager::HipScanManager(QObject* parent)
     : DXAManager{parent}
@@ -12,7 +13,14 @@ HipScanManager::HipScanManager(QObject* parent)
 
 QString HipScanManager::getName()
 {
-    return "";
+    switch(m_test.side) {
+        case LEFT:
+            return "L_HIP";
+        case RIGHT:
+            return "R_HIP";
+        default:
+            return "";
+    }
 }
 
 QString HipScanManager::getBodyPartName()
@@ -54,6 +62,5 @@ QMap<QString, QVariant> HipScanManager::extractData()
     //{
     //   m_test.data[key] = analysisData[key];
     //}
-
-    return m_test.data;
+    return QMap<QString, QVariant> {{}};
 }

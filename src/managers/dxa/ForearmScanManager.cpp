@@ -1,5 +1,4 @@
 #include "ForearmScanManager.h"
-#include "data/DXATest.h"
 #include <QMap>
 #include <QVariant>
 #include <QString>
@@ -57,13 +56,14 @@ QString ForearmScanManager::getRefSource()
 
 QMap<QString, QVariant> ForearmScanManager::extractData()
 {
-    QMap<QString, QVariant> analysisData = extractScanAnalysisData();
-    for (QString key: m_test.testKeys)
-    {
-       m_test.data[key] = analysisData[key];
-    }
+    //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
+    //for (QString key: m_test.testKeys)
+    //{
+    //   m_test.data[key] = analysisData[key];
+    //}
 
-    return m_test.data;
+    //return m_test.data;
+    return QMap<QString, QVariant> {{}};
 }
 
 

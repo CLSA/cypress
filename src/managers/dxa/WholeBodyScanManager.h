@@ -2,6 +2,7 @@
 #define WHOLEBODYSCANMANAGER_H
 
 #include "DXAManager.h"
+#include "data/dxa/tests/WholeBodyScanTest.h"
 
 class WholeBodyScanManager : public DXAManager
 {
@@ -16,6 +17,9 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+private:
+    WholeBodyScanTest m_test;
 };
 
 #endif // WHOLEBODYSCANMANAGER_H
