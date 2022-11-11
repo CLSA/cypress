@@ -4,11 +4,11 @@
 
 #include <QCoreApplication>
 #include <QDebug>
-#include <QHidDevice>
+#include <QtUsb/QHidDevice>
 #include <QJsonObject>
 #include <QSettings>
 #include <QStandardItemModel>
-#include <QUsb>
+#include <QtUsb/QtUsb>
 
 BloodPressureManager::BloodPressureManager(QObject* parent) 
     : ManagerBase(parent)

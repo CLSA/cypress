@@ -1,14 +1,11 @@
 #include "Constants.h"
 #include <QMetaEnum>
 
-const QString Constants::DefaultBarcode
-  = "00000000";
+const QString Constants::DefaultBarcode = "00000000";
 
-const Constants::UnitsSystem Constants::DefaultUnitsSystem
-  = UnitsSystem::systemMetric;
+const Constants::UnitsSystem Constants::DefaultUnitsSystem = UnitsSystem::systemMetric;
 
-const quint16 Constants::DefaultSplitLength
-  = 5;
+const quint16 Constants::DefaultSplitLength = 5;
 
 Constants::MeasureType Constants::getMeasureType(const QString& name)
 {

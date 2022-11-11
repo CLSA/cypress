@@ -16,12 +16,12 @@ public:
     ~DialogBase() = default;
 
     // This method internally calls readInput
-    //
+
     void initialize();
 
     // Call after initialize, launch the application and run
     // the device
-    //
+
     void run();
 
     void setInputFileName(const QString& name) { m_inputFileName = name; }
@@ -50,10 +50,14 @@ protected:
     QString m_inputFileName;
     QString m_outputFileName;
     Constants::RunMode m_mode;
-    bool m_verbose;
     QVariantMap m_inputData;
 
+    bool m_verbose;
+
     void readInput();
+
+    QString getDefaultOutputFileName();
+    QString getOutputFile();
 
 private:
     virtual void initializeModel() = 0;
