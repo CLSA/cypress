@@ -3,7 +3,11 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
+<<<<<<< HEAD
 #include "../auxiliary/tracker5util.h"
+=======
+//#include "../auxiliary/tracker5util.h"
+>>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
 
 const q_stringMap GripStrengthTest::testMetaMap = {
     {"Sequence", "sequence"},
@@ -61,6 +65,7 @@ void GripStrengthTest::readGripTestResults(const QString& gripTestDataPath)
     foreach(QJsonObject record, testDataRecords) {
         GripStrengthMeasurement measurement;
 
+<<<<<<< HEAD
         QString unit = m_metaData.getAttribute(QString("units")).value().toString();
         if (record.contains("Rep1")) {
             qDebug() << Tracker5Util::asKg(record["Rep1"].toInt());
@@ -74,6 +79,21 @@ void GripStrengthTest::readGripTestResults(const QString& gripTestDataPath)
             qDebug() << Tracker5Util::asKg(record["Rep3"].toInt());
             record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toInt());
         }
+=======
+        //QString unit = m_metaData.getAttribute(QString("units")).value().toString();
+        //if (record.contains("Rep1")) {
+        //    qDebug() << Tracker5Util::asKg(record["Rep1"].toInt());
+        //    record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toInt());
+        //}
+        //if (record.contains("Rep2")) {
+        //    qDebug() << Tracker5Util::asKg(record["Rep2"].toInt());
+        //    record["Rep2"] = Tracker5Util::asKg(record["Rep2"].toInt());
+        //}
+        //if (record.contains("Rep3")) {
+        //    qDebug() << Tracker5Util::asKg(record["Rep3"].toInt());
+        //    record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toInt());
+        //}
+>>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
 
         qDebug() << record;
         measurement.fromRecord(&record);

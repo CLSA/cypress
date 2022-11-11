@@ -13,11 +13,7 @@ SOURCES += \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
-<<<<<<< HEAD
     auxiliary/tracker5util.cpp \
-=======
-    #auxiliary/tracker5util.cpp \
->>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
@@ -64,6 +60,8 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+    server/GripStrengthRequestHandler.cpp \
+    server/InstrumentRequestHandlerFactory.cpp \
     server/server.cpp \
     #tests/server/testserver.cpp \
     #tests/server/testserver.cpp \
@@ -83,18 +81,14 @@ SOURCES += \
     dialogs/TonometerDialog.cpp \
     dialogs/WeighScaleDialog.cpp \
     CypressApplication.cpp \
-    main.cpp 
+    main.cpp
 
 HEADERS += \
     auxiliary/CommandLineParser.h \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
-<<<<<<< HEAD
     auxiliary/tracker5util.h \
-=======
-    #auxiliary/tracker5util.h \
->>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
@@ -142,6 +136,8 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+    server/GripStrengthRequestHandler.h \
+    server/InstrumentRequestHandlerFactory.h \
     server/server.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
@@ -181,3 +177,27 @@ FORMS += \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation #-lPocoFoundationd
+else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoFoundation
+
+INCLUDEPATH += $$PWD/../../poco/Foundation/include
+DEPENDPATH += $$PWD/../../poco/Foundation/include
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet #-lPocoNetd
+else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoNet
+
+INCLUDEPATH += $$PWD/../../poco/Net/include
+DEPENDPATH += $$PWD/../../poco/Net/include
+
+DISTFILES += \
+    index.html
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
+else:unix: LIBS += -L$$PWD/../../poco/lib64/ -lPocoUtil
+
+INCLUDEPATH += $$PWD/../../poco/Util/include
+DEPENDPATH += $$PWD/../../poco/Util/include

@@ -13,11 +13,7 @@ SOURCES += \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
-<<<<<<< HEAD
-    auxiliary/tracker5util.cpp \
-=======
     #auxiliary/tracker5util.cpp \
->>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
@@ -64,7 +60,13 @@ SOURCES += \
     managers/SpirometerManager.cpp \
     managers/TonometerManager.cpp \
     managers/WeighScaleManager.cpp \
+<<<<<<< HEAD
     server/server.cpp \
+=======
+    #server/GripStrengthRequestHandler.cpp \
+    #server/InstrumentRequestHandlerFactory.cpp \
+    #server/server.cpp \
+>>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
     #tests/server/testserver.cpp \
     #tests/server/testserver.cpp \
     widgets/BarcodeWidget.cpp \
@@ -90,11 +92,7 @@ HEADERS += \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
-<<<<<<< HEAD
-    auxiliary/tracker5util.h \
-=======
     #auxiliary/tracker5util.h \
->>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \
@@ -142,7 +140,10 @@ HEADERS += \
     managers/SpirometerManager.h \
     managers/TonometerManager.h \
     managers/WeighScaleManager.h \
+<<<<<<< HEAD
     server/server.h \
+=======
+>>>>>>> aeed5d7 (moved server code to its own subproject to be run independently to prevent blocking main loop, applications now launch on network request, added default request (404) handler, regex for matching request URIs to the appropriate handler)
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -159,8 +160,8 @@ HEADERS += \
     dialogs/WeighScaleDialog.h \
     CypressApplication.h
 
-TRANSLATIONS += \
-    Cypress_en_CA.ts
+#TRANSLATIONS += \
+#    Cypress_en_CA.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 

@@ -13,11 +13,7 @@ SOURCES += \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
-<<<<<<< HEAD
-    auxiliary/tracker5util.cpp \
-=======
     #auxiliary/tracker5util.cpp \
->>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.cpp \
     data/BloodPressureMeasurement.cpp \
     data/BloodPressureTest.cpp \
@@ -90,11 +86,7 @@ HEADERS += \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
-<<<<<<< HEAD
-    auxiliary/tracker5util.h \
-=======
     #auxiliary/tracker5util.h \
->>>>>>> refs/rewritten/Integrated-POCO-library-to-use-their-HTTP-server-implementation-Added-Grip-Strength-request-handler-Added-index-html-to-possibly-be-used-as-workstation-configuration-page
     data/AccessQueryHelper.h \
     data/BloodPressureMeasurement.h \
     data/BloodPressureTest.h \

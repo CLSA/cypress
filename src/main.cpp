@@ -6,6 +6,7 @@
 #include <QTranslator>
 #include <QMessageBox>
 #include <QDebug>
+#include "./server/server.h"
 
 #include "./auxiliary/Constants.h"
 
@@ -34,6 +35,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion("1.0.0");
 
     QApplication app(argc, argv);
+
+    Server server;
+    server.start();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
