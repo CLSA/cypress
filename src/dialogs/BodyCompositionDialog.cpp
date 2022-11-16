@@ -1,5 +1,5 @@
 #include "BodyCompositionDialog.h"
-#include "../managers/BodyCompositionManager.h"
+#include "managers/body_composition/BodyCompositionManager.h"
 
 #include <QDebug>
 #include <QMessageBox>

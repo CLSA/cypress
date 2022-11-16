@@ -1,5 +1,5 @@
 #include "TonometerDialog.h"
-#include "../managers/TonometerManager.h"
+#include "managers/tonometer/TonometerManager.h"
 
 #include <QDebug>
 #include <QFileDialog>

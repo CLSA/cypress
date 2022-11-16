@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "auxiliary/tracker5util.h"
+#include "managers/grip_strength/ParadoxReader.h"
 
 const q_stringMap GripStrengthTest::testMetaMap = {
     {"Sequence", "sequence"},

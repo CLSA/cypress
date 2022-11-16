@@ -6,10 +6,10 @@
 #include <QMessageBox>
 #include <stdexcept>
 
-#include "./auxiliary/Constants.h"
-#include "./dialogs/DialogFactory.h"
-#include "./dialogs/DialogBase.h"
-#include "./rest/server/server.h"
+#include "auxiliary/Constants.h"
+#include "dialogs/DialogFactory.h"
+#include "dialogs/DialogBase.h"
+#include "server/Server.h"
 
 extern Server* server;
 
@@ -77,11 +77,11 @@ void CypressApplication::initialize()
     m_dialog->setRunMode(m_mode);
     m_dialog->setVerbose(m_verbose);
     m_dialog->initialize();
-    qDebug() << "show?";
     m_dialog->show();
 
     if (!m_verbose)
         return;
+
     qDebug() << "Input: " << m_inputFileName;
     qDebug() << "Output: " << m_outputFileName;
     qDebug() << "Mode: " << m_mode;

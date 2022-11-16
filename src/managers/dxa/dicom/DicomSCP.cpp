@@ -6,6 +6,7 @@
 #include <signal.h>
 
 #include "DicomSCP.h"
+#include <QSettings>
 
 DicomSCP::DicomSCP(QObject *parent)
     : QObject{parent}
@@ -18,22 +19,19 @@ DicomSCP::~DicomSCP() {
 
 void DicomSCP::initProcess()
 {
-    m_process.reset(new QProcess());
-
-
     // args at https://support.dcmtk.org/docs/dcmrecv.html
-    QStringList args;
-    args
-        << "-xf" << "../etc/dcmtk/storescp.cfg"
-        << "default"
-        << "--filename-extension" << ".dcm"
-        << "-od" << "../storage"
-        << "-lc" << "../etc/dcmtk/filelog.cfg"
-        << "+fst"
-        << "9001";
+    m_process.reset(new QProcess);
 
-    m_process->setWorkingDirectory("C:/work/clsa/cypress/dcmtk-3.6.7/bin");
-    m_process->setProgram("C:/work/clsa/cypress/dcmtk-3.6.7/bin/dcmrecv.exe");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    QStringList args;
+
+    args
+        << "+fst"
+        << settings.value("dicom/port", "9001").toString();
+
+    qDebug() << "args" << args;
+    m_process->setWorkingDirectory(settings.value("dicom/working_dir", "").toString());
+    m_process->setProgram(settings.value("dicom/program", "").toString());
     m_process->setArguments(args);
 
     QStringList list;
@@ -45,7 +43,7 @@ void DicomSCP::initProcess()
 void DicomSCP::initConnections()
 {
     initProcess();
-    start();
+    //start();
 
     connect(m_fileSystemWatcher.get(), &QFileSystemWatcher::directoryChanged, this, [this](const QString& path) {
         QStringList nameFilters;
@@ -97,6 +95,7 @@ void DicomSCP::initConnections()
 
     connect(m_process.get(), &QProcess::readyReadStandardOutput, this, [this]() {
         QString output = m_process->readAllStandardOutput();
+        qDebug() << output;
         emit logUpdate(output);
     });
 
@@ -120,7 +119,6 @@ void DicomSCP::initConnections()
 bool DicomSCP::start()
 {
     m_process->start();
-
     return m_process->waitForStarted();
 }
 

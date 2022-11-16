@@ -1,5 +1,5 @@
 #include "ECGDialog.h"
-#include "../managers/ECGManager.h"
+#include "managers/ecg/ECGManager.h"
 
 #include <QDebug>
 #include <QFileDialog>

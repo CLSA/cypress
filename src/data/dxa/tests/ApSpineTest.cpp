@@ -1,4 +1,5 @@
 #include "ApSpineTest.h"
+
 const QList<QString> ApSpineTest::m_inputKeyList = {
 };
 

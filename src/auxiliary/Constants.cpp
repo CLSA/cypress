@@ -1,5 +1,6 @@
 #include "Constants.h"
 #include <QMetaEnum>
+#include <QDebug>
 
 const QString Constants::DefaultBarcode = "00000000";
 
@@ -18,6 +19,7 @@ Constants::RunMode Constants::getRunMode(const QString& name)
 {
   QMetaEnum meta = QMetaEnum::fromType<RunMode>();
   int result = meta.keyToValue(QString("mode%1").arg(name).toStdString().c_str());
+  qDebug() << name << result;
   return -1 == result ? Constants::RunMode::modeUnknown : static_cast<Constants::RunMode>(result);
 }
 

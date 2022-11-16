@@ -10,26 +10,13 @@ CONFIG += c++11
 
 RC_ICONS = favicon.ico
 SOURCES += \
-    RetinalCameraDialog.cpp \
     auxiliary/CommandLineParser.cpp \
     auxiliary/Constants.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
     auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
-    data/BloodPressureMeasurement.cpp \
-    data/BloodPressureTest.cpp \
-    data/BodyCompositionMeasurement.cpp \
-    data/BodyCompositionTest.cpp \
-    data/CDTTMeasurement.cpp \
-    data/CDTTTest.cpp \
-    data/ChoiceReactionMeasurement.cpp \
-    data/ChoiceReactionTest.cpp \
-    data/ECGMeasurement.cpp \
-    data/ECGTest.cpp \
     data/ExcelQueryHelper.cpp \
-    data/FraxMeasurement.cpp \
-    data/FraxTest.cpp \
     data/dxa/PatScanQueryHelper.cpp \
     data/dxa/ReferenceQueryHelper.cpp \
     data/dxa/measurements/ApSpineMeasurement.cpp \
@@ -44,39 +31,56 @@ SOURCES += \
     data/dxa/tests/HipTest.cpp \
     data/dxa/tests/IVAImagingTest.cpp \
     data/dxa/tests/WholeBodyScanTest.cpp \
-    data/HearingMeasurement.cpp \
-    data/HearingTest.cpp \
     data/Measurement.cpp \
 #    data/TemperatureMeasurement.cpp \
 #    data/TemperatureTest.cpp \
-    data/SpirometerMeasurement.cpp \
-    data/SpirometerTest.cpp \
-    data/TonometerMeasurement.cpp \
-    data/TonometerTest.cpp \
-    data/WeightMeasurement.cpp \
-    data/WeighScaleTest.cpp \
     data/grip_strength/measurements/GripStrengthMeasurement.cpp \
     data/grip_strength/tests/GripStrengthTest.cpp \
     dialogs/DXADialog.cpp \
     dialogs/GripStrengthDialog.cpp \
-    managers/AudiometerManager.cpp \
-    managers/CDTTManager.cpp \
-    managers/ChoiceReactionManager.cpp \
-    managers/dxa/ApSpineScanManager.cpp \
-    managers/dxa/DXAManager.cpp \
-    managers/EMRPluginWriter.cpp \
-    managers/BodyCompositionManager.cpp \
 #    managers/BluetoothLEManager.cpp \
-    managers/BloodPressureManager.cpp \
-    managers/BPMCommunication.cpp \
-    managers/BPMMessage.cpp \
-    managers/ECGManager.cpp \
-    managers/FraxManager.cpp \
+    data/Measurement.cpp \
+    data/MeasurementBase.cpp \
+    data/blood_pressure/measurements/BloodPressureMeasurement.cpp \
+    data/blood_pressure/tests/BloodPressureTest.cpp \
+    data/body_composition/measurements/BodyCompositionMeasurement.cpp \
+    data/body_composition/tests/BodyCompositionTest.cpp \
+    data/cdtt/measurements/CDTTMeasurement.cpp \
+    data/cdtt/tests/CDTTTest.cpp \
+    data/choice_reaction/measurements/ChoiceReactionMeasurement.cpp \
+    data/choice_reaction/tests/ChoiceReactionTest.cpp \
+    data/dxa/PatScanQueryHelper.cpp \
+    data/dxa/ReferenceQueryHelper.cpp \
+    data/dxa/tests/WholeBodyScanTest.cpp \
+    data/ecg/measurements/ECGMeasurement.cpp \
+    data/ecg/tests/ECGTest.cpp \
+    data/frax/measurements/FraxMeasurement.cpp \
+    data/frax/tests/FraxTest.cpp \
+    data/grip_strength/measurements/GripStrengthMeasurement.cpp \
+    data/grip_strength/tests/GripStrengthTest.cpp \
+    data/hearing/measurements/HearingMeasurement.cpp \
+    data/hearing/tests/HearingTest.cpp \
+    data/spirometer/measurements/SpirometerMeasurement.cpp \
+    data/spirometer/tests/SpirometerTest.cpp \
+    data/temperature/measurements/TemperatureMeasurement.cpp \
+    data/temperature/tests/TemperatureTest.cpp \
+    data/tonometer/measurements/TonometerMeasurement.cpp \
+    data/tonometer/tests/TonometerTest.cpp \
+    data/weigh_scale/measurements/WeightMeasurement.cpp \
+    data/weigh_scale/tests/WeighScaleTest.cpp \
+    dialogs/DXADialog.cpp \
+    dialogs/GripStrengthDialog.cpp \
+    dialogs/RetinalCameraDialog.cpp \
     managers/ManagerBase.cpp \
-    managers/SerialPortManager.cpp \
-    managers/SpirometerManager.cpp \
-    managers/TonometerManager.cpp \
-    managers/WeighScaleManager.cpp \
+    managers/audiometer/AudiometerManager.cpp \
+    managers/blood_pressure/BPMCommunication.cpp \
+    managers/blood_pressure/BPMMessage.cpp \
+    managers/blood_pressure/BloodPressureManager.cpp \
+    managers/bluetooth/BluetoothLEManager.cpp \
+    managers/body_composition/BodyCompositionManager.cpp \
+    managers/cdtt/CDTTManager.cpp \
+    managers/choice_reaction/ChoiceReactionManager.cpp \
+    managers/dxa/ApSpineScanManager.cpp \
     managers/dxa/DXAManager.cpp \
     managers/dxa/ForearmScanManager.cpp \
     managers/dxa/HipScanManager.cpp \
@@ -87,12 +91,21 @@ SOURCES += \
     managers/grip_strength/GripStrengthManager.cpp \
     managers/grip_strength/ParadoxReader.cpp \
     managers/retinal_camera/RetinalCameraManager.cpp \
-    rest/DefaultRequestHandler.cpp \
-    rest/RetinalCameraRequestHandler.cpp \
-    rest/server/GripStrengthRequestHandler.cpp \
-    rest/server/InstrumentRequestHandlerFactory.cpp \
-    rest/server/retinalcamerarequesthandler.cpp \
-    rest/server/server.cpp \
+    managers/ecg/ECGManager.cpp \
+    managers/emr/EMRPluginWriter.cpp \
+    managers/frax/FraxManager.cpp \
+    managers/grip_strength/GripStrengthManager.cpp \
+    managers/grip_strength/ParadoxReader.cpp \
+    managers/retinal_camera/RetinalCameraManager.cpp \
+    managers/serial_port/SerialPortManager.cpp \
+    managers/spirometer/SpirometerManager.cpp \
+    managers/tonometer/TonometerManager.cpp \
+    managers/weigh_scale/WeighScaleManager.cpp \
+    server/DefaultRequestHandler.cpp \
+    server/Server.cpp \
+    server/handlers/GripStrengthRequestHandler.cpp \
+    server/handlers/InstrumentRequestHandlerFactory.cpp \
+    server/handlers/RetinalCameraRequestHandler.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -107,31 +120,26 @@ SOURCES += \
     dialogs/SpirometerDialog.cpp \
     dialogs/TonometerDialog.cpp \
     dialogs/WeighScaleDialog.cpp \
-    RetinalCameraDialog.cpp \
     CypressApplication.cpp \
     main.cpp
 
 HEADERS += \
-    RetinalCameraDialog.h \
     auxiliary/CommandLineParser.h \
     auxiliary/Constants.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
     auxiliary/tracker5util.h \
     data/AccessQueryHelper.h \
-    data/BloodPressureMeasurement.h \
-    data/BloodPressureTest.h \
-    data/BodyCompositionMeasurement.h \
-    data/BodyCompositionTest.h \
-    data/CDTTMeasurement.h \
-    data/CDTTTest.h \
-    data/ChoiceReactionMeasurement.h \
-    data/ChoiceReactionTest.h \
-    data/ECGMeasurement.h \
-    data/ECGTest.h \
     data/ExcelQueryHelper.h \
-    data/FraxMeasurement.h \
-    data/FraxTest.h \
+    data/MeasurementBase.h \
+    data/blood_pressure/measurements/BloodPressureMeasurement.h \
+    data/blood_pressure/tests/BloodPressureTest.h \
+    data/body_composition/measurements/BodyCompositionMeasurement.h \
+    data/body_composition/tests/BodyCompositionTest.h \
+    data/cdtt/measurements/CDTTMeasurement.h \
+    data/cdtt/tests/CDTTTest.h \
+    data/choice_reaction/measurements/ChoiceReactionMeasurement.h \
+    data/choice_reaction/tests/ChoiceReactionTest.h \
     data/dxa/PatScanQueryHelper.h \
     data/dxa/ReferenceQueryHelper.h \
     data/dxa/measurements/ApSpineMeasurement.h \
@@ -145,35 +153,43 @@ HEADERS += \
     data/dxa/tests/HipTest.h \
     data/dxa/tests/IVAImagingTest.h \
     data/dxa/tests/WholeBodyScanTest.h \
-    data/HearingMeasurement.h \
-    data/HearingTest.h \
     data/Measurement.h \
     data/TestBase.h \
-    data/SpirometerMeasurement.h \
-    data/SpirometerTest.h \
-    data/TonometerMeasurement.h \
-    data/TonometerTest.h \
 #    data/TemperatureMeasurement.h \
 #    data/TemperatureTest.h \
-    data/WeightMeasurement.h \
-    data/WeighScaleTest.h \
     data/grip_strength/measurements/GripStrengthMeasurement.h \
     data/grip_strength/tests/GripStrengthTest.h \
     dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
-    managers/AudiometerManager.h \
-    managers/BloodPressureManager.h \
-#    managers/BluetoothLEManager.h \
-    managers/BodyCompositionManager.h \
-    managers/BPMCommunication.h \
-    managers/BPMMessage.h \
-    managers/CDTTManager.h \
-    managers/ChoiceReactionManager.h \
+    data/ecg/measurements/ECGMeasurement.h \
+    data/ecg/tests/ECGTest.h \
+    data/frax/measurements/FraxMeasurement.h \
+    data/frax/tests/FraxTest.h \
+    data/grip_strength/measurements/GripStrengthMeasurement.h \
+    data/grip_strength/tests/GripStrengthTest.h \
+    data/hearing/measurements/HearingMeasurement.h \
+    data/hearing/tests/HearingTest.h \
+    data/spirometer/measurements/SpirometerMeasurement.h \
+    data/spirometer/tests/SpirometerTest.h \
+    data/temperature/measurements/TemperatureMeasurement.h \
+    data/temperature/tests/TemperatureTest.h \
+    data/tonometer/measurements/TonometerMeasurement.h \
+    data/tonometer/tests/TonometerTest.h \
+    data/weigh_scale/measurements/WeightMeasurement.h \
+    data/weigh_scale/tests/WeighScaleTest.h \
+    dialogs/DXADialog.h \
+    dialogs/GripStrengthDialog.h \
+    dialogs/RetinalCameraDialog.h \
+    managers/audiometer/AudiometerManager.h \
+    managers/blood_pressure/BPMCommunication.h \
+    managers/blood_pressure/BPMMessage.h \
+    managers/blood_pressure/BloodPressureManager.h \
+    managers/bluetooth/BluetoothLEManager.h \
+    managers/body_composition/BodyCompositionManager.h \
+    managers/cdtt/CDTTManager.h \
+    managers/choice_reaction/ChoiceReactionManager.h \
     managers/dxa/ApSpineScanManager.h \
     managers/dxa/DXAManager.h \
-    managers/ECGManager.h \
-    managers/EMRPluginWriter.h \
-    managers/FraxManager.h \
     managers/dxa/ForearmScanManager.h \
     managers/dxa/HipScanManager.h \
     managers/dxa/IVAImagingScanManager.h \
@@ -182,20 +198,24 @@ HEADERS += \
     managers/dxa/dicom/LogWorker.h \
     managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
-    managers/SerialPortManager.h \
-    managers/SpirometerManager.h \
-    managers/TonometerManager.h \
-    managers/WeighScaleManager.h \
+    managers/ecg/ECGManager.h \
+    managers/emr/EMRPluginWriter.h \
+    managers/frax/FraxManager.h \
+    managers/grip_strength/GripStrengthManager.h \
+    managers/ManagerBase.h \
     managers/dxa/DXAManager.h \
     managers/grip_strength/GripStrengthManager.h \
     managers/grip_strength/ParadoxReader.h \
     managers/retinal_camera/RetinalCameraManager.h \
-    rest/DefaultRequestHandler.h \
-    rest/RetinalCameraRequestHandler.h \
-    rest/server/GripStrengthRequestHandler.h \
-    rest/server/InstrumentRequestHandlerFactory.h \
-    rest/server/retinalcamerarequesthandler.h \
-    rest/server/server.h \
+    managers/serial_port/SerialPortManager.h \
+    managers/spirometer/SpirometerManager.h \
+    managers/tonometer/TonometerManager.h \
+    managers/weigh_scale/WeighScaleManager.h \
+    server/DefaultRequestHandler.h \
+    server/Server.h \
+    server/handlers/GripStrengthRequestHandler.h \
+    server/handlers/InstrumentRequestHandlerFactory.h \
+    server/handlers/RetinalCameraRequestHandler.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -210,7 +230,6 @@ HEADERS += \
     dialogs/SpirometerDialog.h \
     dialogs/TonometerDialog.h \
     dialogs/WeighScaleDialog.h \
-    RetinalCameraDialog.h \
     CypressApplication.h
 
 #TRANSLATIONS += \
@@ -223,30 +242,26 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32: INCLUDEPATH += $$PWD/../poco/Foundation/include
-win32: INCLUDEPATH += $$PWD/../poco/Net/include
-win32: INCLUDEPATH += $$PWD/../poco/Util/include
-win32: LIBS += -L$$PWD/../poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
+INCLUDEPATH += $$PWD/../poco/Foundation/include
+INCLUDEPATH += $$PWD/../poco/Net/include
+INCLUDEPATH += $$PWD/../poco/Util/include
+LIBS += -L$$PWD/../poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
 
 FORMS += \
-    RetinalCameraDialog.ui \
-    dialogs/dxadialog.ui \
+  dialogs/RetinalCameraDialog.ui \
+  dialogs/dxadialog.ui \
   dialogs/gripstrengthdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
   dialogs/bloodpressuredialog.ui \
   dialogs/bodycompositiondialog.ui \
-#  dialogs/thermometerdialog.ui \
   dialogs/runnabledialog.ui \
   dialogs/weighscaledialog.ui
 
 RESOURCES += \
 
-SUBDIRS += \
-    rest/rest.pro
-
 DISTFILES += \
     ../README.md \
     favicon.ico \
-    rest/server/pages/index.html
+    server/pages/index.html

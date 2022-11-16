@@ -1,5 +1,5 @@
 #include "AudiometerDialog.h"
-#include "../managers/AudiometerManager.h"
+#include "managers/audiometer/AudiometerManager.h"
 
 #include <QDebug>
 #include <QMessageBox>

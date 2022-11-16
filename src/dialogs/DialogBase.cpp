@@ -1,7 +1,6 @@
 #include "DialogBase.h"
-
-#include "./auxiliary/JsonSettings.h"
-#include "./managers/ManagerBase.h"
+#include "auxiliary/JsonSettings.h"
+#include "managers/ManagerBase.h"
 
 #include <QCoreApplication>
 #include <QCloseEvent>

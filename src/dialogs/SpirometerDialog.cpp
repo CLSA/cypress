@@ -1,5 +1,5 @@
 #include "SpirometerDialog.h"
-#include "../managers/SpirometerManager.h"
+#include "managers/spirometer/SpirometerManager.h"
 
 #include <QDebug>
 #include <QFileDialog>
