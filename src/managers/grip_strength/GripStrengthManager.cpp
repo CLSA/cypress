@@ -9,6 +9,7 @@
 #include <QStandardItemModel>
 #include <QException>
 
+
 GripStrengthManager::GripStrengthManager(QObject* parent) : ManagerBase(parent)
 {
     setGroup("gripstrength");

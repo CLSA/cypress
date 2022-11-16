@@ -23,14 +23,13 @@ void RetinalCameraManager::loadSettings(const QSettings& settings)
         qDebug() << "RetinalCameraManager::loadSettings";
 
     m_runnableName      = settings.value("retinal_scan/exe").toString();
-    m_defaultPatientUid = settings.value("retinal_scan/patient_id").toString();
-    m_databaseVersion   = settings.value("retinal_scan/database/version").toString();
-    m_databaseDriver    = settings.value("retinal_scan/database/driver").toString();
-    m_database		    = settings.value("retinal_scan/database/database").toString();
-    m_databaseHost      = settings.value("retinal_scan/database/host").toString();
-    m_databasePort      = settings.value("retinal_scan/database/port").toString();
-    m_databaseUser      = settings.value("retinal_scan/database/user").toString();
-    m_databasePassword  = settings.value("retinal_scan/database/password").toString();
+    m_defaultPatientUid = settings.value("instruments/retinal_scan/patient_id").toString();
+    m_databaseDriver    = settings.value("instruments/retinal_scan/database/driver").toString();
+    m_database		    = settings.value("instruments/retinal_scan/database/database").toString();
+    m_databaseHost      = settings.value("instruments/retinal_scan/database/host").toString();
+    m_databasePort      = settings.value("instruments/retinal_scan/database/port").toInt();
+    m_databaseUser      = settings.value("instruments/retinal_scan/database/user").toString();
+    m_databasePassword  = settings.value("instruments/retinal_scan/database/password").toString();
 
     if (m_verbose)
     {
@@ -43,6 +42,18 @@ void RetinalCameraManager::loadSettings(const QSettings& settings)
         qInfo() << m_databaseUser;
         qInfo() << m_databasePassword;
     }
+}
+
+void RetinalCameraManager::printDatabaseParams()
+{
+    qInfo() << m_runnableName;
+    qInfo() << m_defaultPatientUid;
+    qInfo() << m_databaseVersion;
+    qInfo() << m_databaseDriver;
+    qInfo() << m_databaseHost;
+    qInfo() << m_databasePort;
+    qInfo() << m_databaseUser;
+    qInfo() << m_databasePassword;
 }
 
 void RetinalCameraManager::saveSettings(QSettings*) const
@@ -88,42 +99,47 @@ void RetinalCameraManager::updateModel()
         qDebug() << "RetinalCameraManager::updateModel";
 }
 
-
-
-void RetinalCameraManager::start()
+bool RetinalCameraManager::backupDatabase()
 {
-    if (m_verbose)
-        qDebug() << "RetinalCameraManager::start";
+    return false;
+}
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    loadSettings(settings);
-
-    QFileInfo info(m_runnableName);
-    QStringList arguments;
-
+bool RetinalCameraManager::openDatabase()
+{
     // Open DB connection and clean up database
     QSqlDatabase db = QSqlDatabase::addDatabase(m_databaseDriver);
     db.setHostName(m_databaseHost);
+    db.setPort(m_databasePort);
     db.setDatabaseName(m_database);
     db.setUserName(m_databaseUser);
     db.setPassword(m_databasePassword);
 
     bool ok = db.open();
-
     if (!ok)
     {
-        qDebug() << "could not open db";
+        qDebug() << "Could not open MS SQL database: " << db.lastError();
+        printDatabaseParams();
     }
 
+    return ok;
+}
+
+bool RetinalCameraManager::cleanupDatabase()
+{
     QSqlQuery query;
     QSqlQuery locationQuery;
 
-    // clean up
-    //
-
-    // delete all images returned
-    ok = query.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << query.lastError();
+    // delete all stored images
+    bool ok = query.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
+    if (!ok)
+    {
+        if (m_verbose)
+        {
+            qDebug() << query.lastQuery();
+            qDebug() << query.lastError();
+        }
+        return ok;
+    }
     while (query.next()) {
         QString fileName = query.value(0).toString();
         QString fileExt = query.value(1).toString();
@@ -132,70 +148,111 @@ void RetinalCameraManager::start()
         ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + storagePathUid + "'");
 
         if (!ok) qDebug() << query.lastError();
-
         while (locationQuery.next()) {
             QString location = locationQuery.value(0).toString();
             qInfo() << "Deleting: " << location << "/" << fileName + fileExt;
         }
-
         qDebug() << fileName << " " << fileExt << " " << storagePathUid;
     }
 
-    //ok = query.exec("DELETE FROM dbo.Exams WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    //if (!ok) qDebug() << query.lastError();
+    // delete stored exams
+    ok = query.exec("DELETE FROM dbo.Exams WHERE PatientUid = '" + m_defaultPatientUid + "'");
+    if (!ok) qDebug() << query.lastError();
 
-    //ok = query.exec("DELETE FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    //if (!ok) qDebug() << query.lastError();
+    // delete stored media
+    ok = query.exec("DELETE FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
+    if (!ok) qDebug() << query.lastError();
 
-    //ok = query.exec("DELETE FROM dbo.Patients WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    //if (!ok) qDebug() << query.lastError();
+    // delete patient metadata
+    ok = query.exec("DELETE FROM dbo.Patients WHERE PatientUid = '" + m_defaultPatientUid + "'");
+    if (!ok) qDebug() << query.lastError();
 
-    //ok = query.exec("DELETE FROM dbo.Persons WHERE PersonUid = '" + m_defaultPatientUid + "'");
-    //if (!ok) qDebug() << query.lastError();
+    // delete person metadata
+    ok = query.exec("DELETE FROM dbo.Persons WHERE PersonUid = '" + m_defaultPatientUid + "'");
+    if (!ok) qDebug() << query.lastError();
 
-    //// initialize DB data
-    //ok = query.exec("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) values('11111111-2222-3333-4444-555555555555', 'Anthony', 'Hoare')");
-    //if (!ok) qDebug() << query.lastError();
+    return ok;
+}
+bool RetinalCameraManager::restoreDatabase()
+{
+    return false;
+}
 
-    //ok = query.exec("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) values('11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555')");
-    //if (!ok) qDebug() << query.lastError();
+bool RetinalCameraManager::initializeDatabase()
+{
+    QSqlQuery query;
+    bool ok = query.exec("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) values('11111111-2222-3333-4444-555555555555', 'Anthony', 'Hoare')");
+    if (!ok)
+    {
+        qDebug() << query.lastError();
+    }
 
-    //if (!info.exists())
-    //{
-    //   qDebug() << "Program does not exist: " << m_runnableName;
-    //   return;
-    //}
-
-    //if (!info.isExecutable())
-    //{
-    //    qDebug() << "Program is not executable: " << m_runnableName;
-    //    return;
-    //}
-
-    //// clean last participant data from database
-    ////
-    //if (m_verbose)
-    //    qDebug() << "cleaning database..";
-
-
-    //m_process.setProgram(m_runnableName);
-    //m_process.start();
-    //m_process.waitForStarted();
-
-    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-    //        this, [this] {
-    //    finish();
-    //});
-
-    //bool started = m_process.waitForStarted();
-    //if (!started)
-    //{
-    //    if (m_verbose)
-    //        qDebug() << "program running..";
-    //    return;
-    //}
+    ok = query.exec("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) values('11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555')");
+    if (!ok)
+    {
+        qDebug() << query.lastError();
+        return ok;
+    }
+}
 
 
+
+bool RetinalCameraManager::startRetinalCamera()
+{
+    m_process.setProgram(m_runnableName);
+    m_process.start();
+
+    bool started = m_process.waitForStarted();
+    if (!started)
+    {
+        if (m_verbose)
+            qDebug() << "RetinalCameraManager::startRetinalCamera: IMAGEnet_R4 did not start";
+    }
+
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        this, [this]
+    {
+        finish();
+    });
+
+    return started;
+}
+
+void getStoragePathQueryString()
+{
+
+}
+
+void RetinalCameraManager::start()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    QFileInfo info(m_runnableName);
+    QStringList arguments;
+
+    if (m_verbose)
+        qDebug() << "RetinalCameraManager::start";
+
+    loadSettings(settings);
+
+    bool ok = false;
+
+    ok = openDatabase();
+    if (!ok)
+    {
+        return;
+    }
+
+    ok = cleanupDatabase();
+    if (!ok)
+    {
+        return;
+    }
+
+    ok = initializeDatabase();
+    if (!ok)
+    {
+        return;
+    }
 }
 
 // SLOT
@@ -215,9 +272,7 @@ void RetinalCameraManager::finish()
 {
     if (m_verbose)
     {
-        qDebug() << "RetinalCameraManager::finish";
-        qDebug() << "	process finished";
-        qDebug() << "	finalizing results";
+        qDebug() << "RetinalCameraManager::finished";
     }
 
     // process data for left and right eye

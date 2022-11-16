@@ -59,14 +59,21 @@ private:
 
     QString m_runnableName;
     QString m_defaultPatientUid;
-
     QString m_database;
     QString m_databaseVersion;
     QString m_databaseDriver;
     QString m_databaseHost;
-    QString m_databasePort;
+    quint32 m_databasePort;
     QString m_databaseUser;
     QString m_databasePassword;
+
+    bool startRetinalCamera();
+    bool cleanupDatabase();
+    bool initializeDatabase();
+    bool restoreDatabase();
+    bool openDatabase();
+    bool backupDatabase();
+    void printDatabaseParams();
 };
 
 #endif // RETINALCAMERAMANAGER_H

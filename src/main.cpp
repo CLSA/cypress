@@ -5,8 +5,10 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QProcess>
+#include <QSqlDatabase>
 
 #include "CypressApplication.h"
+#include "qsqlerror.h"
 #include "server/Server.h"
 #include "auxiliary/CommandLineParser.h"
 
@@ -52,15 +54,15 @@ const QMap<QString, QVariant> defaultSettings = {{
     {"dxa/refscandb/password", 	""},
     {"dxa/refscandb/database", 	""},
 
-    {"retinal_scan/patient_id", 		"11111111-2222-3333-4444-555555555555"},
-    {"retinal_scan/exe", 				""},
-    {"retinal_scan/database/version", 	"MSSQL Server 2008 R2 Express"},
-    {"retinal_scan/database/driver", 	"QODBC"},
-    {"retinal_scan/database/host", 		"127.0.0.1"},
-    {"retinal_scan/database/port", 		9000},
-    {"retinal_scan/database/user", 		"Anthony"},
-    {"retinal_scan/database/password", 	""},
-    {"retinal_scan/database/database", 	"dbo"},
+    {"instruments/retinal_scan/patient_id", 		"11111111-2222-3333-4444-555555555555"},
+    {"instruments/retinal_scan/exe", 				""},
+    {"instruments/retinal_scan/database/version", 	"MSSQL Server 2008 R2 Express"},
+    {"instruments/retinal_scan/database/driver", 	"QODBC"},
+    {"instruments/retinal_scan/database/host", 		"DESKTOP-OL8FLRR\\SQLEXPRESS"},
+    {"instruments/retinal_scan/database/port", 		1433},
+    {"instruments/retinal_scan/database/user", 		"Anthony"},
+    {"instruments/retinal_scan/database/password", 	""},
+    {"instruments/retinal_scan/database/database", 	"IMAGEnet_R4"},
 }};
 
 void displayError(const QString errMessage, CommandLineParser& parser)
@@ -115,6 +117,20 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
+    //QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    //db.setHostName("localhost");
+    //db.setDatabaseName("Tracker 5");
+    //db.setUserName("Anthony");
+    //db.setPassword("");
+
+    //bool ok = db.open();
+    //qDebug() << db.lastError();
+    //if (ok)
+    //{
+    //    qDebug() << "opened";
+    //    qDebug() << db.tables();
+    //}
 
     // process command line args
     //

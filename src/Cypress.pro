@@ -242,10 +242,18 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-INCLUDEPATH += $$PWD/../poco/Foundation/include
-INCLUDEPATH += $$PWD/../poco/Net/include
-INCLUDEPATH += $$PWD/../poco/Util/include
-LIBS += -L$$PWD/../poco/lib64 -lPocoFoundation -lPocoNet -lPocoUtil
+
+
+!contains(QMAKE_TARGET.arch, x86_64): {
+    message("32-bit")
+    INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include
+    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+} else {
+    message("64-bit")
+    INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x64-windows/include
+    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x64-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+}
+
 
 FORMS += \
   dialogs/RetinalCameraDialog.ui \
