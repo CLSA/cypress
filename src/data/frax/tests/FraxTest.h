@@ -1,8 +1,8 @@
 #ifndef FRAXTEST_H
 #define FRAXTEST_H
 
-#include "data/TestBase.h"
-#include "data/frax/measurements/FraxMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/FraxMeasurement.h"
 
 class FraxTest : public TestBase<FraxMeasurement>
 {

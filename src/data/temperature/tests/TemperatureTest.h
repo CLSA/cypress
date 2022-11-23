@@ -1,7 +1,7 @@
 #ifndef TEMPERATURETEST_H
 #define TEMPERATURETEST_H
 
-#include "data/TestBase.h"
+#include "../../TestBase.h"
 #include "../measurements/TemperatureMeasurement.h"
 
 /*!

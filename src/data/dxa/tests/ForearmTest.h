@@ -3,9 +3,9 @@
 
 #include <QJsonObject>
 
-#include "data/TestBase.h"
-#include "data/dxa/measurements/ForearmMeasurement.h"
-#include "managers/dxa/DXAManager.h"
+#include "../../TestBase.h"
+#include "../measurements/ForearmMeasurement.h"
+#include "../../../managers/dxa/DXAManager.h"
 
 
 class ForearmTest : public TestBase<ForearmMeasurement>

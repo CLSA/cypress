@@ -1,7 +1,7 @@
 #ifndef APSPINEMEASUREMENT_H
 #define APSPINEMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 class ApSpineMeasurement : public Measurement
 {

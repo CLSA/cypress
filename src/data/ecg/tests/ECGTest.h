@@ -1,8 +1,8 @@
 #ifndef ECGTEST_H
 #define ECGTEST_H
 
-#include "data/TestBase.h"
-#include "data/ecg/measurements/ECGMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/ECGMeasurement.h"
 
 QT_FORWARD_DECLARE_CLASS(QDomNode)
 

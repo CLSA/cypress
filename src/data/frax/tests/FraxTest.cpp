@@ -6,7 +6,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QRandomGenerator>
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 /**
  * sample contents of output.txt from blackbox.exe

@@ -1,8 +1,8 @@
 #ifndef CDTTTEST_H
 #define CDTTTEST_H
 
-#include "data/TestBase.h"
-#include "data/cdtt/measurements/CDTTMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/CDTTMeasurement.h"
 #include <QJsonObject>
 
 QT_FORWARD_DECLARE_CLASS(QSqlDatabase)

@@ -2,9 +2,9 @@
 #define APSPINETEST_H
 
 #include <QJsonObject>
-#include "managers/dxa/DXAManager.h"
-#include "data/dxa/measurements/ApSpineMeasurement.h"
-#include "data/TestBase.h"
+#include "../../../managers/dxa/DXAManager.h"
+#include "../../TestBase.h"
+#include "../measurements/ApSpineMeasurement.h"
 
 class ApSpineTest : public TestBase<ApSpineMeasurement>
 {

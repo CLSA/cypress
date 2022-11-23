@@ -1,7 +1,7 @@
 #ifndef SPIROMETERMEASUREMENT_H
 #define SPIROMETERMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 /*!
 * \class SpirometerMeasurement

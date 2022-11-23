@@ -1,7 +1,7 @@
 #ifndef IVAIMAGINGMEASUREMENT_H
 #define IVAIMAGINGMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 class IVAImagingMeasurement : public Measurement
 {

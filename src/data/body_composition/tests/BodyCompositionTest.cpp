@@ -1,6 +1,6 @@
 #include "BodyCompositionTest.h"
 
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QDateTime>
 #include <QDebug>

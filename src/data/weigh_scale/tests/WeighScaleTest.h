@@ -1,8 +1,8 @@
 #ifndef WEIGHSCALETEST_H
 #define WEIGHSCALETEST_H
 
-#include "data/TestBase.h"
-#include "data/weigh_scale/measurements/WeightMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/WeightMeasurement.h"
 
 /*!
  * \class WeighScaleTest

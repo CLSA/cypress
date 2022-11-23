@@ -1,8 +1,8 @@
 #ifndef TEMPERATUREMEASUREMENT_H
 #define TEMPERATUREMEASUREMENT_H
 
-#include "data/Measurement.h"
-#include "auxiliary/Constants.h"
+#include "../../Measurement.h"
+#include "../../../auxiliary/Constants.h"
 
 
 /*!

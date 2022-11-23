@@ -1,7 +1,7 @@
 #include "CDTTTest.h"
 
-#include "data/ExcelQueryHelper.h"
-#include "auxiliary/Utilities.h"
+#include "../../ExcelQueryHelper.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QDebug>
 #include <QJsonObject>

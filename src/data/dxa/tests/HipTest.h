@@ -1,9 +1,9 @@
 #ifndef HIPTEST_H
 #define HIPTEST_H
 
-#include "managers/dxa/DXAManager.h"
-#include "data/dxa/measurements/HipMeasurement.h"
-#include "data/TestBase.h"
+#include "../../../managers/dxa/DXAManager.h"
+#include "../../TestBase.h"
+#include "../measurements/HipMeasurement.h"
 
 class HipTest : public TestBase<HipMeasurement>
 {

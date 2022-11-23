@@ -1,0 +1,16 @@
+{
+    "input": {
+        "barcode": "123456789"
+    },
+    "metadata": {
+        "timeStart": "",
+        "timeEnd": "",
+        "instrumentBarcode": "123456789"
+    },
+    "results": [
+        {
+            "SIDE": "LEFT",
+            "EYE": ""
+        }
+    ]
+}

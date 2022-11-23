@@ -3,9 +3,9 @@
 
 #include <QJsonObject>
 
-#include "managers/dxa/DXAManager.h"
-#include "data/dxa/measurements/IVAImagingMeasurement.h"
-#include "data/TestBase.h"
+#include "../../../managers/dxa/DXAManager.h"
+#include "../../TestBase.h"
+#include "../measurements/IVAImagingMeasurement.h"
 
 class IVAImagingTest : public TestBase<IVAImagingMeasurement>
 {

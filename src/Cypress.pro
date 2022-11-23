@@ -3,7 +3,10 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql usb xml network testlib
 
 CONFIG += c++11
+CONFIG += testcase
+CONFIG += no_testcase_installs
 
+SUBDIRS = tests
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -72,6 +75,7 @@ SOURCES += \
     dialogs/GripStrengthDialog.cpp \
     dialogs/RetinalCameraDialog.cpp \
     managers/ManagerBase.cpp \
+    managers/SettingsManager.cpp \
     managers/audiometer/AudiometerManager.cpp \
     managers/blood_pressure/BPMCommunication.cpp \
     managers/blood_pressure/BPMMessage.cpp \
@@ -180,6 +184,7 @@ HEADERS += \
     dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
     dialogs/RetinalCameraDialog.h \
+    managers/SettingsManager.h \
     managers/audiometer/AudiometerManager.h \
     managers/blood_pressure/BPMCommunication.h \
     managers/blood_pressure/BPMMessage.h \
@@ -237,6 +242,8 @@ HEADERS += \
 CONFIG += lrelease
 CONFIG += embed_translations
 
+QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -246,8 +253,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 !contains(QMAKE_TARGET.arch, x86_64): {
     message("32-bit")
+
     INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include
+    INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
+
     LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+    LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata
+
 } else {
     message("64-bit")
     INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x64-windows/include

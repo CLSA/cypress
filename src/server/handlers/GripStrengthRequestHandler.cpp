@@ -45,7 +45,7 @@ void GripStrengthRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
     //out << "<body><div>Initializing grip strength...</div></body>";
     //out << "</html>";
 
-    server -> requestTestStart();
+    restApiServer -> requestTestStart();
 
     //CypressApplication cypress;
     //QVariantMap args;

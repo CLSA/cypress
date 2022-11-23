@@ -1,21 +1,21 @@
 #include "CypressApplication.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <stdexcept>
+#include <QException>
+#include <QDebug>
 
 #include "auxiliary/Constants.h"
 #include "dialogs/DialogFactory.h"
 #include "dialogs/DialogBase.h"
 #include "server/Server.h"
 
-extern Server* server;
+extern Server* restApiServer;
 
 CypressApplication::CypressApplication(QObject *parent) : QObject(parent)
 {
-    connect(server, &Server::testStart, this, &CypressApplication::startTest);
+    connect(restApiServer, &Server::testStart, this, &CypressApplication::startTest);
 }
 
 CypressApplication::~CypressApplication()
@@ -38,7 +38,7 @@ bool CypressApplication::startTest()
         setArgs(args);
         initialize();
     }
-    catch (std::exception& e)
+    catch (QException& e)
     {
         qDebug() << e.what();
         return false;
@@ -82,8 +82,8 @@ void CypressApplication::initialize()
     if (!m_verbose)
         return;
 
-    qDebug() << "Input: " << m_inputFileName;
-    qDebug() << "Output: " << m_outputFileName;
+    qDebug() << "InputFileName: " << m_inputFileName;
+    qDebug() << "OutputFileName: " << m_outputFileName;
     qDebug() << "Mode: " << m_mode;
     qDebug() << "Type: " << m_type;
 }

@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QRandomGenerator>
 #include <QDateTime>
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 const QStringList SpirometerMeasurement::parameterList = {"DataValue","Unit","PredictedValue","LLNormalValue"};
 

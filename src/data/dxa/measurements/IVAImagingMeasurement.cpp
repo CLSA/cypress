@@ -1,5 +1,5 @@
-#include "data/dxa/measurements/IVAImagingMeasurement.h"
 #include <QJsonObject>
+#include "../measurements/IVAImagingMeasurement.h"
 
 IVAImagingMeasurement::IVAImagingMeasurement()
 {

@@ -6,6 +6,9 @@
 #include <QSql>
 #include <QProcess>
 
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+
 const QMap<QString, QString> DXAManager::ranges = {
     // forearm
     { "RU13TOT_BMD",    "1.." },
@@ -93,6 +96,11 @@ bool DXAManager::endDicomServer()
 {
     //return m_dicomSCP->stop();
     return true;
+}
+
+void DXAManager::dicomFilesReceived(QStringList paths)
+{
+    qDebug() << "DXAManager::dicomFilesReceived" << paths;
 }
 
 void DXAManager::dicomServerExitNormal()

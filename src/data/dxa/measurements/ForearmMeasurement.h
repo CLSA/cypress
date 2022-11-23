@@ -1,7 +1,7 @@
 #ifndef FOREARMMEASUREMENT_H
 #define FOREARMMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 class ForearmMeasurement : public Measurement
 {

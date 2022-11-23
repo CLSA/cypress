@@ -1,8 +1,8 @@
 #ifndef GRIPSTRENGTHTEST_H
 #define GRIPSTRENGTHTEST_H
 
-#include "data/TestBase.h"
-#include "data/grip_strength/measurements/GripStrengthMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/GripStrengthMeasurement.h"
 
 class GripStrengthTest : public TestBase<GripStrengthMeasurement>
 {
@@ -20,8 +20,8 @@ public:
 
     // String keys are converted to snake_case
     //
-    void readGripTestOptions(const QString& gripTestPath);
-    void readGripTestResults(const QString& gripTestDataPath);
+    bool readGripTestOptions();
+    bool readGripTestResults();
 
     QJsonObject toJsonObject() const override;
 

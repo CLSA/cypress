@@ -6,7 +6,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "server/Server.h"
 
-extern Server* server;
+extern Server* restApiServer;
 class GripStrengthRequestHandler: public Poco::Net::HTTPRequestHandler
 {
 public:

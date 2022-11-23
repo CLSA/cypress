@@ -3,6 +3,8 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QMessageBox>
+#include <QGuiApplication>
 #include <QVariant>
 
 class CommandLineParser : QObject
@@ -30,6 +32,23 @@ public:
 
     QVariantMap getArgs(){ return m_args; }
 
+    void displayError(const QString errMessage, CommandLineParser& parser)
+    {
+        QMessageBox::warning(
+            nullptr,
+            QGuiApplication::applicationDisplayName(),
+            "<html><head/><body><h2>" + errMessage + "</h2><pre>" + parser.helpText() + "</pre></body></html>"
+        );
+    }
+
+    void displayHelp(CommandLineParser& parser)
+    {
+        QMessageBox::warning(
+            nullptr,
+            QGuiApplication::applicationDisplayName(),
+            "<html><head/><body><pre>" + parser.helpText() + "</pre></body></html>"
+        );
+    }
 private:
     QCommandLineParser m_parser;
     QVariantMap m_args;

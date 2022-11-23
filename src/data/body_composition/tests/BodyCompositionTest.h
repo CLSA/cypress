@@ -1,8 +1,8 @@
 #ifndef BODYCOMPOSITIONTEST_H
 #define BODYCOMPOSITIONTEST_H
 
-#include "data/TestBase.h"
-#include "data/body_composition/measurements/BodyCompositionMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/BodyCompositionMeasurement.h"
 
 class BodyCompositionTest : public TestBase<BodyCompositionMeasurement>
 {

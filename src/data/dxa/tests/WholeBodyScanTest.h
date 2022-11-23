@@ -1,9 +1,9 @@
 #ifndef WHOLEBODYSCANTEST_H
 #define WHOLEBODYSCANTEST_H
 
-#include "managers/dxa/DXAManager.h"
-#include "data/TestBase.h"
-#include "data/dxa/measurements/WholeBodyScanMeasurement.h"
+#include "../../../managers/dxa/DXAManager.h"
+#include "../../TestBase.h"
+#include "../measurements/WholeBodyScanMeasurement.h"
 
 #include <QString>
 #include <QList>

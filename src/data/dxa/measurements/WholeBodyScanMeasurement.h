@@ -1,7 +1,7 @@
 #ifndef WHOLEBODYSCANMEASUREMENT_H
 #define WHOLEBODYSCANMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 class WholeBodyScanMeasurement : public Measurement
 {

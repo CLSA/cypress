@@ -1,7 +1,7 @@
 #ifndef MANAGERBASE_H
 #define MANAGERBASE_H
 
-#include "auxiliary/Constants.h"
+#include "../auxiliary/Constants.h"
 #include <QJsonObject>
 #include <QObject>
 #include <QWidget>

@@ -27,9 +27,15 @@ void DicomSCP::initProcess()
 
     args
         << "+fst"
-        << settings.value("dicom/port", "9001").toString();
+        << settings.value("dicom/port").toString()
+        << "--config-file"
+        << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/storescp.cfg"
+        << "default"
+        << "--log-config"
+        << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/logger.cfg";
 
-    qDebug() << "args" << args;
+    //qDebug() << "args" << args;
+
     m_process->setWorkingDirectory(settings.value("dicom/working_dir", "").toString());
     m_process->setProgram(settings.value("dicom/program", "").toString());
     m_process->setArguments(args);
@@ -104,7 +110,7 @@ void DicomSCP::initConnections()
             this,
             [=](int exitCode, QProcess::ExitStatus exitStatus)
             {
-                qInfo() << "DICOM Storage SCP: exit " << exitCode << exitStatus;
+                qInfo() << "DICOM: exit" << exitCode << exitStatus;
                 switch (exitStatus)
                 {
                     case QProcess::ExitStatus::NormalExit:
@@ -119,7 +125,9 @@ void DicomSCP::initConnections()
 bool DicomSCP::start()
 {
     m_process->start();
-    return m_process->waitForStarted();
+    bool ok = m_process->waitForStarted();
+    qDebug() << ok;
+    return ok;
 }
 
 bool DicomSCP::stop()

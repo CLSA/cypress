@@ -1,8 +1,8 @@
 #ifndef TONOMETERTEST_H
 #define TONOMETERTEST_H
 
-#include "data/TestBase.h"
-#include "data/tonometer/measurements/TonometerMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/TonometerMeasurement.h"
 
 QT_FORWARD_DECLARE_CLASS(QJsonArray)
 

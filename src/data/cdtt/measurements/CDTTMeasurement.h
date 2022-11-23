@@ -1,7 +1,7 @@
 #ifndef CDTTMEASUREMENT_H
 #define CDTTMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 /*!
 * \class CDTTTMeasurement

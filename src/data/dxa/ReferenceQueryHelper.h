@@ -1,7 +1,6 @@
 #ifndef REFERENCEQUERYHELPER_H
 #define REFERENCEQUERYHELPER_H
 
-#include <QSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 

@@ -1,8 +1,8 @@
 #ifndef HEARINGTEST_H
 #define HEARINGTEST_H
 
-#include "data/TestBase.h"
-#include "data/hearing/measurements/HearingMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/HearingMeasurement.h"
 
 /*!
  * \class HearingTest

@@ -1,7 +1,7 @@
 #ifndef HIPMEASUREMENT_H
 #define HIPMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 class HipMeasurement : public Measurement
 {

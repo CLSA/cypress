@@ -1,8 +1,8 @@
 #ifndef CHOICEREACTIONTEST_H
 #define CHOICEREACTIONTEST_H
 
-#include "data/TestBase.h"
-#include "data/choice_reaction/measurements/ChoiceReactionMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/ChoiceReactionMeasurement.h"
 
 class ChoiceReactionTest : public TestBase<ChoiceReactionMeasurement>
 {

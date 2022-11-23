@@ -1,8 +1,7 @@
 #ifndef DXAMEASUREMENT_H
 #define DXAMEASUREMENT_H
 
-#include "data/Measurement.h"
-
+#include "../../Measurement.h"
 
 
 class DXAMeasurement : public Measurement

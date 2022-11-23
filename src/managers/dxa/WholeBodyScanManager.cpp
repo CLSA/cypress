@@ -5,7 +5,6 @@
 WholeBodyScanManager::WholeBodyScanManager(QObject *parent)
     : DXAManager{parent}
 {
-
 }
 
 QString WholeBodyScanManager::getName()
@@ -56,6 +55,12 @@ QMap<QString, QVariant> WholeBodyScanManager::extractData()
     //return m_test.data;
     return QMap<QString, QVariant> {{}};
 }
+
+void WholeBodyScanManager::dicomFilesReceived(QStringList paths)
+{
+    qDebug() << "WholeBodyScanManager" << paths;
+}
+
 
 QMap<QString, QVariant> WholeBodyScanManager::extractScanAnalysisData(const QString& tableName)
 {

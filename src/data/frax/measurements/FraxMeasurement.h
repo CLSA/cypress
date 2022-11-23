@@ -1,7 +1,7 @@
 #ifndef FRAXMEASUREMENT_H
 #define FRAXMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 /*!
 * \class FraxMeasurement

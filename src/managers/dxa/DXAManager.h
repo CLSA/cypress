@@ -1,14 +1,14 @@
 #ifndef DXAMANAGER_H
 #define DXAMANAGER_H
 
-#include "managers/ManagerBase.h"
+#include "../ManagerBase.h"
 
 #include <QObject>
 #include <QMap>
 #include <QVariant>
 #include <QString>
 
-#include "managers/dxa/dicom/DicomSCP.h"
+#include "./dicom/DicomSCP.h"
 
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
@@ -50,9 +50,10 @@ public:
 
     DicomSCP* m_dicomSCP;
 
-private slots:
-    void dicomServerExitNormal();
-    void dicomServerExitCrash();
+protected slots:
+    virtual void dicomFilesReceived(QStringList paths);
+    virtual void dicomServerExitNormal();
+    virtual void dicomServerExitCrash();
 };
 
 #endif // DXAMANAGER_H

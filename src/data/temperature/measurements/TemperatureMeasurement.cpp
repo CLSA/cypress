@@ -1,6 +1,6 @@
 #include "TemperatureMeasurement.h"
 
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 #include <QBitArray>
 #include <QDateTime>
 #include <QDebug>

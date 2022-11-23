@@ -1,7 +1,7 @@
 #ifndef GRIPSTRENGTHMEASUREMENT_H
 #define GRIPSTRENGTHMEASUREMENT_H
 
-#include "data/Measurement.h"
+#include "../../Measurement.h"
 
 /*!
 * \class GripStrengthMeasurement

@@ -1,8 +1,8 @@
 #ifndef SPIROMETERTEST_H
 #define SPIROMETERTEST_H
 
-#include "data/TestBase.h"
-#include "data/spirometer/measurements/SpirometerMeasurement.h"
+#include "../../TestBase.h"
+#include "../measurements/SpirometerMeasurement.h"
 #include <QJsonObject>
 
 QT_FORWARD_DECLARE_CLASS(QDomNode)
