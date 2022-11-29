@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>barcode</string>
+      <string>Barcode</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -35,7 +35,7 @@
    <item>
     <widget class="QGroupBox" name="serialPortGroupBox">
      <property name="title">
-      <string>serial ports</string>
+      <string>Serial Ports</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
       <item>
@@ -91,7 +91,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>measure</string>
+      <string>Measure</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>

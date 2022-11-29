@@ -1,14 +1,15 @@
-#ifndef GRIPSTRENGTHREQUESTHANDLER_H
-#define GRIPSTRENGTHREQUESTHANDLER_H
+#ifndef SPIROMETERREQUESTHANDLER_H
+#define SPIROMETERREQUESTHANDLER_H
 
 #include "server/DefaultRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-class GripStrengthRequestHandler: public DefaultRequestHandler
+
+class SpirometerRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // GRIPSTRENGTHREQUESTHANDLER_H
+#endif // SPIROMETERREQUESTHANDLER_H

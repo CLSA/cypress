@@ -107,9 +107,20 @@ SOURCES += \
     managers/weigh_scale/WeighScaleManager.cpp \
     server/DefaultRequestHandler.cpp \
     server/Server.cpp \
+    server/handlers/BodyCompositionRequestHandler.cpp \
+    server/handlers/CDTTRequestHandler.cpp \
+    server/handlers/ChoiceReactionRequestHandler.cpp \
+    server/handlers/DxaRequestHandler.cpp \
+    server/handlers/ECGRequestHandler.cpp \
+    server/handlers/EMRRequestHandler.cpp \
+    server/handlers/FraxRequestHandler.cpp \
     server/handlers/GripStrengthRequestHandler.cpp \
     server/handlers/InstrumentRequestHandlerFactory.cpp \
     server/handlers/RetinalCameraRequestHandler.cpp \
+    server/handlers/SpirometerRequestHandler.cpp \
+    server/handlers/TonometerRequestHandler.cpp \
+    server/handlers/UltrasoundRequestHandler.cpp \
+    server/handlers/WeighScaleRequestHandler.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -218,9 +229,20 @@ HEADERS += \
     managers/weigh_scale/WeighScaleManager.h \
     server/DefaultRequestHandler.h \
     server/Server.h \
+    server/handlers/BodyCompositionRequestHandler.h \
+    server/handlers/CDTTRequestHandler.h \
+    server/handlers/ChoiceReactionRequestHandler.h \
+    server/handlers/DxaRequestHandler.h \
+    server/handlers/ECGRequestHandler.h \
+    server/handlers/EMRRequestHandler.h \
+    server/handlers/FraxRequestHandler.h \
     server/handlers/GripStrengthRequestHandler.h \
     server/handlers/InstrumentRequestHandlerFactory.h \
     server/handlers/RetinalCameraRequestHandler.h \
+    server/handlers/SpirometerRequestHandler.h \
+    server/handlers/TonometerRequestHandler.h \
+    server/handlers/UltrasoundRequestHandler.h \
+    server/handlers/WeighScaleRequestHandler.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \
@@ -255,15 +277,25 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
     message("32-bit")
 
     INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include
+
     INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
+    INCLUDEPATH += "C:/Program Files (x86)/DCMTK/zlib-1.2.12/include"
 
     LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
-    LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata
+    LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+    LIBS += -L"C:/Program Files (x86)/DCMTK/zlib-1.2.12/lib" -lzlib_o
 
 } else {
     message("64-bit")
     INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x64-windows/include
     LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x64-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+
+    INCLUDEPATH += "C:/Program Files/DCMTK/include"
+    INCLUDEPATH += "C:/Program Files/DCMTK/zlib-1.2.12/include"
+
+    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+    LIBS += -L"C:/Program Files/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+    LIBS += -L"C:/Program Files/DCMTK/zlib-1.2.12/lib" -lzlib_o
 }
 
 

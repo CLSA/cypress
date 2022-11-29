@@ -1,16 +1,16 @@
-#ifndef RETINALCAMERAREQUESTHANDLER_H
-#define RETINALCAMERAREQUESTHANDLER_H
+#ifndef ULTRASOUNDREQUESTHANDLER_H
+#define ULTRASOUNDREQUESTHANDLER_H
 
 #include <Poco/Net/HTTPRequestHandler.h>
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-using namespace Poco::Net;
+#include "server/DefaultRequestHandler.h"
 
-class RetinalCameraRequestHandler : public Poco::Net::HTTPRequestHandler
+class UltrasoundRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // RETINALCAMERAREQUESTHANDLER_H
+#endif // ULTRASOUNDREQUESTHANDLER_H

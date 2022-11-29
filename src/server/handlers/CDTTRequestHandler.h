@@ -1,14 +1,16 @@
-#ifndef GRIPSTRENGTHREQUESTHANDLER_H
-#define GRIPSTRENGTHREQUESTHANDLER_H
+#ifndef CDTTREQUESTHANDLER_H
+#define CDTTREQUESTHANDLER_H
 
 #include "server/DefaultRequestHandler.h"
+
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-class GripStrengthRequestHandler: public DefaultRequestHandler
+
+class CDTTRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // GRIPSTRENGTHREQUESTHANDLER_H
+#endif // CDTTREQUESTHANDLER_H

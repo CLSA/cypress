@@ -1,14 +1,14 @@
-#ifndef GRIPSTRENGTHREQUESTHANDLER_H
-#define GRIPSTRENGTHREQUESTHANDLER_H
+#ifndef EMRREQUESTHANDLER_H
+#define EMRREQUESTHANDLER_H
 
 #include "server/DefaultRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-class GripStrengthRequestHandler: public DefaultRequestHandler
+class EMRRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // GRIPSTRENGTHREQUESTHANDLER_H
+#endif // EMRREQUESTHANDLER_H

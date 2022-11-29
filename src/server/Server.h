@@ -9,6 +9,8 @@
 #include <QObject>
 #include <QThread>
 
+#include "auxiliary/Constants.h"
+
 using namespace Poco::Net;
 
 class Server: public QObject
@@ -25,10 +27,10 @@ class Server: public QObject
 
         void start();
         void stop();
-        void requestTestStart();
+        void requestTestStart(Constants::MeasureType type);
 
     signals:
-        void testStart();
+        void startTest(Constants::MeasureType type);
 
     private:
         HTTPServer* server;

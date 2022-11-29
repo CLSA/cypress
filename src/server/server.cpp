@@ -16,20 +16,20 @@ using namespace Poco::Net;
 
 Server::Server()
 {
-    Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
-    Poco::UInt16 portNumber = 8000;
-    Poco::Net::HTTPServerParams::Ptr pParams = new Poco::Net::HTTPServerParams;
-
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+
+    HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
+    HTTPServerParams::Ptr pParams = new HTTPServerParams;
+    Poco::UInt16 portNumber = settings.value("server/port", 8000).toInt();
+
 
     server = new HTTPServer(pFactory, portNumber, pParams);
     moveToThread(&serverThread);
 }
 
-void Server::requestTestStart()
+void Server::requestTestStart(Constants::MeasureType type)
 {
-    qDebug() << "Requested test start";
-    emit testStart();
+    emit startTest(type);
 }
 
 

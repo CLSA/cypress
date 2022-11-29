@@ -1,7 +1,9 @@
 #ifndef CYPRESSAPPLICATION_H
 #define CYPRESSAPPLICATION_H
 
-#include "./auxiliary/Constants.h"
+#include "auxiliary/Constants.h"
+#include "server/Server.h"
+
 #include <QObject>
 #include <QCoreApplication>
 
@@ -17,8 +19,9 @@ public:
     void setArgs(const QVariantMap&);
     void initialize();
 
+    static QScopedPointer<Server> restApiServer;
 public slots:
-    bool startTest();
+    bool startTest(Constants::MeasureType type);
 
 private:
     QString m_inputFileName; // TODO this data should be from POST request in production

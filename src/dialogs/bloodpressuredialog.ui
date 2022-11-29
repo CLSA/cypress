@@ -29,7 +29,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>barcode</string>
+      <string>Barcode</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -41,7 +41,7 @@
    <item>
     <widget class="QGroupBox" name="armBandGroupBox">
      <property name="title">
-      <string>cuff information</string>
+      <string>Cuff Information</string>
      </property>
      <layout class="QHBoxLayout" name="armBandHorizontalLayout">
       <item>
@@ -121,7 +121,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Usb devices</string>
+      <string>USB Devices</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
@@ -173,7 +173,7 @@
    <item>
     <widget class="QGroupBox" name="measureGroupBox">
      <property name="title">
-      <string>measure</string>
+      <string>Measure</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>

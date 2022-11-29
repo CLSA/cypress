@@ -2,9 +2,13 @@
 #include <QString>
 #include <QMap>
 #include <QObject>
+#include <QDebug>
 
+#include "dcmtk/dcmdata/dcdeftag.h"
 #include "managers/dxa/DXAManager.h"
 #include "managers/dxa/HipScanManager.h"
+
+#include "dcmtk/dcmdata/dcfilefo.h"
 
 HipScanManager::HipScanManager(QObject* parent)
     : DXAManager{parent}
@@ -88,6 +92,25 @@ QMap<QString, QVariant> HipScanManager::extractData()
     //{
     //   m_test.data[key] = analysisData[key];
     //}
+    qDebug() << "Extract data";
+    DcmFileFormat fileformat;
+    OFCondition status = fileformat.loadFile("C:\\Users\\Anthony\\Documents\\PACS\\20221129160433.102000.SC");
+    if (status.good())
+    {
+      OFString patientName;
+      if (fileformat.getDataset()->findAndGetOFString(DCM_PatientID, patientName).good())
+      {
+        qDebug() << "Patient's Name: " << QString::fromUtf8(patientName.c_str()) << endl;
+      }
+      else
+      {
+        qDebug() << "Error: cannot access Patient's Name!" << endl;
+      }
+    }
+    else
+    {
+      qDebug() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
+    }
     return QMap<QString, QVariant> {{}};
 }
 

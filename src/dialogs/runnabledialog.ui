@@ -29,7 +29,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>barcode</string>
+      <string>Barcode</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -47,7 +47,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>executable</string>
+      <string>Executable</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
@@ -76,7 +76,7 @@
    <item>
     <widget class="QGroupBox" name="measureGroupBox">
      <property name="title">
-      <string>measure</string>
+      <string>Measure</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>

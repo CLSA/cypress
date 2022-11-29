@@ -17,34 +17,41 @@ private:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void test_case1();
-
-
+    void testCase1();
+    void testCase2();
 };
 
 TestGripStrength::TestGripStrength()
 {
-
+    qDebug("constructor");
 }
 
 TestGripStrength::~TestGripStrength()
 {
 
+    qDebug("destructor");
 }
 
 void TestGripStrength::initTestCase()
 {
-
 }
 
 void TestGripStrength::cleanupTestCase()
 {
+}
+
+void TestGripStrength::testCase1()
+{
+    GripStrengthTest test;
+    test.readGripTestOptions();
+    test.readGripTestResults();
+    QVERIFY(test.isValid());
 
 }
 
-void TestGripStrength::test_case1()
+void TestGripStrength::testCase2()
 {
-
+    qDebug("test case 1");
 }
 
 QTEST_APPLESS_MAIN(TestGripStrength)

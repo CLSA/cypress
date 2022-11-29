@@ -32,7 +32,9 @@ void DicomSCP::initProcess()
         << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/storescp.cfg"
         << "default"
         << "--log-config"
-        << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/logger.cfg";
+        << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/logger.cfg"
+        << "--output-directory"
+        << settings.value("dicom/out_dir").toString();
 
     //qDebug() << "args" << args;
 
@@ -41,7 +43,7 @@ void DicomSCP::initProcess()
     m_process->setArguments(args);
 
     QStringList list;
-    list << "C:/work/clsa/cypress/dcmtk-3.6.7/storage/";
+    list << settings.value("dicom/out_dir").toString();
 
     m_fileSystemWatcher.reset(new QFileSystemWatcher(list));
 }
@@ -70,6 +72,7 @@ void DicomSCP::initConnections()
            qDebug() << (*iterator).toLocal8Bit().constData();
         }
 
+        qDebug() << "dicom files received: " << dicomFilePaths;
         emit dicomFilesReceived(dicomFilePaths);
     });
 

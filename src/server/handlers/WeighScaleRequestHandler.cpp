@@ -1,18 +1,7 @@
-#include <iostream>
-
-#include <QString>
-#include <QDebug>
-#include <QObject>
-#include <QApplication>
-
-#include "GripStrengthRequestHandler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/HTTPResponse.h"
+#include "WeighScaleRequestHandler.h"
 #include "CypressApplication.h"
 
-
-void GripStrengthRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
@@ -28,4 +17,5 @@ void GripStrengthRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
     {
         qDebug() << e.what();
     }
+
 }

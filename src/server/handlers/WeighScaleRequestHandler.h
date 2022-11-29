@@ -1,14 +1,14 @@
-#ifndef GRIPSTRENGTHREQUESTHANDLER_H
-#define GRIPSTRENGTHREQUESTHANDLER_H
+#ifndef WEIGHSCALEREQUESTHANDLER_H
+#define WEIGHSCALEREQUESTHANDLER_H
 
 #include "server/DefaultRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-class GripStrengthRequestHandler: public DefaultRequestHandler
+class WeighScaleRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // GRIPSTRENGTHREQUESTHANDLER_H
+#endif // WEIGHSCALEREQUESTHANDLER_H

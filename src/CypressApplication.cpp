@@ -11,32 +11,45 @@
 #include "dialogs/DialogBase.h"
 #include "server/Server.h"
 
-extern Server* restApiServer;
+QScopedPointer<Server> CypressApplication::restApiServer(new Server());
 
 CypressApplication::CypressApplication(QObject *parent) : QObject(parent)
 {
-    connect(restApiServer, &Server::testStart, this, &CypressApplication::startTest);
 }
 
 CypressApplication::~CypressApplication()
 {
 }
 
-bool CypressApplication::startTest()
+bool CypressApplication::startTest(Constants::MeasureType type)
 {
     qDebug() << "start test";
     QVariantMap args;
 
-    args["inputFileName"] = "";
-    args["outputFileName"] = "";
-    args["measureType"] = 9;
-    args["runMode"] = "default";
-    args["verbose"] = true;
+    //args["inputFileName"] = "";
+    //args["outputFileName"] = "";
+    //args["measureType"] = 9;
+    //args["runMode"] = "default";
+    //args["verbose"] = true;
 
     try
     {
         setArgs(args);
-        initialize();
+
+        DialogFactory* factory = DialogFactory::instance();
+
+        m_dialog.reset(factory->instantiate(type));
+        if(m_dialog.isNull()) {
+            QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
+            return false;
+        }
+
+        //m_dialog->setInputFileName(m_inputFileName);
+        //m_dialog->setOutputFileName(m_outputFileName);
+        //m_dialog->setRunMode(m_mode);
+        //m_dialog->setVerbose(m_verbose);
+        m_dialog->initialize();
+        m_dialog->show();
     }
     catch (QException& e)
     {
@@ -65,25 +78,13 @@ void CypressApplication::setArgs(const QVariantMap& args)
 
 void CypressApplication::initialize()
 {
-    DialogFactory *factory = DialogFactory::instance();
-
-    m_dialog.reset(factory->instantiate(m_type));
-    if(m_dialog.isNull()) {
-        QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
+    if (m_verbose) {
+        qDebug() << "InputFileName: " << m_inputFileName;
+        qDebug() << "OutputFileName: " << m_outputFileName;
+        qDebug() << "Mode: " << m_mode;
+        qDebug() << "Type: " << m_type;
     }
 
-    m_dialog->setInputFileName(m_inputFileName);
-    m_dialog->setOutputFileName(m_outputFileName);
-    m_dialog->setRunMode(m_mode);
-    m_dialog->setVerbose(m_verbose);
-    m_dialog->initialize();
-    m_dialog->show();
-
-    if (!m_verbose)
-        return;
-
-    qDebug() << "InputFileName: " << m_inputFileName;
-    qDebug() << "OutputFileName: " << m_outputFileName;
-    qDebug() << "Mode: " << m_mode;
-    qDebug() << "Type: " << m_type;
+    CypressApplication::restApiServer->start();
+    connect(restApiServer.get(), &Server::startTest, this, &CypressApplication::startTest);
 }

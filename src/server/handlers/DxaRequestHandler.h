@@ -1,14 +1,14 @@
-#ifndef GRIPSTRENGTHREQUESTHANDLER_H
-#define GRIPSTRENGTHREQUESTHANDLER_H
+#ifndef DEXAREQUESTHANDLER_H
+#define DEXAREQUESTHANDLER_H
 
 #include "server/DefaultRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-class GripStrengthRequestHandler: public DefaultRequestHandler
+class DxaRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // GRIPSTRENGTHREQUESTHANDLER_H
+#endif // DEXAREQUESTHANDLER_H

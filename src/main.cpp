@@ -10,7 +10,6 @@
 
 #include "CypressApplication.h"
 #include "managers/SettingsManager.h"
-#include "server/Server.h"
 #include "auxiliary/CommandLineParser.h"
 
 const QString orgName = "CLSA";
@@ -18,16 +17,17 @@ const QString orgDomain = "clsa-elcv.ca";
 const QString appName = "Cypress";
 const QString appVersion = "v0.1.0";
 
-Server* restApiServer = new Server();
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setOrganizationName(orgName);
-    QCoreApplication::setOrganizationDomain(orgDomain);
-    QCoreApplication::setApplicationName(appName);
-    QCoreApplication::setApplicationVersion(appVersion);
+    QGuiApplication::setOrganizationName(orgName);
+    QGuiApplication::setOrganizationDomain(orgDomain);
+    QGuiApplication::setApplicationName(appName);
+    QGuiApplication::setApplicationVersion(appVersion);
 
     QApplication app(argc, argv);
+    QApplication::setQuitOnLastWindowClosed(false);
+
     SettingsManager settingsManager;
 
     QTranslator translator;
@@ -67,8 +67,6 @@ int main(int argc, char *argv[])
     CypressApplication cypress;
     cypress.setArgs(parser.getArgs());
     cypress.initialize();
-
-    restApiServer->start();
 
     return app.exec();
 }
