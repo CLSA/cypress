@@ -7,6 +7,27 @@ WholeBodyScanManager::WholeBodyScanManager(QObject *parent)
 {
 }
 
+void WholeBodyScanManager::start()
+{
+    if (m_verbose)
+        qDebug() << "WholeBodyScanManager::end";
+
+    startDicomServer();
+};
+
+void WholeBodyScanManager::measure()
+{
+
+};
+
+void WholeBodyScanManager::finish()
+{
+    if (m_verbose)
+        qDebug() << "WholeBodyScanManager::end";
+
+    endDicomServer();
+};
+
 QString WholeBodyScanManager::getName()
 {
     return "";
@@ -44,7 +65,12 @@ QString WholeBodyScanManager::getRefSource()
    return "Hologic";
 }
 
-QMap<QString, QVariant> WholeBodyScanManager::extractData()
+bool WholeBodyScanManager::validateDicomFile(DcmFileFormat file)
+{
+    return false;
+}
+
+QMap<QString, QVariant> WholeBodyScanManager::extractData(QStringList filePaths)
 {
     //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
     //for (QString key: m_test.testKeys)
@@ -73,4 +99,29 @@ QMap<QString, QVariant> WholeBodyScanManager::extractScanAnalysisData(const QStr
 QMap<QString, QVariant> WholeBodyScanManager::computeTandZScores()
 {
     return QMap<QString, QVariant> {{}};
+}
+
+QJsonObject WholeBodyScanManager::toJsonObject() const
+{
+    return QJsonObject();
+}
+
+void WholeBodyScanManager::initializeModel()
+{
+
+}
+
+void WholeBodyScanManager::updateModel()
+{
+
+}
+
+void WholeBodyScanManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+void WholeBodyScanManager::clearData()
+{
+
 }

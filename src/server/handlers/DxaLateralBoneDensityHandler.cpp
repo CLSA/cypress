@@ -1,7 +1,9 @@
-#include "server/handlers/UltrasoundRequestHandler.h"
-#include "CypressApplication.h"
+#include "DxaLateralBoneDensityHandler.h"
 
-void UltrasoundRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+#include "CypressApplication.h"
+#include <QDebug>
+
+void DxaLateralBoneDensityHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
@@ -9,7 +11,7 @@ void UltrasoundRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 
         std::ostream& out = response.send();
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeCarotidIntima);
+        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDxaLateralBone);
 
         out.flush();
     }
@@ -17,5 +19,4 @@ void UltrasoundRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
     {
         qDebug() << e.what();
     }
-
 }

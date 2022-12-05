@@ -87,6 +87,16 @@ void saveSettings(QSettings*)
 
 }
 
+bool DXAManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+{
+    return false;
+}
+
+QMap<QString, QVariant> DXAManager::extractData(QStringList filePaths)
+{
+    return QMap<QString, QVariant>{{"", ""}};
+}
+
 bool DXAManager::startDicomServer()
 {
     return m_dicomSCP->start();

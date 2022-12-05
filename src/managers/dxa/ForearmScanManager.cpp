@@ -9,6 +9,23 @@ ForearmScanManager::ForearmScanManager(QObject *parent)
 {
 }
 
+void ForearmScanManager::start()
+{
+    qDebug() << "ForearmScanManager::start";
+    startDicomServer();
+};
+
+void ForearmScanManager::measure()
+{
+
+};
+
+void ForearmScanManager::finish()
+{
+    qDebug() << "ForearmScanManager::end";
+    endDicomServer();
+};
+
 QString ForearmScanManager::getName()
 {
     switch (m_test.side)
@@ -54,7 +71,12 @@ QString ForearmScanManager::getRefSource()
    return "Hologic";
 }
 
-QMap<QString, QVariant> ForearmScanManager::extractData()
+bool ForearmScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+{
+    return false;
+}
+
+QMap<QString, QVariant> ForearmScanManager::extractData(QStringList filePaths)
 {
     //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
     //for (QString key: m_test.testKeys)
@@ -79,4 +101,28 @@ QMap<QString, QVariant> ForearmScanManager::computeTandZScores()
     return QMap<QString, QVariant> {{}};
 }
 
+QJsonObject ForearmScanManager::toJsonObject() const
+{
+    return QJsonObject();
+}
+
+void ForearmScanManager::initializeModel()
+{
+
+}
+
+void ForearmScanManager::updateModel()
+{
+
+}
+
+void ForearmScanManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+void ForearmScanManager::clearData()
+{
+
+}
 

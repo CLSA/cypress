@@ -70,7 +70,9 @@ void DXADialog::dicomFilesReceived(QStringList& dicomFilePaths)
        ui->filesList->append((*iterator).toLocal8Bit().constData());
     }
 
-    m_manager->extractData();
+    qDebug() << dicomFilePaths;
+
+    m_manager->extractData(dicomFilePaths);
 }
 void DXADialog::on_openFileExplorer_released()
 {

@@ -110,7 +110,12 @@ SOURCES += \
     server/handlers/BodyCompositionRequestHandler.cpp \
     server/handlers/CDTTRequestHandler.cpp \
     server/handlers/ChoiceReactionRequestHandler.cpp \
+    server/handlers/DxaDualHipBoneDensityHandler.cpp \
+    server/handlers/DxaForearmBoneDensityHandler.cpp \
+    server/handlers/DxaLateralBoneDensityHandler.cpp \
     server/handlers/DxaRequestHandler.cpp \
+    server/handlers/DxaSpineBoneDensityHandler.cpp \
+    server/handlers/DxaWholeBodyBoneDensityHandler.cpp \
     server/handlers/ECGRequestHandler.cpp \
     server/handlers/EMRRequestHandler.cpp \
     server/handlers/FraxRequestHandler.cpp \
@@ -232,7 +237,12 @@ HEADERS += \
     server/handlers/BodyCompositionRequestHandler.h \
     server/handlers/CDTTRequestHandler.h \
     server/handlers/ChoiceReactionRequestHandler.h \
+    server/handlers/DxaDualHipBoneDensityHandler.h \
+    server/handlers/DxaForearmBoneDensityHandler.h \
+    server/handlers/DxaLateralBoneDensityHandler.h \
     server/handlers/DxaRequestHandler.h \
+    server/handlers/DxaSpineBoneDensityHandler.h \
+    server/handlers/DxaWholeBodyBoneDensityHandler.h \
     server/handlers/ECGRequestHandler.h \
     server/handlers/EMRRequestHandler.h \
     server/handlers/FraxRequestHandler.h \

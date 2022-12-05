@@ -18,9 +18,13 @@ public:
     void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
 
-    QMap<QString, QVariant> extractData() override;
+
+    bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+
+    QMap<QString, QVariant> extractData(QStringList filePaths) override;
     QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
     QMap<QString, QVariant> computeTandZScores() override;
+
     QJsonObject toJsonObject() const override;
 
     Side getSide() override;
@@ -29,7 +33,6 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
-
 
 public slots:
     // what the manager does in response to the main application

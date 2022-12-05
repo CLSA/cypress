@@ -1,6 +1,5 @@
 #include "DxaRequestHandler.h"
 #include "CypressApplication.h"
-
 #include <QDebug>
 
 void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
@@ -11,7 +10,7 @@ void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
 
         std::ostream& out = response.send();
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDexa);
+        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDxaWholeBody);
 
         out.flush();
     }

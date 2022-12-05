@@ -1,3 +1,5 @@
+#include <QDebug>
+
 #include "DialogFactory.h"
 #include "AudiometerDialog.h"
 #include "BloodPressureDialog.h"
@@ -11,11 +13,14 @@
 #include "WeighScaleDialog.h"
 #include "GripStrengthDialog.h"
 #include "RetinalCameraDialog.h"
-#include "DXADialog.h"
-#include "managers/dxa/HipScanManager.h"
-//#include "ThermometerDialog.h"
 
-#include <QDebug>
+#include "DXADialog.h"
+#include "managers/dxa/ApSpineScanManager.h"
+#include "managers/dxa/ForearmScanManager.h"
+#include "managers/dxa/IVAImagingScanManager.h"
+#include "managers/dxa/WholeBodyScanManager.h"
+#include "managers/dxa/HipScanManager.h"
+
 
 DialogFactory *DialogFactory::pInstance = Q_NULLPTR;
 
@@ -78,9 +83,23 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
       case Constants::MeasureType::typeECG:
         dialog = new ECGDialog();
         break;
-      case Constants::MeasureType::typeUltrasound:
+
+      case Constants::MeasureType::typeCarotidIntima:
         break;
-      case Constants::MeasureType::typeDexa:
+
+      case Constants::MeasureType::typeDxaWholeBody:
+        dialog = new DXADialog(new WholeBodyScanManager);
+        break;
+      case Constants::MeasureType::typeDxaForearmBone:
+        dialog = new DXADialog(new ForearmScanManager);
+        break;
+      case Constants::MeasureType::typeDxaSpineBone:
+        dialog = new DXADialog(new APSpineScanManager);
+        break;
+      case Constants::MeasureType::typeDxaLateralBone:
+        dialog = new DXADialog(new IVAImagingScanManager);
+        break;
+      case Constants::MeasureType::typeDxaDualHip:
         dialog = new DXADialog(new HipScanManager);
         break;
       case Constants::MeasureType::typeUnknown:

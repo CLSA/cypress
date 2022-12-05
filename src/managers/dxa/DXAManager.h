@@ -9,7 +9,7 @@
 #include <QString>
 
 #include "./dicom/DicomSCP.h"
-
+#include "dcmtk/dcmdata/dcfilefo.h"
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
  * PatScanDb table (eg., Hip) and the corresponding bonerange code in the RefScanDb ReferenceCurve table (eg., 123.).
@@ -31,16 +31,19 @@ public:
 
     const static QMap<QString, QString> ranges;
 
-    virtual QString getName() = 0;
-    virtual QString getBodyPartName() = 0;
+    virtual QMap<QString, QVariant> extractData(QStringList filePaths);
+    virtual bool validateDicomFile(DcmFileFormat loadedFileFormat);
+
     virtual Side getSide() = 0;
     virtual quint8 getScanType() = 0;
+    virtual QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName);
+    virtual QMap<QString, QVariant> computeTandZScores();
+
+    virtual QString getName() = 0;
+    virtual QString getBodyPartName() = 0;
     virtual QString getRefType() = 0;
     virtual QString getRefSource() = 0;
 
-    virtual QMap<QString, QVariant> extractData() = 0;
-    virtual QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName);
-    virtual QMap<QString, QVariant> computeTandZScores();
 
     bool startDicomServer();
     bool endDicomServer();

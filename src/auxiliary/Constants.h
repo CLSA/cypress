@@ -33,8 +33,15 @@ public:
         typeThermometer,
         typeTonometer,
         typeWeigh_Scale,
-        typeUltrasound,
-        typeDexa
+
+        typeCarotidIntima,
+
+        typeDxaWholeBody,
+        typeDxaSpineBone,
+        typeDxaLateralBone,
+        typeDxaForearmBone,
+        typeDxaDualHip,
+
     };
     Q_ENUM(MeasureType)
 
@@ -59,7 +66,7 @@ public:
     static const quint16 DefaultSplitLength;
 
     static MeasureType getMeasureType(const QString&);
-    static RunMode getRunMode(const QString&);    
+    static RunMode getRunMode(const QString&);
     static UnitsSystem getUnitsSystem(const QString&);
 
     static QString getMeasureTypeName(const MeasureType&);

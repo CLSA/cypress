@@ -44,6 +44,7 @@ void DicomSCP::initProcess()
 
     QStringList list;
     list << settings.value("dicom/out_dir").toString();
+    qDebug() << list;
 
     m_fileSystemWatcher.reset(new QFileSystemWatcher(list));
 }
@@ -54,25 +55,16 @@ void DicomSCP::initConnections()
     //start();
 
     connect(m_fileSystemWatcher.get(), &QFileSystemWatcher::directoryChanged, this, [this](const QString& path) {
-        QStringList nameFilters;
-        nameFilters << "*.dcm";
-
         QDir dir;
         QStringList dicomFilePaths;
 
         dir.setPath(path);
-        dir.setNameFilters(nameFilters);
         dir.setSorting(QDir::SortFlag::Time);
 
-        dicomFilePaths = dir.entryList();
-
-        QStringList::Iterator iterator;
-        for (iterator = dicomFilePaths.begin(); iterator != dicomFilePaths.end(); ++iterator)
-        {
-           qDebug() << (*iterator).toLocal8Bit().constData();
-        }
+        dicomFilePaths = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
 
         qDebug() << "dicom files received: " << dicomFilePaths;
+
         emit dicomFilesReceived(dicomFilePaths);
     });
 

@@ -3,41 +3,41 @@
 #include <QMap>
 #include <QObject>
 #include <QDebug>
+#include <QSettings>
 
-#include "dcmtk/dcmdata/dcdeftag.h"
 #include "managers/dxa/DXAManager.h"
 #include "managers/dxa/HipScanManager.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
 
 HipScanManager::HipScanManager(QObject* parent)
     : DXAManager{parent}
 {
-    qDebug() << "Hip Scan Manager init";
+    if (m_verbose)
+        qDebug() << "Hip Scan Manager init";
 }
 
-// window invoking its run method
-//
 void HipScanManager::start()
 {
-    qDebug() << "HipScanManager::start";
+    if (m_verbose)
+        qDebug() << "HipScanManager::start";
+
     startDicomServer();
 };
 
-
-// retrieve a measurement from the device
-//
 void HipScanManager::measure()
 {
 
 };
 
-// implementation of final clean up of device after disconnecting and all
-// data has been retrieved and processed by any upstream classes
-//
 void HipScanManager::finish()
 {
-    qDebug() << "HipScanManager::end";
+    if (m_verbose)
+        qDebug() << "HipScanManager::end";
+
     endDicomServer();
 };
 
@@ -85,35 +85,159 @@ QString HipScanManager::getRefSource()
    return "Hologic";
 }
 
-QMap<QString, QVariant> HipScanManager::extractData()
+
+QMap<QString, QVariant> HipScanManager::extractData(QStringList filePaths)
 {
-    //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
-    //for (QString key: m_test.testKeys)
-    //{
-    //   m_test.data[key] = analysisData[key];
-    //}
-    qDebug() << "Extract data";
-    DcmFileFormat fileformat;
-    OFCondition status = fileformat.loadFile("C:\\Users\\Anthony\\Documents\\PACS\\20221129160433.102000.SC");
-    if (status.good())
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    QList<QString>::const_iterator i;
+    for (i = filePaths.begin(); i != filePaths.end(); ++i)
     {
-      OFString patientName;
-      if (fileformat.getDataset()->findAndGetOFString(DCM_PatientID, patientName).good())
-      {
-        qDebug() << "Patient's Name: " << QString::fromUtf8(patientName.c_str()) << endl;
-      }
-      else
-      {
-        qDebug() << "Error: cannot access Patient's Name!" << endl;
-      }
+        const QString filePath = *i;
+        DcmFileFormat fileFormat;
+        QString fileName = settings.value("dicom/out_dir", "").toString() + "/" + filePath.toStdString().c_str();
+        fileName = fileName.replace("/", "\\");
+        OFCondition status = fileFormat.loadFile(fileName.toStdString().c_str());
+
+        if (status.good())
+        {
+            bool isValid = validateDicomFile(fileFormat);
+            if (isValid)
+            {
+                qDebug() << "DICOM File is valid: " << isValid;
+            }
+            else {
+                qDebug() << "DICOM File is invalid for HIP: " << isValid;
+            }
+        }
+        else
+        {
+          qDebug() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
+        }
     }
-    else
-    {
-      qDebug() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
-    }
+
     return QMap<QString, QVariant> {{}};
 }
 
+
+bool HipScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+{
+
+    bool valid = true;
+    OFString value = "";
+    DcmDataset* dataset = loadedFileFormat.getDataset();
+
+    OFString modality = "OT";
+    OFString bodyPartExamined = "HIP";
+    OFString imageAndFluoroscopyAreaDoseProduct = "";
+    OFString patientOrientation = "";
+    OFString bitsAllocated = "8";
+    OFString photometricInterpretation = "RGB";
+    OFString laterality = "L";
+    OFString pixelSpacing = "";
+    OFString samplesPerPixel = "3";
+    OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    // Modality == "OT"
+    valid = dataset->tagExistsWithValue(DCM_Modality);
+    if (!valid)
+    {
+        return false;
+    }
+
+    dataset->findAndGetOFString(DCM_Modality, value);
+    if (value != modality)
+    {
+        return false;
+    }
+
+    // BodyPartExamined == ""
+    valid = dataset->tagExistsWithValue(DCM_BodyPartExamined);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_BodyPartExamined, value);
+    if (value != bodyPartExamined)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_PatientOrientation);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_BitsAllocated);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_BitsAllocated, value);
+    if (value != bitsAllocated)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_PhotometricInterpretation);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
+    if (value != photometricInterpretation)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_Laterality);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_Laterality, value);
+    if (value != laterality)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_PixelSpacing);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_SamplesPerPixel);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
+    if (value != samplesPerPixel)
+    {
+        return false;
+    }
+
+    loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID);
+    if (!valid)
+    {
+        return false;
+    }
+
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    if (value != mediaStorageSOPClassUID)
+    {
+        return false;
+    }
+
+    return valid;
+}
 
 QJsonObject HipScanManager::toJsonObject() const
 {

@@ -9,6 +9,27 @@ APSpineScanManager::APSpineScanManager(QObject *parent)
 
 }
 
+void APSpineScanManager::start()
+{
+    if (m_verbose)
+        qDebug() << "WholeBodyScanManager::end";
+
+    startDicomServer();
+};
+
+void APSpineScanManager::measure()
+{
+
+};
+
+void APSpineScanManager::finish()
+{
+    if (m_verbose)
+        qDebug() << "WholeBodyScanManager::end";
+
+    endDicomServer();
+};
+
 QString APSpineScanManager::getName()
 {
     return "";
@@ -46,7 +67,12 @@ QString APSpineScanManager::getRefSource()
    return "Hologic";
 }
 
-QMap<QString, QVariant> APSpineScanManager::extractData()
+bool APSpineScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+{
+    return false;
+}
+
+QMap<QString, QVariant> APSpineScanManager::extractData(QStringList filePaths)
 {
     //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
     //for (QString key: m_test.testKeys)
@@ -65,4 +91,29 @@ QMap<QString, QVariant> APSpineScanManager::extractScanAnalysisData(const QStrin
 QMap<QString, QVariant> APSpineScanManager::computeTandZScores()
 {
     return QMap<QString, QVariant> {{}};
+}
+
+QJsonObject APSpineScanManager::toJsonObject() const
+{
+    return QJsonObject();
+}
+
+void APSpineScanManager::initializeModel()
+{
+
+}
+
+void APSpineScanManager::updateModel()
+{
+
+}
+
+void APSpineScanManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+void APSpineScanManager::clearData()
+{
+
 }

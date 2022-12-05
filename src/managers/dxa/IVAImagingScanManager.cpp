@@ -7,6 +7,28 @@ IVAImagingScanManager::IVAImagingScanManager(QObject *parent)
 {
 
 }
+
+void IVAImagingScanManager::start()
+{
+    if (m_verbose)
+        qDebug() << "IVAImagingScanManager::start";
+
+    startDicomServer();
+};
+
+void IVAImagingScanManager::measure()
+{
+
+};
+
+void IVAImagingScanManager::finish()
+{
+    if (m_verbose)
+        qDebug() << "IVAImagingScanManager::end";
+
+    endDicomServer();
+};
+
 QString IVAImagingScanManager::getName()
 {
     return "";
@@ -44,7 +66,7 @@ QString IVAImagingScanManager::getRefSource()
    return "Hologic";
 }
 
-QMap<QString, QVariant> IVAImagingScanManager::extractData()
+QMap<QString, QVariant> IVAImagingScanManager::extractData(QStringList filePaths)
 {
     //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
     //for (QString key: m_test.testKeys)
@@ -53,6 +75,11 @@ QMap<QString, QVariant> IVAImagingScanManager::extractData()
     //}
 
     return QMap<QString, QVariant> {{}};
+}
+
+bool IVAImagingScanManager::validateDicomFile(DcmFileFormat fileFormat)
+{
+   return false;
 }
 
 QMap<QString, QVariant> IVAImagingScanManager::extractScanAnalysisData(const QString& tableName)
@@ -66,4 +93,30 @@ QMap<QString, QVariant> IVAImagingScanManager::extractScanAnalysisData(const QSt
 QMap<QString, QVariant> IVAImagingScanManager::computeTandZScores()
 {
     return QMap<QString, QVariant> {{}};
+}
+
+
+QJsonObject IVAImagingScanManager::toJsonObject() const
+{
+    return QJsonObject();
+}
+
+void IVAImagingScanManager::initializeModel()
+{
+
+}
+
+void IVAImagingScanManager::updateModel()
+{
+
+}
+
+void IVAImagingScanManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+void IVAImagingScanManager::clearData()
+{
+
 }
