@@ -3,6 +3,11 @@
 #include <QVariant>
 #include <QString>
 
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
 APSpineScanManager::APSpineScanManager(QObject *parent)
     : DXAManager{parent}
 {
@@ -15,12 +20,12 @@ void APSpineScanManager::start()
         qDebug() << "WholeBodyScanManager::end";
 
     startDicomServer();
-};
+}
 
 void APSpineScanManager::measure()
 {
 
-};
+}
 
 void APSpineScanManager::finish()
 {
@@ -28,7 +33,7 @@ void APSpineScanManager::finish()
         qDebug() << "WholeBodyScanManager::end";
 
     endDicomServer();
-};
+}
 
 QString APSpineScanManager::getName()
 {
@@ -69,28 +74,113 @@ QString APSpineScanManager::getRefSource()
 
 bool APSpineScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
 {
-    return false;
+    bool valid = true;
+    OFString value = "";
+    DcmDataset* dataset = loadedFileFormat.getDataset();
+
+    OFString modality = "OT";
+    OFString bodyPartExamined = "LSPINE";
+    OFString imageAndFluoroscopyAreaDoseProduct = "";
+    OFString patientOrientation = "";
+    OFString bitsAllocated = "8";
+    OFString photometricInterpretation = "RGB";
+    OFString pixelSpacing = "";
+    OFString samplesPerPixel = "3";
+    OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    valid = dataset->tagExistsWithValue(DCM_Modality);
+    if (!valid)
+    {
+        return false;
+    }
+
+    dataset->findAndGetOFString(DCM_Modality, value);
+    if (value != modality)
+    {
+        return false;
+    }
+
+    // BodyPartExamined == ""
+    valid = dataset->tagExists(DCM_BodyPartExamined);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_PatientOrientation);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_BitsAllocated);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_BitsAllocated, value);
+    if (value != bitsAllocated)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_PhotometricInterpretation);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
+    if (value != photometricInterpretation)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_PixelSpacing);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_SamplesPerPixel);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
+    if (value != samplesPerPixel)
+    {
+        return false;
+    }
+
+    loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID);
+    if (!valid)
+    {
+        return false;
+    }
+
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    if (value != mediaStorageSOPClassUID)
+    {
+        return false;
+    }
+
+    return valid;
 }
 
-QMap<QString, QVariant> APSpineScanManager::extractData(QStringList filePaths)
+QVariantMap APSpineScanManager::extractScanAnalysisData()
 {
-    //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
-    //for (QString key: m_test.testKeys)
-    //{
-    //   m_test.data[key] = analysisData[key];
-    //}
-
-    return QMap<QString, QVariant> {{}};
+    return QVariantMap {{}};
 }
 
-QMap<QString, QVariant> APSpineScanManager::extractScanAnalysisData(const QString& tableName)
+QVariantMap APSpineScanManager::computeTandZScores()
 {
-    return QMap<QString, QVariant> {{}};
-}
-
-QMap<QString, QVariant> APSpineScanManager::computeTandZScores()
-{
-    return QMap<QString, QVariant> {{}};
+    return QVariantMap {{}};
 }
 
 QJsonObject APSpineScanManager::toJsonObject() const

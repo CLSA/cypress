@@ -72,8 +72,9 @@ void DXADialog::dicomFilesReceived(QStringList& dicomFilePaths)
 
     qDebug() << dicomFilePaths;
 
-    m_manager->extractData(dicomFilePaths);
+    m_manager->dicomFilesReceived(dicomFilePaths);
 }
+
 void DXADialog::on_openFileExplorer_released()
 {
     QDesktopServices::openUrl(QUrl("C:/work/clsa/cypress/dcmtk-3.6.7/storage"));

@@ -16,9 +16,8 @@ public:
     QJsonObject toJsonObject() const override;
 
     bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
-    QMap<QString, QVariant> extractData(QStringList filePaths) override;
-    QMap<QString, QVariant> computeTandZScores() override;
-    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
+    QVariantMap computeTandZScores() override;
+    QVariantMap extractScanAnalysisData() override;
 
     QString getName() override;
     QString getBodyPartName() override;
@@ -44,6 +43,10 @@ public slots:
 
 private:
     IVAImagingTest m_test;
+
+    bool isDicomFile1(DcmFileFormat loadedFileFormat);
+    bool isDicomFile2(DcmFileFormat loadedFileFormat);
+    bool isDicomFile3(DcmFileFormat loadedFileFormat);
 };
 
 #endif // IVAIMAGINGSCANMANAGER_H

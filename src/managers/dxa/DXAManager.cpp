@@ -5,6 +5,8 @@
 #include <QString>
 #include <QSql>
 #include <QProcess>
+#include <QSettings>
+#include <QException>
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -59,7 +61,7 @@ const QMap<QString, QString> DXAManager::ranges = {
 DXAManager::DXAManager(QObject *parent)
     : ManagerBase{parent}, m_dicomSCP(new DicomSCP(parent))
 {
-};
+}
 
 DXAManager::~DXAManager()
 {
@@ -70,17 +72,17 @@ DXAManager::~DXAManager()
 void DXAManager::loadSettings(const QSettings &)
 {
 
-};
+}
 
 void DXAManager::saveSettings(QSettings*) const
 {
 
-};
+}
 
 void loadSettings(const QSettings &)
 {
 
-};
+}
 
 void saveSettings(QSettings*)
 {
@@ -92,9 +94,54 @@ bool DXAManager::validateDicomFile(DcmFileFormat loadedFileFormat)
     return false;
 }
 
-QMap<QString, QVariant> DXAManager::extractData(QStringList filePaths)
+void DXAManager::dicomFilesReceived(QStringList paths)
 {
-    return QMap<QString, QVariant>{{"", ""}};
+    QList<DcmFileFormat> validatedDicomFiles = getValidatedFiles(paths);
+    QVariantMap scanAnalysisData = extractScanAnalysisData();
+    QVariantMap scores = computeTandZScores();
+
+    QJsonObject scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
+    QJsonObject scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
+}
+
+QList<DcmFileFormat> DXAManager::getValidatedFiles(QStringList filePaths)
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    QList<DcmFileFormat> validatedDicomFiles;
+
+    DcmFileFormat fileFormat;
+    QList<QString>::const_iterator i;
+
+    try {
+        for (i = filePaths.begin(); i != filePaths.end(); ++i)
+        {
+            const QString filePath = *i;
+            QString fileName = settings.value("dicom/out_dir", "").toString() + "/" + filePath.toStdString().c_str();
+            fileName = fileName.replace("/", "\\");
+
+            OFCondition status = fileFormat.loadFile(fileName.toStdString().c_str());
+            if (status.good())
+            {
+                bool isValid = validateDicomFile(fileFormat);
+                if (isValid)
+                {
+                    qDebug() << "DICOM File is valid: " << isValid;
+                    validatedDicomFiles.append(fileFormat);
+                }
+            }
+            else
+            {
+              qDebug() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
+            }
+        }
+    }
+
+    catch (QException &e)
+    {
+        qDebug() << e.what();
+    }
+
+    return validatedDicomFiles;
 }
 
 bool DXAManager::startDicomServer()
@@ -108,31 +155,12 @@ bool DXAManager::endDicomServer()
     return true;
 }
 
-void DXAManager::dicomFilesReceived(QStringList paths)
-{
-    qDebug() << "DXAManager::dicomFilesReceived" << paths;
-}
-
 void DXAManager::dicomServerExitNormal()
 {
-    qDebug() << "DXAManager::dicomServerExitNormal";
+
 }
 
 void DXAManager::dicomServerExitCrash()
 {
-    qDebug() << "DXAManager::dicomServerExitCrash";
+
 }
-
-QMap<QString, QVariant> DXAManager::extractScanAnalysisData(const QString& tableName)
-{
-    // make connection to PatScan.mdb
-    // query data
-
-    return QMap<QString, QVariant>{{"", ""}};
-}
-
-QMap<QString, QVariant> DXAManager::computeTandZScores()
-{
-    return QMap<QString, QVariant> {{}};
-}
-

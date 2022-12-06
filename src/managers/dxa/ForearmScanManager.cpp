@@ -3,6 +3,10 @@
 #include <QVariant>
 #include <QString>
 
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
 
 ForearmScanManager::ForearmScanManager(QObject *parent)
     : DXAManager{parent}
@@ -13,18 +17,18 @@ void ForearmScanManager::start()
 {
     qDebug() << "ForearmScanManager::start";
     startDicomServer();
-};
+}
 
 void ForearmScanManager::measure()
 {
 
-};
+}
 
 void ForearmScanManager::finish()
 {
     qDebug() << "ForearmScanManager::end";
     endDicomServer();
-};
+}
 
 QString ForearmScanManager::getName()
 {
@@ -73,32 +77,135 @@ QString ForearmScanManager::getRefSource()
 
 bool ForearmScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
 {
-    return false;
+    bool valid = true;
+    OFString value = "";
+    DcmDataset* dataset = loadedFileFormat.getDataset();
+
+    OFString modality = "OT";
+    OFString bodyPartExamined = "ARM";
+    OFString imageAndFluoroscopyAreaDoseProduct = "";
+    OFString patientOrientation = "";
+    OFString bitsAllocated = "8";
+    OFString laterality = "L";
+    OFString photometricInterpretation = "RGB";
+    OFString pixelSpacing = "";
+    OFString samplesPerPixel = "3";
+    OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    // Modality == "OT"
+    valid = dataset->tagExistsWithValue(DCM_Modality);
+    if (!valid)
+    {
+        return false;
+    }
+
+    dataset->findAndGetOFString(DCM_Modality, value);
+    if (value != modality)
+    {
+        return false;
+    }
+
+    // BodyPartExamined == ""
+    valid = dataset->tagExistsWithValue(DCM_BodyPartExamined);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_BodyPartExamined, value);
+    if (value != bodyPartExamined)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_PatientOrientation);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_BitsAllocated);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_BitsAllocated, value);
+    if (value != bitsAllocated)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_PhotometricInterpretation);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
+    if (value != photometricInterpretation)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_Laterality);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_Laterality, value);
+    if (value != laterality)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExists(DCM_PixelSpacing);
+    if (!valid)
+    {
+        return false;
+    }
+
+    valid = dataset->tagExistsWithValue(DCM_SamplesPerPixel);
+    if (!valid)
+    {
+        return false;
+    }
+    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
+    if (value != samplesPerPixel)
+    {
+        return false;
+    }
+
+    loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID);
+    if (!valid)
+    {
+        return false;
+    }
+
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    if (value != mediaStorageSOPClassUID)
+    {
+        return false;
+    }
+
+    return valid;
 }
 
-QMap<QString, QVariant> ForearmScanManager::extractData(QStringList filePaths)
-{
-    //QMap<QString, QVariant> analysisData = extractScanAnalysisData();
-    //for (QString key: m_test.testKeys)
-    //{
-    //   m_test.data[key] = analysisData[key];
-    //}
 
-    //return m_test.data;
-    return QMap<QString, QVariant> {{}};
-}
-
-QMap<QString, QVariant> ForearmScanManager::extractScanAnalysisData(const QString& tableName)
+QVariantMap ForearmScanManager::extractScanAnalysisData()
 {
     // make connection to PatScan.mdb
     // query data
 
-    return QMap<QString, QVariant>{{"", ""}};
+    return QVariantMap {{"", ""}};
 }
 
-QMap<QString, QVariant> ForearmScanManager::computeTandZScores()
+QVariantMap ForearmScanManager::computeTandZScores()
 {
-    return QMap<QString, QVariant> {{}};
+    return QVariantMap {{"", ""}};
 }
 
 QJsonObject ForearmScanManager::toJsonObject() const

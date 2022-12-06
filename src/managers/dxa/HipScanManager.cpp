@@ -26,12 +26,12 @@ void HipScanManager::start()
         qDebug() << "HipScanManager::start";
 
     startDicomServer();
-};
+}
 
 void HipScanManager::measure()
 {
 
-};
+}
 
 void HipScanManager::finish()
 {
@@ -39,7 +39,7 @@ void HipScanManager::finish()
         qDebug() << "HipScanManager::end";
 
     endDicomServer();
-};
+}
 
 QString HipScanManager::getName()
 {
@@ -85,43 +85,18 @@ QString HipScanManager::getRefSource()
    return "Hologic";
 }
 
-
-QMap<QString, QVariant> HipScanManager::extractData(QStringList filePaths)
+QVariantMap HipScanManager::extractScanAnalysisData()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    QList<QString>::const_iterator i;
-    for (i = filePaths.begin(); i != filePaths.end(); ++i)
-    {
-        const QString filePath = *i;
-        DcmFileFormat fileFormat;
-        QString fileName = settings.value("dicom/out_dir", "").toString() + "/" + filePath.toStdString().c_str();
-        fileName = fileName.replace("/", "\\");
-        OFCondition status = fileFormat.loadFile(fileName.toStdString().c_str());
-
-        if (status.good())
-        {
-            bool isValid = validateDicomFile(fileFormat);
-            if (isValid)
-            {
-                qDebug() << "DICOM File is valid: " << isValid;
-            }
-            else {
-                qDebug() << "DICOM File is invalid for HIP: " << isValid;
-            }
-        }
-        else
-        {
-          qDebug() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
-        }
-    }
-
     return QMap<QString, QVariant> {{}};
 }
 
+QVariantMap HipScanManager::computeTandZScores()
+{
+    return QMap<QString, QVariant> {{}};
+}
 
 bool HipScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
 {
-
     bool valid = true;
     OFString value = "";
     DcmDataset* dataset = loadedFileFormat.getDataset();
@@ -264,12 +239,4 @@ void HipScanManager::clearData()
 
 }
 
-QMap<QString, QVariant> HipScanManager::extractScanAnalysisData(const QString& tableName)
-{
-    return QMap<QString, QVariant> {{}};
-}
 
-QMap<QString, QVariant> HipScanManager::computeTandZScores()
-{
-    return QMap<QString, QVariant> {{}};
-}

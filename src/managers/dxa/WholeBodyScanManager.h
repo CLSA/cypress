@@ -15,11 +15,10 @@ public:
     void updateModel() override;
     void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
-    QJsonObject toJsonObject() const override;
 
-    QMap<QString, QVariant> extractData(QStringList filePaths) override;
-    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
-    QMap<QString, QVariant> computeTandZScores() override;
+    QJsonObject toJsonObject() const override;
+    QVariantMap extractScanAnalysisData() override;
+    QVariantMap computeTandZScores() override;
 
     Side getSide() override;
     quint8 getScanType() override;
@@ -46,9 +45,6 @@ public slots:
 
 private:
     WholeBodyScanTest m_test;
-
-protected slots:
-    void dicomFilesReceived(QStringList paths) override;
 };
 
 #endif // WHOLEBODYSCANMANAGER_H

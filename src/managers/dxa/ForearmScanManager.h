@@ -10,17 +10,15 @@ public:
     explicit ForearmScanManager(QObject *parent = nullptr);
 
     virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+    QVariantMap extractScanAnalysisData() override;
+    QVariantMap computeTandZScores() override;
+
+    QJsonObject toJsonObject() const override;
 
     void initializeModel() override;
     void updateModel() override;
     void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
-    QJsonObject toJsonObject() const override;
-
-    QMap<QString, QVariant> extractData(QStringList filePaths) override;
-    QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName) override;
-    QMap<QString, QVariant> computeTandZScores() override;
-
     QString getName() override;
     QString getBodyPartName() override;
     Side getSide() override;

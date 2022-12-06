@@ -104,6 +104,7 @@ SOURCES += \
     managers/serial_port/SerialPortManager.cpp \
     managers/spirometer/SpirometerManager.cpp \
     managers/tonometer/TonometerManager.cpp \
+    managers/ultrasound/CarotidIntimaManager.cpp \
     managers/weigh_scale/WeighScaleManager.cpp \
     server/DefaultRequestHandler.cpp \
     server/Server.cpp \
@@ -231,6 +232,7 @@ HEADERS += \
     managers/serial_port/SerialPortManager.h \
     managers/spirometer/SpirometerManager.h \
     managers/tonometer/TonometerManager.h \
+    managers/ultrasound/CarotidIntimaManager.h \
     managers/weigh_scale/WeighScaleManager.h \
     server/DefaultRequestHandler.h \
     server/Server.h \

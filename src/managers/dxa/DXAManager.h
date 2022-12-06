@@ -31,13 +31,13 @@ public:
 
     const static QMap<QString, QString> ranges;
 
-    virtual QMap<QString, QVariant> extractData(QStringList filePaths);
-    virtual bool validateDicomFile(DcmFileFormat loadedFileFormat);
+    QList<DcmFileFormat> getValidatedFiles(QStringList filePaths);
 
+    virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) = 0;
     virtual Side getSide() = 0;
     virtual quint8 getScanType() = 0;
-    virtual QMap<QString, QVariant> extractScanAnalysisData(const QString& tableName);
-    virtual QMap<QString, QVariant> computeTandZScores();
+    virtual QMap<QString, QVariant> extractScanAnalysisData() = 0;
+    virtual QMap<QString, QVariant> computeTandZScores() = 0;
 
     virtual QString getName() = 0;
     virtual QString getBodyPartName() = 0;
@@ -53,10 +53,11 @@ public:
 
     DicomSCP* m_dicomSCP;
 
+    void dicomFilesReceived(QStringList paths);
+
 protected slots:
-    virtual void dicomFilesReceived(QStringList paths);
-    virtual void dicomServerExitNormal();
-    virtual void dicomServerExitCrash();
+    void dicomServerExitNormal();
+    void dicomServerExitCrash();
 };
 
 #endif // DXAMANAGER_H
