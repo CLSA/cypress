@@ -30,7 +30,7 @@ class TonometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit TonometerManager(QObject* parent = Q_NULLPTR);
+    explicit TonometerManager(QWidget* parent = Q_NULLPTR);
     ~TonometerManager();
 
     void loadSettings(const QSettings&) override;

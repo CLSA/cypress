@@ -4,12 +4,13 @@
 #include <QJsonDocument>
 #include <QFileInfo>
 #include <QSettings>
+#include <QMessageBox>
 
 #include "RetinalCameraManager.h"
 #include "qsqlerror.h"
 
 
-RetinalCameraManager::RetinalCameraManager(QObject *parent)
+RetinalCameraManager::RetinalCameraManager(QWidget *parent)
     : ManagerBase{parent}
 {
     QSettings qSettings;
@@ -126,10 +127,14 @@ bool RetinalCameraManager::openDatabase()
 
 bool RetinalCameraManager::cleanupDatabase()
 {
+    // Remove data from relevant tables, and remove images from disk to prepare for a new test
     QSqlQuery query;
     QSqlQuery locationQuery;
 
-    // delete all stored images
+    QString currentFileName;
+    QString currentFileExtension;
+    QString storagePathUid;
+
     bool ok = query.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
     if (!ok)
     {
@@ -138,41 +143,66 @@ bool RetinalCameraManager::cleanupDatabase()
             qDebug() << query.lastQuery();
             qDebug() << query.lastError();
         }
-        return ok;
+
+        return false;
     }
-    while (query.next()) {
-        QString fileName = query.value(0).toString();
-        QString fileExt = query.value(1).toString();
-        QString storagePathUid = query.value(2).toString();
+
+    while (query.next())
+    {
+        currentFileName = query.value(0).toString();
+        currentFileExtension = query.value(1).toString();
+        storagePathUid = query.value(2).toString();
 
         ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + storagePathUid + "'");
-
-        if (!ok) qDebug() << query.lastError();
-        while (locationQuery.next()) {
-            QString location = locationQuery.value(0).toString();
-            qInfo() << "Deleting: " << location << "/" << fileName + fileExt;
+        if (!ok)
+        {
+            qDebug() << query.lastError();
+            return false;
         }
-        qDebug() << fileName << " " << fileExt << " " << storagePathUid;
+
+        while (locationQuery.next())
+        {
+            QString location = locationQuery.value(0).toString();
+            if (m_verbose)
+            {
+                qDebug() << "Deleting: " << location << "/" << currentFileName + currentFileExtension;
+            }
+        }
+
+        if (m_verbose)
+        {
+            qDebug() << currentFileName << " " << currentFileExtension << " " << storagePathUid;
+        }
     }
 
-    // delete stored exams
     ok = query.exec("DELETE FROM dbo.Exams WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << query.lastError();
+    if (!ok)
+    {
+        qDebug() << query.lastError();
+        return false;
+    }
 
-    // delete stored media
     ok = query.exec("DELETE FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << query.lastError();
+    if (!ok) {
+        qDebug() << query.lastError();
+        return false;
+    }
 
-    // delete patient metadata
     ok = query.exec("DELETE FROM dbo.Patients WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << query.lastError();
+    if (!ok) {
+        qDebug() << query.lastError();
+        return false;
+    }
 
-    // delete person metadata
     ok = query.exec("DELETE FROM dbo.Persons WHERE PersonUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << query.lastError();
+    if (!ok) {
+        qDebug() << query.lastError();
+        return false;
+    }
 
-    return ok;
+    return true;
 }
+
 bool RetinalCameraManager::restoreDatabase()
 {
     return false;
@@ -181,21 +211,22 @@ bool RetinalCameraManager::restoreDatabase()
 bool RetinalCameraManager::initializeDatabase()
 {
     QSqlQuery query;
-    bool ok = query.exec("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) values('11111111-2222-3333-4444-555555555555', 'Anthony', 'Hoare')");
+    bool ok = query.exec("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) values('11111111-2222-3333-4444-555555555555', 'Study', 'Participant')");
     if (!ok)
     {
         qDebug() << query.lastError();
+        return false;
     }
 
     ok = query.exec("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) values('11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555', '11111111-2222-3333-4444-555555555555')");
     if (!ok)
     {
         qDebug() << query.lastError();
-        return ok;
+        return false;
     }
+
+    return true;
 }
-
-
 
 bool RetinalCameraManager::startRetinalCamera()
 {
@@ -209,8 +240,7 @@ bool RetinalCameraManager::startRetinalCamera()
             qDebug() << "RetinalCameraManager::startRetinalCamera: IMAGEnet_R4 did not start";
     }
 
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        this, [this]
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
     {
         finish();
     });
@@ -229,28 +259,42 @@ void RetinalCameraManager::start()
     QFileInfo info(m_runnableName);
     QStringList arguments;
 
+    bool ok = false;
+
     if (m_verbose)
+    {
         qDebug() << "RetinalCameraManager::start";
+    }
 
     loadSettings(settings);
-
-    bool ok = false;
 
     ok = openDatabase();
     if (!ok)
     {
+        QMessageBox::critical(m_parent, tr("Cypress"),
+            tr("Something went wrong, Cypress was unable to access the retinal camera")
+        );
+
         return;
     }
 
     ok = cleanupDatabase();
     if (!ok)
     {
+        QMessageBox::critical(m_parent, tr("Cypress"),
+            tr("Something went wrong, Cypress could not prepare the retinal camera")
+        );
+
         return;
     }
 
     ok = initializeDatabase();
     if (!ok)
     {
+        QMessageBox::critical(m_parent, tr("Cypress"),
+            tr("Something went wrong, Cypress could not initialize the retinal camera")
+        );
+
         return;
     }
 }
@@ -262,7 +306,9 @@ void RetinalCameraManager::start()
 void RetinalCameraManager::measure()
 {
     if (m_verbose)
+    {
         qDebug() << "RetinalCameraManager::measure";
+    }
 }
 
 // SLOT
@@ -281,35 +327,51 @@ void RetinalCameraManager::finish()
     QSqlQuery locationQuery;
 
     bool ok = dataQuery.exec("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = '" + m_defaultPatientUid + "'");
-    if (!ok) qDebug() << dataQuery.lastError();
+    if (!ok)
+    {
+        qDebug() << dataQuery.lastError();
+        return;
+    }
 
-    while (dataQuery.next()) {
+    while (dataQuery.next())
+    {
         QString fileName = dataQuery.value(0).toString();
         QString fileExt = dataQuery.value(1).toString();
         QString storagePathUid = dataQuery.value(2).toString();
 
         ok = locationQuery.exec("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = '" + m_defaultPatientUid + "'");
 
-        if (!ok) qDebug() << locationQuery.lastError();
+        if (!ok)
+        {
+            qDebug() << locationQuery.lastError();
+            continue;
+        }
 
-        while (locationQuery.next()) {
-            QString location = locationQuery.value(0).toString();
-
-            if (m_verbose)
-                qInfo() << "Located image: " << location << "/" << fileName + fileExt;
+        while (locationQuery.next())
+        {
             // get image bytes and put into json
             // get eye side name and put into json
 
+            QString location = locationQuery.value(0).toString();
+
+            if (m_verbose)
+            {
+                qInfo() << "Located image: " << location << "/" << fileName + fileExt;
+            }
         }
 
         if (m_verbose)
+        {
             qDebug() << fileName << " " << fileExt << " " << storagePathUid;
+        }
     }
 
     // save json data locally and send to Pine
     //
     if (m_verbose)
+    {
         qDebug() << "saved";
+    }
 }
 
 // SLOT
@@ -317,5 +379,7 @@ void RetinalCameraManager::finish()
 void RetinalCameraManager::clearData()
 {
     if (m_verbose)
+    {
         qDebug() << "RetinalCameraManager::clearData";
+    }
 }

@@ -7,10 +7,15 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-IVAImagingScanManager::IVAImagingScanManager(QObject *parent)
+IVAImagingScanManager::IVAImagingScanManager(QWidget *parent)
     : DXAManager{parent}
 {
 
+}
+
+QVariantMap IVAImagingScanManager::retrieveDeviceData()
+{
+    return QVariantMap();
 }
 
 void IVAImagingScanManager::start()

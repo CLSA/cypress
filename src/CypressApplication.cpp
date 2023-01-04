@@ -46,8 +46,9 @@ bool CypressApplication::startTest(Constants::MeasureType type)
 
         //m_dialog->setInputFileName(m_inputFileName);
         //m_dialog->setOutputFileName(m_outputFileName);
-        //m_dialog->setRunMode(m_mode);
-        //m_dialog->setVerbose(m_verbose);
+
+        m_dialog->setRunMode(Constants::RunMode::modeDefault);
+        m_dialog->setVerbose(true);
         m_dialog->initialize();
         m_dialog->show();
     }
@@ -78,12 +79,12 @@ void CypressApplication::setArgs(const QVariantMap& args)
 
 void CypressApplication::initialize()
 {
-    if (m_verbose) {
-        qDebug() << "InputFileName: " << m_inputFileName;
-        qDebug() << "OutputFileName: " << m_outputFileName;
-        qDebug() << "Mode: " << m_mode;
-        qDebug() << "Type: " << m_type;
-    }
+    //if (m_verbose) {
+    //    qDebug() << "InputFileName: " << m_inputFileName;
+    //    qDebug() << "OutputFileName: " << m_outputFileName;
+    //    qDebug() << "Mode: " << m_mode;
+    //    qDebug() << "Type: " << m_type;
+    //}
 
     CypressApplication::restApiServer->start();
     connect(restApiServer.get(), &Server::startTest, this, &CypressApplication::startTest);

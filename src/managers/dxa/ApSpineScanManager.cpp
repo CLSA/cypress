@@ -8,10 +8,15 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-APSpineScanManager::APSpineScanManager(QObject *parent)
+APSpineScanManager::APSpineScanManager(QWidget *parent)
     : DXAManager{parent}
 {
 
+}
+
+QVariantMap APSpineScanManager::retrieveDeviceData()
+{
+   return QVariantMap();
 }
 
 void APSpineScanManager::start()

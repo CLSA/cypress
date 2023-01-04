@@ -19,14 +19,15 @@
 
 enum Side {
     LEFT,
-    RIGHT
+    RIGHT,
+    BOTH
 };
 
 class DXAManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    DXAManager(QObject *parent = nullptr);
+    DXAManager(QWidget *parent = nullptr);
     ~DXAManager();
 
     const static QMap<QString, QString> ranges;
@@ -36,6 +37,10 @@ public:
     virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) = 0;
     virtual Side getSide() = 0;
     virtual quint8 getScanType() = 0;
+
+    QVariantMap getParticipantData();
+
+    virtual QMap<QString, QVariant> retrieveDeviceData() = 0;
     virtual QMap<QString, QVariant> extractScanAnalysisData() = 0;
     virtual QMap<QString, QVariant> computeTandZScores() = 0;
 

@@ -28,7 +28,7 @@ class ManagerBase : public QObject
     Q_OBJECT
 
 public:
-    explicit ManagerBase(QObject *parent = Q_NULLPTR);
+    explicit ManagerBase(QWidget *parent = Q_NULLPTR);
     ~ManagerBase();
 
     // load and save device, paths and other constant settings to .ini
@@ -121,6 +121,7 @@ signals:
     void message(const QString &, const int &timeOut=0);
 
 protected:
+    QWidget* m_parent;
 
     bool m_verbose { true };
 

@@ -58,7 +58,7 @@ const QMap<QString, QString> DXAManager::ranges = {
     { "TOT_L2L3L4_BMD", ".234" },
 };
 
-DXAManager::DXAManager(QObject *parent)
+DXAManager::DXAManager(QWidget *parent)
     : ManagerBase{parent}, m_dicomSCP(new DicomSCP(parent))
 {
 }
@@ -67,6 +67,26 @@ DXAManager::~DXAManager()
 {
     m_dicomSCP->stop();
     delete m_dicomSCP;
+}
+
+QVariantMap DXAManager::getParticipantData()
+{
+    QString participantId;
+    if (participantId == "") {
+        throw std::exception("Participant ID not defined, cannot get participant data");
+    }
+
+    QString sqlQuery = "SELECT PATIENT_KEY, BIRTHDATE, SEX, ETHNICITY, FROM PATIENT WHERE IDENTIFIER1 = " + participantId;
+    try {
+
+    }
+
+    catch (std::exception &e)
+    {
+        qDebug() << e.what();
+    }
+
+    return QVariantMap();
 }
 
 void DXAManager::loadSettings(const QSettings &)
@@ -96,6 +116,7 @@ bool DXAManager::validateDicomFile(DcmFileFormat loadedFileFormat)
 
 void DXAManager::dicomFilesReceived(QStringList paths)
 {
+    QVariantMap deviceData = retrieveDeviceData();
     QList<DcmFileFormat> validatedDicomFiles = getValidatedFiles(paths);
     QVariantMap scanAnalysisData = extractScanAnalysisData();
     QVariantMap scores = computeTandZScores();

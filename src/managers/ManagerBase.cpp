@@ -1,9 +1,10 @@
 #include "ManagerBase.h"
 #include <QStandardItemModel>
 
-ManagerBase::ManagerBase(QObject *parent) : QObject(parent)
+ManagerBase::ManagerBase(QWidget* parent) : QObject(parent)
 {
     m_model = new QStandardItemModel;
+    m_parent = parent;
 }
 
 ManagerBase::~ManagerBase()

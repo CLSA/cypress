@@ -28,7 +28,7 @@ class ECGManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ECGManager(QObject* parent = Q_NULLPTR);
+    explicit ECGManager(QWidget* parent = Q_NULLPTR);
 
     void loadSettings(const QSettings&) override;
     void saveSettings(QSettings*) const override;

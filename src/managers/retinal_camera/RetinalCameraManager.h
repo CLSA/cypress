@@ -12,7 +12,7 @@ class RetinalCameraManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit RetinalCameraManager(QObject *parent = nullptr);
+    explicit RetinalCameraManager(QWidget *parent = nullptr);
 
     // load and save device, paths and other constant settings to .ini
     //

@@ -64,39 +64,39 @@ void DialogBase::closeEvent(QCloseEvent *event)
 void DialogBase::readInput()
 {
     // TODO: if the run mode is not debug, an input file name is mandatory, throw an error
-    if(m_inputFileName.isEmpty())
-    {
-        if(Constants::RunMode::modeSimulate == m_mode)
-        {
-          m_inputData["barcode"] = Constants::DefaultBarcode;
-        }
-        else
-        {
-          if(m_verbose)
-            qDebug() << "ERROR: no input json file";
-        }
-        return;
-    }
+    //if(m_inputFileName.isEmpty())
+    //{
+    //    if(Constants::RunMode::modeSimulate == m_mode)
+    //    {
+    //      m_inputData["barcode"] = Constants::DefaultBarcode;
+    //    }
+    //    else
+    //    {
+    //      if(m_verbose)
+    //        qDebug() << "ERROR: no input json file";
+    //    }
+    //    return;
+    //}
 
-    QFileInfo info(m_inputFileName);
-    if(info.exists())
-    {
-      QFile file;
-      file.setFileName(m_inputFileName);
-      file.open(QIODevice::ReadOnly | QIODevice::Text);
-      QString val = file.readAll();
-      file.close();
+    //QFileInfo info(m_inputFileName);
+    //if(info.exists())
+    //{
+    //  QFile file;
+    //  file.setFileName(m_inputFileName);
+    //  file.open(QIODevice::ReadOnly | QIODevice::Text);
+    //  QString val = file.readAll();
+    //  file.close();
 
-      QJsonDocument jsonDoc = QJsonDocument::fromJson(val.toUtf8());
-      m_inputData = jsonDoc.object().toVariantMap();
-      if(m_inputData.contains("barcode"))
-          this->setVerificationBarcode(m_inputData["barcode"].toString());
-    }
-    else
-    {
-      if(m_verbose)
-        qDebug() << m_inputFileName << " file does not exist";
-    }
+    //  QJsonDocument jsonDoc = QJsonDocument::fromJson(val.toUtf8());
+    //  m_inputData = jsonDoc.object().toVariantMap();
+    //  if(m_inputData.contains("barcode"))
+    //      this->setVerificationBarcode(m_inputData["barcode"].toString());
+    //}
+    //else
+    //{
+    //  if(m_verbose)
+    //    qDebug() << m_inputFileName << " file does not exist";
+    //}
 }
 
 QString DialogBase::getDefaultOutputFileName() {

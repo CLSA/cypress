@@ -29,6 +29,43 @@ void PatScanQueryHelper::disconnect()
     m_database.close();
 }
 
+QVariantMap PatScanQueryHelper::getParticipantData(QString participantId) {
+    QString queryStr = "SELECT PATIENT_KEY, BIRTHDATE, SEX, ETHNICITY, FROM PATIENT WHERE IDENTIFIER1 = ?";
+    QSqlQuery query;
+    QVariantMap results;
+
+    if (participantId == "") {
+        throw std::exception("participant id not defined, cannot get participant data");
+    }
+
+    bool connected = connect();
+    if (!connected) {
+        throw std::exception("PatScanQueryHelper::could not connect to PatScan.mdb");
+    }
+
+    query.prepare(queryStr);
+    query.bindValue(0, participantId);
+    query.exec();
+
+    QSqlError lastError = query.lastError();
+    if (lastError.type() != QSqlError::NoError) {
+        qDebug() << lastError.text();
+        throw std::exception("PatScanQueryHelper::getPatientData query error");
+    }
+
+    results["PARTICIPANT_ID"] = participantId;
+    results["PATIENT_KEY"] = query.value(0).toString();
+    results["BIRTHDATE"] = query.value(1).toString();
+    results["SEX"] = query.value(2).toString();
+    results["ETHNICITY"] = !query.value(3).isNull() ? query.value(3).toString() : "W";
+
+    disconnect();
+
+    return results;
+}
+
+
+
 QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientKey, QString scanType)
 {
     bool connected = connect();
@@ -36,12 +73,13 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientK
         throw std::exception("PatScanQueryHelper::could not connect to PatScan.mdb");
     }
 
+    QString queryStr = "SELECT SCANID, SCAN_MODE, SCAN_DATE FROM ScanAnalysis WHERE PATIENT_KEY = ? AND SCAN_TYPE = ?";
     QSqlQuery query;
     QString scanId;
     QString scanMode;
     QString scanDate;
 
-    query.prepare("SELECT SCANID, SCAN_MODE, SCAN_DATE FROM ScanAnalysis WHERE PATIENT_KEY = ? AND SCAN_TYPE = ?");
+    query.prepare(queryStr);
     query.bindValue(0, patientKey);
     query.bindValue(1, scanType);
     query.exec();
@@ -49,7 +87,7 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientK
     QSqlError lastError = query.lastError();
     if (lastError.type() != QSqlError::NoError) {
         qDebug() << lastError.text();
-        throw std::exception("PatScanQueryHelper:: Query error");
+        throw std::exception("PatScanQueryHelper::getScanAnalysisData query error");
     }
 
     // only interested in most recent scan?
@@ -58,14 +96,13 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanAnalysisData(QString patientK
     scanMode = query.value(1).toString();
     scanDate = query.value(2).toString();
 
+    disconnect();
 
     return QMap<QString, QVariant> {
         { "scanId", scanId },
         { "scanMode", scanMode },
         { "scanDate", scanDate },
     };
-
-    disconnect();
 }
 
 QMap<QString, QVariant> PatScanQueryHelper::getScanData(QString patientKey, QString scanType)

@@ -13,11 +13,16 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-HipScanManager::HipScanManager(QObject* parent)
+HipScanManager::HipScanManager(QWidget* parent)
     : DXAManager{parent}
 {
     if (m_verbose)
         qDebug() << "Hip Scan Manager init";
+}
+
+QVariantMap HipScanManager::retrieveDeviceData()
+{
+   return QVariantMap();
 }
 
 void HipScanManager::start()

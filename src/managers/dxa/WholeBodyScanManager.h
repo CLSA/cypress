@@ -7,7 +7,7 @@
 class WholeBodyScanManager : public DXAManager
 {
 public:
-    explicit WholeBodyScanManager(QObject *parent = nullptr);
+    explicit WholeBodyScanManager(QWidget *parent = nullptr);
 
     bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
 
@@ -17,6 +17,8 @@ public:
     void clearData() override;
 
     QJsonObject toJsonObject() const override;
+
+    QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;
     QVariantMap computeTandZScores() override;
 

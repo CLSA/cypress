@@ -8,9 +8,14 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-WholeBodyScanManager::WholeBodyScanManager(QObject *parent)
+WholeBodyScanManager::WholeBodyScanManager(QWidget *parent)
     : DXAManager{parent}
 {
+}
+
+QVariantMap WholeBodyScanManager::retrieveDeviceData()
+{
+    return QVariantMap();
 }
 
 void WholeBodyScanManager::start()

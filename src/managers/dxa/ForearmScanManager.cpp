@@ -8,7 +8,7 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-ForearmScanManager::ForearmScanManager(QObject *parent)
+ForearmScanManager::ForearmScanManager(QWidget *parent)
     : DXAManager{parent}
 {
 }
