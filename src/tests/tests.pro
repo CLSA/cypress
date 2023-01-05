@@ -3,7 +3,7 @@ CONFIG += qt warn_on depend_includepath testcase
 
 TEMPLATE = app
 
-SOURCES +=  tst_gripstrengthtest.cpp \
+SOURCES +=  \
     ../auxiliary/BluetoothUtil.cpp \
     ../auxiliary/CRC8.cpp \
     ../auxiliary/CommandLineParser.cpp \
@@ -52,7 +52,21 @@ SOURCES +=  tst_gripstrengthtest.cpp \
     ../data/tonometer/measurements/TonometerMeasurement.cpp \
     ../data/tonometer/tests/TonometerTest.cpp \
     ../data/weigh_scale/measurements/WeightMeasurement.cpp \
-    ../data/weigh_scale/tests/WeighScaleTest.cpp
+    ../data/weigh_scale/tests/WeighScaleTest.cpp \
+    tst_audiometer.cpp \
+    tst_blood_pressure.cpp \
+    tst_body_composition.cpp \
+    tst_cdtt.cpp \
+    tst_choice_reaction.cpp \
+    tst_dxa.cpp \
+    tst_ecg.cpp \
+    tst_emr.cpp \
+    tst_frax.cpp \
+    tst_grip_strength.cpp \
+    tst_retinal_camera.cpp \
+    tst_tonometer.cpp \
+    tst_ultrasound.cpp \
+    tst_weigh_scale.cpp
 
 HEADERS += ../data/grip_strength/measurements/GripStrengthMeasurement.h \
     ../auxiliary/BluetoothUtil.h \
