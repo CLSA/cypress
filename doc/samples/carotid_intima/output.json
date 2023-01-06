@@ -1,0 +1,18 @@
+{
+    "request": {},
+    "instrument": {
+        "user": "",
+        "timeStart": "",
+        "timeEnd": "",
+        "otherContraindication": "",
+        "code": "",
+        "type": "",
+        "skipComment": ""
+    },
+    "measure": {
+        "user": "",
+        "time": "",
+        "instrumentBarcode": "",
+        "SIDE": ""
+    }
+}

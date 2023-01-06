@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QStandardItemModel>
 
-ECGManager::ECGManager(QObject* parent):
+ECGManager::ECGManager(QWidget* parent):
     ManagerBase(parent)
 {
     setGroup("ecg");

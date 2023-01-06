@@ -1,0 +1,27 @@
+how to share a file in windows xp 
+
+To share a file in Windows XP, follow these steps:
+
+    Right-click the file that you want to share and select "Properties" from the menu.
+    In the Properties window, switch to the "Sharing" tab.
+    Click the "Share this file" radio button and then select a user or group from the drop-down list.
+    Click the "Permissions" button to specify the type of access that you want to allow for the selected user or group.
+    Click "OK" to save your changes and close the Properties window.
+
+Once you have shared the file, other users on your network will be able to access it by navigating to the shared folder on your computer. Keep in mind that this method of sharing files only works if you are on a local network and not over the internet.
+2 / 2
+Anthony Hoare
+will this work to share the file with windows 7?
+
+Yes, the steps to share a file in Windows XP should also work in Windows 7. The process for sharing files in Windows 7 is similar to the one in Windows XP, with a few minor differences.
+
+To share a file in Windows 7, follow these steps:
+
+    Right-click the file that you want to share and select "Properties" from the menu.
+    In the Properties window, switch to the "Sharing" tab.
+    Click the "Share" button to open the File Sharing window.
+    In the File Sharing window, select a user or group from the "Name" drop-down list and then select the type of access that you want to allow for the selected user or group.
+    Click "Add" to add the user or group to the list of people with whom the file is shared.
+    Click "OK" to save your changes and close the File Sharing window.
+
+Once you have shared the file, other users on your network will be able to access it by navigating to the shared folder on your computer. Keep in mind that this method of sharing files only works if you are on a local network and not over the internet.

@@ -12,7 +12,7 @@
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 
-TonometerManager::TonometerManager(QObject* parent):
+TonometerManager::TonometerManager(QWidget* parent):
     ManagerBase(parent)
 {
     setGroup("tonometer");

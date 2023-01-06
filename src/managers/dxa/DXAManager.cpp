@@ -71,22 +71,7 @@ DXAManager::~DXAManager()
 
 QVariantMap DXAManager::getParticipantData()
 {
-    QString participantId;
-    if (participantId == "") {
-        throw std::exception("Participant ID not defined, cannot get participant data");
-    }
 
-    QString sqlQuery = "SELECT PATIENT_KEY, BIRTHDATE, SEX, ETHNICITY, FROM PATIENT WHERE IDENTIFIER1 = " + participantId;
-    try {
-
-    }
-
-    catch (std::exception &e)
-    {
-        qDebug() << e.what();
-    }
-
-    return QVariantMap();
 }
 
 void DXAManager::loadSettings(const QSettings &)
@@ -117,11 +102,27 @@ bool DXAManager::validateDicomFile(DcmFileFormat loadedFileFormat)
 void DXAManager::dicomFilesReceived(QStringList paths)
 {
     QVariantMap deviceData = retrieveDeviceData();
+    if (deviceData.isEmpty()) {
+        return;
+    }
+
     QList<DcmFileFormat> validatedDicomFiles = getValidatedFiles(paths);
+    if (validatedDicomFiles.isEmpty()) {
+        return;
+    }
+
     QVariantMap scanAnalysisData = extractScanAnalysisData();
+    if (scanAnalysisData.isEmpty()) {
+        return;
+    }
+
     QVariantMap scores = computeTandZScores();
+    if (scores.isEmpty()) {
+        return;
+    }
 
     QJsonObject scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
+
     QJsonObject scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
 }
 

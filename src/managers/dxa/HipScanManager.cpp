@@ -35,6 +35,13 @@ void HipScanManager::start()
 
 void HipScanManager::measure()
 {
+    const QVariantMap participantData = getParticipantData();
+    const Side side = getSide();
+    if (side == Side::LEFT) {
+
+    }
+
+    if (side )
 
 }
 
@@ -54,7 +61,7 @@ QString HipScanManager::getName()
         case RIGHT:
             return "R_HIP";
         default:
-            return "";
+            return Side::BOTH;
     }
 }
 

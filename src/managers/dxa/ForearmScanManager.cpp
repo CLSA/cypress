@@ -13,6 +13,11 @@ ForearmScanManager::ForearmScanManager(QWidget *parent)
 {
 }
 
+QVariantMap ForearmScanManager::retrieveDeviceData()
+{
+   return QVariantMap();
+}
+
 void ForearmScanManager::start()
 {
     qDebug() << "ForearmScanManager::start";

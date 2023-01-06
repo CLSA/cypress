@@ -1,0 +1,29 @@
+{
+    "request": {},
+    "instrument": {
+        "user": "",
+        "timeStart": "",
+        "timeEnd": "",
+        "otherContraindication": "",
+        "code": "",
+        "type": "",
+        "skipComment": ""
+    },
+    "measure": {
+        "user": "",
+        "time": "",
+        "instrumentBarcode": "",
+        "DOMINANT_HAND": "",
+        "RES_RUNG": 0,
+        "RES_MAX_REPS": 0,
+        "RES_SEQUENCE": "",
+        "RES_REST_TIME": 0,
+        "RES_TRESHOLD": 0.00,
+        "RES_TRIAL_SIDE": "",
+        "RES_TRIAL_RUNG_POSITION": 0,
+        "RES_TRIAL_MAX": 0.00,
+        "RES_EXAM_MAX": 0.00,
+        "RES_EXAM_AVG": 0.00,
+        "RES_EXAM_CV": 0
+    }
+}
