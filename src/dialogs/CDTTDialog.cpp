@@ -10,6 +10,8 @@ CDTTDialog::CDTTDialog(QWidget *parent)
     , ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new CDTTManager(this));
     this->setWindowTitle("Canadian Digit Triplet Test");
 }

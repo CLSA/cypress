@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QSettings>
 
-SerialPortManager::SerialPortManager(QObject *parent) : ManagerBase(parent)
+SerialPortManager::SerialPortManager(QWidget *parent) : ManagerBase(parent)
 {
 }
 
@@ -213,7 +213,7 @@ void SerialPortManager::setDevice(const QSerialPortInfo &info)
       emit message(tr("Ready to connect..."));
       emit canConnectDevice();
       m_port.close();
-    }    
+    }
 }
 
 void SerialPortManager::connectDevice()

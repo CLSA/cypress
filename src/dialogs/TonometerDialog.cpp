@@ -10,7 +10,10 @@ TonometerDialog::TonometerDialog(QWidget *parent)
     , ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new TonometerManager(this));
+
     this->setWindowTitle("Tonometer");
 }
 

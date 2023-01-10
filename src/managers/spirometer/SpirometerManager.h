@@ -15,7 +15,7 @@ class SpirometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit SpirometerManager(QObject* parent = Q_NULLPTR);
+    explicit SpirometerManager(QWidget* parent = Q_NULLPTR);
     ~SpirometerManager() = default;
 
     void loadSettings(const QSettings&) override;

@@ -12,7 +12,7 @@
 #include <QStandardItemModel>
 #include <QtMath>
 
-WeighScaleManager::WeighScaleManager(QObject* parent) : SerialPortManager(parent)
+WeighScaleManager::WeighScaleManager(QWidget* parent) : SerialPortManager(parent)
 {
   setGroup("weigh_scale");
   m_col = 1;

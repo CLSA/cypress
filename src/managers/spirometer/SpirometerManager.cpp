@@ -5,7 +5,7 @@
 #include <QFileDialog>
 #include <QStandardItemModel>
 
-SpirometerManager::SpirometerManager(QObject* parent) : ManagerBase(parent)
+SpirometerManager::SpirometerManager(QWidget* parent) : ManagerBase(parent)
 {
     setGroup("spirometer");
 

@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QStandardItemModel>
 
-FraxManager::FraxManager(QObject* parent):
+FraxManager::FraxManager(QWidget* parent):
     ManagerBase(parent)
 {
     setGroup("frax");

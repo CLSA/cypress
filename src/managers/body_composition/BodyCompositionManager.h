@@ -24,7 +24,7 @@ class BodyCompositionManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit BodyCompositionManager(QObject* parent = Q_NULLPTR);
+    explicit BodyCompositionManager(QWidget* parent = Q_NULLPTR);
 
     void loadSettings(const QSettings&) override;
     void saveSettings(QSettings*) const override;

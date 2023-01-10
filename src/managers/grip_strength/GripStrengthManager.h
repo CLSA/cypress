@@ -15,7 +15,7 @@ class GripStrengthManager : public ManagerBase
     };
     Q_OBJECT
 public:
-    explicit GripStrengthManager(QObject* parent = Q_NULLPTR);
+    explicit GripStrengthManager(QWidget* parent = Q_NULLPTR);
 
     void loadSettings(const QSettings&) override;
     void saveSettings(QSettings*) const override;

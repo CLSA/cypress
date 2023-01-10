@@ -9,7 +9,7 @@
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 
-CDTTManager::CDTTManager(QObject* parent) : ManagerBase(parent)
+CDTTManager::CDTTManager(QWidget* parent) : ManagerBase(parent)
 {
     setGroup("cdtt");
     m_col = 1;

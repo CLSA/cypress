@@ -28,7 +28,7 @@ class AudiometerManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit AudiometerManager(QObject* parent = Q_NULLPTR);
+    explicit AudiometerManager(QWidget* parent = Q_NULLPTR);
 
     void loadSettings(const QSettings&) override;
     void saveSettings(QSettings*) const override;

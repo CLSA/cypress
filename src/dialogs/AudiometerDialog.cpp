@@ -9,6 +9,8 @@ AudiometerDialog::AudiometerDialog(QWidget *parent)
     , ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new AudiometerManager(this));
 }
 

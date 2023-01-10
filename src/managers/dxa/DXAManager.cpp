@@ -69,29 +69,54 @@ DXAManager::~DXAManager()
     delete m_dicomSCP;
 }
 
-QVariantMap DXAManager::getParticipantData()
-{
 
+// what the manager does in response to the main application
+// window invoking its run method
+//
+void DXAManager::start()
+{
+    if (m_verbose)
+        qDebug() << "DXAManager::end";
+
+    startDicomServer();
 }
 
-void DXAManager::loadSettings(const QSettings &)
+// retrieve a measurement from the device
+//
+void DXAManager::measure()
 {
+    if (m_verbose)
+        qDebug() << "DXAManager::measure";
 
+    QVariantMap participantData;
+    QVariantMap scores;
+    QVariantMap scanAnalysisData;
+    Side side;
+
+    participantData = getParticipantData();
+    side = getSide();
+
+    if (validatedDicomFiles.empty()) return;
+    scanAnalysisData = extractScanAnalysisData();
+
+    if (scanAnalysisData.isEmpty()) return;
+    scores = computeTandZScores();
+
+    if (scores.isEmpty()) return;
+
+    scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
+    scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
 }
 
-void DXAManager::saveSettings(QSettings*) const
+// implementation of final clean up of device after disconnecting and all
+// data has been retrieved and processed by any upstream classes
+//
+void DXAManager::finish()
 {
+    if (m_verbose)
+        qDebug() << "DXAManager::end";
 
-}
-
-void loadSettings(const QSettings &)
-{
-
-}
-
-void saveSettings(QSettings*)
-{
-
+    endDicomServer();
 }
 
 bool DXAManager::validateDicomFile(DcmFileFormat loadedFileFormat)
@@ -103,27 +128,15 @@ void DXAManager::dicomFilesReceived(QStringList paths)
 {
     QVariantMap deviceData = retrieveDeviceData();
     if (deviceData.isEmpty()) {
+        qInfo() << "No device data..";
         return;
     }
 
-    QList<DcmFileFormat> validatedDicomFiles = getValidatedFiles(paths);
+    validatedDicomFiles = getValidatedFiles(paths);
     if (validatedDicomFiles.isEmpty()) {
+        qInfo() << "No valid dicom files received..";
         return;
     }
-
-    QVariantMap scanAnalysisData = extractScanAnalysisData();
-    if (scanAnalysisData.isEmpty()) {
-        return;
-    }
-
-    QVariantMap scores = computeTandZScores();
-    if (scores.isEmpty()) {
-        return;
-    }
-
-    QJsonObject scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
-
-    QJsonObject scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
 }
 
 QList<DcmFileFormat> DXAManager::getValidatedFiles(QStringList filePaths)
@@ -147,20 +160,20 @@ QList<DcmFileFormat> DXAManager::getValidatedFiles(QStringList filePaths)
                 bool isValid = validateDicomFile(fileFormat);
                 if (isValid)
                 {
-                    qDebug() << "DICOM File is valid: " << isValid;
+                    qInfo() << "DICOM File is valid: " << isValid;
                     validatedDicomFiles.append(fileFormat);
                 }
             }
             else
             {
-              qDebug() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
+              qInfo() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
             }
         }
     }
 
     catch (QException &e)
     {
-        qDebug() << e.what();
+        qInfo() << e.what();
     }
 
     return validatedDicomFiles;
@@ -173,8 +186,7 @@ bool DXAManager::startDicomServer()
 
 bool DXAManager::endDicomServer()
 {
-    //return m_dicomSCP->stop();
-    return true;
+    return m_dicomSCP->stop();
 }
 
 void DXAManager::dicomServerExitNormal()
@@ -185,4 +197,19 @@ void DXAManager::dicomServerExitNormal()
 void DXAManager::dicomServerExitCrash()
 {
 
+}
+
+void DXAManager::loadSettings(const QSettings &)
+{
+
+}
+
+void DXAManager::saveSettings(QSettings*) const
+{
+
+}
+
+QVariantMap DXAManager::getParticipantData()
+{
+    return QVariantMap();
 }

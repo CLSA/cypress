@@ -1,6 +1,6 @@
 #include "CarotidIntimaManager.h"
 
-CarotidIntimaManager::CarotidIntimaManager(QObject *parent)
+CarotidIntimaManager::CarotidIntimaManager(QWidget *parent)
     : ManagerBase{parent}
 {
 

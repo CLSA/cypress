@@ -10,6 +10,8 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent)
     , ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new ChoiceReactionManager(this));
     this->setWindowTitle("Choice Reaction Test");
 }

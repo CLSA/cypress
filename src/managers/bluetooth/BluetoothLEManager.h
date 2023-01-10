@@ -18,7 +18,7 @@ class BluetoothLEManager : public ManagerBase
     Q_PROPERTY(QString deviceName MEMBER m_deviceName NOTIFY deviceNameChanged)
 
 public:
-    explicit BluetoothLEManager(QObject* parent = Q_NULLPTR);
+    explicit BluetoothLEManager(QWidget* parent = Q_NULLPTR);
 
     // the host supports Bluetooth Low Energy discovery
     //

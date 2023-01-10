@@ -9,6 +9,8 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent)
     , ui(new Ui::BloodPressureDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new BloodPressureManager(this));
 }
 

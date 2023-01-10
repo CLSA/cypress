@@ -288,7 +288,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !contains(QMAKE_TARGET.arch, x86_64): {
     message("32-bit")
 
-    INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include
+    INCLUDEPATH += "C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include"
 
     INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
     INCLUDEPATH += "C:/Program Files (x86)/DCMTK/zlib-1.2.12/include"

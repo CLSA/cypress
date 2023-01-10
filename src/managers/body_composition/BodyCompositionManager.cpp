@@ -36,7 +36,7 @@ QMap<QByteArray,QString> BodyCompositionManager::incorrectLUT= BodyCompositionMa
 //
 QMap<QByteArray,QString> BodyCompositionManager::confirmLUT= BodyCompositionManager::initConfirmationLUT();
 
-BodyCompositionManager::BodyCompositionManager(QObject *parent) : SerialPortManager(parent)
+BodyCompositionManager::BodyCompositionManager(QWidget *parent) : SerialPortManager(parent)
 {
   setGroup("body_composition");
   m_col = 1;
@@ -517,7 +517,7 @@ void BodyCompositionManager::updateInputData(const QVariantMap& input)
           BodyCompositionManager::defaultLUT["set_measurement_system_metric"] :
           BodyCompositionManager::defaultLUT["set_measurement_system_imperial"];
         m_queue.enqueue(request);
-        qDebug() << "enqueued measurement system input " << request << "from " << units;        
+        qDebug() << "enqueued measurement system input " << request << "from " << units;
     }
 
     // Set the equation, Westerner or Oriental.  The default setting is the equation for Westerner.

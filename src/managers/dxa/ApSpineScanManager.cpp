@@ -19,27 +19,6 @@ QVariantMap APSpineScanManager::retrieveDeviceData()
    return QVariantMap();
 }
 
-void APSpineScanManager::start()
-{
-    if (m_verbose)
-        qDebug() << "WholeBodyScanManager::end";
-
-    startDicomServer();
-}
-
-void APSpineScanManager::measure()
-{
-
-}
-
-void APSpineScanManager::finish()
-{
-    if (m_verbose)
-        qDebug() << "WholeBodyScanManager::end";
-
-    endDicomServer();
-}
-
 QString APSpineScanManager::getName()
 {
     return "";

@@ -8,8 +8,8 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent) :
     DialogBase(parent),
     ui(new Ui::RetinalCameraDialog)
 {
-    setWindowFlags(Qt::Window);
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new RetinalCameraManager(this));
 }

@@ -9,6 +9,8 @@ BodyCompositionDialog::BodyCompositionDialog(QWidget *parent)
     , ui(new Ui::BodyCompositionDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new BodyCompositionManager(this));
 }
 

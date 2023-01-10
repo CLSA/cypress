@@ -18,27 +18,6 @@ QVariantMap IVAImagingScanManager::retrieveDeviceData()
     return QVariantMap();
 }
 
-void IVAImagingScanManager::start()
-{
-    if (m_verbose)
-        qDebug() << "IVAImagingScanManager::start";
-
-    startDicomServer();
-}
-
-void IVAImagingScanManager::measure()
-{
-
-}
-
-void IVAImagingScanManager::finish()
-{
-    if (m_verbose)
-        qDebug() << "IVAImagingScanManager::end";
-
-    endDicomServer();
-}
-
 QString IVAImagingScanManager::getName()
 {
     return "";

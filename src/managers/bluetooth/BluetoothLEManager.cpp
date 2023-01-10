@@ -16,7 +16,7 @@
  *
 */
 
-BluetoothLEManager::BluetoothLEManager(QObject *parent) : ManagerBase(parent)
+BluetoothLEManager::BluetoothLEManager(QWidget *parent) : ManagerBase(parent)
 {
     setGroup("thermometer");
     m_col = 1;

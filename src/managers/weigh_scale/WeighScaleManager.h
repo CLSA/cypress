@@ -22,7 +22,7 @@ class WeighScaleManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit WeighScaleManager(QObject* parent = Q_NULLPTR);
+    explicit WeighScaleManager(QWidget* parent = Q_NULLPTR);
 
     void loadSettings(const QSettings&) override;
     void saveSettings(QSettings*) const override;

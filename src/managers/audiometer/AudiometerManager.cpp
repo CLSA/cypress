@@ -19,7 +19,7 @@ QByteArray AudiometerManager::initEndCode()
     return QByteArray(data);
 }
 
-AudiometerManager::AudiometerManager(QObject *parent)
+AudiometerManager::AudiometerManager(QWidget *parent)
     : SerialPortManager(parent)
 {
     setGroup("audiometer");

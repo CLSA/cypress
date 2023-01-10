@@ -25,34 +25,6 @@ QVariantMap HipScanManager::retrieveDeviceData()
    return QVariantMap();
 }
 
-void HipScanManager::start()
-{
-    if (m_verbose)
-        qDebug() << "HipScanManager::start";
-
-    startDicomServer();
-}
-
-void HipScanManager::measure()
-{
-    const QVariantMap participantData = getParticipantData();
-    const Side side = getSide();
-    if (side == Side::LEFT) {
-
-    }
-
-    if (side )
-
-}
-
-void HipScanManager::finish()
-{
-    if (m_verbose)
-        qDebug() << "HipScanManager::end";
-
-    endDicomServer();
-}
-
 QString HipScanManager::getName()
 {
     switch(m_test.side) {
@@ -60,9 +32,9 @@ QString HipScanManager::getName()
             return "L_HIP";
         case RIGHT:
             return "R_HIP";
-        default:
-            return Side::BOTH;
     }
+
+    return "BOTH";
 }
 
 QString HipScanManager::getBodyPartName()

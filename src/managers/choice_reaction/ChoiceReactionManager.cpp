@@ -12,7 +12,7 @@
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
-ChoiceReactionManager::ChoiceReactionManager(QObject *parent) :
+ChoiceReactionManager::ChoiceReactionManager(QWidget *parent) :
     ManagerBase(parent)
 {
     setGroup("choice_reaction");

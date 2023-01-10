@@ -10,6 +10,8 @@ FraxDialog::FraxDialog(QWidget *parent)
     , ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new FraxManager(this));
     this->setWindowTitle("Frax Test");
 }

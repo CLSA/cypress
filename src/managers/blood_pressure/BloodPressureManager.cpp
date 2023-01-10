@@ -10,7 +10,7 @@
 #include <QStandardItemModel>
 #include <QtUsb/QtUsb>
 
-BloodPressureManager::BloodPressureManager(QObject* parent) 
+BloodPressureManager::BloodPressureManager(QWidget* parent)
     : ManagerBase(parent)
     , m_comm(new BPMCommunication())
 {

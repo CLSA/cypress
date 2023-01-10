@@ -9,7 +9,7 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent):
     ui(new Ui::GripStrengthDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::Window);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new GripStrengthManager(this));
 }

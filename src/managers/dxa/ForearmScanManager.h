@@ -28,20 +28,6 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-public slots:
-    // what the manager does in response to the main application
-    // window invoking its run method
-    //
-    void start() override;
-
-    // retrieve a measurement from the device
-    //
-    void measure() override;
-
-    // implementation of final clean up of device after disconnecting and all
-    // data has been retrieved and processed by any upstream classes
-    //
-    void finish() override;
 
 private:
     ForearmTest m_test;

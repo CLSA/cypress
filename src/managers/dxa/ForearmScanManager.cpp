@@ -18,23 +18,6 @@ QVariantMap ForearmScanManager::retrieveDeviceData()
    return QVariantMap();
 }
 
-void ForearmScanManager::start()
-{
-    qDebug() << "ForearmScanManager::start";
-    startDicomServer();
-}
-
-void ForearmScanManager::measure()
-{
-
-}
-
-void ForearmScanManager::finish()
-{
-    qDebug() << "ForearmScanManager::end";
-    endDicomServer();
-}
-
 QString ForearmScanManager::getName()
 {
     switch (m_test.side)
@@ -42,7 +25,9 @@ QString ForearmScanManager::getName()
         case LEFT:
             return "L_FA";
         case RIGHT:
-            return "R_FA";
+        return "R_FA";
+    case BOTH:
+        break;
     }
 
     return "R_FA";
@@ -65,9 +50,9 @@ quint8 ForearmScanManager::getScanType()
             return 61;
         case RIGHT:
             return 71;
+        case BOTH:
+            return 81;
     }
-
-    return 71;
 }
 
 QString ForearmScanManager::getRefType()

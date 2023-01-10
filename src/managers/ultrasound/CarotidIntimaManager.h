@@ -6,7 +6,7 @@
 class CarotidIntimaManager : public ManagerBase
 {
 public:
-    explicit CarotidIntimaManager(QObject *parent = nullptr);
+    explicit CarotidIntimaManager(QWidget *parent = nullptr);
 
     virtual void loadSettings(const QSettings &) override;
     virtual void saveSettings(QSettings*) const override;

@@ -10,6 +10,8 @@ SpirometerDialog::SpirometerDialog(QWidget *parent)
     , ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new SpirometerManager(this));
     this->setWindowTitle("Spirometer");
 }

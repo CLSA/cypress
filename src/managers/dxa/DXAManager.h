@@ -32,6 +32,13 @@ public:
 
     const static QMap<QString, QString> ranges;
 
+    QJsonObject scanAnalysisJson;
+    QJsonObject scoresJson;
+
+    DicomSCP* m_dicomSCP;
+
+    QList<DcmFileFormat> validatedDicomFiles;
+
     QList<DcmFileFormat> getValidatedFiles(QStringList filePaths);
 
     virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) = 0;
@@ -49,6 +56,7 @@ public:
     virtual QString getRefType() = 0;
     virtual QString getRefSource() = 0;
 
+    void dicomFilesReceived(QStringList paths);
 
     bool startDicomServer();
     bool endDicomServer();
@@ -56,9 +64,21 @@ public:
     void loadSettings(const QSettings &) override;
     void saveSettings(QSettings*) const override;
 
-    DicomSCP* m_dicomSCP;
 
-    void dicomFilesReceived(QStringList paths);
+public slots:
+    // what the manager does in response to the main application
+    // window invoking its run method
+    //
+    void start() override;
+
+    // retrieve a measurement from the device
+    //
+    void measure() override;
+
+    // implementation of final clean up of device after disconnecting and all
+    // data has been retrieved and processed by any upstream classes
+    //
+    void finish() override;
 
 protected slots:
     void dicomServerExitNormal();

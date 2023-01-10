@@ -10,6 +10,8 @@ ECGDialog::ECGDialog(QWidget *parent)
     , ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new ECGManager(this));
     this->setWindowTitle("ECG");
 }

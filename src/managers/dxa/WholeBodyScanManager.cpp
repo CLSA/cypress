@@ -18,26 +18,6 @@ QVariantMap WholeBodyScanManager::retrieveDeviceData()
     return QVariantMap();
 }
 
-void WholeBodyScanManager::start()
-{
-    if (m_verbose)
-        qDebug() << "WholeBodyScanManager::end";
-
-    startDicomServer();
-};
-
-void WholeBodyScanManager::measure()
-{
-};
-
-void WholeBodyScanManager::finish()
-{
-    if (m_verbose)
-        qDebug() << "WholeBodyScanManager::end";
-
-    endDicomServer();
-};
-
 QString WholeBodyScanManager::getName()
 {
     return "";

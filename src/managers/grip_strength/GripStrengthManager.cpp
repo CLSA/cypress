@@ -10,7 +10,7 @@
 #include <QException>
 
 
-GripStrengthManager::GripStrengthManager(QObject* parent) : ManagerBase(parent)
+GripStrengthManager::GripStrengthManager(QWidget* parent) : ManagerBase(parent)
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 
