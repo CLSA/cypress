@@ -387,12 +387,15 @@ void ECGManager::clearData()
 
 void ECGManager::finish()
 {
-    m_test.reset();
     if(QProcess::NotRunning != m_process.state())
     {
         m_process.kill();
     }
+
     deleteDeviceData();
+
+    emit complete(m_test.toJsonObject());
+    //m_test.reset();
 }
 
 bool ECGManager::deleteDeviceData()

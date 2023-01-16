@@ -1,5 +1,6 @@
 QT += core gui sql widgets testlib network xml bluetooth
 CONFIG += qt warn_on depend_includepath testcase
+CONGIG += no_testcase_installs
 
 TEMPLATE = app
 
@@ -53,6 +54,7 @@ SOURCES +=  \
     ../data/tonometer/tests/TonometerTest.cpp \
     ../data/weigh_scale/measurements/WeightMeasurement.cpp \
     ../data/weigh_scale/tests/WeighScaleTest.cpp \
+    main.cpp \
     tst_audiometer.cpp \
     tst_blood_pressure.cpp \
     tst_body_composition.cpp \
@@ -116,4 +118,43 @@ HEADERS += ../data/grip_strength/measurements/GripStrengthMeasurement.h \
     ../data/tonometer/measurements/TonometerMeasurement.h \
     ../data/tonometer/tests/TonometerTest.h \
     ../data/weigh_scale/measurements/WeightMeasurement.h \
-    ../data/weigh_scale/tests/WeighScaleTest.h
+    ../data/weigh_scale/tests/WeighScaleTest.h \
+    tst_audiometer.h \
+    tst_blood_pressure.h \
+    tst_body_composition.h \
+    tst_cdtt.h \
+    tst_choice_reaction.h \
+    tst_dxa.h \
+    tst_ecg.h \
+    tst_emr.h \
+    tst_frax.h \
+    tst_grip_strength.h \
+    tst_retinal_camera.h \
+    tst_tonometer.h \
+    tst_ultrasound.h \
+    tst_weigh_scale.h
+
+!contains(QMAKE_TARGET.arch, x86_64): {
+    message("32-bit")
+
+    INCLUDEPATH += "C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include"
+
+    INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
+    INCLUDEPATH += "C:/Program Files (x86)/DCMTK/zlib-1.2.12/include"
+
+    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+    LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+    LIBS += -L"C:/Program Files (x86)/DCMTK/zlib-1.2.12/lib" -lzlib_o
+
+} else {
+    message("64-bit")
+    INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x64-windows/include
+    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x64-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+
+    INCLUDEPATH += "C:/Program Files/DCMTK/include"
+    INCLUDEPATH += "C:/Program Files/DCMTK/zlib-1.2.12/include"
+
+    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
+    LIBS += -L"C:/Program Files/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+    LIBS += -L"C:/Program Files/DCMTK/zlib-1.2.12/lib" -lzlib_o
+}

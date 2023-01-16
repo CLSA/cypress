@@ -9,7 +9,7 @@ class WholeBodyScanManager : public DXAManager
 public:
     explicit WholeBodyScanManager(QWidget *parent = nullptr);
 
-    bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+    bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
     void initializeModel() override;
     void updateModel() override;

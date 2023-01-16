@@ -38,15 +38,14 @@ public:
     DicomSCP* m_dicomSCP;
 
     QList<DcmFileFormat> validatedDicomFiles;
-
     QList<DcmFileFormat> getValidatedFiles(QStringList filePaths);
-
-    virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) = 0;
-    virtual Side getSide() = 0;
-    virtual quint8 getScanType() = 0;
 
     QVariantMap getParticipantData();
 
+    virtual Side getSide() = 0;
+    virtual quint8 getScanType() = 0;
+
+    virtual bool validateDicomFile(DcmFileFormat &loadedFileFormat) = 0;
     virtual QMap<QString, QVariant> retrieveDeviceData() = 0;
     virtual QMap<QString, QVariant> extractScanAnalysisData() = 0;
     virtual QMap<QString, QVariant> computeTandZScores() = 0;
@@ -64,6 +63,8 @@ public:
     void loadSettings(const QSettings &) override;
     void saveSettings(QSettings*) const override;
 
+    bool isCorrectDicom(DcmFileFormat &file);
+    bool isCompleteDicom(DcmFileFormat &file);
 
 public slots:
     // what the manager does in response to the main application

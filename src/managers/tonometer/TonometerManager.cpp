@@ -539,11 +539,6 @@ void TonometerManager::clearData()
 
 void TonometerManager::finish()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-      return;
-    }
-
     if(QProcess::NotRunning != m_process.state())
     {
       m_process.kill();

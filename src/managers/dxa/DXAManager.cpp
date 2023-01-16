@@ -117,11 +117,26 @@ void DXAManager::finish()
         qDebug() << "DXAManager::end";
 
     endDicomServer();
+
+    emit complete(scanAnalysisJson);
 }
 
-bool DXAManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+bool DXAManager::isCompleteDicom(DcmFileFormat &file)
 {
     return false;
+}
+
+bool DXAManager::isCorrectDicom(DcmFileFormat &file)
+{
+    return true;
+}
+
+bool DXAManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
+{
+    bool isComplete = isCorrectDicom(loadedFileFormat);
+    bool isCorrect = isCompleteDicom(loadedFileFormat);
+
+    return isComplete && isCorrect;
 }
 
 void DXAManager::dicomFilesReceived(QStringList paths)

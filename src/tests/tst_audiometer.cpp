@@ -1,24 +1,5 @@
-#include <QtTest>
-
+#include "tst_audiometer.h"
 //#include "../data/grip_strength/tests/AudiometerTest.h"
-
-class TestAudiometer: public QObject
-{
-    Q_OBJECT
-
-public:
-    TestAudiometer();
-    ~TestAudiometer();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-};
 
 TestAudiometer::TestAudiometer()
 {
@@ -33,18 +14,18 @@ TestAudiometer::~TestAudiometer()
 
 void TestAudiometer::initTestCase()
 {
+    qDebug() << "initTestCase";
 }
 
 void TestAudiometer::cleanupTestCase()
 {
+    qDebug() << "cleanUpTestCase";
 }
 
 void TestAudiometer::testCase1()
 {
+    qDebug() << "testCase1";
     //AudiometerTest test;
     //QVERIFY(test.isValid());
 }
 
-QTEST_APPLESS_MAIN(TestAudiometer)
-
-#include "tst_audiometer.moc"

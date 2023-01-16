@@ -1,56 +1,36 @@
 #include <QtTest>
 
+#include "tst_ecg.h"
 #include "../data/ecg/tests/ECGTest.h"
 
-class TestGripStrength: public QObject
-{
-    Q_OBJECT
-
-public:
-    TestGripStrength();
-    ~TestGripStrength();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-    void testCase2();
-};
-
-TestGripStrength::TestGripStrength()
+TestEcg::TestEcg()
 {
     qDebug("constructor");
 }
 
-TestGripStrength::~TestGripStrength()
+TestEcg::~TestEcg()
 {
 
     qDebug("destructor");
 }
 
-void TestGripStrength::initTestCase()
+void TestEcg::initTestCase()
 {
 }
 
-void TestGripStrength::cleanupTestCase()
+void TestEcg::cleanupTestCase()
 {
 }
 
-void TestGripStrength::testCase1()
+void TestEcg::testCase1()
 {
     ECGTest test;
     QVERIFY(test.isValid());
 }
 
-void TestGripStrength::testCase2()
+void TestEcg::testCase2()
 {
     qDebug("test case 1");
 }
 
-QTEST_APPLESS_MAIN(TestGripStrength)
 
-#include "tst_ecg.moc"

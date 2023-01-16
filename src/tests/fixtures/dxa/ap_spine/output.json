@@ -1,0 +1,55 @@
+{
+    "input": {
+        "barcode": "123456"
+    },
+    "metadata": {
+        "user": "",
+        "timeStart": "",
+        "timeEnd": "",
+        "otherContraindication": "",
+        "skipComment": "",
+        "instrumentBarcode": ""
+    },
+    "results": [
+        {
+            "RES_SP_NO_REGIONS": 0,
+            "RES_SP_STARTING_REGION": 0,
+            "RES_SP_SCANID": "",
+            "RES_SP_SCAN_MODE": "",
+            "RES_SP_L1_INCLUDED": false,
+            "RES_SP_L1_AREA": 0.0,
+            "RES_SP_L1_BMC": 0.0,
+            "RES_SP_L1_BMD": 0.0,
+            "RES_SP_L1_T": 0.0,
+            "RES_SP_L1_Z": 0.0,
+            "RES_SP_L2_INCLUDED": false,
+            "RES_SP_L2_AREA": 0.0,
+            "RES_SP_L2_BMC": 0.0,
+            "RES_SP_L2_BMD": 0.0,
+            "RES_SP_L2_T": 0.0,
+            "RES_SP_L2_Z": 0.0,
+            "RES_SP_L3_INCLUDED": false,
+            "RES_SP_L3_AREA": 0.0,
+            "RES_SP_L3_BMC": 0.0,
+            "RES_SP_L3_BMD": 0.0,
+            "RES_SP_L3_T": 0.0,
+            "RES_SP_L3_Z": 0.0,
+            "RES_SP_L4_INCLUDED": false,
+            "RES_SP_L4_AREA": 0.0,
+            "RES_SP_L4_BMC": 0.0,
+            "RES_SP_L4_BMD": 0.0,
+            "RES_SP_L4_T": 0.0,
+            "RES_SP_L4_Z": 0.0,
+            "RES_SP_TOT_AREA": 0.0,
+            "RES_SP_TOT_BMC": 0.0,
+            "RES_SP_TOT_BMD": 0.0,
+            "RES_SP_TOT_T": 0.0,
+            "RES_SP_TOT_Z": 0.0,
+            "RES_SP_STD_TOT_BMD": 0.0,
+            "RES_SP_ROI_TYPE": 0,
+            "RES_SP_ROI_WIDTH": 0.0,
+            "RES_SP_ROI_HEIGHT": 0.0,
+            "RES_SP_PHYSICIAN_COMMENT": ""
+        }
+    ]
+}

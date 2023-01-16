@@ -10,7 +10,7 @@ class APSpineScanManager : public DXAManager
 public:
     explicit APSpineScanManager(QWidget *parent = nullptr);
 
-    virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+    virtual bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
     QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;

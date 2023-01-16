@@ -334,15 +334,17 @@ void BodyCompositionManager::clearData()
 
 void BodyCompositionManager::finish()
 {
-    m_deviceData.reset();
-    m_deviceList.clear();
-    m_test.reset();
+    //m_deviceData.reset();
+    //m_deviceList.clear();
+    //m_test.reset();
 
     if(m_port.isOpen())
         m_port.close();
 
-    m_queue.clear();
-    m_cache.clear();
+    //m_queue.clear();
+    //m_cache.clear();
+
+    emit complete(m_test.toJsonObject());
 }
 
 bool BodyCompositionManager::hasEndCode(const QByteArray &arr) const

@@ -3,9 +3,12 @@
         "barcode": "123456789"
     },
     "metadata": {
-        "startTime": "",
-        "endTime": "",
-        "instrumentBarcode": "123456789"
+        "user": "",
+        "timeStart": "",
+        "timeEnd": "",
+        "otherContraindication": "",
+        "skipComment": "",
+        "instrumentBarcode": ""
     },
     "results": [
         {

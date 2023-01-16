@@ -120,6 +120,9 @@ signals:
     //
     void message(const QString &, const int &timeOut=0);
 
+    // signal that the test is complete and pass along results
+    void complete(const QJsonObject &results);
+
 protected:
     QWidget* m_parent;
 

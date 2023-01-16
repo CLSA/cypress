@@ -65,7 +65,7 @@ QString ForearmScanManager::getRefSource()
    return "Hologic";
 }
 
-bool ForearmScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+bool ForearmScanManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
 {
     bool valid = true;
     OFString value = "";

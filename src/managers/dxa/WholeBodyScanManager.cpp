@@ -55,7 +55,7 @@ QString WholeBodyScanManager::getRefSource()
    return "Hologic";
 }
 
-bool WholeBodyScanManager::validateDicomFile(DcmFileFormat file)
+bool WholeBodyScanManager::validateDicomFile(DcmFileFormat &file)
 {
     const OFString modality = "OT";
     const OFString bodyPartExamined = "";

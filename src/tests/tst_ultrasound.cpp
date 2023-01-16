@@ -1,25 +1,5 @@
-#include <QtTest>
-
+#include "tst_ultrasound.h"
 //#include "../data/ultrasound/tests/ultrasound.h"
-
-class TestUltrasound: public QObject
-{
-    Q_OBJECT
-
-public:
-    TestUltrasound();
-    ~TestUltrasound();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-    void testCase2();
-};
 
 TestUltrasound::TestUltrasound()
 {
@@ -54,6 +34,4 @@ void TestUltrasound::testCase2()
     qDebug("test case 1");
 }
 
-QTEST_APPLESS_MAIN(TestUltrasound)
 
-#include "tst_ultrasound.moc"

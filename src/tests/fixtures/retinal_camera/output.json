@@ -1,11 +1,14 @@
 {
     "input": {
-        "barcode": "123456789"
+        "barcode": "12345"
     },
     "metadata": {
+        "user": "",
         "timeStart": "",
         "timeEnd": "",
-        "instrumentBarcode": "123456789"
+        "otherContraindication": "",
+        "skipComment": "",
+        "instrumentBarcode": ""
     },
     "results": [
         {

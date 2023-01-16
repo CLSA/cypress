@@ -56,7 +56,7 @@ QString IVAImagingScanManager::getRefSource()
 }
 
 
-bool IVAImagingScanManager::isDicomFile1(DcmFileFormat loadedFileFormat)
+bool IVAImagingScanManager::isDicomFile1(DcmFileFormat &loadedFileFormat)
 {
     // _DICOM_MEASURE
     //dicom1.validator.put(Tag.Modality, new TagEntry(true,true,"OT"));
@@ -176,7 +176,7 @@ bool IVAImagingScanManager::isDicomFile1(DcmFileFormat loadedFileFormat)
     return valid;
 }
 
-bool IVAImagingScanManager::isDicomFile2(DcmFileFormat loadedFileFormat)
+bool IVAImagingScanManager::isDicomFile2(DcmFileFormat &loadedFileFormat)
 {
     //ApexDicomData dicom2 = new ApexDicomData();
     //dicom2.validator.put(Tag.Modality, new TagEntry(true,true,"PR"));
@@ -215,7 +215,7 @@ bool IVAImagingScanManager::isDicomFile2(DcmFileFormat loadedFileFormat)
     return valid;
 }
 
-bool IVAImagingScanManager::isDicomFile3(DcmFileFormat loadedFileFormat)
+bool IVAImagingScanManager::isDicomFile3(DcmFileFormat &loadedFileFormat)
 {
  //   ApexDicomData dicom3 = new ApexDicomData();
     //dicom3.validator.put(Tag.Modality, new TagEntry(true,true,"OT"));
@@ -311,7 +311,7 @@ bool IVAImagingScanManager::isDicomFile3(DcmFileFormat loadedFileFormat)
 }
 
 
-bool IVAImagingScanManager::validateDicomFile(DcmFileFormat fileFormat)
+bool IVAImagingScanManager::validateDicomFile(DcmFileFormat &fileFormat)
 {
     bool file1 = isDicomFile1(fileFormat);
     bool file2 = isDicomFile2(fileFormat);

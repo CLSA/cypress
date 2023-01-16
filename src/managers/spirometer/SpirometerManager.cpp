@@ -496,11 +496,6 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::finish()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-      return;
-    }
-
     if(QProcess::NotRunning != m_process.state())
     {
        m_process.kill();
@@ -519,6 +514,8 @@ void SpirometerManager::finish()
     }
 
     m_test.reset();
+
+    emit complete(m_test.toJsonObject());
 }
 
 void SpirometerManager::removeXmlFiles() const

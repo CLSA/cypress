@@ -15,6 +15,7 @@ DXADialog::DXADialog(DXAManager* manager, QWidget *parent) :
 
     connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
     connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
+    //connect(&DXAManager::canMeasure, &DXADialog::enableMeasure, this, &DXADialog:: );
 }
 
 DXADialog::~DXADialog()

@@ -19,7 +19,7 @@ void CarotidIntimaManager::measure()
 
 void CarotidIntimaManager::finish()
 {
-
+    emit complete(QJsonObject());
 }
 
 void CarotidIntimaManager::clearData()

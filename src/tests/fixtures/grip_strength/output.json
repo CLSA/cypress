@@ -1,11 +1,14 @@
 {
     "request": {
-        "barcode": "12345"
+        "participantId": "12345"
     },
-    "test": {
-        "barcode": "12345",
+    "metadata": {
+        "user": "",
         "timeStart": "",
-        "timeEnd": ""
+        "timeEnd": "",
+        "otherContraindication": "",
+        "skipComment": "",
+        "instrumentBarcode": ""
     },
     "results": [
         {

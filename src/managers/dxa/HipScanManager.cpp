@@ -79,7 +79,7 @@ QVariantMap HipScanManager::computeTandZScores()
     return QMap<QString, QVariant> {{}};
 }
 
-bool HipScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+bool HipScanManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
 {
     bool valid = true;
     OFString value = "";

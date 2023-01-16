@@ -27,6 +27,7 @@ class Server: public QObject
 
         void start();
         void stop();
+
         void requestTestStart(Constants::MeasureType type);
 
     signals:

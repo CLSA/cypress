@@ -1,33 +1,12 @@
-#include <QtTest>
+#include "tst_dxa.h"
 
-//#include "../data/dxa/tests/ApSpineTest.h"
-//#include "../data/dxa/tests/ForearmTest.h"
-//#include "../data/dxa/tests/HipTest.h"
-//#include "../data/dxa/tests/IVAImagingTest.h"
-//#include "../data/dxa/tests/WholeBodyScanTest.h"
+#include "../data/dxa/tests/ApSpineTest.h"
+#include "../data/dxa/tests/ForearmTest.h"
+#include "../data/dxa/tests/HipTest.h"
+#include "../data/dxa/tests/IVAImagingTest.h"
+#include "../data/dxa/tests/WholeBodyScanTest.h"
 
-class TestDxa: public QObject
-{
-    Q_OBJECT
 
-public:
-    TestDxa();
-    ~TestDxa();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-
-    void apSpineTest();
-    void forearmTest();
-    void hipTest();
-    void ivaImagingTest();
-    void wholeBodyScanTest();
-};
 
 TestDxa::TestDxa()
 {
@@ -73,6 +52,4 @@ void TestDxa::wholeBodyScanTest()
     qDebug("whole body scan test");
 }
 
-QTEST_APPLESS_MAIN(TestDxa)
 
-#include "tst_dxa.moc"

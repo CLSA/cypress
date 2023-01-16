@@ -331,21 +331,22 @@ void CDTTManager::clearData()
 
 void CDTTManager::finish()
 {
-    m_test.reset();
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        return;
-    }
-    if(QProcess::NotRunning != m_process.state())
-    {
-        m_process.kill();
-    }
-    if(!m_outputFile.isEmpty() && QFileInfo::exists(m_outputFile))
-    {
-        QFile ofile(m_outputFile);
-        ofile.remove();
-        m_outputFile.clear();
-    }
+    emit complete(m_test.toJsonObject());
+    //m_test.reset();
+    //if(Constants::RunMode::modeSimulate == m_mode)
+    //{
+    //    return;
+    //}
+    //if(QProcess::NotRunning != m_process.state())
+    //{
+    //    m_process.kill();
+    //}
+    //if(!m_outputFile.isEmpty() && QFileInfo::exists(m_outputFile))
+    //{
+    //    QFile ofile(m_outputFile);
+    //    ofile.remove();
+    //    m_outputFile.clear();
+    //}
 }
 
 void CDTTManager::configureProcess()

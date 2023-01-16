@@ -6,8 +6,15 @@
 
 #include <QObject>
 #include <QCoreApplication>
+#include <QJsonObject>
 
 QT_FORWARD_DECLARE_CLASS(DialogBase)
+
+enum Mode {
+    Live,
+    Sim,
+    Debug,
+};
 
 class CypressApplication : public QObject
 {
@@ -20,8 +27,13 @@ public:
     void initialize();
 
     static QScopedPointer<Server> restApiServer;
+    static Mode mode;
+
 public slots:
     bool startTest(Constants::MeasureType type);
+
+signals:
+    bool endTest(QJsonObject results);
 
 private:
     QString m_inputFileName; // TODO this data should be from POST request in production
@@ -33,5 +45,6 @@ private:
 
     bool m_verbose = true;
 };
+
 
 #endif // CYPRESSAPPLICATION_H

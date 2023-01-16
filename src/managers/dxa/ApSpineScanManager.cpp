@@ -56,9 +56,8 @@ QString APSpineScanManager::getRefSource()
    return "Hologic";
 }
 
-bool APSpineScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
+bool APSpineScanManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
 {
-    bool valid = true;
     OFString value = "";
     DcmDataset* dataset = loadedFileFormat.getDataset();
 
@@ -71,6 +70,12 @@ bool APSpineScanManager::validateDicomFile(DcmFileFormat loadedFileFormat)
     OFString pixelSpacing = "";
     OFString samplesPerPixel = "3";
     OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    bool valid = DXAManager::validateDicomFile(loadedFileFormat);
+    if (!valid)
+    {
+        return false;
+    }
 
     valid = dataset->tagExistsWithValue(DCM_Modality);
     if (!valid)

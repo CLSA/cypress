@@ -167,9 +167,10 @@ void AudiometerManager::finish()
     if(m_port.isOpen())
         m_port.close();
 
-    m_deviceData.reset();
-    m_deviceList.clear();
-    m_test.reset();
+    emit complete(m_test.toJsonObject());
+    //m_deviceData.reset();
+    //m_deviceList.clear();
+    //m_test.reset();
 }
 
 bool AudiometerManager::hasEndCode(const QByteArray &arr)

@@ -494,8 +494,10 @@ void BloodPressureManager::finish()
 {
     disconnectDevice();
     m_thread.quit();
-    m_deviceData.reset();
-    m_test.reset();
+
+    emit complete(m_test.toJsonObject());
+    //m_deviceData.reset();
+    //m_test.reset();
 }
 
 // slot for BPMCommunication

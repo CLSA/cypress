@@ -1,24 +1,5 @@
-#include <QtTest>
-
+#include "tst_choice_reaction.h"
 #include "../data/choice_reaction/tests/ChoiceReactionTest.h"
-
-class TestChoiceReaction: public QObject
-{
-    Q_OBJECT
-
-public:
-    TestChoiceReaction();
-    ~TestChoiceReaction();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-};
 
 TestChoiceReaction::TestChoiceReaction()
 {
@@ -46,6 +27,4 @@ void TestChoiceReaction::testCase1()
 }
 
 
-QTEST_APPLESS_MAIN(TestChoiceReaction)
 
-#include "tst_choice_reaction.moc"

@@ -151,9 +151,10 @@ void WeighScaleManager::clearData()
 
 void WeighScaleManager::finish()
 {
-    m_deviceData.reset();
-    m_deviceList.clear();
-    m_test.reset();
+    emit complete(m_test.toJsonObject());
+    //m_deviceData.reset();
+    //m_deviceList.clear();
+    //m_test.reset();
     if(m_port.isOpen())
         m_port.close();
 }

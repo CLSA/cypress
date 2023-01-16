@@ -15,6 +15,7 @@ RC_ICONS = favicon.ico
 SOURCES += \
     auxiliary/CommandLineParser.cpp \
     auxiliary/Constants.cpp \
+    auxiliary/FIleUtils.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
     auxiliary/tracker5util.cpp \
@@ -147,6 +148,7 @@ SOURCES += \
 HEADERS += \
     auxiliary/CommandLineParser.h \
     auxiliary/Constants.h \
+    auxiliary/FileUtils.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
     auxiliary/tracker5util.h \

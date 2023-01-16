@@ -13,6 +13,8 @@
 
 QScopedPointer<Server> CypressApplication::restApiServer(new Server());
 
+Mode CypressApplication::mode = Mode::Sim;
+
 CypressApplication::CypressApplication(QObject *parent) : QObject(parent)
 {
 }
@@ -43,9 +45,6 @@ bool CypressApplication::startTest(Constants::MeasureType type)
             QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
             return false;
         }
-
-        //m_dialog->setInputFileName(m_inputFileName);
-        //m_dialog->setOutputFileName(m_outputFileName);
 
         m_dialog->setRunMode(Constants::RunMode::modeDefault);
         m_dialog->setVerbose(true);
@@ -79,12 +78,12 @@ void CypressApplication::setArgs(const QVariantMap& args)
 
 void CypressApplication::initialize()
 {
-    //if (m_verbose) {
-    //    qDebug() << "InputFileName: " << m_inputFileName;
-    //    qDebug() << "OutputFileName: " << m_outputFileName;
-    //    qDebug() << "Mode: " << m_mode;
-    //    qDebug() << "Type: " << m_type;
-    //}
+    if (m_verbose) {
+        qDebug() << "InputFileName: " << m_inputFileName;
+        qDebug() << "OutputFileName: " << m_outputFileName;
+        qDebug() << "Mode: " << m_mode;
+        qDebug() << "Type: " << m_type;
+    }
 
     CypressApplication::restApiServer->start();
     connect(restApiServer.get(), &Server::startTest, this, &CypressApplication::startTest);

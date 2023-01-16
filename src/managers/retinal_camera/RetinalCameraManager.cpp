@@ -368,10 +368,7 @@ void RetinalCameraManager::finish()
 
     // save json data locally and send to Pine
     //
-    if (m_verbose)
-    {
-        qDebug() << "saved";
-    }
+    emit complete(QJsonObject());
 }
 
 // SLOT

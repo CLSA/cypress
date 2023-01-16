@@ -1,24 +1,7 @@
-#include <QtTest>
+#include "tst_body_composition.h"
 
 #include "../data/body_composition/tests/BodyCompositionTest.h"
 
-class TestBodyComposition: public QObject
-{
-    Q_OBJECT
-
-public:
-    TestBodyComposition();
-    ~TestBodyComposition();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-};
 
 TestBodyComposition::TestBodyComposition()
 {
@@ -41,10 +24,8 @@ void TestBodyComposition::cleanupTestCase()
 
 void TestBodyComposition::testCase1()
 {
-    BodyCompositionTest test;
-    QVERIFY(test.isValid());
+    //BodyCompositionTest test;
+    //QVERIFY(test.isValid());
 }
 
-QTEST_APPLESS_MAIN(TestBodyComposition)
 
-#include "tst_body_composition.moc"

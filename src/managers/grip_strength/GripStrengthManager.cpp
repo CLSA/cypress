@@ -60,13 +60,7 @@ void GripStrengthManager::measure() {
 void GripStrengthManager::finish()
 {
     qDebug() << "finish";
-    try {
-        //m_test.reset();
-        //updateModel();
-    }
-    catch (QException &e) {
-        qDebug() << e.what();
-    }
+    emit complete(m_test.toJsonObject());
 }
 
 bool GripStrengthManager::initializeConnections() {

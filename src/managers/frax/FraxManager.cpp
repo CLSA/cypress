@@ -422,7 +422,8 @@ void FraxManager::clearData()
 
 void FraxManager::finish()
 {
-    m_test.reset();
+    emit complete(m_test.toJsonObject());
+    //m_test.reset();
     if(QProcess::NotRunning != m_process.state())
     {
         m_process.close();

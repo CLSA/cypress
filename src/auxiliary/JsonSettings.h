@@ -8,11 +8,11 @@ class JsonSettings {
 public:
     static bool readSettingsJson(QIODevice &device, QVariantMap &map);
     static bool writeSettingsJson(QIODevice &device, const QVariantMap &map);
-
+    static QJsonObject readJsonFromFile(const QString &path);
     static QSettings::Format JsonFormat;
 
 private:
-    static void paraseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map);
+    static void parseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map);
     static QJsonObject restoreJsonObject(QVariantMap &map);
 };
 

@@ -384,17 +384,18 @@ void ChoiceReactionManager::measure()
 
 void ChoiceReactionManager::finish()
 {
-    m_test.reset();
-    if(QProcess::NotRunning != m_process.state())
-    {
-        m_process.close();
-    }
-    if(!m_outputFile.isEmpty() && QFileInfo::exists(m_outputFile))
-    {
-      QFile ofile(m_outputFile);
-      ofile.remove();
-    }
-    m_outputFile.clear();
+    emit complete(m_test.toJsonObject());
+    //m_test.reset();
+    //if(QProcess::NotRunning != m_process.state())
+    //{
+    //    m_process.close();
+    //}
+    //if(!m_outputFile.isEmpty() && QFileInfo::exists(m_outputFile))
+    //{
+    //  QFile ofile(m_outputFile);
+    //  ofile.remove();
+    //}
+    //m_outputFile.clear();
 }
 
 QJsonObject ChoiceReactionManager::toJsonObject() const

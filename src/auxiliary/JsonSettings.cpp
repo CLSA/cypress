@@ -3,7 +3,21 @@
 QSettings::Format JsonSettings::JsonFormat =
         QSettings::registerFormat("JsonFormat", &JsonSettings::readSettingsJson, &JsonSettings::writeSettingsJson);
 
-void JsonSettings::paraseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map)
+
+QJsonObject JsonSettings::readJsonFromFile(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        throw file.error();
+    }
+
+    QByteArray jsonData = file.readAll();
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonData));
+    return jsonDoc.object();
+}
+
+void JsonSettings::parseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map)
 {
     QJsonValue value;
     QJsonObject obj;
@@ -15,7 +29,7 @@ void JsonSettings::paraseJsonObject(QJsonObject &json, QString prefix, QVariantM
         if(value.isObject())
         {
             obj = value.toObject();
-            paraseJsonObject(obj, prefix+keys[i]+"/", map);
+            parseJsonObject(obj, prefix+keys[i]+"/", map);
         }
         else
         {
@@ -91,7 +105,7 @@ bool JsonSettings::readSettingsJson(QIODevice &device, QVariantMap &map)
         qCritical() << "ERROR: failed to read json from IO device:" << jsonError.errorString();
         return false;
     }
-    paraseJsonObject(obj, QString(), map);
+    parseJsonObject(obj, QString(), map);
     return true;
 }
 

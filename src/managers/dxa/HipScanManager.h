@@ -18,7 +18,7 @@ public:
     void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
 
-    bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+    bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
     QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;

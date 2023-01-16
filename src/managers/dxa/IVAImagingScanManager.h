@@ -15,7 +15,7 @@ public:
     void clearData() override;
     QJsonObject toJsonObject() const override;
 
-    bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+    bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
     QVariantMap retrieveDeviceData() override;
     QVariantMap computeTandZScores() override;
@@ -31,9 +31,9 @@ public:
 private:
     IVAImagingTest m_test;
 
-    bool isDicomFile1(DcmFileFormat loadedFileFormat);
-    bool isDicomFile2(DcmFileFormat loadedFileFormat);
-    bool isDicomFile3(DcmFileFormat loadedFileFormat);
+    bool isDicomFile1(DcmFileFormat &loadedFileFormat);
+    bool isDicomFile2(DcmFileFormat &loadedFileFormat);
+    bool isDicomFile3(DcmFileFormat &loadedFileFormat);
 };
 
 #endif // IVAIMAGINGSCANMANAGER_H

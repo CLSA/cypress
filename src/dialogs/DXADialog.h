@@ -28,6 +28,7 @@ public slots:
     void dicomServerStarted();
     void dicomServerEnded();
     void dicomLogUpdate(QString line);
+    //void enableMeasure();
 
 private slots:
     void on_openFileExplorer_released();

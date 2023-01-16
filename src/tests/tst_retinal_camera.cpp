@@ -1,59 +1,37 @@
-#include <QtTest>
-
+#include "tst_retinal_camera.h"
 //#include "../data/retinal_camera/tests/RetinalCameraTest.h"
 
-class RetinalCameraTest: public QObject
-{
-    Q_OBJECT
-
-public:
-    RetinalCameraTest();
-    ~RetinalCameraTest();
-
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-    void testCase2();
-};
-
-RetinalCameraTest::RetinalCameraTest()
+TestRetinalCamera::TestRetinalCamera()
 {
     qDebug("constructor");
 }
 
-RetinalCameraTest::~RetinalCameraTest()
+TestRetinalCamera::~TestRetinalCamera()
 {
 
     qDebug("destructor");
 }
 
-void RetinalCameraTest::initTestCase()
+void TestRetinalCamera::initTestCase()
 {
 }
 
-void RetinalCameraTest::cleanupTestCase()
+void TestRetinalCamera::cleanupTestCase()
 {
 }
 
-void RetinalCameraTest::testCase1()
+void TestRetinalCamera::testCase1()
 {
-    RetinalCameraTest test;
+    //RetinalCameraTest test;
     //test.readGripTestOptions();
     //test.readGripTestResults();
     //QVERIFY(test.isValid());
 
 }
 
-void RetinalCameraTest::testCase2()
+void TestRetinalCamera::testCase2()
 {
     qDebug("test case 1");
 }
 
-QTEST_APPLESS_MAIN(RetinalCameraTest)
 
-#include "tst_retinal_camera.moc"

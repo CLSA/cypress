@@ -9,7 +9,7 @@ class ForearmScanManager : public DXAManager
 public:
     explicit ForearmScanManager(QWidget *parent = nullptr);
 
-    virtual bool validateDicomFile(DcmFileFormat loadedFileFormat) override;
+    bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
     QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;
