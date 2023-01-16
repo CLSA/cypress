@@ -11,12 +11,7 @@ public:
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
-    void initializeModel() override;
-    void updateModel() override;
-    void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
-
-    QJsonObject toJsonObject() const override;
 
     QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;

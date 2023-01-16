@@ -2,13 +2,14 @@
 #include <QSettings>
 #include <QDebug>
 
+#include "auxiliary/JsonSettings.h"
+
 #include <string>
 #include <iostream>
 
 #include "Poco/Net/HTTPServer.h"
-#include "server/handlers/InstrumentRequestHandlerFactory.h"
+#include "server/InstrumentRequestHandlerFactory.h"
 #include "server/Server.h"
-
 
 using namespace Poco::Net;
 
@@ -30,6 +31,14 @@ Server::Server()
 void Server::requestTestStart(Constants::MeasureType type)
 {
     emit startTest(type);
+}
+
+
+bool Server::sendResults(const QJsonObject &results)
+{
+    QString jsonString = JsonSettings::serializeJson(results);
+    qDebug() << "RESULTS: " << jsonString;
+    return true;
 }
 
 

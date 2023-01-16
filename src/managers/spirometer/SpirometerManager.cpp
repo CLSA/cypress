@@ -7,41 +7,13 @@
 
 SpirometerManager::SpirometerManager(QWidget* parent) : ManagerBase(parent)
 {
-    setGroup("spirometer");
-
-    // all managers must check for barcode and language input values
-    //
-    m_inputKeyList << "barcode";
-    m_inputKeyList << "language";
-    m_inputKeyList << "gender";  // male/female
-    m_inputKeyList << "date_of_birth";
-    m_inputKeyList << "height";  // m
-    m_inputKeyList << "weight";  // kg
-    m_inputKeyList << "smoker";  // true/false
-
-    //TODO: check if these upstream inputs are optinal or required
+    //TODO: check if these upstream inputs are optional or required
     //
     //m_inputKeyList << "asthma"; // true/false
     //m_inputKeyList << "copd";   // true/false
     //m_inputKeyList << "ethnicity"; // caucasian, asian, african, hispanic, other_ethnic
 
     m_test.setExpectedMeasurementCount(4);
-}
-
-void SpirometerManager::initializeModel()
-{
-    for(int col = 0; col < 4; col++)
-    {
-        for(int row = 0; row < 8; row++)
-        {
-            QStandardItem* item = new QStandardItem();
-            m_model->setItem(row, col, item);
-        }
-    }
-    m_model->setHeaderData(0, Qt::Horizontal, "Variables", Qt::DisplayRole);
-    m_model->setHeaderData(1, Qt::Horizontal, "Trial 1", Qt::DisplayRole);
-    m_model->setHeaderData(2, Qt::Horizontal, "Trial 2", Qt::DisplayRole);
-    m_model->setHeaderData(3, Qt::Horizontal, "Trial 3", Qt::DisplayRole);
 }
 
 void SpirometerManager::start()
@@ -73,117 +45,6 @@ void SpirometerManager::start()
     emit dataChanged();
 }
 
-void SpirometerManager::loadSettings(const QSettings& settings)
-{
-    // the full spec path name including exe name
-    // eg., C:/Program Files (x86)/ndd Medizintechnik/Easy on-PC/Application/EasyWarePro.exe
-    //
-    QString exeName = settings.value(getGroup() + "/client/exe").toString();
-    QString path = settings.value(getGroup() + "/client/data").toString();
-    selectRunnable(exeName);
-    selectDataPath(path);
-}
-
-void SpirometerManager::saveSettings(QSettings* settings) const
-{
-    if(!m_runnableName.isEmpty())
-    {
-        settings->beginGroup(getGroup());
-        settings->setValue("client/exe", m_runnableName);
-        settings->endGroup();
-        if(m_verbose)
-            qDebug() << "wrote exe fullspec path to settings file";
-    }
-
-    if(!m_dataPath.isEmpty())
-    {
-        settings->beginGroup(getGroup());
-        settings->setValue("client/data", m_dataPath);
-        settings->endGroup();
-        if(m_verbose)
-            qDebug() << "wrote emr transfer directory path to settings file";
-    }
-}
-
-QJsonObject SpirometerManager::toJsonObject() const
-{
-    QJsonObject json = m_test.toJsonObject();
-    if(Constants::RunMode::modeSimulate != m_mode)
-    {
-        QFile ofile(getEMROutXmlName());
-        if(ofile.exists())
-        {
-            ofile.open(QIODevice::ReadOnly);
-            QByteArray buffer = ofile.readAll();
-            json.insert("test_output_file", QString(buffer.toBase64()));
-            json.insert("test_output_file_mime_type", "xml");
-        }
-
-        if(outputPdfExists())
-        {
-            QString outputPdf = getOutputPdfPath();
-            QFile pdfFile(outputPdf);
-            if(pdfFile.open(QIODevice::ReadOnly))
-            {
-              QByteArray bufferPdf = pdfFile.readAll();
-              json.insert("test_output_pdf_file", QString(bufferPdf.toBase64()));
-              json.insert("test_output_pdf_file_mime_type", "pdf");
-              pdfFile.close();
-            }
-
-        }
-    }
-    json.insert("test_input",QJsonObject::fromVariantMap(m_inputData));
-    return json;
-}
-
-void SpirometerManager::updateModel()
-{
-    // Data from all measurements:
-    // First list is a header and each list after is a trial
-    QList<QStringList> data = m_test.toStringListList();
-    qDebug() << "update model" << data.size();
-    int numLists = data.count();
-    int numElementsPerList = 0 < numLists ? data[0].count() : 0;
-
-    // Set row count
-    int n_row = qMax(1, numElementsPerList);
-    if(n_row != m_model->rowCount())
-    {
-        m_model->setRowCount(n_row);
-    }
-
-    // set column count
-    int n_col = qMax(1, numLists);
-    if(n_col != m_model->columnCount())
-    {
-        m_model->setColumnCount(n_col);
-    }
-
-    for(int i = 0; i < n_col; i++)
-    {
-        QString colName = 0 == i ? "Data Type": QString("Trial %1").arg(i);
-        m_model->setHeaderData(i, Qt::Horizontal, colName, Qt::DisplayRole);
-    }
-
-    for(int row = 0; row < numElementsPerList; row++)
-    {
-        for(int col = 0; col < numLists; col++)
-        {
-            QString dataStr = data[col][row];
-
-            QStandardItem* item = m_model->item(row, col);
-            if(nullptr == item)
-            {
-                item = new QStandardItem();
-                m_model->setItem(row, col, item);
-            }
-            item->setData(dataStr, Qt::DisplayRole);
-        }
-    }
-    emit dataChanged();
-}
-
 bool SpirometerManager::isDefined(const QString& value, const SpirometerManager::FileType &fileType) const
 {
     if(value.isEmpty())
@@ -210,81 +71,11 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::measure()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-      readOutput();
-      return;
-    }
+    qDebug() << "Starting process from measure";
     clearData();
+
     // launch the process
-    if(m_verbose)
-      qDebug() << "Starting process from measure";
-
     m_process.start();
-}
-
-void SpirometerManager::setInputData(const QVariantMap& input)
-{
-    m_inputData = input;
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        if(!input.contains("barcode"))
-            m_inputData["barcode"] = Constants::DefaultBarcode;
-        if(!input.contains("language"))
-            m_inputData["language"] = "en";
-        if(!input.contains("gender"))
-            m_inputData["gender"] = "male";  // required
-        if(!input.contains("date_of_birth"))
-            m_inputData["date_of_birth"] = QDate().fromString("1994-09-25","yyy-MM-dd"); // required
-        if(!input.contains("height"))
-            m_inputData["height"] = 1.8; // m, required
-        if(!input.contains("weight"))
-            m_inputData["weight"] = 109;  // kg, optional, no decimal
-        if(!input.contains("smoker"))
-            m_inputData["smoker"] = false; // optional
-    }
-    bool ok = true;
-    QMap<QString, QMetaType::Type> typeMap{
-        {"barcode",QMetaType::Type::QString},
-        {"language",QMetaType::Type::QString},
-        {"gender",QMetaType::Type::QString},
-        {"date_of_birth",QMetaType::Type::QDate},
-        {"height",QMetaType::Type::Double},
-        {"weight",QMetaType::Type::Double},
-        {"smoker",QMetaType::Type::Bool}
-    };
-    foreach(auto key, m_inputKeyList)
-    {
-        if(!m_inputData.contains(key))
-        {
-            ok = false;
-            qCritical() << "ERROR: invalid input data";
-            break;
-        }
-        const QVariant value = m_inputData[key];
-        bool valueOk = true;
-        QMetaType::Type type;
-        if(typeMap.contains(key))
-        {
-            type = typeMap[key];
-            valueOk = value.canConvert(type);
-        }
-        if(!valueOk)
-        {
-            ok = false;
-            if(m_verbose)
-                qDebug() << "ERROR: invalid input" << key << value.toString() << QMetaType::typeName(type);
-            break;
-        }
-    }
-    if(!ok)
-    {
-        qCritical() << "ERROR: invalid input data";
-        emit message(tr("ERROR: the input data is incorrect"));
-        m_inputData = QVariantMap();
-    }
-    else
-      configureProcess();
 }
 
 void SpirometerManager::select()
@@ -359,44 +150,27 @@ void SpirometerManager::selectDataPath(const QString& path)
 
 void SpirometerManager::readOutput()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        qDebug() << "manager simulate";
-        m_test.simulate(m_inputData);
-        if(m_test.isValid())
-        {
-          // emit the can write signal
-          emit message(tr("Ready to save results..."));
-          emit canWrite();
-        }
-        updateModel();
-        return;
-    }
+    //if(QProcess::NormalExit != m_process.exitStatus())
+    //{
+    //  qDebug() << "ERROR: process failed to finish correctly: cannot read output";
+    //  return;
+    //}
+    //else
+    //  qDebug() << "process finished successfully";
 
-    if(QProcess::NormalExit != m_process.exitStatus())
-    {
-      qDebug() << "ERROR: process failed to finish correctly: cannot read output";
-      return;
-    }
-    else
-      qDebug() << "process finished successfully";
+    //m_test.fromFile(getEMROutXmlName());
+    //if(m_test.isValid())
+    //{
+    //
+    //}
+    //else
+    //  qDebug() << "ERROR: EMR plugin produced invalid xml test results";
 
-    m_test.fromFile(getEMROutXmlName());
-    if(m_test.isValid())
-    {
-      emit message(tr("Ready to save results..."));
-      emit canWrite();
-    }
-    else
-      qDebug() << "ERROR: EMR plugin produced invalid xml test results";
-
-    updateModel();
 }
 
 void SpirometerManager::clearData()
 {
     m_test.reset();
-    updateModel();
 }
 
 void SpirometerManager::backupDatabases() const
@@ -457,15 +231,6 @@ void SpirometerManager::restoreDatabases() const
 
 void SpirometerManager::configureProcess()
 {
-    if(m_inputData.isEmpty()) return;
-
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        emit message(tr("Ready to measure..."));
-        emit canMeasure();
-        return;
-    }
-
     QDir working(m_runnablePath);
     if(isDefined(m_runnableName, SpirometerManager::FileType::EasyWareExe) &&
        isDefined(m_dataPath, SpirometerManager::FileType::EMRDataPath) &&
@@ -483,11 +248,10 @@ void SpirometerManager::configureProcess()
         //
         qDebug() << "creating plugin xml";
         EMRPluginWriter writer;
-        writer.setInputData(m_inputData);
+        //writer.setInputData(m_inputData);
         QDir xmlPath(m_dataPath);
         writer.write(xmlPath.filePath("CypressIn.xml"));
 
-        emit message(tr("Ready to measure..."));
         emit canMeasure();
     }
     else
@@ -515,7 +279,7 @@ void SpirometerManager::finish()
 
     m_test.reset();
 
-    emit complete(m_test.toJsonObject());
+    QJsonObject results = m_test.toJsonObject();
 }
 
 void SpirometerManager::removeXmlFiles() const

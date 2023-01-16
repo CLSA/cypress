@@ -17,6 +17,20 @@ QJsonObject JsonSettings::readJsonFromFile(const QString &path)
     return jsonDoc.object();
 }
 
+QString JsonSettings::serializeJson(const QJsonObject& jsonObject)
+{
+   QJsonDocument jsonDoc(jsonObject);
+   QString jsonString = jsonDoc.toJson();
+   return jsonString;
+}
+
+QJsonObject JsonSettings::deserializeJson(const QString& jsonString)
+{
+   QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toUtf8());
+   QJsonObject jsonObject = jsonDoc.object();
+   return jsonObject;
+}
+
 void JsonSettings::parseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map)
 {
     QJsonValue value;

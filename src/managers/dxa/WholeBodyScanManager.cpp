@@ -20,7 +20,7 @@ QVariantMap WholeBodyScanManager::retrieveDeviceData()
 
 QString WholeBodyScanManager::getName()
 {
-    return "";
+    return "WholeBody";
 }
 
 QString WholeBodyScanManager::getBodyPartName()
@@ -170,26 +170,6 @@ QVariantMap WholeBodyScanManager::extractScanAnalysisData()
 QVariantMap WholeBodyScanManager::computeTandZScores()
 {
     return QMap<QString, QVariant> {{}};
-}
-
-QJsonObject WholeBodyScanManager::toJsonObject() const
-{
-    return QJsonObject();
-}
-
-void WholeBodyScanManager::initializeModel()
-{
-
-}
-
-void WholeBodyScanManager::updateModel()
-{
-
-}
-
-void WholeBodyScanManager::setInputData(const QVariantMap& inputData)
-{
-
 }
 
 void WholeBodyScanManager::clearData()

@@ -12,11 +12,7 @@ public:
     ChoiceReactionDialog(QWidget* parent = Q_NULLPTR);
     ~ChoiceReactionDialog();
 
-    QString getVerificationBarcode() const override;
-    void setVerificationBarcode(const QString&) override;
-
 private:
-    void initializeModel() override;
     void initializeConnections() override;
 
     Ui::RunnableDialog *ui { Q_NULLPTR };

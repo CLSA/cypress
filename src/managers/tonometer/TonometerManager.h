@@ -33,28 +33,10 @@ public:
     explicit TonometerManager(QWidget* parent = Q_NULLPTR);
     ~TonometerManager();
 
-    void loadSettings(const QSettings&) override;
-    void saveSettings(QSettings*) const override;
-
-    QJsonObject toJsonObject() const override;
-
-    void initializeModel() override;
-
-    void updateModel() override;
-
     // is the passed string an executable file
     // with the correct path elements ?
     //
     bool isDefined(const QString&, const TonometerManager::FileType& type = ORAApplication) const;
-
-    // Set the input data.
-    // The input data is read from the input
-    // json file to the main application.  This method should be
-    // used to filter the minimum inputs needed to run
-    // a test.  Filtering keys are stored in member
-    // m_inputKeyList.
-    //
-    void setInputData(const QVariantMap&) override;
 
 public slots:
 

@@ -20,17 +20,18 @@ QVariantMap ForearmScanManager::retrieveDeviceData()
 
 QString ForearmScanManager::getName()
 {
-    switch (m_test.side)
-    {
-        case LEFT:
-            return "L_FA";
-        case RIGHT:
-        return "R_FA";
-    case BOTH:
-        break;
-    }
+    return "Forearm";
+    //switch (m_test.side)
+    //{
+    //    case LEFT:
+    //        return "L_FA";
+    //    case RIGHT:
+    //    return "R_FA";
+    //case BOTH:
+    //    break;
+    //}
 
-    return "R_FA";
+    //return "R_FA";
 }
 
 QString ForearmScanManager::getBodyPartName()
@@ -196,26 +197,6 @@ QVariantMap ForearmScanManager::extractScanAnalysisData()
 QVariantMap ForearmScanManager::computeTandZScores()
 {
     return QVariantMap {{"", ""}};
-}
-
-QJsonObject ForearmScanManager::toJsonObject() const
-{
-    return QJsonObject();
-}
-
-void ForearmScanManager::initializeModel()
-{
-
-}
-
-void ForearmScanManager::updateModel()
-{
-
-}
-
-void ForearmScanManager::setInputData(const QVariantMap& inputData)
-{
-
 }
 
 void ForearmScanManager::clearData()

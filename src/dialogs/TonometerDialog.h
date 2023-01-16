@@ -12,9 +12,6 @@ public:
     TonometerDialog(QWidget *parent = Q_NULLPTR);
     ~TonometerDialog();
 
-    QString getVerificationBarcode() const override;
-    void setVerificationBarcode(const QString&) override;
-
 private:
     void initializeModel() override;
     void initializeConnections() override;

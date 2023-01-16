@@ -20,7 +20,7 @@ QVariantMap IVAImagingScanManager::retrieveDeviceData()
 
 QString IVAImagingScanManager::getName()
 {
-    return "";
+    return "IVA";
 }
 
 QString IVAImagingScanManager::getBodyPartName()
@@ -333,26 +333,6 @@ QVariantMap IVAImagingScanManager::computeTandZScores()
     return QVariantMap {{"", ""}};
 }
 
-
-QJsonObject IVAImagingScanManager::toJsonObject() const
-{
-    return QJsonObject();
-}
-
-void IVAImagingScanManager::initializeModel()
-{
-
-}
-
-void IVAImagingScanManager::updateModel()
-{
-
-}
-
-void IVAImagingScanManager::setInputData(const QVariantMap& inputData)
-{
-
-}
 
 void IVAImagingScanManager::clearData()
 {

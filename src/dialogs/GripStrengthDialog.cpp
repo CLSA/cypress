@@ -19,20 +19,8 @@ GripStrengthDialog::~GripStrengthDialog()
     delete ui;
 }
 
-QString GripStrengthDialog::getVerificationBarcode() const
-{
-  return ui->barcodeWidget->barcode();
-}
-
-void GripStrengthDialog::setVerificationBarcode(const QString &barcode)
-{
-    ui->barcodeWidget->setBarcode(barcode);
-}
-
 void GripStrengthDialog::initializeConnections()
 {
-    setVerificationBarcode(Constants::DefaultBarcode);
-
     QSharedPointer<GripStrengthManager> derived = m_manager.staticCast<GripStrengthManager>();
     //connect(derived.get(), &GripStrengthManager::measureStart, this, &GripStrengthDialog::enableMeasure);
     //connect(derived.get(), &GripStrengthManager::dataChanged, ui->measureWidget, &MeasureWidget::updateModelView);
@@ -72,8 +60,6 @@ void GripStrengthDialog::enableMeasure() {
 
 void GripStrengthDialog::initializeModel()
 {
-    m_manager.get()->initializeModel();
-    ui->measureWidget->initialize(m_manager.get()->getModel());
 }
 
 

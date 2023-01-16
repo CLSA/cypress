@@ -22,142 +22,12 @@ QByteArray AudiometerManager::initEndCode()
 AudiometerManager::AudiometerManager(QWidget *parent)
     : SerialPortManager(parent)
 {
-    setGroup("audiometer");
-    m_col = 2;
-    m_row = 8;
-    // all managers must check for barcode and language input values
-    //
-    m_inputKeyList << "barcode";
-    m_inputKeyList << "language";
-
     m_test.setExpectedMeasurementCount(16);
-}
-
-void AudiometerManager::initializeModel()
-{
-    // allocate 2 columns x 8 rows of hearing measurement items
-    //
-    QStringList sides = {"left","right"};
-    foreach(const auto side, sides)
-    {
-      int col = "left" == side ? 0 : 1;
-      for(int row = 0; row < m_row; row++)
-      {
-        QStandardItem* item = m_model->item(row,col);
-        if(Q_NULLPTR == item)
-        {
-          item = new QStandardItem();
-          m_model->setItem(row,col,item);
-        }
-        item->setData(QString(), Qt::DisplayRole);
-      }
-    }
-    m_model->setHeaderData(0,Qt::Horizontal,"Left",Qt::DisplayRole);
-    m_model->setHeaderData(1,Qt::Horizontal,"Right",Qt::DisplayRole);
-}
-
-void AudiometerManager::updateModel()
-{
-    if(m_test.isValid())
-    {
-      QStringList sides = {"left","right"};
-      foreach(const auto side, sides)
-      {
-        int index = 0;
-        int col = "left" == side ? 0 : 1;
-        for(int row = 0; row < m_row; row++)
-        {
-          HearingMeasurement m = m_test.getMeasurement(side,index);
-          if(!m.isValid())
-            m.fromCode(side,index,"AA");
-
-          QStandardItem* item = m_model->item(row,col);
-          item->setData(m.toString(), Qt::DisplayRole);
-          index++;
-        }
-      }
-    }
-    else
-    {
-        initializeModel();
-    }
-    emit dataChanged();
-}
-
-void AudiometerManager::loadSettings(const QSettings &settings)
-{
-    QString name = settings.value(getGroup() + "/client/port").toString();
-    if(!name.isEmpty())
-    {
-      setProperty("deviceName", name);
-      selectDevice(m_deviceName);
-      if(m_verbose)
-          qInfo() << "using serial port setting" << m_deviceName;
-    }
-}
-
-void AudiometerManager::saveSettings(QSettings* settings) const
-{
-    if(isDefined(m_deviceName))
-    {
-      settings->beginGroup(getGroup());
-      settings->setValue("client/port",m_deviceName);
-      settings->endGroup();
-      if(m_verbose)
-        qInfo() << "wrote serial port to settings";
-    }
-}
-
-void AudiometerManager::setInputData(const QVariantMap& input)
-{
-    m_inputData = input;
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        if(!input.contains("barcode"))
-          m_inputData["barcode"] = Constants::DefaultBarcode;
-        if(!input.contains("language"))
-          m_inputData["language"] = "en";
-    }
-    bool ok = true;
-    QMap<QString,QMetaType::Type> typeMap {
-        {"barcode",QMetaType::Type::QString},
-        {"language",QMetaType::Type::QString}
-    };
-    foreach(const auto key, m_inputKeyList)
-    {
-      if(!m_inputData.contains(key))
-      {
-        ok = false;
-        qCritical() << "ERROR: missing expected input " << key;
-        break;
-      }
-      const QVariant value = m_inputData[key];
-      bool valueOk = true;
-      QMetaType::Type type;
-      if(typeMap.contains(key))
-      {
-        type = typeMap[key];
-        valueOk = value.canConvert(type);
-      }
-      if(!valueOk)
-      {
-        ok = false;
-        qCritical() << "ERROR: invalid input" << key << value.toString() << QMetaType::typeName(type);
-        break;
-      }
-    }
-    if(!ok)
-    {
-      qCritical() << "ERROR: invalid input data";
-      emit message(tr("ERROR: the input data is incorrect"));
-      m_inputData = QVariantMap();
-    }
 }
 
 void AudiometerManager::clearData()
 {
     m_test.reset();
-    updateModel();
 }
 
 void AudiometerManager::finish()
@@ -167,7 +37,7 @@ void AudiometerManager::finish()
     if(m_port.isOpen())
         m_port.close();
 
-    emit complete(m_test.toJsonObject());
+    QJsonObject results = m_test.toJsonObject();
     //m_deviceData.reset();
     //m_deviceList.clear();
     //m_test.reset();
@@ -191,36 +61,9 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr)
 
 void AudiometerManager::readDevice()
 {
-    qDebug() << "slot readDevice";
-
-   if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        QString sim;
-        QDateTime now = QDateTime::currentDateTime();
-        int m = now.date().month();
-        int d = now.date().day();
-        int y = now.date().year()-2000;
-        int h = now.time().hour();
-        int i = now.time().minute();
-        char buffer[20];
-        sprintf(buffer,"%02d/%02d/%d%02d:%02d:00",m,d,y,h,i);
-        QString id = m_inputData["barcode"].toString().leftJustified(14,' ');
-        QTextStream(&sim)
-          << "\u00010\u00020"
-          << id
-          << "00055801011124431"
-          << buffer
-          << "04/01/20000000000       "
-          << "35  10  E2  AA  AA  AA  AA  AA  AA  AA  AA  AA  AA  AA  AA  AA       ~p\u0017Z^\r";
-        m_buffer = QByteArray(sim.toLatin1());
-    }
-    else
-    {
-      QByteArray data = m_port.readAll();
-      m_buffer += data;
-    }
-    if(m_verbose)
-      qInfo() << "read device received buffer " << QString(m_buffer);
+  QByteArray data = m_port.readAll();
+  m_buffer += data;
+  qInfo() << "read device received buffer " << QString(m_buffer);
 
     if(hasEndCode(m_buffer))
     {
@@ -229,17 +72,14 @@ void AudiometerManager::readDevice()
         {
             // emit the can write signal
             qDebug() << "signal canWrite";
-            emit message(tr("Ready to save results..."));
             emit canWrite();
         }
-        updateModel();
     }
 }
 
 void AudiometerManager::measure()
 {
     qDebug() << "slot measure";
-    emit message(tr("Measuring hearing levels..."));
     clearData();
     const char cmd[] = {0x05,'4',0x0d};
     m_request = QByteArray::fromRawData(cmd,3);
@@ -252,20 +92,5 @@ void AudiometerManager::writeDevice()
     //
     m_buffer.clear();
     qDebug() << "slot writeDevice";
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        qDebug() << "simulate writeDevice with request " << QString(m_request);
-        readDevice();
-        return;
-    }
-
     m_port.write(m_request);
-}
-
-QJsonObject AudiometerManager::toJsonObject() const
-{
-    QJsonObject json = m_test.toJsonObject();
-    json.insert("device",m_deviceData.toJsonObject());
-    json.insert("test_input",QJsonObject::fromVariantMap(m_inputData));
-    return json;
 }

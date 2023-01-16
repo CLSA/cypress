@@ -16,9 +16,6 @@ public:
     explicit RetinalCameraDialog(QWidget *parent = nullptr);
     ~RetinalCameraDialog();
 
-    QString getVerificationBarcode() const override;
-    void setVerificationBarcode(const QString&) override;
-
 private:
     Ui::RetinalCameraDialog *ui;
 

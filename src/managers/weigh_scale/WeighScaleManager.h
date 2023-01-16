@@ -24,24 +24,6 @@ class WeighScaleManager : public SerialPortManager
 public:
     explicit WeighScaleManager(QWidget* parent = Q_NULLPTR);
 
-    void loadSettings(const QSettings&) override;
-    void saveSettings(QSettings*) const override;
-
-    QJsonObject toJsonObject() const override;
-
-    void initializeModel() override;
-
-    void updateModel() override;
-
-    // Set the input data.
-    // The input data is read from the input
-    // json file to the main application.  This method should be
-    // used to filter the minimum inputs needed to run
-    // a test.  Filtering keys are stored in member
-    // m_inputKeyList.
-    //
-    void setInputData(const QVariantMap&) override;
-
 public slots:
 
     // connect to the serial port

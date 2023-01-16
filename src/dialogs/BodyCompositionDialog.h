@@ -11,12 +11,8 @@ class BodyCompositionDialog : public DialogBase, public Ui::BodyCompositionDialo
 public:
     BodyCompositionDialog(QWidget *parent = Q_NULLPTR);
     ~BodyCompositionDialog();
- 
-    QString getVerificationBarcode() const override;
-    void setVerificationBarcode(const QString&) override;
 
 private:
-    void initializeModel() override;
     void initializeConnections() override;
 
     Ui::BodyCompositionDialog *ui { Q_NULLPTR };

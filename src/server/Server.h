@@ -29,6 +29,7 @@ class Server: public QObject
         void stop();
 
         void requestTestStart(Constants::MeasureType type);
+        bool sendResults(const QJsonObject& results);
 
     signals:
         void startTest(Constants::MeasureType type);

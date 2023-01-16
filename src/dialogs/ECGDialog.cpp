@@ -21,12 +21,6 @@ ECGDialog::~ECGDialog()
     delete ui;
 }
 
-void ECGDialog::initializeModel()
-{
-    m_manager.get()->initializeModel();
-    ui->measureWidget->initialize(m_manager.get()->getModel());
-}
-
 // set up signal slot connections between GUI front end
 // and device management back end
 //
@@ -49,8 +43,8 @@ void ECGDialog::initializeConnections()
 
   // Relay messages from the manager to the status bar
   //
-  connect(m_manager.get(),&ManagerBase::message,
-          ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
+  //connect(m_manager.get(),&ManagerBase::message,
+  //        ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
 
   // Every instrument stage launched by an interviewer requires input
   // of the interview barcode that accompanies a participant.
@@ -148,23 +142,8 @@ void ECGDialog::initializeConnections()
     connect(derived.get(), &ECGManager::canWrite,
         ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
-    // Write test data to output
-    //
-    connect(ui->measureWidget, &MeasureWidget::writeToFile,
-        this, &DialogBase::writeOutput);
-
     // Close the application
     //
     connect(ui->measureWidget, &MeasureWidget::closeApplication,
         this, &DialogBase::close);
-}
-
-QString ECGDialog::getVerificationBarcode() const
-{
-  return ui->barcodeWidget->barcode();
-}
-
-void ECGDialog::setVerificationBarcode(const QString &barcode)
-{
-    ui->barcodeWidget->setBarcode(barcode);
 }

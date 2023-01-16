@@ -5,8 +5,7 @@
 #include <QDesktopServices>
 
 DXADialog::DXADialog(DXAManager* manager, QWidget *parent) :
-    DialogBase(parent), m_manager(manager),
-    ui(new Ui::DXADialog)
+    DialogBase(parent), ui(new Ui::DXADialog), m_manager(manager)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -15,7 +14,6 @@ DXADialog::DXADialog(DXAManager* manager, QWidget *parent) :
 
     connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
     connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
-    //connect(&DXAManager::canMeasure, &DXADialog::enableMeasure, this, &DXADialog:: );
 }
 
 DXADialog::~DXADialog()
@@ -25,6 +23,7 @@ DXADialog::~DXADialog()
 
 void DXADialog::initializeConnections()
 {
+
 }
 
 void DXADialog::closeEvent(QCloseEvent *event)
@@ -34,16 +33,7 @@ void DXADialog::closeEvent(QCloseEvent *event)
         return;
     }
 
-    if(m_verbose)
-        qDebug() << "Close event called";
-
-    //QDir dir = QCoreApplication::applicationDirPath();
-    //QSettings settings(dir.filePath(m_manager->getGroup() + ".json"), JsonSettings::JsonFormat);
-
-    qDebug() << "sub m_manager finish";
-    //m_manager->saveSettings(&settings);
     m_manager->finish();
-
     event->accept();
 }
 

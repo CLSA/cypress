@@ -108,6 +108,7 @@ SOURCES += \
     managers/ultrasound/CarotidIntimaManager.cpp \
     managers/weigh_scale/WeighScaleManager.cpp \
     server/DefaultRequestHandler.cpp \
+    server/InstrumentRequestHandlerFactory.cpp \
     server/Server.cpp \
     server/handlers/BodyCompositionRequestHandler.cpp \
     server/handlers/CDTTRequestHandler.cpp \
@@ -122,12 +123,12 @@ SOURCES += \
     server/handlers/EMRRequestHandler.cpp \
     server/handlers/FraxRequestHandler.cpp \
     server/handlers/GripStrengthRequestHandler.cpp \
-    server/handlers/InstrumentRequestHandlerFactory.cpp \
     server/handlers/RetinalCameraRequestHandler.cpp \
     server/handlers/SpirometerRequestHandler.cpp \
     server/handlers/TonometerRequestHandler.cpp \
     server/handlers/UltrasoundRequestHandler.cpp \
     server/handlers/WeighScaleRequestHandler.cpp \
+    server/utils.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
     dialogs/AudiometerDialog.cpp \
@@ -237,6 +238,7 @@ HEADERS += \
     managers/ultrasound/CarotidIntimaManager.h \
     managers/weigh_scale/WeighScaleManager.h \
     server/DefaultRequestHandler.h \
+    server/InstrumentRequestHandlerFactory.h \
     server/Server.h \
     server/handlers/BodyCompositionRequestHandler.h \
     server/handlers/CDTTRequestHandler.h \
@@ -251,12 +253,12 @@ HEADERS += \
     server/handlers/EMRRequestHandler.h \
     server/handlers/FraxRequestHandler.h \
     server/handlers/GripStrengthRequestHandler.h \
-    server/handlers/InstrumentRequestHandlerFactory.h \
     server/handlers/RetinalCameraRequestHandler.h \
     server/handlers/SpirometerRequestHandler.h \
     server/handlers/TonometerRequestHandler.h \
     server/handlers/UltrasoundRequestHandler.h \
     server/handlers/WeighScaleRequestHandler.h \
+    server/utils.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
     dialogs/AudiometerDialog.h \

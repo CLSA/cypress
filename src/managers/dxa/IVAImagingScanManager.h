@@ -9,11 +9,7 @@ class IVAImagingScanManager : public DXAManager
 public:
     explicit IVAImagingScanManager(QWidget *parent = nullptr);
 
-    void initializeModel() override;
-    void updateModel() override;
-    void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
-    QJsonObject toJsonObject() const override;
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 

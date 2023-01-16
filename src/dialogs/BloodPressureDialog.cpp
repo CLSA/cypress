@@ -21,8 +21,7 @@ BloodPressureDialog::~BloodPressureDialog()
 
 void BloodPressureDialog::initializeModel()
 {
-    m_manager.get()->initializeModel();
-    ui->measureWidget->initialize(m_manager.get()->getModel());
+
 }
 
 void BloodPressureDialog::initializeConnections()
@@ -73,8 +72,8 @@ void BloodPressureDialog::initializeConnections()
 
     // Relay messages from the manager to the status bar
     //
-    connect(m_manager.get(),&ManagerBase::message,
-            ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
+    //connect(m_manager.get(),&ManagerBase::message,
+    //        ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
 
     // Every instrument stage launched by an interviewer requires input
     // of the interview barcode that accompanies a participant.
@@ -215,23 +214,8 @@ void BloodPressureDialog::initializeConnections()
     connect(derived.get(), &BloodPressureManager::canWrite,
         ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
-    // Write test data to output
-    //
-    connect(ui->measureWidget, &MeasureWidget::writeToFile,
-        this, &BloodPressureDialog::writeOutput);
-
     // Close the application
     //
     connect(ui->measureWidget, &MeasureWidget::closeApplication,
         this, &BloodPressureDialog::close);
   }
-
-QString BloodPressureDialog::getVerificationBarcode() const
-{
-  return ui->barcodeWidget->barcode();
-}
-
-void BloodPressureDialog::setVerificationBarcode(const QString &barcode)
-{
-    ui->barcodeWidget->setBarcode(barcode);
-}

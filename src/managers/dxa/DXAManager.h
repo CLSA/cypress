@@ -60,9 +60,6 @@ public:
     bool startDicomServer();
     bool endDicomServer();
 
-    void loadSettings(const QSettings &) override;
-    void saveSettings(QSettings*) const override;
-
     bool isCorrectDicom(DcmFileFormat &file);
     bool isCompleteDicom(DcmFileFormat &file);
 

@@ -11,7 +11,7 @@
 #include "CypressApplication.h"
 #include "server/DefaultRequestHandler.h"
 
-#include "server/handlers/InstrumentRequestHandlerFactory.h"
+#include "server/InstrumentRequestHandlerFactory.h"
 #include "server/handlers/GripStrengthRequestHandler.h"
 #include "server/handlers/RetinalCameraRequestHandler.h"
 #include "server/handlers/DxaRequestHandler.h"

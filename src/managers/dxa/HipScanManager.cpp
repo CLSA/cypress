@@ -16,8 +16,6 @@
 HipScanManager::HipScanManager(QWidget* parent)
     : DXAManager{parent}
 {
-    if (m_verbose)
-        qDebug() << "Hip Scan Manager init";
 }
 
 QVariantMap HipScanManager::retrieveDeviceData()
@@ -27,14 +25,15 @@ QVariantMap HipScanManager::retrieveDeviceData()
 
 QString HipScanManager::getName()
 {
-    switch(m_test.side) {
-        case LEFT:
-            return "L_HIP";
-        case RIGHT:
-            return "R_HIP";
-    }
+    return "Hip";
+    //switch(m_test.side) {
+    //    case LEFT:
+    //        return "L_HIP";
+    //    case RIGHT:
+    //        return "R_HIP";
+    //}
 
-    return "BOTH";
+    //return "BOTH";
 }
 
 QString HipScanManager::getBodyPartName()
@@ -196,26 +195,6 @@ bool HipScanManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
     }
 
     return valid;
-}
-
-QJsonObject HipScanManager::toJsonObject() const
-{
-    return QJsonObject();
-}
-
-void HipScanManager::initializeModel()
-{
-
-}
-
-void HipScanManager::updateModel()
-{
-
-}
-
-void HipScanManager::setInputData(const QVariantMap& inputData)
-{
-
 }
 
 void HipScanManager::clearData()

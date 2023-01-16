@@ -15,11 +15,7 @@ public:
     QVariantMap extractScanAnalysisData() override;
     QVariantMap computeTandZScores() override;
 
-    QJsonObject toJsonObject() const override;
 
-    void initializeModel() override;
-    void updateModel() override;
-    void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
     QString getName() override;
     QString getBodyPartName() override;

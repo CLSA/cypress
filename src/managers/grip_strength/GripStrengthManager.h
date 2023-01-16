@@ -17,17 +17,6 @@ class GripStrengthManager : public ManagerBase
 public:
     explicit GripStrengthManager(QWidget* parent = Q_NULLPTR);
 
-    void loadSettings(const QSettings&) override;
-    void saveSettings(QSettings*) const override;
-
-
-    void initializeModel() override;
-    void updateModel() override;
-    void setInputData(const QVariantMap&) override;
-
-
-    QJsonObject toJsonObject() const override;
-
 public slots:
     void start() override;
     void measure() override;

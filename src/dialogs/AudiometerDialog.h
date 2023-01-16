@@ -12,11 +12,7 @@ public:
     AudiometerDialog(QWidget *parent = Q_NULLPTR);
     ~AudiometerDialog();
 
-    QString getVerificationBarcode() const override;
-    void setVerificationBarcode(const QString&) override;
-
 private:
-    void initializeModel() override;
     void initializeConnections() override;
 
     Ui::AudiometerDialog *ui { Q_NULLPTR };

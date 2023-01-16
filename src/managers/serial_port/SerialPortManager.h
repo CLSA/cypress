@@ -30,8 +30,6 @@ public:
 
     bool isDefined(const QString&) const;
 
-    QJsonObject toJsonObject() const override;
-
 public slots:
 
     // what the manager does in response to the main application

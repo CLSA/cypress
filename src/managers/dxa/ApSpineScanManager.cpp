@@ -21,7 +21,7 @@ QVariantMap APSpineScanManager::retrieveDeviceData()
 
 QString APSpineScanManager::getName()
 {
-    return "";
+    return "Spine";
 }
 
 QString APSpineScanManager::getBodyPartName()
@@ -170,26 +170,6 @@ QVariantMap APSpineScanManager::extractScanAnalysisData()
 QVariantMap APSpineScanManager::computeTandZScores()
 {
     return QVariantMap {{}};
-}
-
-QJsonObject APSpineScanManager::toJsonObject() const
-{
-    return QJsonObject();
-}
-
-void APSpineScanManager::initializeModel()
-{
-
-}
-
-void APSpineScanManager::updateModel()
-{
-
-}
-
-void APSpineScanManager::setInputData(const QVariantMap& inputData)
-{
-
 }
 
 void APSpineScanManager::clearData()

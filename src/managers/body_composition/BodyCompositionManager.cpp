@@ -38,25 +38,6 @@ QMap<QByteArray,QString> BodyCompositionManager::confirmLUT= BodyCompositionMana
 
 BodyCompositionManager::BodyCompositionManager(QWidget *parent) : SerialPortManager(parent)
 {
-  setGroup("body_composition");
-  m_col = 1;
-  m_row = 13;
-
-  // all managers must check for barcode and language input values
-  //
-  m_inputKeyList << "barcode";
-  m_inputKeyList << "language";
-
-  // mandatory inputs for which there is no default
-  // settings having a default are:
-  // - measurement_system <metric,imperial>, default = metric
-  // - equation <westerner,oriental>, default = westerner
-  // - tare_weight, default 0 (kg)
-  //
-  m_inputKeyList << "height";  // unsigned integer cm
-  m_inputKeyList << "age";     // unsigned integer years
-  m_inputKeyList << "gender";  // <female,male> or <0,1>
-
   m_test.setExpectedMeasurementCount(1);
 }
 
@@ -273,58 +254,6 @@ QMap<QByteArray,QString> BodyCompositionManager::initIncorrectResponseLUT()
     return responses;
 }
 
-void BodyCompositionManager::loadSettings(const QSettings &settings)
-{
-    QString name = settings.value(getGroup() + "/client/port").toString();
-    if(!name.isEmpty())
-    {
-      setProperty("deviceName", name);
-      if(m_verbose)
-          qDebug() << "using serial port " << m_deviceName << " from settings file";
-    }
-}
-
-void BodyCompositionManager::saveSettings(QSettings *settings) const
-{
-    if(!m_deviceName.isEmpty())
-    {
-      settings->beginGroup(getGroup());
-      settings->setValue("client/port",m_deviceName);
-      settings->endGroup();
-      if(m_verbose)
-          qDebug() << "wrote serial port to settings file";
-    }
-}
-
-void BodyCompositionManager::initializeModel()
-{
-    // allocate 1 columns x 8 rows of body composition measurement items
-    //
-    for(int row=0; row<m_row; row++)
-    {
-      QStandardItem* item = new QStandardItem();
-      m_model->setItem(row,0,item);
-    }
-    m_model->setHeaderData(0,Qt::Horizontal,"Body Composition Results",Qt::DisplayRole);
-}
-
-void BodyCompositionManager::updateModel()
-{
-    QStringList list = m_test.toStringList();
-    qDebug() << "updating model with test data" << list.size();
-    for(int row = 0; row < list.size(); row++)
-    {
-      QStandardItem* item = m_model->item(row,0);
-      if(Q_NULLPTR == item)
-      {
-        item = new QStandardItem();
-        m_model->setItem(row,0,item);
-      }
-      item->setData(list.at(row), Qt::DisplayRole);
-    }
-    emit dataChanged();
-}
-
 void BodyCompositionManager::clearData()
 {
     m_deviceData.reset();
@@ -344,7 +273,7 @@ void BodyCompositionManager::finish()
     //m_queue.clear();
     //m_cache.clear();
 
-    emit complete(m_test.toJsonObject());
+    QJsonObject jsonObject = m_test.toJsonObject();
 }
 
 bool BodyCompositionManager::hasEndCode(const QByteArray &arr) const
@@ -358,12 +287,6 @@ bool BodyCompositionManager::hasEndCode(const QByteArray &arr) const
 
 void BodyCompositionManager::connectDevice()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        resetDevice();
-        return;
-    }
-
     if(m_port.isOpen())
         m_port.close();
 
@@ -430,74 +353,6 @@ void BodyCompositionManager::measure()
     clearQueue();
     m_queue.enqueue(BodyCompositionManager::defaultLUT["measure_body_fat"]);
     writeDevice();
-}
-
-void BodyCompositionManager::setInputData(const QVariantMap& input)
-{
-    m_inputData = input;
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-      if(!input.contains("barcode"))
-        m_inputData["barcode"] = Constants::DefaultBarcode;
-      if(!input.contains("language"))
-        m_inputData["language"] = "en";
-      if(!input.contains("age"))
-        m_inputData["age"] = 50;
-      if(!input.contains("gender"))
-        m_inputData["gender"] = "male";
-      if(!input.contains("height"))
-        m_inputData["height"] = 170;
-    }
-    bool ok = true;
-    QMap<QString,QMetaType::Type> typeMap {
-        {"barcode",QMetaType::Type::QString},
-        {"language",QMetaType::Type::QString},
-        {"age",QMetaType::Type::UInt },
-        {"height",QMetaType::Type::UInt},
-        {"gender",QMetaType::Type::QString}
-    };
-    foreach(const auto key, m_inputKeyList)
-    {
-      if(!m_inputData.contains(key))
-      {
-        ok = false;
-        if(m_verbose)
-          qDebug() << "ERROR: missing expected input " << key;
-        break;
-      }
-      else
-      {
-        const QVariant value = m_inputData[key];
-        bool valueOk = true;
-        QMetaType::Type type;
-        if(typeMap.contains(key))
-        {
-          type = typeMap[key];
-          valueOk = value.canConvert(type);
-        }
-        if(!valueOk)
-        {
-          ok = false;
-          if(m_verbose)
-            qDebug() << "ERROR: invalid input" << key << value.toString() << QMetaType::typeName(type);
-          break;
-        }
-      }
-    }
-    if(!ok)
-    {
-      if(m_verbose)
-        qDebug() << "ERROR: invalid input data";
-
-      emit message(tr("ERROR: the input data is incorrect"));
-      m_inputData = QVariantMap();
-    }
-    else
-    {
-        emit notifyAgeInput(QString::number(m_inputData["age"].toInt()));
-        emit notifyGenderInput(m_inputData["gender"].toString());
-        emit notifyHeightInput(QString::number(m_inputData["height"].toInt()));
-    }
 }
 
 // inputs should only be set AFTER a successful reset
@@ -750,21 +605,12 @@ void BodyCompositionManager::processResponse()
       }
       if(requestName.startsWith("confirm_"))
       {
-         if(Constants::RunMode::modeSimulate == m_mode)
-         {
-           emit message(tr("Ready to measure..."));
-           emit canMeasure();
-         }
-         else
-         {
            m_cache.push_back(response);
            // confirm inputs completed
            if(5 == m_cache.size())
            {
-             emit message(tr("Ready to measure..."));
              emit canMeasure();
            }
-         }
       }
       else if(requestName.startsWith("set_"))
       {
@@ -778,44 +624,29 @@ void BodyCompositionManager::processResponse()
                 Constants::UnitsSystem::systemImperial;
               m_test.setUnitsSystem(units);
           }
-          emit message(tr("Ready to confirm inputs..."));
           emit canConfirm();
       }
       else if(requestName.startsWith("measure_"))
       {
-          if(Constants::RunMode::modeSimulate == m_mode)
-          {
-            m_test.simulate(
-              m_inputData["age"].toDouble(),
-              m_inputData["gender"].toString(),
-              m_inputData["height"].toDouble());
-          }
-          else
-          {
             qDebug() << "received complete measurement request buffer, size = " << QString::number(response.size());
             if(59 == response.size())
             {
               qDebug() << "passing response to test for parsing ...";
               m_test.fromArray(response);
             }
-          }
           if(m_test.isValid())
           {
             qDebug() << "OK: valid test";
-            emit message(tr("Ready to save results..."));
             emit canWrite();
            }
            else
              qDebug() << "ERROR: invalid test";
 
-           updateModel();
       }
       else if("reset" == requestName)
       {
           m_test.reset();
-          emit message(tr("Ready to accept inputs..."));
           emit canInput();
-          updateModel();
       }
     }
     writeDevice();
@@ -823,23 +654,9 @@ void BodyCompositionManager::processResponse()
 
 void BodyCompositionManager::readDevice()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        // parent SerialPortManager class calls
-        // readDevice for the current request
-        // simulate a successful test here
-        QByteArray end;
-        end.append(0x0d);
-        end.append(0x0a);
-        m_buffer = end;
-        qDebug() << "simulated buffer with end code" << m_buffer.toHex();
-    }
-    else
-    {
+
       qDebug() << "readDevice adding to buffer from port";
       m_buffer += m_port.readAll();
-    }
-    if(m_verbose)
       qDebug() << "read device received buffer " << m_buffer;
 
     qDebug() <<"readDevice process response start";
@@ -851,40 +668,20 @@ void BodyCompositionManager::writeDevice()
 {
   if(!m_queue.isEmpty())
   {
-    if(m_verbose)
       qDebug() << "writeDevice queue size" << QString::number(m_queue.size()) <<"request";
     m_request = m_queue.dequeue();
     if(m_request.isEmpty())
     {
-      if(m_verbose)
         qDebug() << "ERROR: writeDevice called with empty request in the queue";
     }
     else
     {
-      if(m_verbose)
         qDebug() << "dequeued request " << BodyCompositionManager::commandLUT[m_request.left(2)] << m_request.toHex();
       m_buffer.clear();
 
-      if(Constants::RunMode::modeSimulate == m_mode)
-      {
-          //TODO: simulate buffer content based on current request
-          //
-          if(m_verbose)
-            qDebug() << "processing simulated request";
-          readDevice();
-          return;
-      }
       qDebug() << "writeDevice port writing request start";
       m_port.write(m_request);
       qDebug() << "writeDevice port writing request end";
     }
   }
-}
-
-QJsonObject BodyCompositionManager::toJsonObject() const
-{
-    QJsonObject json = m_test.toJsonObject();
-    json.insert("device",m_deviceData.toJsonObject());
-    json.insert("test_input",QJsonObject::fromVariantMap(m_inputData));
-    return json;
 }

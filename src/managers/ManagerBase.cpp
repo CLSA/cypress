@@ -1,18 +1,28 @@
 #include "ManagerBase.h"
 #include <QStandardItemModel>
+#include "server/utils.h"
+#include <QException>
+#include <QDebug>
 
 ManagerBase::ManagerBase(QWidget* parent) : QObject(parent)
 {
-    m_model = new QStandardItemModel;
-    m_parent = parent;
 }
 
 ManagerBase::~ManagerBase()
 {
-    delete m_model;
 }
 
-QVariant ManagerBase::getInputDataValue(const QString &key)
+bool ManagerBase::sendResultsToPine(const QJsonObject& results)
 {
-    return m_inputData.contains(key) ? m_inputData[key] : QVariant();
+    try {
+        QJsonObject response = Utils::httpPost(results);
+        return true;
+    }
+    catch (QException &e)
+    {
+       qDebug() << e.what();
+    }
+
+    return false;
 }
+

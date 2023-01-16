@@ -19,12 +19,6 @@ BodyCompositionDialog::~BodyCompositionDialog()
     delete ui;
 }
 
-void BodyCompositionDialog::initializeModel()
-{
-    m_manager.get()->initializeModel();
-    ui->measureWidget->initialize(m_manager.get()->getModel());
-}
-
 void BodyCompositionDialog::initializeConnections()
 {
   QSharedPointer<BodyCompositionManager> derived =
@@ -45,8 +39,8 @@ void BodyCompositionDialog::initializeConnections()
 
   // Relay messages from the manager to the status bar
   //
-  connect(m_manager.get(),&ManagerBase::message,
-          ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
+  //connect(m_manager.get(),&ManagerBase::message,
+  //        ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
 
   // Every instrument stage launched by an interviewer requires input
   // of the interview barcode that accompanies a participant.
@@ -295,23 +289,8 @@ void BodyCompositionDialog::initializeConnections()
            "re-input and confirm the inputs."));
   });
 
-  // Write test data to output
-  //
-  connect(ui->measureWidget, &MeasureWidget::writeToFile,
-      this, &DialogBase::writeOutput);
-
   // Close the application
   //
   connect(ui->measureWidget, &MeasureWidget::closeApplication,
       this, &DialogBase::close);
-}
-
-QString BodyCompositionDialog::getVerificationBarcode() const
-{
-  return ui->barcodeWidget->barcode();
-}
-
-void BodyCompositionDialog::setVerificationBarcode(const QString &barcode)
-{
-    ui->barcodeWidget->setBarcode(barcode);
 }

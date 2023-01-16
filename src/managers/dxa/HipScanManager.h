@@ -13,9 +13,6 @@ class HipScanManager : public DXAManager
 public:
     explicit HipScanManager(QWidget *parent = nullptr);
 
-    void initializeModel() override;
-    void updateModel() override;
-    void setInputData(const QVariantMap& inputData) override;
     void clearData() override;
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
@@ -23,7 +20,6 @@ public:
     QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;
     QVariantMap computeTandZScores() override;
-    QJsonObject toJsonObject() const override;
 
     Side getSide() override;
     quint8 getScanType() override;

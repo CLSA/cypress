@@ -19,22 +19,9 @@ RetinalCameraDialog::~RetinalCameraDialog()
     delete ui;
 }
 
-
-QString RetinalCameraDialog::getVerificationBarcode() const
-{
-    return ui->barcodeWidget->barcode();
-}
-
-void RetinalCameraDialog::setVerificationBarcode(const QString& barcode)
-{
-    ui->barcodeWidget->setBarcode(barcode);
-}
-
 void RetinalCameraDialog::initializeModel()
 {
-    setVerificationBarcode(Constants::DefaultBarcode);
 }
-
 
 void RetinalCameraDialog::initializeConnections()
 {

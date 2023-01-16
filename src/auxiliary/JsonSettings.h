@@ -6,9 +6,13 @@
 class JsonSettings {
 
 public:
+
+    static QJsonObject readJsonFromFile(const QString &path);
+    static QJsonObject deserializeJson(const QString &jsonString);
+    static QString serializeJson(const QJsonObject &jsonObject);
+
     static bool readSettingsJson(QIODevice &device, QVariantMap &map);
     static bool writeSettingsJson(QIODevice &device, const QVariantMap &map);
-    static QJsonObject readJsonFromFile(const QString &path);
     static QSettings::Format JsonFormat;
 
 private:

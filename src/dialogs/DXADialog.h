@@ -17,28 +17,22 @@ public:
     explicit DXADialog(DXAManager* manager, QWidget *parent = nullptr);
     ~DXADialog();
 
-    QString getVerificationBarcode() const override { return ""; };
-    void setVerificationBarcode(const QString&) override { } ;
-
 protected:
     void closeEvent(QCloseEvent *event) override;
+    void initializeModel() override {};
+    void initializeConnections() override;
+
+    Ui::DXADialog *ui;
+    std::unique_ptr<DXAManager> m_manager;
 
 public slots:
     void dicomFilesReceived(QStringList& dicomFilePaths);
     void dicomServerStarted();
     void dicomServerEnded();
     void dicomLogUpdate(QString line);
-    //void enableMeasure();
 
 private slots:
     void on_openFileExplorer_released();
-
-private:
-    std::unique_ptr<DXAManager> m_manager;
-    void initializeModel() override {};
-    void initializeConnections() override;
-
-    Ui::DXADialog *ui;
 };
 
 #endif // DXADIALOG_H

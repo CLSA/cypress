@@ -15,37 +15,23 @@ public:
     DialogBase(QWidget *parent = Q_NULLPTR);
     ~DialogBase() = default;
 
-    // This method internally calls readInput
-
     void initialize();
-
-    // Call after initialize, launch the application and run
-    // the device
-
     void run();
-
-    void setInputFileName(const QString& name) { m_inputFileName = name; }
-    QString inputFileName() { return m_inputFileName; }
-
-    void setOutputFileName(const QString& name) { m_outputFileName = name; }
-    QString outputFileName() { return m_outputFileName; }
 
     void setRunMode(const Constants::RunMode& mode) { m_mode = mode; }
     Constants::RunMode runMode() { return m_mode; }
 
-    void setVerbose(const bool& verbose) { m_verbose = verbose; }
-    bool isVerbose(){ return m_verbose; }
+    QSharedPointer<ManagerBase> m_manager;
 
-    virtual QString getVerificationBarcode() const = 0;
-    virtual void setVerificationBarcode(const QString&) = 0;
+signals:
+    void sendResults(QJsonObject& results);
 
 public slots:
-    void writeOutput();
+    void complete(QJsonObject& results);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
 
-    QSharedPointer<ManagerBase> m_manager;
     QStandardItemModel m_model;
     QString m_inputFileName;
     QString m_outputFileName;
@@ -54,14 +40,11 @@ protected:
 
     bool m_verbose;
 
-    void readInput();
-
     QString getDefaultOutputFileName();
     QString getOutputFile();
 
-private:
-    virtual void initializeModel() = 0;
     virtual void initializeConnections() = 0;
+    virtual void initializeModel();
 };
 
 #endif // DIALOGBASE_H

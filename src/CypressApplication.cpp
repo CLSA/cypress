@@ -9,6 +9,7 @@
 #include "auxiliary/Constants.h"
 #include "dialogs/DialogFactory.h"
 #include "dialogs/DialogBase.h"
+#include "dialogs/DXADialog.h"
 #include "server/Server.h"
 
 QScopedPointer<Server> CypressApplication::restApiServer(new Server());
@@ -25,8 +26,8 @@ CypressApplication::~CypressApplication()
 
 bool CypressApplication::startTest(Constants::MeasureType type)
 {
-    qDebug() << "start test";
     QVariantMap args;
+    DialogFactory *factory;
 
     //args["inputFileName"] = "";
     //args["outputFileName"] = "";
@@ -37,8 +38,7 @@ bool CypressApplication::startTest(Constants::MeasureType type)
     try
     {
         setArgs(args);
-
-        DialogFactory* factory = DialogFactory::instance();
+        factory = DialogFactory::instance();
 
         m_dialog.reset(factory->instantiate(type));
         if(m_dialog.isNull()) {
@@ -47,7 +47,6 @@ bool CypressApplication::startTest(Constants::MeasureType type)
         }
 
         m_dialog->setRunMode(Constants::RunMode::modeDefault);
-        m_dialog->setVerbose(true);
         m_dialog->initialize();
         m_dialog->show();
     }
@@ -63,17 +62,29 @@ bool CypressApplication::startTest(Constants::MeasureType type)
 void CypressApplication::setArgs(const QVariantMap& args)
 {
     if(args.contains("inputFileName"))
-      m_inputFileName = args["inputFileName"].toString();
-    if(args.contains("outputFileName"))
-      m_outputFileName = args["outputFileName"].toString();
-    if(args.contains("measureType"))
-      m_type = args["measureType"].value<Constants::MeasureType>();
-    if(args.contains("runMode"))
-      m_mode = args["runMode"].value<Constants::RunMode>();
-    if(args.contains("verbose"))
-      m_verbose = args["verbose"].toBool();
+    {
+        m_inputFileName = args["inputFileName"].toString();
+    }
 
-    qDebug() << m_type;
+    if(args.contains("outputFileName"))
+    {
+        m_outputFileName = args["outputFileName"].toString();
+    }
+
+    if(args.contains("measureType"))
+    {
+        m_type = args["measureType"].value<Constants::MeasureType>();
+    }
+
+    if(args.contains("runMode"))
+    {
+        m_mode = args["runMode"].value<Constants::RunMode>();
+    }
+
+    if(args.contains("verbose"))
+    {
+        m_verbose = args["verbose"].toBool();
+    }
 }
 
 void CypressApplication::initialize()

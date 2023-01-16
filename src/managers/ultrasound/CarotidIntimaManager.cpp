@@ -19,44 +19,10 @@ void CarotidIntimaManager::measure()
 
 void CarotidIntimaManager::finish()
 {
-    emit complete(QJsonObject());
+    QJsonObject results = QJsonObject();
 }
 
 void CarotidIntimaManager::clearData()
 {
 
 }
-
-void CarotidIntimaManager::loadSettings(const QSettings &)
-{
-
-}
-
-void CarotidIntimaManager::saveSettings(QSettings*) const
-{
-
-}
-
-
-QJsonObject CarotidIntimaManager::toJsonObject() const
-{
-    return QJsonObject {{}};
-}
-
-void CarotidIntimaManager::initializeModel()
-{
-
-}
-
-void CarotidIntimaManager::updateModel()
-{
-
-}
-
-void CarotidIntimaManager::setInputData(const QVariantMap &)
-{
-
-}
-
-
-

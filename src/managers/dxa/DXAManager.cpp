@@ -1,5 +1,3 @@
-#include "managers/dxa/DXAManager.h"
-
 #include <QMap>
 #include <QVariant>
 #include <QString>
@@ -10,6 +8,10 @@
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+#include "managers/dxa/DXAManager.h"
 
 const QMap<QString, QString> DXAManager::ranges = {
     // forearm
@@ -65,7 +67,7 @@ DXAManager::DXAManager(QWidget *parent)
 
 DXAManager::~DXAManager()
 {
-    m_dicomSCP->stop();
+    //m_dicomSCP->stop();
     delete m_dicomSCP;
 }
 
@@ -75,19 +77,13 @@ DXAManager::~DXAManager()
 //
 void DXAManager::start()
 {
-    if (m_verbose)
-        qDebug() << "DXAManager::end";
 
-    startDicomServer();
 }
 
 // retrieve a measurement from the device
 //
 void DXAManager::measure()
 {
-    if (m_verbose)
-        qDebug() << "DXAManager::measure";
-
     QVariantMap participantData;
     QVariantMap scores;
     QVariantMap scanAnalysisData;
@@ -113,12 +109,48 @@ void DXAManager::measure()
 //
 void DXAManager::finish()
 {
-    if (m_verbose)
-        qDebug() << "DXAManager::end";
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QString testName = getName();
+        QJsonObject results;
 
-    endDicomServer();
+        qDebug() << "Sim Mode: " << getName();
 
-    emit complete(scanAnalysisJson);
+        if (testName == "Forearm")
+        {
+            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/forearm/output.json");
+        }
+
+        else if (testName == "Spine")
+        {
+            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/spine/output.json");
+        }
+
+        else if (testName == "IVA")
+        {
+            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/iva/output.json");
+        }
+
+        else if (testName == "Hip")
+        {
+            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/hip/output.json");
+        }
+
+        else if (testName == "WholeBody")
+        {
+            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/whole_body/output.json");
+        }
+
+        //qDebug() << "emit complete " << results;
+        sendResultsToPine(results);
+        //emit complete(results);
+    }
+    else
+    {
+        endDicomServer();
+        sendResultsToPine(scanAnalysisJson);
+    }
+
 }
 
 bool DXAManager::isCompleteDicom(DcmFileFormat &file)
@@ -210,16 +242,6 @@ void DXAManager::dicomServerExitNormal()
 }
 
 void DXAManager::dicomServerExitCrash()
-{
-
-}
-
-void DXAManager::loadSettings(const QSettings &)
-{
-
-}
-
-void DXAManager::saveSettings(QSettings*) const
 {
 
 }

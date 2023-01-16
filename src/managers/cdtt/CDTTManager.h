@@ -29,28 +29,10 @@ public:
     explicit CDTTManager(QWidget* parent = Q_NULLPTR);
     ~CDTTManager();
 
-    void loadSettings(const QSettings&) override;
-    void saveSettings(QSettings*) const override;
-
-    QJsonObject toJsonObject() const override;
-
-    void initializeModel() override;
-
-    void updateModel() override;
-
-   // is the passed string a jar file
-   // with the correct path elements ?
-   //
-    bool isDefined(const QString&) const;
-
-    // Set the input data.
-    // The input data is read from the input
-    // json file to the main application.  This method should be
-    // used to filter the minimum inputs needed to run
-    // a test.  Filtering keys are stored in member
-    // m_inputKeyList.
+    // is the passed string a jar file
+    // with the correct path elements ?
     //
-    void setInputData(const QVariantMap&) override;
+    bool isDefined(const QString&) const;
 
 public slots:
 
@@ -72,8 +54,6 @@ public slots:
     // calls isDefined to validate the passed arg
     //
     void selectRunnable(const QString&);
-
-    void readOutput();
 
 signals:
 

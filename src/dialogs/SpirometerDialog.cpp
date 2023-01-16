@@ -21,11 +21,6 @@ SpirometerDialog::~SpirometerDialog()
     delete ui;
 }
 
-void SpirometerDialog::initializeModel()
-{
-    m_manager.get()->initializeModel();
-    ui->measureWidget->initialize(m_manager.get()->getModel());
-}
 
 // set up signal slot connections between GUI front end
 // and device management back end
@@ -50,8 +45,8 @@ void SpirometerDialog::initializeConnections()
 
   // Relay messages from the manager to the status bar
   //
-  connect(m_manager.get(),&ManagerBase::message,
-          ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
+  //connect(m_manager.get(),&ManagerBase::message,
+  //        ui->statusBar, &QStatusBar::showMessage, Qt::DirectConnection);
 
   // Every instrument stage launched by an interviewer requires input
   // of the interview barcode that accompanies a participant.
@@ -64,28 +59,6 @@ void SpirometerDialog::initializeConnections()
   // TODO: for DCS interviews, the first digit corresponds the the wave rank
   // for inhome interviews there is a host dependent prefix before the barcode
   //
-  if(Constants::RunMode::modeSimulate == m_mode)
-  {
-    ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
-  }
-
-  connect(ui->barcodeWidget,&BarcodeWidget::validated,
-          this,[this](const bool& valid)
-    {
-      if(valid)
-      {
-          // launch the manager
-          //
-          this->run();
-      }
-      else
-      {
-          QMessageBox::critical(
-            this, QApplication::applicationName(),
-            tr("The input does not match the expected barcode for this participant."));
-      }
-  });
-
     connect(derived.get(), &SpirometerManager::canSelectRunnable,
             this, [this]() {
         foreach(auto button, this->findChildren<QPushButton *>())
@@ -149,23 +122,8 @@ void SpirometerDialog::initializeConnections()
     connect(derived.get(), &SpirometerManager::canWrite,
         ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
-    // Write test data to output
-    //
-    connect(ui->measureWidget, &MeasureWidget::writeToFile,
-        this, &DialogBase::writeOutput);
-
     // Close the application
     //
     connect(ui->measureWidget, &MeasureWidget::closeApplication,
         this, &DialogBase::close);
-}
-
-QString SpirometerDialog::getVerificationBarcode() const
-{
-  return ui->barcodeWidget->barcode();
-}
-
-void SpirometerDialog::setVerificationBarcode(const QString &barcode)
-{
-    ui->barcodeWidget->setBarcode(barcode);
 }

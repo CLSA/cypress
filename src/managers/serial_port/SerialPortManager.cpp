@@ -19,9 +19,6 @@ void SerialPortManager::start()
       {
         if(error == QSerialPort::NoError)
           return;
-        emit message(tr(
-          QString("Serial port error: %1").arg(m_port.errorString()).toStdString().c_str()
-        ));
 
         qCritical() << "ERROR: serial port " << m_port.errorString();
       });
@@ -45,10 +42,6 @@ void SerialPortManager::start()
 
 bool SerialPortManager::isDefined(const QString &label) const
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-       return true;
-    }
     bool defined = false;
     if(m_deviceList.contains(label))
     {
@@ -62,43 +55,25 @@ void SerialPortManager::scanDevices()
 {
     m_deviceList.clear();
     qDebug() << "signal scanningDevices";
-    emit message(tr("Discovering serial ports..."));
     emit scanningDevices();
-    if(m_verbose)
-      qInfo() << "start scanning for devices...";
-
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-      QSerialPortInfo info;
-      QString label = m_deviceName.isEmpty() ? "simulated_device" : m_deviceName;
-      m_deviceList.insert(label,info);
-      emit deviceDiscovered(label);
-      if(m_verbose)
-        qInfo() << "found device" << label;
-      setDevice(info);
-      return;
-    }
 
     foreach(const auto info, QSerialPortInfo::availablePorts())
     {
-        if(m_verbose)
-        {
-          // get the device data
-          if(info.hasProductIdentifier())
-            qInfo() << "product id:" << QString::number(info.productIdentifier());
-          if(info.hasVendorIdentifier())
-            qInfo() << "vendor id:" << QString::number(info.vendorIdentifier());
-          if(!info.manufacturer().isEmpty())
-            qInfo() << "manufacturer:" << info.manufacturer();
-          if(!info.portName().isEmpty())
-            qInfo() << "port name:" << info.portName();
-          if(!info.serialNumber().isEmpty())
-            qInfo() << "serial number:" << info.serialNumber();
-          if(!info.systemLocation().isEmpty())
-            qInfo() << "system location:" << info.systemLocation();
-          if(!info.description().isEmpty())
-            qInfo() << "description:" << info.description();
-        }
+      // get the device data
+      if(info.hasProductIdentifier())
+        qInfo() << "product id:" << QString::number(info.productIdentifier());
+      if(info.hasVendorIdentifier())
+        qInfo() << "vendor id:" << QString::number(info.vendorIdentifier());
+      if(!info.manufacturer().isEmpty())
+        qInfo() << "manufacturer:" << info.manufacturer();
+      if(!info.portName().isEmpty())
+        qInfo() << "port name:" << info.portName();
+      if(!info.serialNumber().isEmpty())
+        qInfo() << "serial number:" << info.serialNumber();
+      if(!info.systemLocation().isEmpty())
+        qInfo() << "system location:" << info.systemLocation();
+      if(!info.description().isEmpty())
+        qInfo() << "description:" << info.description();
         QString label = info.portName();
         if(!m_deviceList.contains(label))
         {
@@ -107,7 +82,6 @@ void SerialPortManager::scanDevices()
             emit deviceDiscovered(label);
         }
     }
-    if(m_verbose)
         qInfo() << "found" << QString::number(m_deviceList.count()) << " serial ports";
 
     // if we have a port from the ini file, check if it is still available on the system
@@ -128,7 +102,6 @@ void SerialPortManager::scanDevices()
     }
     if(found)
     {
-      if(m_verbose)
         qInfo() << "found port device" << m_deviceName;
 
       qDebug() << "signal deviceSelected";
@@ -140,7 +113,6 @@ void SerialPortManager::scanDevices()
       // select a serial port from the list of scanned ports
       //
       qDebug() << "signal canSelectDevice";
-      emit message(tr("Ready to select..."));
       emit canSelectDevice();
     }
 }
@@ -153,8 +125,7 @@ void SerialPortManager::selectDevice(const QString &label)
       QSerialPortInfo info = m_deviceList.value(label);
       setProperty("deviceName",info.portName());
       setDevice(info);
-      if(m_verbose)
-         qInfo() << "device selected from label " <<  label;
+      qInfo() << "device selected from label " <<  label;
     }
 }
 
@@ -163,29 +134,11 @@ void SerialPortManager::setDevice(const QSerialPortInfo &info)
     qDebug() << "slot setDevice";
     m_deviceData.reset();
 
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-       // get the device data
-       m_deviceData.setAttribute("port_product_id", "simulated");
-       m_deviceData.setAttribute("port_vendor_id", "simulated");
-       m_deviceData.setAttribute("port_manufacturer", "simulated");
-       m_deviceData.setAttribute("port_name", (m_deviceName.isEmpty() ? "simulated" : m_deviceName));
-       m_deviceData.setAttribute("port_serial_number", "simulated");
-       m_deviceData.setAttribute("port_system_location", "simulated");
-       m_deviceData.setAttribute("port_description", "simulated");
-       qDebug() << "signal canConnectDevice";
-       emit message(tr("Ready to connect..."));
-       emit canConnectDevice();
-       return;
-    }
-
     if(m_deviceName.isEmpty() || info.isNull())
     {
         qCritical() << "ERROR: no port available";
         return;
     }
-    if(m_verbose)
-        qInfo() << "ready to connect to" << info.portName();
 
     m_port.setPort(info);
     if(m_port.open(QSerialPort::ReadWrite))
@@ -210,7 +163,6 @@ void SerialPortManager::setDevice(const QSerialPortInfo &info)
       // the connect button can be clicked
       //
       qDebug() << "signal canConnectDevice";
-      emit message(tr("Ready to connect..."));
       emit canConnectDevice();
       m_port.close();
     }
@@ -218,14 +170,6 @@ void SerialPortManager::setDevice(const QSerialPortInfo &info)
 
 void SerialPortManager::connectDevice()
 {
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-        qDebug() << "signal canMeasure";
-        emit message(tr("Ready to measure..."));
-        emit canMeasure();
-        return;
-    }
-
     if(m_port.isOpen())
         m_port.close();
 
@@ -239,7 +183,6 @@ void SerialPortManager::connectDevice()
       // signal the GUI that the measure button can be clicked
       //
       qDebug() << "signal canMeasure";
-      emit message(tr("Ready to measure..."));
       emit canMeasure();
     }
 }
@@ -247,20 +190,8 @@ void SerialPortManager::connectDevice()
 void SerialPortManager::disconnectDevice()
 {
     qDebug() << "signal canConnectDevice";
-    emit message(tr("Ready to connect..."));
     emit canConnectDevice();
-    if(Constants::RunMode::modeSimulate == m_mode)
-    {
-       return;
-    }
 
     if(m_port.isOpen())
         m_port.close();
-}
-
-QJsonObject SerialPortManager::toJsonObject() const
-{
-    QJsonObject json;
-    json.insert("device",m_deviceData.toJsonObject());
-    return json;
 }

@@ -26,23 +26,10 @@ class BodyCompositionManager : public SerialPortManager
 public:
     explicit BodyCompositionManager(QWidget* parent = Q_NULLPTR);
 
-    void loadSettings(const QSettings&) override;
-    void saveSettings(QSettings*) const override;
-
-    QJsonObject toJsonObject() const override;
-
-    void initializeModel() override;
-
-    void updateModel() override;
-
     static QMap<QString,QByteArray> initDefaultLUT();
     static QMap<QByteArray,QString> initCommandLUT();
     static QMap<QByteArray,QString> initIncorrectResponseLUT();
     static QMap<QByteArray,QString> initConfirmationLUT();
-
-    // set inputs from json file or by default
-    //
-    void setInputData(const QVariantMap&) override;
 
     // update inputs from the UI
     //

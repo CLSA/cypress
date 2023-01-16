@@ -14,27 +14,6 @@ class RetinalCameraManager : public ManagerBase
 public:
     explicit RetinalCameraManager(QWidget *parent = nullptr);
 
-    // load and save device, paths and other constant settings to .ini
-    //
-    void loadSettings(const QSettings &) override;
-    void saveSettings(QSettings*) const override;
-
-    // collate test results and device and other meta data
-    // for the main application to write to .json
-    //
-    QJsonObject toJsonObject() const override;
-
-    // build a model from test and measurement data for UI display
-    // of the results
-    //
-    void initializeModel() override;
-
-    // update the model whenever the test data changes
-    //
-    void updateModel() override;
-
-    void setInputData(const QVariantMap &) override;
-
 public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)
@@ -57,23 +36,12 @@ protected:
 private:
     QProcess m_process;
 
-    QString m_runnableName;
-    QString m_defaultPatientUid;
-    QString m_database;
-    QString m_databaseVersion;
-    QString m_databaseDriver;
-    QString m_databaseHost;
-    quint32 m_databasePort;
-    QString m_databaseUser;
-    QString m_databasePassword;
-
     bool startRetinalCamera();
     bool cleanupDatabase();
     bool initializeDatabase();
     bool restoreDatabase();
     bool openDatabase();
     bool backupDatabase();
-    void printDatabaseParams();
 };
 
 #endif // RETINALCAMERAMANAGER_H
