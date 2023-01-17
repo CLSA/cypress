@@ -133,12 +133,12 @@ public:
     void retranslateUi(QDialog *WeighScaleDialog)
     {
         WeighScaleDialog->setWindowTitle(QCoreApplication::translate("WeighScaleDialog", "Weight Measurement", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("WeighScaleDialog", "barcode", nullptr));
-        serialPortGroupBox->setTitle(QCoreApplication::translate("WeighScaleDialog", "serial ports", nullptr));
+        idGroupBox->setTitle(QCoreApplication::translate("WeighScaleDialog", "Barcode", nullptr));
+        serialPortGroupBox->setTitle(QCoreApplication::translate("WeighScaleDialog", "Serial Ports", nullptr));
         serialPortLabel->setText(QCoreApplication::translate("WeighScaleDialog", "Serial Port:", nullptr));
         connectButton->setText(QCoreApplication::translate("WeighScaleDialog", "Connect", nullptr));
         disconnectButton->setText(QCoreApplication::translate("WeighScaleDialog", "Disconnect", nullptr));
-        measureGroupBox->setTitle(QCoreApplication::translate("WeighScaleDialog", "measure", nullptr));
+        measureGroupBox->setTitle(QCoreApplication::translate("WeighScaleDialog", "Measure", nullptr));
     } // retranslateUi
 
 };

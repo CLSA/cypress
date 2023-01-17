@@ -185,15 +185,15 @@ public:
     void retranslateUi(QDialog *BloodPressureDialog)
     {
         BloodPressureDialog->setWindowTitle(QCoreApplication::translate("BloodPressureDialog", "Blood Pressure", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "barcode", nullptr));
-        armBandGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "cuff information", nullptr));
+        idGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "Barcode", nullptr));
+        armBandGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "Cuff Information", nullptr));
         armBandSizeLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Cuff size:", nullptr));
         armLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Arm used:", nullptr));
-        pathGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "Usb devices", nullptr));
+        pathGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "USB Devices", nullptr));
         deviceLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Device:", nullptr));
         connectButton->setText(QCoreApplication::translate("BloodPressureDialog", "Connect", nullptr));
         disconnectButton->setText(QCoreApplication::translate("BloodPressureDialog", "Disconnect", nullptr));
-        measureGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "measure", nullptr));
+        measureGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "Measure", nullptr));
     } // retranslateUi
 
 };

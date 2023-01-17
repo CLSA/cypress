@@ -25,6 +25,9 @@ public:
     QString getRefSource() override;
 
 
+public slots:
+    void finish() override;
+
 private:
     ForearmTest m_test;
 };

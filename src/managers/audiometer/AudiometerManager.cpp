@@ -1,5 +1,3 @@
-#include "AudiometerManager.h"
-
 #include <QDateTime>
 #include <QDebug>
 #include <QJsonArray>
@@ -8,6 +6,11 @@
 #include <QSettings>
 #include <QStandardItemModel>
 #include <QtMath>
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "AudiometerManager.h"
 
 QByteArray AudiometerManager::END_CODE = AudiometerManager::initEndCode();
 
@@ -32,12 +35,22 @@ void AudiometerManager::clearData()
 
 void AudiometerManager::finish()
 {
-    qDebug() << "slot finish";
-
     if(m_port.isOpen())
         m_port.close();
 
-    QJsonObject results = m_test.toJsonObject();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/audiometer/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
     //m_deviceData.reset();
     //m_deviceList.clear();
     //m_test.reset();

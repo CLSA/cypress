@@ -110,10 +110,10 @@ public:
     void retranslateUi(QDialog *RunnableDialog)
     {
         RunnableDialog->setWindowTitle(QString());
-        idGroupBox->setTitle(QCoreApplication::translate("RunnableDialog", "barcode", nullptr));
-        pathGroupBox->setTitle(QCoreApplication::translate("RunnableDialog", "executable", nullptr));
+        idGroupBox->setTitle(QCoreApplication::translate("RunnableDialog", "Barcode", nullptr));
+        pathGroupBox->setTitle(QCoreApplication::translate("RunnableDialog", "Executable", nullptr));
         openButton->setText(QCoreApplication::translate("RunnableDialog", "Open", nullptr));
-        measureGroupBox->setTitle(QCoreApplication::translate("RunnableDialog", "measure", nullptr));
+        measureGroupBox->setTitle(QCoreApplication::translate("RunnableDialog", "Measure", nullptr));
     } // retranslateUi
 
 };

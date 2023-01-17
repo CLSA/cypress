@@ -1,7 +1,11 @@
-#include "ForearmScanManager.h"
 #include <QMap>
 #include <QVariant>
 #include <QString>
+
+#include "CypressApplication.h"
+
+#include "ForearmScanManager.h"
+#include "auxiliary/JsonSettings.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
@@ -42,6 +46,26 @@ QString ForearmScanManager::getBodyPartName()
 Side ForearmScanManager::getSide()
 {
     return m_test.side;
+}
+
+
+void ForearmScanManager::finish()
+{
+    DXAManager::finish();
+
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/dxa/forearm/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 quint8 ForearmScanManager::getScanType()

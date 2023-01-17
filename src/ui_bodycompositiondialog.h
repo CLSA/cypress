@@ -74,8 +74,8 @@ public:
     MeasureWidget *measureWidget;
     QStatusBar *statusBar;
     QButtonGroup *genderGroup;
-    QButtonGroup *unitsGroup;
     QButtonGroup *bodyTypeGroup;
+    QButtonGroup *unitsGroup;
 
     void setupUi(QDialog *BodyCompositionDialog)
     {
@@ -346,12 +346,12 @@ public:
     void retranslateUi(QDialog *BodyCompositionDialog)
     {
         BodyCompositionDialog->setWindowTitle(QCoreApplication::translate("BodyCompositionDialog", "Body Composition Measurement", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "barcode", nullptr));
-        serialPortGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "serial ports", nullptr));
+        idGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Barcode", nullptr));
+        serialPortGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Serial Ports", nullptr));
         serialPortLabel->setText(QCoreApplication::translate("BodyCompositionDialog", "Serial Port:", nullptr));
         connectButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Connect", nullptr));
         disconnectButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Disconnect", nullptr));
-        inputsGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "inputs", nullptr));
+        inputsGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Inputs", nullptr));
         label_5->setText(QCoreApplication::translate("BodyCompositionDialog", "Gender:", nullptr));
         maleRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "Male", nullptr));
         femaleRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "Female", nullptr));
@@ -372,7 +372,7 @@ public:
         setButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Set", nullptr));
         resetButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Reset", nullptr));
         confirmButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Confirm", nullptr));
-        measureGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "measure", nullptr));
+        measureGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Measure", nullptr));
     } // retranslateUi
 
 };

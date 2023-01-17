@@ -1,9 +1,13 @@
-#include "SpirometerManager.h"
-#include "managers/emr/EMRPluginWriter.h"
-
 #include <QSettings>
 #include <QFileDialog>
 #include <QStandardItemModel>
+
+
+#include "CypressApplication.h"
+#include "SpirometerManager.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "managers/emr/EMRPluginWriter.h"
 
 SpirometerManager::SpirometerManager(QWidget* parent) : ManagerBase(parent)
 {
@@ -260,26 +264,39 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::finish()
 {
-    if(QProcess::NotRunning != m_process.state())
+    if (CypressApplication::mode == Mode::Sim)
     {
-       m_process.kill();
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/dxa/forearm/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
     }
+    //if(QProcess::NotRunning != m_process.state())
+    //{
+    //   m_process.kill();
+    //}
 
-    restoreDatabases();
-    removeXmlFiles();
+    //restoreDatabases();
+    //removeXmlFiles();
 
-    // delete pdf output file
-    //
-    QString pdfFilePath = getOutputPdfPath();
-    if(QFile::exists(pdfFilePath))
-    {
-        qDebug() << "remove pdf" << pdfFilePath;
-        QFile::remove(pdfFilePath);
-    }
+    //// delete pdf output file
+    ////
+    //QString pdfFilePath = getOutputPdfPath();
+    //if(QFile::exists(pdfFilePath))
+    //{
+    //    qDebug() << "remove pdf" << pdfFilePath;
+    //    QFile::remove(pdfFilePath);
+    //}
 
-    m_test.reset();
+    //m_test.reset();
 
-    QJsonObject results = m_test.toJsonObject();
+    //QJsonObject results = m_test.toJsonObject();
 }
 
 void SpirometerManager::removeXmlFiles() const

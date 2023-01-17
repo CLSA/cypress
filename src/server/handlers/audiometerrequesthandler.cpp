@@ -1,9 +1,7 @@
-#include <QJsonObject>
-
-#include "BodyCompositionRequestHandler.h"
+#include "audiometerrequesthandler.h"
 #include "CypressApplication.h"
 
-void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
         QJsonObject responseData;
@@ -14,7 +12,7 @@ void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
         std::ostream& out = response.send();
 
         CypressApplication::restApiServer -> requestTestStart(
-            Constants::MeasureType::typeBody_Composition
+            Constants::MeasureType::typeAudiometer
         );
 
         out.flush();

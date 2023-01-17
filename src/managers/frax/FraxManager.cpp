@@ -1,12 +1,15 @@
-#include "FraxManager.h"
-#include "auxiliary/Utilities.h"
-
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonObject>
 #include <QSettings>
 #include <QStandardItemModel>
+
+#include "CypressApplication.h"
+#include "auxiliary/Utilities.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "FraxManager.h"
 
 FraxManager::FraxManager(QWidget* parent):
     ManagerBase(parent)
@@ -122,4 +125,17 @@ void FraxManager::clearData()
 
 void FraxManager::finish()
 {
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/frax/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }

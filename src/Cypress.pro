@@ -128,6 +128,8 @@ SOURCES += \
     server/handlers/TonometerRequestHandler.cpp \
     server/handlers/UltrasoundRequestHandler.cpp \
     server/handlers/WeighScaleRequestHandler.cpp \
+    server/handlers/audiometerrequesthandler.cpp \
+    server/handlers/bloodpressurerequesthandler.cpp \
     server/utils.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
@@ -258,6 +260,8 @@ HEADERS += \
     server/handlers/TonometerRequestHandler.h \
     server/handlers/UltrasoundRequestHandler.h \
     server/handlers/WeighScaleRequestHandler.h \
+    server/handlers/audiometerrequesthandler.h \
+    server/handlers/bloodpressurerequesthandler.h \
     server/utils.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \

@@ -138,12 +138,12 @@ public:
     void retranslateUi(QDialog *AudiometerDialog)
     {
         AudiometerDialog->setWindowTitle(QCoreApplication::translate("AudiometerDialog", "Hearing Measurement", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "barcode", nullptr));
-        serialPortGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "serial ports", nullptr));
+        idGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "Barcode", nullptr));
+        serialPortGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "Serial Ports", nullptr));
         serialPortLabel->setText(QCoreApplication::translate("AudiometerDialog", "Serial Port:", nullptr));
         connectButton->setText(QCoreApplication::translate("AudiometerDialog", "Connect", nullptr));
         disconnectButton->setText(QCoreApplication::translate("AudiometerDialog", "Disconnect", nullptr));
-        measureGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "measure", nullptr));
+        measureGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "Measure", nullptr));
     } // retranslateUi
 
 };

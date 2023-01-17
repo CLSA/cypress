@@ -5,8 +5,12 @@
 #include <QDebug>
 #include <QSettings>
 
+#include "CypressApplication.h"
+
 #include "managers/dxa/DXAManager.h"
 #include "managers/dxa/HipScanManager.h"
+
+#include "auxiliary/JsonSettings.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
@@ -16,12 +20,28 @@
 HipScanManager::HipScanManager(QWidget* parent)
     : DXAManager{parent}
 {
+
 }
 
 QVariantMap HipScanManager::retrieveDeviceData()
 {
    return QVariantMap();
 }
+
+void HipScanManager::finish()
+{
+    DXAManager::finish();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/hip/output.json");
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
+}
+
 
 QString HipScanManager::getName()
 {

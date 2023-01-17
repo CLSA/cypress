@@ -1,5 +1,3 @@
-#include "CDTTManager.h"
-
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -8,6 +6,11 @@
 #include <QSettings>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "CDTTManager.h"
 
 CDTTManager::CDTTManager(QWidget* parent) : ManagerBase(parent)
 {
@@ -75,7 +78,19 @@ void CDTTManager::clearData()
 
 void CDTTManager::finish()
 {
-    QJsonObject results = m_test.toJsonObject();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 void CDTTManager::configureProcess()

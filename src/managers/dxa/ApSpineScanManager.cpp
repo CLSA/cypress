@@ -3,6 +3,8 @@
 #include <QVariant>
 #include <QString>
 
+#include "auxiliary/JsonSettings.h"
+
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -12,6 +14,22 @@ APSpineScanManager::APSpineScanManager(QWidget *parent)
     : DXAManager{parent}
 {
 
+}
+
+
+void APSpineScanManager::finish()
+{
+    DXAManager::finish();
+
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/dxa/spine/output.json"
+    );
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+
+    }
 }
 
 QVariantMap APSpineScanManager::retrieveDeviceData()

@@ -25,6 +25,8 @@ public:
     QString getName() override;
     QString getBodyPartName() override;
 
+public slots:
+    void finish() override;
 
 private:
     WholeBodyScanTest m_test;

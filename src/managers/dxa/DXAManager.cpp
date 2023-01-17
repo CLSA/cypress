@@ -87,10 +87,10 @@ void DXAManager::measure()
     QVariantMap participantData;
     QVariantMap scores;
     QVariantMap scanAnalysisData;
-    Side side;
+    //Side side;
 
     participantData = getParticipantData();
-    side = getSide();
+    //side = getSide();
 
     if (validatedDicomFiles.empty()) return;
     scanAnalysisData = extractScanAnalysisData();
@@ -109,48 +109,7 @@ void DXAManager::measure()
 //
 void DXAManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
-    {
-        QString testName = getName();
-        QJsonObject results;
-
-        qDebug() << "Sim Mode: " << getName();
-
-        if (testName == "Forearm")
-        {
-            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/forearm/output.json");
-        }
-
-        else if (testName == "Spine")
-        {
-            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/spine/output.json");
-        }
-
-        else if (testName == "IVA")
-        {
-            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/iva/output.json");
-        }
-
-        else if (testName == "Hip")
-        {
-            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/hip/output.json");
-        }
-
-        else if (testName == "WholeBody")
-        {
-            results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/whole_body/output.json");
-        }
-
-        //qDebug() << "emit complete " << results;
-        sendResultsToPine(results);
-        //emit complete(results);
-    }
-    else
-    {
-        endDicomServer();
-        sendResultsToPine(scanAnalysisJson);
-    }
-
+    endDicomServer();
 }
 
 bool DXAManager::isCompleteDicom(DcmFileFormat &file)

@@ -3,6 +3,8 @@
 #include <QString>
 #include <QJsonObject>
 
+#include "auxiliary/JsonSettings.h"
+
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -16,6 +18,21 @@ WholeBodyScanManager::WholeBodyScanManager(QWidget *parent)
 QVariantMap WholeBodyScanManager::retrieveDeviceData()
 {
     return QVariantMap();
+}
+
+void WholeBodyScanManager::finish()
+{
+    DXAManager::finish();
+
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/dxa/whole_body/output.json"
+    );
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
 }
 
 QString WholeBodyScanManager::getName()

@@ -1,4 +1,6 @@
 #include "BodyCompositionManager.h"
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
 
 #include <QByteArray>
 #include <QDateTime>
@@ -273,7 +275,19 @@ void BodyCompositionManager::finish()
     //m_queue.clear();
     //m_cache.clear();
 
-    QJsonObject jsonObject = m_test.toJsonObject();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/body_composition/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 bool BodyCompositionManager::hasEndCode(const QByteArray &arr) const

@@ -24,6 +24,9 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
+public slots:
+    void finish() override;
+
 private:
     IVAImagingTest m_test;
 

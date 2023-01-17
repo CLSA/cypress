@@ -2,6 +2,9 @@
 #include <QVariant>
 #include <QString>
 
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -55,6 +58,21 @@ QString IVAImagingScanManager::getRefSource()
    return "Hologic";
 }
 
+void IVAImagingScanManager::finish()
+{
+    DXAManager::finish();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile("C:/work/clsa/cypress/src/tests/fixtures/dxa/iva/output.json");
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
+}
 
 bool IVAImagingScanManager::isDicomFile1(DcmFileFormat &loadedFileFormat)
 {

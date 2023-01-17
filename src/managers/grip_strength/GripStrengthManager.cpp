@@ -1,5 +1,3 @@
-#include "GripStrengthManager.h"
-
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -9,6 +7,10 @@
 #include <QStandardItemModel>
 #include <QException>
 
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "GripStrengthManager.h"
 
 GripStrengthManager::GripStrengthManager(QWidget* parent) : ManagerBase(parent)
 {
@@ -53,7 +55,19 @@ void GripStrengthManager::measure() {
 
 void GripStrengthManager::finish()
 {
-    QJsonObject results = m_test.toJsonObject();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/grip_strength/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 bool GripStrengthManager::initializeConnections() {

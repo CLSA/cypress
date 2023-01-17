@@ -1,5 +1,7 @@
 #include "BloodPressureManager.h"
+#include "auxiliary/JsonSettings.h"
 
+#include "CypressApplication.h"
 #include "BPMCommunication.h"
 
 #include <QCoreApplication>
@@ -118,7 +120,19 @@ void BloodPressureManager::disconnectDevice()
 //
 void BloodPressureManager::finish()
 {
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/blood_pressure/output.json"
+        );
+        if (results.empty()) return;
 
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 // slot for BPMCommunication

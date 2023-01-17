@@ -28,6 +28,9 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
+public slots:
+    void finish() override;
+
 private:
     HipTest m_test;
 };

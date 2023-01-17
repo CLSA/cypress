@@ -25,6 +25,8 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
+public slots:
+    void finish() override;
 
 private:
     ApSpineTest m_test;

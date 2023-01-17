@@ -1,7 +1,3 @@
-#include "TonometerManager.h"
-
-#include "data/AccessQueryHelper.h"
-
 #include <QDebug>
 #include <QDir>
 #include <QFileDialog>
@@ -11,6 +7,12 @@
 #include <QSettings>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+#include "data/AccessQueryHelper.h"
+
+#include "TonometerManager.h"
 
 TonometerManager::TonometerManager(QWidget* parent):
     ManagerBase(parent)
@@ -103,5 +105,17 @@ void TonometerManager::clearData()
 
 void TonometerManager::finish()
 {
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json"
+        );
+        if (results.empty()) return;
 
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }

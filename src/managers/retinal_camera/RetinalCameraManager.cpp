@@ -6,6 +6,9 @@
 #include <QSettings>
 #include <QMessageBox>
 
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
 #include "RetinalCameraManager.h"
 #include "qsqlerror.h"
 
@@ -210,6 +213,19 @@ void RetinalCameraManager::measure()
 //
 void RetinalCameraManager::finish()
 {
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/retinal_camera/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
     // process data for left and right eye
     //
     //QSqlQuery dataQuery;

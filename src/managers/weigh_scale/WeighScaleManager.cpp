@@ -1,9 +1,3 @@
-#include "WeighScaleManager.h"
-#include "data/weigh_scale/tests/WeighScaleTest.h"
-#include "auxiliary/Utilities.h"
-
-#include "CypressApplication.h"
-
 #include <QDateTime>
 #include <QDebug>
 #include <QJsonArray>
@@ -13,6 +7,13 @@
 #include <QSettings>
 #include <QStandardItemModel>
 #include <QtMath>
+
+#include "auxiliary/Utilities.h"
+#include "auxiliary/JsonSettings.h"
+#include "data/weigh_scale/tests/WeighScaleTest.h"
+
+#include "WeighScaleManager.h"
+#include "CypressApplication.h"
 
 WeighScaleManager::WeighScaleManager(QWidget* parent) : SerialPortManager(parent)
 {
@@ -28,14 +29,22 @@ void WeighScaleManager::finish()
 {
     if (CypressApplication::mode == Mode::Sim)
     {
-        QJsonObject results;
-    }
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
+        );
+        if (results.empty()) return;
 
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
     //m_deviceData.reset();
     //m_deviceList.clear();
     //m_test.reset();
-    if(m_port.isOpen())
-        m_port.close();
+    //if(m_port.isOpen())
+    //    m_port.close();
 }
 
 void WeighScaleManager::connectDevice()

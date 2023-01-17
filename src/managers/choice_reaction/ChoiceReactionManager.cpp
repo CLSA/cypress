@@ -1,5 +1,3 @@
-#include "ChoiceReactionManager.h"
-
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -8,6 +6,11 @@
 #include <QProcess>
 #include <QSettings>
 #include <QStandardItemModel>
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "ChoiceReactionManager.h"
 
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
@@ -76,7 +79,19 @@ void ChoiceReactionManager::measure()
 
 void ChoiceReactionManager::finish()
 {
-    QJsonObject results = m_test.toJsonObject();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/choice_reaction/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 void ChoiceReactionManager::clearData()

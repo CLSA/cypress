@@ -1,4 +1,3 @@
-#include "ECGManager.h"
 
 #include <QDebug>
 #include <QDir>
@@ -7,6 +6,11 @@
 #include <QJsonObject>
 #include <QSettings>
 #include <QStandardItemModel>
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+
+#include "ECGManager.h"
 
 ECGManager::ECGManager(QWidget* parent):
     ManagerBase(parent)
@@ -90,7 +94,19 @@ void ECGManager::clearData()
 
 void ECGManager::finish()
 {
-    QJsonObject results = m_test.toJsonObject();
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        QJsonObject results = JsonSettings::readJsonFromFile(
+            "C:/work/clsa/cypress/src/tests/fixtures/ecg/output.json"
+        );
+        if (results.empty()) return;
+
+        bool ok = sendResultsToPine(results);
+        if (!ok)
+        {
+            qDebug() << "Could not send results to Pine";
+        }
+    }
 }
 
 bool ECGManager::deleteDeviceData()
