@@ -43,6 +43,12 @@ BodyCompositionManager::BodyCompositionManager(QWidget *parent) : SerialPortMana
   m_test.setExpectedMeasurementCount(1);
 }
 
+bool BodyCompositionManager::isAvailable()
+{
+    bool found = scanDevices();
+    return found;
+}
+
 // default command lookup by string
 // the D series commands for setting tare weight, height, and age
 // require specific bytes to be filled with numeric characters
@@ -149,6 +155,8 @@ QMap<QByteArray,QString> BodyCompositionManager::initCommandLUT()
     atom.append(0x0d);
     commands[atom] = "reset";
 
+    qDebug() << "Command LUT" << commands << '\n';
+
     return commands;
 }
 
@@ -191,6 +199,7 @@ QMap<QByteArray,QString> BodyCompositionManager::initConfirmationLUT()
     atom.append(0x0d);
     responses[atom] = "received reset request";
 
+    qDebug() << "Confirmation LUT" << responses << '\n';
     return responses;
 }
 
@@ -253,6 +262,7 @@ QMap<QByteArray,QString> BodyCompositionManager::initIncorrectResponseLUT()
     atom.append(end);
     responses[atom] = "set input or reset command failed";
 
+    qDebug() << "Incorrect Response LUT" << responses << '\n';
     return responses;
 }
 
@@ -265,16 +275,6 @@ void BodyCompositionManager::clearData()
 
 void BodyCompositionManager::finish()
 {
-    //m_deviceData.reset();
-    //m_deviceList.clear();
-    //m_test.reset();
-
-    if(m_port.isOpen())
-        m_port.close();
-
-    //m_queue.clear();
-    //m_cache.clear();
-
     if (CypressApplication::mode == Mode::Sim)
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
@@ -287,7 +287,21 @@ void BodyCompositionManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
+
+        return;
     }
+
+    m_deviceData.reset();
+    m_deviceList.clear();
+    m_test.reset();
+
+    if(m_port.isOpen())
+        m_port.close();
+
+    m_queue.clear();
+    m_cache.clear();
 }
 
 bool BodyCompositionManager::hasEndCode(const QByteArray &arr) const

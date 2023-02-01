@@ -12,6 +12,11 @@ ManagerBase::~ManagerBase()
 {
 }
 
+bool ManagerBase::isAvailable()
+{
+    return false;
+}
+
 bool ManagerBase::sendResultsToPine(const QJsonObject& results)
 {
     try {

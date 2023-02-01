@@ -2,16 +2,20 @@
 #include "CypressApplication.h"
 #include <QDebug>
 
+#include "auxiliary/JsonSettings.h"
+
 void DxaForearmBoneDensityHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
+        QString responseData = JsonSettings::serializeJson(getResponseData());
+
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        std::ostream& out = response.send();
-
         CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDxaForearmBone);
 
+        std::ostream& out = response.send();
+        out << responseData.toStdString();
         out.flush();
     }
     catch (std::exception& e)

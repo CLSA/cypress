@@ -16,6 +16,12 @@ enum Mode {
     Debug,
 };
 
+enum Status {
+    Starting,
+    Waiting,
+    Active,
+};
+
 class CypressApplication : public QObject
 {
     Q_OBJECT
@@ -26,8 +32,14 @@ public:
     void setArgs(const QVariantMap&);
     void initialize();
 
+    static QJsonObject getStatus();
     static QScopedPointer<Server> restApiServer;
+
+    static Status status;
     static Mode mode;
+
+    static QElapsedTimer timer;
+    static QDateTime startTime;
 
 public slots:
     bool startTest(Constants::MeasureType type);

@@ -21,6 +21,7 @@ SOURCES += \
     auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
     data/ExcelQueryHelper.cpp \
+    data/body_composition/commands.cpp \
     data/dxa/PatScanQueryHelper.cpp \
     data/dxa/ReferenceQueryHelper.cpp \
     data/dxa/measurements/ApSpineMeasurement.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 #    data/TemperatureTest.cpp \
     data/grip_strength/measurements/GripStrengthMeasurement.cpp \
     data/grip_strength/tests/GripStrengthTest.cpp \
+    data/retinal_camera/databasemanager.cpp \
     dialogs/DXADialog.cpp \
     dialogs/GripStrengthDialog.cpp \
 #    managers/BluetoothLEManager.cpp \
@@ -129,7 +131,26 @@ SOURCES += \
     server/handlers/UltrasoundRequestHandler.cpp \
     server/handlers/WeighScaleRequestHandler.cpp \
     server/handlers/audiometerrequesthandler.cpp \
+    server/handlers/audiometerstatusrequesthandler.cpp \
     server/handlers/bloodpressurerequesthandler.cpp \
+    server/handlers/bloodpressurestatusrequesthandler.cpp \
+    server/handlers/bodycompositionstatusrequesthandler.cpp \
+    server/handlers/cdttstatusrequesthandler.cpp \
+    server/handlers/choicereactionstatusrequesthandler.cpp \
+    server/handlers/cypressstatusrequesthandler.cpp \
+    server/handlers/dxaforearmstatusrequesthandler.cpp \
+    server/handlers/dxahipstatusrequesthandler.cpp \
+    server/handlers/dxaivastatusrequesthandler.cpp \
+    server/handlers/dxaspinestatusrequesthandler.cpp \
+    server/handlers/dxawholebodystatusrequesthandler.cpp \
+    server/handlers/ecgstatusrequesthandler.cpp \
+    server/handlers/fraxstatusrequesthandler.cpp \
+    server/handlers/gripstrengthstatusrequesthandler.cpp \
+    server/handlers/retinalcamerastatusrequesthandler.cpp \
+    server/handlers/spirometerstatusrequesthandler.cpp \
+    server/handlers/tonometerstatusrequesthandler.cpp \
+    server/handlers/ultrasoundstatusrequesthandler.cpp \
+    server/handlers/weighscalestatusrequesthandler.cpp \
     server/utils.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
@@ -160,6 +181,7 @@ HEADERS += \
     data/MeasurementBase.h \
     data/blood_pressure/measurements/BloodPressureMeasurement.h \
     data/blood_pressure/tests/BloodPressureTest.h \
+    data/body_composition/commands.h \
     data/body_composition/measurements/BodyCompositionMeasurement.h \
     data/body_composition/tests/BodyCompositionTest.h \
     data/cdtt/measurements/CDTTMeasurement.h \
@@ -185,6 +207,7 @@ HEADERS += \
 #    data/TemperatureTest.h \
     data/grip_strength/measurements/GripStrengthMeasurement.h \
     data/grip_strength/tests/GripStrengthTest.h \
+    data/retinal_camera/databasemanager.h \
     dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
     data/ecg/measurements/ECGMeasurement.h \
@@ -261,7 +284,26 @@ HEADERS += \
     server/handlers/UltrasoundRequestHandler.h \
     server/handlers/WeighScaleRequestHandler.h \
     server/handlers/audiometerrequesthandler.h \
+    server/handlers/audiometerstatusrequesthandler.h \
     server/handlers/bloodpressurerequesthandler.h \
+    server/handlers/bloodpressurestatusrequesthandler.h \
+    server/handlers/bodycompositionstatusrequesthandler.h \
+    server/handlers/cdttstatusrequesthandler.h \
+    server/handlers/choicereactionstatusrequesthandler.h \
+    server/handlers/cypressstatusrequesthandler.h \
+    server/handlers/dxaforearmstatusrequesthandler.h \
+    server/handlers/dxahipstatusrequesthandler.h \
+    server/handlers/dxaivastatusrequesthandler.h \
+    server/handlers/dxaspinestatusrequesthandler.h \
+    server/handlers/dxawholebodystatusrequesthandler.h \
+    server/handlers/ecgstatusrequesthandler.h \
+    server/handlers/fraxstatusrequesthandler.h \
+    server/handlers/gripstrengthstatusrequesthandler.h \
+    server/handlers/retinalcamerastatusrequesthandler.h \
+    server/handlers/spirometerstatusrequesthandler.h \
+    server/handlers/tonometerstatusrequesthandler.h \
+    server/handlers/ultrasoundstatusrequesthandler.h \
+    server/handlers/weighscalestatusrequesthandler.h \
     server/utils.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \

@@ -10,7 +10,7 @@
 
 #include "CypressApplication.h"
 #include "auxiliary/JsonSettings.h"
-#include "data/AccessQueryHelper.h"
+//#include "data/AccessQueryHelper.h"
 
 #include "TonometerManager.h"
 
@@ -25,8 +25,15 @@ TonometerManager::~TonometerManager()
   QSqlDatabase::removeDatabase("mdb_connection");
 }
 
+bool TonometerManager::isAvailable()
+{
+    return false;
+}
+
 void TonometerManager::start()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     // connect signals and slots to QProcess one time only
     //
     connect(&m_process, &QProcess::started,
@@ -117,5 +124,7 @@ void TonometerManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }

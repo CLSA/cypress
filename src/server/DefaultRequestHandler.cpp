@@ -25,9 +25,15 @@ void DefaultRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
     std::ostream& out = response.send();
 
     QJsonObject responseData {{
-        "error", "404"
+        "error", "Not found"
     }};
 
     out << JsonSettings::serializeJson(responseData).toStdString();
     out.flush();
+}
+
+
+QJsonObject DefaultRequestHandler::getResponseData() {
+    QJsonObject responseData {{ "id", QUuid::createUuid().toString(QUuid::WithoutBraces) }};
+    return responseData;
 }

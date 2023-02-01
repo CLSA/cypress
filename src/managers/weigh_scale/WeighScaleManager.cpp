@@ -8,7 +8,7 @@
 #include <QStandardItemModel>
 #include <QtMath>
 
-#include "auxiliary/Utilities.h"
+//#include "auxiliary/Utilities.h"
 #include "auxiliary/JsonSettings.h"
 #include "data/weigh_scale/tests/WeighScaleTest.h"
 
@@ -18,6 +18,11 @@
 WeighScaleManager::WeighScaleManager(QWidget* parent) : SerialPortManager(parent)
 {
   m_test.setExpectedMeasurementCount(2);
+}
+
+bool WeighScaleManager::isAvailable()
+{
+    return false;
 }
 
 void WeighScaleManager::clearData()
@@ -39,6 +44,8 @@ void WeighScaleManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
     //m_deviceData.reset();
     //m_deviceList.clear();
@@ -95,6 +102,8 @@ void WeighScaleManager::zeroDevice()
 
 void WeighScaleManager::measure()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     m_request = QByteArray("p");
     writeDevice();
 }

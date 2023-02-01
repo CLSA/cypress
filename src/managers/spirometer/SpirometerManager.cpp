@@ -20,8 +20,16 @@ SpirometerManager::SpirometerManager(QWidget* parent) : ManagerBase(parent)
     m_test.setExpectedMeasurementCount(4);
 }
 
+bool SpirometerManager::isAvailable()
+{
+    return false;
+}
+
 void SpirometerManager::start()
 {
+
+    if (CypressApplication::mode == Mode::Sim) return;
+
     // connect signals and slots to QProcess one time only
     //
     connect(&m_process, &QProcess::started,
@@ -75,6 +83,8 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::measure()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     qDebug() << "Starting process from measure";
     clearData();
 
@@ -276,6 +286,8 @@ void SpirometerManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
     //if(QProcess::NotRunning != m_process.state())
     //{

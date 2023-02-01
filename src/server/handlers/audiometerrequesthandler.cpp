@@ -1,10 +1,12 @@
 #include "audiometerrequesthandler.h"
 #include "CypressApplication.h"
 
+#include "auxiliary/JsonSettings.h"
+
 void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
-        QJsonObject responseData;
+        QString responseData = JsonSettings::serializeJson(getResponseData());
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
@@ -14,6 +16,8 @@ void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
         CypressApplication::restApiServer -> requestTestStart(
             Constants::MeasureType::typeAudiometer
         );
+
+        out << responseData.toStdString();
 
         out.flush();
     }

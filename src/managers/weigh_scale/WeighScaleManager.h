@@ -24,6 +24,8 @@ class WeighScaleManager : public SerialPortManager
 public:
     explicit WeighScaleManager(QWidget* parent = Q_NULLPTR);
 
+    bool isAvailable() override;
+
 public slots:
 
     // connect to the serial port

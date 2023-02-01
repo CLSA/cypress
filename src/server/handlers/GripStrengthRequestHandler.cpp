@@ -5,23 +5,27 @@
 #include <QObject>
 #include <QApplication>
 
-#include "GripStrengthRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPResponse.h"
+
 #include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+#include "GripStrengthRequestHandler.h"
 
 
 void GripStrengthRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
+        QString responseData = JsonSettings::serializeJson(getResponseData());
+
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        std::ostream& out = response.send();
-
         CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeGrip_Strength);
 
+        std::ostream& out = response.send();
+        out << responseData.toStdString();
         out.flush();
     }
     catch (std::exception& e)

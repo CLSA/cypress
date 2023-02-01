@@ -26,6 +26,8 @@ class BodyCompositionManager : public SerialPortManager
 public:
     explicit BodyCompositionManager(QWidget* parent = Q_NULLPTR);
 
+    bool isAvailable() override;
+
     static QMap<QString,QByteArray> initDefaultLUT();
     static QMap<QByteArray,QString> initCommandLUT();
     static QMap<QByteArray,QString> initIncorrectResponseLUT();

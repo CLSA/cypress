@@ -37,6 +37,7 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&, const TonometerManager::FileType& type = ORAApplication) const;
+    bool isAvailable() override;
 
 public slots:
 

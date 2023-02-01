@@ -19,7 +19,12 @@ CDTTManager::CDTTManager(QWidget* parent) : ManagerBase(parent)
 
 CDTTManager::~CDTTManager()
 {
-  QSqlDatabase::removeDatabase("xlsx_connection");
+    QSqlDatabase::removeDatabase("xlsx_connection");
+}
+
+bool CDTTManager::isAvailable()
+{
+    return false;
 }
 
 void CDTTManager::start()
@@ -53,20 +58,12 @@ void CDTTManager::start()
     emit dataChanged();
 }
 
-bool CDTTManager::isDefined(const QString& runnableName) const
-{
-    return false;
-}
-
-void CDTTManager::selectRunnable(const QString &runnableName)
-{
-
-}
-
 void CDTTManager::measure()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     clearData();
-    // launch the process
+
     qDebug() << "starting process from measure";
     m_process.start();
 }
@@ -90,6 +87,8 @@ void CDTTManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }
 

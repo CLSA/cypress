@@ -35,7 +35,6 @@ public:
         if (GripStrengthDialog->objectName().isEmpty())
             GripStrengthDialog->setObjectName(QString::fromUtf8("GripStrengthDialog"));
         GripStrengthDialog->resize(900, 600);
-        GripStrengthDialog->setMinimumSize(QSize(900, 600));
         GripStrengthDialog->setSizeGripEnabled(true);
         verticalLayout_3 = new QVBoxLayout(GripStrengthDialog);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));

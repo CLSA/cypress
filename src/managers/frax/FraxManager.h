@@ -29,6 +29,7 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&) const;
+    bool isAvailable() override;
 
 public slots:
 

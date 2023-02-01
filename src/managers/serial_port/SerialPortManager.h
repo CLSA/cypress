@@ -32,6 +32,17 @@ public:
 
 public slots:
 
+    // scan for available devices (serial ports)
+    // emits scanning signal at start
+    // populates a list of devices using serial port name as key
+    // emits discovered signal with the serial port name when a port is discovered
+    // if the ini stored port is found
+    //   setDevice
+    // else
+    //   emits canSelect signal
+    //
+    bool scanDevices();
+
     // what the manager does in response to the main application
     // window invoking its run method
     //
@@ -99,16 +110,7 @@ signals:
 
 protected:
 
-    // scan for available devices (serial ports)
-    // emits scanning signal at start
-    // populates a list of devices using serial port name as key
-    // emits discovered signal with the serial port name when a port is discovered
-    // if the ini stored port is found
-    //   setDevice
-    // else
-    //   emits canSelect signal
-    //
-    void scanDevices();
+
 
     // device data is separate from test data
     Measurement m_deviceData;

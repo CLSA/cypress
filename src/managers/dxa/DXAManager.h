@@ -32,6 +32,8 @@ public:
 
     const static QMap<QString, QString> ranges;
 
+    bool isAvailable() override;
+
     QJsonObject scanAnalysisJson;
     QJsonObject scoresJson;
 

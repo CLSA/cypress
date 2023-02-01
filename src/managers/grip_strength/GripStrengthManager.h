@@ -16,6 +16,7 @@ class GripStrengthManager : public ManagerBase
     Q_OBJECT
 public:
     explicit GripStrengthManager(QWidget* parent = Q_NULLPTR);
+    bool isAvailable() override;
 
 public slots:
     void start() override;

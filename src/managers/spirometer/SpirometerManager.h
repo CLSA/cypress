@@ -19,6 +19,7 @@ public:
     ~SpirometerManager() = default;
 
     bool isDefined(const QString&, const SpirometerManager::FileType&) const;
+    bool isAvailable() override;
 
 public slots:
 

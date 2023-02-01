@@ -21,6 +21,11 @@ ChoiceReactionManager::ChoiceReactionManager(QWidget *parent) :
 
 }
 
+bool ChoiceReactionManager::isAvailable()
+{
+    return false;
+}
+
 void ChoiceReactionManager::start()
 {
     // connect signals and slots to QProcess one time only
@@ -52,16 +57,6 @@ void ChoiceReactionManager::start()
     emit dataChanged();
 }
 
-bool ChoiceReactionManager::isDefined(const QString &exeName) const
-{
-   return false;
-}
-
-void ChoiceReactionManager::selectRunnable(const QString &exeName)
-{
-
-}
-
 void ChoiceReactionManager::configureProcess()
 {
 
@@ -91,6 +86,7 @@ void ChoiceReactionManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+        CypressApplication::status = Status::Waiting;
     }
 }
 

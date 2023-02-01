@@ -35,6 +35,8 @@ public:
     //
     bool isDefined(const QString&, const FileType& type = ECGApplication) const;
 
+    bool isAvailable() override;
+
 public slots:
 
     // what the manager does in response to the main application

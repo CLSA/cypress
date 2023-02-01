@@ -8,6 +8,8 @@ class CarotidIntimaManager : public ManagerBase
 public:
     explicit CarotidIntimaManager(QWidget *parent = nullptr);
 
+    bool isAvailable() override;
+
 public slots:
     virtual void start() override;
     virtual void measure() override;

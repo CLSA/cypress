@@ -28,6 +28,12 @@ AudiometerManager::AudiometerManager(QWidget *parent)
     m_test.setExpectedMeasurementCount(16);
 }
 
+bool AudiometerManager::isAvailable()
+{
+    bool found = scanDevices();
+    return found;
+}
+
 void AudiometerManager::clearData()
 {
     m_test.reset();
@@ -50,6 +56,8 @@ void AudiometerManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
     //m_deviceData.reset();
     //m_deviceList.clear();

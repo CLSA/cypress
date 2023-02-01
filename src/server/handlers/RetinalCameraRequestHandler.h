@@ -1,16 +1,17 @@
 #ifndef RETINALCAMERAREQUESTHANDLER_H
 #define RETINALCAMERAREQUESTHANDLER_H
 
-#include <Poco/Net/HTTPRequestHandler.h>
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
+#include "server/DefaultRequestHandler.h"
+
 using namespace Poco::Net;
 
-class RetinalCameraRequestHandler : public Poco::Net::HTTPRequestHandler
+class RetinalCameraRequestHandler : public DefaultRequestHandler
 {
 public:
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+    void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override;
 };
 
 #endif // RETINALCAMERAREQUESTHANDLER_H

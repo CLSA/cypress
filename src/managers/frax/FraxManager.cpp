@@ -17,6 +17,11 @@ FraxManager::FraxManager(QWidget* parent):
     m_test.setExpectedMeasurementCount(4);
 }
 
+bool FraxManager::isAvailable()
+{
+    return false;
+}
+
 void FraxManager::start()
 {
     // connect signals and slots to QProcess one time only
@@ -84,6 +89,8 @@ void FraxManager::selectRunnable(const QString &runnableName)
 
 void FraxManager::measure()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     clearData();
     // launch the process
     m_process.start();
@@ -137,5 +144,7 @@ void FraxManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }

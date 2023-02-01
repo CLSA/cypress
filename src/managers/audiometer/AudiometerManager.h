@@ -33,6 +33,8 @@ public:
     static QByteArray initEndCode();
     static QByteArray END_CODE;
 
+    bool isAvailable() override;
+
 public slots:
     // retrieve a measurement from the device
     //

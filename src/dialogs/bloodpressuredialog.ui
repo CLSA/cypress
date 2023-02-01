@@ -21,24 +21,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="idGroupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Barcode</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="BarcodeWidget" name="barcodeWidget" native="true"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="armBandGroupBox">
      <property name="title">
       <string>Cuff Information</string>
@@ -192,12 +174,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>BarcodeWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/BarcodeWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>MeasureWidget</class>
    <extends>QWidget</extends>

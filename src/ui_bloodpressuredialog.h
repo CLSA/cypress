@@ -29,9 +29,6 @@ class Ui_BloodPressureDialog
 {
 public:
     QVBoxLayout *verticalLayout_2;
-    QGroupBox *idGroupBox;
-    QHBoxLayout *horizontalLayout;
-    BarcodeWidget *barcodeWidget;
     QGroupBox *armBandGroupBox;
     QHBoxLayout *armBandHorizontalLayout;
     QLabel *armBandSizeLabel;
@@ -62,20 +59,6 @@ public:
         BloodPressureDialog->setSizePolicy(sizePolicy);
         verticalLayout_2 = new QVBoxLayout(BloodPressureDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        idGroupBox = new QGroupBox(BloodPressureDialog);
-        idGroupBox->setObjectName(QString::fromUtf8("idGroupBox"));
-        sizePolicy.setHeightForWidth(idGroupBox->sizePolicy().hasHeightForWidth());
-        idGroupBox->setSizePolicy(sizePolicy);
-        horizontalLayout = new QHBoxLayout(idGroupBox);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        barcodeWidget = new BarcodeWidget(idGroupBox);
-        barcodeWidget->setObjectName(QString::fromUtf8("barcodeWidget"));
-
-        horizontalLayout->addWidget(barcodeWidget);
-
-
-        verticalLayout_2->addWidget(idGroupBox);
-
         armBandGroupBox = new QGroupBox(BloodPressureDialog);
         armBandGroupBox->setObjectName(QString::fromUtf8("armBandGroupBox"));
         armBandHorizontalLayout = new QHBoxLayout(armBandGroupBox);
@@ -185,7 +168,6 @@ public:
     void retranslateUi(QDialog *BloodPressureDialog)
     {
         BloodPressureDialog->setWindowTitle(QCoreApplication::translate("BloodPressureDialog", "Blood Pressure", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "Barcode", nullptr));
         armBandGroupBox->setTitle(QCoreApplication::translate("BloodPressureDialog", "Cuff Information", nullptr));
         armBandSizeLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Cuff size:", nullptr));
         armLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Arm used:", nullptr));

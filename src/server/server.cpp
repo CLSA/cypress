@@ -11,8 +11,9 @@
 #include "server/InstrumentRequestHandlerFactory.h"
 #include "server/Server.h"
 
-using namespace Poco::Net;
+#include "CypressApplication.h"
 
+using namespace Poco::Net;
 
 
 Server::Server()
@@ -37,7 +38,6 @@ void Server::requestTestStart(Constants::MeasureType type)
 bool Server::sendResults(const QJsonObject &results)
 {
     QString jsonString = JsonSettings::serializeJson(results);
-    qDebug() << "RESULTS: " << jsonString;
     return true;
 }
 
@@ -53,6 +53,7 @@ void Server::start()
 {
     serverThread.start();
     server->start();
+    CypressApplication::status = Status::Waiting;
 }
 
 void Server::stop()

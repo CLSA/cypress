@@ -1,10 +1,9 @@
-#include "FileUtils.h"
 #include <stdexcept>
 
-FileUtils::FileUtils()
-{
+#include <QFileInfo>
+#include <QCryptographicHash>
 
-}
+#include "FileUtils.h"
 
 QJsonObject FileUtils::readJsonFile(const QString &filePath)
 {
@@ -27,4 +26,102 @@ QJsonObject FileUtils::readJsonFile(const QString &filePath)
     QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonData));
 
     return jsonDoc.object();
+}
+
+bool FileUtils::doesExeExist(const QString &absolutePath)
+{
+    if (absolutePath.isEmpty()) return false;
+    if (absolutePath.isNull())  return false;
+
+    QFileInfo info(absolutePath);
+    if (!info.isAbsolute())   return false;
+    if (!info.exists()) 	  return false;
+    if (!info.isExecutable()) return false;
+
+    return true;
+}
+
+bool FileUtils::doesFileExist(const QString &absolutePath, const bool checkWritable)
+{
+    if (absolutePath.isEmpty()) return false;
+    if (absolutePath.isNull())  return false;
+
+    QFileInfo info(absolutePath);
+    if (!info.isAbsolute()) return false;
+    if (!info.isFile()) 	return false;
+    if (!info.isReadable()) return false;
+
+    if (checkWritable && !info.isWritable()) return false;
+
+    return true;
+}
+
+bool FileUtils::doesDirExist(const QString &absolutePath, const bool checkWritable)
+{
+    if (absolutePath.isEmpty()) return false;
+    if (absolutePath.isNull())  return false;
+
+    QFileInfo info(absolutePath);
+    if (!info.isAbsolute()) 	return false;
+    if (!info.isDir()) 			return false;
+    if (!info.isWritable())		return false;
+
+    return true;
+}
+
+bool FileUtils::backupFile(const QString& fromPath, const QString& toPath)
+{
+    bool fromExists = doesFileExist(fromPath, false);
+    bool toExists = doesDirExist(toPath, true);
+
+    if (!fromExists)
+    {
+
+    }
+
+    if (!toExists)
+    {
+
+    }
+
+    return false;
+}
+
+bool FileUtils::restoreBackup(const QString& fromPath, const QString& toPath)
+{
+    bool fromExists = doesFileExist(fromPath, false);
+    bool toExists = doesDirExist(toPath, true);
+
+    if (!fromExists)
+    {
+
+    }
+
+    if (!toExists)
+    {
+
+    }
+
+    return false;
+}
+
+
+QByteArray FileUtils::readFileAsBase64(QFile& file)
+{
+    bool opened = file.open(QIODevice::ReadOnly);
+    if (!opened)
+    {
+        throw std::exception();
+    }
+
+    QByteArray bytes = file.readAll().toBase64();
+
+    return bytes;
+}
+
+
+QString FileUtils::generateHash(const QByteArray& bytes)
+{
+    QByteArray hash = QCryptographicHash::hash(bytes, QCryptographicHash::Sha256);
+    return hash;
 }

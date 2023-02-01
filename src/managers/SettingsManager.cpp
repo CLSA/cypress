@@ -20,6 +20,8 @@ QMap<QString, QVariant> SettingsManager::defaultSettings = {{
     {"dicom/working_dir", "C:/ProgramData/chocolatey/bin"},
     {"dicom/program", 	  "C:/ProgramData/chocolatey/bin/dcmrecv.exe"},
 
+
+
     {"grip_strength/workingDir", 	"C:/Program Files (x86)/Tracker 5"},
     {"grip_strength/runnableName", 	"C:/Program Files (x86)/Tracker 5/WTS.exe"},
     {"grip_strength/databaseDir", 	"C:/Program Files (x86)/Tracker 5/Data/Tracker 5 Data"},
@@ -62,7 +64,8 @@ SettingsManager::SettingsManager(QObject *parent,
                                  QString appName): QObject{parent},
       m_format(format),
       m_scope(scope),
-      m_orgName(orgName), m_appName(appName)
+      m_orgName(orgName),
+      m_appName(appName)
 {
     m_settings.reset(new QSettings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress"));
     setDefaultSettings();

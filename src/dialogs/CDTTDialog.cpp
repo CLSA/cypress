@@ -79,36 +79,36 @@ void CDTTDialog::initializeConnections()
       }
   });
 
-  connect(derived.get(),&CDTTManager::canSelectRunnable,
-            this,[this](){
-        foreach(auto button, this->findChildren<QPushButton *>())
-        {
-          if("Close" != button->text())
-            button->setEnabled(false);
-        }
-        ui->openButton->setEnabled(true);
-        static bool warn = true;
-        if(warn)
-        {
-            QMessageBox::warning(
-            this, QApplication::applicationName(),
-            tr("Select the exe by clicking Open and browsing to the "
-            "required executable (CDTTStereo.jar) and selecting the file.  If the executable "
-            "is valid click the Run button to start the test otherwise check the installation."));
-            warn = false;
-        }
-    });
+  //connect(derived.get(),&CDTTManager::canSelectRunnable,
+  //          this,[this](){
+  //      foreach(auto button, this->findChildren<QPushButton *>())
+  //      {
+  //        if("Close" != button->text())
+  //          button->setEnabled(false);
+  //      }
+  //      ui->openButton->setEnabled(true);
+  //      static bool warn = true;
+  //      if(warn)
+  //      {
+  //          QMessageBox::warning(
+  //          this, QApplication::applicationName(),
+  //          tr("Select the exe by clicking Open and browsing to the "
+  //          "required executable (CDTTStereo.jar) and selecting the file.  If the executable "
+  //          "is valid click the Run button to start the test otherwise check the installation."));
+  //          warn = false;
+  //      }
+  //  });
 
-  connect(ui->openButton, &QPushButton::clicked,
-        this, [this, derived]() {
-            QString fileName =
-                QFileDialog::getOpenFileName(
-                    this, tr("Open File"),
-                    QCoreApplication::applicationDirPath(),
-                    tr("Applications (*.jar, *)"));
+  //connect(ui->openButton, &QPushButton::clicked,
+  //      this, [this, derived]() {
+  //          QString fileName =
+  //              QFileDialog::getOpenFileName(
+  //                  this, tr("Open File"),
+  //                  QCoreApplication::applicationDirPath(),
+  //                  tr("Applications (*.jar, *)"));
 
-            derived->selectRunnable(fileName);
-        });
+  //          derived->selectRunnable(fileName);
+  //      });
 
   // Available to start measuring
   //

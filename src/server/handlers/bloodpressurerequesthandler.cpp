@@ -1,10 +1,12 @@
 #include "bloodpressurerequesthandler.h"
 #include "CypressApplication.h"
 
+#include "auxiliary/JsonSettings.h"
+
 void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
-        QJsonObject responseData;
+        QString responseData = JsonSettings::serializeJson(getResponseData());
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
@@ -14,6 +16,8 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
         CypressApplication::restApiServer -> requestTestStart(
             Constants::MeasureType::typeBlood_Pressure
         );
+
+        out << responseData.toStdString();
 
         out.flush();
     }

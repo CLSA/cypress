@@ -72,6 +72,12 @@ DXAManager::~DXAManager()
 }
 
 
+bool DXAManager::isAvailable()
+{
+    return false;
+}
+
+
 // what the manager does in response to the main application
 // window invoking its run method
 //
@@ -84,20 +90,13 @@ void DXAManager::start()
 //
 void DXAManager::measure()
 {
-    QVariantMap participantData;
-    QVariantMap scores;
-    QVariantMap scanAnalysisData;
-    //Side side;
-
-    participantData = getParticipantData();
-    //side = getSide();
-
+    QVariantMap participantData = getParticipantData();
     if (validatedDicomFiles.empty()) return;
-    scanAnalysisData = extractScanAnalysisData();
 
+    QVariantMap scanAnalysisData = extractScanAnalysisData();
     if (scanAnalysisData.isEmpty()) return;
-    scores = computeTandZScores();
 
+    QVariantMap scores = computeTandZScores();
     if (scores.isEmpty()) return;
 
     scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);

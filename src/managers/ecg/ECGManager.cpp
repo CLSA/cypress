@@ -18,6 +18,12 @@ ECGManager::ECGManager(QWidget* parent):
     m_test.setExpectedMeasurementCount(1);
 }
 
+bool ECGManager::isAvailable()
+{
+    return false;
+}
+
+
 void ECGManager::start()
 {
     // connect signals and slots to QProcess one time only
@@ -71,6 +77,8 @@ void ECGManager::select()
 
 void ECGManager::measure()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     clearData();
     // launch the process
     qDebug() << "starting process from measure";
@@ -106,6 +114,8 @@ void ECGManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }
 

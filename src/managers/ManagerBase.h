@@ -31,6 +31,8 @@ public:
     explicit ManagerBase(QWidget *parent = Q_NULLPTR);
     ~ManagerBase();
 
+    virtual bool isAvailable();
+
 public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)

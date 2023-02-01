@@ -65,6 +65,8 @@ void ForearmScanManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }
 

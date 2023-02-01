@@ -10,14 +10,19 @@ CarotidIntimaManager::CarotidIntimaManager(QWidget *parent)
 
 }
 
+bool CarotidIntimaManager::isAvailable()
+{
+    return false;
+}
+
 void CarotidIntimaManager::start()
 {
-
+    if (CypressApplication::mode == Mode::Sim) return;
 }
 
 void CarotidIntimaManager::measure()
 {
-
+    if (CypressApplication::mode == Mode::Sim) return;
 }
 
 void CarotidIntimaManager::finish()
@@ -34,6 +39,8 @@ void CarotidIntimaManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }
 

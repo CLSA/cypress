@@ -51,7 +51,7 @@ bool SerialPortManager::isDefined(const QString &label) const
     return defined;
 }
 
-void SerialPortManager::scanDevices()
+bool SerialPortManager::scanDevices()
 {
     m_deviceList.clear();
     qDebug() << "signal scanningDevices";
@@ -115,6 +115,8 @@ void SerialPortManager::scanDevices()
       qDebug() << "signal canSelectDevice";
       emit canSelectDevice();
     }
+
+    return found;
 }
 
 void SerialPortManager::selectDevice(const QString &label)

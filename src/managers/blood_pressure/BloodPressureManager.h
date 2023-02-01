@@ -43,6 +43,8 @@ public:
 
     const quint16 BPTRU_VENDOR_ID { 4279 };
 
+    bool isAvailable() override;
+
     bool isDefined(const QString&) const;
 
     //TODO: use cypress constant for all use of size and side
@@ -77,7 +79,7 @@ public slots:
     //
     void selectDevice(const QString&);
 
-    void scanDevices();
+    bool scanDevices();
 
 private slots:
 

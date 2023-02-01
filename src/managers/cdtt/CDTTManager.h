@@ -29,10 +29,7 @@ public:
     explicit CDTTManager(QWidget* parent = Q_NULLPTR);
     ~CDTTManager();
 
-    // is the passed string a jar file
-    // with the correct path elements ?
-    //
-    bool isDefined(const QString&) const;
+    bool isAvailable() override;
 
 public slots:
 
@@ -50,31 +47,8 @@ public slots:
     //
     void finish() override;
 
-    // set the executable full path and name
-    // calls isDefined to validate the passed arg
-    //
-    void selectRunnable(const QString&);
-
-signals:
-
-    // a valid runnable was selected
-    // manager attempts to configure the process and may emit canMeasure on success
-    //
-    void runnableSelected();
-
-    // no runnable available or the selected runnable is invalid
-    // signal can be connected to a ui slot to launch a File select dialog
-    //
-    void canSelectRunnable();
-
 private:
-    QString m_runnableName;// full pathspec to CDTTstereo.jar
-    QString m_runnablePath;// path to CDTTstereo.jar
-
-    QString m_outputPath;     // path to output .csv files
-    QString m_outputFile;     // full pathspec to working output .csv file
     QProcess m_process;
-
     CDTTTest m_test;
 
     void clearData() override;

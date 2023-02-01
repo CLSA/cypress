@@ -27,6 +27,11 @@ void BluetoothLEManager::start()
     emit dataChanged();
 }
 
+bool BluetoothLEManager::isAvailable()
+{
+    return false;
+}
+
 void BluetoothLEManager::setLocalDevice(const QString &address)
 {
 #ifdef Q_OS_LINUX

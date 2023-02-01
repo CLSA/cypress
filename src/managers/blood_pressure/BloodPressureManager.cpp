@@ -24,30 +24,36 @@ BloodPressureManager::~BloodPressureManager()
   delete m_comm;
 }
 
+bool BloodPressureManager::isAvailable()
+{
+    bool found = scanDevices();
+    return found;
+}
+
 void BloodPressureManager::start()
 {
     // connect manager to communication
-    connect(this, &BloodPressureManager::attemptConnection, m_comm, &BPMCommunication::connect);
-    connect(this, &BloodPressureManager::startMeasurement, m_comm, &BPMCommunication::measure);
-    connect(this, &BloodPressureManager::abortMeasurement, m_comm, &BPMCommunication::abort);
+    //connect(this, &BloodPressureManager::attemptConnection, m_comm, &BPMCommunication::connect);
+    //connect(this, &BloodPressureManager::startMeasurement, m_comm, &BPMCommunication::measure);
+    //connect(this, &BloodPressureManager::abortMeasurement, m_comm, &BPMCommunication::abort);
 
-    // connect communication to manager
-    connect(m_comm, &BPMCommunication::abortFinished, this, &BloodPressureManager::abortComplete);
-    connect(m_comm, &BPMCommunication::connectionStatus, this, &BloodPressureManager::connectionStatusChanged);
-    connect(m_comm, &BPMCommunication::measurementReady, this, &BloodPressureManager::measurementAvailable);
-    connect(m_comm, &BPMCommunication::averageReady, this, &BloodPressureManager::averageAvailable);
-    connect(m_comm, &BPMCommunication::finalReviewReady, this, &BloodPressureManager::finalReviewAvailable);
-    //connect(m_comm, &BPMCommunication::measurementError, this, &BloodPressureManager::message);
+    //// connect communication to manager
+    //connect(m_comm, &BPMCommunication::abortFinished, this, &BloodPressureManager::abortComplete);
+    //connect(m_comm, &BPMCommunication::connectionStatus, this, &BloodPressureManager::connectionStatusChanged);
+    //connect(m_comm, &BPMCommunication::measurementReady, this, &BloodPressureManager::measurementAvailable);
+    //connect(m_comm, &BPMCommunication::averageReady, this, &BloodPressureManager::averageAvailable);
+    //connect(m_comm, &BPMCommunication::finalReviewReady, this, &BloodPressureManager::finalReviewAvailable);
+    ////connect(m_comm, &BPMCommunication::measurementError, this, &BloodPressureManager::message);
 
-    // move communication to thread and start
-    if(m_comm->thread() != &m_thread)
-    {
-      m_comm->moveToThread(&m_thread);
-      m_thread.start();
-    }
+    //// move communication to thread and start
+    //if(m_comm->thread() != &m_thread)
+    //{
+    //  m_comm->moveToThread(&m_thread);
+    //  m_thread.start();
+    //}
 
-    scanDevices();
-    emit dataChanged();
+    //scanDevices();
+    //emit dataChanged();
 }
 
 bool BloodPressureManager::isDefined(const QString &label) const
@@ -65,9 +71,10 @@ void BloodPressureManager::selectDevice(const QString &label)
 
 }
 
-void BloodPressureManager::scanDevices()
+bool BloodPressureManager::scanDevices()
 {
-
+    bool found = false;
+    return found;
 }
 
 void BloodPressureManager::setDevice(const QUsb::Id &info)
@@ -101,7 +108,7 @@ void BloodPressureManager::setSide(const QString &side)
 //
 void BloodPressureManager::measure()
 {
-
+    if (CypressApplication::mode == Mode::Sim) return;
 }
 
 
@@ -132,6 +139,8 @@ void BloodPressureManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }
 

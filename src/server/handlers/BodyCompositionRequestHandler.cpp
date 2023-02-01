@@ -3,10 +3,12 @@
 #include "BodyCompositionRequestHandler.h"
 #include "CypressApplication.h"
 
+#include "auxiliary/JsonSettings.h"
+
 void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
-        QJsonObject responseData;
+        QString responseData = JsonSettings::serializeJson(getResponseData());
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
@@ -16,6 +18,8 @@ void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
         CypressApplication::restApiServer -> requestTestStart(
             Constants::MeasureType::typeBody_Composition
         );
+
+        out << responseData.toStdString();
 
         out.flush();
     }

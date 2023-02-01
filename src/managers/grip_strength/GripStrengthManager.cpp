@@ -29,8 +29,16 @@ GripStrengthManager::GripStrengthManager(QWidget* parent) : ManagerBase(parent)
 }
 
 
+bool GripStrengthManager::isAvailable()
+{
+    return false;
+}
+
+
 void GripStrengthManager::start()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     initializeConnections();
     //initializeModel();
     //configureProcess();
@@ -42,7 +50,10 @@ void GripStrengthManager::start()
     }
 }
 
-void GripStrengthManager::measure() {
+void GripStrengthManager::measure()
+{
+    if (CypressApplication::mode == Mode::Sim) return;
+
     try {
         readOutput();
         qDebug() << m_test.toJsonObject();
@@ -67,6 +78,8 @@ void GripStrengthManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
 }
 

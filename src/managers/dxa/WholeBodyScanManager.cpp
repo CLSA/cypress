@@ -1,14 +1,15 @@
-#include "WholeBodyScanManager.h"
 #include <QVariant>
 #include <QString>
 #include <QJsonObject>
-
-#include "auxiliary/JsonSettings.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+#include "WholeBodyScanManager.h"
 
 WholeBodyScanManager::WholeBodyScanManager(QWidget *parent)
     : DXAManager{parent}
@@ -33,6 +34,8 @@ void WholeBodyScanManager::finish()
     {
         qDebug() << "Could not send results to Pine";
     }
+
+    CypressApplication::status = Status::Waiting;
 }
 
 QString WholeBodyScanManager::getName()

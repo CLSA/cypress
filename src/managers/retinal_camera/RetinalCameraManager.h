@@ -14,6 +14,7 @@ class RetinalCameraManager : public ManagerBase
 public:
     explicit RetinalCameraManager(QWidget *parent = nullptr);
 
+    bool isAvailable() override;
 public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)

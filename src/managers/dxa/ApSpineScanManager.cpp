@@ -1,14 +1,15 @@
-#include "ApSpineScanManager.h"
 #include <QMap>
 #include <QVariant>
 #include <QString>
-
-#include "auxiliary/JsonSettings.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
+
+#include "CypressApplication.h"
+#include "auxiliary/JsonSettings.h"
+#include "ApSpineScanManager.h"
 
 APSpineScanManager::APSpineScanManager(QWidget *parent)
     : DXAManager{parent}
@@ -30,6 +31,8 @@ void APSpineScanManager::finish()
     {
 
     }
+
+    CypressApplication::status = Status::Waiting;
 }
 
 QVariantMap APSpineScanManager::retrieveDeviceData()

@@ -19,6 +19,12 @@ RetinalCameraManager::RetinalCameraManager(QWidget *parent)
     QSettings qSettings;
 }
 
+
+bool RetinalCameraManager::isAvailable()
+{
+    return false;
+}
+
 // collate test results and device and other meta data
 // for the main application to write to .json
 //
@@ -168,13 +174,10 @@ bool RetinalCameraManager::startRetinalCamera()
     return true;
 }
 
-void getStoragePathQueryString()
-{
-
-}
-
 void RetinalCameraManager::start()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
+
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     //QFileInfo info(m_runnableName);
     QStringList arguments;
@@ -200,17 +203,11 @@ void RetinalCameraManager::start()
     }
 }
 
-// SLOT
-// actual measure will only execute if the barcode has been
-// verified.  Subclasses must reimplement accordingly.
-//
 void RetinalCameraManager::measure()
 {
+    if (CypressApplication::mode == Mode::Sim) return;
 }
 
-// SLOT
-// subclasses call methods just prior to main close event
-//
 void RetinalCameraManager::finish()
 {
     if (CypressApplication::mode == Mode::Sim)
@@ -225,6 +222,8 @@ void RetinalCameraManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
+
+        CypressApplication::status = Status::Waiting;
     }
     // process data for left and right eye
     //

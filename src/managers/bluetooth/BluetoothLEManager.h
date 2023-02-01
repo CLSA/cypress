@@ -33,6 +33,9 @@ public:
     bool isPairedTo(const QString&) const;
 
 
+    bool isAvailable() override;
+
+
 signals:
 
     // Scanning started
