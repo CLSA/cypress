@@ -42,15 +42,12 @@ public:
     static QDateTime startTime;
 
 public slots:
-    bool startTest(Constants::MeasureType type);
+    bool startTest(Constants::MeasureType type, QString uuid);
 
 signals:
     bool endTest(QJsonObject results);
 
 private:
-    QString m_inputFileName; // TODO this data should be from POST request in production
-    QString m_outputFileName; // TODO ""
-
     Constants::RunMode m_mode { Constants::RunMode::modeUnknown };
     Constants::MeasureType m_type { Constants::MeasureType::typeUnknown };
     QScopedPointer<DialogBase> m_dialog;

@@ -22,16 +22,16 @@ Server::Server()
 
     HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
     HTTPServerParams::Ptr pParams = new HTTPServerParams;
-    Poco::UInt16 portNumber = settings.value("server/port", 8000).toInt();
+    Poco::UInt16 portNumber = settings.value("server/port", 9000).toInt();
 
 
     server = new HTTPServer(pFactory, portNumber, pParams);
     moveToThread(&serverThread);
 }
 
-void Server::requestTestStart(Constants::MeasureType type)
+void Server::requestTestStart(Constants::MeasureType type, QString uuid)
 {
-    emit startTest(type);
+    emit startTest(type, uuid);
 }
 
 

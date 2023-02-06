@@ -1,17 +1,24 @@
 #include <QMessageBox>
 
+#include "CypressApplication.h"
 #include "RetinalCameraDialog.h"
 #include "managers/retinal_camera/RetinalCameraManager.h"
 #include "ui_RetinalCameraDialog.h"
 
-RetinalCameraDialog::RetinalCameraDialog(QWidget *parent) :
-    DialogBase(parent),
-    ui(new Ui::RetinalCameraDialog)
+RetinalCameraDialog::RetinalCameraDialog(QString uuid) : ui(new Ui::RetinalCameraDialog)
 {
+    m_uuid = uuid;
+
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new RetinalCameraManager(this));
+    if (CypressApplication::mode == Mode::Sim)
+    {
+        setWindowTitle("Retinal Camera (SIM)");
+        ui->measureWidget->enableMeasure();
+    }
+
+    m_manager.reset(new RetinalCameraManager(m_uuid));
 }
 
 RetinalCameraDialog::~RetinalCameraDialog()
@@ -25,12 +32,10 @@ void RetinalCameraDialog::initializeModel()
 
 void RetinalCameraDialog::initializeConnections()
 {
-    if (m_verbose)
-        qDebug() << "initializeConnections";
+    QSharedPointer<RetinalCameraManager> derived = m_manager.staticCast<RetinalCameraManager>();
+    connect(ui->measureWidget, &MeasureWidget::measure, derived.get(), &RetinalCameraManager::measure);
 
-    connect(ui->measureWidget, &MeasureWidget::closeApplication, this, &RetinalCameraDialog::handleClose);
-
-    this->run();
+    //this->run();
    // connect(ui->barcodeWidget, &BarcodeWidget::validated,
    //       this,[this](const bool& valid)
    // {

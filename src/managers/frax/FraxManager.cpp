@@ -6,13 +6,11 @@
 #include <QStandardItemModel>
 
 #include "CypressApplication.h"
-#include "auxiliary/Utilities.h"
 #include "auxiliary/JsonSettings.h"
 
 #include "FraxManager.h"
 
-FraxManager::FraxManager(QWidget* parent):
-    ManagerBase(parent)
+FraxManager::FraxManager()
 {
     m_test.setExpectedMeasurementCount(4);
 }

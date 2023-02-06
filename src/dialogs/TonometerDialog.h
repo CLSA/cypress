@@ -9,7 +9,7 @@ class TonometerDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    TonometerDialog(QWidget *parent = Q_NULLPTR);
+    TonometerDialog();
     ~TonometerDialog();
 
 private:

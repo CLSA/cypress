@@ -9,7 +9,7 @@ class SpirometerDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    SpirometerDialog(QWidget *parent = Q_NULLPTR);
+    explicit SpirometerDialog();
     ~SpirometerDialog();
 
 private:

@@ -5,15 +5,14 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-CDTTDialog::CDTTDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::RunnableDialog)
+CDTTDialog::CDTTDialog(): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new CDTTManager(this));
     this->setWindowTitle("Canadian Digit Triplet Test");
+
+    m_manager.reset(new CDTTManager());
 }
 
 CDTTDialog::~CDTTDialog()

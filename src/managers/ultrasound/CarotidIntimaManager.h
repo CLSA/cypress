@@ -6,7 +6,7 @@
 class CarotidIntimaManager : public ManagerBase
 {
 public:
-    explicit CarotidIntimaManager(QWidget *parent = nullptr);
+    explicit CarotidIntimaManager();
 
     bool isAvailable() override;
 

@@ -29,7 +29,7 @@ QJsonObject Utils::httpPost(const QJsonObject& data)
         std::string path(uri.getPathAndQuery());
         if (path.empty()) path = "/";
 
-        HTTPRequest req(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
+        HTTPRequest req(HTTPRequest::HTTP_PATCH, path, HTTPMessage::HTTP_1_1);
         req.setContentType("application/json");
 
         req.setContentLength(dataString.length());
@@ -37,9 +37,9 @@ QJsonObject Utils::httpPost(const QJsonObject& data)
         std::ostream &os = session.sendRequest(req);
         os << dataString.toStdString();
 
-        qDebug() << "sent";
+        qDebug() << "REQUEST: " << dataString;
         HTTPResponse res;
-        qDebug() << res.getStatus() << " " << QString::fromStdString(res.getReason());
+        qDebug() << "RESPONSE: " << res.getStatus();
 
         std::istream &is = session.receiveResponse(res);
         std::stringstream ss;

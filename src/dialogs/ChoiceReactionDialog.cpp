@@ -5,14 +5,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::RunnableDialog)
+ChoiceReactionDialog::ChoiceReactionDialog(): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new ChoiceReactionManager(this));
+    m_manager.reset(new ChoiceReactionManager());
     this->setWindowTitle("Choice Reaction Test");
 }
 

@@ -3,8 +3,7 @@
 #include "CypressApplication.h"
 #include "auxiliary/JsonSettings.h"
 
-CarotidIntimaManager::CarotidIntimaManager(QWidget *parent)
-    : ManagerBase{parent}
+CarotidIntimaManager::CarotidIntimaManager()
 {
 
 

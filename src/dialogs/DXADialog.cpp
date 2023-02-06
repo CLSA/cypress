@@ -4,12 +4,13 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-DXADialog::DXADialog(DXAManager* manager, QWidget *parent) :
+DXADialog::DXADialog(DXAManager* manager, QWidget *parent, QString uuid) :
     DialogBase(parent), ui(new Ui::DXADialog), m_manager(manager)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
+    m_uuid = uuid;
     m_manager -> start();
 
     connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);

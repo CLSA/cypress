@@ -13,7 +13,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QVBoxLayout>
-#include "widgets/BarcodeWidget.h"
 #include "widgets/MeasureWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,7 +21,6 @@ class Ui_RetinalCameraDialog
 {
 public:
     QVBoxLayout *verticalLayout;
-    BarcodeWidget *barcodeWidget;
     MeasureWidget *measureWidget;
 
     void setupUi(QDialog *RetinalCameraDialog)
@@ -32,11 +30,6 @@ public:
         RetinalCameraDialog->resize(400, 300);
         verticalLayout = new QVBoxLayout(RetinalCameraDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        barcodeWidget = new BarcodeWidget(RetinalCameraDialog);
-        barcodeWidget->setObjectName(QString::fromUtf8("barcodeWidget"));
-
-        verticalLayout->addWidget(barcodeWidget);
-
         measureWidget = new MeasureWidget(RetinalCameraDialog);
         measureWidget->setObjectName(QString::fromUtf8("measureWidget"));
 

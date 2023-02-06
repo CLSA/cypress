@@ -14,8 +14,7 @@
 
 #include "TonometerManager.h"
 
-TonometerManager::TonometerManager(QWidget* parent):
-    ManagerBase(parent)
+TonometerManager::TonometerManager()
 {
     m_test.setExpectedMeasurementCount(2);
 }

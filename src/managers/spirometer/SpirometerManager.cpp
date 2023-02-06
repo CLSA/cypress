@@ -9,7 +9,7 @@
 
 #include "managers/emr/EMRPluginWriter.h"
 
-SpirometerManager::SpirometerManager(QWidget* parent) : ManagerBase(parent)
+SpirometerManager::SpirometerManager()
 {
     //TODO: check if these upstream inputs are optional or required
     //

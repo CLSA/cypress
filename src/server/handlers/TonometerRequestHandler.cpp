@@ -11,7 +11,7 @@ void TonometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reques
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeTonometer);
+        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeTonometer, "");
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

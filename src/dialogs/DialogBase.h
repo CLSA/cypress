@@ -12,7 +12,7 @@ class DialogBase : public QDialog
     Q_OBJECT
 
 public:
-    DialogBase(QWidget *parent = Q_NULLPTR);
+    DialogBase(QWidget *parent = Q_NULLPTR, QString uuid = "");
     ~DialogBase() = default;
 
     void initialize();
@@ -32,6 +32,7 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+    QString m_uuid;
     QStandardItemModel m_model;
     QString m_inputFileName;
     QString m_outputFileName;

@@ -24,7 +24,7 @@ class ChoiceReactionManager: public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ChoiceReactionManager(QWidget* parent = Q_NULLPTR);
+    explicit ChoiceReactionManager();
 
     static QString CCB_PREFIX;
     static QString CCB_CLINIC;

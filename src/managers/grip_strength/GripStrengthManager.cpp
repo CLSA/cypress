@@ -12,7 +12,7 @@
 
 #include "GripStrengthManager.h"
 
-GripStrengthManager::GripStrengthManager(QWidget* parent) : ManagerBase(parent)
+GripStrengthManager::GripStrengthManager()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 

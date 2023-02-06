@@ -5,14 +5,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-SpirometerDialog::SpirometerDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::RunnableDialog)
+SpirometerDialog::SpirometerDialog(): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new SpirometerManager(this));
+    m_manager.reset(new SpirometerManager());
     this->setWindowTitle("Spirometer");
 }
 
@@ -20,7 +18,6 @@ SpirometerDialog::~SpirometerDialog()
 {
     delete ui;
 }
-
 
 // set up signal slot connections between GUI front end
 // and device management back end

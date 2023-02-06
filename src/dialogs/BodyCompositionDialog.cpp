@@ -4,14 +4,12 @@
 #include <QDebug>
 #include <QMessageBox>
 
-BodyCompositionDialog::BodyCompositionDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::BodyCompositionDialog)
+BodyCompositionDialog::BodyCompositionDialog(): ui(new Ui::BodyCompositionDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new BodyCompositionManager(this));
+    m_manager.reset(new BodyCompositionManager());
 }
 
 BodyCompositionDialog::~BodyCompositionDialog()

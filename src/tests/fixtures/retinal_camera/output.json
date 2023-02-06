@@ -1,6 +1,6 @@
 {
-    "input": {
-        "barcode": "12345"
+    "request": {
+        "participantID": ""
     },
     "metadata": {
         "user": "",
@@ -13,6 +13,10 @@
     "results": [
         {
             "SIDE": "LEFT",
+            "EYE": ""
+        },
+        {
+            "SIDE": "RIGHT",
             "EYE": ""
         }
     ]

@@ -8,8 +8,7 @@
 #include "DicomSCP.h"
 #include <QSettings>
 
-DicomSCP::DicomSCP(QObject *parent)
-    : QObject{parent}
+DicomSCP::DicomSCP()
 {
     initConnections();
 }

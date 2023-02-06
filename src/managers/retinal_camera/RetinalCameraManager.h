@@ -12,7 +12,7 @@ class RetinalCameraManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit RetinalCameraManager(QWidget *parent = nullptr);
+    explicit RetinalCameraManager(QString uuid = "");
 
     bool isAvailable() override;
 public slots:
@@ -36,6 +36,7 @@ protected:
 
 private:
     QProcess m_process;
+    QString m_uuid;
 
     bool startRetinalCamera();
     bool cleanupDatabase();

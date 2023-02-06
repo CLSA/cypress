@@ -14,7 +14,7 @@ class DXADialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit DXADialog(DXAManager* manager, QWidget *parent = nullptr);
+    explicit DXADialog(DXAManager* manager, QWidget *parent = nullptr, QString uuid = "");
     ~DXADialog();
 
 protected:

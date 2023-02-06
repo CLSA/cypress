@@ -24,7 +24,7 @@ class BodyCompositionManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit BodyCompositionManager(QWidget* parent = Q_NULLPTR);
+    explicit BodyCompositionManager();
 
     bool isAvailable() override;
 

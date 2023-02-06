@@ -5,14 +5,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-FraxDialog::FraxDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::RunnableDialog)
+FraxDialog::FraxDialog(): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new FraxManager(this));
+    m_manager.reset(new FraxManager());
+
     this->setWindowTitle("Frax Test");
 }
 

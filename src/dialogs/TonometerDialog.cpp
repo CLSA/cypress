@@ -5,14 +5,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-TonometerDialog::TonometerDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::RunnableDialog)
+TonometerDialog::TonometerDialog(): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new TonometerManager(this));
+    m_manager.reset(new TonometerManager());
 
     this->setWindowTitle("Tonometer");
 }

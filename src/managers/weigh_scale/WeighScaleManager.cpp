@@ -15,7 +15,7 @@
 #include "WeighScaleManager.h"
 #include "CypressApplication.h"
 
-WeighScaleManager::WeighScaleManager(QWidget* parent) : SerialPortManager(parent)
+WeighScaleManager::WeighScaleManager()
 {
   m_test.setExpectedMeasurementCount(2);
 }

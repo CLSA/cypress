@@ -13,10 +13,10 @@
 #include "qsqlerror.h"
 
 
-RetinalCameraManager::RetinalCameraManager(QWidget *parent)
-    : ManagerBase{parent}
+RetinalCameraManager::RetinalCameraManager(QString uuid)
+    : ManagerBase {}, m_uuid { uuid }
 {
-    QSettings qSettings;
+    //QSettings qSettings;
 }
 
 
@@ -178,50 +178,54 @@ void RetinalCameraManager::start()
 {
     if (CypressApplication::mode == Mode::Sim) return;
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    //QFileInfo info(m_runnableName);
-    QStringList arguments;
+    //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    ////QFileInfo info(m_runnableName);
+    //QStringList arguments;
 
-    bool ok = false;
+    //bool ok = false;
 
-    ok = openDatabase();
-    if (!ok)
-    {
-        return;
-    }
+    //ok = openDatabase();
+    //if (!ok)
+    //{
+    //    return;
+    //}
 
-    ok = cleanupDatabase();
-    if (!ok)
-    {
-        return;
-    }
+    //ok = cleanupDatabase();
+    //if (!ok)
+    //{
+    //    return;
+    //}
 
-    ok = initializeDatabase();
-    if (!ok)
-    {
-        return;
-    }
+    //ok = initializeDatabase();
+    //if (!ok)
+    //{
+    //    return;
+    //}
 }
 
 void RetinalCameraManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
-}
-
-void RetinalCameraManager::finish()
-{
-    if (CypressApplication::mode == Mode::Sim)
-    {
+    if (CypressApplication::mode == Mode::Sim) {
         QJsonObject results = JsonSettings::readJsonFromFile(
-            "C:/work/clsa/cypress/src/tests/fixtures/retinal_camera/output.json"
+        "C:/work/clsa/cypress/src/tests/fixtures/retinal_camera/output.json"
         );
         if (results.empty()) return;
+
+        results["id"] = m_uuid;
 
         bool ok = sendResultsToPine(results);
         if (!ok)
         {
             qDebug() << "Could not send results to Pine";
         }
+    }
+}
+
+void RetinalCameraManager::finish()
+{
+    if (CypressApplication::mode == Mode::Sim)
+    {
+
 
         CypressApplication::status = Status::Waiting;
     }

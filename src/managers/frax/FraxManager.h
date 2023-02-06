@@ -23,7 +23,7 @@ class FraxManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit FraxManager(QWidget* parent = Q_NULLPTR);
+    explicit FraxManager();
 
     // is the passed string an executable file
     // with the correct path elements ?

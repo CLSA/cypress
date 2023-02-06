@@ -9,7 +9,7 @@ class WeighScaleDialog : public DialogBase, public Ui::WeighScaleDialog
     Q_OBJECT
 
 public:
-    WeighScaleDialog(QWidget *parent = Q_NULLPTR);
+    explicit WeighScaleDialog();
     ~WeighScaleDialog();
 
 private:

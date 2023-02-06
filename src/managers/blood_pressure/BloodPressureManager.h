@@ -38,7 +38,7 @@ class BloodPressureManager : public ManagerBase
     Q_PROPERTY(QString side MEMBER m_side NOTIFY sideChanged)
 
 public:
-    explicit BloodPressureManager(QWidget*parent = Q_NULLPTR);
+    explicit BloodPressureManager();
     ~BloodPressureManager();
 
     const quint16 BPTRU_VENDOR_ID { 4279 };

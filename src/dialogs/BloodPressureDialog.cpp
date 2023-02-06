@@ -4,14 +4,12 @@
 #include <QDebug>
 #include <QMessageBox>
 
-BloodPressureDialog::BloodPressureDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::BloodPressureDialog)
+BloodPressureDialog::BloodPressureDialog(): ui(new Ui::BloodPressureDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new BloodPressureManager(this));
+    m_manager.reset(new BloodPressureManager());
 }
 
 BloodPressureDialog::~BloodPressureDialog()

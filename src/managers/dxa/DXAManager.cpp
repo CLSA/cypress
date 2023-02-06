@@ -60,8 +60,7 @@ const QMap<QString, QString> DXAManager::ranges = {
     { "TOT_L2L3L4_BMD", ".234" },
 };
 
-DXAManager::DXAManager(QWidget *parent)
-    : ManagerBase{parent}, m_dicomSCP(new DicomSCP(parent))
+DXAManager::DXAManager() : m_dicomSCP(new DicomSCP())
 {
 }
 

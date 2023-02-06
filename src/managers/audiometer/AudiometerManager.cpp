@@ -22,8 +22,7 @@ QByteArray AudiometerManager::initEndCode()
     return QByteArray(data);
 }
 
-AudiometerManager::AudiometerManager(QWidget *parent)
-    : SerialPortManager(parent)
+AudiometerManager::AudiometerManager()
 {
     m_test.setExpectedMeasurementCount(16);
 }

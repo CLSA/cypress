@@ -11,8 +11,7 @@
 #include "auxiliary/JsonSettings.h"
 #include "WholeBodyScanManager.h"
 
-WholeBodyScanManager::WholeBodyScanManager(QWidget *parent)
-    : DXAManager{parent}
+WholeBodyScanManager::WholeBodyScanManager()
 {
 }
 

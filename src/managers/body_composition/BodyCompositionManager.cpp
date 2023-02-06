@@ -38,7 +38,7 @@ QMap<QByteArray,QString> BodyCompositionManager::incorrectLUT= BodyCompositionMa
 //
 QMap<QByteArray,QString> BodyCompositionManager::confirmLUT= BodyCompositionManager::initConfirmationLUT();
 
-BodyCompositionManager::BodyCompositionManager(QWidget *parent) : SerialPortManager(parent)
+BodyCompositionManager::BodyCompositionManager()
 {
   m_test.setExpectedMeasurementCount(1);
 }

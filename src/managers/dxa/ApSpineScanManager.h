@@ -8,7 +8,7 @@ class APSpineScanManager : public DXAManager
 {
     Q_OBJECT
 public:
-    explicit APSpineScanManager(QWidget *parent = nullptr);
+    explicit APSpineScanManager();
 
     virtual bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 

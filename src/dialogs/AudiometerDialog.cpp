@@ -4,19 +4,17 @@
 #include <QDebug>
 #include <QMessageBox>
 
-AudiometerDialog::AudiometerDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::AudiometerDialog)
+AudiometerDialog::AudiometerDialog(): ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new AudiometerManager(this));
+    m_manager.reset(new AudiometerManager());
 }
 
 AudiometerDialog::~AudiometerDialog()
 {
-    delete ui;
+    //delete ui;
 }
 
 // set up signal slot connections between GUI front end

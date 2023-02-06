@@ -13,7 +13,7 @@ class RetinalCameraDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit RetinalCameraDialog(QWidget *parent = nullptr);
+    explicit RetinalCameraDialog(QString uuid = "");
     ~RetinalCameraDialog();
 
 private:

@@ -26,7 +26,7 @@ class CDTTManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit CDTTManager(QWidget* parent = Q_NULLPTR);
+    explicit CDTTManager();
     ~CDTTManager();
 
     bool isAvailable() override;

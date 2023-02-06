@@ -11,8 +11,8 @@ public:
     static DialogFactory *instance();
     ~DialogFactory();
 
-    DialogBase* instantiate(const Constants::MeasureType&);
-    DialogBase* instantiate(const QString&);
+    DialogBase* instantiate(const Constants::MeasureType&, QString uuid);
+    DialogBase* instantiate(const QString&, QString uuid);
 
 private:
     DialogFactory() = default;

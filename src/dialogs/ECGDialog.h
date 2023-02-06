@@ -9,7 +9,7 @@ class ECGDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    ECGDialog(QWidget *parent = Q_NULLPTR);
+    explicit ECGDialog();
     ~ECGDialog();
 
 private:

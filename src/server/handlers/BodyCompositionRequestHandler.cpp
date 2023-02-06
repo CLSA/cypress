@@ -16,7 +16,8 @@ void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
         std::ostream& out = response.send();
 
         CypressApplication::restApiServer -> requestTestStart(
-            Constants::MeasureType::typeBody_Composition
+            Constants::MeasureType::typeBody_Composition,
+                    ""
         );
 
         out << responseData.toStdString();

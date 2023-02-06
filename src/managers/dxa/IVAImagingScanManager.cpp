@@ -10,8 +10,7 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-IVAImagingScanManager::IVAImagingScanManager(QWidget *parent)
-    : DXAManager{parent}
+IVAImagingScanManager::IVAImagingScanManager()
 {
 
 }

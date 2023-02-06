@@ -6,19 +6,42 @@
 
 void RetinalCameraRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    // buffer for reading request body
+    char* buffer = new char[4096];
+
     try {
-        QString responseData = JsonSettings::serializeJson(getResponseData());
+        std::string requestBody;
+        std::istream &i = request.stream();
+
+        // read request body
+        while (i.read(buffer, sizeof(buffer)))
+        {
+            requestBody.append(buffer, sizeof(buffer));
+        }
+        requestBody.append(buffer, i.gcount());
+        qInfo() << QString::fromStdString(requestBody);
+
+        // prepare response
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeRetinal_Camera);
+        const Constants::MeasureType measureType = Constants::MeasureType::typeRetinal_Camera;
+        const QJsonObject responseJSON = getResponseData();
+        const QString uuid = responseJSON.value("id").toString();
+        const QString responseData = JsonSettings::serializeJson(responseJSON);
 
+        // start test
+        CypressApplication::restApiServer -> requestTestStart(measureType, uuid);
+
+        // send response with uuid body
         std::ostream& out = response.send();
-        out << responseData.toStdString();
+        out << "\"" << uuid.toStdString() << "\"";
         out.flush();
     }
     catch (std::exception& e)
     {
         qDebug() << e.what();
     }
+
+    delete[] buffer;
 }

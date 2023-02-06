@@ -11,7 +11,7 @@ class HipScanManager : public DXAManager
     Q_OBJECT
 
 public:
-    explicit HipScanManager(QWidget *parent = nullptr);
+    explicit HipScanManager();
 
     void clearData() override;
 

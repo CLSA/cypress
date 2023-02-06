@@ -5,14 +5,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-ECGDialog::ECGDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::RunnableDialog)
+ECGDialog::ECGDialog(): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new ECGManager(this));
+    m_manager.reset(new ECGManager());
     this->setWindowTitle("ECG");
 }
 

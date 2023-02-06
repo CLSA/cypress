@@ -11,8 +11,7 @@
 #include "auxiliary/JsonSettings.h"
 #include "ApSpineScanManager.h"
 
-APSpineScanManager::APSpineScanManager(QWidget *parent)
-    : DXAManager{parent}
+APSpineScanManager::APSpineScanManager()
 {
 
 }

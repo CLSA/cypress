@@ -12,10 +12,11 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 
-DialogBase::DialogBase(QWidget *parent)
+DialogBase::DialogBase(QWidget *parent, QString uuid)
     : QDialog(parent)
     , m_verbose(false)
 {
+    m_uuid = uuid;
 }
 
 void DialogBase::initialize()
@@ -51,6 +52,6 @@ void DialogBase::closeEvent(QCloseEvent *event)
 
 void DialogBase::complete(QJsonObject &results)
 {
-    qDebug() << "dialog base: complete";
+    results["id"] = m_uuid;
     emit sendResults(results);
 }

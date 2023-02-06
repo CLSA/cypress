@@ -11,7 +11,7 @@ class DicomSCP : public QObject
 {
     Q_OBJECT
 public:
-    explicit DicomSCP(QObject *parent = nullptr);
+    explicit DicomSCP();
     ~DicomSCP();
 
     bool start();

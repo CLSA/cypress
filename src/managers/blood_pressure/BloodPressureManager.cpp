@@ -12,9 +12,8 @@
 #include <QStandardItemModel>
 #include <QtUsb/QtUsb>
 
-BloodPressureManager::BloodPressureManager(QWidget* parent)
-    : ManagerBase(parent)
-    , m_comm(new BPMCommunication())
+BloodPressureManager::BloodPressureManager()
+    : m_comm(new BPMCommunication())
 {
     m_test.setExpectedMeasurementCount(6);
 }

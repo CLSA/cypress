@@ -10,7 +10,7 @@ void ChoiceReactionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeChoice_Reaction);
+        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeChoice_Reaction, "");
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

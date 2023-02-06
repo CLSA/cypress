@@ -27,7 +27,7 @@ class DXAManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    DXAManager(QWidget *parent = nullptr);
+    explicit DXAManager();
     ~DXAManager();
 
     const static QMap<QString, QString> ranges;

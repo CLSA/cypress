@@ -9,7 +9,7 @@ class ChoiceReactionDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    ChoiceReactionDialog(QWidget* parent = Q_NULLPTR);
+    ChoiceReactionDialog();
     ~ChoiceReactionDialog();
 
 private:

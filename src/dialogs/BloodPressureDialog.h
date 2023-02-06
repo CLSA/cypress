@@ -9,7 +9,7 @@ class BloodPressureDialog : public DialogBase, public Ui::BloodPressureDialog
     Q_OBJECT
 
 public:
-    BloodPressureDialog(QWidget *parent = Q_NULLPTR);
+    explicit BloodPressureDialog();
     ~BloodPressureDialog();
 
 private:

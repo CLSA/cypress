@@ -9,7 +9,7 @@ class AudiometerDialog : public DialogBase, public Ui::AudiometerDialog
     Q_OBJECT
 
 public:
-    AudiometerDialog(QWidget *parent = Q_NULLPTR);
+    explicit AudiometerDialog();
     ~AudiometerDialog();
 
 private:

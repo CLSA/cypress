@@ -28,7 +28,7 @@ class ManagerBase : public QObject
     Q_OBJECT
 
 public:
-    explicit ManagerBase(QWidget *parent = Q_NULLPTR);
+    explicit ManagerBase();
     ~ManagerBase();
 
     virtual bool isAvailable();
@@ -65,6 +65,9 @@ signals:
     void canWrite();
 
 protected:
+    // The unique identifier representing this test session (for pine state management)
+    QString m_uuid;
+
     // Context dependent clear test data and possibly device data (eg., serial port info)
     // SerialPortManager class clears device data during setDevice() while
     // test data is cleared depending on derived class implementation requirements.
@@ -81,6 +84,8 @@ private:
     // TODO: use MeasureType enum converted to string for group names
     //
     QString m_group;
+
+
 };
 
 #endif // MANAGERBASE_H

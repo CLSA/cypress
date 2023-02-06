@@ -15,20 +15,11 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="BarcodeWidget" name="barcodeWidget" native="true"/>
-   </item>
-   <item>
     <widget class="MeasureWidget" name="measureWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>BarcodeWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/BarcodeWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>MeasureWidget</class>
    <extends>QWidget</extends>

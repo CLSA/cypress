@@ -15,7 +15,7 @@ class SpirometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit SpirometerManager(QWidget* parent = Q_NULLPTR);
+    explicit SpirometerManager();
     ~SpirometerManager() = default;
 
     bool isDefined(const QString&, const SpirometerManager::FileType&) const;

@@ -92,23 +92,17 @@ QJsonObject CypressApplication::getStatus()
     return statusJson;
 }
 
-bool CypressApplication::startTest(Constants::MeasureType type)
+bool CypressApplication::startTest(Constants::MeasureType type, QString uuid)
 {
     QVariantMap args;
     DialogFactory *factory;
-
-    //args["inputFileName"] = "";
-    //args["outputFileName"] = "";
-    //args["measureType"] = 9;
-    //args["runMode"] = "default";
-    //args["verbose"] = true;
 
     try
     {
         setArgs(args);
         factory = DialogFactory::instance();
 
-        m_dialog.reset(factory->instantiate(type));
+        m_dialog.reset(factory->instantiate(type, uuid));
         if(m_dialog.isNull()) {
             QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
             return false;
@@ -131,26 +125,6 @@ bool CypressApplication::startTest(Constants::MeasureType type)
 
 void CypressApplication::setArgs(const QVariantMap& args)
 {
-    if(args.contains("inputFileName"))
-    {
-        m_inputFileName = args["inputFileName"].toString();
-    }
-
-    if(args.contains("outputFileName"))
-    {
-        m_outputFileName = args["outputFileName"].toString();
-    }
-
-    if(args.contains("measureType"))
-    {
-        m_type = args["measureType"].value<Constants::MeasureType>();
-    }
-
-    if(args.contains("runMode"))
-    {
-        m_mode = args["runMode"].value<Constants::RunMode>();
-    }
-
     if(args.contains("verbose"))
     {
         m_verbose = args["verbose"].toBool();
@@ -162,8 +136,6 @@ void CypressApplication::initialize()
     CypressApplication::startTime = QDateTime::currentDateTimeUtc();
 
     if (m_verbose) {
-        qDebug() << "InputFileName: " << m_inputFileName;
-        qDebug() << "OutputFileName: " << m_outputFileName;
         qDebug() << "Mode: " << m_mode;
         qDebug() << "Type: " << m_type;
     }
@@ -171,5 +143,4 @@ void CypressApplication::initialize()
     CypressApplication::restApiServer->start();
 
     connect(restApiServer.get(), &Server::startTest, this, &CypressApplication::startTest);
-
 }

@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QSettings>
 
-SerialPortManager::SerialPortManager(QWidget *parent) : ManagerBase(parent)
+SerialPortManager::SerialPortManager()
 {
 }
 

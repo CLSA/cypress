@@ -7,7 +7,7 @@
 class IVAImagingScanManager : public DXAManager
 {
 public:
-    explicit IVAImagingScanManager(QWidget *parent = nullptr);
+    explicit IVAImagingScanManager();
 
     void clearData() override;
 

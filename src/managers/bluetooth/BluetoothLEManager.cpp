@@ -16,7 +16,7 @@
  *
 */
 
-BluetoothLEManager::BluetoothLEManager(QWidget *parent) : ManagerBase(parent)
+BluetoothLEManager::BluetoothLEManager()
 {
     m_test.setExpectedMeasurementCount(2);
 }

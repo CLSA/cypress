@@ -9,7 +9,7 @@ class FraxDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    FraxDialog(QWidget *parent = Q_NULLPTR);
+    explicit FraxDialog();
     ~FraxDialog();
 
 private:

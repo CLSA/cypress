@@ -4,14 +4,12 @@
 #include <QDebug>
 #include <QMessageBox>
 
-WeighScaleDialog::WeighScaleDialog(QWidget *parent)
-    : DialogBase(parent)
-    , ui(new Ui::WeighScaleDialog)
+WeighScaleDialog::WeighScaleDialog(): ui(new Ui::WeighScaleDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new WeighScaleManager(this));
+    m_manager.reset(new WeighScaleManager());
 }
 
 WeighScaleDialog::~WeighScaleDialog()

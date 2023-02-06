@@ -12,8 +12,7 @@
 
 #include "ECGManager.h"
 
-ECGManager::ECGManager(QWidget* parent):
-    ManagerBase(parent)
+ECGManager::ECGManager()
 {
     m_test.setExpectedMeasurementCount(1);
 }

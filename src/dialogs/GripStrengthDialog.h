@@ -9,7 +9,7 @@ class GripStrengthDialog : public DialogBase, public Ui::GripStrengthDialog
     Q_OBJECT
 
 public:
-    explicit GripStrengthDialog(QWidget *parent = nullptr);
+    explicit GripStrengthDialog();
     ~GripStrengthDialog();
 
 private:

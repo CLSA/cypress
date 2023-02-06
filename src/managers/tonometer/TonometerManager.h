@@ -30,7 +30,7 @@ class TonometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit TonometerManager(QWidget* parent = Q_NULLPTR);
+    explicit TonometerManager();
     ~TonometerManager();
 
     // is the passed string an executable file

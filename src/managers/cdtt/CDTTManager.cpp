@@ -12,7 +12,7 @@
 
 #include "CDTTManager.h"
 
-CDTTManager::CDTTManager(QWidget* parent) : ManagerBase(parent)
+CDTTManager::CDTTManager()
 {
     m_test.setMinimumMeasurementCount(1);
 }

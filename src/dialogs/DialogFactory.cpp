@@ -37,7 +37,7 @@ DialogFactory::~DialogFactory()
         pInstance = Q_NULLPTR;
 }
 
-DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
+DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QString uuid)
 {
     DialogBase* dialog = Q_NULLPTR;
     switch(type)
@@ -78,7 +78,7 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
         dialog = new GripStrengthDialog();
         break;
       case Constants::MeasureType::typeRetinal_Camera:
-        dialog = new RetinalCameraDialog();
+        dialog = new RetinalCameraDialog(uuid);
         break;
       case Constants::MeasureType::typeECG:
         dialog = new ECGDialog();
@@ -110,7 +110,7 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type)
     return dialog;
 }
 
-DialogBase* DialogFactory::instantiate(const QString& name)
+DialogBase* DialogFactory::instantiate(const QString& name, QString uuid)
 {
-    return instantiate(Constants::getMeasureType(name));
+    return instantiate(Constants::getMeasureType(name), uuid);
 }

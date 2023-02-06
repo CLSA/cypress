@@ -14,7 +14,8 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
         std::ostream& out = response.send();
 
         CypressApplication::restApiServer -> requestTestStart(
-            Constants::MeasureType::typeBlood_Pressure
+            Constants::MeasureType::typeBlood_Pressure,
+                    ""
         );
 
         out << responseData.toStdString();

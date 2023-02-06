@@ -4,14 +4,11 @@
 #include <QDebug>
 #include <QMessageBox>
 
-GripStrengthDialog::GripStrengthDialog(QWidget *parent):
-    DialogBase(parent),
-    ui(new Ui::GripStrengthDialog)
+GripStrengthDialog::GripStrengthDialog(): ui(new Ui::GripStrengthDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
-
-    m_manager.reset(new GripStrengthManager(this));
+    m_manager.reset(new GripStrengthManager());
 }
 
 GripStrengthDialog::~GripStrengthDialog()

@@ -4,7 +4,7 @@
 #include <QException>
 #include <QDebug>
 
-ManagerBase::ManagerBase(QWidget* parent) : QObject(parent)
+ManagerBase::ManagerBase()
 {
 }
 

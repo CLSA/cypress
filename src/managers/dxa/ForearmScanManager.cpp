@@ -12,8 +12,7 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-ForearmScanManager::ForearmScanManager(QWidget *parent)
-    : DXAManager{parent}
+ForearmScanManager::ForearmScanManager()
 {
 }
 
@@ -80,6 +79,8 @@ quint8 ForearmScanManager::getScanType()
         case BOTH:
             return 81;
     }
+
+    return 81;
 }
 
 QString ForearmScanManager::getRefType()

@@ -28,7 +28,7 @@ class AudiometerManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit AudiometerManager(QWidget* parent = Q_NULLPTR);
+    explicit AudiometerManager();
 
     static QByteArray initEndCode();
     static QByteArray END_CODE;
