@@ -1,0 +1,53 @@
+[CDTT]
+
+Barcode 
+
+[Body Composition]
+
+Participant ID 
+Age (years)
+Height (cm)
+Gender (female | male)
+
+
+[Tonometer]
+
+Participant ID
+First Name
+Last Name
+BirthDate
+Sex
+
+
+[Ultrasound / Carotid Intima]
+
+Participant ID
+
+
+[Grip Strength]
+
+Participant ID
+
+
+[Retinal Camera]
+
+Participant ID
+
+
+[Spirometer] 
+
+First Name
+Last Name
+Gender (M | F)
+DateOfBirth (date)
+Height (meters, decimal) required
+Weight (kg, integer) optional
+Ethnicity (caucasian, asian, african, hispanic, other_ethnic)
+Smoker (bool) (optional)
+Asthma (bool) (optional)
+COPD (bool) (optional)s
+
+
+[Blood Pressure]
+Participant ID
+

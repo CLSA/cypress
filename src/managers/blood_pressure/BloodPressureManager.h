@@ -43,9 +43,7 @@ public:
 
     const quint16 BPTRU_VENDOR_ID { 4279 };
 
-    bool isAvailable() override;
-
-    bool isDefined(const QString&) const;
+    static bool isDefined();
 
     //TODO: use cypress constant for all use of size and side
     void setCuffSize(const QString&);
@@ -56,7 +54,6 @@ public:
     void setVendorIdFilter(const quint16& vid);
 
 public slots:
-
     // what the manager does in response to the main application
     // window invoking its run method
     //
@@ -71,18 +68,15 @@ public slots:
     //
     void finish() override;
 
-    void connectDevice();
-
-    void disconnectDevice();
+    bool scanDevices();
 
     // set the device by descritive label
     //
     void selectDevice(const QString&);
-
-    bool scanDevices();
+    void connectDevice();
+    void disconnectDevice();
 
 private slots:
-
     // slot for signals coming from BPMCommunication
     //
     void measurementAvailable(const int&, const int&, const int&, const int&,
@@ -98,7 +92,6 @@ private slots:
     void setDevice(const QUsb::Id&);
 
 signals:
-
     // signals to BPMCommunication
     //
     void attemptConnection(const QUsb::Id&);
@@ -118,31 +111,39 @@ signals:
 private:
     BloodPressureTest m_test;
 
-    // communications handling
-    QThread m_thread;
-    BPMCommunication* m_comm { Q_NULLPTR };
-
-    bool m_aborted { false };
-
-    void clearData() override;
-
     // device data is separate from test data
     Measurement m_deviceData;
 
-    // the usb hid device
-    QString m_deviceName;
-    QUsb::Id m_device;
+    // Set up device
+    bool setUp() override;
+
+    // Reset the session
+    bool clearData() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
+
+    // Send the results to Pine for storage & analysis
+    bool sendResultsToPine(const QJsonObject &data) override;
+
+    bool m_aborted { false };
 
     // usb hid devices plugged in and openable
     QMap<QString,QUsb::Id> m_deviceList;
 
-    quint16 m_vendorIDFilter { 0 };
+    // called when loading from settings
+    void selectDeviceById(const QUsb::Id&);
 
+    // the usb hid device
+    QString m_deviceName;
+    QUsb::Id m_device;
+    quint16 m_vendorIDFilter { 0 };
     QString m_cuffSize { "" };
     QString m_side { "" };
 
-    // called when loading from settings
-    void selectDeviceById(const QUsb::Id&);
+    // communications handling
+    QThread m_thread;
+    BPMCommunication* m_comm { Q_NULLPTR };
 };
 
 #endif // BLOODPRESSUREMANAGER_H

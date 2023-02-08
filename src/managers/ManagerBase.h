@@ -1,7 +1,6 @@
 #ifndef MANAGERBASE_H
 #define MANAGERBASE_H
 
-#include "../auxiliary/Constants.h"
 #include <QJsonObject>
 #include <QObject>
 #include <QWidget>
@@ -31,7 +30,8 @@ public:
     explicit ManagerBase();
     ~ManagerBase();
 
-    virtual bool isAvailable();
+    // Is this instrument available at the installed workstation?
+    static bool isDefined();
 
 public slots:
     // subclasses call methods after main initialization just prior
@@ -74,18 +74,18 @@ protected:
     // Derived classes may also clear test data depending on the nature of the test,
     // such as when multiple measurements are separately acquired.
     //
-    virtual void clearData() = 0;
 
-    virtual bool sendResultsToPine(const QJsonObject &data);
+    // Set up device
+    virtual bool setUp() = 0;
 
-private:
+    // Reset the session
+    virtual bool clearData() = 0;
 
-    // the group name for a manager to write settings into
-    // TODO: use MeasureType enum converted to string for group names
-    //
-    QString m_group;
+    // Clean up the device for next time
+    virtual bool cleanUp() = 0;
 
-
+    // Send the results to Pine for storage & analysis
+    virtual bool sendResultsToPine(const QJsonObject &data) = 0;
 };
 
 #endif // MANAGERBASE_H
