@@ -25,9 +25,10 @@ bool WeighScaleManager::isAvailable()
     return false;
 }
 
-void WeighScaleManager::clearData()
+bool WeighScaleManager::clearData()
 {
     m_test.reset();
+    return false;
 }
 
 void WeighScaleManager::finish()

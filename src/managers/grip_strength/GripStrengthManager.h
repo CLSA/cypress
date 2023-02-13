@@ -16,7 +16,7 @@ class GripStrengthManager : public ManagerBase
     Q_OBJECT
 public:
     explicit GripStrengthManager();
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
     void start() override;
@@ -46,7 +46,7 @@ private:
     bool processStart();
     bool readOutput();
 
-    void clearData() override;
+    bool clearData();
     bool isDefined(const QString&, const GripStrengthManager::FileType&) const;
 };
 

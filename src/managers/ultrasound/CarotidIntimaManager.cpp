@@ -43,7 +43,7 @@ void CarotidIntimaManager::finish()
     }
 }
 
-void CarotidIntimaManager::clearData()
+bool CarotidIntimaManager::clearData()
 {
-
+    return false;
 }

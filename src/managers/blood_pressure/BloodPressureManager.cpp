@@ -23,11 +23,11 @@ BloodPressureManager::~BloodPressureManager()
   delete m_comm;
 }
 
-bool BloodPressureManager::isAvailable()
-{
-    bool found = scanDevices();
-    return found;
-}
+//bool BloodPressureManager::isAvailable()
+//{
+//    bool found = scanDevices();
+//    return found;
+//}
 
 void BloodPressureManager::start()
 {
@@ -55,10 +55,10 @@ void BloodPressureManager::start()
     //emit dataChanged();
 }
 
-bool BloodPressureManager::isDefined(const QString &label) const
-{
-    return false;
-}
+//bool BloodPressureManager::isDefined(const QString &label) const
+//{
+//    return false;
+//}
 
 void BloodPressureManager::selectDeviceById(const QUsb::Id& info)
 {
@@ -111,9 +111,9 @@ void BloodPressureManager::measure()
 }
 
 
-void BloodPressureManager::clearData()
-{
-}
+//void BloodPressureManager::clearData()
+//{
+//}
 
 // slot for UI communication
 //

@@ -87,6 +87,7 @@ QJsonObject CypressApplication::getStatus()
         {"tonometer",          true },
         {"ultrasound",         true },
         {"weigh_scale",        true },
+        {"signature_pad", 	   true },
     };
 
     return statusJson;

@@ -191,7 +191,7 @@ QVariantMap WholeBodyScanManager::computeTandZScores()
     return QMap<QString, QVariant> {{}};
 }
 
-void WholeBodyScanManager::clearData()
+bool WholeBodyScanManager::clearData()
 {
-
+    return true;
 }

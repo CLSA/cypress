@@ -68,6 +68,8 @@
 #include "server/handlers/UltrasoundRequestHandler.h"
 #include "server/handlers/ultrasoundstatusrequesthandler.h"
 
+#include "server/handlers/signaturepadrequesthandler.h"
+
 
 
 using namespace Poco::Net;
@@ -129,6 +131,8 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
 
     { QString(R"(^/weigh_scale/status/?$)"),      &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler      },
     { QString(R"(^/weigh_scale/?$)"), 	          &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler            },
+
+    { QString(R"(^/signature/?$)"), 	          &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
 }};
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
@@ -359,4 +363,9 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createBodyCompositionReques
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createBodyCompositionStatusRequestHandler()
 {
     return new BodyCompositionStatusRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadRequestHandler()
+{
+    return new SignaturePadRequestHandler;
 }

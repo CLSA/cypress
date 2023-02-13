@@ -68,9 +68,10 @@ void CDTTManager::measure()
     m_process.start();
 }
 
-void CDTTManager::clearData()
+bool CDTTManager::clearData()
 {
     m_test.reset();
+    return true;
 }
 
 void CDTTManager::finish()

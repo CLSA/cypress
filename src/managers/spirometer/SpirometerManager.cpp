@@ -182,9 +182,10 @@ void SpirometerManager::readOutput()
 
 }
 
-void SpirometerManager::clearData()
+bool SpirometerManager::clearData()
 {
     m_test.reset();
+    return false;
 }
 
 void SpirometerManager::backupDatabases() const

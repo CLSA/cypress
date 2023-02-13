@@ -16,7 +16,7 @@ public:
     QVariantMap extractScanAnalysisData() override;
     QVariantMap computeTandZScores() override;
 
-    void clearData() override;
+    bool clearData();
 
     Side getSide() override;
     QString getName() override;

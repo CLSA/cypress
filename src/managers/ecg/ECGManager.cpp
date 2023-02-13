@@ -94,9 +94,10 @@ void ECGManager::configureProcess()
 
 }
 
-void ECGManager::clearData()
+bool ECGManager::clearData()
 {
     m_test.reset();
+    return false;
 }
 
 void ECGManager::finish()

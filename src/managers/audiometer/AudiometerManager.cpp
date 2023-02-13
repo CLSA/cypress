@@ -33,9 +33,10 @@ bool AudiometerManager::isAvailable()
     return found;
 }
 
-void AudiometerManager::clearData()
+bool AudiometerManager::clearData()
 {
     m_test.reset();
+    return true;
 }
 
 void AudiometerManager::finish()

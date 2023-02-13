@@ -33,7 +33,7 @@ public:
     static QByteArray initEndCode();
     static QByteArray END_CODE;
 
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
     // retrieve a measurement from the device
@@ -59,7 +59,7 @@ private:
 
     HearingTest m_test;
 
-    void clearData() override;
+    bool clearData();
 };
 
 #endif // AUDIOMETERMANAGER_H

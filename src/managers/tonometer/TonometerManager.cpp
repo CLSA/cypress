@@ -104,9 +104,10 @@ void TonometerManager::configureProcess()
 
 }
 
-void TonometerManager::clearData()
+bool TonometerManager::clearData()
 {
     m_test.reset();
+    return false;
 }
 
 void TonometerManager::finish()

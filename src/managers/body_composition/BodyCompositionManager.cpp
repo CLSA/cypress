@@ -266,11 +266,12 @@ QMap<QByteArray,QString> BodyCompositionManager::initIncorrectResponseLUT()
     return responses;
 }
 
-void BodyCompositionManager::clearData()
+bool BodyCompositionManager::clearData()
 {
     m_deviceData.reset();
     m_test.reset();
     emit dataChanged();
+    return true;
 }
 
 void BodyCompositionManager::finish()

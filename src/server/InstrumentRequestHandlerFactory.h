@@ -78,6 +78,8 @@ public:
     static HTTPRequestHandler* createECGRequestHandler();
     static HTTPRequestHandler* createECGStatusRequestHandler();
 
+    static HTTPRequestHandler* createSignaturePadRequestHandler();
+
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
 };
 

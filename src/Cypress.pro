@@ -77,6 +77,7 @@ SOURCES += \
     dialogs/DXADialog.cpp \
     dialogs/GripStrengthDialog.cpp \
     dialogs/RetinalCameraDialog.cpp \
+    dialogs/signaturepaddialog.cpp \
     managers/ManagerBase.cpp \
     managers/SettingsManager.cpp \
     managers/audiometer/AudiometerManager.cpp \
@@ -105,6 +106,8 @@ SOURCES += \
     managers/grip_strength/ParadoxReader.cpp \
     managers/retinal_camera/RetinalCameraManager.cpp \
     managers/serial_port/SerialPortManager.cpp \
+    managers/signature_pad/signaturepadcommunication.cpp \
+    managers/signature_pad/signaturepadmanager.cpp \
     managers/spirometer/SpirometerManager.cpp \
     managers/tonometer/TonometerManager.cpp \
     managers/ultrasound/CarotidIntimaManager.cpp \
@@ -147,6 +150,7 @@ SOURCES += \
     server/handlers/fraxstatusrequesthandler.cpp \
     server/handlers/gripstrengthstatusrequesthandler.cpp \
     server/handlers/retinalcamerastatusrequesthandler.cpp \
+    server/handlers/signaturepadrequesthandler.cpp \
     server/handlers/spirometerstatusrequesthandler.cpp \
     server/handlers/tonometerstatusrequesthandler.cpp \
     server/handlers/ultrasoundstatusrequesthandler.cpp \
@@ -229,6 +233,7 @@ HEADERS += \
     dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
     dialogs/RetinalCameraDialog.h \
+    dialogs/signaturepaddialog.h \
     managers/SettingsManager.h \
     managers/audiometer/AudiometerManager.h \
     managers/blood_pressure/BPMCommunication.h \
@@ -258,6 +263,8 @@ HEADERS += \
     managers/grip_strength/ParadoxReader.h \
     managers/retinal_camera/RetinalCameraManager.h \
     managers/serial_port/SerialPortManager.h \
+    managers/signature_pad/signaturepadcommunication.h \
+    managers/signature_pad/signaturepadmanager.h \
     managers/spirometer/SpirometerManager.h \
     managers/tonometer/TonometerManager.h \
     managers/ultrasound/CarotidIntimaManager.h \
@@ -300,6 +307,7 @@ HEADERS += \
     server/handlers/fraxstatusrequesthandler.h \
     server/handlers/gripstrengthstatusrequesthandler.h \
     server/handlers/retinalcamerastatusrequesthandler.h \
+    server/handlers/signaturepadrequesthandler.h \
     server/handlers/spirometerstatusrequesthandler.h \
     server/handlers/tonometerstatusrequesthandler.h \
     server/handlers/ultrasoundstatusrequesthandler.h \
@@ -334,37 +342,46 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 
+INCLUDEPATH += $$PWD/../deps/poco_x64-windows/include/
+INCLUDEPATH += $$PWD/../deps/poco/lib64/
+INCLUDEPATH += $$PWD/../deps/poco/bin64/
+DEPENDPATH += $$PWD/../deps/poco/lib64/
+DEPENDPATH += $$PWD/../deps/poco/bin64/
+LIBS += -L$$PWD/../deps/poco/lib64/ -lPocoNet -lPocoFoundation -lPocoUtil
 
-!contains(QMAKE_TARGET.arch, x86_64): {
-    message("32-bit")
+INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win64-release/include/
+INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win64-release/lib/
+INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win64-support-MD-iconv-msvc-16.9/zlib-1.2.12/include
 
-    INCLUDEPATH += "C:/Users/Anthony/vcpkg/packages/poco_x86-windows/include"
+DEPENDPATH += $$PWD/../deps/dcmtk-3.6.7-win64-release/lib/
+LIBS += -L$$PWD/../deps/dcmtk-3.6.7-win64-release/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
-    INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
-    INCLUDEPATH += "C:/Program Files (x86)/DCMTK/zlib-1.2.12/include"
+INCLUDEPATH += $$PWD/../deps/SigPad/Include/
+INCLUDEPATH += $$PWD/../deps/SigPad/SigTablt/x64/
+DEPENDPATH += $$PWD/../deps/SigPad/SigTablt/x64/
+LIBS += -L$$PWD/../deps/SigPad/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
-    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
-    LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
-    LIBS += -L"C:/Program Files (x86)/DCMTK/zlib-1.2.12/lib" -lzlib_o
-
-} else {
-    message("64-bit")
-    INCLUDEPATH += C:/Users/Anthony/vcpkg/packages/poco_x64-windows/include
-    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x64-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
-
-    INCLUDEPATH += "C:/Program Files/DCMTK/include"
-    INCLUDEPATH += "C:/Program Files/DCMTK/zlib-1.2.12/include"
-
-    LIBS += -L"C:/Users/Anthony/vcpkg/packages/poco_x86-windows/lib" -lPocoNet -lPocoFoundation -lPocoUtil
-    LIBS += -L"C:/Program Files/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
-    LIBS += -L"C:/Program Files/DCMTK/zlib-1.2.12/lib" -lzlib_o
-}
+#win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/include
+#win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/lib
+#win32: DEPENDPATH += $$PWD/../deps/poco_x86-windows/lib
+#win32: LIBS += -L$$PWD/../deps/poco_x86-windows/lib -lPocoNet -lPocoFoundation -lPocoUtil
+#
+#win32: INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/include
+#win32: INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/lib
+#win32: DEPENDPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/lib
+#win32: LIBS += -L$$PWD/../deps/dcmtk-3.6.7-win32-release/lib/ -ldcmdata
+#
+#win32: INCLUDEPATH += $$PWD/../deps/SigPad/Include
+#win32: INCLUDEPATH += $$PWD/../deps/SigPad/SigTablt/Win32
+#win32: DEPENDPATH += $$PWD/../deps/SigPad/SigTablt/Win32
+#win32: LIBS += -L$$PWD/../deps/SigPad/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib
 
 
 FORMS += \
   dialogs/RetinalCameraDialog.ui \
   dialogs/dxadialog.ui \
   dialogs/gripstrengthdialog.ui \
+  dialogs/signaturepaddialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
@@ -377,5 +394,10 @@ RESOURCES += \
 
 DISTFILES += \
     ../README.md \
+    clear.tif \
     favicon.ico \
-    server/pages/index.html
+    ok.tif \
+    please.tif \
+    server/pages/index.html \
+    sign.tif \
+    thankyou.tif

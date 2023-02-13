@@ -33,14 +33,13 @@ public:
         typeThermometer,
         typeTonometer,
         typeWeigh_Scale,
-
         typeCarotidIntima,
-
         typeDxaWholeBody,
         typeDxaSpineBone,
         typeDxaLateralBone,
         typeDxaForearmBone,
         typeDxaDualHip,
+        typeSignature,
 
     };
     Q_ENUM(MeasureType)

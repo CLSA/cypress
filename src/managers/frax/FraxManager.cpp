@@ -123,9 +123,10 @@ void FraxManager::configureProcess()
 {
 }
 
-void FraxManager::clearData()
+bool FraxManager::clearData()
 {
     m_test.reset();
+    return false;
 }
 
 void FraxManager::finish()

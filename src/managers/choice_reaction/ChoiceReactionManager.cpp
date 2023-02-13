@@ -89,8 +89,8 @@ void ChoiceReactionManager::finish()
     }
 }
 
-void ChoiceReactionManager::clearData()
+bool ChoiceReactionManager::clearData()
 {
-
+    return false;
 }
 

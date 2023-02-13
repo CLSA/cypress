@@ -29,7 +29,7 @@ public:
     explicit CDTTManager();
     ~CDTTManager();
 
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
 
@@ -51,7 +51,7 @@ private:
     QProcess m_process;
     CDTTTest m_test;
 
-    void clearData() override;
+    bool clearData();
 
     void configureProcess();
 };

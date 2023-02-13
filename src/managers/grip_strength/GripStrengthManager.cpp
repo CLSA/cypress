@@ -163,9 +163,10 @@ bool GripStrengthManager::processStart()
     return false;
 }
 
-void GripStrengthManager::clearData()
+bool GripStrengthManager::clearData()
 {
     //m_test.reset();
+    return false;
     //updateModel();
 }
 
@@ -193,3 +194,15 @@ bool GripStrengthManager::configureProcess() {
 
     return false;
 }
+
+// Set up device
+//    virtual bool setUp() = 0;
+//
+//    // Reset the session
+//    virtual bool clearData() = 0;
+//
+//    // Clean up the device for next time
+//    virtual bool cleanUp() = 0;
+//
+//    // Send the results to Pine for storage & analysis
+//    virtual bool sendResultsToPine(const QJsonObject &data) = 0;

@@ -11,7 +11,7 @@ public:
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
-    void clearData() override;
+    bool clearData();
 
     QVariantMap retrieveDeviceData() override;
     QVariantMap extractScanAnalysisData() override;

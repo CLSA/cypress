@@ -226,8 +226,8 @@ QVariantMap ForearmScanManager::computeTandZScores()
     return QVariantMap {{"", ""}};
 }
 
-void ForearmScanManager::clearData()
+bool ForearmScanManager::clearData()
 {
-
+    return false;
 }
 

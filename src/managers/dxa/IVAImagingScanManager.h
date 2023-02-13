@@ -9,7 +9,7 @@ class IVAImagingScanManager : public DXAManager
 public:
     explicit IVAImagingScanManager();
 
-    void clearData() override;
+    bool clearData();
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 

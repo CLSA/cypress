@@ -35,7 +35,7 @@ public:
     //
     bool isDefined(const QString&, const FileType& type = ECGApplication) const;
 
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
 
@@ -109,9 +109,7 @@ private:
     const QString DATABASE_PATH = "DATABASE";
 
     bool deleteDeviceData();
-
-    void clearData() override;
-
+    bool clearData();
     void configureProcess();
 };
 

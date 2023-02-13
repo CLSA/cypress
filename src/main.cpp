@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     }
 
     CypressApplication cypress;
-    cypress.setArgs(parser.getArgs());
+    //cypress.setArgs(parser.getArgs());
     cypress.initialize();
 
     return app.exec();

@@ -157,10 +157,10 @@ void BluetoothLEManager::serviceDiscovered(const QBluetoothUuid &uuid)
 
 }
 
-void BluetoothLEManager::clearData()
-{
-
-}
+//bool BluetoothLEManager::clearData()
+//{
+//    return false;
+//}
 
 void BluetoothLEManager::finish()
 {

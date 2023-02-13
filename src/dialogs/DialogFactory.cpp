@@ -13,6 +13,7 @@
 #include "WeighScaleDialog.h"
 #include "GripStrengthDialog.h"
 #include "RetinalCameraDialog.h"
+#include "signaturepaddialog.h"
 
 #include "DXADialog.h"
 #include "managers/dxa/ApSpineScanManager.h"
@@ -101,6 +102,9 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QStri
         break;
       case Constants::MeasureType::typeDxaDualHip:
         dialog = new DXADialog(new HipScanManager);
+        break;
+      case Constants::MeasureType::typeSignature:
+        dialog = new SignaturePadDialog(uuid);
         break;
       case Constants::MeasureType::typeUnknown:
         break;

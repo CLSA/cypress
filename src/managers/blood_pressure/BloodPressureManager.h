@@ -115,16 +115,16 @@ private:
     Measurement m_deviceData;
 
     // Set up device
-    bool setUp() override;
+    //bool setUp() override;
 
-    // Reset the session
-    bool clearData() override;
+    //// Reset the session
+    //bool clearData() override;
 
-    // Clean up the device for next time
-    bool cleanUp() override;
+    //// Clean up the device for next time
+    //bool cleanUp() override;
 
-    // Send the results to Pine for storage & analysis
-    bool sendResultsToPine(const QJsonObject &data) override;
+    //// Send the results to Pine for storage & analysis
+    //bool sendResultsToPine(const QJsonObject &data) override;
 
     bool m_aborted { false };
 

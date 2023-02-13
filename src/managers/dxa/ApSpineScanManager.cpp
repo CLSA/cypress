@@ -192,7 +192,7 @@ QVariantMap APSpineScanManager::computeTandZScores()
     return QVariantMap {{}};
 }
 
-void APSpineScanManager::clearData()
+bool APSpineScanManager::clearData()
 {
-
+    return false;
 }

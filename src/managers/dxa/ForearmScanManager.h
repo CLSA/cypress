@@ -15,7 +15,7 @@ public:
     QVariantMap extractScanAnalysisData() override;
     QVariantMap computeTandZScores() override;
 
-    void clearData() override;
+    bool clearData();
 
     QString getName() override;
     QString getBodyPartName() override;
@@ -23,7 +23,6 @@ public:
     quint8 getScanType() override;
     QString getRefType() override;
     QString getRefSource() override;
-
 
 public slots:
     void finish() override;

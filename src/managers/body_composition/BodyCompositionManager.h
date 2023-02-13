@@ -26,7 +26,7 @@ class BodyCompositionManager : public SerialPortManager
 public:
     explicit BodyCompositionManager();
 
-    bool isAvailable() override;
+    bool isAvailable();
 
     static QMap<QString,QByteArray> initDefaultLUT();
     static QMap<QByteArray,QString> initCommandLUT();
@@ -108,7 +108,7 @@ private:
 
     BodyCompositionTest m_test;
 
-    void clearData() override;
+    bool clearData();
     void clearQueue();
 
     QVector<QByteArray> m_cache;

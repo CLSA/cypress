@@ -8,7 +8,7 @@ class CarotidIntimaManager : public ManagerBase
 public:
     explicit CarotidIntimaManager();
 
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
     virtual void start() override;
@@ -16,7 +16,7 @@ public slots:
     virtual void finish() override;
 
 protected:
-    virtual void clearData() override;
+    virtual bool clearData();
 };
 
 #endif // CAROTIDINTIMAMANAGER_H

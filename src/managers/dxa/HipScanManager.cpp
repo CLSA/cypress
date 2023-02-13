@@ -217,9 +217,9 @@ bool HipScanManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
     return valid;
 }
 
-void HipScanManager::clearData()
+bool HipScanManager::clearData()
 {
-
+    return false;
 }
 
 

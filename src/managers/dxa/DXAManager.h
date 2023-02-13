@@ -32,7 +32,7 @@ public:
 
     const static QMap<QString, QString> ranges;
 
-    bool isAvailable() override;
+    bool isAvailable();
 
     QJsonObject scanAnalysisJson;
     QJsonObject scoresJson;

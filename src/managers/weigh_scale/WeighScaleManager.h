@@ -24,7 +24,7 @@ class WeighScaleManager : public SerialPortManager
 public:
     explicit WeighScaleManager();
 
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
 
@@ -59,10 +59,8 @@ private slots:
     void writeDevice() override;
 
 private:
-
     WeighScaleTest m_test;
-
-    void clearData() override;
+    bool clearData();
 };
 
 #endif // WEIGHSCALEMANAGER_H

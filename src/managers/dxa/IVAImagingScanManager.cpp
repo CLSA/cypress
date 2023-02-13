@@ -353,7 +353,7 @@ QVariantMap IVAImagingScanManager::computeTandZScores()
 }
 
 
-void IVAImagingScanManager::clearData()
+bool IVAImagingScanManager::clearData()
 {
-
+    return false;
 }

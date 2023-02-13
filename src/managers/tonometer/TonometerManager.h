@@ -37,7 +37,7 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&, const TonometerManager::FileType& type = ORAApplication) const;
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
 
@@ -91,8 +91,7 @@ private:
     QProcess m_process;
     TonometerTest m_test;
 
-    void clearData() override;
-
+    bool clearData();
     void configureProcess();
 };
 

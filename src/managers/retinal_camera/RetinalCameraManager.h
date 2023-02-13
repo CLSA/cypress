@@ -14,7 +14,7 @@ class RetinalCameraManager : public ManagerBase
 public:
     explicit RetinalCameraManager(QString uuid = "");
 
-    bool isAvailable() override;
+    bool isAvailable();
 public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)
@@ -32,7 +32,7 @@ public slots:
 
 protected:
     // Context dependent clear test data and possibly device data (eg., serial port info)
-    void clearData() override;
+    bool clearData();
 
 private:
     QProcess m_process;

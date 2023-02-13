@@ -271,7 +271,8 @@ void RetinalCameraManager::finish()
 
 // SLOT
 // Context dependent clear test data and possibly device data (eg., serial port info)
-void RetinalCameraManager::clearData()
+bool RetinalCameraManager::clearData()
 {
     qDebug() << "RetinalCameraManager::clearData";
+    return false;
 }

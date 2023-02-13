@@ -29,7 +29,7 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&) const;
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
 
@@ -77,8 +77,7 @@ private:
 
     FraxTest m_test;
 
-    void clearData() override;
-
+    bool clearData();
     void configureProcess();
 };
 

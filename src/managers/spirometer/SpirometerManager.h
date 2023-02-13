@@ -19,7 +19,7 @@ public:
     ~SpirometerManager() = default;
 
     bool isDefined(const QString&, const SpirometerManager::FileType&) const;
-    bool isAvailable() override;
+    bool isAvailable();
 
 public slots:
 
@@ -90,7 +90,7 @@ private:
 
     SpirometerTest m_test;
 
-    void clearData() override;
+    bool clearData();
 
     // create a copy of the two databases in the EMR transfer directory
     //

@@ -13,7 +13,7 @@ class HipScanManager : public DXAManager
 public:
     explicit HipScanManager();
 
-    void clearData() override;
+    bool clearData();
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat) override;
 
