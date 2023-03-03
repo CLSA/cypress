@@ -194,3 +194,15 @@ void BloodPressureManager::abortComplete(const bool& success)
 {
     Q_UNUSED(success)
 }
+
+// Set up device
+bool BloodPressureManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool BloodPressureManager::cleanUp()
+{
+    return true;
+}

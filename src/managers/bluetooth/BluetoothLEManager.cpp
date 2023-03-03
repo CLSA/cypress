@@ -211,3 +211,15 @@ void BluetoothLEManager::updateTemperatureData(const QLowEnergyCharacteristic &c
 {
 
 }
+
+// Set up device
+bool BluetoothLEManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool BluetoothLEManager::cleanUp()
+{
+    return true;
+}

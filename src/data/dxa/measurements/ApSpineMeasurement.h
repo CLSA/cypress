@@ -1,9 +1,9 @@
 #ifndef APSPINEMEASUREMENT_H
 #define APSPINEMEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "DXAMeasurement.h"
 
-class ApSpineMeasurement : public Measurement
+class ApSpineMeasurement : public DXAMeasurement
 {
 public:
     ApSpineMeasurement();

@@ -31,6 +31,18 @@ signals:
 
 private:
     QThread captureThread;
+
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
+
+    // Send the test results to Pine
+    bool sendResultsToPine(const QJsonObject &data) override;
 };
 
 

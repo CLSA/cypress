@@ -1,9 +1,9 @@
 #ifndef IVAIMAGINGMEASUREMENT_H
 #define IVAIMAGINGMEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "DXAMeasurement.h"
 
-class IVAImagingMeasurement : public Measurement
+class IVAImagingMeasurement : public DXAMeasurement
 {
 public:
     IVAImagingMeasurement();

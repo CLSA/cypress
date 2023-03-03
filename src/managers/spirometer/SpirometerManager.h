@@ -90,22 +90,27 @@ private:
 
     SpirometerTest m_test;
 
-    bool clearData();
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
 
     // create a copy of the two databases in the EMR transfer directory
-    //
     void backupDatabases() const;
 
     // restore databases from copies
-    //
     void restoreDatabases() const;
-
     void removeXmlFiles() const;
-
     void configureProcess();
 
     QString getOutputPdfPath() const;
     bool outputPdfExists() const;
+
+
 };
 
 #endif // SPIROMETERMANAGER_H

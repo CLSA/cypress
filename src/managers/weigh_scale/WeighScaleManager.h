@@ -27,7 +27,6 @@ public:
     bool isAvailable();
 
 public slots:
-
     // connect to the serial port
     // opens the serial port with required parametere (baud rate etc.)
     // connects the port readyRead signal to the readDevice slot
@@ -60,7 +59,15 @@ private slots:
 
 private:
     WeighScaleTest m_test;
-    bool clearData();
+
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
 };
 
 #endif // WEIGHSCALEMANAGER_H

@@ -36,3 +36,23 @@ void SignaturePadManager::measure()
 void SignaturePadManager::finish()
 {
 }
+
+// Reset the session
+bool SignaturePadManager::clearData() {
+   return true;
+}
+
+// Set up device
+bool SignaturePadManager::setUp() {
+    return true;
+}
+
+// Clean up the device for next time
+bool SignaturePadManager::cleanUp() {
+    return true;
+}
+
+// Send the test results to Pine
+bool SignaturePadManager::sendResultsToPine(const QJsonObject &data) {
+    return true;
+};

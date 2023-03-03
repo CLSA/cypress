@@ -1,9 +1,9 @@
 #ifndef HIPMEASUREMENT_H
 #define HIPMEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "DXAMeasurement.h"
 
-class HipMeasurement : public Measurement
+class HipMeasurement : public DXAMeasurement
 {
 public:
     HipMeasurement();

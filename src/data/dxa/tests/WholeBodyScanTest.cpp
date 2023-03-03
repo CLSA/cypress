@@ -1,66 +1,60 @@
 #include "WholeBodyScanTest.h"
 #include <QJsonObject>
 
-WholeBodyScanTest::WholeBodyScanTest()
-{
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
 
-}
+const QList<QString> WholeBodyScanTest::m_inputKeyList = {
 
-bool WholeBodyScanTest::isValid() const
-{
-    return false;
-}
-
-void WholeBodyScanTest::reset()
-{
-    m_metaData.reset();
-    m_measurementList.clear();
-}
-
-QString WholeBodyScanTest::toString() const
-{
-   return "";
-}
-
-QJsonObject WholeBodyScanTest::toJsonObject() const
-{
-    return QJsonObject();
-}
+};
 
 const QList<QString> WholeBodyScanTest::m_outputKeyList = {
     "WBTOT_AREA",
     "WBTOT_BMC",
     "WBTOT_BMD",
+
     "SUBTOT_AREA",
     "SUBTOT_BMC",
     "SUBTOT_BMD",
+
     "HEAD_AREA",
     "HEAD_BMC",
     "HEAD_BMD",
+
     "LARM_AREA",
     "LARM_BMC",
     "LARM_BMD",
+
     "RARM_AREA",
     "RARM_BMC",
     "RARM_BMD",
+
     "LRIB_AREA",
     "LRIB_BMC",
     "LRIB_BMD",
+
     "RRIB_AREA",
     "RRIB_BMC",
     "RRIB_BMD",
+
     "T_S_AREA",
     "T_S_BMC",
     "T_S_BMD",
+
     "L_S_AREA",
     "L_S_BMC",
     "L_S_BMD",
+
     "PELV_AREA",
     "PELV_BMC",
     "PELV_BMD",
+
     "LLEG_AREA",
     "LLEG_BMC",
     "LLEG_BMD",
+
     "RLEG_AREA",
     "RLEG_BMC",
     "RLEG_BMD",
@@ -69,34 +63,42 @@ const QList<QString> WholeBodyScanTest::m_outputKeyList = {
     "LEAN_STD",
     "BRAIN_FAT",
     "WATER_LBM",
+
     "HEAD_FAT",
     "HEAD_LEAN",
     "HEAD_MASS",
     "HEAD_PFAT",
+
     "LARM_FAT",
     "LARM_LEAN",
     "LARM_MASS",
     "LARM_PFAT",
+
     "RARM_FAT",
     "RARM_LEAN",
     "RARM_MASS",
     "RARM_PFAT",
+
     "TRUNK_FAT",
     "TRUNK_LEAN",
     "TRUNK_MASS",
     "TRUNK_PFAT",
+
     "L_LEG_FAT",
     "L_LEG_LEAN",
     "L_LEG_MASS",
     "L_LEG_PFAT",
+
     "R_LEG_FAT",
     "R_LEG_LEAN",
     "R_LEG_MASS",
     "R_LEG_PFAT",
+
     "SUBTOT_FAT",
     "SUBTOT_LEAN",
     "SUBTOT_MASS",
     "SUBTOT_PFAT",
+
     "WBTOT_FAT",
     "WBTOT_LEAN",
     "WBTOT_MASS",
@@ -105,6 +107,7 @@ const QList<QString> WholeBodyScanTest::m_outputKeyList = {
     "NET_AVG_AREA",
     "NET_AVG_BMC",
     "NET_AVG_BMD",
+
     "GLOBAL_AREA",
     "GLOBAL_BMC",
     "GLOBAL_BMD",
@@ -185,6 +188,7 @@ const QList<QString> WholeBodyScanTest::m_outputKeyList = {
     "NET_AVG_LEAN",
     "NET_AVG_MASS",
     "NET_AVG_PFAT",
+
     "GLOBAL_FAT",
     "GLOBAL_LEAN",
     "GLOBAL_MASS",
@@ -285,5 +289,103 @@ const QList<QString> WholeBodyScanTest::m_outputKeyList = {
     "GYNOID_FAT",
     "GYNOID_LEAN",
 };
+
+WholeBodyScanTest::WholeBodyScanTest()
+{
+
+}
+
+bool WholeBodyScanTest::isValid() const
+{
+    return false;
+}
+
+Side WholeBodyScanTest::getSide() {
+    return Side::BOTH;
+}
+
+quint8 WholeBodyScanTest::getScanType() {
+    return 0;
+}
+
+QString WholeBodyScanTest::getName() {
+    return "ForearmTest";
+}
+
+QString WholeBodyScanTest::getBodyPartName() {
+    return "Forearm";
+}
+
+QString WholeBodyScanTest::getRefType() {
+    return 0;
+}
+
+QString WholeBodyScanTest::getRefSource() {
+    return "ref";
+}
+
+bool WholeBodyScanTest::isValidDicom(DcmFileFormat &loadedFileFormat) const
+{
+    const OFString modality = "OT";
+    const OFString bodyPartExamined = "";
+    const OFString imageAndFluoroscopyAreaDoseProduct = "";
+    const OFString patientOrientation = "";
+    const OFString bitsAllocated = "8";
+    const OFString photometricInterpretation = "RGB";
+    const OFString pixelSpacing = "";
+    const OFString samplesPerPixel = "3";
+    const OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    OFString value = "";
+    DcmDataset* dataset = loadedFileFormat.getDataset();
+
+    //const QString dicom1Name = getResultPrefix() + "_DICOM_1";
+    //const QString dicom2Name = getResultPrefix() + "_DICOM_2";
+
+    if (!dataset->tagExistsWithValue(DCM_Modality)) return false;
+    if (!dataset->tagExists(DCM_BodyPartExamined)) return false;
+    if (!dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct)) return false;
+    if (!dataset->tagExists(DCM_PatientOrientation)) return false;
+    if (!dataset->tagExistsWithValue(DCM_BitsAllocated)) return false;
+    if (!dataset->tagExists(DCM_PixelSpacing)) return false;
+    if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel)) return false;
+    if (!loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
+    if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation)) return false;
+
+    dataset->findAndGetOFString(DCM_Modality, value);
+    if (value != modality) return false;
+
+    dataset->findAndGetOFString(DCM_BitsAllocated, value);
+    if (value != bitsAllocated) return false;
+
+    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
+    if (value != photometricInterpretation) return false;
+
+    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
+    if (value != samplesPerPixel) return false;
+
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    if (value != mediaStorageSOPClassUID) return false;
+
+    return true;
+}
+
+void WholeBodyScanTest::reset()
+{
+    m_metaData.reset();
+    m_measurementList.clear();
+}
+
+QString WholeBodyScanTest::toString() const
+{
+   return "";
+}
+
+QJsonObject WholeBodyScanTest::toJsonObject() const
+{
+    return QJsonObject();
+}
+
+
 
 

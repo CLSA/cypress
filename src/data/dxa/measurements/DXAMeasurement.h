@@ -3,7 +3,6 @@
 
 #include "../../Measurement.h"
 
-
 class DXAMeasurement : public Measurement
 {
 public:

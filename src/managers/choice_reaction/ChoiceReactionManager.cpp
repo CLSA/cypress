@@ -94,3 +94,15 @@ bool ChoiceReactionManager::clearData()
     return false;
 }
 
+
+// Set up device
+bool ChoiceReactionManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool ChoiceReactionManager::cleanUp()
+{
+    return true;
+}

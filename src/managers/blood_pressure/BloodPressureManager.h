@@ -115,13 +115,13 @@ private:
     Measurement m_deviceData;
 
     // Set up device
-    //bool setUp() override;
+    bool setUp() override;
 
     //// Reset the session
-    //bool clearData() override;
+    bool clearData() override;
 
     //// Clean up the device for next time
-    //bool cleanUp() override;
+    bool cleanUp() override;
 
     //// Send the results to Pine for storage & analysis
     //bool sendResultsToPine(const QJsonObject &data) override;
@@ -145,5 +145,7 @@ private:
     QThread m_thread;
     BPMCommunication* m_comm { Q_NULLPTR };
 };
+
+
 
 #endif // BLOODPRESSUREMANAGER_H

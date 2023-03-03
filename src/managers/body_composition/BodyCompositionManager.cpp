@@ -714,3 +714,15 @@ void BodyCompositionManager::writeDevice()
     }
   }
 }
+
+// Set up device
+bool BodyCompositionManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool BodyCompositionManager::cleanUp()
+{
+    return true;
+}

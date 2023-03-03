@@ -40,13 +40,23 @@ private:
     QString m_databaseUser;
     QString m_databasePassword;
 
+    bool setInputData(const QVariantMap&) override;
     bool validateInputData(const QVariantMap& inputData);
+
     bool initializeConnections();
     bool configureProcess();
     bool processStart();
     bool readOutput();
 
-    bool clearData();
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
+
     bool isDefined(const QString&, const GripStrengthManager::FileType&) const;
 };
 

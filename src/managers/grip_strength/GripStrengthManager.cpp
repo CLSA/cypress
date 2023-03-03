@@ -196,6 +196,24 @@ bool GripStrengthManager::configureProcess() {
 }
 
 // Set up device
+bool GripStrengthManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool GripStrengthManager::cleanUp()
+{
+    return true;
+}
+
+
+void GripStrengthManager::setInputData(const QVariantMap&)
+{
+
+}
+
+// Set up device
 //    virtual bool setUp() = 0;
 //
 //    // Reset the session

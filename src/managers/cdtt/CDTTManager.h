@@ -51,7 +51,14 @@ private:
     QProcess m_process;
     CDTTTest m_test;
 
-    bool clearData();
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
 
     void configureProcess();
 };

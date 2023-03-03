@@ -31,18 +31,6 @@ public:
     bool isDefined(const QString&) const;
 
 public slots:
-
-    // scan for available devices (serial ports)
-    // emits scanning signal at start
-    // populates a list of devices using serial port name as key
-    // emits discovered signal with the serial port name when a port is discovered
-    // if the ini stored port is found
-    //   setDevice
-    // else
-    //   emits canSelect signal
-    //
-    bool scanDevices();
-
     // what the manager does in response to the main application
     // window invoking its run method
     //
@@ -80,6 +68,10 @@ private slots:
     //
     void setDevice(const QSerialPortInfo&);
 
+    virtual void handleSerialPortError(QSerialPort::SerialPortError error);
+    virtual void handleDataTerminalReadyChanged(bool set);
+    virtual void handleRequestToSendChanged(bool set);
+
 signals:
 
     // port scanning started
@@ -108,12 +100,20 @@ signals:
 
     void deviceNameChanged(const QString&);
 
+
 protected:
+    // scan for available devices (serial ports)
+    // emits scanning signal at start
+    // populates a list of devices using serial port name as key
+    // emits discovered signal with the serial port name when a port is discovered
+    // if the ini stored port is found
+    //   setDevice
+    // else
+    //   emits canSelect signal
+    //
+    bool scanDevices();
 
-
-
-    // device data is separate from test data
-    Measurement m_deviceData;
+    QJsonObject m_deviceData;
 
     // list of available serial ports
     QMap<QString,QSerialPortInfo> m_deviceList;
@@ -127,6 +127,18 @@ protected:
 
     // serial port input signal
     QByteArray m_request;
+
+    QJsonObject getDeviceData(const QSerialPortInfo& info);
+    void setDeviceData(const QJsonObject& deviceData);
+
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
 };
 
 #endif // SERIALPORTMANAGER_H

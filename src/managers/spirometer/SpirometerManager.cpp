@@ -354,3 +354,14 @@ bool SpirometerManager::outputPdfExists() const
     }
     return pdfExists;
 }
+
+
+// Set up device
+bool SpirometerManager::setUp() {
+    return true;
+}
+
+// Clean up the device for next time
+bool SpirometerManager::cleanUp() {
+    return true;
+}

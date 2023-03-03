@@ -30,10 +30,6 @@ public slots:
     //
     void finish() override;
 
-protected:
-    // Context dependent clear test data and possibly device data (eg., serial port info)
-    bool clearData();
-
 private:
     QProcess m_process;
     QString m_uuid;
@@ -44,6 +40,15 @@ private:
     bool restoreDatabase();
     bool openDatabase();
     bool backupDatabase();
+
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
 };
 
 #endif // RETINALCAMERAMANAGER_H

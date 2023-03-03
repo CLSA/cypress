@@ -24,6 +24,7 @@ public slots:
 
 signals:
     void signatureFinished(const QString& path);
+    void signatureOk(const QByteArray& data);
     void signatureReset();
 
 private:

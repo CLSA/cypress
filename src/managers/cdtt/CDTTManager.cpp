@@ -97,3 +97,16 @@ void CDTTManager::configureProcess()
 {
 
 }
+
+// Set up device
+bool CDTTManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool CDTTManager::cleanUp()
+{
+    return true;
+}
+

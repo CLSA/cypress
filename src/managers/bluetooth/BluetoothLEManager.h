@@ -147,13 +147,13 @@ private slots:
     void scanDevices();
 
     // Set up device
-    //bool setUp() override;
+    bool setUp() override;
 
     //// Reset the session
-    //bool clearData() override;
+    bool clearData() override;
 
     //// Clean up the device for next time
-    //bool cleanUp() override;
+    bool cleanUp() override;
 
     // Send the results to Pine for storage & analysis
     //bool sendResultsToPine(const QJsonObject &data) override;

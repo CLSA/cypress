@@ -27,10 +27,11 @@ AudiometerManager::AudiometerManager()
     m_test.setExpectedMeasurementCount(16);
 }
 
-bool AudiometerManager::isAvailable()
+bool AudiometerManager::isInstalled()
 {
-    bool found = scanDevices();
-    return found;
+    //bool found = scanDevices();
+    //return found;
+    return false;
 }
 
 bool AudiometerManager::clearData()
@@ -92,7 +93,7 @@ void AudiometerManager::readDevice()
         if(m_test.isValid())
         {
             // emit the can write signal
-            qDebug() << "signal canWrite";
+            qDebug() << "Audiometer::readDevice, signal canWrite";
             emit canWrite();
         }
     }

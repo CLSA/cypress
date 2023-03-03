@@ -113,6 +113,12 @@ void SignaturePadCommunication::processInput()
                 signature->KeyPadAddHotSpot(2, 1, 29, 38, 44, 19); //For BACK button
                 signature->KeyPadAddHotSpot(3, 1, 172, 37, 40, 19); //For EXIT button
                 signature->ClearSignature();
+
+                char* filePath = QString("C:\\Users\\Anthony\\Documents").toLocal8Bit().data();
+                signature->WriteImageFile(filePath);
+
+                //emit signatureOk();
+
             }
             else
             {

@@ -88,12 +88,7 @@ SOURCES += \
     managers/body_composition/BodyCompositionManager.cpp \
     managers/cdtt/CDTTManager.cpp \
     managers/choice_reaction/ChoiceReactionManager.cpp \
-    managers/dxa/ApSpineScanManager.cpp \
     managers/dxa/DXAManager.cpp \
-    managers/dxa/ForearmScanManager.cpp \
-    managers/dxa/HipScanManager.cpp \
-    managers/dxa/IVAImagingScanManager.cpp \
-    managers/dxa/WholeBodyScanManager.cpp \
     managers/dxa/dicom/DicomSCP.cpp \
     managers/dxa/dicom/LogWorker.cpp \
     managers/grip_strength/GripStrengthManager.cpp \
@@ -209,6 +204,7 @@ HEADERS += \
     data/TestBase.h \
 #    data/TemperatureMeasurement.h \
 #    data/TemperatureTest.h \
+    data/dxa/tests/dxatest.h \
     data/grip_strength/measurements/GripStrengthMeasurement.h \
     data/grip_strength/tests/GripStrengthTest.h \
     data/retinal_camera/databasemanager.h \
@@ -243,12 +239,7 @@ HEADERS += \
     managers/body_composition/BodyCompositionManager.h \
     managers/cdtt/CDTTManager.h \
     managers/choice_reaction/ChoiceReactionManager.h \
-    managers/dxa/ApSpineScanManager.h \
     managers/dxa/DXAManager.h \
-    managers/dxa/ForearmScanManager.h \
-    managers/dxa/HipScanManager.h \
-    managers/dxa/IVAImagingScanManager.h \
-    managers/dxa/WholeBodyScanManager.h \
     managers/dxa/dicom/DicomSCP.h \
     managers/dxa/dicom/LogWorker.h \
     managers/grip_strength/GripStrengthManager.h \

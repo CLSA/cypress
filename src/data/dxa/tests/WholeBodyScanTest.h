@@ -1,44 +1,31 @@
 #ifndef WHOLEBODYSCANTEST_H
 #define WHOLEBODYSCANTEST_H
 
-#include "../../../managers/dxa/DXAManager.h"
-#include "../../TestBase.h"
-#include "../measurements/WholeBodyScanMeasurement.h"
-
 #include <QString>
 #include <QList>
 
+#include "./dxatest.h"
+#include "../measurements/WholeBodyScanMeasurement.h"
 
 
-
-class WholeBodyScanTest : public TestBase<WholeBodyScanMeasurement>
+class WholeBodyScanTest: public DXATest<WholeBodyScanMeasurement>
 {
 public:
     explicit WholeBodyScanTest();
-      // TODO: implement validation for tests that capture participant ID meta data
-    // against an interview barcode
-    //
 
-    Side side = LEFT;
-
-    // String representation for debug and GUI display purposes
-    //
-    QString toString() const override;
-
-    // derived classes should at minimum check
-    // - number of measurements = expected number of measurements
-    // - meta data received matches on expected keys
-    // - attributes received matched on expected keys
-    //
     bool isValid() const override;
-
-    // String keys are converted to snake_case
-    //
-    QJsonObject toJsonObject() const override;
-
-    // default is to reset both meta and measurement data
-    //
+    bool isValidDicom(DcmFileFormat &loadedFileFormat) const override;
     void reset() override;
+
+    Side getSide() override;
+    quint8 getScanType() override;
+    QString getName() override;
+    QString getBodyPartName() override;
+    QString getRefType() override;
+    QString getRefSource() override;
+
+    QString toString() const override;
+    QJsonObject toJsonObject() const override;
 
 private:
     static const QList<QString> m_inputKeyList;

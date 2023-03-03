@@ -147,3 +147,15 @@ void FraxManager::finish()
         CypressApplication::status = Status::Waiting;
     }
 }
+
+// Set up device
+bool FraxManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool FraxManager::cleanUp()
+{
+    return true;
+}

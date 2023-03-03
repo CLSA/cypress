@@ -1,27 +1,28 @@
 #ifndef DXAMANAGER_H
 #define DXAMANAGER_H
 
-#include "../ManagerBase.h"
-
 #include <QObject>
 #include <QMap>
 #include <QVariant>
 #include <QString>
 
-#include "./dicom/DicomSCP.h"
 #include "dcmtk/dcmdata/dcfilefo.h"
+
+#include "../ManagerBase.h"
+#include "./dicom/DicomSCP.h"
+
+#include "data/dxa/tests/ApSpineTest.h"
+#include "data/dxa/tests/ForearmTest.h"
+#include "data/dxa/tests/HipTest.h"
+#include "data/dxa/tests/IVAImagingTest.h"
+#include "data/dxa/tests/WholeBodyScanTest.h"
+
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
  * PatScanDb table (eg., Hip) and the corresponding bonerange code in the RefScanDb ReferenceCurve table (eg., 123.).
  * Additional BMD variables and codes should be added here for other tables (ie., Spine).
  */
 
-
-enum Side {
-    LEFT,
-    RIGHT,
-    BOTH
-};
 
 class DXAManager : public ManagerBase
 {
@@ -30,35 +31,23 @@ public:
     explicit DXAManager();
     ~DXAManager();
 
-    const static QMap<QString, QString> ranges;
-
+    DicomSCP* m_dicomSCP;
     bool isAvailable();
 
     QJsonObject scanAnalysisJson;
     QJsonObject scoresJson;
-
-    DicomSCP* m_dicomSCP;
 
     QList<DcmFileFormat> validatedDicomFiles;
     QList<DcmFileFormat> getValidatedFiles(QStringList filePaths);
 
     QVariantMap getParticipantData();
 
-    virtual Side getSide() = 0;
-    virtual quint8 getScanType() = 0;
-
-    virtual bool validateDicomFile(DcmFileFormat &loadedFileFormat) = 0;
-    virtual QMap<QString, QVariant> retrieveDeviceData() = 0;
-    virtual QMap<QString, QVariant> extractScanAnalysisData() = 0;
-    virtual QMap<QString, QVariant> computeTandZScores() = 0;
-
-    virtual QString getName() = 0;
-    virtual QString getBodyPartName() = 0;
-    virtual QString getRefType() = 0;
-    virtual QString getRefSource() = 0;
+    QMap<QString, QVariant> retrieveDeviceData();
+    QMap<QString, QVariant> extractScanAnalysisData();
+    QMap<QString, QVariant> computeTandZScores();
 
     void dicomFilesReceived(QStringList paths);
-
+    bool validateDicomFile(DcmFileFormat &loadedFileFormat);
     bool startDicomServer();
     bool endDicomServer();
 
@@ -66,23 +55,29 @@ public:
     bool isCompleteDicom(DcmFileFormat &file);
 
 public slots:
-    // what the manager does in response to the main application
-    // window invoking its run method
-    //
     void start() override;
-
-    // retrieve a measurement from the device
-    //
     void measure() override;
-
-    // implementation of final clean up of device after disconnecting and all
-    // data has been retrieved and processed by any upstream classes
-    //
     void finish() override;
 
 protected slots:
     void dicomServerExitNormal();
     void dicomServerExitCrash();
+
+private:
+    ApSpineTest m_apSpineTest;
+    ForearmTest m_forearmTest;
+    HipTest m_hipScanTest;
+    IVAImagingTest m_ivaImagingTest;
+    WholeBodyScanTest m_wholeBodyTest;
+
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
 };
 
 #endif // DXAMANAGER_H

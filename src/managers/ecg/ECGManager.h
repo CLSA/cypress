@@ -108,8 +108,16 @@ private:
     const QString INIT_PATH = "initecg";
     const QString DATABASE_PATH = "DATABASE";
 
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
+
     bool deleteDeviceData();
-    bool clearData();
     void configureProcess();
 };
 

@@ -16,11 +16,6 @@
 #include "signaturepaddialog.h"
 
 #include "DXADialog.h"
-#include "managers/dxa/ApSpineScanManager.h"
-#include "managers/dxa/ForearmScanManager.h"
-#include "managers/dxa/IVAImagingScanManager.h"
-#include "managers/dxa/WholeBodyScanManager.h"
-#include "managers/dxa/HipScanManager.h"
 
 
 DialogFactory *DialogFactory::pInstance = Q_NULLPTR;
@@ -84,24 +79,10 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QStri
       case Constants::MeasureType::typeECG:
         dialog = new ECGDialog();
         break;
-
       case Constants::MeasureType::typeCarotidIntima:
         break;
-
       case Constants::MeasureType::typeDxaWholeBody:
-        dialog = new DXADialog(new WholeBodyScanManager);
-        break;
-      case Constants::MeasureType::typeDxaForearmBone:
-        dialog = new DXADialog(new ForearmScanManager);
-        break;
-      case Constants::MeasureType::typeDxaSpineBone:
-        dialog = new DXADialog(new APSpineScanManager);
-        break;
-      case Constants::MeasureType::typeDxaLateralBone:
-        dialog = new DXADialog(new IVAImagingScanManager);
-        break;
-      case Constants::MeasureType::typeDxaDualHip:
-        dialog = new DXADialog(new HipScanManager);
+        dialog = new DXADialog(uuid);
         break;
       case Constants::MeasureType::typeSignature:
         dialog = new SignaturePadDialog(uuid);

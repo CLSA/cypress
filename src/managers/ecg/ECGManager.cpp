@@ -123,3 +123,16 @@ bool ECGManager::deleteDeviceData()
 {
    return false;
 }
+
+// Set up device
+bool ECGManager::setUp()
+{
+    return true;
+}
+
+// Clean up the device for next time
+bool ECGManager::cleanUp()
+{
+    return true;
+}
+

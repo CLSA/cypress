@@ -14,7 +14,7 @@ class DXADialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit DXADialog(DXAManager* manager, QWidget *parent = nullptr, QString uuid = "");
+    explicit DXADialog(QString uuid = "");
     ~DXADialog();
 
 protected:
@@ -23,7 +23,7 @@ protected:
     void initializeConnections() override;
 
     Ui::DXADialog *ui;
-    std::unique_ptr<DXAManager> m_manager;
+    QScopedPointer<DXAManager> m_manager;
 
 public slots:
     void dicomFilesReceived(QStringList& dicomFilePaths);

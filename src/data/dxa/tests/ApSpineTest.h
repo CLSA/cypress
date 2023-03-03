@@ -2,35 +2,28 @@
 #define APSPINETEST_H
 
 #include <QJsonObject>
-#include "../../../managers/dxa/DXAManager.h"
-#include "../../TestBase.h"
+#include "dxatest.h"
 #include "../measurements/ApSpineMeasurement.h"
 
-class ApSpineTest : public TestBase<ApSpineMeasurement>
+
+class ApSpineTest : public DXATest<ApSpineMeasurement>
 {
 public:
     explicit ApSpineTest();
 
-    Side side = LEFT;
-
-    // String representation for debug and GUI display purposes
-    //
-    QString toString() const override;
-
-    // derived classes should at minimum check
-    // - number of measurements = expected number of measurements
-    // - meta data received matches on expected keys
-    // - attributes received matched on expected keys
-    //
     bool isValid() const override;
-
-    // String keys are converted to snake_case
-    //
-    QJsonObject toJsonObject() const override;
-
-    // default is to reset both meta and measurement data
-    //
+    bool isValidDicom(DcmFileFormat &loadedFileFormat) const override;
     void reset() override;
+
+    Side getSide() override;
+    quint8 getScanType() override;
+    QString getName() override;
+    QString getBodyPartName() override;
+    QString getRefType() override;
+    QString getRefSource() override;
+
+    QJsonObject toJsonObject() const override;
+    QString toString() const override;
 
 private:
     const static QList<QString> m_outputKeyList;

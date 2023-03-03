@@ -1,9 +1,9 @@
 #ifndef FOREARMMEASUREMENT_H
 #define FOREARMMEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "DXAMeasurement.h"
 
-class ForearmMeasurement : public Measurement
+class ForearmMeasurement : public DXAMeasurement
 {
 public:
     ForearmMeasurement();

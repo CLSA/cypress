@@ -31,7 +31,7 @@ public:
     ~ManagerBase();
 
     // Is this instrument available at the installed workstation?
-    static bool isDefined();
+    static bool isInstalled();
 
 public slots:
     // subclasses call methods after main initialization just prior
@@ -68,6 +68,14 @@ protected:
     // The unique identifier representing this test session (for pine state management)
     QString m_uuid;
 
+    QVariantMap m_inputData;
+    virtual void setInputData(const QVariantMap&) = 0;
+
+    QVariant getInputDataValue(const QString &);
+
+    // Input data from Pine
+    QList<QString> m_inputKeyList;
+
     // Context dependent clear test data and possibly device data (eg., serial port info)
     // SerialPortManager class clears device data during setDevice() while
     // test data is cleared depending on derived class implementation requirements.
@@ -75,16 +83,16 @@ protected:
     // such as when multiple measurements are separately acquired.
     //
 
-    //// Set up device
-    //virtual bool setUp() = 0;
+    // Set up device
+    virtual bool setUp() = 0;
 
-    //// Reset the session
-    //virtual bool clearData() = 0;
+    // Reset the session
+    virtual bool clearData() = 0;
 
-    //// Clean up the device for next time
-    //virtual bool cleanUp() = 0;
+    // Clean up the device for next time
+    virtual bool cleanUp() = 0;
 
-    //// Send the results to Pine for storage & analysis
+    // Send the test results to Pine for storage & analysis
     virtual bool sendResultsToPine(const QJsonObject &data);
 };
 
