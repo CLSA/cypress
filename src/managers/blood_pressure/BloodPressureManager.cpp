@@ -206,3 +206,15 @@ bool BloodPressureManager::cleanUp()
 {
     return true;
 }
+
+// Clean up the device for next time
+bool BloodPressureManager::clearData()
+{
+    return true;
+}
+
+void BloodPressureManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+

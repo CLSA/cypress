@@ -40,7 +40,6 @@ private:
     QString m_databaseUser;
     QString m_databasePassword;
 
-    bool setInputData(const QVariantMap&) override;
     bool validateInputData(const QVariantMap& inputData);
 
     bool initializeConnections();
@@ -56,6 +55,9 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
+
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
 
     bool isDefined(const QString&, const GripStrengthManager::FileType&) const;
 };

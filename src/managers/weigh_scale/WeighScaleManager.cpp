@@ -119,7 +119,7 @@ void WeighScaleManager::readDevice()
     {
       if("i" == QString(m_request))
       {
-        m_deviceData.setAttribute("software_id", QString(m_buffer.simplified()));
+        //m_deviceData.setAttribute("software_id", QString(m_buffer.simplified()));
         // signal the GUI that the measure button can be clicked
         //
         emit canMeasure();
@@ -159,3 +159,21 @@ void WeighScaleManager::writeDevice()
     m_buffer.clear();
     m_port.write(m_request);
 }
+
+// set input parameters for the test
+void WeighScaleManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+bool WeighScaleManager::setUp()
+{
+    return true;
+}
+
+bool WeighScaleManager::cleanUp()
+{
+    return true;
+}
+
+

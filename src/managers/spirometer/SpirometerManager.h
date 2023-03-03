@@ -110,6 +110,9 @@ private:
     QString getOutputPdfPath() const;
     bool outputPdfExists() const;
 
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
 
 };
 

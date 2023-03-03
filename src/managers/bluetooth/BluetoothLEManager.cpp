@@ -223,3 +223,13 @@ bool BluetoothLEManager::cleanUp()
 {
     return true;
 }
+
+bool BluetoothLEManager::clearData()
+{
+    return true;
+}
+
+void BluetoothLEManager::setInputData(const QVariantMap& inputData)
+{
+
+}

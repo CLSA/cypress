@@ -70,6 +70,9 @@ private:
     IVAImagingTest m_ivaImagingTest;
     WholeBodyScanTest m_wholeBodyTest;
 
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
     // Reset the session
     bool clearData() override;
 

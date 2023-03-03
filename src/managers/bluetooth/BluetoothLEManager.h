@@ -155,6 +155,9 @@ private slots:
     //// Clean up the device for next time
     bool cleanUp() override;
 
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
     // Send the results to Pine for storage & analysis
     //bool sendResultsToPine(const QJsonObject &data) override;
 

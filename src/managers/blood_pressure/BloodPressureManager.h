@@ -117,13 +117,16 @@ private:
     // Set up device
     bool setUp() override;
 
-    //// Reset the session
+    // Reset the session
     bool clearData() override;
 
-    //// Clean up the device for next time
+    // Clean up the device for next time
     bool cleanUp() override;
 
-    //// Send the results to Pine for storage & analysis
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
+    // Send the results to Pine for storage & analysis
     //bool sendResultsToPine(const QJsonObject &data) override;
 
     bool m_aborted { false };

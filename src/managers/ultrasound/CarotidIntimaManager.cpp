@@ -9,11 +9,6 @@ CarotidIntimaManager::CarotidIntimaManager()
 
 }
 
-bool CarotidIntimaManager::isAvailable()
-{
-    return false;
-}
-
 void CarotidIntimaManager::start()
 {
     if (CypressApplication::mode == Mode::Sim) return;
@@ -46,4 +41,20 @@ void CarotidIntimaManager::finish()
 bool CarotidIntimaManager::clearData()
 {
     return false;
+}
+
+// set input parameters for the test
+void CarotidIntimaManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+bool CarotidIntimaManager::setUp()
+{
+    return true;
+}
+
+bool CarotidIntimaManager::cleanUp()
+{
+    return true;
 }

@@ -287,3 +287,9 @@ bool RetinalCameraManager::cleanUp()
 {
     return true;
 }
+
+// set input parameters for the test
+void RetinalCameraManager::setInputData(const QVariantMap& inputData)
+{
+
+}

@@ -106,3 +106,8 @@ bool ChoiceReactionManager::cleanUp()
 {
     return true;
 }
+
+void ChoiceReactionManager::setInputData(const QVariantMap& inputData)
+{
+
+}

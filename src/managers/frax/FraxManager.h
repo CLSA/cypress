@@ -86,6 +86,9 @@ private:
     // Clean up the device for next time
     bool cleanUp() override;
 
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
     void configureProcess();
 };
 

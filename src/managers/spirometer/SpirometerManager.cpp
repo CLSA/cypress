@@ -365,3 +365,9 @@ bool SpirometerManager::setUp() {
 bool SpirometerManager::cleanUp() {
     return true;
 }
+
+// set input parameters for the test
+void SpirometerManager::setInputData(const QVariantMap& inputData)
+{
+
+}

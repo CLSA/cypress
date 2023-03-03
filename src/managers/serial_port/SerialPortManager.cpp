@@ -206,3 +206,25 @@ void SerialPortManager::disconnectDevice()
 
     emit canConnectDevice();
 }
+
+// set input parameters for the test
+void SerialPortManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+
+bool SerialPortManager::setUp()
+{
+    return true;
+}
+
+bool SerialPortManager::clearData()
+{
+    return true;
+}
+
+bool SerialPortManager::cleanUp()
+{
+    return true;
+}

@@ -101,6 +101,9 @@ private:
     bool cleanUp() override;
 
     void configureProcess();
+
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
 };
 
 #endif // TONOMETERMANAGER_H

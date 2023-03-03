@@ -110,3 +110,8 @@ bool CDTTManager::cleanUp()
     return true;
 }
 
+void CDTTManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+

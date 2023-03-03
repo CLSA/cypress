@@ -136,3 +136,8 @@ bool ECGManager::cleanUp()
     return true;
 }
 
+void ECGManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+

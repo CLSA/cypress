@@ -159,3 +159,8 @@ bool FraxManager::cleanUp()
 {
     return true;
 }
+
+void FraxManager::setInputData(const QVariantMap& inputData)
+{
+
+}

@@ -66,6 +66,9 @@ private:
     // Reset the session
     bool clearData() override;
 
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
     // Set up device
     bool setUp() override;
 

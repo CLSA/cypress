@@ -128,3 +128,19 @@ void TonometerManager::finish()
         CypressApplication::status = Status::Waiting;
     }
 }
+
+// set input parameters for the test
+void TonometerManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+bool TonometerManager::setUp()
+{
+    return true;
+}
+
+bool TonometerManager::cleanUp()
+{
+    return true;
+}

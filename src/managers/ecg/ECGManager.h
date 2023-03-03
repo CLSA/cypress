@@ -103,6 +103,9 @@ private:
 
     ECGTest m_test;
 
+    // set input parameters for the test
+    void setInputData(const QVariantMap& inputData) override;
+
     // path for Cardiosoft database backup to and restore from
     //
     const QString INIT_PATH = "initecg";

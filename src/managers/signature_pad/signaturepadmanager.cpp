@@ -56,3 +56,9 @@ bool SignaturePadManager::cleanUp() {
 bool SignaturePadManager::sendResultsToPine(const QJsonObject &data) {
     return true;
 };
+
+// set input parameters for the test
+void SignaturePadManager::setInputData(const QVariantMap& inputData)
+{
+
+}

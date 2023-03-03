@@ -268,7 +268,7 @@ QMap<QByteArray,QString> BodyCompositionManager::initIncorrectResponseLUT()
 
 bool BodyCompositionManager::clearData()
 {
-    m_deviceData.reset();
+    m_deviceData = {};
     m_test.reset();
     emit dataChanged();
     return true;
@@ -294,7 +294,7 @@ void BodyCompositionManager::finish()
         return;
     }
 
-    m_deviceData.reset();
+    m_deviceData = {};
     m_deviceList.clear();
     m_test.reset();
 
@@ -725,4 +725,9 @@ bool BodyCompositionManager::setUp()
 bool BodyCompositionManager::cleanUp()
 {
     return true;
+}
+
+void BodyCompositionManager::setInputData(const QVariantMap& inputData)
+{
+
 }

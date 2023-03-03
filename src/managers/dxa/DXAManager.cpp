@@ -153,6 +153,25 @@ void DXAManager::dicomServerExitCrash()
 
 }
 
+QMap<QString, QVariant> DXAManager::retrieveDeviceData()
+{
+    return QVariantMap();
+}
+
+
+QMap<QString, QVariant> DXAManager::extractScanAnalysisData()
+{
+    return QVariantMap();
+}
+
+
+QMap<QString, QVariant> DXAManager::computeTandZScores()
+{
+    return QVariantMap();
+}
+
+
+
 QVariantMap DXAManager::getParticipantData()
 {
     return QVariantMap();
@@ -164,8 +183,18 @@ bool DXAManager::setUp()
     return true;
 }
 
-// Clean up the device for next time
 bool DXAManager::cleanUp()
 {
     return true;
 }
+
+bool DXAManager::clearData()
+{
+    return true;
+}
+
+void DXAManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+

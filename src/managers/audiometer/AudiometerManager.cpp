@@ -116,3 +116,18 @@ void AudiometerManager::writeDevice()
     qDebug() << "slot writeDevice";
     m_port.write(m_request);
 }
+
+bool AudiometerManager::setUp()
+{
+    return true;
+}
+
+bool AudiometerManager::cleanUp()
+{
+    return true;
+}
+
+void AudiometerManager::setInputData(const QVariantMap& inputData)
+{
+
+}
