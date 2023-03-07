@@ -17,6 +17,7 @@ DialogBase::DialogBase(QWidget *parent, QString uuid)
     , m_verbose(false)
 {
     m_uuid = uuid;
+    this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void DialogBase::initialize()
@@ -43,11 +44,8 @@ void DialogBase::closeEvent(QCloseEvent *event)
         return;
     }
 
-    if(m_verbose)
-        qDebug() << "Close event called";
-
-    m_manager->finish();
     event->accept();
+    //m_manager.get()->finish();
 }
 
 void DialogBase::complete(QJsonObject &results)

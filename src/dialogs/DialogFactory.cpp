@@ -35,7 +35,7 @@ DialogFactory::~DialogFactory()
 
 DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QString uuid)
 {
-    DialogBase* dialog = Q_NULLPTR;
+    DialogBase* dialog;
     switch(type)
     {
       case Constants::MeasureType::typeWeigh_Scale:

@@ -50,7 +50,7 @@ signals:
 private:
     Constants::RunMode m_mode { Constants::RunMode::modeUnknown };
     Constants::MeasureType m_type { Constants::MeasureType::typeUnknown };
-    QScopedPointer<DialogBase> m_dialog;
+    QSharedPointer<DialogBase> m_dialog;
 
     bool m_verbose = true;
 };

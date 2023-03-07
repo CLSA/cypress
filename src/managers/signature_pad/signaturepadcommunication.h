@@ -18,6 +18,7 @@ class SignaturePadCommunication : public QObject
     Q_OBJECT
 public:
     explicit SignaturePadCommunication();
+    ~SignaturePadCommunication();
 
 public slots:
     void start();
@@ -28,11 +29,6 @@ signals:
     void signatureReset();
 
 private:
-    void toggleDisplay(bool on);
-
-    void processInput();
-    void finish();
-
     Signature* signature;
     TabletInterface* tablet;
     LCDInterface* lcd;
@@ -42,6 +38,15 @@ private:
     LCDGraphicBitmap* sign;
     LCDGraphicBitmap* clear;
     LCDGraphicBitmap* ok;
+
+    void toggleDisplay(bool on);
+
+    void drawSign();
+    void clearSignature();
+    void drawThanks();
+
+    bool capture();
+    void finish();
 };
 
 #endif // SIGNATUREPADCOMMUNICATION_H

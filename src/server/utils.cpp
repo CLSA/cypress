@@ -23,33 +23,29 @@ QJsonObject Utils::httpPost(const QJsonObject& data)
     {
         QString dataString = JsonSettings::serializeJson(data);
 
-        URI uri("http://localhost:9000/");
+        URI uri("http://localhost:8000/");
         HTTPClientSession session(uri.getHost(), uri.getPort());
 
         std::string path(uri.getPathAndQuery());
         if (path.empty()) path = "/";
 
         HTTPRequest req(HTTPRequest::HTTP_PATCH, path, HTTPMessage::HTTP_1_1);
-        req.setContentType("application/json");
 
+        req.setContentType("application/json");
         req.setContentLength(dataString.length());
 
         std::ostream &os = session.sendRequest(req);
         os << dataString.toStdString();
 
-        qDebug() << "REQUEST: " << dataString;
         HTTPResponse res;
-        qDebug() << "RESPONSE: " << res.getStatus();
 
         std::istream &is = session.receiveResponse(res);
         std::stringstream ss;
         StreamCopier::copyStream(is, ss);
-
-        qDebug() << QString::fromStdString(ss.str());
     }
     catch (Exception &e)
     {
-
+        qDebug() << e.what();
     }
 
     return QJsonObject();

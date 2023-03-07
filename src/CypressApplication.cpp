@@ -103,15 +103,15 @@ bool CypressApplication::startTest(Constants::MeasureType type, QString uuid)
         setArgs(args);
         factory = DialogFactory::instance();
 
-        m_dialog.reset(factory->instantiate(type, uuid));
-        if(m_dialog.isNull()) {
+        DialogBase* dialog = factory->instantiate(type, uuid);
+        if(dialog == Q_NULLPTR) {
             QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
             return false;
         }
 
-        m_dialog->setRunMode(Constants::RunMode::modeDefault);
-        m_dialog->initialize();
-        m_dialog->show();
+        dialog->setRunMode(Constants::RunMode::modeDefault);
+        dialog->initialize();
+        dialog->show();
 
         CypressApplication::status = Status::Active;
     }

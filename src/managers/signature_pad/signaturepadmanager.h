@@ -2,6 +2,7 @@
 #define SIGNATUREPADMANAGER_H
 
 #include "managers/ManagerBase.h"
+#include "managers//signature_pad/signaturepadcommunication.h"
 
 #ifndef SIGLIB_H
 #define SIGLIB_H
@@ -21,16 +22,24 @@ public:
     explicit SignaturePadManager();
     ~SignaturePadManager();
 
+    void restart();
+
 public slots:
     void start() override;
     void measure() override;
     void finish() override;
 
+    void receiveSignature(const QByteArray& bytes);
+
 signals:
     void startCapture();
+    void displaySignature(const QByteArray& bytes);
+    void reset();
 
 private:
     QThread captureThread;
+    QByteArray signature;
+    QScopedPointer<SignaturePadCommunication> spc;
 
     // Reset the session
     bool clearData() override;
@@ -43,9 +52,6 @@ private:
 
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;
-
-    // Send the test results to Pine
-    bool sendResultsToPine(const QJsonObject &data) override;
 };
 
 
