@@ -25,7 +25,7 @@
      <item>
       <widget class="QGroupBox" name="form">
        <property name="title">
-        <string>DEXA</string>
+        <string/>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
@@ -149,7 +149,7 @@
             <item>
              <widget class="QPushButton" name="collectButton">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>Collect</string>
