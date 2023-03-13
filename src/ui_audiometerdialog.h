@@ -17,7 +17,6 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include "widgets/BarcodeWidget.h"
 #include "widgets/MeasureWidget.h"
@@ -28,9 +27,6 @@ class Ui_AudiometerDialog
 {
 public:
     QVBoxLayout *verticalLayout_2;
-    QGroupBox *idGroupBox;
-    QHBoxLayout *horizontalLayout;
-    BarcodeWidget *barcodeWidget;
     QGroupBox *serialPortGroupBox;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_3;
@@ -41,7 +37,6 @@ public:
     QGroupBox *measureGroupBox;
     QVBoxLayout *verticalLayout_3;
     MeasureWidget *measureWidget;
-    QStatusBar *statusBar;
 
     void setupUi(QDialog *AudiometerDialog)
     {
@@ -50,25 +45,13 @@ public:
         AudiometerDialog->resize(561, 541);
         verticalLayout_2 = new QVBoxLayout(AudiometerDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        idGroupBox = new QGroupBox(AudiometerDialog);
-        idGroupBox->setObjectName(QString::fromUtf8("idGroupBox"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(idGroupBox->sizePolicy().hasHeightForWidth());
-        idGroupBox->setSizePolicy(sizePolicy);
-        horizontalLayout = new QHBoxLayout(idGroupBox);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        barcodeWidget = new BarcodeWidget(idGroupBox);
-        barcodeWidget->setObjectName(QString::fromUtf8("barcodeWidget"));
-
-        horizontalLayout->addWidget(barcodeWidget);
-
-
-        verticalLayout_2->addWidget(idGroupBox);
-
         serialPortGroupBox = new QGroupBox(AudiometerDialog);
         serialPortGroupBox->setObjectName(QString::fromUtf8("serialPortGroupBox"));
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(serialPortGroupBox->sizePolicy().hasHeightForWidth());
+        serialPortGroupBox->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(serialPortGroupBox);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout_3 = new QHBoxLayout();
@@ -111,8 +94,11 @@ public:
 
         measureGroupBox = new QGroupBox(AudiometerDialog);
         measureGroupBox->setObjectName(QString::fromUtf8("measureGroupBox"));
-        sizePolicy.setHeightForWidth(measureGroupBox->sizePolicy().hasHeightForWidth());
-        measureGroupBox->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(measureGroupBox->sizePolicy().hasHeightForWidth());
+        measureGroupBox->setSizePolicy(sizePolicy3);
         verticalLayout_3 = new QVBoxLayout(measureGroupBox);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         measureWidget = new MeasureWidget(measureGroupBox);
@@ -123,12 +109,6 @@ public:
 
         verticalLayout_2->addWidget(measureGroupBox);
 
-        statusBar = new QStatusBar(AudiometerDialog);
-        statusBar->setObjectName(QString::fromUtf8("statusBar"));
-        statusBar->setSizeGripEnabled(false);
-
-        verticalLayout_2->addWidget(statusBar);
-
 
         retranslateUi(AudiometerDialog);
 
@@ -138,7 +118,6 @@ public:
     void retranslateUi(QDialog *AudiometerDialog)
     {
         AudiometerDialog->setWindowTitle(QCoreApplication::translate("AudiometerDialog", "Hearing Measurement", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "Barcode", nullptr));
         serialPortGroupBox->setTitle(QCoreApplication::translate("AudiometerDialog", "Serial Ports", nullptr));
         serialPortLabel->setText(QCoreApplication::translate("AudiometerDialog", "Serial Port:", nullptr));
         connectButton->setText(QCoreApplication::translate("AudiometerDialog", "Connect", nullptr));

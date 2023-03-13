@@ -15,7 +15,7 @@ RetinalCameraDialog::RetinalCameraDialog(QString uuid) : ui(new Ui::RetinalCamer
     if (CypressApplication::mode == Mode::Sim)
     {
         setWindowTitle("Retinal Camera (SIM)");
-        ui->measureWidget->enableMeasure();
+        //ui->measureWidget->enableMeasure();
     }
 
     m_manager.reset(new RetinalCameraManager(m_uuid));
@@ -33,7 +33,7 @@ void RetinalCameraDialog::initializeModel()
 void RetinalCameraDialog::initializeConnections()
 {
     QSharedPointer<RetinalCameraManager> derived = m_manager.staticCast<RetinalCameraManager>();
-    connect(ui->measureWidget, &MeasureWidget::measure, derived.get(), &RetinalCameraManager::measure);
+    //connect(ui->measureWidget, &MeasureWidget::measure, derived.get(), &RetinalCameraManager::measure);
 
     //this->run();
    // connect(ui->barcodeWidget, &BarcodeWidget::validated,

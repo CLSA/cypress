@@ -23,24 +23,6 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QGroupBox" name="idGroupBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="title">
-        <string>Barcode</string>
-       </property>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="BarcodeWidget" name="barcodeWidget" native="true"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <widget class="MeasureWidget" name="measureWidget" native="true"/>
      </item>
     </layout>
@@ -48,12 +30,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>BarcodeWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/BarcodeWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>MeasureWidget</class>
    <extends>QWidget</extends>

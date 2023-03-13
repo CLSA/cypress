@@ -7,10 +7,6 @@
 
 SerialPortManager::SerialPortManager()
 {
-}
-
-void SerialPortManager::start()
-{
     connect(&m_port, &QSerialPort::readyRead,
             this,    &SerialPortManager::readDevice);
 
@@ -21,10 +17,12 @@ void SerialPortManager::start()
             this,    &SerialPortManager::handleDataTerminalReadyChanged);
 
     connect(&m_port, &QSerialPort::requestToSendChanged,
-            this,    &SerialPortManager::handleRequestToSendChanged);;
+            this,    &SerialPortManager::handleRequestToSendChanged);
+}
 
+void SerialPortManager::start()
+{
     scanDevices();
-
     //qDebug() << "signal dataChanged";
     //emit dataChanged();
 }

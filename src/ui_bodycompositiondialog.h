@@ -14,7 +14,6 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -32,9 +31,6 @@ class Ui_BodyCompositionDialog
 {
 public:
     QVBoxLayout *verticalLayout_2;
-    QGroupBox *idGroupBox;
-    QHBoxLayout *horizontalLayout;
-    BarcodeWidget *barcodeWidget;
     QGroupBox *serialPortGroupBox;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_3;
@@ -43,28 +39,28 @@ public:
     QPushButton *connectButton;
     QPushButton *disconnectButton;
     QGroupBox *inputsGroupBox;
-    QFormLayout *formLayout;
+    QVBoxLayout *verticalLayout_4;
+    QHBoxLayout *horizontalLayout_4;
+    QLabel *label;
+    QLineEdit *ageLineEdit;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_5;
     QRadioButton *maleRadio;
     QRadioButton *femaleRadio;
-    QHBoxLayout *horizontalLayout_4;
-    QLabel *label;
-    QLineEdit *ageLineEdit;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label_3;
+    QLineEdit *heightLineEdit;
     QHBoxLayout *horizontalLayout_8;
     QLabel *label_6;
     QRadioButton *metricRadio;
     QRadioButton *imperialRadio;
-    QHBoxLayout *horizontalLayout_7;
-    QLabel *label_3;
-    QLineEdit *heightLineEdit;
-    QHBoxLayout *horizontalLayout_6;
-    QLabel *label_2;
-    QLineEdit *tareWeightLineEdit;
     QHBoxLayout *horizontalLayout_5;
     QLabel *label_4;
     QRadioButton *standardRadio;
     QRadioButton *athleticRadio;
+    QHBoxLayout *horizontalLayout_6;
+    QLabel *label_2;
+    QLineEdit *tareWeightLineEdit;
     QHBoxLayout *horizontalLayout_9;
     QPushButton *setButton;
     QPushButton *resetButton;
@@ -73,8 +69,8 @@ public:
     QVBoxLayout *verticalLayout_3;
     MeasureWidget *measureWidget;
     QStatusBar *statusBar;
-    QButtonGroup *genderGroup;
     QButtonGroup *bodyTypeGroup;
+    QButtonGroup *genderGroup;
     QButtonGroup *unitsGroup;
 
     void setupUi(QDialog *BodyCompositionDialog)
@@ -84,25 +80,13 @@ public:
         BodyCompositionDialog->resize(587, 649);
         verticalLayout_2 = new QVBoxLayout(BodyCompositionDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        idGroupBox = new QGroupBox(BodyCompositionDialog);
-        idGroupBox->setObjectName(QString::fromUtf8("idGroupBox"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(idGroupBox->sizePolicy().hasHeightForWidth());
-        idGroupBox->setSizePolicy(sizePolicy);
-        horizontalLayout = new QHBoxLayout(idGroupBox);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        barcodeWidget = new BarcodeWidget(idGroupBox);
-        barcodeWidget->setObjectName(QString::fromUtf8("barcodeWidget"));
-
-        horizontalLayout->addWidget(barcodeWidget);
-
-
-        verticalLayout_2->addWidget(idGroupBox);
-
         serialPortGroupBox = new QGroupBox(BodyCompositionDialog);
         serialPortGroupBox->setObjectName(QString::fromUtf8("serialPortGroupBox"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(serialPortGroupBox->sizePolicy().hasHeightForWidth());
+        serialPortGroupBox->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(serialPortGroupBox);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout_3 = new QHBoxLayout();
@@ -140,13 +124,31 @@ public:
 
         inputsGroupBox = new QGroupBox(BodyCompositionDialog);
         inputsGroupBox->setObjectName(QString::fromUtf8("inputsGroupBox"));
-        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Maximum);
+        sizePolicy.setHeightForWidth(inputsGroupBox->sizePolicy().hasHeightForWidth());
+        inputsGroupBox->setSizePolicy(sizePolicy);
+        verticalLayout_4 = new QVBoxLayout(inputsGroupBox);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label = new QLabel(inputsGroupBox);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout_4->addWidget(label);
+
+        ageLineEdit = new QLineEdit(inputsGroupBox);
+        ageLineEdit->setObjectName(QString::fromUtf8("ageLineEdit"));
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Preferred);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(inputsGroupBox->sizePolicy().hasHeightForWidth());
-        inputsGroupBox->setSizePolicy(sizePolicy2);
-        formLayout = new QFormLayout(inputsGroupBox);
-        formLayout->setObjectName(QString::fromUtf8("formLayout"));
+        sizePolicy2.setHeightForWidth(ageLineEdit->sizePolicy().hasHeightForWidth());
+        ageLineEdit->setSizePolicy(sizePolicy2);
+        ageLineEdit->setClearButtonEnabled(true);
+
+        horizontalLayout_4->addWidget(ageLineEdit);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_4);
+
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         label_5 = new QLabel(inputsGroupBox);
@@ -159,8 +161,11 @@ public:
         genderGroup->setObjectName(QString::fromUtf8("genderGroup"));
         genderGroup->addButton(maleRadio);
         maleRadio->setObjectName(QString::fromUtf8("maleRadio"));
-        sizePolicy.setHeightForWidth(maleRadio->sizePolicy().hasHeightForWidth());
-        maleRadio->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(maleRadio->sizePolicy().hasHeightForWidth());
+        maleRadio->setSizePolicy(sizePolicy3);
         maleRadio->setChecked(true);
         maleRadio->setAutoExclusive(false);
 
@@ -169,35 +174,32 @@ public:
         femaleRadio = new QRadioButton(inputsGroupBox);
         genderGroup->addButton(femaleRadio);
         femaleRadio->setObjectName(QString::fromUtf8("femaleRadio"));
-        sizePolicy.setHeightForWidth(femaleRadio->sizePolicy().hasHeightForWidth());
-        femaleRadio->setSizePolicy(sizePolicy);
+        sizePolicy3.setHeightForWidth(femaleRadio->sizePolicy().hasHeightForWidth());
+        femaleRadio->setSizePolicy(sizePolicy3);
         femaleRadio->setAutoExclusive(false);
 
         horizontalLayout_2->addWidget(femaleRadio);
 
 
-        formLayout->setLayout(0, QFormLayout::LabelRole, horizontalLayout_2);
+        verticalLayout_4->addLayout(horizontalLayout_2);
 
-        horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        label = new QLabel(inputsGroupBox);
-        label->setObjectName(QString::fromUtf8("label"));
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        label_3 = new QLabel(inputsGroupBox);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
 
-        horizontalLayout_4->addWidget(label);
+        horizontalLayout_7->addWidget(label_3);
 
-        ageLineEdit = new QLineEdit(inputsGroupBox);
-        ageLineEdit->setObjectName(QString::fromUtf8("ageLineEdit"));
-        QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Preferred);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(ageLineEdit->sizePolicy().hasHeightForWidth());
-        ageLineEdit->setSizePolicy(sizePolicy3);
-        ageLineEdit->setClearButtonEnabled(true);
+        heightLineEdit = new QLineEdit(inputsGroupBox);
+        heightLineEdit->setObjectName(QString::fromUtf8("heightLineEdit"));
+        sizePolicy2.setHeightForWidth(heightLineEdit->sizePolicy().hasHeightForWidth());
+        heightLineEdit->setSizePolicy(sizePolicy2);
+        heightLineEdit->setClearButtonEnabled(true);
 
-        horizontalLayout_4->addWidget(ageLineEdit);
+        horizontalLayout_7->addWidget(heightLineEdit);
 
 
-        formLayout->setLayout(0, QFormLayout::FieldRole, horizontalLayout_4);
+        verticalLayout_4->addLayout(horizontalLayout_7);
 
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
@@ -224,44 +226,7 @@ public:
         horizontalLayout_8->addWidget(imperialRadio);
 
 
-        formLayout->setLayout(1, QFormLayout::LabelRole, horizontalLayout_8);
-
-        horizontalLayout_7 = new QHBoxLayout();
-        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
-        label_3 = new QLabel(inputsGroupBox);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-
-        horizontalLayout_7->addWidget(label_3);
-
-        heightLineEdit = new QLineEdit(inputsGroupBox);
-        heightLineEdit->setObjectName(QString::fromUtf8("heightLineEdit"));
-        sizePolicy3.setHeightForWidth(heightLineEdit->sizePolicy().hasHeightForWidth());
-        heightLineEdit->setSizePolicy(sizePolicy3);
-        heightLineEdit->setClearButtonEnabled(true);
-
-        horizontalLayout_7->addWidget(heightLineEdit);
-
-
-        formLayout->setLayout(1, QFormLayout::FieldRole, horizontalLayout_7);
-
-        horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
-        label_2 = new QLabel(inputsGroupBox);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-
-        horizontalLayout_6->addWidget(label_2);
-
-        tareWeightLineEdit = new QLineEdit(inputsGroupBox);
-        tareWeightLineEdit->setObjectName(QString::fromUtf8("tareWeightLineEdit"));
-        sizePolicy3.setHeightForWidth(tareWeightLineEdit->sizePolicy().hasHeightForWidth());
-        tareWeightLineEdit->setSizePolicy(sizePolicy3);
-        tareWeightLineEdit->setMaxLength(32767);
-        tareWeightLineEdit->setClearButtonEnabled(true);
-
-        horizontalLayout_6->addWidget(tareWeightLineEdit);
-
-
-        formLayout->setLayout(2, QFormLayout::FieldRole, horizontalLayout_6);
+        verticalLayout_4->addLayout(horizontalLayout_8);
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
@@ -275,8 +240,8 @@ public:
         bodyTypeGroup->setObjectName(QString::fromUtf8("bodyTypeGroup"));
         bodyTypeGroup->addButton(standardRadio);
         standardRadio->setObjectName(QString::fromUtf8("standardRadio"));
-        sizePolicy.setHeightForWidth(standardRadio->sizePolicy().hasHeightForWidth());
-        standardRadio->setSizePolicy(sizePolicy);
+        sizePolicy3.setHeightForWidth(standardRadio->sizePolicy().hasHeightForWidth());
+        standardRadio->setSizePolicy(sizePolicy3);
         standardRadio->setChecked(true);
         standardRadio->setAutoExclusive(false);
 
@@ -285,14 +250,33 @@ public:
         athleticRadio = new QRadioButton(inputsGroupBox);
         bodyTypeGroup->addButton(athleticRadio);
         athleticRadio->setObjectName(QString::fromUtf8("athleticRadio"));
-        sizePolicy.setHeightForWidth(athleticRadio->sizePolicy().hasHeightForWidth());
-        athleticRadio->setSizePolicy(sizePolicy);
+        sizePolicy3.setHeightForWidth(athleticRadio->sizePolicy().hasHeightForWidth());
+        athleticRadio->setSizePolicy(sizePolicy3);
         athleticRadio->setAutoExclusive(false);
 
         horizontalLayout_5->addWidget(athleticRadio);
 
 
-        formLayout->setLayout(2, QFormLayout::LabelRole, horizontalLayout_5);
+        verticalLayout_4->addLayout(horizontalLayout_5);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        label_2 = new QLabel(inputsGroupBox);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout_6->addWidget(label_2);
+
+        tareWeightLineEdit = new QLineEdit(inputsGroupBox);
+        tareWeightLineEdit->setObjectName(QString::fromUtf8("tareWeightLineEdit"));
+        sizePolicy2.setHeightForWidth(tareWeightLineEdit->sizePolicy().hasHeightForWidth());
+        tareWeightLineEdit->setSizePolicy(sizePolicy2);
+        tareWeightLineEdit->setMaxLength(32767);
+        tareWeightLineEdit->setClearButtonEnabled(true);
+
+        horizontalLayout_6->addWidget(tareWeightLineEdit);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_6);
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
@@ -312,15 +296,18 @@ public:
         horizontalLayout_9->addWidget(confirmButton);
 
 
-        formLayout->setLayout(3, QFormLayout::LabelRole, horizontalLayout_9);
+        verticalLayout_4->addLayout(horizontalLayout_9);
 
 
         verticalLayout_2->addWidget(inputsGroupBox);
 
         measureGroupBox = new QGroupBox(BodyCompositionDialog);
         measureGroupBox->setObjectName(QString::fromUtf8("measureGroupBox"));
-        sizePolicy.setHeightForWidth(measureGroupBox->sizePolicy().hasHeightForWidth());
-        measureGroupBox->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(measureGroupBox->sizePolicy().hasHeightForWidth());
+        measureGroupBox->setSizePolicy(sizePolicy4);
         verticalLayout_3 = new QVBoxLayout(measureGroupBox);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         measureWidget = new MeasureWidget(measureGroupBox);
@@ -346,29 +333,28 @@ public:
     void retranslateUi(QDialog *BodyCompositionDialog)
     {
         BodyCompositionDialog->setWindowTitle(QCoreApplication::translate("BodyCompositionDialog", "Body Composition Measurement", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Barcode", nullptr));
         serialPortGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Serial Ports", nullptr));
         serialPortLabel->setText(QCoreApplication::translate("BodyCompositionDialog", "Serial Port:", nullptr));
         connectButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Connect", nullptr));
         disconnectButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Disconnect", nullptr));
         inputsGroupBox->setTitle(QCoreApplication::translate("BodyCompositionDialog", "Inputs", nullptr));
+        label->setText(QCoreApplication::translate("BodyCompositionDialog", "Age:", nullptr));
+        ageLineEdit->setInputMask(QString());
         label_5->setText(QCoreApplication::translate("BodyCompositionDialog", "Gender:", nullptr));
         maleRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "Male", nullptr));
         femaleRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "Female", nullptr));
-        label->setText(QCoreApplication::translate("BodyCompositionDialog", "Age:", nullptr));
-        ageLineEdit->setInputMask(QString());
-        label_6->setText(QCoreApplication::translate("BodyCompositionDialog", "Units:", nullptr));
-        metricRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "cm/kg", nullptr));
-        imperialRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "in/lb", nullptr));
         label_3->setText(QCoreApplication::translate("BodyCompositionDialog", "Height:", nullptr));
         heightLineEdit->setInputMask(QString());
         heightLineEdit->setText(QString());
-        label_2->setText(QCoreApplication::translate("BodyCompositionDialog", "Tare:", nullptr));
-        tareWeightLineEdit->setInputMask(QString());
-        tareWeightLineEdit->setText(QString());
+        label_6->setText(QCoreApplication::translate("BodyCompositionDialog", "Units:", nullptr));
+        metricRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "cm/kg", nullptr));
+        imperialRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "in/lb", nullptr));
         label_4->setText(QCoreApplication::translate("BodyCompositionDialog", "Body Type:", nullptr));
         standardRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "Standard", nullptr));
         athleticRadio->setText(QCoreApplication::translate("BodyCompositionDialog", "Athletic", nullptr));
+        label_2->setText(QCoreApplication::translate("BodyCompositionDialog", "Tare:", nullptr));
+        tareWeightLineEdit->setInputMask(QString());
+        tareWeightLineEdit->setText(QString());
         setButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Set", nullptr));
         resetButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Reset", nullptr));
         confirmButton->setText(QCoreApplication::translate("BodyCompositionDialog", "Confirm", nullptr));

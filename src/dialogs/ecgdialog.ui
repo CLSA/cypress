@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RetinalCameraDialog</class>
- <widget class="QDialog" name="RetinalCameraDialog">
+ <class>EcgDialog</class>
+ <widget class="QDialog" name="EcgDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,9 +10,8 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Retinal Camera</string>
+   <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout"/>
  </widget>
  <resources/>
  <connections/>

@@ -77,6 +77,7 @@ SOURCES += \
     dialogs/DXADialog.cpp \
     dialogs/GripStrengthDialog.cpp \
     dialogs/RetinalCameraDialog.cpp \
+    dialogs/ecgdialog.cpp \
     dialogs/signaturepaddialog.cpp \
     managers/ManagerBase.cpp \
     managers/SettingsManager.cpp \
@@ -161,7 +162,6 @@ SOURCES += \
     dialogs/DialogBase.cpp \
     dialogs/DialogFactory.cpp \
     dialogs/FraxDialog.cpp \
-    dialogs/ECGDialog.cpp \
     dialogs/SpirometerDialog.cpp \
     dialogs/TonometerDialog.cpp \
     dialogs/WeighScaleDialog.cpp \
@@ -229,6 +229,7 @@ HEADERS += \
     dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
     dialogs/RetinalCameraDialog.h \
+    dialogs/ecgdialog.h \
     dialogs/signaturepaddialog.h \
     managers/SettingsManager.h \
     managers/audiometer/AudiometerManager.h \
@@ -313,7 +314,6 @@ HEADERS += \
     dialogs/ChoiceReactionDialog.h \
     dialogs/DialogBase.h \
     dialogs/DialogFactory.h \
-    dialogs/ECGDialog.h \
     dialogs/FraxDialog.h \
     dialogs/SpirometerDialog.h \
     dialogs/TonometerDialog.h \
@@ -370,9 +370,15 @@ LIBS += -L$$PWD/../deps/SigPad/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib 
 
 FORMS += \
   dialogs/RetinalCameraDialog.ui \
+  dialogs/cdttdialog.ui \
+  dialogs/choicereactiondialog.ui \
   dialogs/dxadialog.ui \
+  dialogs/ecgdialog.ui \
+  dialogs/fraxdialog.ui \
   dialogs/gripstrengthdialog.ui \
   dialogs/signaturepaddialog.ui \
+  dialogs/spirometerdialog.ui \
+  dialogs/tonometerdialog.ui \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \

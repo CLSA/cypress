@@ -26,7 +26,7 @@
    <string>Signature</string>
   </property>
   <property name="toolTip">
-   <string>Cypress signature tool</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="sizeConstraint">
@@ -46,6 +46,13 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">

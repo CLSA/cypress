@@ -51,27 +51,27 @@ void BodyCompositionDialog::initializeConnections()
   // TODO: for DCS interviews, the first digit corresponds the the wave rank
   // for inhome interviews there is a host dependent prefix before the barcode
   //
-  if(Constants::RunMode::modeSimulate == m_mode)
-  {
-    ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
-  }
+  //if(Constants::RunMode::modeSimulate == m_mode)
+  //{
+  //  ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
+  //}
 
-  connect(ui->barcodeWidget,&BarcodeWidget::validated,
-          this,[this](const bool& valid)
-    {
-      if(valid)
-      {
-          // launch the manager
-          //
-          this->run();
-      }
-      else
-      {
-          QMessageBox::critical(
-            this, QApplication::applicationName(),
-            tr("The input does not match the expected barcode for this participant."));
-      }
-  });
+  //connect(ui->barcodeWidget,&BarcodeWidget::validated,
+  //        this,[this](const bool& valid)
+  //  {
+  //    if(valid)
+  //    {
+  //        // launch the manager
+  //        //
+  //        this->run();
+  //    }
+  //    else
+  //    {
+  //        QMessageBox::critical(
+  //          this, QApplication::applicationName(),
+  //          tr("The input does not match the expected barcode for this participant."));
+  //    }
+  //});
 
   // Scan for devices
   //

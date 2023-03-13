@@ -15,25 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="idGroupBox">
+    <widget class="QGroupBox" name="serialPortGroupBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title">
-      <string>Barcode</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="BarcodeWidget" name="barcodeWidget" native="true"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="serialPortGroupBox">
      <property name="title">
       <string>Serial Ports</string>
      </property>
@@ -78,7 +66,7 @@
    <item>
     <widget class="QGroupBox" name="inputsGroupBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -86,8 +74,35 @@
      <property name="title">
       <string>Inputs</string>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Age:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="ageLineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="inputMask">
+           <string/>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="label_5">
@@ -139,17 +154,17 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Age:</string>
+           <string>Height:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="ageLineEdit">
+         <widget class="QLineEdit" name="heightLineEdit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -159,6 +174,9 @@
           <property name="inputMask">
            <string/>
           </property>
+          <property name="text">
+           <string/>
+          </property>
           <property name="clearButtonEnabled">
            <bool>true</bool>
           </property>
@@ -166,7 +184,7 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
          <widget class="QLabel" name="label_6">
@@ -206,70 +224,7 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Height:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="heightLineEdit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="inputMask">
-           <string/>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Tare:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="tareWeightLineEdit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="inputMask">
-           <string/>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="maxLength">
-           <number>32767</number>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="0">
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <widget class="QLabel" name="label_4">
@@ -321,7 +276,40 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="0">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Tare:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="tareWeightLineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="inputMask">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="maxLength">
+           <number>32767</number>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <widget class="QPushButton" name="setButton">
@@ -352,7 +340,7 @@
    <item>
     <widget class="QGroupBox" name="measureGroupBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -378,12 +366,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>BarcodeWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/BarcodeWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>MeasureWidget</class>
    <extends>QWidget</extends>
    <header>widgets/MeasureWidget.h</header>
@@ -397,8 +379,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="genderGroup"/>
   <buttongroup name="bodyTypeGroup"/>
+  <buttongroup name="genderGroup"/>
   <buttongroup name="unitsGroup"/>
  </buttongroups>
 </ui>

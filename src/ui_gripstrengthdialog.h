@@ -12,10 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QVBoxLayout>
-#include "widgets/BarcodeWidget.h"
 #include "widgets/MeasureWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -25,9 +22,6 @@ class Ui_GripStrengthDialog
 public:
     QVBoxLayout *verticalLayout_3;
     QVBoxLayout *verticalLayout_2;
-    QGroupBox *idGroupBox;
-    QFormLayout *formLayout;
-    BarcodeWidget *barcodeWidget;
     MeasureWidget *measureWidget;
 
     void setupUi(QDialog *GripStrengthDialog)
@@ -41,23 +35,6 @@ public:
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, -1, -1, -1);
-        idGroupBox = new QGroupBox(GripStrengthDialog);
-        idGroupBox->setObjectName(QString::fromUtf8("idGroupBox"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(idGroupBox->sizePolicy().hasHeightForWidth());
-        idGroupBox->setSizePolicy(sizePolicy);
-        formLayout = new QFormLayout(idGroupBox);
-        formLayout->setObjectName(QString::fromUtf8("formLayout"));
-        barcodeWidget = new BarcodeWidget(idGroupBox);
-        barcodeWidget->setObjectName(QString::fromUtf8("barcodeWidget"));
-
-        formLayout->setWidget(0, QFormLayout::LabelRole, barcodeWidget);
-
-
-        verticalLayout_2->addWidget(idGroupBox);
-
         measureWidget = new MeasureWidget(GripStrengthDialog);
         measureWidget->setObjectName(QString::fromUtf8("measureWidget"));
 
@@ -75,7 +52,6 @@ public:
     void retranslateUi(QDialog *GripStrengthDialog)
     {
         GripStrengthDialog->setWindowTitle(QCoreApplication::translate("GripStrengthDialog", "Grip Strength", nullptr));
-        idGroupBox->setTitle(QCoreApplication::translate("GripStrengthDialog", "Barcode", nullptr));
     } // retranslateUi
 
 };

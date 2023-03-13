@@ -18,7 +18,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include "widgets/BarcodeWidget.h"
 #include "widgets/MeasureWidget.h"
@@ -45,7 +44,6 @@ public:
     QGroupBox *measureGroupBox;
     QVBoxLayout *verticalLayout;
     MeasureWidget *measureWidget;
-    QStatusBar *statusBar;
 
     void setupUi(QDialog *BloodPressureDialog)
     {
@@ -61,41 +59,46 @@ public:
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         armBandGroupBox = new QGroupBox(BloodPressureDialog);
         armBandGroupBox->setObjectName(QString::fromUtf8("armBandGroupBox"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Minimum);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(armBandGroupBox->sizePolicy().hasHeightForWidth());
+        armBandGroupBox->setSizePolicy(sizePolicy1);
         armBandHorizontalLayout = new QHBoxLayout(armBandGroupBox);
         armBandHorizontalLayout->setObjectName(QString::fromUtf8("armBandHorizontalLayout"));
         armBandSizeLabel = new QLabel(armBandGroupBox);
         armBandSizeLabel->setObjectName(QString::fromUtf8("armBandSizeLabel"));
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(armBandSizeLabel->sizePolicy().hasHeightForWidth());
-        armBandSizeLabel->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(armBandSizeLabel->sizePolicy().hasHeightForWidth());
+        armBandSizeLabel->setSizePolicy(sizePolicy2);
         armBandSizeLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         armBandHorizontalLayout->addWidget(armBandSizeLabel);
 
         armBandSizeComboBox = new QComboBox(armBandGroupBox);
         armBandSizeComboBox->setObjectName(QString::fromUtf8("armBandSizeComboBox"));
-        QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(armBandSizeComboBox->sizePolicy().hasHeightForWidth());
-        armBandSizeComboBox->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(armBandSizeComboBox->sizePolicy().hasHeightForWidth());
+        armBandSizeComboBox->setSizePolicy(sizePolicy3);
 
         armBandHorizontalLayout->addWidget(armBandSizeComboBox);
 
         armLabel = new QLabel(armBandGroupBox);
         armLabel->setObjectName(QString::fromUtf8("armLabel"));
-        sizePolicy1.setHeightForWidth(armLabel->sizePolicy().hasHeightForWidth());
-        armLabel->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(armLabel->sizePolicy().hasHeightForWidth());
+        armLabel->setSizePolicy(sizePolicy2);
         armLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         armBandHorizontalLayout->addWidget(armLabel);
 
         armComboBox = new QComboBox(armBandGroupBox);
         armComboBox->setObjectName(QString::fromUtf8("armComboBox"));
-        sizePolicy2.setHeightForWidth(armComboBox->sizePolicy().hasHeightForWidth());
-        armComboBox->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(armComboBox->sizePolicy().hasHeightForWidth());
+        armComboBox->setSizePolicy(sizePolicy3);
 
         armBandHorizontalLayout->addWidget(armComboBox);
 
@@ -108,14 +111,14 @@ public:
 
         pathGroupBox = new QGroupBox(BloodPressureDialog);
         pathGroupBox->setObjectName(QString::fromUtf8("pathGroupBox"));
-        sizePolicy.setHeightForWidth(pathGroupBox->sizePolicy().hasHeightForWidth());
-        pathGroupBox->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(pathGroupBox->sizePolicy().hasHeightForWidth());
+        pathGroupBox->setSizePolicy(sizePolicy1);
         horizontalLayout_2 = new QHBoxLayout(pathGroupBox);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         deviceLabel = new QLabel(pathGroupBox);
         deviceLabel->setObjectName(QString::fromUtf8("deviceLabel"));
-        sizePolicy1.setHeightForWidth(deviceLabel->sizePolicy().hasHeightForWidth());
-        deviceLabel->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(deviceLabel->sizePolicy().hasHeightForWidth());
+        deviceLabel->setSizePolicy(sizePolicy2);
         deviceLabel->setLayoutDirection(Qt::LeftToRight);
         deviceLabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -123,8 +126,8 @@ public:
 
         deviceComboBox = new QComboBox(pathGroupBox);
         deviceComboBox->setObjectName(QString::fromUtf8("deviceComboBox"));
-        sizePolicy2.setHeightForWidth(deviceComboBox->sizePolicy().hasHeightForWidth());
-        deviceComboBox->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(deviceComboBox->sizePolicy().hasHeightForWidth());
+        deviceComboBox->setSizePolicy(sizePolicy3);
 
         horizontalLayout_2->addWidget(deviceComboBox);
 
@@ -143,6 +146,11 @@ public:
 
         measureGroupBox = new QGroupBox(BloodPressureDialog);
         measureGroupBox->setObjectName(QString::fromUtf8("measureGroupBox"));
+        QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(measureGroupBox->sizePolicy().hasHeightForWidth());
+        measureGroupBox->setSizePolicy(sizePolicy4);
         verticalLayout = new QVBoxLayout(measureGroupBox);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         measureWidget = new MeasureWidget(measureGroupBox);
@@ -152,12 +160,6 @@ public:
 
 
         verticalLayout_2->addWidget(measureGroupBox);
-
-        statusBar = new QStatusBar(BloodPressureDialog);
-        statusBar->setObjectName(QString::fromUtf8("statusBar"));
-        statusBar->setSizeGripEnabled(false);
-
-        verticalLayout_2->addWidget(statusBar);
 
 
         retranslateUi(BloodPressureDialog);

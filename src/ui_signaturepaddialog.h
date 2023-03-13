@@ -28,6 +28,7 @@ public:
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
+    QLabel *label_2;
     QSpacerItem *horizontalSpacer;
     QPushButton *ResetButton;
     QPushButton *SubmitButton;
@@ -60,6 +61,11 @@ public:
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        label_2 = new QLabel(groupBox);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout_2->addWidget(label_2);
+
         horizontalSpacer = new QSpacerItem(353, 17, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer);
@@ -111,9 +117,10 @@ public:
     {
         SignaturePadDialog->setWindowTitle(QCoreApplication::translate("SignaturePadDialog", "Signature", nullptr));
 #if QT_CONFIG(tooltip)
-        SignaturePadDialog->setToolTip(QCoreApplication::translate("SignaturePadDialog", "Cypress signature tool", nullptr));
+        SignaturePadDialog->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)
         groupBox->setTitle(QString());
+        label_2->setText(QString());
         ResetButton->setText(QCoreApplication::translate("SignaturePadDialog", "Reset", nullptr));
         SubmitButton->setText(QCoreApplication::translate("SignaturePadDialog", "Submit", nullptr));
         groupBox_2->setTitle(QString());
