@@ -9,7 +9,7 @@ void SpirometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeSpirometer, "");
+        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeSpirometer, QJsonObject {});
         std::ostream& out = response.send();
 
 

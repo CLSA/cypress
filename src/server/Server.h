@@ -11,6 +11,8 @@
 
 #include "auxiliary/Constants.h"
 
+#include <QJsonObject>
+
 using namespace Poco::Net;
 
 class Server: public QObject
@@ -28,11 +30,11 @@ class Server: public QObject
         void start();
         void stop();
 
-        void requestTestStart(Constants::MeasureType type, QString uuid);
+        void requestTestStart(Constants::MeasureType type, QJsonObject pineRequestData);
         bool sendResults(const QJsonObject& results);
 
     signals:
-        void startTest(Constants::MeasureType type, QString uuid);
+        void startTest(Constants::MeasureType type, QJsonObject inputData);
 
     private:
         HTTPServer* server;

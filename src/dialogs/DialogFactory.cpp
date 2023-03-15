@@ -33,7 +33,7 @@ DialogFactory::~DialogFactory()
         pInstance = Q_NULLPTR;
 }
 
-DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QString uuid)
+DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QJsonObject inputData)
 {
     DialogBase* dialog;
     switch(type)
@@ -74,18 +74,18 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QStri
         dialog = new GripStrengthDialog();
         break;
       case Constants::MeasureType::typeRetinal_Camera:
-        dialog = new RetinalCameraDialog(uuid);
+        dialog = new RetinalCameraDialog();
         break;
       case Constants::MeasureType::typeECG:
-        dialog = new ECGDialog();
+        //dialog = new EcgDialog(inputData);
         break;
       case Constants::MeasureType::typeCarotidIntima:
         break;
       case Constants::MeasureType::typeDxaWholeBody:
-        dialog = new DXADialog(uuid);
+        dialog = new DXADialog();
         break;
       case Constants::MeasureType::typeSignature:
-        dialog = new SignaturePadDialog(uuid);
+        dialog = new SignaturePadDialog(inputData);
         break;
       case Constants::MeasureType::typeUnknown:
         break;
@@ -95,7 +95,7 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QStri
     return dialog;
 }
 
-DialogBase* DialogFactory::instantiate(const QString& name, QString uuid)
+DialogBase* DialogFactory::instantiate(const QString& name, QJsonObject inputData)
 {
-    return instantiate(Constants::getMeasureType(name), uuid);
+    return instantiate(Constants::getMeasureType(name), inputData);
 }

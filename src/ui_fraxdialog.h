@@ -1,13 +1,13 @@
 /********************************************************************************
-** Form generated from reading UI file 'gripstrengthdialog.ui'
+** Form generated from reading UI file 'fraxdialog.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_GRIPSTRENGTHDIALOG_H
-#define UI_GRIPSTRENGTHDIALOG_H
+#ifndef UI_FRAXDIALOG_H
+#define UI_FRAXDIALOG_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
@@ -21,37 +21,36 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_GripStrengthDialog
+class Ui_Dialog
 {
 public:
     QVBoxLayout *verticalLayout;
-    QGroupBox *groupBox_3;
+    QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_10;
     QLabel *label_7;
     QLabel *participantId;
-    QGroupBox *groupBox;
+    QGroupBox *controlsBox;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
     QPushButton *measureButton;
     QPushButton *submitButton;
     QGroupBox *groupBox_2;
 
-    void setupUi(QDialog *GripStrengthDialog)
+    void setupUi(QDialog *Dialog)
     {
-        if (GripStrengthDialog->objectName().isEmpty())
-            GripStrengthDialog->setObjectName(QString::fromUtf8("GripStrengthDialog"));
-        GripStrengthDialog->resize(448, 363);
-        GripStrengthDialog->setSizeGripEnabled(true);
-        verticalLayout = new QVBoxLayout(GripStrengthDialog);
+        if (Dialog->objectName().isEmpty())
+            Dialog->setObjectName(QString::fromUtf8("Dialog"));
+        Dialog->resize(400, 300);
+        verticalLayout = new QVBoxLayout(Dialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        groupBox_3 = new QGroupBox(GripStrengthDialog);
-        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        verticalLayout_5 = new QVBoxLayout(groupBox_3);
+        groupBox = new QGroupBox(Dialog);
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        verticalLayout_5 = new QVBoxLayout(groupBox);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
         horizontalLayout_10 = new QHBoxLayout();
         horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
-        label_7 = new QLabel(groupBox_3);
+        label_7 = new QLabel(groupBox);
         label_7->setObjectName(QString::fromUtf8("label_7"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
@@ -61,7 +60,7 @@ public:
 
         horizontalLayout_10->addWidget(label_7);
 
-        participantId = new QLabel(groupBox_3);
+        participantId = new QLabel(groupBox);
         participantId->setObjectName(QString::fromUtf8("participantId"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
@@ -75,37 +74,37 @@ public:
         verticalLayout_5->addLayout(horizontalLayout_10);
 
 
-        verticalLayout->addWidget(groupBox_3);
+        verticalLayout->addWidget(groupBox);
 
-        groupBox = new QGroupBox(GripStrengthDialog);
-        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        controlsBox = new QGroupBox(Dialog);
+        controlsBox->setObjectName(QString::fromUtf8("controlsBox"));
         QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Minimum);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
-        groupBox->setSizePolicy(sizePolicy2);
-        horizontalLayout = new QHBoxLayout(groupBox);
+        sizePolicy2.setHeightForWidth(controlsBox->sizePolicy().hasHeightForWidth());
+        controlsBox->setSizePolicy(sizePolicy2);
+        horizontalLayout = new QHBoxLayout(controlsBox);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
-        measureButton = new QPushButton(groupBox);
+        measureButton = new QPushButton(controlsBox);
         measureButton->setObjectName(QString::fromUtf8("measureButton"));
         measureButton->setEnabled(false);
 
         horizontalLayout->addWidget(measureButton);
 
-        submitButton = new QPushButton(groupBox);
+        submitButton = new QPushButton(controlsBox);
         submitButton->setObjectName(QString::fromUtf8("submitButton"));
         submitButton->setEnabled(false);
 
         horizontalLayout->addWidget(submitButton);
 
 
-        verticalLayout->addWidget(groupBox);
+        verticalLayout->addWidget(controlsBox);
 
-        groupBox_2 = new QGroupBox(GripStrengthDialog);
+        groupBox_2 = new QGroupBox(Dialog);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy3.setHorizontalStretch(0);
@@ -116,29 +115,29 @@ public:
         verticalLayout->addWidget(groupBox_2);
 
 
-        retranslateUi(GripStrengthDialog);
+        retranslateUi(Dialog);
 
-        QMetaObject::connectSlotsByName(GripStrengthDialog);
+        QMetaObject::connectSlotsByName(Dialog);
     } // setupUi
 
-    void retranslateUi(QDialog *GripStrengthDialog)
+    void retranslateUi(QDialog *Dialog)
     {
-        GripStrengthDialog->setWindowTitle(QCoreApplication::translate("GripStrengthDialog", "Grip Strength", nullptr));
-        groupBox_3->setTitle(QString());
-        label_7->setText(QCoreApplication::translate("GripStrengthDialog", "Participant ID:", nullptr));
-        participantId->setText(QString());
+        Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
         groupBox->setTitle(QString());
-        measureButton->setText(QCoreApplication::translate("GripStrengthDialog", "Measure", nullptr));
-        submitButton->setText(QCoreApplication::translate("GripStrengthDialog", "Submit", nullptr));
-        groupBox_2->setTitle(QCoreApplication::translate("GripStrengthDialog", "Measurement", nullptr));
+        label_7->setText(QCoreApplication::translate("Dialog", "Participant ID:", nullptr));
+        participantId->setText(QString());
+        controlsBox->setTitle(QString());
+        measureButton->setText(QCoreApplication::translate("Dialog", "Measure", nullptr));
+        submitButton->setText(QCoreApplication::translate("Dialog", "Submit", nullptr));
+        groupBox_2->setTitle(QString());
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class GripStrengthDialog: public Ui_GripStrengthDialog {};
+    class Dialog: public Ui_Dialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE
 
-#endif // UI_GRIPSTRENGTHDIALOG_H
+#endif // UI_FRAXDIALOG_H

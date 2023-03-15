@@ -27,15 +27,16 @@ void RetinalCameraRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 
         const Constants::MeasureType measureType = Constants::MeasureType::typeRetinal_Camera;
         const QJsonObject responseJSON = getResponseData();
-        const QString uuid = responseJSON.value("id").toString();
+        const QString sessionId = responseJSON.value("id").toString();
         const QString responseData = JsonSettings::serializeJson(responseJSON);
 
         // start test
-        CypressApplication::restApiServer -> requestTestStart(measureType, uuid);
+        CypressApplication::restApiServer -> requestTestStart(measureType, QJsonObject {});
 
         // send response with uuid body
         std::ostream& out = response.send();
-        out << "\"" << uuid.toStdString() << "\"";
+
+        //out << "\"" << uuid.toStdString() << "\"";
         out.flush();
     }
     catch (std::exception& e)

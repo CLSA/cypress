@@ -42,7 +42,7 @@ public:
     static QDateTime startTime;
 
 public slots:
-    bool startTest(Constants::MeasureType type, QString uuid);
+    bool startTest(Constants::MeasureType type, QJsonObject inputData);
 
 signals:
     bool endTest(QJsonObject results);

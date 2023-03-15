@@ -2,6 +2,7 @@
 #define DIALOGFACTORY_H
 
 #include "../auxiliary/Constants.h"
+#include <QJsonObject>
 
 QT_FORWARD_DECLARE_CLASS(DialogBase)
 
@@ -11,8 +12,8 @@ public:
     static DialogFactory *instance();
     ~DialogFactory();
 
-    DialogBase* instantiate(const Constants::MeasureType&, QString uuid);
-    DialogBase* instantiate(const QString&, QString uuid);
+    DialogBase* instantiate(const Constants::MeasureType&, QJsonObject inputData);
+    DialogBase* instantiate(const QString&, QJsonObject inputData);
 
 private:
     DialogFactory() = default;

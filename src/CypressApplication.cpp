@@ -63,37 +63,37 @@ QJsonObject CypressApplication::getStatus()
     QJsonObject availableInstruments {{}};
 
     statusJson["availableInstruments"] = QJsonObject {
-        { "audiometer",        true },
-        { "blood_pressure",    true },
-        { "temperature",       true },
-        { "body_composition",  true },
-        { "cdtt",              true },
-        { "choice_reaction",   true },
+        { "audiometer",        false },
+        { "blood_pressure",    false },
+        { "temperature",       false },
+        { "body_composition",  false },
+        { "cdtt",              false },
+        { "choice_reaction",   false },
         { "dxa", QJsonObject
             {
-                { "forearm",    true },
-                { "spine",      true },
-                { "hip",        true },
-                { "whole_body", true },
-                { "iva",        true },
+                { "forearm",    false },
+                { "spine",      false },
+                { "hip",        false },
+                { "whole_body", false },
+                { "iva",        false },
             }
         },
 
-        {"ecg",                true },
-        {"frax", 		       true },
+        {"ecg",                false },
+        {"frax", 		       false },
         {"dynamometer",        false },
         {"retinal_camera",     false },
-        {"spirometer",         true },
-        {"tonometer",          true },
-        {"ultrasound",         true },
-        {"weigh_scale",        true },
-        {"signature_pad", 	   true },
+        {"spirometer",         false },
+        {"tonometer",          false },
+        {"ultrasound",         false },
+        {"weigh_scale",        false },
+        {"signature_pad", 	   false },
     };
 
     return statusJson;
 }
 
-bool CypressApplication::startTest(Constants::MeasureType type, QString uuid)
+bool CypressApplication::startTest(Constants::MeasureType type, QJsonObject inputData)
 {
     QVariantMap args;
     DialogFactory *factory;
@@ -103,7 +103,7 @@ bool CypressApplication::startTest(Constants::MeasureType type, QString uuid)
         setArgs(args);
         factory = DialogFactory::instance();
 
-        DialogBase* dialog = factory->instantiate(type, uuid);
+        DialogBase* dialog = factory->instantiate(type, inputData);
         if(dialog == Q_NULLPTR) {
             QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
             return false;

@@ -69,6 +69,7 @@
 #include "server/handlers/ultrasoundstatusrequesthandler.h"
 
 #include "server/handlers/signaturepadrequesthandler.h"
+#include "server/handlers/signaturepadstatusrequesthandler.h"
 
 
 
@@ -133,6 +134,7 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/weigh_scale/?$)"), 	          &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler            },
 
     { QString(R"(^/signature/?$)"), 	          &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
+    { QString(R"(^/signature/status?$)"), 	      &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler    },
 }};
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
@@ -369,3 +371,9 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadRequestHa
 {
     return new SignaturePadRequestHandler;
 }
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler()
+{
+    return new SignaturePadStatusRequestHandler;
+}
+

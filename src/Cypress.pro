@@ -147,6 +147,7 @@ SOURCES += \
     server/handlers/gripstrengthstatusrequesthandler.cpp \
     server/handlers/retinalcamerastatusrequesthandler.cpp \
     server/handlers/signaturepadrequesthandler.cpp \
+    server/handlers/signaturepadstatusrequesthandler.cpp \
     server/handlers/spirometerstatusrequesthandler.cpp \
     server/handlers/tonometerstatusrequesthandler.cpp \
     server/handlers/ultrasoundstatusrequesthandler.cpp \
@@ -300,6 +301,7 @@ HEADERS += \
     server/handlers/gripstrengthstatusrequesthandler.h \
     server/handlers/retinalcamerastatusrequesthandler.h \
     server/handlers/signaturepadrequesthandler.h \
+    server/handlers/signaturepadstatusrequesthandler.h \
     server/handlers/spirometerstatusrequesthandler.h \
     server/handlers/tonometerstatusrequesthandler.h \
     server/handlers/ultrasoundstatusrequesthandler.h \
@@ -332,25 +334,31 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+# OpenSSL
+INCLUDEPATH += C:/OpenSSL-Win64/include
+LIBS += -LC:/OpenSSL-Win64/lib -lopenssl -llibcrypto
 
-INCLUDEPATH += $$PWD/../deps/poco_x64-windows/include/
-INCLUDEPATH += $$PWD/../deps/poco/lib64/
-INCLUDEPATH += $$PWD/../deps/poco/bin64/
-DEPENDPATH += $$PWD/../deps/poco/lib64/
-DEPENDPATH += $$PWD/../deps/poco/bin64/
-LIBS += -L$$PWD/../deps/poco/lib64/ -lPocoNet -lPocoFoundation -lPocoUtil
+# POCO
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Foundation/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Util/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Net/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Crypto/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/NetSSL_OpenSSL/include
+LIBS += -L$$PWD/../dep/poco-1.12.4-win64/lib64 -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
-INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win64-release/include/
-INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win64-release/lib/
-INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win64-support-MD-iconv-msvc-16.9/zlib-1.2.12/include
+# DCMTK
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-support-MD-iconv-msvc-16.9/zlib-1.2.12/include
 
-DEPENDPATH += $$PWD/../deps/dcmtk-3.6.7-win64-release/lib/
-LIBS += -L$$PWD/../deps/dcmtk-3.6.7-win64-release/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+DEPENDPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win64-release/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
-INCLUDEPATH += $$PWD/../deps/SigPad/Include/
-INCLUDEPATH += $$PWD/../deps/SigPad/SigTablt/x64/
-DEPENDPATH += $$PWD/../deps/SigPad/SigTablt/x64/
-LIBS += -L$$PWD/../deps/SigPad/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
+# Topaz Signature Pad
+INCLUDEPATH += $$PWD/../dep/SigPad/Include/
+INCLUDEPATH += $$PWD/../dep/SigPad/SigTablt/x64/
+DEPENDPATH += $$PWD/../dep/SigPad/SigTablt/x64/
+LIBS += -L$$PWD/../dep/SigPad/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
 #win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/include
 #win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/lib

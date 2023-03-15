@@ -110,7 +110,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Measurement</string>
+      <string/>
      </property>
     </widget>
    </item>

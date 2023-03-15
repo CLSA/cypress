@@ -34,6 +34,6 @@ void DefaultRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
 
 
 QJsonObject DefaultRequestHandler::getResponseData() {
-    QJsonObject responseData {{ "id", QUuid::createUuid().toString(QUuid::WithoutBraces) }};
+    QJsonObject responseData {{ "sessionId", QUuid::createUuid().toString(QUuid::WithoutBraces) }};
     return responseData;
 }

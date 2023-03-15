@@ -15,7 +15,7 @@ void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 
         CypressApplication::restApiServer -> requestTestStart(
             Constants::MeasureType::typeAudiometer,
-            ""
+                    QJsonObject {}
         );
 
         out << responseData.toStdString();

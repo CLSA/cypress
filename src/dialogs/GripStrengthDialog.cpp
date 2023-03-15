@@ -22,7 +22,7 @@ void GripStrengthDialog::initializeConnections()
     //connect(derived.get(), &GripStrengthManager::measureStart, this, &GripStrengthDialog::enableMeasure);
     //connect(derived.get(), &GripStrengthManager::dataChanged, ui->measureWidget, &MeasureWidget::updateModelView);
 
-    connect(ui->measureWidget, &MeasureWidget::closeApplication, this, &GripStrengthDialog::handleClose);
+    //connect(ui->measureWidget, &MeasureWidget::closeApplication, this, &GripStrengthDialog::handleClose);
 
     run();
     //connect(ui->measureWidget, &MeasureWidget::measure, derived.get(), &GripStrengthManager::measure);
@@ -52,7 +52,7 @@ bool GripStrengthDialog::handleClose() {
 }
 
 void GripStrengthDialog::enableMeasure() {
-    ui->measureWidget->enableMeasure();
+    //ui->measureWidget->enableMeasure();
 }
 
 void GripStrengthDialog::initializeModel()

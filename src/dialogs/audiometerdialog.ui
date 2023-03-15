@@ -24,6 +24,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Participant ID:</string>
           </property>
@@ -31,6 +37,12 @@
         </item>
         <item>
          <widget class="QLabel" name="participantId">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -50,7 +62,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Serial Port</string>
+      <string/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -149,7 +161,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Measurement</string>
+      <string/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>

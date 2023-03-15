@@ -2,13 +2,14 @@
 #include "ui_signaturepaddialog.h"
 #include "managers/signature_pad/signaturepadmanager.h"
 
-SignaturePadDialog::SignaturePadDialog(QString uuid) : ui(new Ui::SignaturePadDialog)
+SignaturePadDialog::SignaturePadDialog(QJsonObject inputData) : ui(new Ui::SignaturePadDialog)
 {
-    m_uuid = uuid;
+    m_uuid = inputData.value("answer_id").toString();
+
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new SignaturePadManager());
+    m_manager.reset(new SignaturePadManager(inputData));
 
     connect(m_manager.get(), &SignaturePadManager::displaySignature, this, &SignaturePadDialog::renderSignature);
     m_manager->start();
@@ -39,6 +40,7 @@ void SignaturePadDialog::on_SubmitButton_clicked()
 
 void SignaturePadDialog::renderSignature(const QByteArray& bytes)
 {
+    ui->SubmitButton->setEnabled(true);
     QPixmap mpixmap;
     bool ok = mpixmap.loadFromData(bytes);
     if (!ok)

@@ -19,7 +19,7 @@ class SignaturePadManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit SignaturePadManager();
+    explicit SignaturePadManager(QJsonObject inputData);
     ~SignaturePadManager();
 
     void restart();
@@ -40,6 +40,11 @@ private:
     QThread captureThread;
     QByteArray signature;
     QScopedPointer<SignaturePadCommunication> spc;
+
+    void sendRawDataToPine(QByteArray data);
+
+    QString m_answerId; 	 // from Pine
+    QString m_participantId; // from Pine
 
     // Reset the session
     bool clearData() override;

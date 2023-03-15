@@ -24,14 +24,13 @@ Server::Server()
     HTTPServerParams::Ptr pParams = new HTTPServerParams;
     Poco::UInt16 portNumber = settings.value("server/port", 9000).toInt();
 
-
     server = new HTTPServer(pFactory, portNumber, pParams);
     moveToThread(&serverThread);
 }
 
-void Server::requestTestStart(Constants::MeasureType type, QString uuid)
+void Server::requestTestStart(Constants::MeasureType type, QJsonObject inputData)
 {
-    emit startTest(type, uuid);
+    emit startTest(type, inputData);
 }
 
 

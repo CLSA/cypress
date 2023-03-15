@@ -146,7 +146,7 @@ public:
 
         collectButton = new QPushButton(form);
         collectButton->setObjectName(QString::fromUtf8("collectButton"));
-        collectButton->setEnabled(true);
+        collectButton->setEnabled(false);
 
         buttonRow->addWidget(collectButton);
 
@@ -213,7 +213,7 @@ public:
 
         retranslateUi(DXADialog);
 
-        tabs->setCurrentIndex(0);
+        tabs->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(DXADialog);
@@ -222,7 +222,7 @@ public:
     void retranslateUi(QWidget *DXADialog)
     {
         DXADialog->setWindowTitle(QCoreApplication::translate("DXADialog", "CLSA Cypress", nullptr));
-        form->setTitle(QCoreApplication::translate("DXADialog", "DEXA", nullptr));
+        form->setTitle(QString());
         participantLabel->setText(QCoreApplication::translate("DXADialog", "Participant ID: ", nullptr));
         participantValue->setText(QCoreApplication::translate("DXADialog", "100125263", nullptr));
         scanLabel->setText(QCoreApplication::translate("DXADialog", "Scan:", nullptr));

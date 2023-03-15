@@ -14,7 +14,7 @@ class SignaturePadDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit SignaturePadDialog(QString uuid);
+    explicit SignaturePadDialog(QJsonObject inputData);
     ~SignaturePadDialog();
 
 private slots:

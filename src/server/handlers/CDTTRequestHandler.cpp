@@ -12,7 +12,7 @@ void CDTTRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
         response.setContentType("application/json");
 
         CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeCDTT,
-                                                              "");
+                                                              QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

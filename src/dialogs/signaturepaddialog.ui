@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>581</width>
-    <height>317</height>
+    <height>328</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -108,7 +108,7 @@
         <item>
          <widget class="QPushButton" name="ResetButton">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>Reset</string>
