@@ -1,6 +1,6 @@
-QT       += core gui
+QT += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql usb xml network testlib
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql xml network testlib
 
 CONFIG += c++11
 CONFIG += testcase
@@ -30,6 +30,7 @@ SOURCES += \
     data/dxa/measurements/HipMeasurement.cpp \
     data/dxa/measurements/IVAImagingMeasurement.cpp \
     data/dxa/measurements/WholeBodyScanMeasurement.cpp \
+    data/dxa/smbfilecopier.cpp \
     data/dxa/tests/ApSpineTest.cpp \
     data/dxa/tests/DXATest.cpp \
     data/dxa/tests/ForearmTest.cpp \
@@ -196,6 +197,7 @@ HEADERS += \
     data/dxa/measurements/HipMeasurement.h \
     data/dxa/measurements/IVAImagingMeasurement.h \
     data/dxa/measurements/WholeBodyScanMeasurement.h \
+    data/dxa/smbfilecopier.h \
     data/dxa/tests/ApSpineTest.h \
     data/dxa/tests/ForearmTest.h \
     data/dxa/tests/HipTest.h \
@@ -334,17 +336,18 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-# OpenSSL
-INCLUDEPATH += C:/OpenSSL-Win64/include
-LIBS += -LC:/OpenSSL-Win64/lib -lopenssl -llibcrypto
 
 # POCO
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Foundation/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Util/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Net/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/Crypto/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-win64/NetSSL_OpenSSL/include
-LIBS += -L$$PWD/../dep/poco-1.12.4-win64/lib64 -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Util/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib64 -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+
+# OpenSSL
+INCLUDEPATH += "C:/Program Files/OpenSSL-Win64/include"
+LIBS += -L"C:/Program Files/OpenSSL-Win64/lib" -lopenssl -llibcrypto
 
 # DCMTK
 INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/include/
@@ -355,10 +358,10 @@ DEPENDPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
 LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win64-release/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
-INCLUDEPATH += $$PWD/../dep/SigPad/Include/
-INCLUDEPATH += $$PWD/../dep/SigPad/SigTablt/x64/
-DEPENDPATH += $$PWD/../dep/SigPad/SigTablt/x64/
-LIBS += -L$$PWD/../dep/SigPad/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
+INCLUDEPATH += $$PWD/../dep/SigLib/Include/
+INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/x64/
+DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/x64/
+LIBS += -L$$PWD/../dep/SigLib/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
 #win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/include
 #win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/lib
