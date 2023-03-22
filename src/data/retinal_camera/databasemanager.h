@@ -2,6 +2,7 @@
 #define DATABASEMANAGER_H
 
 #include <QtSql>
+#include <QByteArray>
 #include <QJsonObject>
 #include <QIODevice>
 
@@ -10,33 +11,15 @@ enum EyeType {
     RIGHT = 2
 };
 
-class DatabaseManager
-{
+class EyeExtractorQueryUtil {
 public:
-    static QJsonObject extractEyeData(const QString& patientUUID, const EyeType& side);
-    static QJsonObject getDatabaseSettings();
+    static QString getLocation(const QSqlDatabase& db, const QString& storagePathUid);
+    static QByteArray pathToByteArray(const QString &location, const QString &fileName, const QString &extension);
+    static QMap<QString, QVariant> extractData(const QSqlDatabase &db, const QString &patientUUID, int eyeTypeIntValue, const QString &sideName);
 
-    static bool openDatabase();
-    static bool isDatabaseOpen();
-
-    static bool initializeParticipantData(
-            const QString& participantId, const QString& firstName, const QString& lastName);
-
-    static bool cleanupDatabase();
-    static bool closeDatabase();
-
-private:
-    DatabaseManager() = default;
-
-    static QString defaultPersonUUID;
-    static QString defaultPatientUUID;
-
-    static bool wasSqlError(QSqlDatabase& db, const QSqlQuery& query, bool isTransaction);
-
-    static QString getImageLocation(const QString& storagePathUid);
-    static QByteArray getEyeImage(const QString& path);
-
-    static bool removeImageFiles();
+protected:
+    const QString EYE_PICT_VENDOR = "";
+    const QString EYE_SIDE_VENDOR = "";
 };
 
 #endif // DATABASEMANAGER_H

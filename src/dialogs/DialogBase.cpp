@@ -18,6 +18,7 @@ DialogBase::DialogBase(QWidget *parent, QString uuid)
 {
     m_uuid = uuid;
     this->setAttribute(Qt::WA_DeleteOnClose);
+
 }
 
 void DialogBase::initialize()

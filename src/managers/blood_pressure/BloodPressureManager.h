@@ -6,7 +6,7 @@
 
 #include <QObject>
 #include <QThread>
-#include <QtUsb/QtUsb>
+#include "QtUsb/QtUsb"
 
 /*!
  * \class BloodPressureManager

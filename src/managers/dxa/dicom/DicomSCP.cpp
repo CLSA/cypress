@@ -1,9 +1,12 @@
-#include "DicomSCP.h"
 #include <QFileSystemWatcher>
 #include <QFile>
 #include <QDir>
 #include <QDebug>
 #include <QException>
+#include <QCoreApplication>
+
+#include "DicomSCP.h"
+
 
 DicomSCP::DicomSCP()
     : m_settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress")
@@ -22,18 +25,31 @@ void DicomSCP::initProcess()
 {
     m_process.reset(new QProcess);
 
+    const QString basePath = QCoreApplication::applicationDirPath();
     QStringList args;
 
-    args
-        << "+fst"
-        << m_settings.value("dicom/port").toString()
-        << "--config-file"
-        << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/storescp.cfg"
-        << "default"
-        << "--log-config"
-        << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/logger.cfg"
-        << "--output-directory"
-        << m_settings.value("dicom/out_dir").toString();
+    qDebug() << basePath;
+
+    args << "+fst"
+         << m_settings.value("dicom/port").toString()
+         << "--config-file"
+         << basePath + "/dcmtk-3.6.7/etc/dcmtk/storescp.cfg"
+         << "default"
+         << "--log-config"
+         << basePath + "/dcmtk-3.6.7/etc/dcmtk/logger.cfg"
+         << "--output-directory"
+         << m_settings.value("dicom/out_dir").toString();
+
+    //args
+    //    << "+fst"
+    //    << m_settings.value("dicom/port").toString()
+    //    << "--config-file"
+    //    << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/storescp.cfg"
+    //    << "default"
+    //    << "--log-config"
+    //    << "C:/work/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/logger.cfg"
+    //    << "--output-directory"
+    //    << m_settings.value("dicom/out_dir").toString();
 
     m_process->setWorkingDirectory(m_settings.value("dicom/working_dir", "").toString());
     m_process->setProgram(m_settings.value("dicom/program", "").toString());

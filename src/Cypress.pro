@@ -80,6 +80,7 @@ SOURCES += \
     dialogs/RetinalCameraDialog.cpp \
     dialogs/ecgdialog.cpp \
     dialogs/signaturepaddialog.cpp \
+    logging/debugdialog.cpp \
     managers/ManagerBase.cpp \
     managers/SettingsManager.cpp \
     managers/audiometer/AudiometerManager.cpp \
@@ -234,6 +235,7 @@ HEADERS += \
     dialogs/RetinalCameraDialog.h \
     dialogs/ecgdialog.h \
     dialogs/signaturepaddialog.h \
+    logging/debugdialog.h \
     managers/SettingsManager.h \
     managers/audiometer/AudiometerManager.h \
     managers/blood_pressure/BPMCommunication.h \
@@ -363,6 +365,8 @@ INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/x64/
 DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/x64/
 LIBS += -L$$PWD/../dep/SigLib/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
+INCLUDEPATH += $$PWD/../dep/qt_usb_x64/include
+LIBS += -L$$PWD/../dep/qt_usb_x64/lib -lQt5Usb
 #win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/include
 #win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/lib
 #win32: DEPENDPATH += $$PWD/../deps/poco_x86-windows/lib

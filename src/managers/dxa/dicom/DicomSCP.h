@@ -3,26 +3,21 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QThread>
 #include <QFileSystemWatcher>
 #include <QSettings>
 
-/**
- * @brief DicomSCP class is responsible for handling DICOM Storage Service Class Provider (SCP) operations.
- *
- * This class utilizes the Qt framework (version 5.15.2) and is designed to manage the SCP process,
- * watching the output directory for new DICOM files, and emitting relevant signals.
- */
 class DicomSCP : public QObject
 {
     Q_OBJECT
 public:
     /**
-     * @brief Constructs a DicomSCP object.
+     * @brief Constructor.
      */
     explicit DicomSCP();
 
     /**
-     * @brief DicomSCP destructor.
+     * @brief Destructor.
      */
     ~DicomSCP();
 
@@ -50,15 +45,48 @@ signals:
     void exitCrash();
 
 private:
+    /**
+     * @brief Initializes the connections for the process and the file system watcher.
+     */
     void initConnections();
+
+    /**
+     * @brief Initializes the DICOM SCP process.
+     */
     void initProcess();
 
+    /**
+     * @brief Triggered when a monitored directory changes.
+     * @param path The path of the directory that has changed.
+     */
     void onDirectoryChanged(const QString& path);
+
+    /**
+     * @brief Triggered when a monitored file changes.
+     */
     void onFileChanged();
-    void onWatcherDestroyed();
-    void onProcessStateChanged();
-    void onProcessStandardOutputReady();
-    void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+    /**
+     * @brief Triggered when the file system watcher is destroyed.
+     */
+    void onFileSystemWatcherDestroyed();
+
+    /**
+     * @brief Triggered when the process state changes.
+     */
+    void onStateChanged();
+
+    /**
+     * @brief Triggered when there is standard output available from the process.
+     */
+    void onReadyReadStandardOutput();
+
+    /**
+     * @brief Triggered when the process finishes execution.
+     * @param exitCode The exit code of the process.
+     * @param exitStatus The exit status of the process.
+     */
+    void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     QScopedPointer<QProcess> m_process;
     QScopedPointer<QFileSystemWatcher> m_fileSystemWatcher;
@@ -66,4 +94,3 @@ private:
 };
 
 #endif // DICOMSCP_H
-

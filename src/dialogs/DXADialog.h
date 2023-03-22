@@ -26,7 +26,7 @@ protected:
     QScopedPointer<DXAManager> m_manager;
 
 public slots:
-    void dicomFilesReceived(QStringList& dicomFilePaths);
+    void dicomFilesReceived(const QStringList& dicomFilePaths);
     void dicomServerStarted();
     void dicomServerEnded();
     void dicomLogUpdate(QString line);

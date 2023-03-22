@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QSettings>
+#include <QSqlDatabase>
 
 #include "managers/ManagerBase.h"
 
@@ -33,6 +34,9 @@ public slots:
 private:
     QProcess m_process;
     QString m_uuid;
+    QSqlDatabase m_db;
+    QString defaultPersonUUID = "11111111-2222-3333-4444-555555555555";
+    QString defaultPatientUUID = "11111111-2222-3333-4444-555555555555";
 
     bool startRetinalCamera();
     bool cleanupDatabase();

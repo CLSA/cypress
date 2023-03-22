@@ -53,10 +53,10 @@ void DXADialog::dicomLogUpdate(QString line)
     ui->logBrowser->append(line);
 }
 
-void DXADialog::dicomFilesReceived(QStringList& dicomFilePaths)
+void DXADialog::dicomFilesReceived(const QStringList& dicomFilePaths)
 {
     ui->filesList->clear();
-    QStringList::Iterator iterator;
+    QStringList::ConstIterator iterator;
     for (iterator = dicomFilePaths.begin(); iterator != dicomFilePaths.end(); ++iterator)
     {
        ui->filesList->append((*iterator).toLocal8Bit().constData());
