@@ -24,7 +24,11 @@ SignaturePadManager::SignaturePadManager(QJsonObject inputData)
     connect(this, &SignaturePadManager::startCapture, spc.get(), &SignaturePadCommunication::start);
     connect(spc.get(), &SignaturePadCommunication::signatureOk, this, &SignaturePadManager::receiveSignature);
 
-    m_answerId = inputData.value("answer_id").toString();
+    qDebug() << "signature pad manager" << inputData;
+    qDebug() << inputData.value("answer_id").toInt();
+    qDebug() << inputData.value("barcode").toString();
+
+    m_answerId = inputData.value("answer_id").toInt();
     m_participantId = inputData.value("barcode").toString();
 }
 
@@ -51,7 +55,9 @@ void SignaturePadManager::measure()
     };
 
     //sendResultsToPine(response);
-    sendRawDataToPine(signature);
+    if (!signature.isEmpty()) {
+        sendRawDataToPine(signature);
+    }
 }
 
 void SignaturePadManager::sendRawDataToPine(QByteArray data)
@@ -74,10 +80,10 @@ void SignaturePadManager::sendRawDataToPine(QByteArray data)
         //    Poco::Net::X509Certificate cert = socket.peerCertificate();
         //}
 
-        Poco::URI uri(QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + m_answerId + "?filename=signature.bmp").toStdString());
+        Poco::URI uri(QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + QString::number(m_answerId) + "?filename=signature.bmp").toStdString());
         Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
 
-        qDebug() << QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + m_answerId + "?filename=signature.bmp");
+        qDebug() << QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + QString::number(m_answerId) + "?filename=signature.bmp");
 
         std::string path(uri.getPathAndQuery());
         if (path.empty()) path = "/";
@@ -89,7 +95,7 @@ void SignaturePadManager::sendRawDataToPine(QByteArray data)
         req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
 
         std::ostream &os = session.sendRequest(req);
-        os << data.constData();
+        os.write(data.constData(), data.size());
         os.flush();
 
         Poco::Net::HTTPResponse res;
@@ -103,7 +109,6 @@ void SignaturePadManager::sendRawDataToPine(QByteArray data)
         qDebug() << e.code();
         qDebug() << e.what();
     }
-
 }
 
 void SignaturePadManager::restart()
@@ -159,6 +164,6 @@ bool SignaturePadManager::cleanUp() {
 // set input parameters for the test
 void SignaturePadManager::setInputData(const QVariantMap& inputData)
 {
-    m_answerId = inputData.value("answerId").toString();
+    m_answerId = inputData.value("answerId").toInt();
     m_participantId = inputData.value("participantId").toString();
 }

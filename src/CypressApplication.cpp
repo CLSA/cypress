@@ -98,6 +98,8 @@ bool CypressApplication::startTest(Constants::MeasureType type, QJsonObject inpu
     QVariantMap args;
     DialogFactory *factory;
 
+    qDebug() << "CypressApplication: startTest";
+    qDebug() << inputData;
     try
     {
         setArgs(args);

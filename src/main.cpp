@@ -24,51 +24,51 @@ QMap<QString, QVariant> defaultSettings = {{
     {"pine/host", ""},
     {"pine/port", ""},
 
-    {"rest_api/host", 	"0.0.0.0"},
-    {"rest_api/port", 	8000},
-    {"rest_api/args", 	""},
+    {"rest_api/host", "0.0.0.0"},
+    {"rest_api/port", 8000},
+    {"rest_api/args", ""},
 
-    {"dicom/host", 		  "0.0.0.0"},
-    {"dicom/port", 		  9000},
-    {"dicom/asc_config",  "C:/work/clsa/cypress/dcmtk-3.6.7/dcmnet/etc/storescp.cfg"},
-    {"dicom/log_config",  "./logger.cfg"},
-    {"dicom/out_dir", 	  "C:/Users/antho/Documents/PACS"},
-    {"dicom/working_dir", "C:/ProgramData/chocolatey/bin"},
-    {"dicom/program", 	  "C:/ProgramData/chocolatey/bin/dcmrecv.exe"},
+    {"grip_strength/working_dir", "C:/Program Files/Tracker 5"},
+    {"grip_strength/executable",  "WTS.exe"},
+    {"grip_strength/database",    "Tracker 5 Data"},
 
-    {"grip_strength/workingDir", 	"C:/Program Files (x86)/Tracker 5"},
-    {"grip_strength/runnableName", 	"C:/Program Files (x86)/Tracker 5/WTS.exe"},
-    {"grip_strength/databaseDir", 	"C:/Program Files (x86)/Tracker 5/Data/Tracker 5 Data"},
-    {"grip_strength/databaseHost", 	"localhost"},
-    {"grip_strength/databaseName",  "Tracker 5"},
-    {"grip_strength/databasePort",  ""},
-    {"grip_strength/databaseUser",  "Anthony"},
-    {"grip_strength/databasePassword", ""},
+    {"retinal_camera/patient_id", 		 "11111111-2222-3333-4444-555555555555"},
+    {"retinal_camera/working_dir",       "C:/Program Files/TOPCON/IMAGEnet R4/"},
+    {"retinal_camera/executable",        "imagenet.exe"},
+    {"retinal_camera/database/driver", 	 "QODBC"},
+    {"retinal_camera/database/host",     "localhost"},
+    {"retinal_camera/database/database", "IMAGEnet_R4"},
+    {"retinal_camera/database/port",     1433},
+    {"retinal_camera/database/username", ""},
+    {"retinal_camera/database/password", ""},
 
-    {"retinal_camera/patient_id", 		    "11111111-2222-3333-4444-555555555555"},
-    {"retinal_camera/working_dir", 			"C:/Program Files/TOPCON/IMAGEnet R4/"},
-    {"retinal_camera/executable", 			"imagenet.exe"},
-    {"retinal_camera/database/version", 	"MSSQL Server 2008 R2 Express"},
-    {"retinal_camera/database/driver", 	    "QODBC"},
-    {"retinal_camera/database/host", 		"DSN=IMAGEnet_R4;"},
-    {"retinal_camera/database/port", 		1433},
-    {"retinal_camera/database/database", 	"IMAGEnet_R4"},
+    {"dxa/dicom/host", 		  "0.0.0.0"},
+    {"dxa/dicom/port", 		  9000},
+    {"dxa/dicom/asc_config",  "C:/work/clsa/cypress/dcmtk-3.6.7/dcmnet/etc/storescp.cfg"},
+    {"dxa/dicom/log_config",  "./logger.cfg"},
+    {"dxa/dicom/out_dir", 	  "C:/Users/antho/Documents/PACS"},
+    {"dxa/dicom/working_dir", "C:/ProgramData/chocolatey/bin"},
+    {"dxa/dicom/program", 	  "C:/ProgramData/chocolatey/bin/dcmrecv.exe"},
 
-    {"dxa/patscandb/version", 	"MS Access"},
-    {"dxa/patscandb/driver", 	"QODBC"},
-    {"dxa/patscandb/host", 		""},
-    {"dxa/patscandb/port", 		""},
-    {"dxa/patscandb/user", 		""},
+    {"dxa/patscandb/version",   "MS Access"},
+    {"dxa/patscandb/driver",    "QODBC"},
+    {"dxa/patscandb/host",      ""},
+    {"dxa/patscandb/port",      ""},
+    {"dxa/patscandb/user", 	    ""},
     {"dxa/patscandb/password", 	""},
     {"dxa/patscandb/database", 	""},
 
-    {"dxa/refscandb/version", 	"MS Access"},
-    {"dxa/refscandb/driver", 	"QODBC"},
-    {"dxa/refscandb/host", 		""},
-    {"dxa/refscandb/port", 		""},
-    {"dxa/refscandb/user", 		""},
+    {"dxa/refscandb/version",   "MS Access"},
+    {"dxa/refscandb/driver",    "QODBC"},
+    {"dxa/refscandb/host",      ""},
+    {"dxa/refscandb/port", 	    ""},
+    {"dxa/refscandb/user", 	    ""},
     {"dxa/refscandb/password", 	""},
     {"dxa/refscandb/database", 	""},
+
+    {"vividi/dicom/aeTitle",    "DICOMSTORAGESCP"},
+    {"vividi/dicom/hostname",   "0.0.0.0"},
+    {"vividi/dicom/port",       1100}
 }};
 
 // .ini file can be found at C:\Users\<User>\AppData\Roaming\CLSA\Cypress.ini
@@ -109,11 +109,23 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         debugDialog->show();
     }
 
-    debugDialog->appendDebugMessage(msg);
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+
+    // Create a new message with the timestamp and original message
+    QString newMsg = currentDateTime.toString(Qt::ISODateWithMs) + " [" + QString::number(type) + "] " + msg;
+
+    debugDialog->appendDebugMessage(newMsg);
+}
+
+void restartApplication(const QStringList& arguments) {
+    QProcess process;
+    process.startDetached(arguments[0], arguments.mid(1));
+    QCoreApplication::quit();
 }
 
 int main(int argc, char *argv[])
 {
+
     QGuiApplication::setOrganizationName(orgName);
     QGuiApplication::setOrganizationDomain(orgDomain);
     QGuiApplication::setApplicationName(appName);
@@ -122,9 +134,13 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 
+    QStringList appArguments = QCoreApplication::arguments();
+
+    //restartApplication(appArguments);
+
     qInstallMessageHandler(customMessageHandler);
 
-    SettingsManager settingsManager;
+    //SettingsManager settingsManager;
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

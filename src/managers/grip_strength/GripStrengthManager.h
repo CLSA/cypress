@@ -1,65 +1,43 @@
 #ifndef GRIPSTRENGTHMANAGER_H
 #define GRIPSTRENGTHMANAGER_H
 
-#include "managers/ManagerBase.h"
-#include "data/grip_strength/tests/GripStrengthTest.h"
+#include <QObject>
+#include <QTemporaryDir>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
-#include <QProcess>
-
-class GripStrengthManager : public ManagerBase
+class GripStrengthManager : public QObject
 {
-    enum FileType {
-        Tracker5Exe,
-        GripTestDbPath,
-        GripTestDataDbPath
-    };
     Q_OBJECT
+
 public:
-    explicit GripStrengthManager();
-    bool isAvailable();
+    explicit GripStrengthManager(QObject *parent = nullptr);
+    ~GripStrengthManager();
+
+    void setTrackerDatabaseName(const QString &name);
+    QByteArray extractTrials();
 
 public slots:
-    void start() override;
-    void measure() override;
-    void finish() override;
-
-signals:
-    void processInitialized();
-    void measureStart();
+    void initialize();
+    void run();
+    void shutdown();
 
 private:
-    QProcess m_process;
-    GripStrengthTest m_test;
+    QDir backupDir;
+    QDir trackerDir;
 
-    QString m_workingDir;
-    QString m_runnableName;
-    QString m_databaseDir;
-    QString m_databaseName;
-    QString m_databaseHost;
-    QString m_databasePort;
-    QString m_databaseUser;
-    QString m_databasePassword;
+    QString trackerDatabaseName;
+    QSqlDatabase database;
+    QSqlDatabase getTracker5DB();
+    QMap<QString, QVariant> extractExam();
 
-    bool validateInputData(const QVariantMap& inputData);
+    void createDatabaseBackupFolder();
+    void backupTrackerDatabase();
+    void restoreTrackerDatabase();
+    void sendToPine(const QMap<QString, QVariant> &values);
 
-    bool initializeConnections();
-    bool configureProcess();
-    bool processStart();
-    bool readOutput();
-
-    // Reset the session
-    bool clearData() override;
-
-    // Set up device
-    bool setUp() override;
-
-    // Clean up the device for next time
-    bool cleanUp() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
-
-    bool isDefined(const QString&, const GripStrengthManager::FileType&) const;
+    QString getTrackerDatabaseFolder();
+    QTemporaryDir databaseBackupFolder;
 };
 
 #endif // GRIPSTRENGTHMANAGER_H

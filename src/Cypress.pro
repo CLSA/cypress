@@ -80,6 +80,7 @@ SOURCES += \
     dialogs/RetinalCameraDialog.cpp \
     dialogs/ecgdialog.cpp \
     dialogs/signaturepaddialog.cpp \
+    dicom/dicomdirectorywatcher.cpp \
     logging/debugdialog.cpp \
     managers/ManagerBase.cpp \
     managers/SettingsManager.cpp \
@@ -235,6 +236,7 @@ HEADERS += \
     dialogs/RetinalCameraDialog.h \
     dialogs/ecgdialog.h \
     dialogs/signaturepaddialog.h \
+    dicom/dicomdirectorywatcher.h \
     logging/debugdialog.h \
     managers/SettingsManager.h \
     managers/audiometer/AudiometerManager.h \
@@ -348,9 +350,11 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib64 -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # OpenSSL
-INCLUDEPATH += "C:/Program Files/OpenSSL-Win64/include"
-LIBS += -L"C:/Program Files/OpenSSL-Win64/lib" -lopenssl -llibcrypto
+INCLUDEPATH += "C:/OpenSSL-Win64/include"
+LIBS += -L"C:/OpenSSL-Win64/lib" -lopenssl -llibcrypto
 
+INCLUDEPATH += $$PWD/../dep/QtUsb/include
+LIBS += -L$$PWD/../dep/QtUsb/lib/ -lQt5Usb
 # DCMTK
 INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/include/
 INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/

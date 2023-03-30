@@ -1,26 +1,18 @@
 #ifndef TST_GRIP_STRENGTH_H
 #define TST_GRIP_STRENGTH_H
 
-#include <QTest>
-#include <QJsonObject>
+#include <QObject>
 
-class TestGripStrength: public QObject
+class TestGripStrength : public QObject
 {
     Q_OBJECT
 
 public:
     TestGripStrength();
-    ~TestGripStrength();
 
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-    void testCase2();
+private Q_SLOTS:
+    void testInitialize();
+    void testExtractExam();
 };
 
 #endif // TST_GRIP_STRENGTH_H

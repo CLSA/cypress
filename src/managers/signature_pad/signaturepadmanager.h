@@ -43,7 +43,7 @@ private:
 
     void sendRawDataToPine(QByteArray data);
 
-    QString m_answerId; 	 // from Pine
+    qint32 m_answerId; 	 // from Pine
     QString m_participantId; // from Pine
 
     // Reset the session

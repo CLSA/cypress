@@ -6,6 +6,8 @@ SignaturePadDialog::SignaturePadDialog(QJsonObject inputData) : ui(new Ui::Signa
 {
     m_uuid = inputData.value("answer_id").toString();
 
+    qDebug() << "SignaturePadDialog" << inputData;
+
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 

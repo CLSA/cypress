@@ -26,6 +26,7 @@ void SignaturePadRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
         QJsonDocument jsonDocument = QJsonDocument::fromJson(inputDataRaw);
         QJsonObject inputData = jsonDocument.object();
 
+        qDebug() << inputData;
         // prepare response
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");

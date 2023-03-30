@@ -1,10 +1,10 @@
 #include "tst_dxa.h"
 
-#include "../data/dxa/tests/ApSpineTest.h"
-#include "../data/dxa/tests/ForearmTest.h"
-#include "../data/dxa/tests/HipTest.h"
-#include "../data/dxa/tests/IVAImagingTest.h"
-#include "../data/dxa/tests/WholeBodyScanTest.h"
+//#include "../data/dxa/tests/ApSpineTest.h"
+//#include "../data/dxa/tests/ForearmTest.h"
+//#include "../data/dxa/tests/HipTest.h"
+//#include "../data/dxa/tests/IVAImagingTest.h"
+//#include "../data/dxa/tests/WholeBodyScanTest.h"
 
 
 
