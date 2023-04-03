@@ -1,4 +1,5 @@
 #include "gripstrengthmanager.h"
+#include "../auxiliary/tracker5util.h"
 
 #include <QDebug>
 #include <QSqlError>
@@ -9,191 +10,242 @@
 #include <QFile>
 #include <QtSql>
 
-#include "../auxiliary/tracker5util.h"
-
 GripStrengthManager::GripStrengthManager(QObject *parent)
     : QObject(parent)
 {
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+
+    m_workingDirPath = settings.value("instruments/grip_strength/working_dir").toString();
+    if (m_workingDirPath.isEmpty() || m_workingDirPath.isNull())
+    {
+        const QString error = "working directory path for tracker 5 is not defined";
+        qCritical() << error;
+        throw std::runtime_error(error.toStdString());
+    }
+
+    m_executablePath = settings.value("instruments/grip_strength/executable").toString();
+    if (m_executablePath.isEmpty() || m_executablePath.isNull())
+    {
+        const QString error = "executable path for Tracker 5 is not defined";
+        qCritical() << error;
+        throw std::runtime_error(error.toStdString());
+    }
+
+    m_databaseName = settings.value("instruments/grip_strength/databaseName").toString();
+    if (m_databaseName.isEmpty() || m_databaseName.isNull())
+    {
+        const QString error = "database name is not defined";
+        qCritical() << error;
+        throw std::runtime_error(error.toStdString());
+    }
 }
 
 GripStrengthManager::~GripStrengthManager()
 {
-    if (database.isOpen()) {
-        database.close();
+    if (m_database.isOpen())
+    {
+        m_database.close();
     }
 }
 
-void GripStrengthManager::setTrackerDatabaseName(const QString &name)
+void GripStrengthManager::start()
 {
-    trackerDatabaseName = name;
+    initialize();
+    //startApp();
 }
 
 void GripStrengthManager::initialize()
 {
     createDatabaseBackupFolder();
-    backupTrackerDatabase();
-
-    database = getTracker5DB();
-    if (!database.isOpen()) {
-        qWarning() << "Cannot open database:" << database.lastError().text();
-    }
+    backupDatabase();
+    openDatabase();
 }
 
-void GripStrengthManager::run()
+void GripStrengthManager::startApp()
 {
-    qDebug() << "Launching Tracker 5 software";
-    extractTrials();
+    m_process.setProgram(m_workingDirPath + m_executablePath);
+    m_process.start();
+
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
+    {
+        finish();
+    });
+
+    m_process.waitForStarted();
 }
 
-void GripStrengthManager::shutdown()
-{
-    restoreTrackerDatabase();
-}
-
-QByteArray GripStrengthManager::extractTrials()
+void GripStrengthManager::measure()
 {
     QMap<QString, QVariant> exam = extractExam();
     QVector<QMap<QString, QVariant>> trialData;
 
-    QSqlQuery query(database);
+    QSqlQuery query(m_database);
     query.prepare("SELECT * FROM ZGripTestData");
-    if (!query.exec()) {
-        qWarning() << "Error executing query:" << query.lastError().text();
-        //throw std::exception;
+    if (!query.exec())
+    {
+        const QString error = "Error executing query:" + query.lastError().text();
+        qCritical() << error;
+        throw std::runtime_error(error.toStdString());
     }
 
-    while (query.next()) {
+    while (query.next())
+    {
         QVariant examMax = query.value("Maximum");
         QVariant avg = query.value("Average");
         QVariant cv = query.value("CV");
 
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 8; i++)
+        {
             QVariant side = query.value("Side");
             QVariant rungPosition = query.value("Position");
             QVariant rep = query.value(QString("Rep%1").arg(i));
             int excludeFieldIndex = query.record().indexOf("Rep" + QString::number(i) + "Exclude");
             QVariant exclude = query.record().value(excludeFieldIndex);
 
-            if (!rep.isNull() && (exclude.isNull() || exclude.toInt() == 0)) {
-                QMap<QString, QVariant> map = exam;
+            if (!rep.isNull() && (exclude.isNull() || exclude.toInt() == 0))
+            {
+                QMap<QString, QVariant> map = exam; // copy
+
                 map.insert("Side", side);
                 map.insert("Position", rungPosition.toInt());
                 map.insert("Rep", rep.toDouble());
-
                 map.insert("Max", examMax.toDouble());
                 map.insert("Avg", avg.toDouble());
                 map.insert("CV", cv.toInt());
+
                 trialData.append(map);
             }
         }
     }
 
-    // Convert the trials vector to a JSON array
     QJsonArray trialArray;
-    for (const auto& trial : trialData) {
+    for (const auto& trial : trialData)
+    {
         QJsonObject trialObject;
-        for (auto it = trial.begin(); it != trial.end(); ++it) {
+        for (auto it = trial.begin(); it != trial.end(); ++it)
+        {
             trialObject.insert(it.key(), QJsonValue::fromVariant(it.value()));
         }
         trialArray.append(trialObject);
     }
 
-    // Add the exam data to a JSON object
     QJsonObject examObject;
-    for (auto it = exam.begin(); it != exam.end(); ++it) {
+    for (auto it = exam.begin(); it != exam.end(); ++it)
+    {
         examObject.insert(it.key(), QJsonValue::fromVariant(it.value()));
     }
 
-    // Add the trial array to the exam object
     examObject.insert("trials", trialArray);
 
-    // Convert the exam object to a JSON document and pretty print it to the console
-    QJsonDocument doc(examObject);
-    qDebug().noquote() << doc.toJson(QJsonDocument::Indented);
+    m_exam = QJsonDocument(examObject);
+    emit validExam(m_exam);
 
-    return doc.toBinaryData();
+    qDebug().noquote() << m_exam.toJson(QJsonDocument::Indented);
 }
 
-QMap<QString, QVariant> GripStrengthManager::extractExam()
+void GripStrengthManager::finish()
 {
-    QMap<QString, QVariant> map;
-    QSqlQuery query(database);
+    measure();
+    sendToPine();
+    restoreTrackerDatabase();
+}
+
+QMap<QString, QVariant> GripStrengthManager::extractExam() const
+{
+    QMap<QString, QVariant> examData;
+    QSqlQuery query(m_database);
+
     query.prepare("SELECT * FROM ZGripTest");
-    if (!query.exec()) {
-        qWarning() << "Error executing query:" << query.lastError().text();
-        return map;
+    if (!query.exec())
+    {
+        const QString error = "Error executing query:" + query.lastError().text();
+        qWarning() << error;
+        throw std::runtime_error(error.toStdString());
     }
 
-    if (!query.next()) {
+    if (!query.next())
+    {
         qWarning() << "No records found in ZGripTest";
-        return map;
+        throw std::runtime_error("No records found in ZGripTest");
     }
 
     QSqlRecord record = query.record();
     QStringList fields = { "Rung", "MaxReps", "Sequence", "RestTime", "Rate", "Threshold", "NormType", "Comparison" };
-    for (const QString &field : fields) {
+    for (const QString &field : fields)
+    {
         QVariant value = record.value(field);
-        if (field == "Threshold") {
+        if (field == "Threshold")
+        {
             value = Tracker5Util::asKg(value.toInt());
         }
-        map.insert(field, value);
+        examData.insert(field, value);
         qDebug() << field << ":" << value;
     }
 
-    return map;
+    return examData;
 }
 
-QSqlDatabase GripStrengthManager::getTracker5DB() {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-
-    QString workingDir = settings.value("instruments/grip_strength/working_dir").toString();
-    QString databaseName = settings.value("instruments/grip_strength/database").toString();
-
-    QDir databaseDir(workingDir + databaseName);
-    qDebug() << "database dir: " << databaseDir.absolutePath();
-
+void GripStrengthManager::openDatabase() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("Tracker 5 Data");
-    if (!db.open()) {
-        qWarning() << "Failed to open database:" << db.lastError().text();
+    db.setDatabaseName(m_databaseName);
+
+    if (!db.open())
+    {
+        const QString error = "Failed to open database:" + db.lastError().text();
+        qWarning() << error;
+        throw std::runtime_error(error.toStdString());
     }
 
-    return db;
+    m_database = db;
 }
 
 void GripStrengthManager::restoreTrackerDatabase() {
-    // Copy backed-up database files back into the tracker database folder
-    trackerDir.removeRecursively();
-    for (const QString &fileName : backupDir.entryList(QDir::Files)) {
-        QFile::copy(backupDir.filePath(fileName), trackerDir.filePath(fileName));
+    if (!m_trackerDir.removeRecursively())
+    {
+        throw std::runtime_error("Failed to remove trackerDir");
     }
-    backupDir.removeRecursively();
+
+    for (const QString &fileName : m_backupDir.entryList(QDir::Files))
+    {
+        if (!QFile::copy(m_backupDir.filePath(fileName), m_trackerDir.filePath(fileName)))
+        {
+            throw std::runtime_error("Failed to open database");
+        }
+    }
+
+    if (!m_backupDir.removeRecursively())
+    {
+       throw std::runtime_error("Failed to remove backupDir");
+    }
 }
 
 void GripStrengthManager::createDatabaseBackupFolder() {
     QString backupFolder = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/database_backup";
-    backupDir = QDir(backupFolder);
-    if (!backupDir.exists()) {
-        if (!backupDir.mkpath(backupFolder)) {
+    m_backupDir = QDir(backupFolder);
+    if (!m_backupDir.exists())
+    {
+        if (!m_backupDir.mkpath(backupFolder))
+        {
             throw std::runtime_error("Error creating temp directory");
         }
     }
 }
 
-void GripStrengthManager::backupTrackerDatabase() {
-    // Copy database files out of the database folder
-    if (!backupDir.exists()) {
-        throw std::runtime_error("Error: backup dir does not exist");
+void GripStrengthManager::backupDatabase() {
+    for (const QString &fileName : m_trackerDir.entryList(QDir::Files))
+    {
+        if (!QFile::copy(m_trackerDir.filePath(fileName), m_backupDir.filePath(fileName)))
+        {
+            throw std::runtime_error("Could not backup file");
+        }
     }
-    for (const QString &fileName : trackerDir.entryList(QDir::Files)) {
-        QFile::copy(trackerDir.filePath(fileName), backupDir.filePath(fileName));
-    }
-
-    qDebug() << backupDir.absolutePath();
 }
 
-
-void GripStrengthManager::sendToPine(const QMap<QString, QVariant> &values) {
-
+void GripStrengthManager::sendToPine()
+{
+    if (m_exam.isEmpty() || m_exam.isNull())
+    {
+        return;
+    }
 }
 

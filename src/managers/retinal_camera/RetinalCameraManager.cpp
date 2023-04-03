@@ -75,10 +75,9 @@ bool RetinalCameraManager::openDatabase()
     // Open DB connection and clean up database
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     m_db = QSqlDatabase::addDatabase(settings.value("retinal_camera/database/driver").toString());
-
     m_db.setHostName(settings.value("retinal_camera/database/host").toString());
     m_db.setPort(settings.value("retinal_camera/database/port").toInt());
-    m_db.setDatabaseName(settings.value("retinal_camera/database/port").toString());
+    m_db.setDatabaseName(settings.value("retinal_camera/database/database").toString());
     m_db.setUserName(settings.value("retinal_camera/database/username").toString());
     m_db.setPassword(settings.value("retinal_camera/database/password").toString());
 

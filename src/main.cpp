@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 
     //restartApplication(appArguments);
 
-    qInstallMessageHandler(customMessageHandler);
+    //qInstallMessageHandler(customMessageHandler);
 
     //SettingsManager settingsManager;
 

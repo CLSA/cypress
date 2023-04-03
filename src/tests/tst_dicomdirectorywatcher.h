@@ -1,16 +1,17 @@
-#ifndef TST_DICOMDIRECTORYWATCHER_H
-#define TST_DICOMDIRECTORYWATCHER_H
+#ifndef TEST_DICOMDIRECTORYWATCHER_H
+#define TEST_DICOMDIRECTORYWATCHER_H
 
-#include <QObject>
+#include <QtTest>
 
-class tst_dicomdirectorywatcher : public QObject
+class Test_DicomDirectoryWatcher : public QObject
 {
     Q_OBJECT
-public:
-    explicit tst_dicomdirectorywatcher(QObject *parent = nullptr);
 
-signals:
-
+private slots:
+    void initTestCase();
+    void cleanupTestCase();
+    void testValidateTags();
+    void testOnDirectoryChanged();
 };
 
-#endif // TST_DICOMDIRECTORYWATCHER_H
+#endif // TEST_DICOMDIRECTORYWATCHER_H

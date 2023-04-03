@@ -98,8 +98,6 @@ bool CypressApplication::startTest(Constants::MeasureType type, QJsonObject inpu
     QVariantMap args;
     DialogFactory *factory;
 
-    qDebug() << "CypressApplication: startTest";
-    qDebug() << inputData;
     try
     {
         setArgs(args);
@@ -137,12 +135,6 @@ void CypressApplication::setArgs(const QVariantMap& args)
 void CypressApplication::initialize()
 {
     CypressApplication::startTime = QDateTime::currentDateTimeUtc();
-
-    if (m_verbose) {
-        qDebug() << "Mode: " << m_mode;
-        qDebug() << "Type: " << m_type;
-    }
-
     CypressApplication::restApiServer->start();
 
     connect(restApiServer.get(), &Server::startTest, this, &CypressApplication::startTest);

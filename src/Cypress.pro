@@ -18,6 +18,7 @@ SOURCES += \
     auxiliary/FIleUtils.cpp \
     auxiliary/JsonSettings.cpp \
     auxiliary/Utilities.cpp \
+    auxiliary/filecompressor.cpp \
     auxiliary/tracker5util.cpp \
     data/AccessQueryHelper.cpp \
     data/ExcelQueryHelper.cpp \
@@ -178,6 +179,7 @@ HEADERS += \
     auxiliary/FileUtils.h \
     auxiliary/JsonSettings.h \
     auxiliary/Utilities.h \
+    auxiliary/filecompressor.h \
     auxiliary/tracker5util.h \
     data/AccessQueryHelper.h \
     data/ExcelQueryHelper.h \

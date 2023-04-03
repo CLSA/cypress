@@ -2,6 +2,8 @@
 #define GRIPSTRENGTHMANAGER_H
 
 #include <QObject>
+#include <QJsonDocument>
+#include <QProcess>
 #include <QTemporaryDir>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -14,30 +16,35 @@ public:
     explicit GripStrengthManager(QObject *parent = nullptr);
     ~GripStrengthManager();
 
-    void setTrackerDatabaseName(const QString &name);
-    QByteArray extractTrials();
+    void start();
+    void measure();
+    void finish();
 
-public slots:
-    void initialize();
-    void run();
-    void shutdown();
+signals:
+    void validExam(QJsonDocument exam);
 
 private:
-    QDir backupDir;
-    QDir trackerDir;
+    QString m_workingDirPath;
+    QString m_executablePath;
+    QString m_databaseName;
 
-    QString trackerDatabaseName;
-    QSqlDatabase database;
-    QSqlDatabase getTracker5DB();
-    QMap<QString, QVariant> extractExam();
+    QDir m_backupDir;
+    QDir m_trackerDir;
 
+    QProcess m_process;
+    QJsonDocument m_exam;
+    QSqlDatabase m_database;
+
+    void initialize();
     void createDatabaseBackupFolder();
-    void backupTrackerDatabase();
+    void backupDatabase();
+    void openDatabase();
+    void startApp();
     void restoreTrackerDatabase();
-    void sendToPine(const QMap<QString, QVariant> &values);
+    void sendToPine();
 
     QString getTrackerDatabaseFolder();
-    QTemporaryDir databaseBackupFolder;
+    QMap<QString, QVariant> extractExam() const;
 };
 
 #endif // GRIPSTRENGTHMANAGER_H

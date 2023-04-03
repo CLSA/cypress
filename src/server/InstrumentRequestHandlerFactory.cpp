@@ -115,8 +115,8 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/frax/status?$)"), 	          &InstrumentRequestHandlerFactory::createFraxStatusRequestHandler 		      },
     { QString(R"(^/frax/?$)"), 	                  &InstrumentRequestHandlerFactory::createFraxRequestHandler 			      },
 
-    { QString(R"(^/dynamometer/status/?$)"),      &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler    },
-    { QString(R"(^/dynamometer/?$)"),             &InstrumentRequestHandlerFactory::createGripStrengthRequestHandler  	      },
+    { QString(R"(^/grip_strength/status/?$)"),    &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler  },
+    { QString(R"(^/grip_strength/?$)"),           &InstrumentRequestHandlerFactory::createGripStrengthRequestHandler  	  },
 
     { QString(R"(^/retinal_camera/status/?$)"),   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
     { QString(R"(^/retinal_camera/?$)"),          &InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler         },
