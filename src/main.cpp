@@ -125,7 +125,7 @@ void restartApplication(const QStringList& arguments) {
 
 int main(int argc, char *argv[])
 {
-
+    qDebug() << "here";
     QGuiApplication::setOrganizationName(orgName);
     QGuiApplication::setOrganizationDomain(orgDomain);
     QGuiApplication::setApplicationName(appName);

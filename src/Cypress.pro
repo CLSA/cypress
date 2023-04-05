@@ -7,6 +7,7 @@ CONFIG += testcase
 CONFIG += no_testcase_installs
 
 SUBDIRS = tests
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -39,14 +40,11 @@ SOURCES += \
     data/dxa/tests/IVAImagingTest.cpp \
     data/dxa/tests/WholeBodyScanTest.cpp \
     data/Measurement.cpp \
-#    data/TemperatureMeasurement.cpp \
-#    data/TemperatureTest.cpp \
     data/grip_strength/measurements/GripStrengthMeasurement.cpp \
     data/grip_strength/tests/GripStrengthTest.cpp \
     data/retinal_camera/databasemanager.cpp \
     dialogs/DXADialog.cpp \
     dialogs/GripStrengthDialog.cpp \
-#    managers/BluetoothLEManager.cpp \
     data/Measurement.cpp \
     data/MeasurementBase.cpp \
     data/blood_pressure/measurements/BloodPressureMeasurement.cpp \
@@ -81,6 +79,7 @@ SOURCES += \
     dialogs/RetinalCameraDialog.cpp \
     dialogs/ecgdialog.cpp \
     dialogs/signaturepaddialog.cpp \
+    dicom/dcmrecv.cpp \
     dicom/dicomdirectorywatcher.cpp \
     logging/debugdialog.cpp \
     managers/ManagerBase.cpp \
@@ -209,8 +208,8 @@ HEADERS += \
     data/dxa/tests/WholeBodyScanTest.h \
     data/Measurement.h \
     data/TestBase.h \
-#    data/TemperatureMeasurement.h \
-#    data/TemperatureTest.h \
+    #data/TemperatureMeasurement.h \
+    #data/TemperatureTest.h \
     data/dxa/tests/dxatest.h \
     data/grip_strength/measurements/GripStrengthMeasurement.h \
     data/grip_strength/tests/GripStrengthTest.h \
@@ -238,6 +237,7 @@ HEADERS += \
     dialogs/RetinalCameraDialog.h \
     dialogs/ecgdialog.h \
     dialogs/signaturepaddialog.h \
+    dicom/dcmrecv.h \
     dicom/dicomdirectorywatcher.h \
     logging/debugdialog.h \
     managers/SettingsManager.h \
@@ -342,6 +342,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -lopenssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -349,44 +351,23 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Util/include
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
-LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib64 -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoNet -lPocoCrypto -lPocoNetSSL
 
-# OpenSSL
-INCLUDEPATH += "C:/OpenSSL-Win64/include"
-LIBS += -L"C:/OpenSSL-Win64/lib" -lopenssl -llibcrypto
 
-INCLUDEPATH += $$PWD/../dep/QtUsb/include
-LIBS += -L$$PWD/../dep/QtUsb/lib/ -lQt5Usb
-# DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-support-MD-iconv-msvc-16.9/zlib-1.2.12/include
+INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
+LIBS += -L$$PWD/../dep/QtUsb_x86/lib/ -lQt5Usb
 
-DEPENDPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win64-release/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+#
+## DCMTK
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
-# Topaz Signature Pad
+#
+## Topaz Signature Pad
 INCLUDEPATH += $$PWD/../dep/SigLib/Include/
-INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/x64/
-DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/x64/
-LIBS += -L$$PWD/../dep/SigLib/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
-
-INCLUDEPATH += $$PWD/../dep/qt_usb_x64/include
-LIBS += -L$$PWD/../dep/qt_usb_x64/lib -lQt5Usb
-#win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/include
-#win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/lib
-#win32: DEPENDPATH += $$PWD/../deps/poco_x86-windows/lib
-#win32: LIBS += -L$$PWD/../deps/poco_x86-windows/lib -lPocoNet -lPocoFoundation -lPocoUtil
-#
-#win32: INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/include
-#win32: INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/lib
-#win32: DEPENDPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/lib
-#win32: LIBS += -L$$PWD/../deps/dcmtk-3.6.7-win32-release/lib/ -ldcmdata
-#
-#win32: INCLUDEPATH += $$PWD/../deps/SigPad/Include
-#win32: INCLUDEPATH += $$PWD/../deps/SigPad/SigTablt/Win32
-#win32: DEPENDPATH += $$PWD/../deps/SigPad/SigTablt/Win32
-#win32: LIBS += -L$$PWD/../deps/SigPad/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib
+INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+LIBS += -L$$PWD/../dep/SigLib/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
 
 FORMS += \

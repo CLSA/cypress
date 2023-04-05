@@ -1,5 +1,5 @@
 #include "gripstrengthmanager.h"
-#include "../auxiliary/tracker5util.h"
+#include "auxiliary/tracker5util.h"
 
 #include <QDebug>
 #include <QSqlError>
