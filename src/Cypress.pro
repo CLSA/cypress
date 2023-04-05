@@ -7,9 +7,53 @@ CONFIG += testcase
 CONFIG += no_testcase_installs
 
 SUBDIRS = tests
+
+#TRANSLATIONS += \
+#    Cypress_en_CA.ts
+CONFIG += lrelease
+CONFIG += embed_translations
+
+#QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
+#QMAKE_LFLAGS += /VERBOSE:LIB
+QMAKE_LFLAGS += /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+# OpenSSL
+INCLUDEPATH += "C:/OpenSSL-Win32/include"
+LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
+
+
+# POCO
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Util/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+
+
+# DCMTK
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+
+# Topaz Signature Pad
+INCLUDEPATH += $$PWD/../dep/SigLib/Include/
+INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+LIBS += -L$$PWD/../dep/SigLib/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
+
+# QtUsb
+INCLUDEPATH += $$PWD/../dep/QtUsb/include
+LIBS += -L$$PWD/../dep/QtUsb/lib -lQt5Usb
 
 RC_ICONS = favicon.ico
 SOURCES += \
@@ -31,9 +75,9 @@ SOURCES += \
     data/dxa/measurements/HipMeasurement.cpp \
     data/dxa/measurements/IVAImagingMeasurement.cpp \
     data/dxa/measurements/WholeBodyScanMeasurement.cpp \
-    data/dxa/smbfilecopier.cpp \
+    #data/dxa/smbfilecopier.cpp \
     data/dxa/tests/ApSpineTest.cpp \
-    data/dxa/tests/DXATest.cpp \
+    #data/dxa/tests/DXATest.cpp \
     data/dxa/tests/ForearmTest.cpp \
     data/dxa/tests/HipTest.cpp \
     data/dxa/tests/IVAImagingTest.cpp \
@@ -41,13 +85,9 @@ SOURCES += \
     data/Measurement.cpp \
 #    data/TemperatureMeasurement.cpp \
 #    data/TemperatureTest.cpp \
-    data/grip_strength/measurements/GripStrengthMeasurement.cpp \
-    data/grip_strength/tests/GripStrengthTest.cpp \
     data/retinal_camera/databasemanager.cpp \
-    dialogs/DXADialog.cpp \
-    dialogs/GripStrengthDialog.cpp \
 #    managers/BluetoothLEManager.cpp \
-    data/Measurement.cpp \
+    #data/Measurement.cpp \
     data/MeasurementBase.cpp \
     data/blood_pressure/measurements/BloodPressureMeasurement.cpp \
     data/blood_pressure/tests/BloodPressureTest.cpp \
@@ -59,7 +99,6 @@ SOURCES += \
     data/choice_reaction/tests/ChoiceReactionTest.cpp \
     data/dxa/PatScanQueryHelper.cpp \
     data/dxa/ReferenceQueryHelper.cpp \
-    data/dxa/tests/WholeBodyScanTest.cpp \
     data/ecg/measurements/ECGMeasurement.cpp \
     data/ecg/tests/ECGTest.cpp \
     data/frax/measurements/FraxMeasurement.cpp \
@@ -81,7 +120,7 @@ SOURCES += \
     dialogs/RetinalCameraDialog.cpp \
     dialogs/ecgdialog.cpp \
     dialogs/signaturepaddialog.cpp \
-    dicom/dicomdirectorywatcher.cpp \
+    #dicom/dicomdirectorywatcher.cpp \
     logging/debugdialog.cpp \
     managers/ManagerBase.cpp \
     managers/SettingsManager.cpp \
@@ -95,15 +134,12 @@ SOURCES += \
     managers/choice_reaction/ChoiceReactionManager.cpp \
     managers/dxa/DXAManager.cpp \
     managers/dxa/dicom/DicomSCP.cpp \
-    managers/dxa/dicom/LogWorker.cpp \
+    #managers/dxa/dicom/LogWorker.cpp \
     managers/grip_strength/GripStrengthManager.cpp \
     managers/grip_strength/ParadoxReader.cpp \
-    managers/retinal_camera/RetinalCameraManager.cpp \
     managers/ecg/ECGManager.cpp \
     managers/emr/EMRPluginWriter.cpp \
     managers/frax/FraxManager.cpp \
-    managers/grip_strength/GripStrengthManager.cpp \
-    managers/grip_strength/ParadoxReader.cpp \
     managers/retinal_camera/RetinalCameraManager.cpp \
     managers/serial_port/SerialPortManager.cpp \
     managers/signature_pad/signaturepadcommunication.cpp \
@@ -201,7 +237,7 @@ HEADERS += \
     data/dxa/measurements/HipMeasurement.h \
     data/dxa/measurements/IVAImagingMeasurement.h \
     data/dxa/measurements/WholeBodyScanMeasurement.h \
-    data/dxa/smbfilecopier.h \
+    #data/dxa/smbfilecopier.h \
     data/dxa/tests/ApSpineTest.h \
     data/dxa/tests/ForearmTest.h \
     data/dxa/tests/HipTest.h \
@@ -212,17 +248,14 @@ HEADERS += \
 #    data/TemperatureMeasurement.h \
 #    data/TemperatureTest.h \
     data/dxa/tests/dxatest.h \
-    data/grip_strength/measurements/GripStrengthMeasurement.h \
     data/grip_strength/tests/GripStrengthTest.h \
     data/retinal_camera/databasemanager.h \
     dialogs/DXADialog.h \
-    dialogs/GripStrengthDialog.h \
     data/ecg/measurements/ECGMeasurement.h \
     data/ecg/tests/ECGTest.h \
     data/frax/measurements/FraxMeasurement.h \
     data/frax/tests/FraxTest.h \
     data/grip_strength/measurements/GripStrengthMeasurement.h \
-    data/grip_strength/tests/GripStrengthTest.h \
     data/hearing/measurements/HearingMeasurement.h \
     data/hearing/tests/HearingTest.h \
     data/spirometer/measurements/SpirometerMeasurement.h \
@@ -233,12 +266,11 @@ HEADERS += \
     data/tonometer/tests/TonometerTest.h \
     data/weigh_scale/measurements/WeightMeasurement.h \
     data/weigh_scale/tests/WeighScaleTest.h \
-    dialogs/DXADialog.h \
     dialogs/GripStrengthDialog.h \
     dialogs/RetinalCameraDialog.h \
     dialogs/ecgdialog.h \
     dialogs/signaturepaddialog.h \
-    dicom/dicomdirectorywatcher.h \
+    #dicom/dicomdirectorywatcher.h \
     logging/debugdialog.h \
     managers/SettingsManager.h \
     managers/audiometer/AudiometerManager.h \
@@ -249,18 +281,15 @@ HEADERS += \
     managers/body_composition/BodyCompositionManager.h \
     managers/cdtt/CDTTManager.h \
     managers/choice_reaction/ChoiceReactionManager.h \
-    managers/dxa/DXAManager.h \
     managers/dxa/dicom/DicomSCP.h \
-    managers/dxa/dicom/LogWorker.h \
+    #managers/dxa/dicom/LogWorker.h \
     managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
     managers/ecg/ECGManager.h \
     managers/emr/EMRPluginWriter.h \
     managers/frax/FraxManager.h \
-    managers/grip_strength/GripStrengthManager.h \
     managers/ManagerBase.h \
     managers/dxa/DXAManager.h \
-    managers/grip_strength/GripStrengthManager.h \
     managers/grip_strength/ParadoxReader.h \
     managers/retinal_camera/RetinalCameraManager.h \
     managers/serial_port/SerialPortManager.h \
@@ -330,65 +359,6 @@ HEADERS += \
     dialogs/WeighScaleDialog.h \
     CypressApplication.h
 
-#TRANSLATIONS += \
-#    Cypress_en_CA.ts
-CONFIG += lrelease
-CONFIG += embed_translations
-
-QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
-
-
-# POCO
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
-LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib64 -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
-
-# OpenSSL
-INCLUDEPATH += "C:/OpenSSL-Win64/include"
-LIBS += -L"C:/OpenSSL-Win64/lib" -lopenssl -llibcrypto
-
-INCLUDEPATH += $$PWD/../dep/QtUsb/include
-LIBS += -L$$PWD/../dep/QtUsb/lib/ -lQt5Usb
-# DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win64-support-MD-iconv-msvc-16.9/zlib-1.2.12/include
-
-DEPENDPATH += $$PWD/../dep/dcmtk-3.6.7-win64-release/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win64-release/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
-
-# Topaz Signature Pad
-INCLUDEPATH += $$PWD/../dep/SigLib/Include/
-INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/x64/
-DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/x64/
-LIBS += -L$$PWD/../dep/SigLib/SigTablt/x64/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
-
-INCLUDEPATH += $$PWD/../dep/qt_usb_x64/include
-LIBS += -L$$PWD/../dep/qt_usb_x64/lib -lQt5Usb
-#win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/include
-#win32: INCLUDEPATH += $$PWD/../deps/poco_x86-windows/lib
-#win32: DEPENDPATH += $$PWD/../deps/poco_x86-windows/lib
-#win32: LIBS += -L$$PWD/../deps/poco_x86-windows/lib -lPocoNet -lPocoFoundation -lPocoUtil
-#
-#win32: INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/include
-#win32: INCLUDEPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/lib
-#win32: DEPENDPATH += $$PWD/../deps/dcmtk-3.6.7-win32-release/lib
-#win32: LIBS += -L$$PWD/../deps/dcmtk-3.6.7-win32-release/lib/ -ldcmdata
-#
-#win32: INCLUDEPATH += $$PWD/../deps/SigPad/Include
-#win32: INCLUDEPATH += $$PWD/../deps/SigPad/SigTablt/Win32
-#win32: DEPENDPATH += $$PWD/../deps/SigPad/SigTablt/Win32
-#win32: LIBS += -L$$PWD/../deps/SigPad/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib
-
-
 FORMS += \
   dialogs/RetinalCameraDialog.ui \
   dialogs/cdttdialog.ui \
@@ -403,7 +373,7 @@ FORMS += \
   widgets/barcodewidget.ui \
   widgets/measurewidget.ui \
   dialogs/audiometerdialog.ui \
-  dialogs/bloodpressuredialog.ui \
+  #dialogs/bloodpressuredialog.ui \
   dialogs/bodycompositiondialog.ui \
   dialogs/runnabledialog.ui \
   dialogs/weighscaledialog.ui

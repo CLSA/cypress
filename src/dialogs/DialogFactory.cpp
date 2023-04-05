@@ -14,7 +14,6 @@
 #include "GripStrengthDialog.h"
 #include "RetinalCameraDialog.h"
 #include "signaturepaddialog.h"
-
 #include "DXADialog.h"
 
 
@@ -50,11 +49,9 @@ DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, QJson
       case Constants::MeasureType::typeChoice_Reaction:
         dialog = new ChoiceReactionDialog();
         break;
-/*
-      case Constants::MeasureType::typeThermometer:
-        dialog = new ThermometerDialog();
-        break;
-*/
+      //case Constants::MeasureType::typeThermometer:
+      //  dialog = new ThermometerDialog();
+      //  break;
       case Constants::MeasureType::typeFrax:
         dialog = new FraxDialog();
         break;
