@@ -112,6 +112,6 @@ bool CDTTManager::cleanUp()
 
 void CDTTManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 

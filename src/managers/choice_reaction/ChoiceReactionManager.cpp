@@ -109,5 +109,5 @@ bool ChoiceReactionManager::cleanUp()
 
 void ChoiceReactionManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }

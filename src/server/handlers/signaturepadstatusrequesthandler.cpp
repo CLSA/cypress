@@ -11,6 +11,7 @@
 
 void SignaturePadStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    Q_UNUSED(request)
     try {
         QJsonObject responseData {
             {"status", "Available"}

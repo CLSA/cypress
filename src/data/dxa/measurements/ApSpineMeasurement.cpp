@@ -14,6 +14,7 @@ QString ApSpineMeasurement::toString() const
 
 QStringList ApSpineMeasurement::toStringList(const bool& no_keys) const
 {
+    Q_UNUSED(no_keys)
     return QStringList {{}};
 };
 

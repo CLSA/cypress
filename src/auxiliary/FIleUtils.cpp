@@ -58,6 +58,7 @@ bool FileUtils::doesFileExist(const QString &absolutePath, const bool checkWrita
 
 bool FileUtils::doesDirExist(const QString &absolutePath, const bool checkWritable)
 {
+    Q_UNUSED(checkWritable)
     if (absolutePath.isEmpty()) return false;
     if (absolutePath.isNull())  return false;
 

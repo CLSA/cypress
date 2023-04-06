@@ -16,6 +16,8 @@ public:
     explicit GripStrengthManager(QObject *parent = nullptr);
     ~GripStrengthManager();
 
+    QJsonDocument m_exam;
+
     void start();
     void measure();
     void finish();
@@ -24,16 +26,17 @@ signals:
     void validExam(QJsonDocument exam);
 
 private:
+    QProcess m_process;
+    QSqlDatabase m_database;
+
+    QMap<QString, QVariant> extractExam() const;
+
+    QDir m_backupDir;
+    QDir m_trackerDir;
     QString m_workingDirPath;
     QString m_executablePath;
     QString m_databaseName;
 
-    QDir m_backupDir;
-    QDir m_trackerDir;
-
-    QProcess m_process;
-    QJsonDocument m_exam;
-    QSqlDatabase m_database;
 
     void initialize();
     void createDatabaseBackupFolder();
@@ -44,7 +47,6 @@ private:
     void sendToPine();
 
     QString getTrackerDatabaseFolder();
-    QMap<QString, QVariant> extractExam() const;
 };
 
 #endif // GRIPSTRENGTHMANAGER_H

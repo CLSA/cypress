@@ -14,6 +14,7 @@ QString HipMeasurement::toString() const
 
 QStringList HipMeasurement::toStringList(const bool& no_keys) const
 {
+    Q_UNUSED(no_keys)
     return QStringList {{}};
 };
 

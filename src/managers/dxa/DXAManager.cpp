@@ -62,11 +62,13 @@ void DXAManager::finish()
 
 bool DXAManager::isCompleteDicom(DcmFileFormat &file)
 {
+    Q_UNUSED(file)
     return false;
 }
 
 bool DXAManager::isCorrectDicom(DcmFileFormat &file)
 {
+    Q_UNUSED(file)
     return true;
 }
 
@@ -195,6 +197,6 @@ bool DXAManager::clearData()
 
 void DXAManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 

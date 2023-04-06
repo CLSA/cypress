@@ -81,12 +81,12 @@ void TonometerManager::select()
 
 void TonometerManager::selectRunnable(const QString &exeName)
 {
-
+    Q_UNUSED(exeName)
 }
 
 void TonometerManager::selectDatabase(const QString &dbName)
 {
-
+    Q_UNUSED(dbName)
 }
 
 void TonometerManager::measure()
@@ -132,7 +132,7 @@ void TonometerManager::finish()
 // set input parameters for the test
 void TonometerManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 
 bool TonometerManager::setUp()

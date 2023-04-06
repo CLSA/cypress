@@ -162,5 +162,5 @@ bool FraxManager::cleanUp()
 
 void FraxManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }

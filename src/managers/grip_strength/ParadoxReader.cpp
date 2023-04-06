@@ -3,6 +3,7 @@
 
 ParadoxReader::ParadoxReader(const QString& filePath, QWidget* parent)
 {
+    Q_UNUSED(parent)
     // Open Database connection
     openDatabase(filePath);
 }

@@ -13,6 +13,7 @@ QString IVAImagingMeasurement::toString() const
 
 QStringList IVAImagingMeasurement::toStringList(const bool& no_keys) const
 {
+    Q_UNUSED(no_keys)
     return QStringList {{}};
 };
 

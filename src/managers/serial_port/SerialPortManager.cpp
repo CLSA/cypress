@@ -208,7 +208,7 @@ void SerialPortManager::disconnectDevice()
 // set input parameters for the test
 void SerialPortManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 
 

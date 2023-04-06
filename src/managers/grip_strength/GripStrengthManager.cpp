@@ -160,12 +160,14 @@ QMap<QString, QVariant> GripStrengthManager::extractExam() const
     {
         const QString error = "Error executing query:" + query.lastError().text();
         qWarning() << error;
+
         throw std::runtime_error(error.toStdString());
     }
 
     if (!query.next())
     {
         qWarning() << "No records found in ZGripTest";
+
         throw std::runtime_error("No records found in ZGripTest");
     }
 
@@ -189,6 +191,7 @@ void GripStrengthManager::openDatabase() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName(m_databaseName);
 
+    qDebug() << "openDatabase" << m_databaseName;
     if (!db.open())
     {
         const QString error = "Failed to open database:" + db.lastError().text();
@@ -220,6 +223,7 @@ void GripStrengthManager::restoreTrackerDatabase() {
 }
 
 void GripStrengthManager::createDatabaseBackupFolder() {
+    qDebug() << "createDatabaseBackupFolder";
     QString backupFolder = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/database_backup";
     m_backupDir = QDir(backupFolder);
     if (!m_backupDir.exists())
@@ -236,13 +240,15 @@ void GripStrengthManager::backupDatabase() {
     {
         if (!QFile::copy(m_trackerDir.filePath(fileName), m_backupDir.filePath(fileName)))
         {
-            throw std::runtime_error("Could not backup file");
+            continue;
+            //throw std::runtime_error("Could not backup file");
         }
     }
 }
 
 void GripStrengthManager::sendToPine()
 {
+    qDebug() << "sendToPine";
     if (m_exam.isEmpty() || m_exam.isNull())
     {
         return;

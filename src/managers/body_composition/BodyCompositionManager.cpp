@@ -155,7 +155,6 @@ QMap<QByteArray,QString> BodyCompositionManager::initCommandLUT()
     atom.append(0x0d);
     commands[atom] = "reset";
 
-    qDebug() << "Command LUT" << commands << '\n';
 
     return commands;
 }
@@ -199,7 +198,6 @@ QMap<QByteArray,QString> BodyCompositionManager::initConfirmationLUT()
     atom.append(0x0d);
     responses[atom] = "received reset request";
 
-    qDebug() << "Confirmation LUT" << responses << '\n';
     return responses;
 }
 
@@ -262,7 +260,6 @@ QMap<QByteArray,QString> BodyCompositionManager::initIncorrectResponseLUT()
     atom.append(end);
     responses[atom] = "set input or reset command failed";
 
-    qDebug() << "Incorrect Response LUT" << responses << '\n';
     return responses;
 }
 
@@ -729,5 +726,5 @@ bool BodyCompositionManager::cleanUp()
 
 void BodyCompositionManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }

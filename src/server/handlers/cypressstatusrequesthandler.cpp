@@ -7,6 +7,7 @@
 
 void CypressStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    Q_UNUSED(request)
     try {
         QJsonObject responseJson = CypressApplication::getStatus();
         QString responseData = JsonSettings::serializeJson(responseJson);

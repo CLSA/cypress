@@ -369,5 +369,5 @@ bool SpirometerManager::cleanUp() {
 // set input parameters for the test
 void SpirometerManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }

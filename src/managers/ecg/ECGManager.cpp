@@ -56,17 +56,20 @@ void ECGManager::start()
 
 bool ECGManager::isDefined(const QString &fileName, const FileType &type) const
 {
+    Q_UNUSED(fileName)
+    Q_UNUSED(type)
+
     return false;
 }
 
 void ECGManager::selectRunnable(const QString &runnableName)
 {
-
+    Q_UNUSED(runnableName)
 }
 
 void ECGManager::selectWorking(const QString& workingName)
 {
-
+    Q_UNUSED(workingName)
 }
 
 void ECGManager::select()
@@ -138,6 +141,6 @@ bool ECGManager::cleanUp()
 
 void ECGManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 

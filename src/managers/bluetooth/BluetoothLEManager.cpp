@@ -34,6 +34,7 @@ bool BluetoothLEManager::isAvailable()
 
 void BluetoothLEManager::setLocalDevice(const QString &address)
 {
+    Q_UNUSED(&address)
 #ifdef Q_OS_LINUX
     if(!address.isEmpty())
     {
@@ -128,6 +129,7 @@ void BluetoothLEManager::scanDevices()
 
 bool BluetoothLEManager::isPairedTo(const QString &label) const
 {
+    Q_UNUSED(label)
     return true;
 }
 
@@ -135,7 +137,7 @@ bool BluetoothLEManager::isPairedTo(const QString &label) const
 //
 void BluetoothLEManager::deviceDiscoveredInternal(const QBluetoothDeviceInfo &info)
 {
-
+    Q_UNUSED(info)
 }
 
 // Enable discovered devices selection
@@ -149,12 +151,12 @@ void BluetoothLEManager::discoveryCompleteInternal()
 //
 void BluetoothLEManager::selectDevice(const QString &label)
 {
-
+    Q_UNUSED(label)
 }
 
 void BluetoothLEManager::serviceDiscovered(const QBluetoothUuid &uuid)
 {
-
+    Q_UNUSED(uuid)
 }
 
 //bool BluetoothLEManager::clearData()
@@ -169,7 +171,7 @@ void BluetoothLEManager::finish()
 
 void BluetoothLEManager::setDevice(const QBluetoothDeviceInfo &info)
 {
-
+    Q_UNUSED(info)
 }
 
 void BluetoothLEManager::connectDevice()
@@ -189,12 +191,12 @@ void BluetoothLEManager::measure()
 
 void BluetoothLEManager::infoServiceStateChanged(QLowEnergyService::ServiceState state)
 {
-
+    Q_UNUSED(state)
 }
 
 void BluetoothLEManager::thermoServiceStateChanged(QLowEnergyService::ServiceState state)
 {
-
+    Q_UNUSED(state)
 }
 
 void BluetoothLEManager::disconnectDevice()
@@ -204,12 +206,14 @@ void BluetoothLEManager::disconnectDevice()
 
 void BluetoothLEManager::updateInfoData(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-
+    Q_UNUSED(c)
+    Q_UNUSED(value)
 }
 
 void BluetoothLEManager::updateTemperatureData(const QLowEnergyCharacteristic &c, const QByteArray &arr)
 {
-
+    Q_UNUSED(c)
+    Q_UNUSED(arr)
 }
 
 // Set up device
@@ -231,5 +235,5 @@ bool BluetoothLEManager::clearData()
 
 void BluetoothLEManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }

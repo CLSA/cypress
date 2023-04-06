@@ -62,12 +62,12 @@ void BloodPressureManager::start()
 
 void BloodPressureManager::selectDeviceById(const QUsb::Id& info)
 {
-
+    Q_UNUSED(info)
 }
 
 void BloodPressureManager::selectDevice(const QString &label)
 {
-
+    Q_UNUSED(label)
 }
 
 bool BloodPressureManager::scanDevices()
@@ -78,7 +78,7 @@ bool BloodPressureManager::scanDevices()
 
 void BloodPressureManager::setDevice(const QUsb::Id &info)
 {
-
+    Q_UNUSED(info)
 }
 
 void BloodPressureManager::setCuffSize(const QString &size)
@@ -149,7 +149,12 @@ void BloodPressureManager::measurementAvailable(
   const int& readingNum, const int& sbp, const int& dbp, const int& pulse,
   const QDateTime& start, const QDateTime& end)
 {
-
+    Q_UNUSED(end)
+    Q_UNUSED(start)
+    Q_UNUSED(pulse)
+    Q_UNUSED(readingNum)
+    Q_UNUSED(sbp)
+    Q_UNUSED(dbp)
 }
 
 // slot for BPMCommunication
@@ -157,7 +162,9 @@ void BloodPressureManager::measurementAvailable(
 void BloodPressureManager::averageAvailable(
   const int& sbp, const int& dbp, const int& pulse)
 {
-
+    Q_UNUSED(sbp)
+    Q_UNUSED(dbp)
+    Q_UNUSED(pulse)
 }
 
 // slot for BPMCommunication
@@ -165,7 +172,9 @@ void BloodPressureManager::averageAvailable(
 void BloodPressureManager::finalReviewAvailable(
   const int& sbp, const int& dbp, const int& pulse)
 {
-
+    Q_UNUSED(sbp)
+    Q_UNUSED(dbp)
+    Q_UNUSED(pulse)
 }
 
 // slot for UI communication
@@ -178,7 +187,7 @@ void BloodPressureManager::connectDevice()
 //
 void BloodPressureManager::connectionStatusChanged(const bool& connected)
 {
-
+    Q_UNUSED(connected)
 }
 
 // slot for BPMCommunication
@@ -215,6 +224,6 @@ bool BloodPressureManager::clearData()
 
 void BloodPressureManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 

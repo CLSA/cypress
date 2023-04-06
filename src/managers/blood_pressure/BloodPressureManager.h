@@ -132,7 +132,7 @@ private:
     bool m_aborted { false };
 
     // usb hid devices plugged in and openable
-    QMap<QString,QUsb::Id> m_deviceList;
+    //QMap<QString,QUsb::Id> m_deviceList;
 
     // called when loading from settings
     void selectDeviceById(const QUsb::Id&);

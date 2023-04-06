@@ -2,6 +2,7 @@
 
 CarotidIntimaManager::CarotidIntimaManager(QObject *parent)
 {
+    Q_UNUSED(parent)
 }
 
 

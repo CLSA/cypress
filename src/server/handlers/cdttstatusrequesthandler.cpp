@@ -4,6 +4,7 @@
 
 void CDTTStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    Q_UNUSED(request)
     try {
         QJsonObject responseJson = {{"available", true}};
         QString responseData = JsonSettings::serializeJson(responseJson);

@@ -1,26 +1,17 @@
-#ifndef TST_RETINAL_CAMERA_H
-#define TST_RETINAL_CAMERA_H
+#ifndef TSTRETINALCAMERA_H
+#define TSTRETINALCAMERA_H
 
-#include <QTest>
-#include <QJsonObject>
+#include <QObject>
 
-class TestRetinalCamera: public QObject
+class TestRetinalCamera : public QObject
 {
     Q_OBJECT
-
 public:
     TestRetinalCamera();
-    ~TestRetinalCamera();
 
-private:
-    QJsonObject expectedInput;
-    QJsonObject expectedOutput;
-
-private slots:
-    void initTestCase();
-    void cleanupTestCase();
-    void testCase1();
-    void testCase2();
+private Q_SLOTS:
+    void testInitialize();
+    void testExtractExam();
 };
 
-#endif // TST_RETINAL_CAMERA_H
+#endif // TSTRETINALCAMERA_H

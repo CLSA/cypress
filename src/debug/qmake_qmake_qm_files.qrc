@@ -1,4 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="i18n">
+<file alias="Cypress_en_CA.qm">C:/dev/clsa/cypress/src/debug/Cypress_en_CA.qm</file>
 </qresource>
 </RCC>

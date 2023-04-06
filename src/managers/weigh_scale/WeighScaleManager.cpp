@@ -163,7 +163,7 @@ void WeighScaleManager::writeDevice()
 // set input parameters for the test
 void WeighScaleManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData)
 }
 
 bool WeighScaleManager::setUp()

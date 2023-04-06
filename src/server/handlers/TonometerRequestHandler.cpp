@@ -5,6 +5,7 @@
 
 void TonometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    Q_UNUSED(request)
     try {
         QString responseData = JsonSettings::serializeJson(getResponseData());
 

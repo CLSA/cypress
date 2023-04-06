@@ -124,6 +124,6 @@ QMap<QString, QVariant> PatScanQueryHelper::getScanData(QString patientKey, QStr
     }
     catch (...)
     {
-
+        return data;
     }
 }

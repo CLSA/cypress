@@ -13,6 +13,7 @@ QString DXAMeasurement::toString() const
 
 QStringList DXAMeasurement::toStringList(const bool& no_keys) const
 {
+    Q_UNUSED(no_keys)
     return QStringList {{}};
 };
 
