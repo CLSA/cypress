@@ -28,7 +28,13 @@ bool DcmRecv::startDcmRecv(const QString& executablePath, const QString& aetitle
     arguments << aetitle << QString::number(port) << "--output-directory" << m_tempDir.path();
     m_process.start(executablePath, arguments);
 
-    return m_process.waitForStarted();
+    bool started = m_process.waitForStarted();
+    if (started)
+    {
+        emit running();
+    }
+
+    return started;
 }
 
 QString DcmRecv::receivedFilesDir() const
@@ -40,12 +46,14 @@ void DcmRecv::onReadyReadStandardOutput()
 {
     QByteArray output = m_process.readAllStandardOutput();
     qDebug() << "DCMRECV stdout:" << output;
+    emit logUpdate(output);
 }
 
 void DcmRecv::onReadyReadStandardError()
 {
     QByteArray error = m_process.readAllStandardError();
     qDebug() << "DCMRECV stderr:" << error;
+    emit logUpdate(error);
 }
 
 void DcmRecv::onErrorOccurred(QProcess::ProcessError error)
@@ -56,4 +64,12 @@ void DcmRecv::onErrorOccurred(QProcess::ProcessError error)
 void DcmRecv::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug() << "DCMRECV process finished with exit code" << exitCode << "and exit status" << exitStatus;
+    if (exitCode == 0)
+    {
+        emit exitNormal();
+    }
+    else
+    {
+        emit exitCrash();
+    }
 }

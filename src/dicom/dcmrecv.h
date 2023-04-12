@@ -13,8 +13,21 @@ class DcmRecv : public QObject
 public:
     explicit DcmRecv(QObject* parent = nullptr);
     ~DcmRecv();
+
     bool startDcmRecv(const QString& executablePath, const QString& aetitle, quint16 port);
+
     QString receivedFilesDir() const;
+
+signals:
+    void dicomFilesReceived(const QStringList& dicomFilePaths);
+    void logUpdate(const QString& line);
+
+    void notRunning();
+    void starting();
+    void running();
+
+    void exitNormal();
+    void exitCrash();
 
 private slots:
     void onReadyReadStandardOutput();

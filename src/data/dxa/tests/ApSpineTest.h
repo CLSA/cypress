@@ -5,7 +5,6 @@
 #include "dxatest.h"
 #include "../measurements/ApSpineMeasurement.h"
 
-
 class ApSpineTest : public DXATest<ApSpineMeasurement>
 {
 public:

@@ -2,23 +2,32 @@
 #define DXAMEASUREMENT_H
 
 #include "../../Measurement.h"
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+#include "dcmtk/ofstd/ofstdinc.h"
+
+struct ValidDCMTag {
+    ValidDCMTag(DcmTagKey key, OFString value);
+    DcmTagKey key;
+    OFString value;
+};
 
 class DXAMeasurement : public Measurement
 {
 public:
     DXAMeasurement();
 
-    // String representation for debug and GUI display purposes
-    //
-    virtual QString toString() const;
+    QList<ValidDCMTag> m_metaInfoTagExistsWithValue {};
+    QList<ValidDCMTag> m_metaInfoTagExists {};
+    QList<ValidDCMTag> m_datasetTagExistsWithValue {};
+    QList<ValidDCMTag> m_datasetTagExists {};
 
-    virtual QStringList toStringList(const bool& no_keys = false) const;
+    bool isValidDicomFile(DcmFileFormat& dicomFileFormat) const;
 
     virtual bool isValid() const;
-
-    // String keys are converted to snake_case
-    //
     virtual QJsonObject toJsonObject() const;
+    virtual QString toString() const;
+    virtual QStringList toStringList(const bool& no_keys = false) const;
 };
 
 #endif // DXAMEASUREMENT_H

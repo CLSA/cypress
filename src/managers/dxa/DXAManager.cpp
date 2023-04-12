@@ -10,8 +10,10 @@
 #include "managers/dxa/DXAManager.h"
 
 
-DXAManager::DXAManager() : m_dicomSCP(new DicomSCP())
+
+DXAManager::DXAManager(): m_dicomWatcher(QDir::currentPath())
 {
+
 }
 
 DXAManager::~DXAManager()
@@ -171,7 +173,6 @@ QMap<QString, QVariant> DXAManager::computeTandZScores()
 {
     return QVariantMap();
 }
-
 
 
 QVariantMap DXAManager::getParticipantData()

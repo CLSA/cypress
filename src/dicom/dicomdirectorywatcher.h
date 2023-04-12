@@ -7,15 +7,10 @@
 #include <QDir>
 #include <QDebug>
 
-#include "dcmtk/config/osconfig.h"
-#include "dcmtk/dcmdata/dctk.h"
-#include "dcmtk/ofstd/ofstdinc.h"
 
 
-struct ValidDCMTag {
-    DcmTagKey key;
-    OFString value;
-};
+
+
 
 class DicomDirectoryWatcher : public QObject
 {
@@ -24,19 +19,15 @@ class DicomDirectoryWatcher : public QObject
 public:
     explicit DicomDirectoryWatcher(const QString &directoryPath, QObject *parent = nullptr);
 
+signals:
+    void dicomDirectoryChanged(const QString &path);
+
 private slots:
     void onDirectoryChanged(const QString &path);
 
 private:
-    bool validateTags(DcmFileFormat& dicomFileFormat);
 
     QFileSystemWatcher m_watcher;
-
-    QList<ValidDCMTag> m_metaInfoTagExistsWithValue;
-    QList<ValidDCMTag> m_metainfoTagExists;
-
-    QList<ValidDCMTag> m_datasetTagExistsWithValue;
-    QList<ValidDCMTag> m_datasetTagExists;
 };
 
 

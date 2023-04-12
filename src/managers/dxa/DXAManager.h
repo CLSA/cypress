@@ -8,6 +8,9 @@
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 
+#include "dicom/dicomdirectorywatcher.h"
+#include "dicom/dcmrecv.h"
+
 #include "../ManagerBase.h"
 #include "./dicom/DicomSCP.h"
 
@@ -69,6 +72,10 @@ private:
     HipTest m_hipScanTest;
     IVAImagingTest m_ivaImagingTest;
     WholeBodyScanTest m_wholeBodyTest;
+
+    DicomDirectoryWatcher m_dicomWatcher;
+    DcmRecv m_dcmRecv;
+
 
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;

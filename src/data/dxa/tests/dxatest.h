@@ -1,8 +1,9 @@
 #ifndef DXATEST_H
 #define DXATEST_H
 
-#include "dcmtk/dcmdata/dcfilefo.h"
 #include "data/TestBase.h"
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/ofstd/ofstdinc.h"
 
 enum Side {
     LEFT,
@@ -13,6 +14,9 @@ enum Side {
 template <class DxaMeasurement>
 class DXATest: public TestBase<DxaMeasurement>
 {
+public slots:
+    void onDicomDirectoryChange(const QString& path);
+
 public:
     static const QMap<QString, QString> ranges;
 

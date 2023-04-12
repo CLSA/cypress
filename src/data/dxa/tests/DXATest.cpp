@@ -1,4 +1,5 @@
 #include "dxatest.h"
+#include <QDir>;
 
 template <class DxaMeasurement>
 const QMap<QString, QString> DXATest<DxaMeasurement>::ranges = {
@@ -47,3 +48,39 @@ const QMap<QString, QString> DXATest<DxaMeasurement>::ranges = {
     { "TOT_L1L3L4_BMD", "1.34" },
     { "TOT_L2L3L4_BMD", ".234" },
 };
+
+template <class DxaMeasurement>
+void DXATest<DxaMeasurement>::onDicomDirectoryChange(const QString &path)
+{
+    QDir dir(path);
+    QStringList filters { "*.dcm", "*.dicom"};
+
+    const QStringList dicomFiles = dir.entryList(filters, QDir::Files | QDir::NoDotAndDotDot);
+
+    DcmFileFormat fileFormat;
+
+    for (const QString& filePath : dicomFiles)
+    {
+        QString absoluteFilePath = dir.absoluteFilePath(filePath);
+        try
+        {
+            if (!fileFormat.loadFile(absoluteFilePath.toLocal8Bit().constData()).good())
+            {
+                qCritical() << "Error loading DICOM file" << absoluteFilePath;
+            }
+
+            if (isValidDicom(fileFormat)) {
+                qDebug() << "DICOM file is valid for measurement: " << getName();
+            }
+        }
+        catch (const std::exception& e)
+        {
+            qCritical() << "Error loading DICOM file" << absoluteFilePath << ": " << e.what();
+        }
+    }
+}
+
+
+
+
+
