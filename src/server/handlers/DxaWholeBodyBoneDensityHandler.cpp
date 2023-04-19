@@ -14,7 +14,7 @@ void DxaWholeBodyBoneDensityHandler::handleRequest(Poco::Net::HTTPServerRequest 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDxaWholeBody, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::DxaWholeBody, QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

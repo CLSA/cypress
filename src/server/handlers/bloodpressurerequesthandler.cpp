@@ -13,8 +13,8 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 
         std::ostream& out = response.send();
 
-        CypressApplication::restApiServer -> requestTestStart(
-            Constants::MeasureType::typeBlood_Pressure,
+        CypressApplication::getInstance().server -> requestTestStart(
+            Constants::MeasureType::Blood_Pressure,
                     QJsonObject {}
         );
 

@@ -28,9 +28,9 @@ Server::Server()
     moveToThread(&serverThread);
 }
 
-void Server::requestTestStart(Constants::MeasureType type, QJsonObject inputData)
+void Server::requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData)
 {
-    emit startTest(type, inputData);
+    emit startTest(type, requestData);
 }
 
 
@@ -52,7 +52,6 @@ void Server::start()
 {
     serverThread.start();
     server->start();
-    CypressApplication::status = Status::Waiting;
 }
 
 void Server::stop()

@@ -22,37 +22,49 @@ enum Status {
     Active,
 };
 
-class CypressApplication : public QObject
+class CypressApplication: public QObject
 {
     Q_OBJECT
 public:
-    explicit CypressApplication(QObject *parent = Q_NULLPTR);
-    ~CypressApplication();
+    static CypressApplication& getInstance();
+
+    QJsonObject getSessionInfo();
+    QJsonObject getStatus();
+
+    QScopedPointer<Server> restApiServer;
+
+    Status status;
+    QDateTime startTime;
+    QDateTime endTime;
+
+    DialogBase* dialog;
+    QScopedPointer<Server> server;
 
     void setArgs(const QVariantMap&);
-    void initialize();
 
-    static QJsonObject getStatus();
-    static QScopedPointer<Server> restApiServer;
+    bool forceSessionEnd();
 
-    static Status status;
-    static Mode mode;
-
-    static QElapsedTimer timer;
-    static QDateTime startTime;
+    bool isSimulation();
+    bool isVerbose();
 
 public slots:
-    bool startTest(Constants::MeasureType type, QJsonObject inputData);
+    bool startTest(const Constants::MeasureType& type, const QJsonObject& requestData);
 
 signals:
     bool endTest(QJsonObject results);
 
 private:
-    Constants::RunMode m_mode { Constants::RunMode::modeUnknown };
-    Constants::MeasureType m_type { Constants::MeasureType::typeUnknown };
-    QSharedPointer<DialogBase> m_dialog;
+    explicit CypressApplication(QObject *parent = Q_NULLPTR);
+    ~CypressApplication();
 
-    bool m_verbose = true;
+    static CypressApplication* app;
+
+    void initialize();
+
+    Constants::MeasureType m_type { Constants::MeasureType::Unknown };
+
+    bool m_simulate { false };
+    bool m_verbose { false };
 };
 
 

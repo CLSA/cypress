@@ -12,7 +12,7 @@ void ECGRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeECG, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::ECG, QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

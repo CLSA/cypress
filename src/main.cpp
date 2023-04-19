@@ -125,7 +125,6 @@ void restartApplication(const QStringList& arguments) {
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "here";
     QGuiApplication::setOrganizationName(orgName);
     QGuiApplication::setOrganizationDomain(orgDomain);
     QGuiApplication::setApplicationName(appName);
@@ -176,9 +175,8 @@ int main(int argc, char *argv[])
     //        return EXIT_FAILURE;
     //}
 
-    CypressApplication cypress;
-    //cypress.setArgs(parser.getArgs());
-    cypress.initialize();
+    CypressApplication& cypress = CypressApplication::getInstance();
+    cypress.setArgs(parser.getArgs());
 
     return app.exec();
 }

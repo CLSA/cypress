@@ -12,7 +12,7 @@ Constants::MeasureType Constants::getMeasureType(const QString& name)
 {
   QMetaEnum meta = QMetaEnum::fromType<MeasureType>();
   int result = meta.keyToValue(QString("type%1").arg(name).toStdString().c_str());
-  return -1 == result ? Constants::MeasureType::typeUnknown : static_cast<Constants::MeasureType>(result);
+  return -1 == result ? Constants::MeasureType::Unknown : static_cast<Constants::MeasureType>(result);
 }
 
 Constants::RunMode Constants::getRunMode(const QString& name)

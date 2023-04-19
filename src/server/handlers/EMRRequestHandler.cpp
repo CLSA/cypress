@@ -11,7 +11,7 @@ void EMRRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        //CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::type);
+        //CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::type);
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

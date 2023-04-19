@@ -22,7 +22,7 @@ void GripStrengthRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeGrip_Strength, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::Grip_Strength, QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

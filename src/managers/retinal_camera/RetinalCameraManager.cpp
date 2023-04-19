@@ -14,8 +14,14 @@
 RetinalCameraManager::RetinalCameraManager(QString uuid)
     : ManagerBase {}, m_uuid { uuid }
 {
+    start();
 }
 
+
+RetinalCameraManager::~RetinalCameraManager()
+{
+    finish();
+}
 
 bool RetinalCameraManager::isAvailable()
 {
@@ -58,7 +64,7 @@ void RetinalCameraManager::start()
 
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
     {
-        finish();
+        measure();
     });
 }
 
@@ -174,18 +180,16 @@ bool RetinalCameraManager::startRetinalCamera()
 void RetinalCameraManager::measure()
 {
     qDebug() << "RetinalCameraManager::measure";
+
+    QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
+    qDebug() << "RetinalCameraManager::finish - left data: " << leftData;
+
+    QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
+    qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
 }
 
 void RetinalCameraManager::finish()
 {
-    qDebug() << "RetinalCameraManager::finish";
-
-    QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
-    QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
-
-    qDebug() << "RetinalCameraManager::finish - left data: " << leftData;
-    qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
-
     cleanupDatabase();
     m_db.close();
 }

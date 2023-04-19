@@ -10,7 +10,7 @@ void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
 
         std::ostream& out = response.send();
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDxaWholeBody, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::DxaWholeBody, QJsonObject {});
 
         out.flush();
     }

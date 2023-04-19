@@ -40,27 +40,27 @@ const q_stringMap GripStrengthTest::testMetaMap = {
 //
 GripStrengthTest::GripStrengthTest()
 {
-    m_outputKeyList << "patient_id";
+    m_outputKeyList << "participant_id";
     m_outputKeyList.append(testMetaMap.values());
-
+    setExpectedMeasurementCount(1);
 }
 
-bool GripStrengthTest::readGripTestOptions()
-{
-    return false;
-    // Read in test information
-    //ParadoxReader gripTestReader(gripTestPath);
-    //QList<QJsonObject> records = gripTestReader.Read();
-    //foreach(const auto record, records) {
-    //    foreach(const auto tag, testMetaMap.toStdMap()){
-    //        if (record.contains(tag.first)) {
-    //            addMetaData(tag.second, record[tag.first].toVariant());
-    //        }
-    //    }
-    //}
-}
+//bool GripStrengthTest::readGripTestOptions()
+//{
+//    return false;
+//    // Read in test information
+//    ParadoxReader gripTestReader(gripTestPath);
+//    QList<QJsonObject> records = gripTestReader.Read();
+//    foreach(const auto record, records) {
+//        foreach(const auto tag, testMetaMap.toStdMap()){
+//            if (record.contains(tag.first)) {
+//                addMetaData(tag.second, record[tag.first].toVariant());
+//            }
+//        }
+//    }
+//}
 
-bool GripStrengthTest::readGripTestResults()
+bool GripStrengthTest::readMeasurements()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
@@ -110,7 +110,7 @@ bool GripStrengthTest::readGripTestResults()
 
         foreach(QJsonObject record, testRecords) {
             if (record.contains("Rep1")) {
-                record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toInt());
+                record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toDouble());
             }
             if (record.contains("Rep2")) {
                 record["Rep2"] = Tracker5Util::asKg(record["Rep2"].toDouble());

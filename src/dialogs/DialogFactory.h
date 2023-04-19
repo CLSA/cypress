@@ -12,8 +12,7 @@ public:
     static DialogFactory *instance();
     ~DialogFactory();
 
-    DialogBase* instantiate(const Constants::MeasureType&, QJsonObject inputData);
-    DialogBase* instantiate(const QString&, QJsonObject inputData);
+    DialogBase* instantiate(const Constants::MeasureType& type);
 
 private:
     DialogFactory() = default;

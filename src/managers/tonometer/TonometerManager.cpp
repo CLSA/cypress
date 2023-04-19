@@ -31,7 +31,7 @@ bool TonometerManager::isAvailable()
 
 void TonometerManager::start()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     // connect signals and slots to QProcess one time only
     //
@@ -112,7 +112,7 @@ bool TonometerManager::clearData()
 
 void TonometerManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json"
@@ -124,8 +124,6 @@ void TonometerManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
     }
 }
 

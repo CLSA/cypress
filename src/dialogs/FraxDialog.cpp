@@ -104,7 +104,7 @@ void FraxDialog::initializeConnections()
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &FraxManager::canWrite,
+  connect(derived.get(), &FraxManager::canFinish,
       ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application

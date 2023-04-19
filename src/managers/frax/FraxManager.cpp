@@ -87,7 +87,7 @@ void FraxManager::selectRunnable(const QString &runnableName)
 
 void FraxManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     clearData();
     // launch the process
@@ -110,7 +110,7 @@ void FraxManager::readOutput()
         m_test.fromFile(m_outputFile);
         if(m_test.isValid())
         {
-            emit canWrite();
+            emit canFinish();
         }
         else
             qDebug() << "ERROR: input from file produced invalid test results";
@@ -131,7 +131,7 @@ bool FraxManager::clearData()
 
 void FraxManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/frax/output.json"
@@ -143,8 +143,6 @@ void FraxManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
     }
 }
 

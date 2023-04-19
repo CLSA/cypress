@@ -7,7 +7,7 @@ void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 {
     try {
         QString responseData = JsonSettings::serializeJson(getResponseData());
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeGrip_Strength, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::Grip_Strength, QJsonObject {});
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");

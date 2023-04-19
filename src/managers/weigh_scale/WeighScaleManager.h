@@ -50,7 +50,7 @@ public slots:
 private slots:
 
     // retrieve data from the scale over RS232
-    // emits canWrite signal if the test data is valid
+    // emits canFinish signal if the test data is valid
     // Read is based on the last written code
     //
     void readDevice() override;

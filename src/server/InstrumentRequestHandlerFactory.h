@@ -15,9 +15,12 @@ class InstrumentRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFacto
 public:
     InstrumentRequestHandlerFactory() = default;
 
+    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
+
     static QMap<QString, createRequestHandlerImpl> urlMap;
 
-    static HTTPRequestHandler* createCypressStatusRequestHandler();
+    static HTTPRequestHandler* defaultDeleteSessionRequestHandler();
+
     static HTTPRequestHandler* createGripStrengthRequestHandler();
     static HTTPRequestHandler* createGripStrengthStatusRequestHandler();
 
@@ -30,20 +33,20 @@ public:
     static HTTPRequestHandler* createBloodPressureRequestHandler();
     static HTTPRequestHandler* createBloodPressureStatusRequestHandler();
 
-    static HTTPRequestHandler* createDXAForearmRequestHandler();
-    static HTTPRequestHandler* createDXAForearmStatusRequestHandler();
+    //static HTTPRequestHandler* createDXAForearmRequestHandler();
+    //static HTTPRequestHandler* createDXAForearmStatusRequestHandler();
 
-    static HTTPRequestHandler* createDXAHipRequestHandler();
-    static HTTPRequestHandler* createDXAHipStatusRequestHandler();
+    //static HTTPRequestHandler* createDXAHipRequestHandler();
+    //static HTTPRequestHandler* createDXAHipStatusRequestHandler();
 
-    static HTTPRequestHandler* createDXASpineRequestHandler();
-    static HTTPRequestHandler* createDXASpineStatusRequestHandler();
+    //static HTTPRequestHandler* createDXASpineRequestHandler();
+    //static HTTPRequestHandler* createDXASpineStatusRequestHandler();
 
-    static HTTPRequestHandler* createDXAIvaRequestHandler();
-    static HTTPRequestHandler* createDXAIvaStatusRequestHandler();
+    //static HTTPRequestHandler* createDXAIvaRequestHandler();
+    //static HTTPRequestHandler* createDXAIvaStatusRequestHandler();
 
-    static HTTPRequestHandler* createDXAWholeBodyRequestHandler();
-    static HTTPRequestHandler* createDXAWholeBodyStatusRequestHandler();
+    //static HTTPRequestHandler* createDXAWholeBodyRequestHandler();
+    //static HTTPRequestHandler* createDXAWholeBodyStatusRequestHandler();
 
     static HTTPRequestHandler* createUltrasoundRequestHandler();
     static HTTPRequestHandler* createUltrasoundStatusRequestHandler();
@@ -80,8 +83,6 @@ public:
 
     static HTTPRequestHandler* createSignaturePadRequestHandler();
     static HTTPRequestHandler* createSignaturePadStatusRequestHandler();
-
-    HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request);
 };
 
 

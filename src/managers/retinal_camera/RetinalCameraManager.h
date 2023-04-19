@@ -14,6 +14,7 @@ class RetinalCameraManager : public ManagerBase
     Q_OBJECT
 public:
     explicit RetinalCameraManager(QString uuid = "");
+    ~RetinalCameraManager();
 
     bool isAvailable();
 public slots:

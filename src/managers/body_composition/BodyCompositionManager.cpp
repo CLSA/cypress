@@ -276,7 +276,7 @@ bool BodyCompositionManager::clearData()
 
 void BodyCompositionManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/body_composition/output.json"
@@ -288,8 +288,6 @@ void BodyCompositionManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
 
         return;
     }
@@ -666,7 +664,7 @@ void BodyCompositionManager::processResponse()
           if(m_test.isValid())
           {
             qDebug() << "OK: valid test";
-            emit canWrite();
+            emit canFinish();
            }
            else
              qDebug() << "ERROR: invalid test";

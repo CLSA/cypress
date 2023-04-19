@@ -209,7 +209,7 @@ void BloodPressureDialog::initializeConnections()
 
     // All measurements received: enable write test results
     //
-    connect(derived.get(), &BloodPressureManager::canWrite,
+    connect(derived.get(), &BloodPressureManager::canFinish,
         ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
     // Close the application

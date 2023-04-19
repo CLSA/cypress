@@ -126,7 +126,7 @@ void ChoiceReactionDialog::initializeConnections()
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &ChoiceReactionManager::canWrite,
+  connect(derived.get(), &ChoiceReactionManager::canFinish,
       ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application

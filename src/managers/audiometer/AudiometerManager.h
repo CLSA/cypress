@@ -47,7 +47,7 @@ public slots:
 
 private slots:
     // retrieve data from the audiometer over RS232
-    // emits canWrite signal if the test data is valid
+    // emits canFinish signal if the test data is valid
     //
     void readDevice() override;
     void writeDevice() override;

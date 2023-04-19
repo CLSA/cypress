@@ -76,7 +76,7 @@ void ECGManager::select()
 
 void ECGManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     clearData();
     // launch the process
@@ -102,7 +102,7 @@ bool ECGManager::clearData()
 
 void ECGManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/ecg/output.json"
@@ -114,8 +114,6 @@ void ECGManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
     }
 }
 

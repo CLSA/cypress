@@ -1,6 +1,4 @@
 #include "cypressstatusrequesthandler.h"
-
-#include "CypressApplication.h"
 #include "auxiliary/JsonSettings.h"
 
 
@@ -8,7 +6,7 @@
 void CypressStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
-        QJsonObject responseJson = CypressApplication::getStatus();
+        QJsonObject responseJson {};
         QString responseData = JsonSettings::serializeJson(responseJson);
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

@@ -146,7 +146,7 @@ void AudiometerDialog::initializeConnections()
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &AudiometerManager::canWrite,
+  connect(derived.get(), &AudiometerManager::canFinish,
       ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application
