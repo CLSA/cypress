@@ -73,7 +73,7 @@ void ChoiceReactionManager::measure()
 
 void ChoiceReactionManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/choice_reaction/output.json"
@@ -85,7 +85,6 @@ void ChoiceReactionManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-        CypressApplication::status = Status::Waiting;
     }
 }
 

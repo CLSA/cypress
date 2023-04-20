@@ -12,6 +12,7 @@ class RetinalCameraManager: public QObject
     Q_OBJECT
 public:
     explicit RetinalCameraManager(QString uuid = "");
+    ~RetinalCameraManager();
 
     void start();
     void measure();

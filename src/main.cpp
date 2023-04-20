@@ -127,9 +127,6 @@ void restartApplication(const QStringList& arguments) {
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QApplication::setQuitOnLastWindowClosed(false);
-
     QGuiApplication::setOrganizationName(orgName);
     QGuiApplication::setOrganizationDomain(orgDomain);
     QGuiApplication::setApplicationName(appName);
@@ -155,8 +152,32 @@ int main(int argc, char *argv[])
         }
     }
 
-    CypressApplication cypress;
-    cypress.initialize();
+    // process command line args
+    //
+    //CommandLineParser parser;
+    //QString errMessage;
+    //switch(parser.parseCommandLine(app, &errMessage))
+    //{
+    //    case CommandLineParser::parseHelpRequested:
+    //        parser.displayHelp(parser);
+    //        return EXIT_SUCCESS;
+    //    case CommandLineParser::parseVersionRequested:
+    //        parser.displayHelp(parser);
+    //        return EXIT_SUCCESS;
+    //    case CommandLineParser::parseOk:
+    //        break;
+    //    case CommandLineParser::parseError:
+    //    case CommandLineParser::parseInputFileError:
+    //    case CommandLineParser::parseOutputPathError:
+    //    case CommandLineParser::parseMissingArg:
+    //    case CommandLineParser::parseMeasureTypeError:
+    //    case CommandLineParser::parseRunModeError:
+    //        parser.displayError(errMessage, parser);
+    //        return EXIT_FAILURE;
+    //}
+
+    CypressApplication& cypress = CypressApplication::getInstance();
+    cypress.setArgs(parser.getArgs());
 
     return app.exec();
 }

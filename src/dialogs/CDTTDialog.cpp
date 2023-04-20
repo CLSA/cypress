@@ -126,7 +126,7 @@ void CDTTDialog::initializeConnections()
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &CDTTManager::canWrite,
+  connect(derived.get(), &CDTTManager::canFinish,
       ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application

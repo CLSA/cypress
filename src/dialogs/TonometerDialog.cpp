@@ -143,7 +143,7 @@ void TonometerDialog::initializeConnections()
 
     // All measurements received: enable write test results
     //
-    connect(derived.get(), &TonometerManager::canWrite,
+    connect(derived.get(), &TonometerManager::canFinish,
         ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
     // Close the application

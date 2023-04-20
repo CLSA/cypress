@@ -60,7 +60,7 @@ void CDTTManager::start()
 
 void CDTTManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     clearData();
 
@@ -76,7 +76,7 @@ bool CDTTManager::clearData()
 
 void CDTTManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json"
@@ -88,8 +88,6 @@ void CDTTManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
     }
 }
 

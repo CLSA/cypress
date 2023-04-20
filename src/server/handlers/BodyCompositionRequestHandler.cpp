@@ -15,13 +15,11 @@ void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
         response.setContentType("application/json");
 
         std::ostream& out = response.send();
-
-        CypressApplication::restApiServer -> requestTestStart(
-                    Constants::MeasureType::typeBody_Composition, QJsonObject {}
+        CypressApplication::getInstance().server -> requestTestStart(
+                    Constants::MeasureType::Body_Composition, QJsonObject {}
         );
 
         out << responseData.toStdString();
-
         out.flush();
     }
     catch (std::exception& e)

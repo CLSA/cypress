@@ -8,7 +8,10 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
-class GripStrengthManager : public QObject
+#include "managers/ManagerBase.h"
+#include "data/grip_strength/tests/GripStrengthTest.h"
+
+class GripStrengthManager : public ManagerBase
 {
     Q_OBJECT
 
@@ -16,37 +19,37 @@ public:
     explicit GripStrengthManager(QObject *parent = nullptr);
     ~GripStrengthManager();
 
-    QJsonDocument m_exam;
-
-    void start();
-    void measure();
-    void finish();
-
-signals:
-    void validExam(QJsonDocument exam);
+public slots:
+    void start() override;
+    void measure() override;
+    void finish() override;
 
 private:
+    GripStrengthTest m_test;
     QProcess m_process;
     QSqlDatabase m_database;
 
-    QMap<QString, QVariant> extractExam() const;
-
-    QDir m_backupDir;
-    QDir m_trackerDir;
     QString m_workingDirPath;
     QString m_executablePath;
     QString m_databaseName;
 
+    QDir m_backupDir;
+    QDir m_trackerDir;
 
-    void initialize();
-    void createDatabaseBackupFolder();
-    void backupDatabase();
-    void openDatabase();
-    void startApp();
-    void restoreTrackerDatabase();
-    void sendToPine();
+    // Set data from Pine request
+    void setInputData(const QVariantMap&) override;
 
-    QString getTrackerDatabaseFolder();
+    // Set up device
+    bool setUp() override;
+
+    // Reset the session
+    bool clearData() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
+
+    // Send test data to Pine server
+    bool sendResultsToPine(const QJsonObject& data) override;
 };
 
 #endif // GRIPSTRENGTHMANAGER_H

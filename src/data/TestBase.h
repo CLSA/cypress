@@ -48,16 +48,10 @@ public:
     //
     virtual bool isValid() const = 0;
 
-    // String keys are converted to snake_case
-    //
     virtual QJsonObject toJsonObject() const = 0;
 
-    // default is to reset both meta and measurement data
-    //
     virtual void reset();
 
-    // set the system of units for the test
-    //
     void setUnitsSystem(const Constants::UnitsSystem& system)
     {
       m_unitsSystem = system;

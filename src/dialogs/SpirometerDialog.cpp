@@ -116,7 +116,7 @@ void SpirometerDialog::initializeConnections()
 
     // All measurements received: enable write test results
     //
-    connect(derived.get(), &SpirometerManager::canWrite,
+    connect(derived.get(), &SpirometerManager::canFinish,
         ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
     // Close the application

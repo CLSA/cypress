@@ -243,7 +243,7 @@ void BodyCompositionDialog::initializeConnections()
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &BodyCompositionManager::canWrite,
+  connect(derived.get(), &BodyCompositionManager::canFinish,
       ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   QIntValidator *v_age = new QIntValidator(this);

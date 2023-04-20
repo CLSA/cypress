@@ -31,13 +31,13 @@ void SignaturePadRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        const Constants::MeasureType measureType = Constants::MeasureType::typeSignature;
+        const Constants::MeasureType measureType = Constants::MeasureType::Signature;
         const QJsonObject responseJSON = getResponseData();
         const QString sessionId = responseJSON.value("sessionId").toString();
         const QString responseData = JsonSettings::serializeJson(responseJSON);
 
         // start test
-        CypressApplication::restApiServer -> requestTestStart(measureType, inputData);
+        CypressApplication::getInstance().server -> requestTestStart(measureType, inputData);
 
         // send response with uuid body
         std::ostream& out = response.send();

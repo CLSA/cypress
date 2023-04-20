@@ -14,10 +14,9 @@ RetinalCameraDialog::RetinalCameraDialog(QString uuid) : ui(new Ui::RetinalCamer
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         setWindowTitle("Retinal Camera (SIM)");
-        //ui->measureWidget->enableMeasure();
     }
     else {
         setWindowTitle("Retinal Camera");

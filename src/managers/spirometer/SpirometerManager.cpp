@@ -28,7 +28,7 @@ bool SpirometerManager::isAvailable()
 void SpirometerManager::start()
 {
 
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     // connect signals and slots to QProcess one time only
     //
@@ -83,7 +83,7 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     qDebug() << "Starting process from measure";
     clearData();
@@ -275,7 +275,7 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/dxa/forearm/output.json"
@@ -288,7 +288,6 @@ void SpirometerManager::finish()
             qDebug() << "Could not send results to Pine";
         }
 
-        CypressApplication::status = Status::Waiting;
     }
     //if(QProcess::NotRunning != m_process.state())
     //{

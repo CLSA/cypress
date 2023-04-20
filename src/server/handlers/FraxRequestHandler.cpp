@@ -13,7 +13,7 @@ void FraxRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeFrax, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::Frax, QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

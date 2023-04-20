@@ -14,8 +14,8 @@ void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 
         std::ostream& out = response.send();
 
-        CypressApplication::restApiServer -> requestTestStart(
-            Constants::MeasureType::typeAudiometer,
+        CypressApplication::getInstance().server -> requestTestStart(
+            Constants::MeasureType::Audiometer,
                     QJsonObject {}
         );
 

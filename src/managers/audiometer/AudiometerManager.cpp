@@ -44,8 +44,6 @@ AudiometerManager::AudiometerManager()
 
 bool AudiometerManager::isInstalled()
 {
-    //bool found = scanDevices();
-    //return found;
     return false;
 }
 
@@ -77,7 +75,7 @@ void AudiometerManager::finish()
         m_port.close();
 
     QJsonObject results;
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         results = JsonSettings::readJsonFromFile(
             QCoreApplication::applicationDirPath() + "/src/tests/fixtures/audiometer/output.json"
@@ -99,8 +97,6 @@ void AudiometerManager::finish()
     {
         qCritical() << "AudiometerManager::finish - error: unable to send results";
     }
-
-    CypressApplication::status = Status::Waiting;
 
     ok = cleanUp();
     if (!ok)
@@ -131,7 +127,7 @@ void AudiometerManager::readDevice()
         {
             // emit the can write signal
             qDebug() << "Audiometer::readDevice - test is valid";
-            emit canWrite();
+            emit canFinish();
         }
     }
 }

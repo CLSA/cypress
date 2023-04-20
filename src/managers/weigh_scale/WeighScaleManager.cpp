@@ -33,7 +33,7 @@ bool WeighScaleManager::clearData()
 
 void WeighScaleManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
@@ -45,8 +45,6 @@ void WeighScaleManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
     }
     //m_deviceData.reset();
     //m_deviceList.clear();
@@ -103,7 +101,7 @@ void WeighScaleManager::zeroDevice()
 
 void WeighScaleManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+    if (CypressApplication::getInstance().isSimulation()) return;
 
     m_request = QByteArray("p");
     writeDevice();
@@ -132,7 +130,7 @@ void WeighScaleManager::readDevice()
          {
            qDebug() << "test is valid, can save results";
            // emit the can write signal
-           emit canWrite();
+           emit canFinish();
          }
          else
              qDebug() << "invalid test";

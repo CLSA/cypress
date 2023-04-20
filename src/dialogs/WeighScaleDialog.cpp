@@ -160,7 +160,7 @@ void WeighScaleDialog::initializeConnections()
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &WeighScaleManager::canWrite,
+  connect(derived.get(), &WeighScaleManager::canFinish,
       ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application

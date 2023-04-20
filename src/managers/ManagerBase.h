@@ -62,14 +62,13 @@ signals:
     // valid test completed and ready to write to output
     // (update GUI enable write button and update the results display)
     //
-    void canWrite();
+    void canFinish();
 
 protected:
     // The unique identifier representing this test session (for pine state management)
     QString m_uuid;
 
     QVariantMap m_inputData;
-    virtual void setInputData(const QVariantMap&) = 0;
 
     QVariant getInputDataValue(const QString &);
 
@@ -83,6 +82,8 @@ protected:
     // such as when multiple measurements are separately acquired.
     //
 
+    virtual void setInputData(const QVariantMap&) = 0;
+
     // Set up device
     virtual bool setUp() = 0;
 
@@ -93,7 +94,7 @@ protected:
     virtual bool cleanUp() = 0;
 
     // Send the test results to Pine for storage & analysis
-    virtual bool sendResultsToPine(const QJsonObject &data);
+    virtual bool sendResultsToPine(const QJsonObject& data);
 };
 
 #endif // MANAGERBASE_H

@@ -60,7 +60,7 @@ private slots:
     virtual void writeDevice() = 0;
 
     // retrieve data from the audiometer over RS232
-    // emits canWrite signal if the test data is valid
+    // emits canFinish signal if the test data is valid
     //
     virtual void readDevice() = 0;
 

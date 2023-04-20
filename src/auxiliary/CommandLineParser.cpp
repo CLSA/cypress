@@ -13,7 +13,7 @@ CommandLineParser::CommandLineParser(QObject* parent) : QObject(parent)
    m_args["runMode"] = QVariant::fromValue(Constants::RunMode::modeUnknown);
    m_args["inputFileName"] = QVariant();
    m_args["outputFileName"] = QVariant();
-   m_args["measureType"] = QVariant::fromValue(Constants::MeasureType::typeUnknown);
+   m_args["measureType"] = QVariant::fromValue(Constants::MeasureType::Unknown);
 }
 
 CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
@@ -204,7 +204,7 @@ CommandLineParser::ParseResult CommandLineParser::parseCommandLine(
             s = s.at(0).toUpper() + s.mid(1);
 
         Constants::MeasureType measureType = Constants::getMeasureType(s);
-        if(Constants::MeasureType::typeUnknown != measureType)
+        if(Constants::MeasureType::Unknown != measureType)
         {
             m_args["measureType"] = QVariant::fromValue(measureType);
             if(m_args["verbose"].toBool())

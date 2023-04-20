@@ -1,6 +1,8 @@
 #ifndef GRIPSTRENGTHTEST_H
 #define GRIPSTRENGTHTEST_H
 
+#include <QDir>
+
 #include "../../TestBase.h"
 #include "../measurements/GripStrengthMeasurement.h"
 
@@ -12,21 +14,22 @@ public:
 
     static const q_stringMap testMetaMap;
 
-    // String representation for debug and GUI display purposes
-    //
     QString toString() const override;
 
     bool isValid() const override;
 
-    // String keys are converted to snake_case
-    //
-    bool readGripTestOptions();
-    bool readGripTestResults();
+    void openDatabase();
 
+    bool readMeasurements();
+
+
+    QString getTrackerDatabaseFolder();
     QJsonObject toJsonObject() const override;
 
 private:
     QStringList m_outputKeyList;
+
+
 };
 
 Q_DECLARE_METATYPE(GripStrengthTest);

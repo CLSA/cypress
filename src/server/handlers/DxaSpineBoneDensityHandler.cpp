@@ -14,7 +14,7 @@ void DxaSpineBoneDensityHandler::handleRequest(Poco::Net::HTTPServerRequest &req
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeDxaSpineBone, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::DxaSpineBone, QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

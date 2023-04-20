@@ -14,22 +14,119 @@
 #include "dialogs/DialogBase.h"
 #include "server/Server.h"
 
-QScopedPointer<Server> CypressApplication::restApiServer(new Server());
+CypressApplication* CypressApplication::app = nullptr;
 
-Mode CypressApplication::mode = Mode::Sim;
-Status CypressApplication::status = Status::Starting;
-QDateTime CypressApplication::startTime = QDateTime::currentDateTimeUtc();
+CypressApplication& CypressApplication::getInstance()
+{
+    if (!app)
+    {
+        app = new CypressApplication();
+    }
 
-QElapsedTimer CypressApplication::timer = QElapsedTimer();
+    return *app;
+}
+
 
 CypressApplication::CypressApplication(QObject *parent) : QObject(parent)
 {
-    timer.start();
+    initialize();
 }
+
 
 CypressApplication::~CypressApplication()
 {
 }
+
+
+bool CypressApplication::isSimulation() {
+    return m_simulate;
+}
+
+
+bool CypressApplication::isVerbose() {
+    return m_verbose;
+}
+
+
+void CypressApplication::initialize()
+{
+    startTime = QDateTime::currentDateTimeUtc();
+
+    server.reset(new Server());
+    server->start();
+    connect(server.get(), &Server::startTest, this, &CypressApplication::startTest);
+
+    status = Status::Waiting;
+}
+
+
+bool CypressApplication::forceSessionEnd()
+{
+    if (dialog == nullptr) return true;
+
+    delete dialog;
+    dialog = nullptr;
+
+    return true;
+}
+
+
+bool CypressApplication::startTest(const Constants::MeasureType& type, const QJsonObject& requestData)
+{
+    try
+    {
+        qDebug() << "REQUEST Data: " << requestData;
+        qDebug() << isSimulation();
+        qDebug() << isVerbose();
+
+        DialogFactory* factory = DialogFactory::instance();
+
+        dialog = factory->instantiate(type);
+        if(dialog == Q_NULLPTR) {
+            QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
+            return false;
+        }
+
+        dialog->initialize();
+        dialog->show();
+    }
+    catch (QException& e)
+    {
+        qDebug() << e.what();
+        return false;
+    }
+
+    return true;
+}
+
+
+QJsonObject CypressApplication::getSessionInfo() {
+    QJsonObject sessionInfo {
+        {"participant_id", ""},
+
+        {"user", ""},
+        {"session_id", ""},
+        {"session_start", ""},
+        {"session_end", ""},
+    };
+
+    return sessionInfo;
+}
+
+
+void CypressApplication::setArgs(const QVariantMap& args)
+{
+    if (args.contains("verbose"))
+    {
+        m_verbose = args["verbose"].toBool();
+    }
+
+    if (args.contains("sim"))
+    {
+        m_simulate = args["simulate"].toBool();
+    }
+}
+
 
 QJsonObject CypressApplication::getStatus()
 {
@@ -50,7 +147,7 @@ QJsonObject CypressApplication::getStatus()
     statusJson["addresses"] = QJsonArray::fromStringList(addresses);
     statusJson["port"] = "8000";
 
-    switch (CypressApplication::status)
+    switch (status)
     {
         case Status::Starting:
             statusJson["status"] = "Starting";
@@ -91,51 +188,4 @@ QJsonObject CypressApplication::getStatus()
     };
 
     return statusJson;
-}
-
-bool CypressApplication::startTest(Constants::MeasureType type, QJsonObject inputData)
-{
-    QVariantMap args;
-    DialogFactory *factory;
-
-    try
-    {
-        setArgs(args);
-        factory = DialogFactory::instance();
-
-        DialogBase* dialog = factory->instantiate(type, inputData);
-        if(dialog == Q_NULLPTR) {
-            QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
-            return false;
-        }
-
-        dialog->setRunMode(Constants::RunMode::modeDefault);
-        dialog->initialize();
-        dialog->show();
-
-        CypressApplication::status = Status::Active;
-    }
-    catch (QException& e)
-    {
-        qDebug() << e.what();
-        return false;
-    }
-
-    return true;
-}
-
-void CypressApplication::setArgs(const QVariantMap& args)
-{
-    if(args.contains("verbose"))
-    {
-        m_verbose = args["verbose"].toBool();
-    }
-}
-
-void CypressApplication::initialize()
-{
-    CypressApplication::startTime = QDateTime::currentDateTimeUtc();
-    CypressApplication::restApiServer->start();
-
-    connect(restApiServer.get(), &Server::startTest, this, &CypressApplication::startTest);
 }

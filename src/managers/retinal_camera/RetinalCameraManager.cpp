@@ -13,7 +13,22 @@
 
 RetinalCameraManager::RetinalCameraManager(QString uuid): m_uuid { uuid }
 {
+<<<<<<< HEAD
 
+=======
+    start();
+}
+
+
+RetinalCameraManager::~RetinalCameraManager()
+{
+    finish();
+}
+
+bool RetinalCameraManager::isAvailable()
+{
+    return false;
+>>>>>>> private/wfh
 }
 
 void RetinalCameraManager::start()
@@ -67,6 +82,7 @@ bool RetinalCameraManager::startRetinalCamera()
     bool started = m_process.waitForStarted();
     if (!started)
     {
+<<<<<<< HEAD
         qDebug() << "RetinalCameraManager::startRetinalCamera: IMAGEnet_R4 did not start";
     }
 
@@ -104,6 +120,10 @@ void RetinalCameraManager::finish()
 {
     cleanupDatabase();
     m_db.close();
+=======
+        measure();
+    });
+>>>>>>> private/wfh
 }
 
 // collate test results and device and other meta data
@@ -201,4 +221,87 @@ bool RetinalCameraManager::cleanupDatabase()
     return true;
 }
 
+<<<<<<< HEAD
+=======
+bool RetinalCameraManager::restoreDatabase()
+{
+    return false;
+}
+
+bool RetinalCameraManager::initializeDatabase()
+{
+    QString participantId = "123456789";
+
+    QSqlQuery query(m_db);
+    query.prepare("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) VALUES (:personUUID, :lastName, :firstName)");
+    query.bindValue(":personUUID", defaultPersonUUID);
+    query.bindValue(":lastName", "Study");
+    query.bindValue(":firstName", "Participant");
+    query.exec();
+
+    query.prepare("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUUID, :participantId, :personUUID)");
+    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.bindValue(":participantId", participantId);
+    query.bindValue(":personUUID", defaultPatientUUID);
+    query.exec();
+
+    return true;
+}
+
+bool RetinalCameraManager::startRetinalCamera()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+
+    m_process.setProgram(settings.value("retinal_camera/working_dir").toString() + settings.value("retinal_camera/executable").toString());
+    m_process.start();
+
+    bool started = m_process.waitForStarted();
+    if (!started)
+    {
+        qDebug() << "RetinalCameraManager::startRetinalCamera: IMAGEnet_R4 did not start";
+    }
+
+    return started;
+}
+
+void RetinalCameraManager::measure()
+{
+    qDebug() << "RetinalCameraManager::measure";
+
+    QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
+    qDebug() << "RetinalCameraManager::finish - left data: " << leftData;
+
+    QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
+    qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
+}
+
+void RetinalCameraManager::finish()
+{
+    cleanupDatabase();
+    m_db.close();
+}
+
+// Context dependent clear test data and possibly device data (eg., serial port info)
+bool RetinalCameraManager::clearData()
+{
+    qDebug() << "RetinalCameraManager::clearData";
+    return false;
+}
+
+// set input parameters for the test
+void RetinalCameraManager::setInputData(const QVariantMap& inputData)
+{
+
+}
+
+bool RetinalCameraManager::setUp()
+{
+    return true;
+}
+
+bool RetinalCameraManager::cleanUp()
+{
+   return true;
+}
+>>>>>>> private/wfh
 

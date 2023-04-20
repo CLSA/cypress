@@ -107,7 +107,7 @@ void BloodPressureManager::setSide(const QString &side)
 //
 void BloodPressureManager::measure()
 {
-    if (CypressApplication::mode == Mode::Sim) return;
+
 }
 
 
@@ -126,7 +126,7 @@ void BloodPressureManager::disconnectDevice()
 //
 void BloodPressureManager::finish()
 {
-    if (CypressApplication::mode == Mode::Sim)
+    if (CypressApplication::getInstance().isSimulation())
     {
         QJsonObject results = JsonSettings::readJsonFromFile(
             "C:/work/clsa/cypress/src/tests/fixtures/blood_pressure/output.json"
@@ -138,8 +138,6 @@ void BloodPressureManager::finish()
         {
             qDebug() << "Could not send results to Pine";
         }
-
-        CypressApplication::status = Status::Waiting;
     }
 }
 

@@ -136,6 +136,7 @@ SOURCES += \
     server/DefaultRequestHandler.cpp \
     server/InstrumentRequestHandlerFactory.cpp \
     server/Server.cpp \
+    server/defaultdeletesessionrequesthandler.cpp \
     server/handlers/BodyCompositionRequestHandler.cpp \
     server/handlers/CDTTRequestHandler.cpp \
     server/handlers/ChoiceReactionRequestHandler.cpp \
@@ -288,6 +289,7 @@ HEADERS += \
     server/DefaultRequestHandler.h \
     server/InstrumentRequestHandlerFactory.h \
     server/Server.h \
+    server/defaultdeletesessionrequesthandler.h \
     server/handlers/BodyCompositionRequestHandler.h \
     server/handlers/CDTTRequestHandler.h \
     server/handlers/ChoiceReactionRequestHandler.h \

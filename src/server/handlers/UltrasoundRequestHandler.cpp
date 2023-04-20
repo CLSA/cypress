@@ -10,7 +10,7 @@ void UltrasoundRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
-        CypressApplication::restApiServer -> requestTestStart(Constants::MeasureType::typeCarotidIntima, QJsonObject {});
+        CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::CarotidIntima, QJsonObject {});
 
         std::ostream& out = response.send();
         out << responseData.toStdString();

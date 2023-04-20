@@ -53,7 +53,7 @@ public:
 public slots:    
     void updateModelView();     // a manager nofified dataChanged
     void enableMeasure();       // a manager notified canMeasure
-    void enableWriteToFile();   // a manager notified canWrite
+    void enableWriteToFile();   // a manager notified canFinish
 
 signals:
     void measure();             // the measure button was clicked

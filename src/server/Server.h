@@ -30,11 +30,11 @@ class Server: public QObject
         void start();
         void stop();
 
-        void requestTestStart(Constants::MeasureType type, QJsonObject pineRequestData);
+        void requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData);
         bool sendResults(const QJsonObject& results);
 
     signals:
-        void startTest(Constants::MeasureType type, QJsonObject inputData);
+        void startTest(const Constants::MeasureType& type, const QJsonObject& requestData);
 
     private:
         HTTPServer* server;
