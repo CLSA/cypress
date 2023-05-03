@@ -70,6 +70,8 @@ protected:
 
     QVariantMap m_inputData;
 
+
+
     QVariant getInputDataValue(const QString &);
 
     // Input data from Pine
@@ -82,7 +84,7 @@ protected:
     // such as when multiple measurements are separately acquired.
     //
 
-    virtual void setInputData(const QVariantMap&) = 0;
+    virtual void setInputData(const QVariantMap&);
 
     // Set up device
     virtual bool setUp() = 0;

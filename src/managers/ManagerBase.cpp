@@ -25,4 +25,3 @@ bool ManagerBase::sendResultsToPine(const QJsonObject& results)
 
     return false;
 }
-

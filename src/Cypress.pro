@@ -193,7 +193,8 @@ SOURCES += \
     dialogs/TonometerDialog.cpp \
     dialogs/WeighScaleDialog.cpp \
     CypressApplication.cpp \
-    main.cpp
+    main.cpp \
+    widgets/testinfowidget.cpp
 
 HEADERS += \
     auxiliary/CommandLineParser.h \
@@ -345,7 +346,8 @@ HEADERS += \
     dialogs/SpirometerDialog.h \
     dialogs/TonometerDialog.h \
     dialogs/WeighScaleDialog.h \
-    CypressApplication.h
+    CypressApplication.h \
+    widgets/testinfowidget.h
 
 FORMS += \
   dialogs/RetinalCameraDialog.ui \
@@ -364,7 +366,8 @@ FORMS += \
   dialogs/bloodpressuredialog.ui \
   dialogs/bodycompositiondialog.ui \
   dialogs/runnabledialog.ui \
-  dialogs/weighscaledialog.ui
+  dialogs/weighscaledialog.ui \
+  widgets/testinfowidget.ui
 
 RESOURCES += \
 
