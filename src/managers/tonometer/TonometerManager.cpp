@@ -35,30 +35,31 @@ void TonometerManager::start()
 
     // connect signals and slots to QProcess one time only
     //
-    connect(&m_process, &QProcess::started,
-        this, [this]() {
-            qDebug() << "process started: " << m_process.arguments().join(" ");
-        });
+    //connect(&m_process, &QProcess::started,
+    //    this, [this]() {
+    //        qDebug() << "process started: " << m_process.arguments().join(" ");
+    //    });
 
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        this, &TonometerManager::readOutput);
+    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    //    this, &TonometerManager::readOutput);
 
-    connect(&m_process, &QProcess::errorOccurred,
-        this, [](QProcess::ProcessError error)
-        {
-            QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
-        });
+    //connect(&m_process, &QProcess::errorOccurred,
+    //    this, [](QProcess::ProcessError error)
+    //    {
+    //        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+    //    });
 
-    connect(&m_process, &QProcess::stateChanged,
-        this, [](QProcess::ProcessState state) {
-            QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "process state: " << s.join(" ").toLower();
-        });
+    //connect(&m_process, &QProcess::stateChanged,
+    //    this, [](QProcess::ProcessState state) {
+    //        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "process state: " << s.join(" ").toLower();
+    //    });
 
-    configureProcess();
-    emit dataChanged();
+    //configureProcess();
+    //emit dataChanged();
 }
+
 
 bool TonometerManager::isDefined(const QString& fileName, const TonometerManager::FileType& type) const
 {
@@ -91,7 +92,28 @@ void TonometerManager::selectDatabase(const QString &dbName)
 
 void TonometerManager::measure()
 {
+    //QJsonObject response {
+    //    {"uuid", m_uuid,},
+    //    {"answer_id", m_answerId }
+    //};
 
+    //sendResultsToPine(response);
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json"
+    );
+
+    results["cypress_session"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    if (results.empty()) return;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
 }
 
 void TonometerManager::readOutput()
@@ -112,19 +134,19 @@ bool TonometerManager::clearData()
 
 void TonometerManager::finish()
 {
-    if (CypressApplication::getInstance().isSimulation())
-    {
-        QJsonObject results = JsonSettings::readJsonFromFile(
-            "C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json"
-        );
-        if (results.empty()) return;
+    //if (CypressApplication::getInstance().isSimulation())
+    //{
+    //    QJsonObject results = JsonSettings::readJsonFromFile(
+    //        "C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json"
+    //    );
+    //    if (results.empty()) return;
 
-        bool ok = sendResultsToPine(results);
-        if (!ok)
-        {
-            qDebug() << "Could not send results to Pine";
-        }
-    }
+    //    bool ok = sendResultsToPine(results);
+    //    if (!ok)
+    //    {
+    //        qDebug() << "Could not send results to Pine";
+    //    }
+    //}
 }
 
 // set input parameters for the test

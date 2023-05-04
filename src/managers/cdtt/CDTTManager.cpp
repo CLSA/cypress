@@ -31,64 +31,80 @@ void CDTTManager::start()
 {
     // connect signals and slots to QProcess one time only
     //
-    connect(&m_process, &QProcess::started,
-        this, [this]() {
-            qDebug() << "process started: " << m_process.arguments().join(" ");
-        });
+    //connect(&m_process, &QProcess::started,
+    //    this, [this]() {
+    //        qDebug() << "process started: " << m_process.arguments().join(" ");
+    //    });
 
-    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-    //    this, &CDTTManager::readOutput);
+    ////connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    ////    this, &CDTTManager::readOutput);
 
-    connect(&m_process, &QProcess::errorOccurred,
-        this, [](QProcess::ProcessError error)
-        {
-            QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
-        });
+    //connect(&m_process, &QProcess::errorOccurred,
+    //    this, [](QProcess::ProcessError error)
+    //    {
+    //        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+    //    });
 
-    connect(&m_process, &QProcess::stateChanged,
-        this, [](QProcess::ProcessState state) {
-            QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "process state: " << s.join(" ").toLower();
-        });
+    //connect(&m_process, &QProcess::stateChanged,
+    //    this, [](QProcess::ProcessState state) {
+    //        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "process state: " << s.join(" ").toLower();
+    //    });
 
-    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
+    //m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    configureProcess();
-    emit dataChanged();
+    //configureProcess();
+    //emit dataChanged();
 }
 
 void CDTTManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) return;
+    //if (CypressApplication::getInstance().isSimulation()) return;
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json"
+    );
 
-    clearData();
+    if (results.empty()) return;
 
-    qDebug() << "starting process from measure";
-    m_process.start();
+    results["cypress_session"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
+
+    //clearData();
+
+    //qDebug() << "starting process from measure";
+    //m_process.start();
 }
 
 bool CDTTManager::clearData()
 {
-    m_test.reset();
-    return true;
+    //m_test.reset();
+    //return true;
 }
 
 void CDTTManager::finish()
 {
-    if (CypressApplication::getInstance().isSimulation())
-    {
-        QJsonObject results = JsonSettings::readJsonFromFile(
-            "C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json"
-        );
-        if (results.empty()) return;
+    //if (CypressApplication::getInstance().isSimulation())
+    //{
+    //    QJsonObject results = JsonSettings::readJsonFromFile(
+    //        "C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json"
+    //    );
+    //    if (results.empty()) return;
 
-        bool ok = sendResultsToPine(results);
-        if (!ok)
-        {
-            qDebug() << "Could not send results to Pine";
-        }
-    }
+    //    bool ok = sendResultsToPine(results);
+    //    if (!ok)
+    //    {
+    //        qDebug() << "Could not send results to Pine";
+    //    }
+    //}
 }
 
 void CDTTManager::configureProcess()

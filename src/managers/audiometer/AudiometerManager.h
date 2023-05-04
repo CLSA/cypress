@@ -32,7 +32,6 @@ public:
 
     static QByteArray initEndCode();
     static QByteArray END_CODE;
-
     static bool isInstalled();
 
 public slots:

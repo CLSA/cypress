@@ -54,60 +54,79 @@ bool AudiometerManager::setUp()
 
 void AudiometerManager::setInputData(const QVariantMap& inputData)
 {
-    if (inputData.value("participant_id").isNull())
-    {
-        qDebug() << "no participant id";
-    }
-    m_test.addMetaData("participant_id", inputData.value("participant_id"));
+    //if (inputData.value("participant_id").isNull())
+    //{
+    //    qDebug() << "no participant id";
+    //}
+    //m_test.addMetaData("participant_id", inputData.value("participant_id"));
 }
 
 void AudiometerManager::measure()
 {
-    clearData();
-    const char cmd[] = { 0x05, '4', 0x0d };
-    m_request = QByteArray::fromRawData(cmd, 3);
-    writeDevice();
-}
+    //clearData();
+    //const char cmd[] = { 0x05, '4', 0x0d };
+    //m_request = QByteArray::fromRawData(cmd, 3);
+    //writeDevice();
 
-void AudiometerManager::finish()
-{
-    if(m_port.isOpen())
-        m_port.close();
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/audiometer/output.json"
+    );
 
-    QJsonObject results;
-    if (CypressApplication::getInstance().isSimulation())
-    {
-        results = JsonSettings::readJsonFromFile(
-            QCoreApplication::applicationDirPath() + "/src/tests/fixtures/audiometer/output.json"
-        );
-    }
-    else
-    {
-        results = m_test.toJsonObject();
-    }
+    if (results.empty()) return;
 
-    if (results.empty())
-    {
-        qCritical() << "AudiometerManager::finish - error: test results are empty";
-        return;
-    }
+    results["uuid"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
 
     bool ok = sendResultsToPine(results);
     if (!ok)
     {
-        qCritical() << "AudiometerManager::finish - error: unable to send results";
+        qDebug() << "Could not send results to Pine";
     }
 
-    ok = cleanUp();
-    if (!ok)
-    {
-        qCritical() << "AudiometerManager::finish - error: device cleanup failed";
-    }
+    qDebug() << "measure called";
+}
+
+void AudiometerManager::finish()
+{
+    //if(m_port.isOpen())
+    //    m_port.close();
+
+    //QJsonObject results;
+    //if (CypressApplication::getInstance().isSimulation())
+    //{
+    //    results = JsonSettings::readJsonFromFile(
+    //        QCoreApplication::applicationDirPath() + "/src/tests/fixtures/audiometer/output.json"
+    //    );
+    //}
+    //else
+    //{
+    //    results = m_test.toJsonObject();
+    //}
+
+    //if (results.empty())
+    //{
+    //    qCritical() << "AudiometerManager::finish - error: test results are empty";
+    //    return;
+    //}
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qCritical() << "AudiometerManager::finish - error: unable to send results";
+    //}
+
+    //ok = cleanUp();
+    //if (!ok)
+    //{
+    //    qCritical() << "AudiometerManager::finish - error: device cleanup failed";
+    //}
 }
 
 bool AudiometerManager::cleanUp()
 {
-    clearData();
+    //clearData();
     return true;
 }
 
@@ -116,40 +135,40 @@ void AudiometerManager::readDevice()
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
 
-    QByteArray data = m_port.readAll();
+    //QByteArray data = m_port.readAll();
 
-    m_buffer += data;
+    //m_buffer += data;
 
-    if(hasEndCode(m_buffer))
-    {
-        m_test.fromArray(m_buffer);
-        if(m_test.isValid())
-        {
-            // emit the can write signal
-            qDebug() << "Audiometer::readDevice - test is valid";
-            emit canFinish();
-        }
-    }
+    //if(hasEndCode(m_buffer))
+    //{
+    //    m_test.fromArray(m_buffer);
+    //    if(m_test.isValid())
+    //    {
+    //        // emit the can write signal
+    //        qDebug() << "Audiometer::readDevice - test is valid";
+    //        emit canFinish();
+    //    }
+    //}
 }
 
 void AudiometerManager::writeDevice()
 {
     // send a request to the audiometer to start data collection
     //
-    m_buffer.clear();
-    const int bytesWritten = m_port.write(m_request);
-    if (bytesWritten < 0) {
-        qCritical() << "AudiometerManager::writeDevice - Error: could not write data to the serial port";
-    }
+    //m_buffer.clear();
+    //const int bytesWritten = m_port.write(m_request);
+    //if (bytesWritten < 0) {
+    //    qCritical() << "AudiometerManager::writeDevice - Error: could not write data to the serial port";
+    //}
 }
 
 bool AudiometerManager::clearData()
 {
-    // Reset the device and data
-    m_buffer.clear();
-    //m_deviceList.clear();
-    //m_deviceData.reset();
-    m_test.reset();
+    //// Reset the device and data
+    //m_buffer.clear();
+    ////m_deviceList.clear();
+    ////m_deviceData.reset();
+    //m_test.reset();
     return true;
 }
 

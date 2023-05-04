@@ -41,9 +41,6 @@ private:
     QByteArray signature;
     QScopedPointer<SignaturePadCommunication> spc;
 
-    void sendRawDataToPine(QByteArray data);
-
-    qint32 m_answerId; 	 // from Pine
     QString m_participantId; // from Pine
 
     // Reset the session

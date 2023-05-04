@@ -8,10 +8,12 @@
 #include <QProcess>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QMetaType>
 
 #include "CypressApplication.h"
 //#include "managers/SettingsManager.h"
-//#include "auxiliary/CommandLineParser.h"
+#include "auxiliary/CommandLineParser.h"
+#include "auxiliary/Constants.h"
 
 #include "logging/debugdialog.h"
 
@@ -132,7 +134,10 @@ int main(int argc, char *argv[])
     QGuiApplication::setApplicationName(appName);
     QGuiApplication::setApplicationVersion(appVersion);
 
+    QApplication app(argc, argv);
     QStringList appArguments = QCoreApplication::arguments();
+
+    qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
 
     //if (updateAvailable())
     //{
@@ -142,15 +147,15 @@ int main(int argc, char *argv[])
     //    }
     //}
 
-    QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-    for (const QString &locale : uiLanguages) {
-        const QString baseName = "cypress_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName)) {
-            app.installTranslator(&translator);
-            break;
-        }
-    }
+    //QTranslator translator;
+    //const QStringList uiLanguages = QLocale::system().uiLanguages();
+    //for (const QString &locale : uiLanguages) {
+    //    const QString baseName = "cypress_" + QLocale(locale).name();
+    //    if (translator.load(":/i18n/" + baseName)) {
+    //        app.installTranslator(&translator);
+    //        break;
+    //    }
+    //}
 
     // process command line args
     //
@@ -177,7 +182,7 @@ int main(int argc, char *argv[])
     //}
 
     CypressApplication& cypress = CypressApplication::getInstance();
-    cypress.setArgs(parser.getArgs());
+    //cypress.setArgs();
 
     return app.exec();
 }

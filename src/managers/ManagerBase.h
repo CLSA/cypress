@@ -68,13 +68,16 @@ protected:
     // The unique identifier representing this test session (for pine state management)
     QString m_uuid;
 
-    QVariantMap m_inputData;
+    // The ID to sent the response to (Pine)
+    qint32 m_answerId;
 
-
+    // Input data from Pine
+    QString m_barcode { "" };
+    QString m_interviewer { "" };
 
     QVariant getInputDataValue(const QString &);
 
-    // Input data from Pine
+    QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
 
     // Context dependent clear test data and possibly device data (eg., serial port info)
@@ -83,8 +86,7 @@ protected:
     // Derived classes may also clear test data depending on the nature of the test,
     // such as when multiple measurements are separately acquired.
     //
-
-    virtual void setInputData(const QVariantMap&);
+    virtual void setInputData(const QVariantMap&) = 0;
 
     // Set up device
     virtual bool setUp() = 0;
@@ -97,6 +99,7 @@ protected:
 
     // Send the test results to Pine for storage & analysis
     virtual bool sendResultsToPine(const QJsonObject& data);
+    virtual bool sendFileToPine(const QByteArray& rawData, const QString& fileName);
 };
 
 #endif // MANAGERBASE_H

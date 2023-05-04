@@ -13,117 +13,61 @@
 
 RetinalCameraManager::RetinalCameraManager(QString uuid): m_uuid { uuid }
 {
-<<<<<<< HEAD
-
-=======
     start();
 }
 
 
 RetinalCameraManager::~RetinalCameraManager()
 {
-    finish();
-}
-
-bool RetinalCameraManager::isAvailable()
-{
-    return false;
->>>>>>> private/wfh
+    //finish();
 }
 
 void RetinalCameraManager::start()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    QStringList arguments;
+    //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    //QStringList arguments;
 
-    bool ok = false;
-    ok = openDatabase();
-    if (!ok)
-    {
-        qCritical() << "RetinalCameraManager:start() - could not open database";
-        return;
-    }
+    //bool ok = false;
+    //ok = openDatabase();
+    //if (!ok)
+    //{
+    //    qCritical() << "RetinalCameraManager:start() - could not open database";
+    //    return;
+    //}
 
-    ok = cleanupDatabase();
-    if (!ok)
-    {
-        qCritical() << "RetinalCameraManager:start() - could not cleanup database";
-        return;
-    }
+    //ok = cleanupDatabase();
+    //if (!ok)
+    //{
+    //    qCritical() << "RetinalCameraManager:start() - could not cleanup database";
+    //    return;
+    //}
 
-    ok = initializeDatabase();
-    if (!ok)
-    {
-        qCritical() << "RetinalCameraManager:start() - could not initialize database";
-        return;
-    }
+    //ok = initializeDatabase();
+    //if (!ok)
+    //{
+    //    qCritical() << "RetinalCameraManager:start() - could not initialize database";
+    //    return;
+    //}
 
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
-    {
-        measure();
-        finish();
-    });
+    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
+    //{
+    //    measure();
+    //    finish();
+    //});
 
-    ok = startRetinalCamera();
-    if (!ok)
-    {
-        qCritical() << "RetinalCameraManager:start() - could not start exe";
-        return;
-    }
-}
-
-bool RetinalCameraManager::startRetinalCamera()
-{
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-
-    m_process.setProgram(settings.value("instruments/retinal_camera/exe").toString());
-    m_process.start();
-
-    bool started = m_process.waitForStarted();
-    if (!started)
-    {
-<<<<<<< HEAD
-        qDebug() << "RetinalCameraManager::startRetinalCamera: IMAGEnet_R4 did not start";
-    }
-
-    return started;
-}
-
-void RetinalCameraManager::measure()
-{
-    QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
-    QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
-
-    QJsonObject leftEyeObject;
-    for (const QString &key : leftData.keys())
-    {
-        leftEyeObject.insert(key, QJsonValue::fromVariant(leftData.value(key)));
-    }
-
-    QJsonObject rightEyeObject;
-    for (const QString &key : rightData.keys())
-    {
-        rightEyeObject.insert(key, QJsonValue::fromVariant(rightData.value(key)));
-    }
-
-    QJsonObject examJson {
-        { "left" , leftEyeObject },
-        { "right", rightEyeObject }
-    };
-
-    qDebug().noquote() << m_exam.toJson(QJsonDocument::Indented);
-
-    m_exam = QJsonDocument(examJson);
+    //ok = startRetinalCamera();
+    //if (!ok)
+    //{
+    //    qCritical() << "RetinalCameraManager:start() - could not start exe";
+    //    return;
+    //}
 }
 
 void RetinalCameraManager::finish()
 {
-    cleanupDatabase();
-    m_db.close();
-=======
-        measure();
-    });
->>>>>>> private/wfh
+    //cleanupDatabase();
+    //m_db.close();
+    //measure();
 }
 
 // collate test results and device and other meta data
@@ -152,29 +96,6 @@ bool RetinalCameraManager::openDatabase()
         return false;
         //printDatabaseParams();
     }
-
-    return true;
-}
-
-bool RetinalCameraManager::initializeDatabase()
-{
-    QString participantId = "123456789";
-
-    QSqlQuery query(m_db);
-    query.prepare("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) VALUES (:personUUID, :lastName, :firstName)");
-    query.bindValue(":personUUID", defaultPersonUUID);
-    query.bindValue(":lastName", "Study");
-    query.bindValue(":firstName", "Participant");
-    query.exec();
-    qDebug() << query.lastError();
-    qDebug() << query.lastInsertId();
-
-    query.prepare("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUUID, :participantId, :personUUID)");
-    query.bindValue(":patientUUID", defaultPatientUUID);
-    query.bindValue(":participantId", participantId);
-    query.bindValue(":personUUID", defaultPatientUUID);
-    query.exec();
-    qDebug() << query.lastError();
 
     return true;
 }
@@ -221,8 +142,6 @@ bool RetinalCameraManager::cleanupDatabase()
     return true;
 }
 
-<<<<<<< HEAD
-=======
 bool RetinalCameraManager::restoreDatabase()
 {
     return false;
@@ -273,12 +192,27 @@ void RetinalCameraManager::measure()
 
     QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
     qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
-}
 
-void RetinalCameraManager::finish()
-{
-    cleanupDatabase();
-    m_db.close();
+    QJsonObject response {
+        { "cypress_session", m_uuid },
+        { "answer_id", m_answerId },
+    };
+
+    response["cypress_session"] = m_uuid;
+    response["answer_id"] = m_answerId;
+    response["barcode"] = m_barcode;
+    response["interviewer"] = m_interviewer;
+
+    sendResultsToPine(response);
+
+    if (!leftData["EYE_PICT_VENDOR"].isNull())
+    {
+        sendFileToPine(leftData["EYE_PICT_VENDOR"].toByteArray(), "left_eye.jpeg");
+    }
+    if (!rightData["EYE_PICT_VENDOR"].isNull())
+    {
+        sendFileToPine(rightData["EYE_PICT_VENDOR"].toByteArray(), "right_eye.jpeg");
+    }
 }
 
 // Context dependent clear test data and possibly device data (eg., serial port info)
@@ -291,7 +225,7 @@ bool RetinalCameraManager::clearData()
 // set input parameters for the test
 void RetinalCameraManager::setInputData(const QVariantMap& inputData)
 {
-
+    Q_UNUSED(inputData);
 }
 
 bool RetinalCameraManager::setUp()
@@ -303,5 +237,4 @@ bool RetinalCameraManager::cleanUp()
 {
    return true;
 }
->>>>>>> private/wfh
 

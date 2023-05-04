@@ -27,31 +27,31 @@ void ECGManager::start()
 {
     // connect signals and slots to QProcess one time only
     //
-    connect(&m_process, &QProcess::started,
-        this, [this]() {
-            qDebug() << "process started: " << m_process.arguments().join(" ");
-        });
+    //connect(&m_process, &QProcess::started,
+    //    this, [this]() {
+    //        qDebug() << "process started: " << m_process.arguments().join(" ");
+    //    });
 
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        this, &ECGManager::readOutput);
+    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    //    this, &ECGManager::readOutput);
 
-    connect(&m_process, &QProcess::errorOccurred,
-        this, [](QProcess::ProcessError error)
-        {
-            QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
-        });
+    //connect(&m_process, &QProcess::errorOccurred,
+    //    this, [](QProcess::ProcessError error)
+    //    {
+    //        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+    //    });
 
-    connect(&m_process, &QProcess::stateChanged,
-        this, [](QProcess::ProcessState state) {
-            QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "process state: " << s.join(" ").toLower();
-        });
+    //connect(&m_process, &QProcess::stateChanged,
+    //    this, [](QProcess::ProcessState state) {
+    //        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "process state: " << s.join(" ").toLower();
+    //    });
 
-    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
+    //m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    configureProcess();
-    emit dataChanged();
+    //configureProcess();
+    //emit dataChanged();
 }
 
 bool ECGManager::isDefined(const QString &fileName, const FileType &type) const
@@ -79,12 +79,29 @@ void ECGManager::select()
 
 void ECGManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) return;
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/ecg/output.json"
+    );
 
-    clearData();
-    // launch the process
-    qDebug() << "starting process from measure";
-    m_process.start();
+    results["cypress_session"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    if (results.empty()) return;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
+
+    //if (CypressApplication::getInstance().isSimulation()) return;
+
+    //clearData();
+    //// launch the process
+    //qDebug() << "starting process from measure";
+    //m_process.start();
 }
 
 void ECGManager::readOutput()
@@ -105,18 +122,15 @@ bool ECGManager::clearData()
 
 void ECGManager::finish()
 {
-    if (CypressApplication::getInstance().isSimulation())
-    {
-        QJsonObject results = JsonSettings::readJsonFromFile(
-            "C:/work/clsa/cypress/src/tests/fixtures/ecg/output.json"
-        );
-        if (results.empty()) return;
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/ecg/output.json"
+    );
+    if (results.empty()) return;
 
-        bool ok = sendResultsToPine(results);
-        if (!ok)
-        {
-            qDebug() << "Could not send results to Pine";
-        }
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
     }
 }
 

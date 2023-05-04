@@ -126,19 +126,24 @@ void BloodPressureManager::disconnectDevice()
 //
 void BloodPressureManager::finish()
 {
-    if (CypressApplication::getInstance().isSimulation())
-    {
-        QJsonObject results = JsonSettings::readJsonFromFile(
-            "C:/work/clsa/cypress/src/tests/fixtures/blood_pressure/output.json"
-        );
-        if (results.empty()) return;
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/blood_pressure/output.json"
+    );
 
-        bool ok = sendResultsToPine(results);
-        if (!ok)
-        {
-            qDebug() << "Could not send results to Pine";
-        }
+    if (results.empty()) return;
+
+    results["uuid"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
     }
+
+    qDebug() << "measure called";
 }
 
 // slot for BPMCommunication

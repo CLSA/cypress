@@ -33,18 +33,20 @@ bool WeighScaleManager::clearData()
 
 void WeighScaleManager::finish()
 {
-    if (CypressApplication::getInstance().isSimulation())
-    {
-        QJsonObject results = JsonSettings::readJsonFromFile(
-            "C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
-        );
-        if (results.empty()) return;
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
+    );
+    if (results.empty()) return;
 
-        bool ok = sendResultsToPine(results);
-        if (!ok)
-        {
-            qDebug() << "Could not send results to Pine";
-        }
+    results["cypress_session"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
     }
     //m_deviceData.reset();
     //m_deviceList.clear();

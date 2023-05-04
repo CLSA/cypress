@@ -7,7 +7,10 @@
 #include "dcmtk/ofstd/ofstdinc.h"
 
 struct ValidDCMTag {
-    ValidDCMTag(DcmTagKey key, OFString value);
+    ValidDCMTag(DcmTagKey _key, OFString _value) {
+        key =_key;
+        value = _value;
+    }
     DcmTagKey key;
     OFString value;
 };

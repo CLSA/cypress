@@ -1,4 +1,5 @@
 #include "BluetoothLEManager.h"
+#include "auxiliary/JsonSettings.h"
 
 #include <QBitArray>
 #include <QDateTime>
@@ -7,6 +8,7 @@
 #include <QJsonObject>
 #include <QSettings>
 #include <QStandardItemModel>
+
 
 /**
  * Qt 5.14 adds a native Win32 port supporting Classic Bluetooth on Windows 7 or newer, and Bluetooth LE on Windows 8 or newer.
@@ -23,8 +25,8 @@ BluetoothLEManager::BluetoothLEManager()
 
 void BluetoothLEManager::start()
 {
-    scanDevices();
-    emit dataChanged();
+    //scanDevices();
+    //emit dataChanged();
 }
 
 bool BluetoothLEManager::isAvailable()
@@ -78,53 +80,55 @@ void BluetoothLEManager::setLocalDevice(const QString &address)
 
 bool BluetoothLEManager::lowEnergyEnabled() const
 {
-  return (QBluetoothDeviceDiscoveryAgent::LowEnergyMethod &
-          QBluetoothDeviceDiscoveryAgent::supportedDiscoveryMethods());
+  //return (QBluetoothDeviceDiscoveryAgent::LowEnergyMethod &
+  //        QBluetoothDeviceDiscoveryAgent::supportedDiscoveryMethods());
+    return true;
 }
 
 bool BluetoothLEManager::localDeviceEnabled() const
 {
-    bool enabled = true;
-#ifdef Q_OS_LINUX
-    enabled = (!m_localDevice.isNull() && m_localDevice->isValid());
-#endif
-    return enabled;
+//    bool enabled = true;
+//#ifdef Q_OS_LINUX
+//    enabled = (!m_localDevice.isNull() && m_localDevice->isValid());
+//#endif
+//    return enabled;
+    return true;
 }
 
 void BluetoothLEManager::scanDevices()
 {
-    m_deviceList.clear();
-    emit scanningDevices();
+    //m_deviceList.clear();
+    //emit scanningDevices();
 
-    // NOTE: Due to API limitations it is only possible to find devices that have been paired
-    // using Windows' settings on Win OS.
-    // Create the agent to perform device discovery and populate the address list box
-    // with candidate items.
-    // If the address line edit field has not been filled with a stored peripheral address,
-    // prompt the user to double click to select a device.
-    //
-    if(m_agent.isNull())
-    {
-      m_agent.reset(new QBluetoothDeviceDiscoveryAgent(this));
+    //// NOTE: Due to API limitations it is only possible to find devices that have been paired
+    //// using Windows' settings on Win OS.
+    //// Create the agent to perform device discovery and populate the address list box
+    //// with candidate items.
+    //// If the address line edit field has not been filled with a stored peripheral address,
+    //// prompt the user to double click to select a device.
+    ////
+    //if(m_agent.isNull())
+    //{
+    //  m_agent.reset(new QBluetoothDeviceDiscoveryAgent(this));
 
-      connect(m_agent.data(), &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
-           this, &BluetoothLEManager::deviceDiscoveredInternal);
+    //  connect(m_agent.data(), &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
+    //       this, &BluetoothLEManager::deviceDiscoveredInternal);
 
-      connect(m_agent.data(), QOverload<QBluetoothDeviceDiscoveryAgent::Error>::of(&QBluetoothDeviceDiscoveryAgent::error),
-            this,[](QBluetoothDeviceDiscoveryAgent::Error error)
-        {
-          QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),Qt::SkipEmptyParts);
-        }
-      );
+    //  connect(m_agent.data(), QOverload<QBluetoothDeviceDiscoveryAgent::Error>::of(&QBluetoothDeviceDiscoveryAgent::error),
+    //        this,[](QBluetoothDeviceDiscoveryAgent::Error error)
+    //    {
+    //      QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),Qt::SkipEmptyParts);
+    //    }
+    //  );
 
-      connect(m_agent.data(), &QBluetoothDeviceDiscoveryAgent::finished,
-            this, &BluetoothLEManager::discoveryCompleteInternal);
+    //  connect(m_agent.data(), &QBluetoothDeviceDiscoveryAgent::finished,
+    //        this, &BluetoothLEManager::discoveryCompleteInternal);
 
-      connect(m_agent.data(), &QBluetoothDeviceDiscoveryAgent::canceled,
-              this, &BluetoothLEManager::discoveryCompleteInternal);
-    }
+    //  connect(m_agent.data(), &QBluetoothDeviceDiscoveryAgent::canceled,
+    //          this, &BluetoothLEManager::discoveryCompleteInternal);
+    //}
 
-    m_agent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+    //m_agent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
 }
 
 bool BluetoothLEManager::isPairedTo(const QString &label) const
@@ -186,7 +190,24 @@ void BluetoothLEManager::serviceDiscoveryComplete()
 
 void BluetoothLEManager::measure()
 {
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/thermometer/output.json"
+    );
 
+    if (results.empty()) return;
+
+    results["uuid"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
+
+    qDebug() << "measure called";
 }
 
 void BluetoothLEManager::infoServiceStateChanged(QLowEnergyService::ServiceState state)

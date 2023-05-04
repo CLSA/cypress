@@ -2,10 +2,8 @@
 #include <QJsonObject>
 #include <QStringList>
 
-#include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
 
 ApSpineMeasurement::ApSpineMeasurement()
 {

@@ -73,6 +73,7 @@ bool CypressApplication::forceSessionEnd()
 
 bool CypressApplication::startTest(const Constants::MeasureType& type, const QJsonObject& requestData)
 {
+    qDebug("starta test");
     try
     {
         qDebug() << "REQUEST Data: " << requestData;

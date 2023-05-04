@@ -83,13 +83,35 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) return;
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/spirometer/output.json"
+    );
 
-    qDebug() << "Starting process from measure";
-    clearData();
+    QJsonObject response {
+        { "answer_id", m_answerId },
+        { "session_id", m_uuid },
+    };
 
-    // launch the process
-    m_process.start();
+    results["cypress_session"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    if (results.empty()) return;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
+
+    //if (CypressApplication::getInstance().isSimulation()) return;
+
+    //qDebug() << "Starting process from measure";
+    //clearData();
+
+    //// launch the process
+    //m_process.start();
 }
 
 void SpirometerManager::select()

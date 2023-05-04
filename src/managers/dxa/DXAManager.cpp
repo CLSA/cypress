@@ -8,6 +8,7 @@
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "managers/dxa/DXAManager.h"
+#include "auxiliary/JsonSettings.h"
 
 
 
@@ -19,7 +20,7 @@ DXAManager::DXAManager(): m_dicomWatcher(QDir::currentPath())
 DXAManager::~DXAManager()
 {
     //m_dicomSCP->stop();
-    delete m_dicomSCP;
+    //delete m_dicomSCP;
 }
 
 
@@ -41,17 +42,34 @@ void DXAManager::start()
 //
 void DXAManager::measure()
 {
-    QVariantMap participantData = getParticipantData();
-    if (validatedDicomFiles.empty()) return;
+    //QVariantMap participantData = getParticipantData();
+    //if (validatedDicomFiles.empty()) return;
 
-    QVariantMap scanAnalysisData = extractScanAnalysisData();
-    if (scanAnalysisData.isEmpty()) return;
+    //QVariantMap scanAnalysisData = extractScanAnalysisData();
+    //if (scanAnalysisData.isEmpty()) return;
 
-    QVariantMap scores = computeTandZScores();
-    if (scores.isEmpty()) return;
+    //QVariantMap scores = computeTandZScores();
+    //if (scores.isEmpty()) return;
 
-    scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
-    scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
+    //scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
+    //scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
+
+    QJsonObject results = JsonSettings::readJsonFromFile(
+        "C:/work/clsa/cypress/src/tests/fixtures/ultrasound/output.json"
+    );
+
+    results["cypress_session"] = m_uuid;
+    results["answer_id"] = m_answerId;
+    results["barcode"] = m_barcode;
+    results["interviewer"] = m_interviewer;
+
+    if (results.empty()) return;
+
+    bool ok = sendResultsToPine(results);
+    if (!ok)
+    {
+        qDebug() << "Could not send results to Pine";
+    }
 }
 
 // implementation of final clean up of device after disconnecting and all
