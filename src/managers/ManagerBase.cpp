@@ -39,6 +39,7 @@ bool ManagerBase::sendResultsToPine(const QJsonObject& results)
             "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
         );
         Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
+
         //Poco::Net::SocketAddress address("drummer.clsa-elcv.ca:443");
         //Poco::Net::SecureStreamSocket socket(address);
         //if (socket.havePeerCertificate())
