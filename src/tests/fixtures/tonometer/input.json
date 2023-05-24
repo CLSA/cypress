@@ -1,7 +1,8 @@
 {
-  "barcode":"12345678",
-  "language":"en",
-  "interviewer_id":"jdoe",
-  "sex":"male",
-  "date_of_birth":"1958-05-21"
+  "answer_id": null,
+  "barcode": "string",
+  "language": "en | fr",
+  "interviewer": "default",
+  "sex": "male",
+  "date_of_birth": "1958-05-21"
 }

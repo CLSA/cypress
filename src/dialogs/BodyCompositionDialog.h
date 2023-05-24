@@ -9,7 +9,7 @@ class BodyCompositionDialog : public DialogBase, public Ui::BodyCompositionDialo
     Q_OBJECT
 
 public:
-    BodyCompositionDialog();
+    BodyCompositionDialog(QJsonObject inputData);
     ~BodyCompositionDialog();
 
 private:

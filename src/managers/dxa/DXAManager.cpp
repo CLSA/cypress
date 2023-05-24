@@ -10,11 +10,13 @@
 #include "managers/dxa/DXAManager.h"
 #include "auxiliary/JsonSettings.h"
 
+#include "CypressApplication.h"
 
 
-DXAManager::DXAManager(): m_dicomWatcher(QDir::currentPath())
+DXAManager::DXAManager(QJsonObject inputData) /* : m_dicomWatcher(QDir::currentPath())*/
 {
-
+    m_inputData = jsonObjectToVariantMap(inputData);
+    qDebug() << "DXA inputData: " << inputData;
 }
 
 DXAManager::~DXAManager()
@@ -42,6 +44,12 @@ void DXAManager::start()
 //
 void DXAManager::measure()
 {
+    qDebug() << "measure";
+    if (CypressApplication::getInstance().isSimulation()) {
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/dxa/output.json");
+        return;
+    }
+
     //QVariantMap participantData = getParticipantData();
     //if (validatedDicomFiles.empty()) return;
 
@@ -54,22 +62,22 @@ void DXAManager::measure()
     //scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
     //scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
 
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/ultrasound/output.json"
-    );
+    //QJsonObject results = JsonSettings::readJsonFromFile(
+    //    "C:/work/clsa/cypress/src/tests/fixtures/ultrasound/output.json"
+    //);
 
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
 
-    if (results.empty()) return;
+    //if (results.empty()) return;
 
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
-    }
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 }
 
 // implementation of final clean up of device after disconnecting and all
@@ -77,7 +85,7 @@ void DXAManager::measure()
 //
 void DXAManager::finish()
 {
-    endDicomServer();
+    //endDicomServer();
 }
 
 bool DXAManager::isCompleteDicom(DcmFileFormat &file)
@@ -157,12 +165,14 @@ QList<DcmFileFormat> DXAManager::getValidatedFiles(QStringList filePaths)
 
 bool DXAManager::startDicomServer()
 {
-    return m_dicomSCP->start();
+    //return m_dicomSCP->start();
+    return true;
 }
 
 bool DXAManager::endDicomServer()
 {
-    return m_dicomSCP->stop();
+    //return m_dicomSCP->stop();
+    return true;
 }
 
 void DXAManager::dicomServerExitNormal()

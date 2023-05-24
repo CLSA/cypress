@@ -15,9 +15,11 @@
 #include "WeighScaleManager.h"
 #include "CypressApplication.h"
 
-WeighScaleManager::WeighScaleManager()
+WeighScaleManager::WeighScaleManager(QJsonObject inputData)
 {
   m_test.setExpectedMeasurementCount(2);
+  m_inputData = jsonObjectToVariantMap(inputData);
+  qDebug() << "Weigh Scale: Input" << m_inputData;
 }
 
 bool WeighScaleManager::isAvailable()
@@ -33,21 +35,21 @@ bool WeighScaleManager::clearData()
 
 void WeighScaleManager::finish()
 {
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
-    );
-    if (results.empty()) return;
+    //QJsonObject results = JsonSettings::readJsonFromFile(
+    //    "C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
+    //);
+    //if (results.empty()) return;
 
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
 
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
-    }
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
     //m_deviceData.reset();
     //m_deviceList.clear();
     //m_test.reset();
@@ -103,10 +105,13 @@ void WeighScaleManager::zeroDevice()
 
 void WeighScaleManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) return;
+    if (CypressApplication::getInstance().isSimulation()) {
+      sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
+      return;
+    };
 
-    m_request = QByteArray("p");
-    writeDevice();
+    //m_request = QByteArray("p");
+    //writeDevice();
 }
 
 void WeighScaleManager::readDevice()

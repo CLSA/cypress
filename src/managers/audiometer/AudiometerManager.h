@@ -28,7 +28,7 @@ class AudiometerManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit AudiometerManager();
+    explicit AudiometerManager(QJsonObject inputData);
 
     static QByteArray initEndCode();
     static QByteArray END_CODE;

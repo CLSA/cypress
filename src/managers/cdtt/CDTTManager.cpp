@@ -12,9 +12,11 @@
 
 #include "CDTTManager.h"
 
-CDTTManager::CDTTManager()
+CDTTManager::CDTTManager(QJsonObject inputData)
 {
     m_test.setMinimumMeasurementCount(1);
+    m_inputData = jsonObjectToVariantMap(inputData);
+    qDebug() << "CDTT input data: " << m_inputData;
 }
 
 CDTTManager::~CDTTManager()
@@ -36,8 +38,8 @@ void CDTTManager::start()
     //        qDebug() << "process started: " << m_process.arguments().join(" ");
     //    });
 
-    ////connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-    ////    this, &CDTTManager::readOutput);
+    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    //    this, &CDTTManager::readOutput);
 
     //connect(&m_process, &QProcess::errorOccurred,
     //    this, [](QProcess::ProcessError error)
@@ -60,23 +62,22 @@ void CDTTManager::start()
 
 void CDTTManager::measure()
 {
-    //if (CypressApplication::getInstance().isSimulation()) return;
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json"
-    );
+    if (CypressApplication::getInstance().isSimulation()) {
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/cdtt/output.json");
+    };
 
-    if (results.empty()) return;
+    //if (results.empty()) return;
 
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
 
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
-    }
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 
     //clearData();
 
@@ -87,7 +88,7 @@ void CDTTManager::measure()
 bool CDTTManager::clearData()
 {
     //m_test.reset();
-    //return true;
+    return true;
 }
 
 void CDTTManager::finish()

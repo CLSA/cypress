@@ -2,6 +2,8 @@
 //#include "auxiliary/tracker5util.h"
 #include "auxiliary/JsonSettings.h"
 
+#include "CypressApplication.h"
+
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlRecord>
@@ -11,34 +13,35 @@
 #include <QFile>
 #include <QtSql>
 
-GripStrengthManager::GripStrengthManager(QObject *parent)
+GripStrengthManager::GripStrengthManager(QJsonObject inputData)
 {
-    Q_UNUSED(parent);
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    m_workingDirPath = settings.value("instruments/grip_strength/working_dir").toString();
-    if (m_workingDirPath.isEmpty() || m_workingDirPath.isNull())
-    {
-        const QString error = "working directory path for tracker 5 is not defined";
-        qCritical() << error;
-        throw std::runtime_error(error.toStdString());
-    }
+    //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    //m_workingDirPath = settings.value("instruments/grip_strength/working_dir").toString();
+    //if (m_workingDirPath.isEmpty() || m_workingDirPath.isNull())
+    //{
+    //    const QString error = "working directory path for tracker 5 is not defined";
+    //    qCritical() << error;
+    //    throw std::runtime_error(error.toStdString());
+    //}
 
-    m_executablePath = settings.value("instruments/grip_strength/executable").toString();
-    if (m_executablePath.isEmpty() || m_executablePath.isNull())
-    {
-        const QString error = "executable path for Tracker 5 is not defined";
-        qCritical() << error;
-        throw std::runtime_error(error.toStdString());
-    }
+    //m_executablePath = settings.value("instruments/grip_strength/executable").toString();
+    //if (m_executablePath.isEmpty() || m_executablePath.isNull())
+    //{
+    //    const QString error = "executable path for Tracker 5 is not defined";
+    //    qCritical() << error;
+    //    throw std::runtime_error(error.toStdString());
+    //}
 
-    m_databaseName = settings.value("instruments/grip_strength/databaseName").toString();
-    if (m_databaseName.isEmpty() || m_databaseName.isNull())
-    {
-        const QString error = "database name is not defined";
-        qCritical() << error;
-        throw std::runtime_error(error.toStdString());
-    }
+    //m_databaseName = settings.value("instruments/grip_strength/databaseName").toString();
+    //if (m_databaseName.isEmpty() || m_databaseName.isNull())
+    //{
+    //    const QString error = "database name is not defined";
+    //    qCritical() << error;
+    //    throw std::runtime_error(error.toStdString());
+    //}
+
+    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 GripStrengthManager::~GripStrengthManager()
@@ -58,22 +61,22 @@ void GripStrengthManager::measure()
     //    emit canFinish();
     //}
 
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/grip_strength/output.json"
-    );
-
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
-
-    if (results.empty()) return;
-
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
+    if (CypressApplication::getInstance().isSimulation()) {
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/grip_strength/output.json");
     }
+
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
+
+    //if (results.empty()) return;
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 }
 
 void GripStrengthManager::finish()
@@ -110,7 +113,7 @@ bool GripStrengthManager::setUp() {
 
     //m_process.waitForStarted();
 
-    //return true;
+    return true;
 }
 
 bool GripStrengthManager::cleanUp() {

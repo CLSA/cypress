@@ -3,19 +3,17 @@
 
 #include "DialogBase.h"
 #include "ui_gripstrengthdialog.h"
-#include "managers/grip_strength/GripStrengthManager.h"
 
 class GripStrengthDialog : public DialogBase, public Ui::GripStrengthDialog
 {
     Q_OBJECT
 
 public:
-    explicit GripStrengthDialog();
+    explicit GripStrengthDialog(QJsonObject inputData);
     ~GripStrengthDialog();
 
 private:
     Ui::GripStrengthDialog *ui;
-    GripStrengthManager m_manager;
 
     void initializeConnections() override;
     void initializeModel() override;

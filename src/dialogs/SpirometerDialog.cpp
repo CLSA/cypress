@@ -1,16 +1,17 @@
 #include "SpirometerDialog.h"
 #include "managers/spirometer/SpirometerManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 
-SpirometerDialog::SpirometerDialog(): ui(new Ui::RunnableDialog)
+SpirometerDialog::SpirometerDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new SpirometerManager());
+    m_manager.reset(new SpirometerManager(inputData));
     this->setWindowTitle("Spirometer");
 }
 
@@ -27,7 +28,11 @@ void SpirometerDialog::initializeConnections()
   QSharedPointer<SpirometerManager> derived =
     m_manager.staticCast<SpirometerManager>();
 
-  // Disable all buttons by default
+    if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+
+  } else {
+      // Disable all buttons by default
   //
   foreach(auto button, this->findChildren<QPushButton *>())
   {
@@ -39,6 +44,9 @@ void SpirometerDialog::initializeConnections()
       button->setDefault(false);
       button->setAutoDefault(false);
   }
+
+    }
+
 
   // Relay messages from the manager to the status bar
   //

@@ -26,7 +26,7 @@ class CDTTManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit CDTTManager();
+    explicit CDTTManager(QJsonObject inputData);
     ~CDTTManager();
 
     bool isAvailable();

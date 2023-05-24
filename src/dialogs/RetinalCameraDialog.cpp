@@ -5,12 +5,8 @@
 #include "managers/retinal_camera/RetinalCameraManager.h"
 #include "ui_RetinalCameraDialog.h"
 
-RetinalCameraDialog::RetinalCameraDialog(QString uuid) : ui(new Ui::RetinalCameraDialog)
+RetinalCameraDialog::RetinalCameraDialog(QJsonObject inputData) : ui(new Ui::RetinalCameraDialog)
 {
-    qDebug() << "RetinalCameraDialog::RetinalCameraDialog(" << uuid << ")";
-
-    m_uuid = uuid;
-
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
@@ -22,7 +18,7 @@ RetinalCameraDialog::RetinalCameraDialog(QString uuid) : ui(new Ui::RetinalCamer
         setWindowTitle("Retinal Camera");
     }
 
-    m_manager.reset(new RetinalCameraManager(m_uuid));
+    m_manager.reset(new RetinalCameraManager(inputData));
     this->run();
 }
 

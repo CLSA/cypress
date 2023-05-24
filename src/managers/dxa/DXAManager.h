@@ -31,10 +31,10 @@ class DXAManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit DXAManager();
+    explicit DXAManager(QJsonObject inputData);
     ~DXAManager();
 
-    DicomSCP* m_dicomSCP;
+    //DicomSCP* m_dicomSCP;
     bool isAvailable();
 
     QJsonObject scanAnalysisJson;
@@ -73,9 +73,8 @@ private:
     IVAImagingTest m_ivaImagingTest;
     WholeBodyScanTest m_wholeBodyTest;
 
-    DicomDirectoryWatcher m_dicomWatcher;
-    DcmRecv m_dcmRecv;
-
+    //DicomDirectoryWatcher m_dicomWatcher;
+    //DcmRecv m_dcmRecv;
 
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;

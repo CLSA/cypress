@@ -1,15 +1,16 @@
 #include "WeighScaleDialog.h"
 #include "managers/weigh_scale/WeighScaleManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QMessageBox>
 
-WeighScaleDialog::WeighScaleDialog(): ui(new Ui::WeighScaleDialog)
+WeighScaleDialog::WeighScaleDialog(QJsonObject inputData): ui(new Ui::WeighScaleDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new WeighScaleManager());
+    m_manager.reset(new WeighScaleManager(inputData));
 }
 
 WeighScaleDialog::~WeighScaleDialog()
@@ -28,8 +29,13 @@ void WeighScaleDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
+
+  if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+  }
+  else {
+      foreach(auto button, this->findChildren<QPushButton *>())
+        {
       if("Close" != button->text())
         button->setEnabled(false);
 
@@ -38,6 +44,9 @@ void WeighScaleDialog::initializeConnections()
       button->setDefault(false);
       button->setAutoDefault(false);
   }
+  }
+
+
 
   // Relay messages from the manager to the status bar
   //

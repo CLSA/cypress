@@ -15,9 +15,10 @@
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
-ChoiceReactionManager::ChoiceReactionManager()
+ChoiceReactionManager::ChoiceReactionManager(QJsonObject inputData)
 {
-
+    m_inputData = jsonObjectToVariantMap(inputData);
+    qDebug() << "ChoiceReactionManager inputData: " << m_inputData;
 }
 
 bool ChoiceReactionManager::isAvailable()
@@ -68,22 +69,24 @@ void ChoiceReactionManager::readOutput()
 
 void ChoiceReactionManager::measure()
 {
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/choice_reaction/output.json"
-    );
-
-    if (results.empty()) return;
-
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
-
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
+    if (CypressApplication::getInstance().isSimulation()) {
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/choice_reaction/output.json");
+        return;
     }
+
+
+    //if (results.empty()) return;
+
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 }
 
 void ChoiceReactionManager::finish()

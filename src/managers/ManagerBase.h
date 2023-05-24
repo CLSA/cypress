@@ -77,6 +77,8 @@ protected:
 
     QVariant getInputDataValue(const QString &);
 
+    QVariantMap jsonObjectToVariantMap(const QJsonObject& jsonObject);
+
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
 
@@ -100,6 +102,9 @@ protected:
     // Send the test results to Pine for storage & analysis
     virtual bool sendResultsToPine(const QJsonObject& data);
     virtual bool sendFileToPine(const QByteArray& rawData, const QString& fileName);
+
+    virtual void sendJsonData(const QString& filePath);
+    virtual void sendOctetStream(const QString& filePath);
 };
 
 #endif // MANAGERBASE_H

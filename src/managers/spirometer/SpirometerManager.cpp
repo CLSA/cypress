@@ -9,13 +9,14 @@
 
 #include "managers/emr/EMRPluginWriter.h"
 
-SpirometerManager::SpirometerManager()
+SpirometerManager::SpirometerManager(QJsonObject inputData)
 {
     //TODO: check if these upstream inputs are optional or required
     //
     //m_inputKeyList << "asthma"; // true/false
     //m_inputKeyList << "copd";   // true/false
     //m_inputKeyList << "ethnicity"; // caucasian, asian, african, hispanic, other_ethnic
+    m_inputData = jsonObjectToVariantMap(inputData);
 
     m_test.setExpectedMeasurementCount(4);
 }
@@ -28,7 +29,10 @@ bool SpirometerManager::isAvailable()
 void SpirometerManager::start()
 {
 
-    if (CypressApplication::getInstance().isSimulation()) return;
+    if (CypressApplication::getInstance().isSimulation()) {
+
+        return;
+    }
 
     // connect signals and slots to QProcess one time only
     //
@@ -83,27 +87,28 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::measure()
 {
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/spirometer/output.json"
-    );
-
-    QJsonObject response {
-        { "answer_id", m_answerId },
-        { "session_id", m_uuid },
-    };
-
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
-
-    if (results.empty()) return;
-
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
+    if (CypressApplication::getInstance().isSimulation()) {
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/spirometer/output.json");
+        return;
     }
+
+    //QJsonObject response {
+    //    { "answer_id", m_answerId },
+    //    { "session_id", m_uuid },
+    //};
+
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
+
+    //if (results.empty()) return;
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 
     //if (CypressApplication::getInstance().isSimulation()) return;
 

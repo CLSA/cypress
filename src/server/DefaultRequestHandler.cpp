@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QDebug>
 
+#include <Poco/StreamCopier.h>
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
@@ -32,6 +33,23 @@ void DefaultRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
     out.flush();
 }
 
+QJsonObject DefaultRequestHandler::getRequestData(Poco::Net::HTTPServerRequest &request) {
+    // Step 1: Extract data from request
+    std::istream& iStream = request.stream();
+    std::string requestData;
+    Poco::StreamCopier::copyToString(iStream, requestData);
+
+    // Step 2: Convert to QString
+    QString qRequestData = QString::fromStdString(requestData);
+
+    // Step 3: Parse JSON data
+    QJsonDocument doc = QJsonDocument::fromJson(qRequestData.toUtf8());
+
+    // Step 4: Get JSON object
+    QJsonObject json = doc.object();
+
+    return json;
+}
 
 QJsonObject DefaultRequestHandler::getResponseData() {
     QJsonObject responseData {{ "sessionId", QUuid::createUuid().toString(QUuid::WithoutBraces) }};

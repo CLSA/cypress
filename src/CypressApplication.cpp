@@ -73,16 +73,11 @@ bool CypressApplication::forceSessionEnd()
 
 bool CypressApplication::startTest(const Constants::MeasureType& type, const QJsonObject& requestData)
 {
-    qDebug("starta test");
     try
     {
-        qDebug() << "REQUEST Data: " << requestData;
-        qDebug() << isSimulation();
-        qDebug() << isVerbose();
-
+        qDebug() << "REQUEST: " << requestData;
         DialogFactory* factory = DialogFactory::instance();
-
-        dialog = factory->instantiate(type);
+        dialog = factory->instantiate(type, requestData);
         if(dialog == Q_NULLPTR) {
             QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
             return false;

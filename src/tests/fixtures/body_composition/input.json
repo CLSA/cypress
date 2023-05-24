@@ -1,6 +1,8 @@
 {
-  "barcode": "12345678",
-  "language":"en",
+  "answer_id": 1,
+  "barcode": "string",
+  "language": "en | fr",
+  "interviewer": "string",
   "age":56,
   "height":170,
   "gender":"male"

@@ -1,15 +1,11 @@
 {
-    "metadata": {
-        "user": "",
-        "timeStart": "",
-        "timeEnd": "",
-        "otherContraindication": "",
-        "skipComment": "",
-        "instrumentBarcode": ""
-    },
-    "results": [
-        {
-            "side": ""
-        }
-    ]
+  "answer_id": "",
+  "barcode": "",
+  "language": "en",
+  "interviewer": "john doe",
+  "results": [
+    {
+      "side": ""
+    }
+  ]
 }

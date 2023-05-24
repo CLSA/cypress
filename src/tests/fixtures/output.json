@@ -1,0 +1,19 @@
+{
+  "answer_id": "",
+  "barcode": "",
+  "language": "en",
+  "interviewer": "john doe",
+  "device": {
+    "port_description": "sim",
+    "port_manufacturer": "sim",
+    "port_name": "sim",
+    "port_product_id": "sim",
+    "port_serial_number": "sim",
+    "port_system_location": "sim",
+    "port_vendor_id": "sim",
+    "software_id": "sim"
+  },
+  "results": [
+    {}
+  ]
+}

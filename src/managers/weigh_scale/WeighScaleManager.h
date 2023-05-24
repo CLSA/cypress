@@ -22,7 +22,7 @@ class WeighScaleManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit WeighScaleManager();
+    explicit WeighScaleManager(QJsonObject inputData);
 
     bool isAvailable();
 

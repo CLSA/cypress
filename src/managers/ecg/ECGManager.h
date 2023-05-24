@@ -28,7 +28,7 @@ class ECGManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ECGManager();
+    explicit ECGManager(QJsonObject inputData);
 
     // is the passed string an executable file
     // with the correct path elements ?

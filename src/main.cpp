@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setOrganizationDomain(orgDomain);
     QGuiApplication::setApplicationName(appName);
     QGuiApplication::setApplicationVersion(appVersion);
+    QGuiApplication::setQuitOnLastWindowClosed(false);
 
     QApplication app(argc, argv);
     QStringList appArguments = QCoreApplication::arguments();

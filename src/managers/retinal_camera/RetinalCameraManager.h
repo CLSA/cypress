@@ -13,7 +13,7 @@ class RetinalCameraManager: public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit RetinalCameraManager(QString uuid = "");
+    explicit RetinalCameraManager(QJsonObject inputData);
     ~RetinalCameraManager();
 
     QJsonDocument m_exam;

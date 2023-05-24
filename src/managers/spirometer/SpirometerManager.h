@@ -15,7 +15,7 @@ class SpirometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit SpirometerManager();
+    explicit SpirometerManager(QJsonObject inputData);
     ~SpirometerManager() = default;
 
     bool isDefined(const QString&, const SpirometerManager::FileType&) const;

@@ -9,7 +9,7 @@ class SpirometerDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    explicit SpirometerDialog();
+    explicit SpirometerDialog(QJsonObject inputData);
     ~SpirometerDialog();
 
 private:

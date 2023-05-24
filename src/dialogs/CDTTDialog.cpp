@@ -5,14 +5,16 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-CDTTDialog::CDTTDialog(): ui(new Ui::RunnableDialog)
+#include "CypressApplication.h"
+
+CDTTDialog::CDTTDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     this->setWindowTitle("Canadian Digit Triplet Test");
 
-    m_manager.reset(new CDTTManager());
+    m_manager.reset(new CDTTManager(inputData));
 }
 
 CDTTDialog::~CDTTDialog()
@@ -29,8 +31,13 @@ void CDTTDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
+
+  if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+  }
+  else {
+      foreach(auto button, this->findChildren<QPushButton *>())
+        {
       if("Close" != button->text())
         button->setEnabled(false);
 
@@ -38,7 +45,9 @@ void CDTTDialog::initializeConnections()
       //
       button->setDefault(false);
       button->setAutoDefault(false);
+        }
   }
+
 
   // Relay messages from the manager to the status bar
   //

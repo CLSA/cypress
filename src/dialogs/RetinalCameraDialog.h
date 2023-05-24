@@ -13,12 +13,10 @@ class RetinalCameraDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit RetinalCameraDialog(QString uuid = "");
+    explicit RetinalCameraDialog(QJsonObject inputData);
     ~RetinalCameraDialog();
 
 private:
-
-
     Ui::RetinalCameraDialog *ui;
 
     void initializeModel() override;

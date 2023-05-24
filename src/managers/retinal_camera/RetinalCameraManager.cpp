@@ -8,12 +8,13 @@
 
 #include "RetinalCameraManager.h"
 #include "qsqlerror.h"
+#include "CypressApplication.h"
 
 #include "../../data/retinal_camera/databasemanager.h"
 
-RetinalCameraManager::RetinalCameraManager(QString uuid): m_uuid { uuid }
+RetinalCameraManager::RetinalCameraManager(QJsonObject inputData)
 {
-    start();
+    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 
@@ -185,34 +186,37 @@ bool RetinalCameraManager::startRetinalCamera()
 
 void RetinalCameraManager::measure()
 {
-    qDebug() << "RetinalCameraManager::measure";
-
-    QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
-    qDebug() << "RetinalCameraManager::finish - left data: " << leftData;
-
-    QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
-    qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
-
-    QJsonObject response {
-        { "cypress_session", m_uuid },
-        { "answer_id", m_answerId },
-    };
-
-    response["cypress_session"] = m_uuid;
-    response["answer_id"] = m_answerId;
-    response["barcode"] = m_barcode;
-    response["interviewer"] = m_interviewer;
-
-    sendResultsToPine(response);
-
-    if (!leftData["EYE_PICT_VENDOR"].isNull())
-    {
-        sendFileToPine(leftData["EYE_PICT_VENDOR"].toByteArray(), "left_eye.jpeg");
+    if (CypressApplication::getInstance().isSimulation()) {
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/retinal_camera/output.json");
     }
-    if (!rightData["EYE_PICT_VENDOR"].isNull())
-    {
-        sendFileToPine(rightData["EYE_PICT_VENDOR"].toByteArray(), "right_eye.jpeg");
-    }
+    //qDebug() << "RetinalCameraManager::measure";
+
+    //QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
+    //qDebug() << "RetinalCameraManager::finish - left data: " << leftData;
+
+    //QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
+    //qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
+
+    //QJsonObject response {
+    //    { "cypress_session", m_uuid },
+    //    { "answer_id", m_answerId },
+    //};
+
+    //response["cypress_session"] = m_uuid;
+    //response["answer_id"] = m_answerId;
+    //response["barcode"] = m_barcode;
+    //response["interviewer"] = m_interviewer;
+
+    //sendResultsToPine(response);
+
+    //if (!leftData["EYE_PICT_VENDOR"].isNull())
+    //{
+    //    sendFileToPine(leftData["EYE_PICT_VENDOR"].toByteArray(), "left_eye.jpeg");
+    //}
+    //if (!rightData["EYE_PICT_VENDOR"].isNull())
+    //{
+    //    sendFileToPine(rightData["EYE_PICT_VENDOR"].toByteArray(), "right_eye.jpeg");
+    //}
 }
 
 // Context dependent clear test data and possibly device data (eg., serial port info)

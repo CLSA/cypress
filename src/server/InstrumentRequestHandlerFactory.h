@@ -33,20 +33,8 @@ public:
     static HTTPRequestHandler* createBloodPressureRequestHandler();
     static HTTPRequestHandler* createBloodPressureStatusRequestHandler();
 
-    //static HTTPRequestHandler* createDXAForearmRequestHandler();
-    //static HTTPRequestHandler* createDXAForearmStatusRequestHandler();
-
-    //static HTTPRequestHandler* createDXAHipRequestHandler();
-    //static HTTPRequestHandler* createDXAHipStatusRequestHandler();
-
-    //static HTTPRequestHandler* createDXASpineRequestHandler();
-    //static HTTPRequestHandler* createDXASpineStatusRequestHandler();
-
-    //static HTTPRequestHandler* createDXAIvaRequestHandler();
-    //static HTTPRequestHandler* createDXAIvaStatusRequestHandler();
-
-    //static HTTPRequestHandler* createDXAWholeBodyRequestHandler();
-    //static HTTPRequestHandler* createDXAWholeBodyStatusRequestHandler();
+    static HTTPRequestHandler* createDxaRequestHandler();
+    static HTTPRequestHandler* createDxaStatusRequestHandler();
 
     static HTTPRequestHandler* createUltrasoundRequestHandler();
     static HTTPRequestHandler* createUltrasoundStatusRequestHandler();

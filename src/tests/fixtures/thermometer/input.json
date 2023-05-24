@@ -1,4 +1,6 @@
 {
-  "barcode":"12345678",
-  "language":"en"
+  "answer_id": 1,
+  "barcode": "string",
+  "language": "en | fr",
+  "interviewer": "string"
 }

@@ -11,6 +11,7 @@ public:
 
 protected:
     virtual QJsonObject getResponseData();
+    virtual QJsonObject getRequestData(Poco::Net::HTTPServerRequest &request);
 };
 
 #endif // DEFAULTREQUESTHANDLER_H

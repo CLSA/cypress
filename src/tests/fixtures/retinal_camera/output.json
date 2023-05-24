@@ -1,23 +1,17 @@
 {
-    "request": {
-        "participantID": ""
+  "answer_id": "",
+  "barcode": "",
+  "language": "en",
+  "interviewer": "patrick",
+  "device": {},
+  "results": [
+    {
+      "SIDE": "LEFT",
+      "EYE": ""
     },
-    "metadata": {
-        "user": "",
-        "timeStart": "",
-        "timeEnd": "",
-        "otherContraindication": "",
-        "skipComment": "",
-        "instrumentBarcode": ""
-    },
-    "results": [
-        {
-            "SIDE": "LEFT",
-            "EYE": ""
-        },
-        {
-            "SIDE": "RIGHT",
-            "EYE": ""
-        }
-    ]
+    {
+      "SIDE": "RIGHT",
+      "EYE": ""
+    }
+  ]
 }

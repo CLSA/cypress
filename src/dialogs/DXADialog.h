@@ -14,7 +14,7 @@ class DXADialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit DXADialog(QString uuid = "");
+    explicit DXADialog(QJsonObject inputData);
     ~DXADialog();
 
 protected:
@@ -33,6 +33,7 @@ public slots:
 
 private slots:
     void on_openFileExplorer_released();
+    void on_submitButton_clicked();
 };
 
 #endif // DXADIALOG_H

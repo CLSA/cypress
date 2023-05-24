@@ -37,9 +37,11 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr)
     return ok;
 }
 
-AudiometerManager::AudiometerManager()
+AudiometerManager::AudiometerManager(QJsonObject inputData)
 {
     m_test.setExpectedMeasurementCount(16);
+    m_inputData = jsonObjectToVariantMap(inputData);
+    qDebug() << "m_inputdata: " << m_inputData;
 }
 
 bool AudiometerManager::isInstalled()
@@ -54,6 +56,8 @@ bool AudiometerManager::setUp()
 
 void AudiometerManager::setInputData(const QVariantMap& inputData)
 {
+    m_inputData = inputData;
+    qDebug() << "INPUT DATA";
     //if (inputData.value("participant_id").isNull())
     //{
     //    qDebug() << "no participant id";
@@ -68,24 +72,26 @@ void AudiometerManager::measure()
     //m_request = QByteArray::fromRawData(cmd, 3);
     //writeDevice();
 
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/audiometer/output.json"
-    );
-
-    if (results.empty()) return;
-
-    results["uuid"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
-
-    bool ok = sendResultsToPine(results);
-    if (!ok)
+    if (CypressApplication::getInstance().isSimulation())
     {
-        qDebug() << "Could not send results to Pine";
+      sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/audiometer/output.json");
+      return;
     }
 
-    qDebug() << "measure called";
+    //if (results.empty()) return;
+
+    //results["uuid"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
+
+    //qDebug() << "measure called";
 }
 
 void AudiometerManager::finish()

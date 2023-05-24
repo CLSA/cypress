@@ -12,12 +12,20 @@
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Path.h"
-
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
 #include <sstream>
 
 #include "auxiliary/JsonSettings.h"
+
+#include <QFile>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QVariantMap>
 
 ManagerBase::ManagerBase()
 {
@@ -25,6 +33,81 @@ ManagerBase::ManagerBase()
 
 ManagerBase::~ManagerBase()
 {
+}
+
+
+
+QVariantMap ManagerBase::jsonObjectToVariantMap(const QJsonObject& jsonObject)
+{
+    // Convert QJsonObject to QJsonDocument
+    QJsonDocument jsonDoc(jsonObject);
+
+    // Convert QJsonDocument to QByteArray
+    QByteArray byteArray = jsonDoc.toJson(QJsonDocument::Compact);
+
+    // Convert QByteArray to QJsonDocument
+    QJsonDocument convertedJsonDoc = QJsonDocument::fromJson(byteArray);
+
+    // Convert QJsonDocument to QVariantMap
+    QVariantMap variantMap = convertedJsonDoc.toVariant().toMap();
+
+    return variantMap;
+}
+
+void ManagerBase::sendOctetStream(const QString& filePath)
+{
+
+    QString answer_id = m_inputData["answer_id"].toString();
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Cannot open file for reading: " << qPrintable(file.errorString());
+        return;
+    }
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QNetworkRequest request;
+
+    request.setUrl(QUrl("http://127.0.0.1:5000/api/answer/" + answer_id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
+
+    QNetworkReply *reply = manager->post(request, file.readAll());
+
+    connect(reply, &QNetworkReply::finished, [reply]() {
+        if (reply->error()) {
+            qDebug() << "Error: " << reply->errorString();
+        } else {
+            qDebug() << "success";
+        }
+        reply->deleteLater();
+    });
+}
+
+void ManagerBase::sendJsonData(const QString& filePath)
+{
+    QString answer_id = m_inputData["answer_id"].toString();
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Cannot open file for reading: " << qPrintable(file.errorString());
+        return;
+    }
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QNetworkRequest request;
+
+    request.setUrl(QUrl("http://127.0.0.1:5000/api/answer/" + answer_id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply *reply = manager->post(request, file.readAll());
+
+    connect(reply, &QNetworkReply::finished, [reply]() {
+        if (reply->error()) {
+            qDebug() << "Error: " << reply->errorString();
+        } else {
+            qDebug() << "success";
+        }
+        reply->deleteLater();
+    });
+
 }
 
 bool ManagerBase::sendResultsToPine(const QJsonObject& results)
@@ -99,7 +182,8 @@ bool ManagerBase::sendFileToPine(const QByteArray& rawData, const QString& fileN
         //    Poco::Net::X509Certificate cert = socket.peerCertificate();
         //}
 
-        const QString& pinePath = QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + QString::number(m_answerId) + "?filename=" + fileName);
+        //const QString& pinePath = QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + QString::number(m_answerId) + "?filename=" + fileName);
+        const QString& pinePath = QString("http://127.0.0.1/patrick/pine/api/answer/" + QString::number(m_answerId) + "?filename=" + fileName);
         qDebug() << pinePath;
 
         Poco::URI uri(pinePath.toStdString());
@@ -129,9 +213,6 @@ bool ManagerBase::sendFileToPine(const QByteArray& rawData, const QString& fileN
         qDebug() << e.code();
         qDebug() << e.what();
     }
-}
 
-QJsonObject Utils::httpPost(const QJsonObject& data)
-{
-
+    return true;
 }

@@ -9,7 +9,7 @@ class TonometerDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    TonometerDialog();
+    TonometerDialog(QJsonObject inputData);
     ~TonometerDialog();
 
 private:

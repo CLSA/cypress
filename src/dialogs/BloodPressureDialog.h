@@ -9,7 +9,7 @@ class BloodPressureDialog : public DialogBase, public Ui::BloodPressureDialog
     Q_OBJECT
 
 public:
-    explicit BloodPressureDialog();
+    explicit BloodPressureDialog(QJsonObject inputData);
     ~BloodPressureDialog();
 
 private:

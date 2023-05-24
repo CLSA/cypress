@@ -17,36 +17,36 @@ Utils::Utils()
 
 }
 
-QJsonObject Utils::httpPost(const QJsonObject& data)
-{
-    try
-    {
-        QString dataString = JsonSettings::serializeJson(data);
-
-        URI uri("http://localhost:8000/");
-        HTTPClientSession session(uri.getHost(), uri.getPort());
-
-        std::string path(uri.getPathAndQuery());
-        if (path.empty()) path = "/";
-
-        HTTPRequest req(HTTPRequest::HTTP_PATCH, path, HTTPMessage::HTTP_1_1);
-
-        req.setContentType("application/json");
-        req.setContentLength(dataString.length());
-
-        std::ostream &os = session.sendRequest(req);
-        os << dataString.toStdString();
-
-        HTTPResponse res;
-
-        std::istream &is = session.receiveResponse(res);
-        std::stringstream ss;
-        StreamCopier::copyStream(is, ss);
-    }
-    catch (Exception &e)
-    {
-        qDebug() << e.what();
-    }
-
-    return QJsonObject();
-}
+//QJsonObject Utils::httpPost(const QJsonObject& data)
+//{
+//    try
+//    {
+//        QString dataString = JsonSettings::serializeJson(data);
+//
+//        URI uri("http://localhost:8000/");
+//        HTTPClientSession session(uri.getHost(), uri.getPort());
+//
+//        std::string path(uri.getPathAndQuery());
+//        if (path.empty()) path = "/";
+//
+//        HTTPRequest req(HTTPRequest::HTTP_PATCH, path, HTTPMessage::HTTP_1_1);
+//
+//        req.setContentType("application/json");
+//        req.setContentLength(dataString.length());
+//
+//        std::ostream &os = session.sendRequest(req);
+//        os << dataString.toStdString();
+//
+//        HTTPResponse res;
+//
+//        std::istream &is = session.receiveResponse(res);
+//        std::stringstream ss;
+//        StreamCopier::copyStream(is, ss);
+//    }
+//    catch (Exception &e)
+//    {
+//        qDebug() << e.what();
+//    }
+//
+//    return QJsonObject();
+//}

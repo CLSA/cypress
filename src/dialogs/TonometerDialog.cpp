@@ -1,16 +1,17 @@
 #include "TonometerDialog.h"
 #include "managers/tonometer/TonometerManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 
-TonometerDialog::TonometerDialog(): ui(new Ui::RunnableDialog)
+TonometerDialog::TonometerDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new TonometerManager());
+    m_manager.reset(new TonometerManager(inputData));
 
     this->setWindowTitle("Tonometer");
 }
@@ -34,6 +35,11 @@ void TonometerDialog::initializeConnections()
 
   // Disable all buttons by default
   //
+
+  if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+  }
+  else {
   foreach(auto button, this->findChildren<QPushButton *>())
   {
       if("Close" != button->text())
@@ -43,6 +49,7 @@ void TonometerDialog::initializeConnections()
       //
       button->setDefault(false);
       button->setAutoDefault(false);
+  }
   }
 
   // Relay messages from the manager to the status bar

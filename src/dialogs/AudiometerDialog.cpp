@@ -1,15 +1,16 @@
 #include "AudiometerDialog.h"
 #include "managers/audiometer/AudiometerManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QMessageBox>
 
-AudiometerDialog::AudiometerDialog(): ui(new Ui::AudiometerDialog)
+AudiometerDialog::AudiometerDialog(QJsonObject inputData): ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new AudiometerManager());
+    m_manager.reset(new AudiometerManager(inputData));
 }
 
 AudiometerDialog::~AudiometerDialog()
@@ -26,8 +27,14 @@ void AudiometerDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
+
+  if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+  }
+
+  else {
+      foreach(auto button, this->findChildren<QPushButton *>())
+    {
       if("Close" != button->text())
         button->setEnabled(false);
 
@@ -36,6 +43,8 @@ void AudiometerDialog::initializeConnections()
       button->setDefault(false);
       button->setAutoDefault(false);
   }
+  }
+
 
   // Relay messages from the manager to the status bar
   //

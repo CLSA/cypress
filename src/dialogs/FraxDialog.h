@@ -9,7 +9,7 @@ class FraxDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    explicit FraxDialog();
+    explicit FraxDialog(QJsonObject inputData);
     ~FraxDialog();
 
 private:

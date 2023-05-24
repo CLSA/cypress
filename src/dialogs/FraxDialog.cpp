@@ -1,16 +1,17 @@
 #include "FraxDialog.h"
 #include "managers/frax/FraxManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 
-FraxDialog::FraxDialog(): ui(new Ui::RunnableDialog)
+FraxDialog::FraxDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new FraxManager());
+    m_manager.reset(new FraxManager(inputData));
 
     this->setWindowTitle("Frax Test");
 }
@@ -29,6 +30,11 @@ void FraxDialog::initializeConnections()
 
   // Disable all buttons by default
   //
+
+  if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+  }
+  else {
   foreach(auto button, this->findChildren<QPushButton *>())
   {
       if("Close" != button->text())
@@ -38,6 +44,7 @@ void FraxDialog::initializeConnections()
       //
       button->setDefault(false);
       button->setAutoDefault(false);
+  }
   }
 
   // Relay messages from the manager to the status bar

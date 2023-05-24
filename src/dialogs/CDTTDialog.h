@@ -9,7 +9,7 @@ class CDTTDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    CDTTDialog();
+    CDTTDialog(QJsonObject inputData);
     ~CDTTDialog();
 
 private:

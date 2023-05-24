@@ -9,7 +9,7 @@ class WeighScaleDialog : public DialogBase, public Ui::WeighScaleDialog
     Q_OBJECT
 
 public:
-    explicit WeighScaleDialog();
+    explicit WeighScaleDialog(QJsonObject inputData);
     ~WeighScaleDialog();
 
 private:

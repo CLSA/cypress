@@ -17,12 +17,12 @@ QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='f
 
 win32 {
     # QtUsb
-    INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
-    LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
+    INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
+    LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
 
     # OpenSSL
-    INCLUDEPATH += "C:/OpenSSL-Win32/include"
-    LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
+    INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+    LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
     # POCO
     INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -33,9 +33,9 @@ win32 {
     LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
     # DCMTK
-    INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
-    INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
-    LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+    INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
+    INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
+    LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
     # Topaz Signature Pad
     INCLUDEPATH += $$PWD/../dep/SigLib/Include/
@@ -137,47 +137,37 @@ SOURCES += \
     server/InstrumentRequestHandlerFactory.cpp \
     server/Server.cpp \
     server/defaultdeletesessionrequesthandler.cpp \
-    server/handlers/BodyCompositionRequestHandler.cpp \
-    server/handlers/CDTTRequestHandler.cpp \
-    server/handlers/ChoiceReactionRequestHandler.cpp \
-    server/handlers/DxaDualHipBoneDensityHandler.cpp \
-    server/handlers/DxaForearmBoneDensityHandler.cpp \
-    server/handlers/DxaLateralBoneDensityHandler.cpp \
-    server/handlers/DxaRequestHandler.cpp \
-    server/handlers/DxaSpineBoneDensityHandler.cpp \
-    server/handlers/DxaWholeBodyBoneDensityHandler.cpp \
-    server/handlers/ECGRequestHandler.cpp \
-    server/handlers/EMRRequestHandler.cpp \
-    server/handlers/FraxRequestHandler.cpp \
-    server/handlers/GripStrengthRequestHandler.cpp \
-    server/handlers/RetinalCameraRequestHandler.cpp \
-    server/handlers/SpirometerRequestHandler.cpp \
-    server/handlers/TonometerRequestHandler.cpp \
-    server/handlers/UltrasoundRequestHandler.cpp \
-    server/handlers/WeighScaleRequestHandler.cpp \
-    server/handlers/audiometerrequesthandler.cpp \
-    server/handlers/audiometerstatusrequesthandler.cpp \
-    server/handlers/bloodpressurerequesthandler.cpp \
-    server/handlers/bloodpressurestatusrequesthandler.cpp \
-    server/handlers/bodycompositionstatusrequesthandler.cpp \
-    server/handlers/cdttstatusrequesthandler.cpp \
-    server/handlers/choicereactionstatusrequesthandler.cpp \
-    server/handlers/cypressstatusrequesthandler.cpp \
-    server/handlers/dxaforearmstatusrequesthandler.cpp \
-    server/handlers/dxahipstatusrequesthandler.cpp \
-    server/handlers/dxaivastatusrequesthandler.cpp \
-    server/handlers/dxaspinestatusrequesthandler.cpp \
-    server/handlers/dxawholebodystatusrequesthandler.cpp \
-    server/handlers/ecgstatusrequesthandler.cpp \
-    server/handlers/fraxstatusrequesthandler.cpp \
-    server/handlers/gripstrengthstatusrequesthandler.cpp \
-    server/handlers/retinalcamerastatusrequesthandler.cpp \
-    server/handlers/signaturepadrequesthandler.cpp \
-    server/handlers/signaturepadstatusrequesthandler.cpp \
-    server/handlers/spirometerstatusrequesthandler.cpp \
-    server/handlers/tonometerstatusrequesthandler.cpp \
-    server/handlers/ultrasoundstatusrequesthandler.cpp \
-    server/handlers/weighscalestatusrequesthandler.cpp \
+    server/handlers/body_composition_request_handler.cpp \
+    server/handlers/audiometer_request_handler.cpp \
+    server/handlers/audiometer_status_request_handler.cpp \
+    server/handlers/blood_pressure_request_handler.cpp \
+    server/handlers/blood_pressure_status_request_handler.cpp \
+    server/handlers/body_composition_status_request_handler.cpp \
+    server/handlers/cdtt_request_handler.cpp \
+    server/handlers/cdtt_status_request_handler.cpp \
+    server/handlers/choice_reaction_request_handler.cpp \
+    server/handlers/choice_reaction_status_request_handler.cpp \
+    server/handlers/cypress_status_request_handler.cpp \
+    server/handlers/dxa_request_handler.cpp \
+    server/handlers/dxa_status_request_handler.cpp \
+    server/handlers/ecg_request_handler.cpp \
+    server/handlers/ecg_status_request_handler.cpp \
+    server/handlers/frax_request_handler.cpp \
+    server/handlers/frax_status_request_handler.cpp \
+    server/handlers/grip_strength_request_handler.cpp \
+    server/handlers/grip_strength_status_request_handler.cpp \
+    server/handlers/retinal_camera_request_handler.cpp \
+    server/handlers/retinal_camera_status_request_handler.cpp \
+    server/handlers/signature_pad_request_handler.cpp \
+    server/handlers/signature_pad_status_request_handler.cpp \
+    server/handlers/spirometer_request_handler.cpp \
+    server/handlers/spirometer_status_request_handler.cpp \
+    server/handlers/tonometer_request_handler.cpp \
+    server/handlers/tonometer_status_request_handler.cpp \
+    server/handlers/ultrasound_request_handler.cpp \
+    server/handlers/ultrasound_status_request_handler.cpp \
+    server/handlers/weigh_scale_request_handler.cpp \
+    server/handlers/weigh_scale_status_request_handler.cpp \
     server/utils.cpp \
     widgets/BarcodeWidget.cpp \
     widgets/MeasureWidget.cpp \
@@ -292,46 +282,36 @@ HEADERS += \
     server/Server.h \
     server/defaultdeletesessionrequesthandler.h \
     server/handlers/BodyCompositionRequestHandler.h \
-    server/handlers/CDTTRequestHandler.h \
-    server/handlers/ChoiceReactionRequestHandler.h \
-    server/handlers/DxaDualHipBoneDensityHandler.h \
-    server/handlers/DxaForearmBoneDensityHandler.h \
-    server/handlers/DxaLateralBoneDensityHandler.h \
-    server/handlers/DxaRequestHandler.h \
-    server/handlers/DxaSpineBoneDensityHandler.h \
-    server/handlers/DxaWholeBodyBoneDensityHandler.h \
-    server/handlers/ECGRequestHandler.h \
-    server/handlers/EMRRequestHandler.h \
-    server/handlers/FraxRequestHandler.h \
-    server/handlers/GripStrengthRequestHandler.h \
-    server/handlers/RetinalCameraRequestHandler.h \
-    server/handlers/SpirometerRequestHandler.h \
-    server/handlers/TonometerRequestHandler.h \
-    server/handlers/UltrasoundRequestHandler.h \
-    server/handlers/WeighScaleRequestHandler.h \
-    server/handlers/audiometerrequesthandler.h \
-    server/handlers/audiometerstatusrequesthandler.h \
-    server/handlers/bloodpressurerequesthandler.h \
-    server/handlers/bloodpressurestatusrequesthandler.h \
-    server/handlers/bodycompositionstatusrequesthandler.h \
-    server/handlers/cdttstatusrequesthandler.h \
-    server/handlers/choicereactionstatusrequesthandler.h \
-    server/handlers/cypressstatusrequesthandler.h \
-    server/handlers/dxaforearmstatusrequesthandler.h \
-    server/handlers/dxahipstatusrequesthandler.h \
-    server/handlers/dxaivastatusrequesthandler.h \
-    server/handlers/dxaspinestatusrequesthandler.h \
-    server/handlers/dxawholebodystatusrequesthandler.h \
-    server/handlers/ecgstatusrequesthandler.h \
-    server/handlers/fraxstatusrequesthandler.h \
-    server/handlers/gripstrengthstatusrequesthandler.h \
-    server/handlers/retinalcamerastatusrequesthandler.h \
-    server/handlers/signaturepadrequesthandler.h \
-    server/handlers/signaturepadstatusrequesthandler.h \
-    server/handlers/spirometerstatusrequesthandler.h \
-    server/handlers/tonometerstatusrequesthandler.h \
-    server/handlers/ultrasoundstatusrequesthandler.h \
-    server/handlers/weighscalestatusrequesthandler.h \
+    server/handlers/audiometer_request_handler.h \
+    server/handlers/audiometer_status_requesthandler.h \
+    server/handlers/blood_pressure_request_handler.h \
+    server/handlers/blood_pressure_status_request_handler.h \
+    server/handlers/body_composition_status_request_handler.h \
+    server/handlers/cdtt_request_handler.h \
+    server/handlers/cdtt_status_request_handler.h \
+    server/handlers/choice_reaction_request_handler.h \
+    server/handlers/choice_reaction_status_request_handler.h \
+    server/handlers/cypress_status_request_handler.h \
+    server/handlers/dxa_request_handler.h \
+    server/handlers/dxa_status_request_handler.h \
+    server/handlers/ecg_request_handler.h \
+    server/handlers/ecg_status_request_handler.h \
+    server/handlers/frax_request_handler.h \
+    server/handlers/frax_status_request_handler.h \
+    server/handlers/grip_strength_request_handler.h \
+    server/handlers/grip_strength_status_request_handler.h \
+    server/handlers/retinal_camera_request_handler.h \
+    server/handlers/retinal_camera_status_request_handler.h \
+    server/handlers/signature_pad_request_handler.h \
+    server/handlers/signature_pad_status_request_handler.h \
+    server/handlers/spirometer_request_handler.h \
+    server/handlers/spirometer_status_request_handler.h \
+    server/handlers/tonometer_request_handler.h \
+    server/handlers/tonometer_status_request_handler.h \
+    server/handlers/ultrasound_request_handler.h \
+    server/handlers/ultrasound_status_request_handler.h \
+    server/handlers/weigh_scale_request_handler.h \
+    server/handlers/weigh_scale_status_request_handler.h \
     server/utils.h \
     widgets/BarcodeWidget.h \
     widgets/MeasureWidget.h \
@@ -373,10 +353,53 @@ RESOURCES += \
 
 DISTFILES += \
     ../README.md \
+    RunNetworkRequests.py \
     clear.tif \
     favicon.ico \
     ok.tif \
     please.tif \
     server/pages/index.html \
     sign.tif \
+    tests/fixtures/audiometer/input.json \
+    tests/fixtures/audiometer/output.json \
+    tests/fixtures/audiometer/settings.json \
+    tests/fixtures/blood_pressure/input.json \
+    tests/fixtures/blood_pressure/output.json \
+    tests/fixtures/blood_pressure/settings.json \
+    tests/fixtures/body_composition/input.json \
+    tests/fixtures/body_composition/output.json \
+    tests/fixtures/body_composition/settings.json \
+    tests/fixtures/cdtt/input.json \
+    tests/fixtures/cdtt/output.json \
+    tests/fixtures/cdtt/settings.json \
+    tests/fixtures/choice_reaction/input.json \
+    tests/fixtures/choice_reaction/output.json \
+    tests/fixtures/choice_reaction/settings.json \
+    tests/fixtures/dxa/hip/hip.json \
+    tests/fixtures/dxa/input.json \
+    tests/fixtures/dxa/iva/iva.json \
+    tests/fixtures/dxa/output.json \
+    tests/fixtures/dxa/spine/spine.json \
+    tests/fixtures/dxa/whole_body/whole_body.json \
+    tests/fixtures/frax/input.json \
+    tests/fixtures/frax/output.json \
+    tests/fixtures/frax/settings.json \
+    tests/fixtures/grip_strength/input.json \
+    tests/fixtures/grip_strength/output.json \
+    tests/fixtures/input.json \
+    tests/fixtures/output.json \
+    tests/fixtures/retinal_camera/input.json \
+    tests/fixtures/retinal_camera/output.json \
+    tests/fixtures/thermometer/input.json \
+    tests/fixtures/thermometer/output.json \
+    tests/fixtures/thermometer/settings.json \
+    tests/fixtures/tonometer/input.json \
+    tests/fixtures/tonometer/output.json \
+    tests/fixtures/tonometer/settings.json \
+    tests/fixtures/ultrasound/input.json \
+    tests/fixtures/ultrasound/output.json \
+    tests/fixtures/ultrasound/settings.json \
+    tests/fixtures/weigh_scale/input.json \
+    tests/fixtures/weigh_scale/output.json \
+    tests/fixtures/weigh_scale/settings.json \
     thankyou.tif

@@ -13,64 +13,64 @@
 
 #include "server/InstrumentRequestHandlerFactory.h"
 
-#include "server/handlers/cypressstatusrequesthandler.h"
+#include "server/handlers/cypress_status_request_handler.h"
 
-#include "server/handlers/GripStrengthRequestHandler.h"
-#include "server/handlers/gripstrengthstatusrequesthandler.h"
+#include "server/handlers/grip_strength_request_handler.h"
+#include "server/handlers/grip_strength_status_request_handler.h"
 
-#include "server/handlers/RetinalCameraRequestHandler.h"
-#include "server/handlers/retinalcamerastatusrequesthandler.h"
+#include "server/handlers/retinal_camera_request_handler.h"
+#include "server/handlers/retinal_camera_status_request_handler.h"
 
-#include "server/handlers/bloodpressurerequesthandler.h"
-#include "server/handlers/bloodpressurestatusrequesthandler.h"
+#include "server/handlers/blood_pressure_request_handler.h"
+#include "server/handlers/blood_pressure_status_request_handler.h"
 
-#include "server/handlers/audiometerrequesthandler.h"
-#include "server/handlers/audiometerstatusrequesthandler.h"
+#include "server/handlers/audiometer_request_handler.h"
+#include "server/handlers/audiometer_status_request_handler.h"
 
-#include "server/handlers/DxaDualHipBoneDensityHandler.h"
-#include "server/handlers/dxahipstatusrequesthandler.h"
+#include "server/handlers/cdtt_request_handler.h"
+#include "server/handlers/cdtt_status_request_handler.h"
 
-#include "server/handlers/CDTTRequestHandler.h"
-#include "server/handlers/cdttstatusrequesthandler.h"
+#include "server/handlers/choice_reaction_request_handler.h"
+#include "server/handlers/choice_reaction_status_request_handler.h"
 
-#include "server/handlers/ChoiceReactionRequestHandler.h"
-#include "server/handlers/choicereactionstatusrequesthandler.h"
+#include "server/handlers/dxa_request_handler.h"
+#include "server/handlers/dxa_status_request_handler.h"
 
-#include "server/handlers/ECGRequestHandler.h"
-#include "server/handlers/ecgstatusrequesthandler.h"
+#include "server/handlers/ecg_request_handler.h"
+#include "server/handlers/ecg_status_request_handler.h"
 
-#include "server/handlers/FraxRequestHandler.h"
-#include "server/handlers/fraxstatusrequesthandler.h"
+#include "server/handlers/frax_request_handler.h"
+#include "server/handlers/frax_status_request_handler.h"
 
-#include "server/handlers/SpirometerRequestHandler.h"
-#include "server/handlers/spirometerstatusrequesthandler.h"
+#include "server/handlers/spirometer_request_handler.h"
+#include "server/handlers/spirometer_status_request_handler.h"
 
-#include "server/handlers/TonometerRequestHandler.h"
-#include "server/handlers/tonometerstatusrequesthandler.h"
+#include "server/handlers/tonometer_request_handler.h"
+#include "server/handlers/tonometer_status_request_handler.h"
 
-#include "server/handlers/WeighScaleRequestHandler.h"
-#include "server/handlers/weighscalestatusrequesthandler.h"
+#include "server/handlers/weigh_scale_request_handler.h"
+#include "server/handlers/weigh_scale_status_request_handler.h"
 
-#include "server/handlers/BodyCompositionRequestHandler.h"
-#include "server/handlers/bodycompositionstatusrequesthandler.h"
+#include "server/handlers/body_composition_request_handler.h".h"
+#include "server/handlers/body_composition_status_request_handler.h".h"
 
-#include "server/handlers/UltrasoundRequestHandler.h"
-#include "server/handlers/ultrasoundstatusrequesthandler.h"
+#include "server/handlers/ultrasound_request_handler.h"
+#include "server/handlers/ultrasound_status_request_handler.h"
 
-#include "server/handlers/signaturepadrequesthandler.h"
-#include "server/handlers/signaturepadstatusrequesthandler.h"
+#include "server/handlers/signature_pad_request_handler.h"
+#include "server/handlers/signature_pad_status_request_handler.h"
 
 
 
 using namespace Poco::Net;
 
 QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap = {{
+
     { QString(R"(^/audiometer/status/?$)"),                &InstrumentRequestHandlerFactory::createAudiometerStatusRequestHandler      },
     { QString(R"(^/audiometer/delete/([^\/]+)/?$)"),       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
     { QString(R"(^/audiometer/?$)"),                       &InstrumentRequestHandlerFactory::createAudiometerRequestHandler            },
 
     { QString(R"(^/blood_pressure/status/?$)"),            &InstrumentRequestHandlerFactory::createBloodPressureStatusRequestHandler   },
-    { QString(R"(^/blood_pressure/delete/([^\/]+)/?$)"),   &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
     { QString(R"(^/blood_pressure/?$)"),                   &InstrumentRequestHandlerFactory::createBloodPressureRequestHandler         },
 
     { QString(R"(^/body_composition/status/?$)"),          &InstrumentRequestHandlerFactory::createBodyCompositionStatusRequestHandler },
@@ -85,9 +85,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/choice_reaction/delete/([^\/]+)/?$)"),  &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
     { QString(R"(^/choice_reaction/?$)"),                  &InstrumentRequestHandlerFactory::createChoiceReactionRequestHandler        },
 
-    //{ QString(R"(^/dxa/status/?$)"),                       &InstrumentRequestHandlerFactory::createDXAHipStatusRequestHandler	       },
-    //{ QString(R"(^/dxa/delete/([^\/]+)/?$)"),              &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
-    //{ QString(R"(^/dxa/?$)"),                              &InstrumentRequestHandlerFactory::createDXAHipRequestHandler			       },
+    { QString(R"(^/dxa/?$)"),                              &InstrumentRequestHandlerFactory::createDxaRequestHandler },
+    { QString(R"(^/dxa/status/?$)"),                       &InstrumentRequestHandlerFactory::createDxaStatusRequestHandler },
+    { QString(R"(^/dxa/delete/([^\/]+)/?$)"),              &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/ecg/status/?$)"),                       &InstrumentRequestHandlerFactory::createECGStatusRequestHandler             },
     { QString(R"(^/ecg/delete/([^\/]+)/?$)"),              &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
@@ -216,15 +216,15 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createUltrasoundStatusReque
    return new UltrasoundStatusRequestHandler;
 }
 
-//HTTPRequestHandler* InstrumentRequestHandlerFactory::createDXAHipRequestHandler()
-//{
-//   return new DxaDualHipBoneDensityHandler;
-//}
-//
-//HTTPRequestHandler* InstrumentRequestHandlerFactory::createDXAHipStatusRequestHandler()
-//{
-//   return new DXAHipStatusRequestHandler;
-//}
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createDxaRequestHandler()
+{
+   return new DxaRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createDxaStatusRequestHandler()
+{
+   return new DxaStatusRequestHandler;
+}
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createSpirometerRequestHandler()
 {

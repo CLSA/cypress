@@ -16,7 +16,7 @@ class GripStrengthManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit GripStrengthManager(QObject *parent = nullptr);
+    explicit GripStrengthManager(QJsonObject inputData);
     ~GripStrengthManager();
 
 public slots:
@@ -47,9 +47,6 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    // Send test data to Pine server
-    bool sendResultsToPine(const QJsonObject& data) override;
 };
 
 #endif // GRIPSTRENGTHMANAGER_H

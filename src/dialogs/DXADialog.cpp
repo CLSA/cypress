@@ -4,17 +4,18 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-DXADialog::DXADialog(QString uuid) : ui(new Ui::DXADialog)
+DXADialog::DXADialog(QJsonObject inputData) : ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_uuid = uuid;
-    m_manager.reset(new DXAManager());
-    m_manager -> start();
+    m_manager.reset(new DXAManager(inputData));
+    m_manager->start();
 
-    connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
-    connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
+    ui->submitButton->setEnabled(true);
+    connect(ui->submitButton, &QPushButton::clicked, m_manager.get(), &DXAManager::measure);
+    //connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
+    //connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
 }
 
 DXADialog::~DXADialog()
@@ -70,5 +71,11 @@ void DXADialog::dicomFilesReceived(const QStringList& dicomFilePaths)
 void DXADialog::on_openFileExplorer_released()
 {
     QDesktopServices::openUrl(QUrl("C:/work/clsa/cypress/dcmtk-3.6.7/storage"));
+}
+
+
+void DXADialog::on_submitButton_clicked()
+{
+    //m_manager->measure();
 }
 

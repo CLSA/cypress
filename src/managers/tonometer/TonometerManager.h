@@ -30,7 +30,7 @@ class TonometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit TonometerManager();
+    explicit TonometerManager(QJsonObject inputData);
     ~TonometerManager();
 
     // is the passed string an executable file

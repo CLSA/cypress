@@ -14,9 +14,10 @@
 
 #include "TonometerManager.h"
 
-TonometerManager::TonometerManager()
+TonometerManager::TonometerManager(QJsonObject inputData)
 {
     m_test.setExpectedMeasurementCount(2);
+    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 TonometerManager::~TonometerManager()
@@ -98,22 +99,22 @@ void TonometerManager::measure()
     //};
 
     //sendResultsToPine(response);
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json"
-    );
-
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
-
-    if (results.empty()) return;
-
-    bool ok = sendResultsToPine(results);
-    if (!ok)
-    {
-        qDebug() << "Could not send results to Pine";
+    if (CypressApplication::getInstance().isSimulation()) {
+      sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/tonometer/output.json");
     }
+
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
+
+    //if (results.empty()) return;
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 }
 
 void TonometerManager::readOutput()

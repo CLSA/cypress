@@ -10,9 +10,10 @@
 
 #include "FraxManager.h"
 
-FraxManager::FraxManager()
+FraxManager::FraxManager(QJsonObject inputData)
 {
     m_test.setExpectedMeasurementCount(4);
+    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 bool FraxManager::isAvailable()
@@ -63,7 +64,7 @@ bool FraxManager::isDefined(const QString &exeName) const
     //        ok = true;
     //    }
     //}
-    //return ok;
+    return true;
 }
 
 void FraxManager::selectRunnable(const QString &runnableName)
@@ -91,22 +92,25 @@ void FraxManager::measure()
     //// launch the process
     //m_process.start();
 
-    QJsonObject results = JsonSettings::readJsonFromFile(
-        "C:/work/clsa/cypress/src/tests/fixtures/frax/output.json"
-    );
-
-    results["cypress_session"] = m_uuid;
-    results["answer_id"] = m_answerId;
-    results["barcode"] = m_barcode;
-    results["interviewer"] = m_interviewer;
-
-    if (results.empty()) return;
-
-    bool ok = sendResultsToPine(results);
-    if (!ok)
+    if (CypressApplication::getInstance().isSimulation())
     {
-        qDebug() << "Could not send results to Pine";
+        sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/frax/output.json");
     }
+    //QJsonObject results = JsonSettings::readJsonFromFile(
+    //);
+
+    //results["cypress_session"] = m_uuid;
+    //results["answer_id"] = m_answerId;
+    //results["barcode"] = m_barcode;
+    //results["interviewer"] = m_interviewer;
+
+    //if (results.empty()) return;
+
+    //bool ok = sendResultsToPine(results);
+    //if (!ok)
+    //{
+    //    qDebug() << "Could not send results to Pine";
+    //}
 }
 
 void FraxManager::readOutput()

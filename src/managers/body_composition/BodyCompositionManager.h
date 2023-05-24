@@ -24,7 +24,7 @@ class BodyCompositionManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit BodyCompositionManager();
+    explicit BodyCompositionManager(QJsonObject inputData);
 
     bool isAvailable();
 

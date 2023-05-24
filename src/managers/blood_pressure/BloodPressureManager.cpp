@@ -12,10 +12,12 @@
 #include <QStandardItemModel>
 #include <QtUsb/QtUsb>
 
-BloodPressureManager::BloodPressureManager()
+BloodPressureManager::BloodPressureManager(QJsonObject inputData)
     : m_comm(new BPMCommunication())
 {
     m_test.setExpectedMeasurementCount(6);
+    m_inputData = jsonObjectToVariantMap(inputData);
+    qDebug() << "m_inputdata: " << m_inputData;
 }
 
 BloodPressureManager::~BloodPressureManager()
@@ -107,7 +109,11 @@ void BloodPressureManager::setSide(const QString &side)
 //
 void BloodPressureManager::measure()
 {
-
+  if (CypressApplication::getInstance().isSimulation())
+  {
+    sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/blood_pressure/output.json");
+    return;
+  }
 }
 
 

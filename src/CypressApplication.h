@@ -63,7 +63,7 @@ private:
 
     Constants::MeasureType m_type { Constants::MeasureType::Unknown };
 
-    bool m_simulate { false };
+    bool m_simulate { true };
     bool m_verbose { false };
 };
 

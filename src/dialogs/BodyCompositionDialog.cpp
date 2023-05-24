@@ -1,15 +1,16 @@
 #include "BodyCompositionDialog.h"
 #include "managers/body_composition/BodyCompositionManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QMessageBox>
 
-BodyCompositionDialog::BodyCompositionDialog(): ui(new Ui::BodyCompositionDialog)
+BodyCompositionDialog::BodyCompositionDialog(QJsonObject inputData): ui(new Ui::BodyCompositionDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new BodyCompositionManager());
+    m_manager.reset(new BodyCompositionManager(inputData));
 }
 
 BodyCompositionDialog::~BodyCompositionDialog()
@@ -22,10 +23,14 @@ void BodyCompositionDialog::initializeConnections()
   QSharedPointer<BodyCompositionManager> derived =
     m_manager.staticCast<BodyCompositionManager>();
 
-  // Disable all buttons by default
-  //
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
+  if (CypressApplication::getInstance().isSimulation()) {
+    ui->measureWidget->enableMeasure();
+  }
+  else {
+    // Disable all buttons by default
+    //
+    foreach(auto button, this->findChildren<QPushButton *>())
+    {
       if("Close" != button->text())
         button->setEnabled(false);
 
@@ -33,7 +38,9 @@ void BodyCompositionDialog::initializeConnections()
       //
       button->setDefault(false);
       button->setAutoDefault(false);
+    }
   }
+
 
   // Relay messages from the manager to the status bar
   //

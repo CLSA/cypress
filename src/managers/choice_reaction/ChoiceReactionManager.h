@@ -24,7 +24,7 @@ class ChoiceReactionManager: public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ChoiceReactionManager();
+    explicit ChoiceReactionManager(QJsonObject inputData);
 
     static QString CCB_PREFIX;
     static QString CCB_CLINIC;

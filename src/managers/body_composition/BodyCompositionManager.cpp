@@ -38,9 +38,11 @@ QMap<QByteArray,QString> BodyCompositionManager::incorrectLUT= BodyCompositionMa
 //
 QMap<QByteArray,QString> BodyCompositionManager::confirmLUT= BodyCompositionManager::initConfirmationLUT();
 
-BodyCompositionManager::BodyCompositionManager()
+BodyCompositionManager::BodyCompositionManager(QJsonObject inputData)
 {
   m_test.setExpectedMeasurementCount(1);
+  m_inputData = jsonObjectToVariantMap(inputData);
+  qDebug() << "m_inputdata: " << m_inputData;
 }
 
 bool BodyCompositionManager::isAvailable()
@@ -373,6 +375,12 @@ void BodyCompositionManager::confirmSettings()
 
 void BodyCompositionManager::measure()
 {
+    if (CypressApplication::getInstance().isSimulation())
+    {
+      sendJsonData("C:/work/clsa/cypress/src/tests/fixtures/body_composition/output.json");
+      return;
+    }
+
     //QJsonObject results = JsonSettings::readJsonFromFile(
     //    "C:/work/clsa/cypress/src/tests/fixtures/body_composition/output.json"
     //);

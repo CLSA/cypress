@@ -9,7 +9,7 @@ class AudiometerDialog : public DialogBase, public Ui::AudiometerDialog
     Q_OBJECT
 
 public:
-    explicit AudiometerDialog();
+    explicit AudiometerDialog(QJsonObject inputData);
     ~AudiometerDialog();
 
 private:

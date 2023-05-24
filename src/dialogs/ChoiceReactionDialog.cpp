@@ -1,16 +1,17 @@
 #include "ChoiceReactionDialog.h"
 #include "managers/choice_reaction/ChoiceReactionManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 
-ChoiceReactionDialog::ChoiceReactionDialog(): ui(new Ui::RunnableDialog)
+ChoiceReactionDialog::ChoiceReactionDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new ChoiceReactionManager());
+    m_manager.reset(new ChoiceReactionManager(inputData));
     this->setWindowTitle("Choice Reaction Test");
 }
 
@@ -27,18 +28,24 @@ void ChoiceReactionDialog::initializeConnections()
   QSharedPointer<ChoiceReactionManager> derived =
     m_manager.staticCast<ChoiceReactionManager>();
 
-  // Disable all buttons by default
-  //
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
-      if("Close" != button->text())
-        button->setEnabled(false);
-
-      // disable enter key press event passing onto auto focus buttons
+    if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+    }
+    else {
+      // Disable all buttons by default
       //
-      button->setDefault(false);
-      button->setAutoDefault(false);
-  }
+      foreach(auto button, this->findChildren<QPushButton *>())
+      {
+          if("Close" != button->text())
+            button->setEnabled(false);
+
+          // disable enter key press event passing onto auto focus buttons
+          //
+          button->setDefault(false);
+          button->setAutoDefault(false);
+      }
+    }
+
 
   // Relay messages from the manager to the status bar
   //

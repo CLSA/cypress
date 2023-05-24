@@ -1,15 +1,16 @@
 #include "BloodPressureDialog.h"
 #include "managers/blood_pressure/BloodPressureManager.h"
+#include "CypressApplication.h"
 
 #include <QDebug>
 #include <QMessageBox>
 
-BloodPressureDialog::BloodPressureDialog(): ui(new Ui::BloodPressureDialog)
+BloodPressureDialog::BloodPressureDialog(QJsonObject inputData): ui(new Ui::BloodPressureDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new BloodPressureManager());
+    m_manager.reset(new BloodPressureManager(inputData));
 }
 
 BloodPressureDialog::~BloodPressureDialog()
@@ -25,6 +26,23 @@ void BloodPressureDialog::initializeModel()
 void BloodPressureDialog::initializeConnections()
 {
     QSharedPointer<BloodPressureManager> derived = m_manager.staticCast<BloodPressureManager>();
+    if (CypressApplication::getInstance().isSimulation()) {
+      ui->measureWidget->enableMeasure();
+    }
+    else {
+      // Disable all buttons by default
+      //
+      foreach(auto button, this->findChildren<QPushButton *>())
+      {
+        if("Close" != button->text())
+          button->setEnabled(false);
+
+        // disable enter key press event passing onto auto focus buttons
+        //
+        button->setDefault(false);
+        button->setAutoDefault(false);
+      }
+    }
 
     // The qcombobox automatically selects the first item in the list. So a blank entry is
     // added to display that an option has not been picked yet. The blank entry is treated
@@ -55,18 +73,7 @@ void BloodPressureDialog::initializeConnections()
     connect(derived.get(), &BloodPressureManager::sideChanged,
             ui->armComboBox, &QComboBox::setCurrentText);
 
-    // Disable all buttons by default
-    //
-    foreach(auto button, this->findChildren<QPushButton *>())
-    {
-        if("Close" != button->text())
-          button->setEnabled(false);
 
-        // disable enter key press event passing onto auto focus buttons
-        //
-        button->setDefault(false);
-        button->setAutoDefault(false);
-    }
 
     // Relay messages from the manager to the status bar
     //
