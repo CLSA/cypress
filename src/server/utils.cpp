@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "auxiliary/JsonSettings.h"
+#include "auxiliary/json_settings.h"
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>

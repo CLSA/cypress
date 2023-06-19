@@ -1,53 +1,43 @@
 {
-  "answer_id": null,
-  "barcode": "12345678",
   "language": "en",
-  "interviewer": "John Doe",
-  "device": {
-    "port_description": "USB-Serial Controller D",
-    "port_manufacturer": "Prolific Technology Inc.",
-    "port_name": "ttyUSB0",
-    "port_product_id": 8963,
-    "port_system_location": "/dev/ttyUSB0",
-    "port_vendor_id": 1659
-  },
-  "age": 56,
-  "gender": "male",
-  "height": 170,
-  "results": [
-    {
-      "basal_metabolic_rate": {
-        "units": "kJ",
-        "value": 8065
-      },
-      "body_mass_index": {
-        "units": "kg/cm2",
-        "value": 34.8
-      },
-      "fat_free_mass": {
-        "units": "kg",
-        "value": 64.8
-      },
-      "fat_mass": {
-        "units": "kg",
-        "value": 35.9
-      },
-      "impedance": {
-        "units": "ohm",
-        "value": 419
-      },
-      "percent_fat": {
-        "units": "%",
-        "value": 35.6
-      },
-      "total_body_water": {
-        "units": "kg",
-        "value": 47.4
-      },
-      "weight": {
-        "units": "kg",
-        "value": 100.7
+  "value": {
+    "startTime": "2023-05-24T20:16:39Z",
+    "endTime": "2023-05-24T20:16:39Z",
+    "results": [
+      {
+        "BASAL_METABOLIC_RATE": {
+          "units": "kJ",
+          "value": 8065
+        },
+        "BODY_MASS_INDEX": {
+          "units": "kg/cm2",
+          "value": 34.8
+        },
+        "FAT_FREE_MASS": {
+          "units": "kg",
+          "value": 64.8
+        },
+        "FAT_MASS": {
+          "units": "kg",
+          "value": 35.9
+        },
+        "IMPEDANCE": {
+          "units": "ohm",
+          "value": 419
+        },
+        "PERCENT_FAT": {
+          "units": "%",
+          "value": 35.6
+        },
+        "TOTAL_BODY_WATER": {
+          "units": "kg",
+          "value": 47.4
+        },
+        "WEIGHT": {
+          "units": "kg",
+          "value": 100.7
+        }
       }
-    }
-  ]
+    ]
+  }
 }

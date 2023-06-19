@@ -2,16 +2,16 @@
 #include <QSettings>
 #include <QDebug>
 
-#include "auxiliary/JsonSettings.h"
+#include "auxiliary/json_settings.h"
 
 #include <string>
 #include <iostream>
 
 #include "Poco/Net/HTTPServer.h"
-#include "server/InstrumentRequestHandlerFactory.h"
+#include "server/instrument_request_handler_factory.h"
 #include "server/Server.h"
 
-#include "CypressApplication.h"
+#include "cypress_application.h"
 
 using namespace Poco::Net;
 
@@ -28,9 +28,9 @@ Server::Server()
     moveToThread(&serverThread);
 }
 
-void Server::requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData)
+void Server::requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId)
 {
-    emit startTest(type, requestData);
+    emit startTest(type, requestData, sessionId);
 }
 
 

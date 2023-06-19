@@ -10,12 +10,12 @@
 #include <QSqlQuery>
 #include <QMetaType>
 
-#include "CypressApplication.h"
+#include "cypress_application.h"
 //#include "managers/SettingsManager.h"
-#include "auxiliary/CommandLineParser.h"
+#include "auxiliary/command_line_parser.h"
 #include "auxiliary/Constants.h"
 
-#include "logging/debugdialog.h"
+#include "logging/debug_dialog.h"
 
 const QString orgName = "CLSA";
 const QString orgDomain = "clsa-elcv.ca";
@@ -139,6 +139,8 @@ int main(int argc, char *argv[])
     QStringList appArguments = QCoreApplication::arguments();
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
+
+    qDebug() << "running";
 
     //if (updateAvailable())
     //{

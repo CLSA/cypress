@@ -30,11 +30,11 @@ class Server: public QObject
         void start();
         void stop();
 
-        void requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData);
+        void requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId);
         bool sendResults(const QJsonObject& results);
 
     signals:
-        void startTest(const Constants::MeasureType& type, const QJsonObject& requestData);
+        void startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId);
 
     private:
         HTTPServer* server;

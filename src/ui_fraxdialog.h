@@ -33,6 +33,7 @@ public:
     QGroupBox *controlsBox;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
+    QPushButton *completeButton;
     QPushButton *measureButton;
     QPushButton *submitButton;
     QGroupBox *groupBox_2;
@@ -89,6 +90,11 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer);
 
+        completeButton = new QPushButton(controlsBox);
+        completeButton->setObjectName(QString::fromUtf8("completeButton"));
+
+        horizontalLayout->addWidget(completeButton);
+
         measureButton = new QPushButton(controlsBox);
         measureButton->setObjectName(QString::fromUtf8("measureButton"));
         measureButton->setEnabled(false);
@@ -127,6 +133,7 @@ public:
         label_7->setText(QCoreApplication::translate("Dialog", "Participant ID:", nullptr));
         participantId->setText(QString());
         controlsBox->setTitle(QString());
+        completeButton->setText(QCoreApplication::translate("Dialog", "Complete", nullptr));
         measureButton->setText(QCoreApplication::translate("Dialog", "Measure", nullptr));
         submitButton->setText(QCoreApplication::translate("Dialog", "Submit", nullptr));
         groupBox_2->setTitle(QString());

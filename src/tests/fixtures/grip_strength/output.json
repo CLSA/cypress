@@ -1,47 +1,48 @@
 {
-  "answer_id": "",
-  "barcode": "",
   "language": "en",
-  "interviewer": "patrick",
-  "results": [
-    {
-      "RES_RUNG": 2,
-      "RES_MAX_REPS": 3,
-      "RES_SEQUENCE": 3,
-      "RES_REST_TIME": 3,
-      "RES_THRESHOLD": 4.99994869451,
-      "RES_TRIAL_SIDE": "Right",
-      "RES_TRIAL_RUNG_POSITION": 2,
-      "RES_TRIAL_MAX": 37.02402360887999,
-      "RES_EXAM_MAX": 37.02402360887999,
-      "RES_EXAM_AVG": 35.05452553834,
-      "RES_EXAM_CSV": 5
-    },
-    {
-      "RES_RUNG": 2,
-      "RES_MAX_REPS": 3,
-      "RES_SEQUENCE": 3,
-      "RES_REST_TIME": 3,
-      "RES_THRESHOLD": 4.99994869451,
-      "RES_TRIAL_SIDE": "Right",
-      "RES_TRIAL_RUNG_POSITION": 2,
-      "RES_TRIAL_MAX": 35.02402360887999,
-      "RES_EXAM_MAX": 37.02402360887999,
-      "RES_EXAM_AVG": 35.05452553834,
-      "RES_EXAM_CSV": 5
-    },
-    {
-      "RES_RUNG": 2,
-      "RES_MAX_REPS": 3,
-      "RES_SEQUENCE": 3,
-      "RES_REST_TIME": 3,
-      "RES_THRESHOLD": 4.99994869451,
-      "RES_TRIAL_SIDE": "Right",
-      "RES_TRIAL_RUNG_POSITION": 2,
-      "RES_TRIAL_MAX": 32.02402360887999,
-      "RES_EXAM_MAX": 37.02402360887999,
-      "RES_EXAM_AVG": 35.05452553834,
-      "RES_EXAM_CSV": 5
-    }
-  ]
+  "value": {
+    "startTime": "2023-05-24T20:16:39Z",
+    "endTime": "2023-05-24T20:16:39Z",
+    "results": [
+      {
+        "RES_RUNG": 2,
+        "RES_MAX_REPS": 3,
+        "RES_SEQUENCE": 3,
+        "RES_REST_TIME": 3,
+        "RES_THRESHOLD": 4.99994869451,
+        "RES_TRIAL_SIDE": "Right",
+        "RES_TRIAL_RUNG_POSITION": 2,
+        "RES_TRIAL_MAX": 37.02402360887999,
+        "RES_EXAM_MAX": 37.02402360887999,
+        "RES_EXAM_AVG": 35.05452553834,
+        "RES_EXAM_CSV": 5
+      },
+      {
+        "RES_RUNG": 2,
+        "RES_MAX_REPS": 3,
+        "RES_SEQUENCE": 3,
+        "RES_REST_TIME": 3,
+        "RES_THRESHOLD": 4.99994869451,
+        "RES_TRIAL_SIDE": "Right",
+        "RES_TRIAL_RUNG_POSITION": 2,
+        "RES_TRIAL_MAX": 35.02402360887999,
+        "RES_EXAM_MAX": 37.02402360887999,
+        "RES_EXAM_AVG": 35.05452553834,
+        "RES_EXAM_CSV": 5
+      },
+      {
+        "RES_RUNG": 2,
+        "RES_MAX_REPS": 3,
+        "RES_SEQUENCE": 3,
+        "RES_REST_TIME": 3,
+        "RES_THRESHOLD": 4.99994869451,
+        "RES_TRIAL_SIDE": "Right",
+        "RES_TRIAL_RUNG_POSITION": 2,
+        "RES_TRIAL_MAX": 32.02402360887999,
+        "RES_EXAM_MAX": 37.02402360887999,
+        "RES_EXAM_AVG": 35.05452553834,
+        "RES_EXAM_CSV": 5
+      }
+    ]
+  }
 }

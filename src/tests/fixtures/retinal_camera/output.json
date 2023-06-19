@@ -1,17 +1,17 @@
 {
-  "answer_id": "",
-  "barcode": "",
   "language": "en",
-  "interviewer": "patrick",
-  "device": {},
-  "results": [
-    {
-      "SIDE": "LEFT",
-      "EYE": ""
-    },
-    {
-      "SIDE": "RIGHT",
-      "EYE": ""
-    }
-  ]
+  "value": {
+    "startTime": "2023-05-24T20:16:39Z",
+    "endTime": "2023-05-24T20:16:39Z",
+    "results": [
+      {
+        "SIDE": "LEFT",
+        "EYE": ""
+      },
+      {
+        "SIDE": "RIGHT",
+        "EYE": ""
+      }
+    ]
+  }
 }

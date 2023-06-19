@@ -7,7 +7,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-#include "server/DefaultRequestHandler.h"
+#include "server/default_request_handler.h"
 
 class CypressStatusRequestHandler : public DefaultRequestHandler
 {

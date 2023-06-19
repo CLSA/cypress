@@ -1,11 +1,12 @@
 {
-  "answer_id": "",
-  "barcode": "",
   "language": "en",
-  "interviewer": "john doe",
-  "results": [
-    {
-      "side": ""
-    }
-  ]
+  "value": {
+    "startTime": "2023-05-24T20:16:39Z",
+    "endTime": "2023-05-24T20:16:39Z",
+    "results": [
+      {
+        "side": ""
+      }
+    ]
+  }
 }

@@ -1,55 +1,37 @@
 {
-  "answer_id": "",
-  "barcode": "",
   "language": "en",
-  "interviewer": "patrick",
-  "timeStart": "",
-  "timeEnd": "",
-  "device": {},
-  "otherContraindication": "",
-  "skipComment": "",
-  "instrumentBarcode": "",
-  "age": 56.19,
-  "alcohol": false,
-  "body_mass_index": 34.07,
-  "country_code": 19,
-  "current_smoker": false,
-  "femoral_neck_bmd": 0.9537,
-  "gluccocorticoid": false,
-  "parent_hip_fracture": false,
-  "previous_fracture": false,
-  "rheumatoid_arthritis": false,
-  "secondary_osteoporosis": false,
-  "sex": "male",
-  "type": "t",
-  "results": [
-    {
-      "probability": {
-        "units": "%",
-        "value": 7.47954531363678
+  "value": {
+    "startTime": "2023-05-24T20:16:39Z",
+    "endTime": "2023-05-24T20:16:39Z",
+    "results": [
+      {
+        "probability": {
+          "units": "%",
+          "value": 7.47954531363678
+        },
+        "type": "osteoporotic_fracture"
       },
-      "type": "osteoporotic_fracture"
-    },
-    {
-      "probability": {
-        "units": "%",
-        "value": 2.9046237612854533
+      {
+        "probability": {
+          "units": "%",
+          "value": 2.9046237612854533
+        },
+        "type": "hip_fracture"
       },
-      "type": "hip_fracture"
-    },
-    {
-      "probability": {
-        "units": "%",
-        "value": 6.468651940439159
+      {
+        "probability": {
+          "units": "%",
+          "value": 6.468651940439159
+        },
+        "type": "osteoporotic_fracture_bmd"
       },
-      "type": "osteoporotic_fracture_bmd"
-    },
-    {
-      "probability": {
-        "units": "%",
-        "value": 1.7874607761756636
-      },
-      "type": "hip_fracture_bmd"
-    }
-  ]
+      {
+        "probability": {
+          "units": "%",
+          "value": 1.7874607761756636
+        },
+        "type": "hip_fracture_bmd"
+      }
+    ]
+  }
 }

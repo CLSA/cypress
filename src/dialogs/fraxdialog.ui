@@ -79,6 +79,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="completeButton">
+        <property name="text">
+         <string>Complete</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="measureButton">
         <property name="enabled">
          <bool>false</bool>
