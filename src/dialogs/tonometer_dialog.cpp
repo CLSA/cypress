@@ -36,8 +36,8 @@ void TonometerDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-
-  if (CypressApplication::getInstance().isSimulation()) {
+  
+  if (Cypress::getInstance().isSimulation()) {
       ui->measureWidget->enableMeasure();
   }
   else {
@@ -162,22 +162,21 @@ void TonometerDialog::initializeConnections()
 
 void TonometerDialog::userClose()
 {
-    DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void TonometerDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "TonometerDialog::handleClose";
-    event->ignore();
+    DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("tonometer", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("tonometer", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void TonometerDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

@@ -22,6 +22,10 @@ public:
     explicit SignaturePadManager(QJsonObject inputData);
     ~SignaturePadManager();
 
+
+    static bool isInstalled();
+    static bool isAvailable();
+
     void restart();
 
 public slots:

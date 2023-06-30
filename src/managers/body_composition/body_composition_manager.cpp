@@ -47,8 +47,13 @@ BodyCompositionManager::BodyCompositionManager(QJsonObject inputData)
 
 bool BodyCompositionManager::isAvailable()
 {
-    bool found = scanDevices();
-    return found;
+    //bool found = scanDevices();
+    return false;
+}
+
+bool BodyCompositionManager::isInstalled()
+{
+    return false;
 }
 
 // default command lookup by string
@@ -375,7 +380,7 @@ void BodyCompositionManager::confirmSettings()
 
 void BodyCompositionManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation())
+    if (Cypress::getInstance().isSimulation())
     {
       sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/body_composition/output.json");
       return;

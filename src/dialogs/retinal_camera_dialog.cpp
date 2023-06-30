@@ -11,8 +11,8 @@ RetinalCameraDialog::RetinalCameraDialog(QJsonObject inputData) : ui(new Ui::Ret
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
-
-    if (CypressApplication::getInstance().isSimulation())
+    
+    if (Cypress::getInstance().isSimulation())
     {
         setWindowTitle("Retinal Camera (SIM)");
     }
@@ -52,22 +52,20 @@ void RetinalCameraDialog::initializeConnections()
 void RetinalCameraDialog::userClose()
 {
     DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void RetinalCameraDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "RetinalCameraDialog::handleClose";
-    event->ignore();
     if (m_user_close)
     {
         m_manager->sendComplete("retinal_camera", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("retinal_camera", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
 
+void RetinalCameraDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

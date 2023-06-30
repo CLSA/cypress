@@ -33,8 +33,8 @@ void ChoiceReactionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
 
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
-
-    CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::Choice_Reaction, requestData, responseJson["sessionId"].toString());
+    
+    Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::Choice_Reaction, requestData, responseJson["sessionId"].toString());
 
     std::ostream& out = response.send();
     out << responseData.toStdString();

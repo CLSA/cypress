@@ -27,12 +27,17 @@ TonometerManager::~TonometerManager()
 
 bool TonometerManager::isAvailable()
 {
-    return false;
+  return false;
+}
+
+bool TonometerManager::isInstalled()
+{
+  return false;
 }
 
 void TonometerManager::start()
 {
-    if (CypressApplication::getInstance().isSimulation()) return;
+  if (Cypress::getInstance().isSimulation()) return;
 
     // connect signals and slots to QProcess one time only
     //
@@ -99,7 +104,7 @@ void TonometerManager::measure()
     //};
 
     //sendResultsToPine(response);
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
       sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/tonometer/output.json");
     }
 

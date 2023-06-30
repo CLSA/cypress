@@ -30,11 +30,9 @@ public:
     explicit ManagerBase();
     ~ManagerBase();
 
-    // Is this instrument available at the installed workstation?
-    static bool isInstalled();
-
     bool sendCancellation(QString device, QString uuid);
     bool sendComplete(QString device, QString uuid);
+
 
     // The unique identifier representing this test session (for pine state management)
     QString m_uuid;

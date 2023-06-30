@@ -45,6 +45,9 @@ public:
 
     static bool isDefined();
 
+    static bool isInstalled();
+    static bool isAvailable();
+
     //TODO: use cypress constant for all use of size and side
     void setCuffSize(const QString&);
 

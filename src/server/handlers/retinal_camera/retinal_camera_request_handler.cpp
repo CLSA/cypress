@@ -41,7 +41,7 @@ void RetinalCameraRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
     const QString sessionId = responseJSON.value("id").toString();
 
     // start test
-    CypressApplication::getInstance().server -> requestTestStart(measureType, requestData, responseJson["sessionId"].toString());
+    Cypress::getInstance().server -> requestTestStart(measureType, requestData, responseJson["sessionId"].toString());
 
     // send response with uuid body
     std::ostream& out = response.send();

@@ -48,6 +48,16 @@ GripStrengthManager::~GripStrengthManager()
 {
 }
 
+bool GripStrengthManager::isInstalled()
+{
+    return false;
+}
+
+bool GripStrengthManager::isAvailable()
+{
+    return false;
+}
+
 void GripStrengthManager::start()
 {
     setUp();
@@ -60,8 +70,8 @@ void GripStrengthManager::measure()
     //{
     //    emit canFinish();
     //}
-
-    if (CypressApplication::getInstance().isSimulation()) {
+    
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/grip_strength/output.json");
     }
 

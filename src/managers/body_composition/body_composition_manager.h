@@ -26,7 +26,8 @@ class BodyCompositionManager : public SerialPortManager
 public:
     explicit BodyCompositionManager(QJsonObject inputData);
 
-    bool isAvailable();
+    static bool isAvailable();
+    static bool isInstalled();
 
     static QMap<QString,QByteArray> initDefaultLUT();
     static QMap<QByteArray,QString> initCommandLUT();

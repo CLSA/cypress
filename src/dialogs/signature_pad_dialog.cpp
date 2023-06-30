@@ -59,22 +59,21 @@ void SignaturePadDialog::renderSignature(const QByteArray& bytes)
 void SignaturePadDialog::userClose()
 {
     DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void SignaturePadDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "SignaturePadDialog::handleClose";
-    event->ignore();
     if (m_user_close)
     {
         m_manager->sendComplete("signature_pad", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("signature_pad", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void SignaturePadDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }
 

@@ -43,22 +43,21 @@ void GripStrengthDialog::initializeModel()
 void GripStrengthDialog::userClose()
 {
     DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void GripStrengthDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "GripStrengthDialog::handleClose";
-    event->ignore();
     if (m_user_close)
     {
         m_manager->sendComplete("grip_strength", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("grip_strength", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void GripStrengthDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }
 

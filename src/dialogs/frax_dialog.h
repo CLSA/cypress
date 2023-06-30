@@ -2,9 +2,9 @@
 #define FRAX_DIALOG_H
 
 #include "dialog_base.h"
-#include "ui_runnable_dialog.h"
+#include "ui_frax_dialog.h"
 
-class FraxDialog : public DialogBase, public Ui::RunnableDialog
+class FraxDialog : public DialogBase, public Ui::FraxDialog
 {
     Q_OBJECT
 
@@ -18,7 +18,7 @@ private:
     void userClose() override;
     void closeEvent(QCloseEvent *event) override;
 
-    Ui::RunnableDialog *ui { Q_NULLPTR };
+    Ui::FraxDialog *ui { Q_NULLPTR };
 };
 
 #endif // FRAX_DIALOG_H

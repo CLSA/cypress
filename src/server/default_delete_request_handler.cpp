@@ -24,8 +24,8 @@ void DefaultDeleteSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequ
 
     response.setStatus(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
     response.setContentType("application/json");
-
-    bool success = CypressApplication::getInstance().forceSessionEnd();
+    
+    bool success = Cypress::getInstance().forceSessionEnd();
     QJsonObject responseData {};
     if (success) {
        responseData["success"] = "Ended session";

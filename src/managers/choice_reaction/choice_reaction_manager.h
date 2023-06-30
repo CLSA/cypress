@@ -26,6 +26,9 @@ class ChoiceReactionManager: public ManagerBase
 public:
     explicit ChoiceReactionManager(QJsonObject inputData);
 
+    static bool isAvailable();
+    static bool isInstalled();
+
     static QString CCB_PREFIX;
     static QString CCB_CLINIC;
 
@@ -33,7 +36,6 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&) const;
-    bool isAvailable();
 
 public slots:
 

@@ -23,6 +23,10 @@ bool ECGManager::isAvailable()
     return false;
 }
 
+bool ECGManager::isInstalled()
+{
+    return false;
+}
 
 void ECGManager::start()
 {
@@ -80,7 +84,7 @@ void ECGManager::select()
 
 void ECGManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/ecg/output.json");
         return;
     }

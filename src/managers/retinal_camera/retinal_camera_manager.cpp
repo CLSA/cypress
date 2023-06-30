@@ -23,6 +23,16 @@ RetinalCameraManager::~RetinalCameraManager()
     //finish();
 }
 
+bool RetinalCameraManager::isInstalled()
+{
+    return false;
+}
+
+bool RetinalCameraManager::isAvailable()
+{
+    return false;
+}
+
 void RetinalCameraManager::start()
 {
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
@@ -186,7 +196,7 @@ bool RetinalCameraManager::startRetinalCamera()
 
 void RetinalCameraManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/retinal_camera/output.json");
         sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/retinal_camera/left.jpg", "left.jpg");
         sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/retinal_camera/right.jpg", "right.jpg");

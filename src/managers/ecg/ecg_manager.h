@@ -35,7 +35,8 @@ public:
     //
     bool isDefined(const QString&, const FileType& type = ECGApplication) const;
 
-    bool isAvailable();
+    static bool isAvailable();
+    static bool isInstalled();
 
 public slots:
 

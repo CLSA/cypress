@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>FraxDialog</class>
+ <widget class="QDialog" name="FraxDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -54,7 +54,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="controlsBox">
+    <widget class="QGroupBox" name="group">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -109,20 +109,18 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-    </widget>
+    <widget class="MeasureWidget" name="measureWidget" native="true"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MeasureWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/MeasureWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

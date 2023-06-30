@@ -56,7 +56,7 @@ QJsonObject DefaultRequestHandler::getRequestData(Poco::Net::HTTPServerRequest &
 
 bool DefaultRequestHandler::isBusy()
 {
-    if (CypressApplication::getInstance().dialog != nullptr)
+    if (Cypress::getInstance().deviceDialog != nullptr)
     {
         return true;
     }

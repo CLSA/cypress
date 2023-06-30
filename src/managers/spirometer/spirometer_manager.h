@@ -18,8 +18,10 @@ public:
     explicit SpirometerManager(QJsonObject inputData);
     ~SpirometerManager() = default;
 
+    static bool isInstalled();
+    static bool isAvailable();
+
     bool isDefined(const QString&, const SpirometerManager::FileType&) const;
-    bool isAvailable();
 
 public slots:
 

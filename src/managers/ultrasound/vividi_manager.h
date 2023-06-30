@@ -10,6 +10,9 @@ class VividiManager: public ManagerBase
 public:
     explicit VividiManager(QObject *parent = nullptr);
 
+    static bool isAvailable();
+    static bool isInstalled();
+
 public slots:
     void start() override;
     void measure() override;

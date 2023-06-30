@@ -27,6 +27,11 @@ bool WeighScaleManager::isAvailable()
     return false;
 }
 
+bool WeighScaleManager::isInstalled()
+{
+    return false;
+}
+
 bool WeighScaleManager::clearData()
 {
     m_test.reset();
@@ -105,7 +110,33 @@ void WeighScaleManager::zeroDevice()
 
 void WeighScaleManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
+      QFile file("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
+      if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+          qDebug() << "Could not open file for write";
+          return;
+      }
+      QByteArray data = file.readAll();
+
+      QJsonDocument json = QJsonDocument::fromJson(data);
+      QJsonObject dataData = json.object();
+
+      QJsonObject valueObj = dataData["value"].toObject();
+      QJsonObject results = valueObj["results"].toObject();
+
+      results["body_mass_index"] = valueObj["average_weight"].toObject()["value"].toDouble() / std::pow(m_inputData["height"].toDouble(), 2);
+
+      valueObj["results"] = results;
+      dataData["value"] = valueObj;
+
+      QJsonDocument doc(dataData);
+      QTextStream outStream(&file);
+
+      outStream << doc.toJson(QJsonDocument::Indented);
+      outStream.flush();
+
+      file.close();
+
       sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
       return;
     };

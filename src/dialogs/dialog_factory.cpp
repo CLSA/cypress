@@ -16,97 +16,70 @@
 #include "retinal_camera_dialog.h"
 #include "signature_pad_dialog.h"
 #include "dxa_dialog.h"
+#include "cypress_session.h"
 
-
-DialogFactory *DialogFactory::pInstance = Q_NULLPTR;
-
-DialogFactory *DialogFactory::instance()
+QSharedPointer<DialogBase> DialogFactory::instantiate(const Constants::MeasureType &type, const QJsonObject& requestData)
 {
-    if(!pInstance)
-        pInstance = new DialogFactory();
-    return pInstance;
-}
+    QSharedPointer<DialogBase> dialog;
 
-DialogFactory::~DialogFactory()
-{
-    if(pInstance)
-        pInstance = Q_NULLPTR;
-}
+    CypressSession session;
 
-DialogBase* DialogFactory::instantiate(const Constants::MeasureType &type, const QJsonObject& requestData)
-{
-    DialogBase* dialog = nullptr;
     switch(type)
     {
       case Constants::MeasureType::Audiometer:
-        dialog = new AudiometerDialog(requestData);
+        dialog.reset(new AudiometerDialog(requestData));
         break;
-
       case Constants::MeasureType::Blood_Pressure:
-        dialog = new BloodPressureDialog(requestData);
+        dialog.reset(new BloodPressureDialog(requestData));
         break;
-
       case Constants::MeasureType::Body_Composition:
-        dialog = new BodyCompositionDialog(requestData);
+        dialog.reset(new BodyCompositionDialog(requestData));
         break;
-
       case Constants::MeasureType::CDTT:
-        dialog = new CDTTDialog(requestData);
+        dialog.reset(new CDTTDialog(requestData));
         break;
-
       case Constants::MeasureType::Choice_Reaction:
-        dialog = new ChoiceReactionDialog(requestData);
+        dialog.reset(new ChoiceReactionDialog(requestData));
         break;
-
       case Constants::MeasureType::DxaWholeBody:
-        dialog = new DXADialog(requestData);
+        dialog.reset(new DXADialog(requestData));
         break;
-
       case Constants::MeasureType::ECG:
-        dialog = new EcgDialog(requestData);
+        dialog.reset(new EcgDialog(requestData));
         break;
-
       case Constants::MeasureType::Frax:
-        dialog = new FraxDialog(requestData);
+        dialog.reset(new FraxDialog(requestData));
         break;
-
       case Constants::MeasureType::Grip_Strength:
-        dialog = new GripStrengthDialog(requestData);
+        dialog.reset(new GripStrengthDialog(requestData));
         break;
-
       case Constants::MeasureType::Weigh_Scale:
-        dialog = new WeighScaleDialog(requestData);
+        dialog.reset(new WeighScaleDialog(requestData));
         break;
-
       //case Constants::MeasureType::Thermometer:
         //dialog = new ThermometerDialog(requestData);
         //break;
-
       case Constants::MeasureType::Tonometer:
-        dialog = new TonometerDialog(requestData);
+        dialog.reset(new TonometerDialog(requestData));
         break;
-
       //case Constants::MeasureType::CarotidIntima:
       //  dialog = new UltrasoundDialog(requestData);
       //  break;
-
       case Constants::MeasureType::Retinal_Camera:
-        dialog = new RetinalCameraDialog(requestData);
+        dialog.reset(new RetinalCameraDialog(requestData));
         break;
-
       case Constants::MeasureType::Spirometer:
-        dialog = new SpirometerDialog(requestData);
+        dialog.reset(new SpirometerDialog(requestData));
         break;
-
       case Constants::MeasureType::Signature:
-        dialog = new SignaturePadDialog(requestData);
+        dialog.reset(new SignaturePadDialog(requestData));
         break;
-
       case Constants::MeasureType::Unknown:
         break;
-
       default:
         break;
     }
+
+      qDebug() << "returning dialog";
     return dialog;
 }

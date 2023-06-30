@@ -8,6 +8,16 @@ VividiManager::VividiManager(QObject *parent)
 
 }
 
+bool VividiManager::isAvailable()
+{
+    return false;
+}
+
+bool VividiManager::isInstalled()
+{
+    return false;
+}
+
 void VividiManager::start()
 {
 
@@ -15,7 +25,7 @@ void VividiManager::start()
 
 void VividiManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
       sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/ultrasound/output.json");
     }
 

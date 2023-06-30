@@ -24,7 +24,8 @@ class WeighScaleManager : public SerialPortManager
 public:
     explicit WeighScaleManager(QJsonObject inputData);
 
-    bool isAvailable();
+    static bool isAvailable();
+    static bool isInstalled();
 
 public slots:
     // connect to the serial port

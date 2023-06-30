@@ -30,6 +30,16 @@ SignaturePadManager::~SignaturePadManager()
     qDebug() << "destroy sig pad manager";
 }
 
+bool SignaturePadManager::isInstalled()
+{
+    return false;
+}
+
+bool SignaturePadManager::isAvailable()
+{
+    return false;
+}
+
 void SignaturePadManager::start()
 {
     captureThread.start();

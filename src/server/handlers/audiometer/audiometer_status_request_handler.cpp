@@ -14,7 +14,6 @@ void AudiometerStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
-        qDebug() << "status request";
         std::ostream& out = response.send();
         out << responseData.toStdString();
         out.flush();

@@ -29,7 +29,8 @@ public:
     explicit CDTTManager(QJsonObject inputData);
     ~CDTTManager();
 
-    bool isAvailable();
+    static bool isAvailable();
+    static bool isInstalled();
 
 public slots:
 

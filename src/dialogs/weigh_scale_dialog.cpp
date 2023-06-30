@@ -31,7 +31,7 @@ void WeighScaleDialog::initializeConnections()
   // Disable all buttons by default
   //
 
-  if (CypressApplication::getInstance().isSimulation()) {
+  if (Cypress::getInstance().isSimulation()) {
       ui->measureWidget->enableMeasure();
   }
   else {
@@ -47,7 +47,7 @@ void WeighScaleDialog::initializeConnections()
   }
   }
 
-
+  connect(ui->completeButton, &QPushButton::clicked, this, &WeighScaleDialog::userClose);
 
   // Relay messages from the manager to the status bar
   //
@@ -181,22 +181,20 @@ void WeighScaleDialog::initializeConnections()
 
 void WeighScaleDialog::userClose()
 {
-    DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void WeighScaleDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "WeighScaleDialog::handleClose";
-    event->ignore();
+    DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("weigh_scale", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
         m_manager->sendCancellation("weigh_scale", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void WeighScaleDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

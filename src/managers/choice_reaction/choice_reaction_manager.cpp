@@ -26,6 +26,11 @@ bool ChoiceReactionManager::isAvailable()
     return false;
 }
 
+bool ChoiceReactionManager::isInstalled()
+{
+    return false;
+}
+
 void ChoiceReactionManager::start()
 {
     // connect signals and slots to QProcess one time only
@@ -69,7 +74,7 @@ void ChoiceReactionManager::readOutput()
 
 void ChoiceReactionManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/choice_reaction/output.json");
         return;
     }

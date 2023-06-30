@@ -27,7 +27,7 @@ void BloodPressureDialog::initializeModel()
 void BloodPressureDialog::initializeConnections()
 {
     QSharedPointer<BloodPressureManager> derived = m_manager.staticCast<BloodPressureManager>();
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
       ui->measureWidget->enableMeasure();
     }
     else {
@@ -229,21 +229,20 @@ void BloodPressureDialog::initializeConnections()
 void BloodPressureDialog::userClose()
 {
     DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void BloodPressureDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "BloodPressureDialog::handleClose";
-    event->ignore();
     if (m_user_close)
     {
         m_manager->sendComplete("blood_pressure", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("blood_pressure", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void BloodPressureDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

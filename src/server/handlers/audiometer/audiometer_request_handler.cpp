@@ -33,8 +33,8 @@ void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
-
-    CypressApplication::getInstance().server -> requestTestStart(
+    
+    Cypress::getInstance().server -> requestTestStart(
         Constants::MeasureType::Audiometer, requestData, data["sessionId"].toString()
     );
 

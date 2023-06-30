@@ -29,7 +29,9 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&) const;
-    bool isAvailable();
+
+    static bool isAvailable();
+    static bool isInstalled();
 
 public slots:
 

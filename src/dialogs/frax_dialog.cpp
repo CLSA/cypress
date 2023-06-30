@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-FraxDialog::FraxDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
+FraxDialog::FraxDialog(QJsonObject inputData): ui(new Ui::FraxDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -31,8 +31,8 @@ void FraxDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-
-  if (CypressApplication::getInstance().isSimulation()) {
+  
+  if (Cypress::getInstance().isSimulation()) {
       ui->measureWidget->enableMeasure();
   }
   else {
@@ -47,6 +47,8 @@ void FraxDialog::initializeConnections()
       button->setAutoDefault(false);
   }
   }
+
+  connect(ui->completeButton, &QPushButton::clicked, this, &FraxDialog::userClose);
 
   // Relay messages from the manager to the status bar
   //
@@ -71,7 +73,7 @@ void FraxDialog::initializeConnections()
           if("Close" != button->text())
             button->setEnabled(false);
         }
-        ui->openButton->setEnabled(true);
+        //ui->openButton->setEnabled(true);
         static bool warn = true;
         if(warn)
         {
@@ -84,16 +86,16 @@ void FraxDialog::initializeConnections()
         }
     });
 
-  connect(ui->openButton, &QPushButton::clicked,
-        this, [this, derived]() {
-            QString fileName =
-                QFileDialog::getOpenFileName(
-                    this, tr("Open File"),
-                    QCoreApplication::applicationDirPath(),
-                    tr("Applications (*.exe, *)"));
+  //connect(ui->openButton, &QPushButton::clicked,
+  //      this, [this, derived]() {
+  //          QString fileName =
+  //              QFileDialog::getOpenFileName(
+  //                  this, tr("Open File"),
+  //                  QCoreApplication::applicationDirPath(),
+  //                  tr("Applications (*.exe, *)"));
 
-            derived->selectRunnable(fileName);
-        });
+  //          derived->selectRunnable(fileName);
+  //      });
 
   // Available to start measuring
   //
@@ -123,22 +125,21 @@ void FraxDialog::initializeConnections()
 
 void FraxDialog::userClose()
 {
-    DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void FraxDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "FraxDialog::handleClose";
-    event->ignore();
+    DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("frax", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("frax", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void FraxDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

@@ -16,6 +16,9 @@ public:
     explicit RetinalCameraManager(QJsonObject inputData);
     ~RetinalCameraManager();
 
+    static bool isInstalled();
+    static bool isAvailable();
+
     QJsonDocument m_exam;
 
 public slots:

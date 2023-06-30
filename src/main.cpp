@@ -1,3 +1,13 @@
+#include "cypress_application.h"
+
+#include "managers/audiometer/audiometer_manager.h"
+#include "managers/blood_pressure/blood_pressure_manager.h"
+#include "managers/body_composition/body_composition_manager.h"
+#include "managers/cdtt/cdtt_manager.h"
+#include "managers/choice_reaction/choice_reaction_manager.h"
+
+#include "auxiliary/Constants.h"
+
 #include <QApplication>
 #include <QException>
 #include <QSettings>
@@ -9,13 +19,10 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QMetaType>
-
-#include "cypress_application.h"
-//#include "managers/SettingsManager.h"
-#include "auxiliary/command_line_parser.h"
-#include "auxiliary/Constants.h"
-
-#include "logging/debug_dialog.h"
+#include <QDir>
+#include <QSysInfo>
+#include <QHostInfo>
+#include <QNetworkInterface>
 
 const QString orgName = "CLSA";
 const QString orgDomain = "clsa-elcv.ca";
@@ -97,28 +104,63 @@ bool setDefaultSettings()
 }
 
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+// Custom message handler to write to a log file and stdout
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    Q_UNUSED(context);
-    Q_UNUSED(type);
-
-    static DebugDialog *debugDialog = nullptr;
-
-    if (!debugDialog)
-    {
-        debugDialog = new DebugDialog();
-        debugDialog->setWindowTitle("Debug");
-        debugDialog->setWindowFlags(Qt::WindowFullscreenButtonHint);
-        debugDialog->setMinimumWidth(400);
-        debugDialog->show();
+    QString txt;
+    switch (type) {
+    case QtDebugMsg:
+        txt = QString("debug: ");
+        break;
+    case QtInfoMsg:
+        txt = QString("info: ");
+        break;
+    case QtWarningMsg:
+        txt = QString("warning: ");
+        break;
+    case QtCriticalMsg:
+        txt = QString("critical: ");
+        break;
+    case QtFatalMsg:
+        txt = QString("fatal: ");
     }
 
-    QDateTime currentDateTime = QDateTime::currentDateTime();
+    txt += msg;
+    txt.prepend(QDateTime::currentDateTime().toString("[dd.MM.yyyy hh:mm:ss] "));
 
-    // Create a new message with the timestamp and original message
-    QString newMsg = currentDateTime.toString(Qt::ISODateWithMs) + " [" + QString::number(type) + "] " + msg;
+    QString path = QDir::currentPath() + "/logs";
+    QDir dir;
+    bool success { dir.mkpath(path) };
+    if (!success)
+    {
+        qFatal(("could not create log file directory at " + QDir::currentPath()).toStdString().c_str());
+    }
 
-    debugDialog->appendDebugMessage(newMsg);
+    QFile outFile(path + "/log.txt");
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+    QTextStream ts(&outFile);
+    ts << txt << "\n";
+
+    fprintf(stdout, "%s\n", txt.toStdString().c_str());
+    fflush(stdout);
+}
+
+// Removes old log files (>= 30 days old)
+void cleanupLogs()
+{
+    QString path = QDir::currentPath() + "/logs";
+    QDir dir(path);
+    if (!dir.exists())
+        return;
+
+    QStringList logFiles = dir.entryList(QStringList() << "log_*.txt", QDir::Files, QDir::Name);
+    for(const QString &logFile : logFiles) {
+        QFileInfo fileInfo(dir.absoluteFilePath(logFile));
+        if (fileInfo.lastModified().date().addDays(30) < QDate::currentDate()) {
+            dir.remove(logFile);
+        }
+    }
 }
 
 void restartApplication(const QStringList& arguments) {
@@ -127,65 +169,148 @@ void restartApplication(const QStringList& arguments) {
     QCoreApplication::quit();
 }
 
+void logSystemInfo()
+{
+    qInfo() << QHostInfo::localHostName();
+    qInfo() << QSysInfo::productType() + " "
+               + QSysInfo::productVersion() + " ("
+               + QSysInfo::kernelType() + " "
+               + QSysInfo::kernelVersion() + " "
+               + QSysInfo::currentCpuArchitecture() + ")";
+}
+
+void logNetworkInfo()
+{
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for(const QNetworkInterface &interface : interfaces) {
+        qInfo() << interface.humanReadableName();
+        QList<QNetworkAddressEntry> entries = interface.addressEntries();
+        for(const QNetworkAddressEntry &entry : entries) {
+            if(entry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
+                qInfo() << "\t" << entry.ip().toString();
+            }
+        }
+    }
+}
+
+void logAppInfo()
+{
+    qInfo() << QCoreApplication::applicationName();
+    qInfo() << QCoreApplication::applicationVersion();
+    qInfo() << QCoreApplication::applicationDirPath();
+}
+
+QString getStatusCheckString(const QString& arg1, bool arg2)
+{
+    return QString("%1 %2").arg(arg1, -17).arg("[ " + (arg2 ? QString("true ") : QString("false")) + " ]");
+}
+
+bool checkAlive()
+{
+    bool isAlive { true };
+
+    qInfo() << getStatusCheckString("pine available", isAlive);
+
+    return isAlive;
+}
+
+bool updateAvailable()
+{
+    bool isUpdateAvailable { false };
+
+    qInfo() << getStatusCheckString("update available", isUpdateAvailable);
+
+    return isUpdateAvailable;
+}
+
+bool downloadUpdate()
+{
+    qInfo() << "downloading update...";
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
+    // Setup Qt and defaults
     QGuiApplication::setOrganizationName(orgName);
     QGuiApplication::setOrganizationDomain(orgDomain);
+
     QGuiApplication::setApplicationName(appName);
     QGuiApplication::setApplicationVersion(appVersion);
+    QGuiApplication::setApplicationVersion("1.0");
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
-    QApplication app(argc, argv);
-    QStringList appArguments = QCoreApplication::arguments();
-
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
+    qInstallMessageHandler(messageHandler);
 
-    qDebug() << "running";
+    // Clean up system
 
-    //if (updateAvailable())
-    //{
-    //    if (downloadUpdate())
-    //    {
-    //        restartApplication(appArguments);
-    //    }
-    //}
+    cleanupLogs();
 
-    //QTranslator translator;
-    //const QStringList uiLanguages = QLocale::system().uiLanguages();
-    //for (const QString &locale : uiLanguages) {
-    //    const QString baseName = "cypress_" + QLocale(locale).name();
-    //    if (translator.load(":/i18n/" + baseName)) {
-    //        app.installTranslator(&translator);
-    //        break;
-    //    }
-    //}
+    // Init app
+    QApplication app(argc, argv);
+    QSettings(QSettings::IniFormat, QSettings::UserScope, orgName, appName);
 
-    // process command line args
-    //
-    //CommandLineParser parser;
-    //QString errMessage;
-    //switch(parser.parseCommandLine(app, &errMessage))
-    //{
-    //    case CommandLineParser::parseHelpRequested:
-    //        parser.displayHelp(parser);
-    //        return EXIT_SUCCESS;
-    //    case CommandLineParser::parseVersionRequested:
-    //        parser.displayHelp(parser);
-    //        return EXIT_SUCCESS;
-    //    case CommandLineParser::parseOk:
-    //        break;
-    //    case CommandLineParser::parseError:
-    //    case CommandLineParser::parseInputFileError:
-    //    case CommandLineParser::parseOutputPathError:
-    //    case CommandLineParser::parseMissingArg:
-    //    case CommandLineParser::parseMeasureTypeError:
-    //    case CommandLineParser::parseRunModeError:
-    //        parser.displayError(errMessage, parser);
-    //        return EXIT_FAILURE;
-    //}
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "cypress_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            app.installTranslator(&translator);
+            break;
+        }
+    }
 
-    CypressApplication& cypress = CypressApplication::getInstance();
-    //cypress.setArgs();
+    logAppInfo();
+    logSystemInfo();
+    logNetworkInfo();
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Managers medical device data collection.");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption isDebug("d",
+        QCoreApplication::translate("main", "run app in debug mode")
+    );
+    parser.addOption(isDebug);
+    parser.process(app);
+
+
+    if (parser.positionalArguments().length())
+    {
+        qInfo() << "args: ", parser.positionalArguments();
+    }
+
+    if (parser.isSet(isDebug))
+    {
+        qInfo("debug");
+    }
+    else
+    {
+        qInfo("production");
+    }
+
+    // Make sure the network is up and that the Pine server is alive
+    if (!checkAlive())
+    {
+        qCritical() << "could not connect to the Pine server";
+        return -1;
+    }
+
+    // Check for and install any updates
+    if (updateAvailable())
+    {
+        if (downloadUpdate())
+        {
+            restartApplication(QCoreApplication::arguments());
+        }
+        else {
+            qCritical() << "could not download a new update";
+        }
+    }
+
+    Cypress::getInstance().start();
 
     return app.exec();
 }

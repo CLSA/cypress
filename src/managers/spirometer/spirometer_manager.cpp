@@ -21,6 +21,11 @@ SpirometerManager::SpirometerManager(QJsonObject inputData)
     m_test.setExpectedMeasurementCount(4);
 }
 
+bool SpirometerManager::isInstalled()
+{
+    return false;
+}
+
 bool SpirometerManager::isAvailable()
 {
     return false;
@@ -28,8 +33,8 @@ bool SpirometerManager::isAvailable()
 
 void SpirometerManager::start()
 {
-
-    if (CypressApplication::getInstance().isSimulation()) {
+    
+    if (Cypress::getInstance().isSimulation()) {
 
         return;
     }
@@ -87,7 +92,7 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/spirometer/output.json");
         return;
     }

@@ -36,8 +36,8 @@ void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
 
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
-
-    CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::DxaWholeBody, requestData, responseJson["sessionId"].toString());
+    
+    Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::DxaWholeBody, requestData, responseJson["sessionId"].toString());
 
     std::ostream& out = response.send();
     out << responseData.toStdString();

@@ -32,8 +32,8 @@ void CDTTDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-
-  if (CypressApplication::getInstance().isSimulation()) {
+  
+  if (Cypress::getInstance().isSimulation()) {
       ui->measureWidget->enableMeasure();
   }
   else {
@@ -149,21 +149,21 @@ void CDTTDialog::initializeConnections()
 void CDTTDialog::userClose()
 {
     DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void CDTTDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "CDTTDialog::handleClose";
-    event->ignore();
     if (m_user_close)
     {
         m_manager->sendComplete("cdtt", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("body_composition", m_manager->m_uuid);
     }
+    
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void CDTTDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

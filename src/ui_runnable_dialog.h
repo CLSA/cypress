@@ -18,8 +18,8 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
-#include "widgets/measure_widget.h"
 #include "widgets/barcode_widget.h"
+#include "widgets/measure_widget.h"
 
 QT_BEGIN_NAMESPACE
 

@@ -23,7 +23,6 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
-
 #include "widgets/barcode_widget.h"
 #include "widgets/measure_widget.h"
 

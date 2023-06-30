@@ -62,6 +62,16 @@ void BloodPressureManager::start()
 //    return false;
 //}
 
+bool BloodPressureManager::isAvailable()
+{
+  return false;
+}
+
+bool BloodPressureManager::isInstalled()
+{
+  return false;
+}
+
 void BloodPressureManager::selectDeviceById(const QUsb::Id& info)
 {
     Q_UNUSED(info)
@@ -109,7 +119,7 @@ void BloodPressureManager::setSide(const QString &side)
 //
 void BloodPressureManager::measure()
 {
-  if (CypressApplication::getInstance().isSimulation())
+  if (Cypress::getInstance().isSimulation())
   {
     sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/blood_pressure/output.json");
     return;

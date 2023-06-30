@@ -22,11 +22,11 @@ enum Status {
     Active,
 };
 
-class CypressApplication: public QObject
+class Cypress: public QObject
 {
     Q_OBJECT
 public:
-    static CypressApplication& getInstance();
+    static Cypress& getInstance();
 
     QString getSessionInfo();
     QJsonObject getStatus();
@@ -34,18 +34,18 @@ public:
     QScopedPointer<Server> restApiServer;
 
     Status status;
+
     QDateTime startTime;
     QDateTime endTime;
 
-    DialogBase* dialog = nullptr;
+    QSharedPointer<DialogBase> deviceDialog;
     QScopedPointer<Server> server;
 
-    void setArgs(const QVariantMap&);
-
+    void start();
     bool forceSessionEnd();
-
     bool isSimulation();
     bool isVerbose();
+
 
 public slots:
     bool startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId);
@@ -54,10 +54,10 @@ signals:
     bool endTest(QJsonObject results);
 
 private:
-    explicit CypressApplication(QObject *parent = Q_NULLPTR);
-    ~CypressApplication();
+    explicit Cypress(QObject *parent = Q_NULLPTR);
+    ~Cypress();
 
-    static CypressApplication* app;
+    static Cypress* app;
 
     void initialize();
 

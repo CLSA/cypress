@@ -44,8 +44,92 @@ AudiometerManager::AudiometerManager(QJsonObject inputData)
     qDebug() << "m_inputdata: " << m_inputData;
 }
 
+bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
+{
+#ifdef Q_OS_WIN
+    // Check if the system location starts with "COM"
+    return portInfo.description().contains("communications port", Qt::CaseInsensitive);
+#elif defined(Q_OS_LINUX)
+    // Check if the system location matches the pattern "/dev/ttyS*"
+    return portInfo.systemLocation().startsWith("/dev/ttyS", Qt::CaseSensitive);
+#else
+    // Unsupported platform
+    return false;
+#endif
+}
+
 bool AudiometerManager::isInstalled()
 {
+    QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
+    if (portList.isEmpty()) {
+      qInfo() << "no RS232 ports available.";
+      qInfo() << "-------------------------------------";
+      return false;
+    } else {
+      qInfo() << "checking for installed devices on available COM ports:";
+      bool isInstalled { false };
+
+      for (const QSerialPortInfo& portInfo : portList) {
+
+        if (!isRS232Port(portInfo))
+        {
+            continue;
+        }
+
+        QSerialPort serialPort;
+        serialPort.setPort(portInfo);
+        if (serialPort.open(QIODevice::ReadWrite)) {
+            qDebug() << "device installed on port" << portInfo.portName();
+            serialPort.close();
+            isInstalled = true;
+        } else {
+            qDebug() << "no device installed on port" << portInfo.portName();
+        }
+        qInfo() << "-------------------------------------";
+      }
+      return isInstalled;
+    }
+    return false;
+}
+
+bool AudiometerManager::isAvailable()
+{
+    QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
+    if (portList.isEmpty()) {
+      qWarning() << "audiometer: no RS232 ports available.";
+      return false;
+    } else {
+      qInfo() << "audiometer: available RS232 ports with supported baud rates between 600 and 19200:";
+      bool supportsBaudRates = false;
+      for (const QSerialPortInfo& portInfo : portList) {
+          if (!isRS232Port(portInfo))
+          {
+              continue;
+          }
+
+          QList<qint32> baudRates = portInfo.standardBaudRates();
+          for (qint32 baudRate : baudRates) {
+              if (baudRate >= 600 && baudRate <= 19200) {
+                  supportsBaudRates = true;
+                  break;
+              }
+          }
+
+          if (supportsBaudRates) {
+            qInfo() << "port:"                 << portInfo.portName();
+            qInfo() << "supported baud rates:" << baudRates;
+            qInfo() << "description:"          << portInfo.description();
+            qInfo() << "manufacturer:"         << portInfo.manufacturer();
+            qInfo() << "serial number:"        << portInfo.serialNumber();
+            qInfo() << "system location:"      << portInfo.systemLocation();
+            qInfo() << "vendor identifier:"    << portInfo.vendorIdentifier();
+            qInfo() << "product identifier:"   << portInfo.productIdentifier();
+            qInfo() << "-------------------------------------";
+          }
+      }
+
+      return supportsBaudRates;
+    }
     return false;
 }
 
@@ -71,7 +155,7 @@ void AudiometerManager::measure()
     //const char cmd[] = { 0x05, '4', 0x0d };
     //m_request = QByteArray::fromRawData(cmd, 3);
     //writeDevice();
-    if (CypressApplication::getInstance().isSimulation())
+    if (Cypress::getInstance().isSimulation())
     {
       sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/audiometer/output.json");
       return;

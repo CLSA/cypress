@@ -12,8 +12,8 @@ EcgDialog::EcgDialog(QJsonObject inputData) : ui(new Ui::EcgDialog)
 
     m_manager.reset(new ECGManager(inputData));
     m_manager->start();
-
-    if (CypressApplication::getInstance().isSimulation()) {
+    
+    if (Cypress::getInstance().isSimulation()) {
         ui->measureButton->setEnabled(true);
     }
 
@@ -31,22 +31,22 @@ EcgDialog::~EcgDialog()
 
 void EcgDialog::userClose()
 {
-    DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void EcgDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "ECGDialog::handleClose";
-    event->ignore();
+    DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("ecg", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("ecg", m_manager->m_uuid);
     }
+    
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void EcgDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

@@ -31,6 +31,10 @@ bool DXAManager::isAvailable()
     return false;
 }
 
+bool DXAManager::isInstalled()
+{
+    return false;
+}
 
 // what the manager does in response to the main application
 // window invoking its run method
@@ -45,7 +49,7 @@ void DXAManager::start()
 void DXAManager::measure()
 {
     qDebug() << "measure";
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/dxa/output.json");
         sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/dxa/whole_body.dcm", "whole_body.dcm");
         sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/dxa/whole_body2.dcm", "whole_body2.dcm");

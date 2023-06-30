@@ -20,6 +20,9 @@ public:
     explicit SignaturePadCommunication();
     ~SignaturePadCommunication();
 
+    static bool isInstalled();
+    static bool isAvailable();
+
 public slots:
     void start();
 

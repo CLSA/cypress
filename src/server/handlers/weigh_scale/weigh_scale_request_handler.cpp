@@ -6,16 +6,16 @@
 void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     QJsonObject requestData = getRequestData(request);
-    if (!isValidInputData(requestData))
-    {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        response.setContentType("application/json");
+    //if (!isValidInputData(requestData))
+    //{
+    //    response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    //    response.setContentType("application/json");
 
-        std::ostream& out = response.send();
-        out.flush();
+    //    std::ostream& out = response.send();
+    //    out.flush();
 
-        return;
-    }
+    //    return;
+    //}
 
     if (isBusy())
     {
@@ -29,9 +29,8 @@ void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
     }
 
     QJsonObject responseJson = getResponseData();
-
-    QString responseData = JsonSettings::serializeJson(getResponseData());
-    CypressApplication::getInstance().server -> requestTestStart(Constants::MeasureType::Weigh_Scale, requestData, responseJson["sessionId"].toString());
+    QString responseData = JsonSettings::serializeJson(responseJson);
+    Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::Weigh_Scale, requestData, responseJson["sessionId"].toString());
 
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
@@ -43,5 +42,5 @@ void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 
 bool WeighScaleRequestHandler::isValidInputData(const QJsonObject& inputData)
 {
-    return DefaultRequestHandler::isValidInputData(inputData);
+    return DefaultRequestHandler::isValidInputData(inputData) && inputData.contains("height");
 }

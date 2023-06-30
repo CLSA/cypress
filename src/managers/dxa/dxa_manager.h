@@ -35,7 +35,8 @@ public:
     ~DXAManager();
 
     //DicomSCP* m_dicomSCP;
-    bool isAvailable();
+    static bool isAvailable();
+    static bool isInstalled();
 
     QJsonObject scanAnalysisJson;
     QJsonObject scoresJson;

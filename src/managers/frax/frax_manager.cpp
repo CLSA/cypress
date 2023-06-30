@@ -21,6 +21,11 @@ bool FraxManager::isAvailable()
     return false;
 }
 
+bool FraxManager::isInstalled()
+{
+    return false;
+}
+
 void FraxManager::start()
 {
     // connect signals and slots to QProcess one time only
@@ -91,8 +96,8 @@ void FraxManager::measure()
     //clearData();
     //// launch the process
     //m_process.start();
-
-    if (CypressApplication::getInstance().isSimulation())
+    
+    if (Cypress::getInstance().isSimulation())
     {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/frax/output.json");
     }

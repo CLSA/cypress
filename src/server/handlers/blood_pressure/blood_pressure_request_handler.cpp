@@ -38,8 +38,8 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
     response.setContentType("application/json");
 
     std::ostream& out = response.send();
-
-    CypressApplication::getInstance().server -> requestTestStart(
+    
+    Cypress::getInstance().server -> requestTestStart(
         Constants::MeasureType::Blood_Pressure, requestData, responseJson["sessionId"].toString()
     );
 

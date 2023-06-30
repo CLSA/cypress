@@ -6,7 +6,7 @@ void CypressStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 {
     Q_UNUSED(request)
     try {
-        QString sessionInfo = CypressApplication::getInstance().getSessionInfo();
+        QString sessionInfo = Cypress::getInstance().getSessionInfo();
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");

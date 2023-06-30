@@ -28,8 +28,8 @@ void AudiometerDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-
-  if (CypressApplication::getInstance().isSimulation()) {
+  
+  if (Cypress::getInstance().isSimulation()) {
       ui->measureWidget->enableMeasure();
   }
 
@@ -169,22 +169,20 @@ void AudiometerDialog::initializeConnections()
 void AudiometerDialog::userClose()
 {
     DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void AudiometerDialog::closeEvent(QCloseEvent* event)
-{
-    qDebug() << "AudiometerDialog::handleClose";
-    event->ignore();
     if (m_user_close)
     {
         m_manager->sendComplete("audiometer", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("audiometer", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void AudiometerDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }
 

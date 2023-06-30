@@ -19,6 +19,9 @@ public:
     explicit GripStrengthManager(QJsonObject inputData);
     ~GripStrengthManager();
 
+    static bool isInstalled();
+    static bool isAvailable();
+
 public slots:
     void start() override;
     void measure() override;

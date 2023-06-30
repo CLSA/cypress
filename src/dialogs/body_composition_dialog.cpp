@@ -23,8 +23,8 @@ void BodyCompositionDialog::initializeConnections()
 {
   QSharedPointer<BodyCompositionManager> derived =
     m_manager.staticCast<BodyCompositionManager>();
-
-  if (CypressApplication::getInstance().isSimulation()) {
+    
+    if (Cypress::getInstance().isSimulation()) {
     ui->measureWidget->enableMeasure();
   }
   else {
@@ -304,22 +304,21 @@ void BodyCompositionDialog::initializeConnections()
 
 void BodyCompositionDialog::userClose()
 {
-    DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void BodyCompositionDialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "BloodPressureDialog::handleClose";
-    event->ignore();
+    DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("body_composition", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("body_composition", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void BodyCompositionDialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }

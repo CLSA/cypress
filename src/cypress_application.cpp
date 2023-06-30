@@ -14,77 +14,88 @@
 #include "dialogs/dialog_base.h"
 #include "server/Server.h"
 
-CypressApplication* CypressApplication::app = nullptr;
+Cypress* Cypress::app = nullptr;
 
-CypressApplication& CypressApplication::getInstance()
+Cypress& Cypress::getInstance()
 {
     if (!app)
     {
-        app = new CypressApplication();
+        app = new Cypress();
     }
 
     return *app;
 }
 
 
-CypressApplication::CypressApplication(QObject *parent) : QObject(parent)
+Cypress::Cypress(QObject *parent) : QObject(parent)
 {
-    initialize();
+
 }
 
 
-CypressApplication::~CypressApplication()
+Cypress::~Cypress()
 {
+    qDebug() << "destroy cypress";
 }
 
+void Cypress::start()
+{
+    try {
+        initialize();
+    }
+    catch (QException& exception)
+    {
+        qCritical() << exception.what();
+    }
+}
 
-bool CypressApplication::isSimulation() {
+bool Cypress::isSimulation()
+{
     return m_simulate;
 }
 
 
-bool CypressApplication::isVerbose() {
+bool Cypress::isVerbose()
+{
     return m_verbose;
 }
 
 
-void CypressApplication::initialize()
+void Cypress::initialize()
 {
     startTime = QDateTime::currentDateTimeUtc();
 
     server.reset(new Server());
     server->start();
-    connect(server.get(), &Server::startTest, this, &CypressApplication::startTest);
+    connect(server.get(), &Server::startTest, this, &Cypress::startTest);
 
     status = Status::Waiting;
 }
 
 
-bool CypressApplication::forceSessionEnd()
+bool Cypress::forceSessionEnd()
 {
-    if (dialog == nullptr) return true;
+    if (deviceDialog.isNull()) return true;
 
-    dialog->close();
-    dialog = nullptr;
+    deviceDialog->close();
+    deviceDialog.reset();
 
     return true;
 }
 
 
-bool CypressApplication::startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId)
+bool Cypress::startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId)
 {
     try
     {
-        DialogFactory* factory = DialogFactory::instance();
-        dialog = factory->instantiate(type, requestData);
-        if(dialog == Q_NULLPTR) {
+        deviceDialog = DialogFactory::instantiate(type, requestData);
+        if(deviceDialog == Q_NULLPTR) {
             QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
             return false;
         }
-
-        dialog->initialize();
-        dialog->m_manager->m_uuid = sessionId;
-        dialog->show();
+        deviceDialog->initialize();
+        deviceDialog->m_manager->m_uuid = sessionId;
+        deviceDialog->show();
     }
     catch (QException& e)
     {
@@ -96,8 +107,8 @@ bool CypressApplication::startTest(const Constants::MeasureType& type, const QJs
 }
 
 
-QString CypressApplication::getSessionInfo() {
-    if (dialog == nullptr)
+QString Cypress::getSessionInfo() {
+    if (deviceDialog == nullptr)
     {
         return "Available";
     }
@@ -108,21 +119,7 @@ QString CypressApplication::getSessionInfo() {
 }
 
 
-void CypressApplication::setArgs(const QVariantMap& args)
-{
-    if (args.contains("verbose"))
-    {
-        m_verbose = args["verbose"].toBool();
-    }
-
-    if (args.contains("sim"))
-    {
-        m_simulate = args["simulate"].toBool();
-    }
-}
-
-
-QJsonObject CypressApplication::getStatus()
+QJsonObject Cypress::getStatus()
 {
     QJsonObject statusJson = {};
 

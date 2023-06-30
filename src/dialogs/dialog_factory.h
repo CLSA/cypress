@@ -9,14 +9,10 @@ QT_FORWARD_DECLARE_CLASS(DialogBase)
 class DialogFactory
 {
 public:
-    static DialogFactory *instance();
-    ~DialogFactory();
-
-    DialogBase* instantiate(const Constants::MeasureType& type, const QJsonObject& requestData);
+    static QSharedPointer<DialogBase> instantiate(const Constants::MeasureType& type, const QJsonObject& requestData);
 
 private:
     DialogFactory() = default;
-    static DialogFactory *pInstance;
 };
 
 #endif // DIALOG_FACTORY_H

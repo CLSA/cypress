@@ -52,6 +52,8 @@ void Server::start()
 {
     serverThread.start();
     server->start();
+
+    qInfo() << "listening at " + QString::fromStdString(server->socket().address().toString());
 }
 
 void Server::stop()

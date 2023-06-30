@@ -29,6 +29,11 @@ bool CDTTManager::isAvailable()
     return false;
 }
 
+bool CDTTManager::isInstalled()
+{
+    return false;
+}
+
 void CDTTManager::start()
 {
     // connect signals and slots to QProcess one time only
@@ -62,7 +67,7 @@ void CDTTManager::start()
 
 void CDTTManager::measure()
 {
-    if (CypressApplication::getInstance().isSimulation()) {
+    if (Cypress::getInstance().isSimulation()) {
         sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/cdtt/output.json");
     };
 

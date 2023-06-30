@@ -32,7 +32,10 @@ public:
 
     static QByteArray initEndCode();
     static QByteArray END_CODE;
+
+    static bool isRS232Port(const QSerialPortInfo& portInfo);
     static bool isInstalled();
+    static bool isAvailable();
 
 public slots:
     // retrieve a measurement from the device

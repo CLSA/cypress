@@ -56,13 +56,12 @@ void DXADialog::dicomFilesReceived(const QStringList& dicomFilePaths)
     }
 
     qDebug() << dicomFilePaths;
-
     m_manager->dicomFilesReceived(dicomFilePaths);
 }
 
 void DXADialog::on_openFileExplorer_released()
 {
-    QDesktopServices::openUrl(QUrl("C:/dev/clsa/cypress/dcmtk-3.6.7/storage"));
+    QDesktopServices::openUrl(QUrl(QDir::currentPath() + "/dcmtk-3.6.7/storage"));
 }
 
 
@@ -73,23 +72,22 @@ void DXADialog::on_submitButton_clicked()
 
 void DXADialog::userClose()
 {
-    DialogBase::userClose();
-    CypressApplication::getInstance().forceSessionEnd();
-}
-
-void DXADialog::closeEvent(QCloseEvent* event)
-{
     qDebug() << "DXADialog::handleClose";
-    event->ignore();
+    DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("dxa", m_manager->m_uuid);
     }
     else
     {
-        CypressApplication::getInstance().dialog = nullptr;
+        Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("dxa", m_manager->m_uuid);
     }
+    Cypress::getInstance().forceSessionEnd();
+}
+
+void DXADialog::closeEvent(QCloseEvent* event)
+{
     event->accept();
 }
 
