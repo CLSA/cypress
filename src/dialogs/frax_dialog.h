@@ -9,7 +9,7 @@ class FraxDialog : public DialogBase, public Ui::FraxDialog
     Q_OBJECT
 
 public:
-    explicit FraxDialog(QJsonObject inputData);
+    explicit FraxDialog(QWidget* parent, const CypressSession& session);
     ~FraxDialog();
 
 private:

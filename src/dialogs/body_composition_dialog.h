@@ -9,7 +9,7 @@ class BodyCompositionDialog : public DialogBase, public Ui::BodyCompositionDialo
     Q_OBJECT
 
 public:
-    BodyCompositionDialog(QJsonObject inputData);
+    BodyCompositionDialog(QWidget* parent, const CypressSession& session);
     ~BodyCompositionDialog();
 
 private:

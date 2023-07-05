@@ -1,16 +1,12 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QObject>
-#include <QTcpServer>
-
 #include "Poco/Net/HTTPServer.h"
 
 #include <QObject>
+#include <QTcpServer>
+#include <QObject>
 #include <QThread>
-
-#include "auxiliary/Constants.h"
-
 #include <QJsonObject>
 
 using namespace Poco::Net;
@@ -20,7 +16,7 @@ class Server: public QObject
     Q_OBJECT
 
     enum Ports {
-        DEFAULT_PORT = 8000
+        DEFAULT_PORT = 9000
     };
 
     public:
@@ -30,14 +26,8 @@ class Server: public QObject
         void start();
         void stop();
 
-        void requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId);
-        bool sendResults(const QJsonObject& results);
-
-    signals:
-        void startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId);
-
     private:
-        HTTPServer* server;
+        QScopedPointer<HTTPServer> server;
         QThread serverThread;
 
 };

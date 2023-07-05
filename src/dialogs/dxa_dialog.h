@@ -14,7 +14,7 @@ class DXADialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit DXADialog(QJsonObject inputData);
+    explicit DXADialog(QWidget* parent, const CypressSession& session);
     ~DXADialog();
 
 private:

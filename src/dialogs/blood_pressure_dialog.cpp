@@ -6,12 +6,13 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-BloodPressureDialog::BloodPressureDialog(QJsonObject inputData): ui(new Ui::BloodPressureDialog)
+BloodPressureDialog::BloodPressureDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::BloodPressureDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
-
-    m_manager.reset(new BloodPressureManager(inputData));
+    //m_manager.reset(new BloodPressureManager(inputData));
 }
 
 BloodPressureDialog::~BloodPressureDialog()
@@ -28,7 +29,7 @@ void BloodPressureDialog::initializeConnections()
 {
     QSharedPointer<BloodPressureManager> derived = m_manager.staticCast<BloodPressureManager>();
     if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
     }
     else {
       // Disable all buttons by default
@@ -170,7 +171,7 @@ void BloodPressureDialog::initializeConnections()
             this,[this]() {
         ui->connectButton->setEnabled(true);
         ui->disconnectButton->setEnabled(false);
-        ui->measureWidget->disableMeasure();
+        //ui->measureWidget->disableMeasure();
     });
 
     // Connect to the device (bpm)
@@ -184,7 +185,7 @@ void BloodPressureDialog::initializeConnections()
             this,[this](){
         ui->connectButton->setEnabled(false);
         ui->disconnectButton->setEnabled(true);
-        ui->measureWidget->disableMeasure();
+        //ui->measureWidget->disableMeasure();
 
         // Remove blank enty from selection, so that user cannot change answer to blank
         // The user will still be able to change their selection if they make a mistake
@@ -207,23 +208,23 @@ void BloodPressureDialog::initializeConnections()
 
     // Request a measurement from the device
     //
-    connect(ui->measureWidget, &MeasureWidget::measure,
-          derived.get(), &BloodPressureManager::measure);
+    //connect(ui->measureWidget, &MeasureWidget::measure,
+    //      derived.get(), &BloodPressureManager::measure);
 
     // Update the UI with any data
     //
-    connect(derived.get(), &BloodPressureManager::dataChanged,
-        ui->measureWidget, &MeasureWidget::updateModelView);
+    //connect(derived.get(), &BloodPressureManager::dataChanged,
+    //    ui->measureWidget, &MeasureWidget::updateModelView);
 
     // All measurements received: enable write test results
     //
-    connect(derived.get(), &BloodPressureManager::canFinish,
-        ui->measureWidget, &MeasureWidget::enableWriteToFile);
+    //connect(derived.get(), &BloodPressureManager::canFinish,
+    //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
     // Close the application
     //
-    connect(ui->measureWidget, &MeasureWidget::closeApplication,
-        this, &BloodPressureDialog::close);
+    //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+    //    this, &BloodPressureDialog::close);
 }
 
 void BloodPressureDialog::userClose()
@@ -236,10 +237,10 @@ void BloodPressureDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("blood_pressure", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void BloodPressureDialog::closeEvent(QCloseEvent* event)

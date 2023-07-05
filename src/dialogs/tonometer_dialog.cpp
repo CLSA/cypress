@@ -7,12 +7,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-TonometerDialog::TonometerDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
+TonometerDialog::TonometerDialog(QWidget* parent, const CypressSession& session):
+    DialogBase { parent, session },
+    ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new TonometerManager(inputData));
+    //m_manager.reset(new TonometerManager(inputData));
 
     this->setWindowTitle("Tonometer");
 }
@@ -38,7 +40,7 @@ void TonometerDialog::initializeConnections()
   //
   
   if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
   }
   else {
   foreach(auto button, this->findChildren<QPushButton *>())
@@ -71,25 +73,25 @@ void TonometerDialog::initializeConnections()
   //
   if(Constants::RunMode::modeSimulate == m_mode)
   {
-    ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
+    //ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
   }
 
-  connect(ui->barcodeWidget,&BarcodeWidget::validated,
-          this,[this](const bool& valid)
-    {
-      if(valid)
-      {
-          // launch the manager
-          //
-          this->run();
-      }
-      else
-      {
-          QMessageBox::critical(
-            this, QApplication::applicationName(),
-            tr("The input does not match the expected barcode for this participant."));
-      }
-  });
+  //connect(ui->barcodeWidget,&BarcodeWidget::validated,
+  //        this,[this](const bool& valid)
+  //  {
+  //    if(valid)
+  //    {
+  //        // launch the manager
+  //        //
+  //        this->run();
+  //    }
+  //    else
+  //    {
+  //        QMessageBox::critical(
+  //          this, QApplication::applicationName(),
+  //          tr("The input does not match the expected barcode for this participant."));
+  //    }
+  //});
 
     connect(derived.get(),&TonometerManager::canSelectRunnable,
             this,[this](){
@@ -136,28 +138,28 @@ void TonometerDialog::initializeConnections()
 
     // Available to start measuring
     //
-    connect(derived.get(), &TonometerManager::canMeasure,
-            ui->measureWidget, &MeasureWidget::enableMeasure);
+    //connect(derived.get(), &TonometerManager::canMeasure,
+    //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
     // Request a measurement from the device
     //
-    connect(ui->measureWidget, &MeasureWidget::measure,
-        derived.get(), &TonometerManager::measure);
+    //connect(ui->measureWidget, &MeasureWidget::measure,
+    //    derived.get(), &TonometerManager::measure);
 
     // Update the UI with any data
     //
-    connect(derived.get(), &TonometerManager::dataChanged,
-        ui->measureWidget, &MeasureWidget::updateModelView);
+    //connect(derived.get(), &TonometerManager::dataChanged,
+    //    ui->measureWidget, &MeasureWidget::updateModelView);
 
     // All measurements received: enable write test results
     //
-    connect(derived.get(), &TonometerManager::canFinish,
-        ui->measureWidget, &MeasureWidget::enableWriteToFile);
+    //connect(derived.get(), &TonometerManager::canFinish,
+    //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
     // Close the application
     //
-    connect(ui->measureWidget, &MeasureWidget::closeApplication,
-        this, &DialogBase::close);
+    //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+    //    this, &DialogBase::close);
 }
 
 void TonometerDialog::userClose()
@@ -170,10 +172,10 @@ void TonometerDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("tonometer", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void TonometerDialog::closeEvent(QCloseEvent* event)

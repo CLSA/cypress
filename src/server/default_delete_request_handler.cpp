@@ -25,17 +25,16 @@ void DefaultDeleteSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequ
     response.setStatus(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
     response.setContentType("application/json");
     
-    bool success = Cypress::getInstance().forceSessionEnd();
-    QJsonObject responseData {};
-    if (success) {
-       responseData["success"] = "Ended session";
-    }
-    else  {
-       responseData["error"] = "Could not end session..";
-    }
+    //bool success = Cypress::getInstance().endSession();
+    //QJsonObject responseData {};
+    //if (success) {
+    //   responseData["success"] = "Ended session";
+    //}
+    //else  {
+    //   responseData["error"] = "Could not end session..";
+    //}
 
     std::ostream& out = response.send();
-
-    out << JsonSettings::serializeJson(responseData).toStdString();
+    //out << JsonSettings::serializeJson(responseData).toStdString();
     out.flush();
 }

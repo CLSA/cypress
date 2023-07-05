@@ -4,15 +4,17 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
-#include "../managers/manager_base.h"
-#include "../auxiliary/Constants.h"
+#include "managers/manager_base.h"
+#include "auxiliary/Constants.h"
+
+class CypressSession;
 
 class DialogBase : public QDialog
 {
     Q_OBJECT
 
 public:
-    DialogBase(QWidget *parent = Q_NULLPTR, QString uuid = "");
+    DialogBase(QWidget *parent, const CypressSession& session);
     ~DialogBase() = default;
 
     void initialize();
@@ -34,21 +36,19 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+    const CypressSession& m_session;
+
     bool m_user_close = false;
 
     QString m_uuid;
     QStandardItemModel m_model;
-    QString m_inputFileName;
-    QString m_outputFileName;
     Constants::RunMode m_mode;
     QVariantMap m_inputData;
-
-    bool m_verbose;
 
     QString getDefaultOutputFileName();
     QString getOutputFile();
 
-    virtual void initializeConnections() = 0;
+    virtual void initializeConnections();
     virtual void initializeModel();
 };
 

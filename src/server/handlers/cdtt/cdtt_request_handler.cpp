@@ -35,8 +35,8 @@ void CDTTRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
     
-    Cypress::getInstance().server -> requestTestStart(
-        Constants::MeasureType::CDTT, requestData, responseJson["sessionId"].toString());
+    //Cypress::getInstance().server -> requestTestStart(
+    //    Constants::MeasureType::CDTT, requestData, responseJson["sessionId"].toString());
 
     std::ostream& out = response.send();
     out << responseData.toStdString();

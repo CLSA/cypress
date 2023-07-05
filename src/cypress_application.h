@@ -1,12 +1,14 @@
 #ifndef CYPRESS_APPLICATION_H
 #define CYPRESS_APPLICATION_H
 
-#include "auxiliary/Constants.h"
 #include "server/Server.h"
+#include "cypress_session.h"
+#include "auxiliary/Constants.h"
 
 #include <QObject>
 #include <QCoreApplication>
 #include <QJsonObject>
+
 
 QT_FORWARD_DECLARE_CLASS(DialogBase)
 
@@ -28,30 +30,22 @@ class Cypress: public QObject
 public:
     static Cypress& getInstance();
 
+    QScopedPointer<Server> httpServer;
+    QMap<QString, QScopedPointer<CypressSession>> activeSessions {};
+
     QString getSessionInfo();
     QJsonObject getStatus();
 
-    QScopedPointer<Server> restApiServer;
+    bool startSession(CypressSession& session);
+    bool endSession(CypressSession& session);
 
-    Status status;
+    void enableSimMode() { m_simulate = true; };
+    void disableSimMode() { m_simulate = false; };
+    bool isSimulation() { return m_simulate; };
 
-    QDateTime startTime;
-    QDateTime endTime;
-
-    QSharedPointer<DialogBase> deviceDialog;
-    QScopedPointer<Server> server;
-
-    void start();
-    bool forceSessionEnd();
-    bool isSimulation();
-    bool isVerbose();
-
-
-public slots:
-    bool startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId);
-
-signals:
-    bool endTest(QJsonObject results);
+    void enableVerbose() { m_verbose = true; };
+    void disableVerbose() { m_verbose = false; };
+    bool isVerbose() { return m_verbose; };
 
 private:
     explicit Cypress(QObject *parent = Q_NULLPTR);

@@ -15,45 +15,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string/>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_10">
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Participant ID:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="participantId">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="serialPortGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -230,9 +191,6 @@
           <property name="autoExclusive">
            <bool>false</bool>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">genderGroup</string>
-          </attribute>
          </widget>
         </item>
         <item>
@@ -249,9 +207,6 @@
           <property name="autoExclusive">
            <bool>false</bool>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">genderGroup</string>
-          </attribute>
          </widget>
         </item>
        </layout>
@@ -306,9 +261,6 @@
           <property name="autoExclusive">
            <bool>false</bool>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">unitsGroup</string>
-          </attribute>
          </widget>
         </item>
         <item>
@@ -319,9 +271,6 @@
           <property name="autoExclusive">
            <bool>false</bool>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">unitsGroup</string>
-          </attribute>
          </widget>
         </item>
        </layout>
@@ -352,9 +301,6 @@
           <property name="autoExclusive">
            <bool>false</bool>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">bodyTypeGroup</string>
-          </attribute>
          </widget>
         </item>
         <item>
@@ -371,9 +317,6 @@
           <property name="autoExclusive">
            <bool>false</bool>
           </property>
-          <attribute name="buttonGroup">
-           <string notr="true">bodyTypeGroup</string>
-          </attribute>
          </widget>
         </item>
        </layout>
@@ -439,50 +382,8 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="measureGroupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Measure</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="MeasureWidget" name="measureWidget" native="true"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QStatusBar" name="statusBar">
-     <property name="sizeGripEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MeasureWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/MeasureWidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <includes>
-  <include location="local">widgets/BarcodeWidget.h</include>
-  <include location="local">widgets/MeasureWidget.h</include>
- </includes>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="bodyTypeGroup"/>
-  <buttongroup name="genderGroup"/>
-  <buttongroup name="unitsGroup"/>
- </buttongroups>
 </ui>

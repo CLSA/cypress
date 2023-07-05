@@ -6,12 +6,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-WeighScaleDialog::WeighScaleDialog(QJsonObject inputData): ui(new Ui::WeighScaleDialog)
+WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::WeighScaleDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new WeighScaleManager(inputData));
+    //m_manager.reset(new WeighScaleManager(inputData));
 }
 
 WeighScaleDialog::~WeighScaleDialog()
@@ -32,7 +34,7 @@ void WeighScaleDialog::initializeConnections()
   //
 
   if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
   }
   else {
       foreach(auto button, this->findChildren<QPushButton *>())
@@ -126,7 +128,7 @@ void WeighScaleDialog::initializeConnections()
       //TODO: fix MeasureWidget segfault when adding extra zero button
       // ui->zeroButton->setEnabled(false);
       //
-      ui->measureWidget->disableMeasure();
+      //ui->measureWidget->disableMeasure();
   });
 
   // Connect to device
@@ -136,8 +138,8 @@ void WeighScaleDialog::initializeConnections()
 
   // Connection is established: enable measurement requests
   //
-  connect(derived.get(), &WeighScaleManager::canMeasure,
-          ui->measureWidget, &MeasureWidget::enableMeasure);
+  //connect(derived.get(), &WeighScaleManager::canMeasure,
+  //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
   connect(m_manager.get(), &WeighScaleManager::canMeasure,
           this,[this](){
@@ -160,29 +162,29 @@ void WeighScaleDialog::initializeConnections()
 
   // Request a measurement from the device
   //
-  connect(ui->measureWidget, &MeasureWidget::measure,
-        derived.get(), &WeighScaleManager::measure);
+  //connect(ui->measureWidget, &MeasureWidget::measure,
+  //      derived.get(), &WeighScaleManager::measure);
 
   // Update the UI with any data
   //
-  connect(derived.get(), &WeighScaleManager::dataChanged,
-      ui->measureWidget, &MeasureWidget::updateModelView);
+  //connect(derived.get(), &WeighScaleManager::dataChanged,
+  //    ui->measureWidget, &MeasureWidget::updateModelView);
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &WeighScaleManager::canFinish,
-      ui->measureWidget, &MeasureWidget::enableWriteToFile);
+  //connect(derived.get(), &WeighScaleManager::canFinish,
+  //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application
   //
-  connect(ui->measureWidget, &MeasureWidget::closeApplication,
-      this, &DialogBase::close);
+  //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+  //    this, &DialogBase::close);
 }
 
 void WeighScaleDialog::userClose()
 {
     qDebug() << "WeighScaleDialog::handleClose";
-    DialogBase::userClose();
+    //DialogBase::userClose();
     if (m_user_close)
     {
         m_manager->sendComplete("weigh_scale", m_manager->m_uuid);
@@ -191,7 +193,7 @@ void WeighScaleDialog::userClose()
     {
         m_manager->sendCancellation("weigh_scale", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void WeighScaleDialog::closeEvent(QCloseEvent* event)

@@ -13,7 +13,7 @@ class RetinalCameraDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit RetinalCameraDialog(QJsonObject inputData);
+    explicit RetinalCameraDialog(QWidget* parent, const CypressSession& session);
     ~RetinalCameraDialog();
 
 

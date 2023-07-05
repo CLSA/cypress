@@ -39,9 +39,9 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 
     std::ostream& out = response.send();
     
-    Cypress::getInstance().server -> requestTestStart(
-        Constants::MeasureType::Blood_Pressure, requestData, responseJson["sessionId"].toString()
-    );
+    //Cypress::getInstance().server -> requestTestStart(
+    //    Constants::MeasureType::Blood_Pressure, requestData, responseJson["sessionId"].toString()
+    //);
 
     out << responseData.toStdString();
     out.flush();

@@ -9,7 +9,7 @@ class BloodPressureDialog : public DialogBase, public Ui::BloodPressureDialog
     Q_OBJECT
 
 public:
-    explicit BloodPressureDialog(QJsonObject inputData);
+    BloodPressureDialog(QWidget* parent, const CypressSession& session);
     ~BloodPressureDialog();
 
     void userClose() override;

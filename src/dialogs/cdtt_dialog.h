@@ -2,14 +2,14 @@
 #define CDTT_DIALOG_H
 
 #include "dialog_base.h"
-#include "ui_runnable_dialog.h"
+#include "ui_cdtt_dialog.h"
 
-class CDTTDialog : public DialogBase, public Ui::RunnableDialog
+class CDTTDialog : public DialogBase, public Ui::CDTTDialog
 {
     Q_OBJECT
 
 public:
-    CDTTDialog(QJsonObject inputData);
+    CDTTDialog(QWidget* parent, const CypressSession& session);
     ~CDTTDialog();
 
 private:
@@ -18,7 +18,7 @@ private:
     void userClose() override;
     void closeEvent(QCloseEvent* event) override;
 
-    Ui::RunnableDialog *ui { Q_NULLPTR };
+    Ui::CDTTDialog *ui { Q_NULLPTR };
 };
 
 #endif // CDTT_DIALOG_H

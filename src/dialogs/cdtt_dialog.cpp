@@ -8,14 +8,15 @@
 
 #include "cypress_application.h"
 
-CDTTDialog::CDTTDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
+CDTTDialog::CDTTDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::CDTTDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     this->setWindowTitle("Canadian Digit Triplet Test");
-
-    m_manager.reset(new CDTTManager(inputData));
+    //m_manager.reset(new CDTTManager(inputData));
 }
 
 CDTTDialog::~CDTTDialog()
@@ -33,21 +34,21 @@ void CDTTDialog::initializeConnections()
   // Disable all buttons by default
   //
   
-  if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
-  }
-  else {
-      foreach(auto button, this->findChildren<QPushButton *>())
-      {
-        if("Close" != button->text())
-            button->setEnabled(false);
+  //if (Cypress::getInstance().isSimulation()) {
+  //    ui->measureWidget->enableMeasure();
+  //}
+  //else {
+  //    foreach(auto button, this->findChildren<QPushButton *>())
+  //    {
+  //      if("Close" != button->text())
+  //          button->setEnabled(false);
 
-        // disable enter key press event passing onto auto focus buttons
-        //
-        button->setDefault(false);
-        button->setAutoDefault(false);
-      }
-  }
+  //      // disable enter key press event passing onto auto focus buttons
+  //      //
+  //      button->setDefault(false);
+  //      button->setAutoDefault(false);
+  //    }
+  //}
 
 
   // Relay messages from the manager to the status bar
@@ -66,27 +67,27 @@ void CDTTDialog::initializeConnections()
   // TODO: for DCS interviews, the first digit corresponds the the wave rank
   // for inhome interviews there is a host dependent prefix before the barcode
   //
-  if(Constants::RunMode::modeSimulate == m_mode)
-  {
-    ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
-  }
+  //if(Constants::RunMode::modeSimulate == m_mode)
+  //{
+  //  ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
+  //}
 
-  connect(ui->barcodeWidget,&BarcodeWidget::validated,
-          this,[this](const bool& valid)
-    {
-      if(valid)
-      {
-          // launch the manager
-          //
-          this->run();
-      }
-      else
-      {
-          QMessageBox::critical(
-            this, QApplication::applicationName(),
-            tr("The input does not match the expected barcode for this participant."));
-      }
-  });
+  //connect(ui->barcodeWidget,&BarcodeWidget::validated,
+  //        this,[this](const bool& valid)
+  //  {
+  //    if(valid)
+  //    {
+  //        // launch the manager
+  //        //
+  //        this->run();
+  //    }
+  //    else
+  //    {
+  //        QMessageBox::critical(
+  //          this, QApplication::applicationName(),
+  //          tr("The input does not match the expected barcode for this participant."));
+  //    }
+  //});
 
   //connect(derived.get(),&CDTTManager::canSelectRunnable,
   //          this,[this](){
@@ -121,28 +122,28 @@ void CDTTDialog::initializeConnections()
 
   // Available to start measuring
   //
-  connect(derived.get(), &CDTTManager::canMeasure,
-          ui->measureWidget, &MeasureWidget::enableMeasure);
+  //connect(derived.get(), &CDTTManager::canMeasure,
+  //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
   // Request a measurement from the device
   //
-  connect(ui->measureWidget, &MeasureWidget::measure,
-      derived.get(), &CDTTManager::measure);
+  //connect(ui->measureWidget, &MeasureWidget::measure,
+  //    derived.get(), &CDTTManager::measure);
 
   // Update the UI with any data
   //
-  connect(derived.get(), &CDTTManager::dataChanged,
-      ui->measureWidget, &MeasureWidget::updateModelView);
+  //connect(derived.get(), &CDTTManager::dataChanged,
+  //    ui->measureWidget, &MeasureWidget::updateModelView);
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &CDTTManager::canFinish,
-      ui->measureWidget, &MeasureWidget::enableWriteToFile);
+  //connect(derived.get(), &CDTTManager::canFinish,
+  //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application
   //
-  connect(ui->measureWidget, &MeasureWidget::closeApplication,
-      this, &DialogBase::close);
+  //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+  //    this, &DialogBase::close);
 }
 
 
@@ -156,11 +157,11 @@ void CDTTDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("body_composition", m_manager->m_uuid);
     }
     
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void CDTTDialog::closeEvent(QCloseEvent* event)

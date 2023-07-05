@@ -7,7 +7,9 @@
 
 #include <QCloseEvent>
 
-RetinalCameraDialog::RetinalCameraDialog(QJsonObject inputData) : ui(new Ui::RetinalCameraDialog)
+RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& session) :
+    DialogBase { parent, session },
+    ui(new Ui::RetinalCameraDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -20,7 +22,7 @@ RetinalCameraDialog::RetinalCameraDialog(QJsonObject inputData) : ui(new Ui::Ret
         setWindowTitle("Retinal Camera");
     }
 
-    m_manager.reset(new RetinalCameraManager(inputData));
+    //m_manager.reset(new RetinalCameraManager());
 }
 
 RetinalCameraDialog::~RetinalCameraDialog()
@@ -59,10 +61,10 @@ void RetinalCameraDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("retinal_camera", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().endSession();
 }
 
 void RetinalCameraDialog::closeEvent(QCloseEvent* event)

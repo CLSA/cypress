@@ -40,7 +40,7 @@ void SignaturePadRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
     const QString responseData = JsonSettings::serializeJson(responseJSON);
 
     // start test
-    Cypress::getInstance().server -> requestTestStart(measureType, requestData, sessionId);
+    // Cypress::getInstance().server -> requestTestStart(measureType, requestData, sessionId);
 
     // send response with uuid body
     std::ostream& out = response.send();

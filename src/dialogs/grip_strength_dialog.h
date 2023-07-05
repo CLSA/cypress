@@ -9,7 +9,7 @@ class GripStrengthDialog : public DialogBase, public Ui::GripStrengthDialog
     Q_OBJECT
 
 public:
-    explicit GripStrengthDialog(QJsonObject inputData);
+    explicit GripStrengthDialog(QWidget* parent, const CypressSession& session);
     ~GripStrengthDialog();
 
 private:

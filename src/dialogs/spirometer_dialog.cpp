@@ -7,12 +7,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-SpirometerDialog::SpirometerDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
+SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new SpirometerManager(inputData));
+    //m_manager.reset(new SpirometerManager(inputData));
     this->setWindowTitle("Spirometer");
 }
 
@@ -30,7 +32,7 @@ void SpirometerDialog::initializeConnections()
     m_manager.staticCast<SpirometerManager>();
     
     if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
 
   } else {
       // Disable all buttons by default
@@ -110,28 +112,28 @@ void SpirometerDialog::initializeConnections()
 
     // Available to start measuring
     //
-    connect(derived.get(), &SpirometerManager::canMeasure,
-            ui->measureWidget, &MeasureWidget::enableMeasure);
+    //connect(derived.get(), &SpirometerManager::canMeasure,
+    //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
     // Request a measurement from the device
     //
-    connect(ui->measureWidget, &MeasureWidget::measure,
-        derived.get(), &SpirometerManager::measure);
+    //connect(ui->measureWidget, &MeasureWidget::measure,
+    //    derived.get(), &SpirometerManager::measure);
 
     // Update the UI with any data
     //
-    connect(derived.get(), &SpirometerManager::dataChanged,
-        ui->measureWidget, &MeasureWidget::updateModelView);
+    //connect(derived.get(), &SpirometerManager::dataChanged,
+    //    ui->measureWidget, &MeasureWidget::updateModelView);
 
     // All measurements received: enable write test results
     //
-    connect(derived.get(), &SpirometerManager::canFinish,
-        ui->measureWidget, &MeasureWidget::enableWriteToFile);
+    //connect(derived.get(), &SpirometerManager::canFinish,
+    //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
     // Close the application
     //
-    connect(ui->measureWidget, &MeasureWidget::closeApplication,
-        this, &DialogBase::close);
+    //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+    //    this, &DialogBase::close);
 }
 
 void SpirometerDialog::userClose()
@@ -144,10 +146,10 @@ void SpirometerDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("spirometer", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void SpirometerDialog::closeEvent(QCloseEvent* event)

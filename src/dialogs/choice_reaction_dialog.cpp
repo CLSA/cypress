@@ -7,12 +7,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-ChoiceReactionDialog::ChoiceReactionDialog(QJsonObject inputData): ui(new Ui::RunnableDialog)
+ChoiceReactionDialog::ChoiceReactionDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new ChoiceReactionManager(inputData));
+    //m_manager.reset(new ChoiceReactionManager(inputData));
     this->setWindowTitle("Choice Reaction Test");
 }
 
@@ -30,7 +32,7 @@ void ChoiceReactionDialog::initializeConnections()
     m_manager.staticCast<ChoiceReactionManager>();
     
     if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
     }
     else {
       // Disable all buttons by default
@@ -66,25 +68,25 @@ void ChoiceReactionDialog::initializeConnections()
   //
   if(Constants::RunMode::modeSimulate == m_mode)
   {
-    ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
+    //ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
   }
 
-  connect(ui->barcodeWidget,&BarcodeWidget::validated,
-          this,[this](const bool& valid)
-    {
-      if(valid)
-      {
-          // launch the manager
-          //
-          this->run();
-      }
-      else
-      {
-          QMessageBox::critical(
-            this, QApplication::applicationName(),
-            tr("The input does not match the expected barcode for this participant."));
-      }
-  });
+  //connect(ui->barcodeWidget,&BarcodeWidget::validated,
+  //        this,[this](const bool& valid)
+  //  {
+  //    if(valid)
+  //    {
+  //        // launch the manager
+  //        //
+  //        this->run();
+  //    }
+  //    else
+  //    {
+  //        QMessageBox::critical(
+  //          this, QApplication::applicationName(),
+  //          tr("The input does not match the expected barcode for this participant."));
+  //    }
+  //});
 
   //connect(derived.get(),&ChoiceReactionManager::canSelectRunnable,
   //          this,[this](){
@@ -119,28 +121,28 @@ void ChoiceReactionDialog::initializeConnections()
 
   // Available to start measuring
   //
-  connect(derived.get(), &ChoiceReactionManager::canMeasure,
-          ui->measureWidget, &MeasureWidget::enableMeasure);
+  //connect(derived.get(), &ChoiceReactionManager::canMeasure,
+  //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
-  // Request a measurement from the device
-  //
-  connect(ui->measureWidget, &MeasureWidget::measure,
-      derived.get(), &ChoiceReactionManager::measure);
+  //// Request a measurement from the device
+  ////
+  //connect(ui->measureWidget, &MeasureWidget::measure,
+  //    derived.get(), &ChoiceReactionManager::measure);
 
-  // Update the UI with any data
-  //
-  connect(derived.get(), &ChoiceReactionManager::dataChanged,
-      ui->measureWidget, &MeasureWidget::updateModelView);
+  //// Update the UI with any data
+  ////
+  //connect(derived.get(), &ChoiceReactionManager::dataChanged,
+  //    ui->measureWidget, &MeasureWidget::updateModelView);
 
-  // All measurements received: enable write test results
-  //
-  connect(derived.get(), &ChoiceReactionManager::canFinish,
-      ui->measureWidget, &MeasureWidget::enableWriteToFile);
+  //// All measurements received: enable write test results
+  ////
+  //connect(derived.get(), &ChoiceReactionManager::canFinish,
+  //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
-  // Close the application
-  //
-  connect(ui->measureWidget, &MeasureWidget::closeApplication,
-      this, &DialogBase::close);
+  //// Close the application
+  ////
+  //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+  //    this, &DialogBase::close);
 }
 
 void ChoiceReactionDialog::userClose()
@@ -153,10 +155,10 @@ void ChoiceReactionDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("choice_reaction", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void ChoiceReactionDialog::closeEvent(QCloseEvent* event)

@@ -27,21 +27,10 @@ Cypress& Cypress::getInstance()
 }
 
 
-Cypress::Cypress(QObject *parent) : QObject(parent)
-{
-
-}
-
-
-Cypress::~Cypress()
-{
-    qDebug() << "destroy cypress";
-}
-
-void Cypress::start()
+Cypress::Cypress(QObject *parent) : QObject(parent), httpServer(new Server)
 {
     try {
-        initialize();
+        httpServer->start();
     }
     catch (QException& exception)
     {
@@ -49,82 +38,49 @@ void Cypress::start()
     }
 }
 
-bool Cypress::isSimulation()
+
+Cypress::~Cypress()
 {
-    return m_simulate;
+    qDebug() << "destroy cypress";
+    delete app;
 }
 
-
-bool Cypress::isVerbose()
-{
-    return m_verbose;
-}
-
-
-void Cypress::initialize()
-{
-    startTime = QDateTime::currentDateTimeUtc();
-
-    server.reset(new Server());
-    server->start();
-    connect(server.get(), &Server::startTest, this, &Cypress::startTest);
-
-    status = Status::Waiting;
-}
-
-
-bool Cypress::forceSessionEnd()
-{
-    if (deviceDialog.isNull()) return true;
-
-    deviceDialog->close();
-    deviceDialog.reset();
-
-    return true;
-}
-
-
-bool Cypress::startTest(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId)
+bool Cypress::startSession(CypressSession& session)
 {
     try
     {
-        deviceDialog = DialogFactory::instantiate(type, requestData);
-        if(deviceDialog == Q_NULLPTR) {
-            QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
-            return false;
-        }
-        deviceDialog->initialize();
-        deviceDialog->m_manager->m_uuid = sessionId;
-        deviceDialog->show();
+        return session.start();
     }
-    catch (QException& e)
+    catch (...)
     {
-        qDebug() << e.what();
+        qDebug() << "could not start a session";
         return false;
     }
 
     return true;
 }
 
-
-QString Cypress::getSessionInfo() {
-    if (deviceDialog == nullptr)
+bool Cypress::endSession(CypressSession& session)
+{
+    try
     {
-        return "Available";
+        return session.end();
     }
-    else
+    catch (...)
     {
-        return "Session in-progress";
+        qDebug() << "could not end session";
+        return false;
     }
 }
 
+void Cypress::initialize()
+{
+}
 
 QJsonObject Cypress::getStatus()
 {
     QJsonObject statusJson = {};
-
     statusJson["version"] = "v1.0.0";
-    statusJson["start_time"] = startTime.toString();
 
     const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
     QStringList addresses;
@@ -137,16 +93,6 @@ QJsonObject Cypress::getStatus()
 
     statusJson["addresses"] = QJsonArray::fromStringList(addresses);
     statusJson["port"] = "8000";
-
-    switch (status)
-    {
-        case Status::Starting:
-            statusJson["status"] = "Starting";
-        case Status::Waiting:
-            statusJson["status"] = "Waiting";
-        case Status::Active:
-            statusJson["status"] = "Active";
-    }
 
     QJsonObject availableInstruments {{}};
 

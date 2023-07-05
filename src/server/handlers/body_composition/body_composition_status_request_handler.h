@@ -1,13 +1,13 @@
 #ifndef BODYCOMPOSITIONSTATUSREQUESTHANDLER_H
 #define BODYCOMPOSITIONSTATUSREQUESTHANDLER_H
 
-#include <QJsonObject>
-#include <QDebug>
+#include "server/default_request_handler.h"
 
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-#include "server/default_request_handler.h"
+#include <QJsonObject>
+#include <QDebug>
 
 class BodyCompositionStatusRequestHandler : public DefaultRequestHandler
 {

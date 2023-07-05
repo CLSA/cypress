@@ -7,12 +7,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-FraxDialog::FraxDialog(QJsonObject inputData): ui(new Ui::FraxDialog)
+FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::FraxDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new FraxManager(inputData));
+    //m_manager.reset(new FraxManager(inputData));
 
     this->setWindowTitle("Frax Test");
 }
@@ -33,7 +35,7 @@ void FraxDialog::initializeConnections()
   //
   
   if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
   }
   else {
   foreach(auto button, this->findChildren<QPushButton *>())
@@ -99,28 +101,28 @@ void FraxDialog::initializeConnections()
 
   // Available to start measuring
   //
-  connect(derived.get(), &FraxManager::canMeasure,
-          ui->measureWidget, &MeasureWidget::enableMeasure);
+  //connect(derived.get(), &FraxManager::canMeasure,
+  //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
   // Request a measurement from the device
   //
-  connect(ui->measureWidget, &MeasureWidget::measure,
-      derived.get(), &FraxManager::measure);
+  //connect(ui->measureWidget, &MeasureWidget::measure,
+  //    derived.get(), &FraxManager::measure);
 
   // Update the UI with any data
   //
-  connect(derived.get(), &FraxManager::dataChanged,
-      ui->measureWidget, &MeasureWidget::updateModelView);
+  //connect(derived.get(), &FraxManager::dataChanged,
+  //    ui->measureWidget, &MeasureWidget::updateModelView);
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &FraxManager::canFinish,
-      ui->measureWidget, &MeasureWidget::enableWriteToFile);
+  //connect(derived.get(), &FraxManager::canFinish,
+  //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application
   //
-  connect(ui->measureWidget, &MeasureWidget::closeApplication,
-      this, &DialogBase::close);
+  //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+  //    this, &DialogBase::close);
 }
 
 void FraxDialog::userClose()
@@ -133,10 +135,10 @@ void FraxDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("frax", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void FraxDialog::closeEvent(QCloseEvent* event)

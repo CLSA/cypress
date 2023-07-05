@@ -9,7 +9,7 @@ class SpirometerDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    explicit SpirometerDialog(QJsonObject inputData);
+    explicit SpirometerDialog(QWidget* parent, const CypressSession& session);
     ~SpirometerDialog();
 
 private:

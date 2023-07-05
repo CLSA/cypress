@@ -9,7 +9,7 @@ class TonometerDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    TonometerDialog(QJsonObject inputData);
+    TonometerDialog(QWidget* parent, const CypressSession& session);
     ~TonometerDialog();
 
 private:

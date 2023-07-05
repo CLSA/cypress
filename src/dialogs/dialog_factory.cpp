@@ -1,4 +1,7 @@
 #include <QDebug>
+#include <QMessageBox>
+
+#include "cypress_session.h"
 
 #include "dialog_factory.h"
 #include "audiometer_dialog.h"
@@ -16,70 +19,64 @@
 #include "retinal_camera_dialog.h"
 #include "signature_pad_dialog.h"
 #include "dxa_dialog.h"
-#include "cypress_session.h"
 
-QSharedPointer<DialogBase> DialogFactory::instantiate(const Constants::MeasureType &type, const QJsonObject& requestData)
+DialogBase* DialogFactory::instantiate(const CypressSession& session)
 {
-    QSharedPointer<DialogBase> dialog;
-
-    CypressSession session;
-
-    switch(type)
+    switch(session.getDeviceType())
     {
       case Constants::MeasureType::Audiometer:
-        dialog.reset(new AudiometerDialog(requestData));
-        break;
+        return new AudiometerDialog(nullptr, session);
+
       case Constants::MeasureType::Blood_Pressure:
-        dialog.reset(new BloodPressureDialog(requestData));
-        break;
+        return new BloodPressureDialog(nullptr, session);
+
       case Constants::MeasureType::Body_Composition:
-        dialog.reset(new BodyCompositionDialog(requestData));
-        break;
+        return new BodyCompositionDialog(nullptr, session);
+
       case Constants::MeasureType::CDTT:
-        dialog.reset(new CDTTDialog(requestData));
-        break;
+        return new CDTTDialog(nullptr, session);
+
       case Constants::MeasureType::Choice_Reaction:
-        dialog.reset(new ChoiceReactionDialog(requestData));
-        break;
+        return new ChoiceReactionDialog(nullptr, session);
+
       case Constants::MeasureType::DxaWholeBody:
-        dialog.reset(new DXADialog(requestData));
-        break;
+        //return new DXADialog(nullptr, session);
+
       case Constants::MeasureType::ECG:
-        dialog.reset(new EcgDialog(requestData));
-        break;
+        return new EcgDialog(nullptr, session);
+
       case Constants::MeasureType::Frax:
-        dialog.reset(new FraxDialog(requestData));
-        break;
+        return new FraxDialog(nullptr, session);
+
       case Constants::MeasureType::Grip_Strength:
-        dialog.reset(new GripStrengthDialog(requestData));
-        break;
+        return new GripStrengthDialog(nullptr, session);
+
       case Constants::MeasureType::Weigh_Scale:
-        dialog.reset(new WeighScaleDialog(requestData));
-        break;
+        return new WeighScaleDialog(nullptr, session);
+
       //case Constants::MeasureType::Thermometer:
-        //dialog = new ThermometerDialog(requestData);
-        //break;
+      //  return new ThermometerDialog(session);
+
       case Constants::MeasureType::Tonometer:
-        dialog.reset(new TonometerDialog(requestData));
-        break;
+        return new TonometerDialog(nullptr, session);
+
       //case Constants::MeasureType::CarotidIntima:
-      //  dialog = new UltrasoundDialog(requestData);
-      //  break;
+      //  return new UltrasoundDialog(session);
       case Constants::MeasureType::Retinal_Camera:
-        dialog.reset(new RetinalCameraDialog(requestData));
-        break;
+        return new RetinalCameraDialog(nullptr, session);
+
       case Constants::MeasureType::Spirometer:
-        dialog.reset(new SpirometerDialog(requestData));
-        break;
+        return new SpirometerDialog(nullptr, session);
+
       case Constants::MeasureType::Signature:
-        dialog.reset(new SignaturePadDialog(requestData));
-        break;
+        return new SignaturePadDialog(nullptr, session);
+
       case Constants::MeasureType::Unknown:
-        break;
       default:
         break;
     }
 
-      qDebug() << "returning dialog";
-    return dialog;
+    QMessageBox::warning(nullptr, "Error", "Could not find a supported instrument");
+
+    return nullptr;
 }

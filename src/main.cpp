@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    Cypress::getInstance().start();
+    Cypress::getInstance();
 
     return app.exec();
 }

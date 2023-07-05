@@ -6,13 +6,12 @@ void CypressStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 {
     Q_UNUSED(request)
     try {
-        QString sessionInfo = Cypress::getInstance().getSessionInfo();
-
+        //QString sessionInfo = Cypress::getInstance().getSessionInfo();
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");
 
         std::ostream& out = response.send();
-        out << sessionInfo.toStdString();
+        //out << sessionInfo.toStdString();
         out.flush();
     }
     catch (std::exception& e)

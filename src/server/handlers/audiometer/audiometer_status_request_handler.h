@@ -1,13 +1,14 @@
 #ifndef AUDIOMETERSTATUSREQUESTHANDLER_H
 #define AUDIOMETERSTATUSREQUESTHANDLER_H
 
-#include <QJsonObject>
-#include <QDebug>
+#include "server/default_request_handler.h"
 
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-#include "server/default_request_handler.h"
+#include <QJsonObject>
+#include <QDebug>
+
 
 class AudiometerStatusRequestHandler : public DefaultRequestHandler
 {

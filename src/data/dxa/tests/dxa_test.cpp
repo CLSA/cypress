@@ -1,5 +1,5 @@
-#include "dxatest.h"
-#include <QDir>;
+#include "dxa_test.h"
+#include <QDir>
 
 template <class DxaMeasurement>
 const QMap<QString, QString> DXATest<DxaMeasurement>::ranges = {

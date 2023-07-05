@@ -5,13 +5,15 @@
 #include <QDesktopServices>
 #include "cypress_application.h"
 
-DXADialog::DXADialog(QJsonObject inputData) : ui(new Ui::DXADialog)
+DXADialog::DXADialog(QWidget* parent, const CypressSession& session) :
+    DialogBase(parent, session),
+    ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new DXAManager(inputData));
-    m_manager->start();
+    //m_manager.reset(new DXAManager());
+    //m_manager->start();
 
     ui->submitButton->setEnabled(true);
     connect(ui->submitButton, &QPushButton::clicked, m_manager.get(), &DXAManager::measure);
@@ -80,10 +82,10 @@ void DXADialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("dxa", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().endSession();
 }
 
 void DXADialog::closeEvent(QCloseEvent* event)

@@ -39,9 +39,9 @@ void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
     response.setContentType("application/json");
 
     std::ostream& out = response.send();
-    Cypress::getInstance().server -> requestTestStart(
-        Constants::MeasureType::Body_Composition, requestData, responseJson["sessionId"].toString()
-    );
+    //Cypress::getInstance().server -> requestTestStart(
+    //    Constants::MeasureType::Body_Composition, requestData, responseJson["sessionId"].toString()
+    //);
 
     out << responseData.toStdString();
     out.flush();

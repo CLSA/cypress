@@ -14,14 +14,14 @@ class EcgDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit EcgDialog(QJsonObject inputData);
+    explicit EcgDialog(QWidget* parent, const CypressSession& session);
     ~EcgDialog();
 
 protected:
     void initializeConnections() override;
 
 private:
-    Ui::EcgDialog *ui;
+    Ui::EcgDialog* ui;
     QScopedPointer<ECGManager> m_manager;
 
     void userClose() override;

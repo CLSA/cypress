@@ -6,12 +6,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-AudiometerDialog::AudiometerDialog(QJsonObject inputData): ui(new Ui::AudiometerDialog)
+AudiometerDialog::AudiometerDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new AudiometerManager(inputData));
+    //m_manager.reset(new AudiometerManager(inputData));
 }
 
 AudiometerDialog::~AudiometerDialog()
@@ -30,7 +32,7 @@ void AudiometerDialog::initializeConnections()
   //
   
   if (Cypress::getInstance().isSimulation()) {
-      ui->measureWidget->enableMeasure();
+      //ui->measureWidget->enableMeasure();
   }
 
   else {
@@ -121,7 +123,7 @@ void AudiometerDialog::initializeConnections()
           this,[this](){
       ui->connectButton->setEnabled(true);
       ui->disconnectButton->setEnabled(false);
-      ui->measureWidget->disableMeasure();
+      //ui->measureWidget->disableMeasure();
   });
 
   // Connect to device
@@ -131,8 +133,8 @@ void AudiometerDialog::initializeConnections()
 
   // Connection is established: enable measurement requests
   //
-  connect(derived.get(), &AudiometerManager::canMeasure,
-          ui->measureWidget, &MeasureWidget::enableMeasure);
+  //connect(derived.get(), &AudiometerManager::canMeasure,
+  //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
   connect(derived.get(), &AudiometerManager::canMeasure,
           this,[this](){
@@ -147,23 +149,23 @@ void AudiometerDialog::initializeConnections()
 
   // Request a measurement from the device
   //
-  connect(ui->measureWidget, &MeasureWidget::measure,
-        derived.get(), &AudiometerManager::measure);
+  //connect(ui->measureWidget, &MeasureWidget::measure,
+  //      derived.get(), &AudiometerManager::measure);
 
   // Update the UI with any data
   //
-  connect(derived.get(), &AudiometerManager::dataChanged,
-      ui->measureWidget, &MeasureWidget::updateModelView);
+  //connect(derived.get(), &AudiometerManager::dataChanged,
+  //    ui->measureWidget, &MeasureWidget::updateModelView);
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &AudiometerManager::canFinish,
-      ui->measureWidget, &MeasureWidget::enableWriteToFile);
+  //connect(derived.get(), &AudiometerManager::canFinish,
+  //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   // Close the application
   //
-  connect(ui->measureWidget, &MeasureWidget::closeApplication,
-      this, &DialogBase::close);
+  //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+  //    this, &DialogBase::close);
 }
 
 void AudiometerDialog::userClose()
@@ -175,10 +177,10 @@ void AudiometerDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("audiometer", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+   // Cypress::getInstance().endSession();
 }
 
 void AudiometerDialog::closeEvent(QCloseEvent* event)

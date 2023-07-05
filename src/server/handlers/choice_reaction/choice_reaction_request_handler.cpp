@@ -1,4 +1,4 @@
-#include "choice_reaction_request_handler.h".h"
+#include "choice_reaction_request_handler.h"
 #include "cypress_application.h"
 
 #include "auxiliary/json_settings.h"
@@ -34,7 +34,7 @@ void ChoiceReactionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
     
-    Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::Choice_Reaction, requestData, responseJson["sessionId"].toString());
+    //Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::Choice_Reaction, requestData, responseJson["sessionId"].toString());
 
     std::ostream& out = response.send();
     out << responseData.toStdString();

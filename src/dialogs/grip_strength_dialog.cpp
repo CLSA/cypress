@@ -7,11 +7,13 @@
 #include <QCloseEvent>
 
 
-GripStrengthDialog::GripStrengthDialog(QJsonObject inputData): ui(new Ui::GripStrengthDialog)
+GripStrengthDialog::GripStrengthDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::GripStrengthDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
-    m_manager.reset(new GripStrengthManager(inputData));
+    //m_manager.reset(new GripStrengthManager(inputData));
 
     ui->measureButton->setEnabled(true);
 
@@ -50,10 +52,10 @@ void GripStrengthDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("grip_strength", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void GripStrengthDialog::closeEvent(QCloseEvent* event)

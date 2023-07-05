@@ -5,12 +5,12 @@
 
 #include <QCloseEvent>
 
-EcgDialog::EcgDialog(QJsonObject inputData) : ui(new Ui::EcgDialog)
+EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session) : DialogBase(parent, session), ui(new Ui::EcgDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new ECGManager(inputData));
+    //m_manager.reset(new ECGManager());
     m_manager->start();
     
     if (Cypress::getInstance().isSimulation()) {
@@ -39,11 +39,11 @@ void EcgDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("ecg", m_manager->m_uuid);
     }
     
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().endSession();
 }
 
 void EcgDialog::closeEvent(QCloseEvent* event)

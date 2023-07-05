@@ -9,7 +9,7 @@ class ChoiceReactionDialog : public DialogBase, public Ui::RunnableDialog
     Q_OBJECT
 
 public:
-    ChoiceReactionDialog(QJsonObject inputData);
+    ChoiceReactionDialog(QWidget* parent, const CypressSession& session);
     ~ChoiceReactionDialog();
 
 private:

@@ -36,10 +36,10 @@ void FraxRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
     response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
     
-    Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::Frax, requestData, responseJson["sessionId"].toString());
+    // Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::Frax, requestData, responseJson["sessionId"].toString());
 
     std::ostream& out = response.send();
-    out << responseData.toStdString();
+    //out << responseData.toStdString();
     out.flush();
 }
 

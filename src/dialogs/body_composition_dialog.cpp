@@ -6,12 +6,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-BodyCompositionDialog::BodyCompositionDialog(QJsonObject inputData): ui(new Ui::BodyCompositionDialog)
+BodyCompositionDialog::BodyCompositionDialog(QWidget* parent, const CypressSession& session):
+    DialogBase(parent, session),
+    ui(new Ui::BodyCompositionDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new BodyCompositionManager(inputData));
+    //m_manager.reset(new BodyCompositionManager(inputData));
 }
 
 BodyCompositionDialog::~BodyCompositionDialog()
@@ -25,8 +27,9 @@ void BodyCompositionDialog::initializeConnections()
     m_manager.staticCast<BodyCompositionManager>();
     
     if (Cypress::getInstance().isSimulation()) {
-    ui->measureWidget->enableMeasure();
+    //ui->measureWidget->enableMeasure();
   }
+
   else {
     // Disable all buttons by default
     //
@@ -112,7 +115,7 @@ void BodyCompositionDialog::initializeConnections()
   //
   connect(derived.get(), &BodyCompositionManager::canSelectDevice,
           this,[this](){
-      ui->statusBar->showMessage("Ready to select...");
+      //ui->statusBar->showMessage("Ready to select...");
       QMessageBox::warning(
         this, QApplication::applicationName(),
         tr("Select the port from the list or connect to the currently visible port in the list.  If the device "
@@ -141,7 +144,7 @@ void BodyCompositionDialog::initializeConnections()
       ui->resetButton->setEnabled(false);
       ui->setButton->setEnabled(false);
       ui->confirmButton->setEnabled(false);
-      ui->measureWidget->disableMeasure();
+      //ui->measureWidget->disableMeasure();
   });
 
   // Connect to device
@@ -151,8 +154,8 @@ void BodyCompositionDialog::initializeConnections()
 
   // Connection is established: enable measurement requests
   //
-  connect(derived.get(), &BodyCompositionManager::canMeasure,
-          ui->measureWidget, &MeasureWidget::enableMeasure);
+  //connect(derived.get(), &BodyCompositionManager::canMeasure,
+  //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
   connect(m_manager.get(), &BodyCompositionManager::canMeasure,
           this,[this](){
@@ -172,7 +175,7 @@ void BodyCompositionDialog::initializeConnections()
       ui->resetButton->setEnabled(true);
       ui->setButton->setEnabled(true);
       ui->confirmButton->setEnabled(false);
-      ui->measureWidget->disableMeasure();
+      //ui->measureWidget->disableMeasure();
   });
 
   // A successful confirmation of all inputs was done
@@ -184,7 +187,7 @@ void BodyCompositionDialog::initializeConnections()
       ui->resetButton->setEnabled(true);
       ui->setButton->setEnabled(true);
       ui->confirmButton->setEnabled(true);
-      ui->measureWidget->disableMeasure();
+      //ui->measureWidget->disableMeasure();
   });
 
   // Disconnect from device
@@ -199,40 +202,40 @@ void BodyCompositionDialog::initializeConnections()
 
   // Set the inputs to the analyzer
   //
-  connect(ui->setButton, &QPushButton::clicked,
-           this,[this, derived](){
-      QMap<QString,QVariant> inputs;
-      inputs["equation"] = "westerner";
+  //connect(ui->setButton, &QPushButton::clicked,
+  //         this,[this, derived](){
+  //    QMap<QString,QVariant> inputs;
+  //    inputs["equation"] = "westerner";
 
-      inputs["measurement_system"] =
-        "metricRadio" == ui->unitsGroup->checkedButton()->objectName() ?
-          "metric" : "imperial";
+  //    inputs["measurement_system"] =
+  //      "metricRadio" == ui->unitsGroup->checkedButton()->objectName() ?
+  //        "metric" : "imperial";
 
-      QString units = inputs["measurement system"].toString();
+  //    QString units = inputs["measurement system"].toString();
 
-      inputs["gender"] =
-        "maleRadio" == ui->genderGroup->checkedButton()->objectName() ?
-          "male" : "female";
+  //    inputs["gender"] =
+  //      "maleRadio" == ui->genderGroup->checkedButton()->objectName() ?
+  //        "male" : "female";
 
-      QString s = ui->ageLineEdit->text().simplified();
-      s = s.replace(" ","");
-      inputs["age"] = s.toUInt();
+  //    QString s = ui->ageLineEdit->text().simplified();
+  //    s = s.replace(" ","");
+  //    inputs["age"] = s.toUInt();
 
-      inputs["body_type"] =
-        "standardRadio" == ui->bodyTypeGroup->checkedButton()->objectName() ?
-          "standard" : "athlete";
+  //    inputs["body_type"] =
+  //      "standardRadio" == ui->bodyTypeGroup->checkedButton()->objectName() ?
+  //        "standard" : "athlete";
 
-      s = ui->heightLineEdit->text().simplified();
-      s = s.replace(" ","");
-      inputs["height"] = "metric" == units ? s.toUInt() :  s.toDouble();
+  //    s = ui->heightLineEdit->text().simplified();
+  //    s = s.replace(" ","");
+  //    inputs["height"] = "metric" == units ? s.toUInt() :  s.toDouble();
 
-      s = ui->tareWeightLineEdit->text().simplified();
-      s = s.replace(" ","");
-      inputs["tare_weight"] = s.toDouble();
+  //    s = ui->tareWeightLineEdit->text().simplified();
+  //    s = s.replace(" ","");
+  //    inputs["tare_weight"] = s.toDouble();
 
-      qDebug() << inputs;
-      derived->updateInputData(inputs);
-  });
+  //    qDebug() << inputs;
+  //    derived->updateInputData(inputs);
+  //});
 
   // Confirm inputs and check if measurement can proceed
   //
@@ -241,18 +244,18 @@ void BodyCompositionDialog::initializeConnections()
 
   // Request a measurement from the device
   //
-  connect(ui->measureWidget, &MeasureWidget::measure,
-        derived.get(), &BodyCompositionManager::measure);
+  //connect(ui->measureWidget, &MeasureWidget::measure,
+  //      derived.get(), &BodyCompositionManager::measure);
 
   // Update the UI with any data
   //
-  connect(derived.get(), &BodyCompositionManager::dataChanged,
-      ui->measureWidget, &MeasureWidget::updateModelView);
+  //connect(derived.get(), &BodyCompositionManager::dataChanged,
+  //    ui->measureWidget, &MeasureWidget::updateModelView);
 
   // All measurements received: enable write test results
   //
-  connect(derived.get(), &BodyCompositionManager::canFinish,
-      ui->measureWidget, &MeasureWidget::enableWriteToFile);
+  //connect(derived.get(), &BodyCompositionManager::canFinish,
+  //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
   QIntValidator *v_age = new QIntValidator(this);
   v_age->setRange(
@@ -263,42 +266,42 @@ void BodyCompositionDialog::initializeConnections()
   // When the units are changed to imperial, the input field for
   // height input must change to accomodate 0.5" increments
   //
-  connect(ui->unitsGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-          this,[this](QAbstractButton *button){
-     ui->heightLineEdit->setText("");
-     if("metricRadio" == button->objectName())
-     {
-         QIntValidator *v_ht = new QIntValidator(this);
-         v_ht->setRange(
-           BodyCompositionManager::HEIGHT_MIN_METRIC,
-           BodyCompositionManager::HEIGHT_MAX_METRIC);
-         ui->heightLineEdit->setValidator(v_ht);
-     }
-     else
-     {
-         QDoubleValidator *v_ht = new QDoubleValidator(this);
-         v_ht->setRange(
-           BodyCompositionManager::HEIGHT_MIN_IMPERIAL,
-           BodyCompositionManager::HEIGHT_MAX_IMPERIAL);
-         v_ht->setDecimals(1);
-         ui->heightLineEdit->setValidator(v_ht);
-     }
-  });
+  //connect(ui->unitsGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
+  //        this,[this](QAbstractButton *button){
+  //   ui->heightLineEdit->setText("");
+  //   if("metricRadio" == button->objectName())
+  //   {
+  //       QIntValidator *v_ht = new QIntValidator(this);
+  //       v_ht->setRange(
+  //         BodyCompositionManager::HEIGHT_MIN_METRIC,
+  //         BodyCompositionManager::HEIGHT_MAX_METRIC);
+  //       ui->heightLineEdit->setValidator(v_ht);
+  //   }
+  //   else
+  //   {
+  //       QDoubleValidator *v_ht = new QDoubleValidator(this);
+  //       v_ht->setRange(
+  //         BodyCompositionManager::HEIGHT_MIN_IMPERIAL,
+  //         BodyCompositionManager::HEIGHT_MAX_IMPERIAL);
+  //       v_ht->setDecimals(1);
+  //       ui->heightLineEdit->setValidator(v_ht);
+  //   }
+  //});
 
-  connect(derived.get(), &BodyCompositionManager::error,
-          this, [this](const QString &error){
-      ui->statusBar->showMessage(error);
-      QMessageBox::warning(
-        this, QApplication::applicationName(),
-        tr("A fatal error occured while attempting a measurement and the "
-           "device was disconnected. Turn the device on if it is off, re-connect, "
-           "re-input and confirm the inputs."));
-  });
+  //connect(derived.get(), &BodyCompositionManager::error,
+  //        this, [this](const QString &error){
+  //    ui->statusBar->showMessage(error);
+  //    QMessageBox::warning(
+  //      this, QApplication::applicationName(),
+  //      tr("A fatal error occured while attempting a measurement and the "
+  //         "device was disconnected. Turn the device on if it is off, re-connect, "
+  //         "re-input and confirm the inputs."));
+  //});
 
-  // Close the application
-  //
-  connect(ui->measureWidget, &MeasureWidget::closeApplication,
-      this, &DialogBase::close);
+  //// Close the application
+  ////
+  //connect(ui->measureWidget, &MeasureWidget::closeApplication,
+  //    this, &DialogBase::close);
 }
 
 
@@ -312,10 +315,10 @@ void BodyCompositionDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("body_composition", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().forceSessionEnd();
 }
 
 void BodyCompositionDialog::closeEvent(QCloseEvent* event)

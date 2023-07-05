@@ -9,7 +9,7 @@ class WeighScaleDialog : public DialogBase, public Ui::WeighScaleDialog
     Q_OBJECT
 
 public:
-    explicit WeighScaleDialog(QJsonObject inputData);
+    explicit WeighScaleDialog(QWidget* parent, const CypressSession& session);
     ~WeighScaleDialog();
 
 private:

@@ -6,7 +6,6 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-
 class BodyCompositionRequestHandler : public DefaultRequestHandler
 {
 public:

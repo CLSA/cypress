@@ -5,15 +5,14 @@
 
 #include <QCloseEvent>
 
-SignaturePadDialog::SignaturePadDialog(QJsonObject inputData) : ui(new Ui::SignaturePadDialog)
+SignaturePadDialog::SignaturePadDialog(QWidget* parent, const CypressSession& session) :
+    DialogBase(parent, session),
+    ui(new Ui::SignaturePadDialog)
 {
-    m_uuid = inputData.value("answer_id").toString();
-
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    m_manager.reset(new SignaturePadManager(inputData));
-
+    //m_manager.reset(new SignaturePadManager(inputData));
     connect(m_manager.get(), &SignaturePadManager::displaySignature, this, &SignaturePadDialog::renderSignature);
     m_manager->start();
 }
@@ -66,10 +65,10 @@ void SignaturePadDialog::userClose()
     }
     else
     {
-        Cypress::getInstance().deviceDialog = nullptr;
+        //Cypress::getInstance().deviceDialog = nullptr;
         m_manager->sendCancellation("signature_pad", m_manager->m_uuid);
     }
-    Cypress::getInstance().forceSessionEnd();
+    //Cypress::getInstance().endSession();
 }
 
 void SignaturePadDialog::closeEvent(QCloseEvent* event)

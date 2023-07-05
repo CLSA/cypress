@@ -24,35 +24,19 @@ Server::Server()
     HTTPServerParams::Ptr pParams = new HTTPServerParams;
     Poco::UInt16 portNumber = settings.value("server/port", 9000).toInt();
 
-    server = new HTTPServer(pFactory, portNumber, pParams);
+    server.reset(new HTTPServer(pFactory, portNumber, pParams));
     moveToThread(&serverThread);
 }
 
-void Server::requestTestStart(const Constants::MeasureType& type, const QJsonObject& requestData, const QString& sessionId)
-{
-    emit startTest(type, requestData, sessionId);
-}
-
-
-bool Server::sendResults(const QJsonObject &results)
-{
-    QString jsonString = JsonSettings::serializeJson(results);
-    return true;
-}
-
-
 Server::~Server()
 {
-    serverThread.quit();
-    serverThread.wait();
-    delete server;
+    stop();
 }
 
 void Server::start()
 {
     serverThread.start();
     server->start();
-
     qInfo() << "listening at " + QString::fromStdString(server->socket().address().toString());
 }
 

@@ -9,7 +9,7 @@ class AudiometerDialog : public DialogBase, public Ui::AudiometerDialog
     Q_OBJECT
 
 public:
-    explicit AudiometerDialog(QJsonObject inputData);
+    explicit AudiometerDialog(QWidget* parent, const CypressSession& session);
     ~AudiometerDialog();
 
 private:
