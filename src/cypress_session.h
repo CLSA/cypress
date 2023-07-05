@@ -11,19 +11,23 @@
 class CypressSession
 {
 public:
+    CypressSession();
     CypressSession(const Constants::MeasureType& deviceType, const QJsonObject& inputData);
+    CypressSession(const CypressSession& session);
+
     ~CypressSession();
 
     bool start();
     bool end();
+
+    Constants::MeasureType getDeviceType() const;
+    QJsonObject getInputData() const;
 
     QString getAnswerId() const;
     QString getSessionId() const;
     QString getBarcode() const;
     QString getLanguage() const;
     QString getInterviewer() const;
-
-    Constants::MeasureType getDeviceType() const;
 
 private:
     // The device to be used for this session
@@ -41,6 +45,7 @@ private:
     QString m_sessionId {};
     QString m_barcode {};
     QString m_language {};
+
 
     QDateTime m_startDateTime {};
     QDateTime m_endDateTime {};

@@ -226,24 +226,3 @@ void BloodPressureDialog::initializeConnections()
     //connect(ui->measureWidget, &MeasureWidget::closeApplication,
     //    this, &BloodPressureDialog::close);
 }
-
-void BloodPressureDialog::userClose()
-{
-    DialogBase::userClose();
-    qDebug() << "BloodPressureDialog::handleClose";
-    if (m_user_close)
-    {
-        m_manager->sendComplete("blood_pressure", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("blood_pressure", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().forceSessionEnd();
-}
-
-void BloodPressureDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
-}

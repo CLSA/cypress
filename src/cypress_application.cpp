@@ -8,17 +8,15 @@
 #include <QNetworkInterface>
 #include <QJsonArray>
 #include <QDateTime>
+#include <QSettings>
 
 #include "auxiliary/Constants.h"
-#include "dialogs/dialog_factory.h"
-#include "dialogs/dialog_base.h"
-#include "server/Server.h"
+#include "server/server.h"
 
 Cypress* Cypress::app = nullptr;
-
 Cypress& Cypress::getInstance()
 {
-    if (!app)
+    if (app == nullptr)
     {
         app = new Cypress();
     }
@@ -27,9 +25,14 @@ Cypress& Cypress::getInstance()
 }
 
 
-Cypress::Cypress(QObject *parent) : QObject(parent), httpServer(new Server)
+Cypress::Cypress(QObject *parent) :
+    QObject(parent),
+    httpServer(new Server)
 {
     try {
+        connect(httpServer.get(), &Server::startSession, this, &Cypress::startValidatedSession);
+        connect(httpServer.get(), &Server::endSession,   this, &Cypress::forceSessionEnd);
+
         httpServer->start();
     }
     catch (QException& exception)
@@ -41,41 +44,65 @@ Cypress::Cypress(QObject *parent) : QObject(parent), httpServer(new Server)
 
 Cypress::~Cypress()
 {
-    qDebug() << "destroy cypress";
+    if (isVerbose())
+        qDebug() << "destroy cypress";
+
     delete app;
 }
 
-bool Cypress::startSession(CypressSession& session)
+// slot
+bool Cypress::startValidatedSession(CypressSession session)
 {
-    try
-    {
-        return session.start();
-    }
-    catch (...)
-    {
-        qDebug() << "could not start a session";
-        return false;
-    }
-
-    return true;
+    printActiveSessions();
+    QSharedPointer<CypressSession> newSession { new CypressSession(session) };
+    sessions.insert(newSession->getSessionId(), newSession);
+    return newSession->start();
 }
 
-bool Cypress::endSession(CypressSession& session)
+// slot
+void Cypress::forceSessionEnd(QString sessionId)
 {
-    try
+    endSession(sessionId);
+}
+
+bool Cypress::endSession(const QString& sessionId)
+{
+    if (!sessions.contains(sessionId))
     {
-        return session.end();
+        return true;
     }
-    catch (...)
+
+    else
     {
-        qDebug() << "could not end session";
-        return false;
+        CypressSession& session = *sessions.value(sessionId);
+        bool ended = session.end();
+        if (!ended)
+        {
+            return false;
+        }
+        else
+        {
+            return sessions.remove(sessionId);
+        }
+    }
+
+}
+
+void Cypress::printActiveSessions() const
+{
+    QMapIterator<QString, QSharedPointer<CypressSession>> it(sessions);
+    while (it.hasNext())
+    {
+        it.next();
+        const CypressSession& session = *it.value();
+        qDebug() << " " << session.getAnswerId() << " " << session.getBarcode() << session.getDeviceType();
     }
 }
 
 void Cypress::initialize()
 {
 }
+
 
 QJsonObject Cypress::getStatus()
 {

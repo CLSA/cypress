@@ -33,7 +33,7 @@ void FraxDialog::initializeConnections()
 
   // Disable all buttons by default
   //
-  
+
   if (Cypress::getInstance().isSimulation()) {
       //ui->measureWidget->enableMeasure();
   }
@@ -50,7 +50,7 @@ void FraxDialog::initializeConnections()
   }
   }
 
-  connect(ui->completeButton, &QPushButton::clicked, this, &FraxDialog::userClose);
+  //connect(ui->completeButton, &QPushButton::clicked, this, &FraxDialog::userClose);
 
   // Relay messages from the manager to the status bar
   //
@@ -123,25 +123,4 @@ void FraxDialog::initializeConnections()
   //
   //connect(ui->measureWidget, &MeasureWidget::closeApplication,
   //    this, &DialogBase::close);
-}
-
-void FraxDialog::userClose()
-{
-    qDebug() << "FraxDialog::handleClose";
-    DialogBase::userClose();
-    if (m_user_close)
-    {
-        m_manager->sendComplete("frax", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("frax", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().forceSessionEnd();
-}
-
-void FraxDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
 }

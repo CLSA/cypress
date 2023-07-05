@@ -8,43 +8,75 @@
 
 void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
-    QJsonObject requestData = getRequestData(request);
-    if (!isValidInputData(requestData))
+    try {
+        QJsonObject requestData = getRequestData(request);
+        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::DxaWholeBody, requestData);
+
+        if (false)
+        {
+            response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+            response.setContentType("application/json");
+
+            std::ostream& out = response.send();
+            out << "workstation is busy";
+            out.flush();
+
+            return;
+        }
+
+        QJsonObject data = getResponseData(sessionId);
+        QString responseData = JsonSettings::serializeJson(data);
+
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+        response.setContentType("application/json");
+
+        std::ostream& out = response.send();
+        out << responseData.toStdString();
+        out.flush();
+    }
+    catch (const InvalidBarcodeException& exception)
     {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         response.setContentType("application/json");
 
         std::ostream& out = response.send();
+        out << "invalid barcode";
         out.flush();
-
-        return;
     }
-
-    if (isBusy())
+    catch (const InvalidAnswerIdException& exception)
     {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         response.setContentType("application/json");
 
         std::ostream& out = response.send();
+        out << "invalid answer id";
         out.flush();
-
-        return;
     }
+    catch (const InvalidInterviewerException& exception)
+    {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        response.setContentType("application/json");
 
-    QJsonObject responseJson = getResponseData();
-    QString responseData = JsonSettings::serializeJson(getResponseData());
+        std::ostream& out = response.send();
+        out << "invalid interviewer option";
+        out.flush();
+    }
+    catch (const InvalidLanguageException& exception)
+    {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        response.setContentType("application/json");
 
-    response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-    response.setContentType("application/json");
-    
-    //Cypress::getInstance().server -> requestTestStart(Constants::MeasureType::DxaWholeBody, requestData, responseJson["sessionId"].toString());
+        std::ostream& out = response.send();
+        out << "invalid language option";
+        out.flush();
+    }
+    catch (const InvalidInputDataException& exception)
+    {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        response.setContentType("application/json");
 
-    std::ostream& out = response.send();
-    out << responseData.toStdString();
-    out.flush();
-}
-
-bool DxaRequestHandler::isValidInputData(const QJsonObject& inputData)
-{
-    return DefaultRequestHandler::isValidInputData(inputData);
+        std::ostream& out = response.send();
+        out << "invalid input data";
+        out.flush();
+    }
 }

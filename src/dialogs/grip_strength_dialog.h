@@ -15,9 +15,6 @@ public:
 private:
     Ui::GripStrengthDialog *ui;
 
-    void userClose() override;
-    void closeEvent(QCloseEvent *event) override;
-
     void initializeConnections() override;
     void initializeModel() override;
 

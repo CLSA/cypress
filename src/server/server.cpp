@@ -33,6 +33,20 @@ Server::~Server()
     stop();
 }
 
+QString Server::requestSession(const Constants::MeasureType& device, const QJsonObject& inputData)
+{
+    CypressSession session(device, inputData); // this validates the input data or throws exception
+
+    emit startSession(session);
+
+    return session.getSessionId();
+}
+
+void Server::forceSessionEnd(QString sessionId)
+{
+    emit endSession(sessionId);
+}
+
 void Server::start()
 {
     serverThread.start();

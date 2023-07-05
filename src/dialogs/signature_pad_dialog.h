@@ -30,9 +30,6 @@ protected:
 private:
     QScopedPointer<SignaturePadManager> m_manager;
     Ui::SignaturePadDialog *ui;
-
-    void userClose() override;
-    void closeEvent(QCloseEvent* event) override;
 };
 
 #endif // SIGNATURE_PAD_DIALOG_H

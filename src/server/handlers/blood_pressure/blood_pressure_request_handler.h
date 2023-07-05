@@ -10,7 +10,6 @@ class BloodPressureRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
-    bool isValidInputData(const QJsonObject& inputData) override;
 };
 
 #endif // BLOODPRESSUREREQUESTHANDLER_H

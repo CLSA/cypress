@@ -23,4 +23,5 @@ build*
 /CDTT-2018-07-22/applicationFiles/Results
 /src/debug/*
 /src/debug
+/src/_CL_*
 /src/%SystemDrive%/*

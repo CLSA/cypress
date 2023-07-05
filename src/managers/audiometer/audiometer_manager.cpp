@@ -37,10 +37,10 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr)
     return ok;
 }
 
-AudiometerManager::AudiometerManager(QJsonObject inputData)
+AudiometerManager::AudiometerManager(const CypressSession& session)
 {
     m_test.setExpectedMeasurementCount(16);
-    m_inputData = jsonObjectToVariantMap(inputData);
+    m_inputData = jsonObjectToVariantMap(session.getInputData());
     qDebug() << "m_inputdata: " << m_inputData;
 }
 

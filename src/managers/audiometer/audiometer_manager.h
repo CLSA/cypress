@@ -3,6 +3,7 @@
 
 #include "managers/serial_port/serial_port_manager.h"
 #include "data/hearing/tests/hearing_test.h"
+#include "cypress_session.h"
 
 /*!
  * \class AudiometerManager
@@ -28,7 +29,7 @@ class AudiometerManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit AudiometerManager(QJsonObject inputData);
+    explicit AudiometerManager(const CypressSession& session);
 
     static QByteArray initEndCode();
     static QByteArray END_CODE;

@@ -49,7 +49,7 @@ void WeighScaleDialog::initializeConnections()
   }
   }
 
-  connect(ui->completeButton, &QPushButton::clicked, this, &WeighScaleDialog::userClose);
+  //connect(ui->completeButton, &QPushButton::clicked, this, &WeighScaleDialog::userClose);
 
   // Relay messages from the manager to the status bar
   //
@@ -179,24 +179,4 @@ void WeighScaleDialog::initializeConnections()
   //
   //connect(ui->measureWidget, &MeasureWidget::closeApplication,
   //    this, &DialogBase::close);
-}
-
-void WeighScaleDialog::userClose()
-{
-    qDebug() << "WeighScaleDialog::handleClose";
-    //DialogBase::userClose();
-    if (m_user_close)
-    {
-        m_manager->sendComplete("weigh_scale", m_manager->m_uuid);
-    }
-    else
-    {
-        m_manager->sendCancellation("weigh_scale", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().forceSessionEnd();
-}
-
-void WeighScaleDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
 }

@@ -1,4 +1,4 @@
-#include "BluetoothUtil.h"
+#include "bluetooth_util.h"
 
 #include <QByteArray>
 #include <QString>

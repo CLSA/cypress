@@ -30,7 +30,7 @@ void ChoiceReactionDialog::initializeConnections()
 {
   QSharedPointer<ChoiceReactionManager> derived =
     m_manager.staticCast<ChoiceReactionManager>();
-    
+
     if (Cypress::getInstance().isSimulation()) {
       //ui->measureWidget->enableMeasure();
     }
@@ -143,25 +143,4 @@ void ChoiceReactionDialog::initializeConnections()
   ////
   //connect(ui->measureWidget, &MeasureWidget::closeApplication,
   //    this, &DialogBase::close);
-}
-
-void ChoiceReactionDialog::userClose()
-{
-    qDebug() << "ChoiceReactionDialog::handleClose";
-    DialogBase::userClose();
-    if (m_user_close)
-    {
-        m_manager->sendComplete("choice_reaction", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("choice_reaction", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().forceSessionEnd();
-}
-
-void ChoiceReactionDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
 }

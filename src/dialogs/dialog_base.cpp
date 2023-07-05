@@ -1,6 +1,10 @@
+#include "cypress_application.h"
+#include "cypress_session.h"
+
 #include "dialog_base.h"
-#include "auxiliary/json_settings.h"
 #include "managers/manager_base.h"
+
+#include "auxiliary/json_settings.h"
 
 #include <QCoreApplication>
 #include <QCloseEvent>
@@ -16,12 +20,20 @@ DialogBase::DialogBase(QWidget* parent, const CypressSession& session)
     : QDialog(parent),
     m_session(session)
 {
+    connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
+
     this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void DialogBase::initialize()
 {
+    initializeModel();
+    initializeConnections();
+}
 
+DialogBase::~DialogBase()
+{
+    qDebug() << "destroy dialog";
 }
 
 void DialogBase::initializeModel()
@@ -38,20 +50,24 @@ void DialogBase::run()
 {
     initialize();
     m_manager->start();
+    show();
 }
 
-void DialogBase::userClose()
+
+void DialogBase::closeEvent(QCloseEvent* event)
 {
-    m_user_close = true;
+    bool sessionEnded = Cypress::getInstance().endSession(m_session.getSessionId());
+    if (!sessionEnded)
+    {
+        event->ignore();
+    }
+    else
+    {
+        QDialog::closeEvent(event);
+    }
 }
 
-void DialogBase::closeEvent(QCloseEvent *event)
-{
-    event->accept();
-    //m_manager.get()->finish();
-}
-
-void DialogBase::complete(QJsonObject &results)
+void DialogBase::complete(QJsonObject& results)
 {
     //results["id"] = m_uuid;
     emit sendResults(results);

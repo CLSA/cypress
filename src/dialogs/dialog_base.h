@@ -15,12 +15,12 @@ class DialogBase : public QDialog
 
 public:
     DialogBase(QWidget *parent, const CypressSession& session);
-    ~DialogBase() = default;
+    ~DialogBase();
 
     void initialize();
     void run();
 
-    virtual void userClose();
+    //virtual void userClose();
 
     void setRunMode(const Constants::RunMode& mode) { m_mode = mode; }
     Constants::RunMode runMode() { return m_mode; }

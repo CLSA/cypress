@@ -15,9 +15,6 @@ public:
 private:
     void initializeConnections() override;
 
-    void userClose() override;
-    void closeEvent(QCloseEvent* event) override;
-
     Ui::CDTTDialog *ui { Q_NULLPTR };
 };
 

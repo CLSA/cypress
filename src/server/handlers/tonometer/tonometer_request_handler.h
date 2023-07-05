@@ -9,7 +9,6 @@ class TonometerRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
-    bool isValidInputData(const QJsonObject& inputData) override;
 };
 
 #endif // TONOMETER_REQUEST_HANDLER_H

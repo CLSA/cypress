@@ -27,17 +27,23 @@ enum Status {
 class Cypress: public QObject
 {
     Q_OBJECT
+
+public slots:
+    bool startValidatedSession(CypressSession session);
+    void forceSessionEnd(QString sessionId);
+
 public:
     static Cypress& getInstance();
 
     QScopedPointer<Server> httpServer;
-    QMap<QString, QScopedPointer<CypressSession>> activeSessions {};
+    QMap<QString, QSharedPointer<CypressSession>> sessions {};
 
     QString getSessionInfo();
     QJsonObject getStatus();
 
-    bool startSession(CypressSession& session);
-    bool endSession(CypressSession& session);
+    QSettings getSettings();
+
+    bool endSession(const QString& uuid);
 
     void enableSimMode() { m_simulate = true; };
     void disableSimMode() { m_simulate = false; };
@@ -46,6 +52,8 @@ public:
     void enableVerbose() { m_verbose = true; };
     void disableVerbose() { m_verbose = false; };
     bool isVerbose() { return m_verbose; };
+
+    void printActiveSessions() const;
 
 private:
     explicit Cypress(QObject *parent = Q_NULLPTR);

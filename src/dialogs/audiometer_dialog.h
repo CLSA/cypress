@@ -15,9 +15,6 @@ public:
 private:
     void initializeConnections() override;
 
-    void closeEvent(QCloseEvent* event) override;
-    void userClose() override;
-
     Ui::AudiometerDialog *ui { Q_NULLPTR };
 };
 

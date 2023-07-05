@@ -30,7 +30,7 @@ void SpirometerDialog::initializeConnections()
 {
   QSharedPointer<SpirometerManager> derived =
     m_manager.staticCast<SpirometerManager>();
-    
+
     if (Cypress::getInstance().isSimulation()) {
       //ui->measureWidget->enableMeasure();
 
@@ -134,25 +134,4 @@ void SpirometerDialog::initializeConnections()
     //
     //connect(ui->measureWidget, &MeasureWidget::closeApplication,
     //    this, &DialogBase::close);
-}
-
-void SpirometerDialog::userClose()
-{
-    qDebug() << "SpirometerDialog::handleClose";
-    DialogBase::userClose();
-    if (m_user_close)
-    {
-        m_manager->sendComplete("spirometer", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("spirometer", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().forceSessionEnd();
-}
-
-void SpirometerDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
 }

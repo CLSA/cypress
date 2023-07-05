@@ -12,7 +12,6 @@ class RetinalCameraRequestHandler : public DefaultRequestHandler
 {
 public:
     void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override;
-    bool isValidInputData(const QJsonObject& inputData) override;
 };
 
 #endif // RETINAL_CAMERA_REQUEST_HANDLER_H

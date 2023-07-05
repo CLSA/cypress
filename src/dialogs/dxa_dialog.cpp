@@ -71,26 +71,3 @@ void DXADialog::on_submitButton_clicked()
 {
     //m_manager->measure();
 }
-
-void DXADialog::userClose()
-{
-    qDebug() << "DXADialog::handleClose";
-    DialogBase::userClose();
-    if (m_user_close)
-    {
-        m_manager->sendComplete("dxa", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("dxa", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().endSession();
-}
-
-void DXADialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
-}
-
-

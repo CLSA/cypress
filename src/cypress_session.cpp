@@ -5,9 +5,19 @@
 
 #include <QException>
 
-CypressSession::CypressSession(const Constants::MeasureType& device, const QJsonObject& inputData): m_deviceType(device), m_inputData(inputData)
+CypressSession::CypressSession():
+    m_deviceType(Constants::MeasureType::Unknown),
+    m_inputData(QJsonObject {})
 {
-    qDebug() << "CypressSession::Constructor" << inputData;
+
+}
+
+CypressSession::CypressSession(const Constants::MeasureType& device, const QJsonObject& inputData):
+    m_deviceType(device),
+    m_inputData(inputData)
+{
+    qDebug() << "CypressSession::NewSession" << inputData;
+
     validate(inputData);
 
     m_barcode = m_inputData.value("barcode").toString();
@@ -17,6 +27,18 @@ CypressSession::CypressSession(const Constants::MeasureType& device, const QJson
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 };
 
+CypressSession::CypressSession(const CypressSession& session):
+    m_deviceType(session.getDeviceType()),
+    m_inputData(session.getInputData())
+{
+    qDebug() << "CypressSession::CopySession";
+
+    m_barcode = session.getBarcode();
+    m_answerId = session.getAnswerId();
+    m_interviewer = session.getInterviewer();
+    m_language = session.getLanguage();
+    m_sessionId = session.getSessionId();
+}
 
 CypressSession::~CypressSession()
 {
@@ -43,12 +65,13 @@ void CypressSession::validate(const QJsonObject& inputData) const
 
 bool CypressSession::start()
 {
+    qDebug() << "CypressSession::start()";
+
     if (!m_deviceDialog.isNull())
         throw QException();
 
     m_deviceDialog.reset(DialogFactory::instantiate(*this) /* pass a const reference of the session to the dialog */ );
-    m_deviceDialog->initialize();
-    m_deviceDialog->m_manager->m_uuid = getSessionId();
+    m_deviceDialog->run();
     m_deviceDialog->show();
 
     return true;
@@ -59,7 +82,7 @@ bool CypressSession::end()
     if (m_deviceDialog.isNull())
         throw QException();
 
-    m_deviceDialog->userClose();
+    qDebug() << "end session" << getSessionId();
 
     return true;
 }
@@ -94,6 +117,10 @@ Constants::MeasureType CypressSession::getDeviceType() const
     return m_deviceType;
 }
 
+QJsonObject CypressSession::getInputData() const
+{
+    return m_inputData;
+}
 
 
 bool CypressSession::isValidString(const QJsonObject& inputData, const QString& key) const

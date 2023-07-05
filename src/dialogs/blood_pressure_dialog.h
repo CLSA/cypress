@@ -12,9 +12,6 @@ public:
     BloodPressureDialog(QWidget* parent, const CypressSession& session);
     ~BloodPressureDialog();
 
-    void userClose() override;
-    void closeEvent(QCloseEvent* event) override;
-
 private:
     void initializeModel() override;
     void initializeConnections() override;

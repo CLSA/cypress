@@ -53,35 +53,10 @@ QJsonObject DefaultRequestHandler::getRequestData(Poco::Net::HTTPServerRequest &
     return json;
 }
 
+QJsonObject DefaultRequestHandler::getResponseData(const QString& sessionId) {
+    QJsonObject responseData {
+        { "sessionId", sessionId }
+    };
 
-bool DefaultRequestHandler::isBusy()
-{
-    return false;
-}
-
-
-bool DefaultRequestHandler::isValidInputData(const QJsonObject& inputData)
-{
-    if (inputData.isEmpty())
-        return false;
-
-    if (!inputData.contains("barcode"))
-        return false;
-
-    if (!inputData.contains("answer_id"))
-        return false;
-
-    if (!inputData.contains("language"))
-        return false;
-
-    if (!inputData.contains("interviewer"))
-        return false;
-
-    return true;
-}
-
-
-QJsonObject DefaultRequestHandler::getResponseData() {
-    QJsonObject responseData {{ "sessionId", QUuid::createUuid().toString(QUuid::WithoutBraces) }};
     return responseData;
 }

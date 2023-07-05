@@ -54,25 +54,3 @@ void SignaturePadDialog::renderSignature(const QByteArray& bytes)
         ui->label->setPixmap(mpixmap);
     }
 }
-
-void SignaturePadDialog::userClose()
-{
-    DialogBase::userClose();
-    qDebug() << "SignaturePadDialog::handleClose";
-    if (m_user_close)
-    {
-        m_manager->sendComplete("signature_pad", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("signature_pad", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().endSession();
-}
-
-void SignaturePadDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
-}
-

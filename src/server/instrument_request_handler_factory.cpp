@@ -115,9 +115,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/ultrasound/status/?$)"),                &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler      },
     { QString(R"(^/ultrasound/delete/?$)"),                &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/weigh_scale/?$)"),                      &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler            },
-    { QString(R"(^/weigh_scale/status/?$)"),               &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler      },
-    { QString(R"(^/weigh_scale/delete/?$)"),               &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/weight_scale/?$)"),                     &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler            },
+    { QString(R"(^/weight_scale/status/?$)"),              &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler      },
+    { QString(R"(^/weight_scale/delete/?$)"),              &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/signature/?$)"), 	                   &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
     { QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },

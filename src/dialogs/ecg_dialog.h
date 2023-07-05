@@ -23,9 +23,6 @@ protected:
 private:
     Ui::EcgDialog* ui;
     QScopedPointer<ECGManager> m_manager;
-
-    void userClose() override;
-    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // ECG_DIALOG_H

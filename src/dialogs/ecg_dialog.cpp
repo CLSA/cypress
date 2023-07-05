@@ -12,7 +12,7 @@ EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session) : DialogBas
 
     //m_manager.reset(new ECGManager());
     m_manager->start();
-    
+
     if (Cypress::getInstance().isSimulation()) {
         ui->measureButton->setEnabled(true);
     }
@@ -27,26 +27,4 @@ void EcgDialog::initializeConnections() {
 EcgDialog::~EcgDialog()
 {
     delete ui;
-}
-
-void EcgDialog::userClose()
-{
-    qDebug() << "ECGDialog::handleClose";
-    DialogBase::userClose();
-    if (m_user_close)
-    {
-        m_manager->sendComplete("ecg", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("ecg", m_manager->m_uuid);
-    }
-    
-    //Cypress::getInstance().endSession();
-}
-
-void EcgDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
 }

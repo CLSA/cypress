@@ -16,16 +16,11 @@ public:
     explicit RetinalCameraDialog(QWidget* parent, const CypressSession& session);
     ~RetinalCameraDialog();
 
-
-
 private:
-    Ui::RetinalCameraDialog *ui;
-
-    void userClose() override;
-    void closeEvent(QCloseEvent* event) override;
-
     void initializeModel() override;
     void initializeConnections() override;
+
+    Ui::RetinalCameraDialog *ui;
 };
 
 #endif // RETINAL_CAMERA_DIALOG_H

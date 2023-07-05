@@ -17,10 +17,6 @@ public:
     explicit DXADialog(QWidget* parent, const CypressSession& session);
     ~DXADialog();
 
-private:
-    void userClose() override;
-    void closeEvent(QCloseEvent *event) override;
-
 protected:
     void initializeModel() override {};
     void initializeConnections() override;

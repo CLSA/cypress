@@ -22,7 +22,7 @@ BloodPressureManager::BloodPressureManager(QJsonObject inputData)
 
 BloodPressureManager::~BloodPressureManager()
 {
-  delete m_comm;
+    delete m_comm;
 }
 
 //bool BloodPressureManager::isAvailable()

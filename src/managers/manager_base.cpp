@@ -110,6 +110,8 @@ void ManagerBase::sendJsonData(const QString& filePath)
 
 bool ManagerBase::sendCancellation(QString device, QString uuid)
 {
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
@@ -127,7 +129,8 @@ bool ManagerBase::sendCancellation(QString device, QString uuid)
 
     qDebug() << serializedData;
 
-    const QString& pinePath = QString("https://blueberry.clsa-elcv.ca/qa/pine/api/answer_device/uuid=" + uuid);
+    const QString& url = settings.value("answer_device_endpoint", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer_device/uuid=").toString();
+    const QString& pinePath = QString(url + uuid);
 
     qDebug() << pinePath;
 
@@ -157,6 +160,8 @@ bool ManagerBase::sendCancellation(QString device, QString uuid)
 
 bool ManagerBase::sendComplete(QString device, QString uuid)
 {
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
@@ -174,7 +179,8 @@ bool ManagerBase::sendComplete(QString device, QString uuid)
 
     qDebug() << serializedData;
 
-    const QString& pinePath = QString("https://blueberry.clsa-elcv.ca/qa/pine/api/answer_device/uuid=" + uuid);
+    const QString& url = settings.value("answer_device_endpoint", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer_device/uuid=").toString();
+    const QString& pinePath = QString(url + uuid);
 
     qDebug() << pinePath;
 

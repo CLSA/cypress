@@ -13,7 +13,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
-    
+
     if (Cypress::getInstance().isSimulation())
     {
         setWindowTitle("Retinal Camera (SIM)");
@@ -43,31 +43,10 @@ void RetinalCameraDialog::initializeConnections()
 
     QSharedPointer<RetinalCameraManager> derived = m_manager.staticCast<RetinalCameraManager>();
     connect(ui->measureButton, &QPushButton::clicked, derived.get(), &RetinalCameraManager::measure);
-    connect(ui->completeButton, &QPushButton::clicked, this, &RetinalCameraDialog::userClose);
+    //connect(ui->completeButton, &QPushButton::clicked, this, &RetinalCameraDialog::userClose);
 
     QObject::connect(this, &RetinalCameraDialog::accepted, [&]() {
     });
 
     ui->measureButton->setEnabled(true);
-}
-
-void RetinalCameraDialog::userClose()
-{
-    DialogBase::userClose();
-    qDebug() << "RetinalCameraDialog::handleClose";
-    if (m_user_close)
-    {
-        m_manager->sendComplete("retinal_camera", m_manager->m_uuid);
-    }
-    else
-    {
-        //Cypress::getInstance().deviceDialog = nullptr;
-        m_manager->sendCancellation("retinal_camera", m_manager->m_uuid);
-    }
-    //Cypress::getInstance().endSession();
-}
-
-void RetinalCameraDialog::closeEvent(QCloseEvent* event)
-{
-    event->accept();
 }

@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <regex>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -16,25 +17,32 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-#include "auxiliary/json_settings.h"
-
 void DefaultDeleteSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     std::string uri = request.getURI();
+    std::regex uuid_regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+    std::smatch match;
+
+    QString uuid;
+
+    if(std::regex_search(uri, match, uuid_regex)) {
+        std::cout << "UUID: " << match[0] << std::endl;
+        uuid = QString::fromStdString(match[0]);
+    }
+    else {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+        response.setContentType("application/json");
+
+        std::ostream& out = response.send();
+        out.flush();
+        return;
+    }
+
+    Cypress::getInstance().httpServer->endSession(uuid);
 
     response.setStatus(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
     response.setContentType("application/json");
-    
-    //bool success = Cypress::getInstance().endSession();
-    //QJsonObject responseData {};
-    //if (success) {
-    //   responseData["success"] = "Ended session";
-    //}
-    //else  {
-    //   responseData["error"] = "Could not end session..";
-    //}
 
     std::ostream& out = response.send();
-    //out << JsonSettings::serializeJson(responseData).toStdString();
     out.flush();
 }

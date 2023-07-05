@@ -241,6 +241,8 @@ int main(int argc, char *argv[])
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
+    qRegisterMetaType<CypressSession>("CypressSession");
+
     qInstallMessageHandler(messageHandler);
 
     // Clean up system
