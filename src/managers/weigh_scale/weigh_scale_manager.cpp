@@ -1,3 +1,10 @@
+//#include "auxiliary/Utilities.h"
+#include "auxiliary/json_settings.h"
+#include "data/weigh_scale/tests/weigh_scale_test.h"
+
+#include "weigh_scale_manager.h"
+#include "cypress_application.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QJsonArray>
@@ -8,18 +15,10 @@
 #include <QStandardItemModel>
 #include <QtMath>
 
-//#include "auxiliary/Utilities.h"
-#include "auxiliary/json_settings.h"
-#include "data/weigh_scale/tests/weigh_scale_test.h"
-
-#include "weigh_scale_manager.h"
-#include "cypress_application.h"
-
-WeighScaleManager::WeighScaleManager(QJsonObject inputData)
+WeighScaleManager::WeighScaleManager(const CypressSession& session)
+    : SerialPortManager(session)
 {
   m_test.setExpectedMeasurementCount(2);
-  m_inputData = jsonObjectToVariantMap(inputData);
-  qDebug() << "Weigh Scale: Input" << m_inputData;
 }
 
 bool WeighScaleManager::isAvailable()

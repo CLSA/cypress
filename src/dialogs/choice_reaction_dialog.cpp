@@ -14,8 +14,8 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget* parent, const CypressSession
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new ChoiceReactionManager(inputData));
     this->setWindowTitle("Choice Reaction Test");
+    m_manager.reset(new ChoiceReactionManager(session));
 }
 
 ChoiceReactionDialog::~ChoiceReactionDialog()
@@ -28,26 +28,26 @@ ChoiceReactionDialog::~ChoiceReactionDialog()
 //
 void ChoiceReactionDialog::initializeConnections()
 {
-  QSharedPointer<ChoiceReactionManager> derived =
-    m_manager.staticCast<ChoiceReactionManager>();
+    //QSharedPointer<ChoiceReactionManager> derived =
+   // m_manager.staticCast<ChoiceReactionManager>();
 
-    if (Cypress::getInstance().isSimulation()) {
-      //ui->measureWidget->enableMeasure();
-    }
-    else {
-      // Disable all buttons by default
-      //
-      foreach(auto button, this->findChildren<QPushButton *>())
-      {
-          if("Close" != button->text())
-            button->setEnabled(false);
+   // if (Cypress::getInstance().isSimulation()) {
+   //   //ui->measureWidget->enableMeasure();
+   // }
+   // else {
+   //   // Disable all buttons by default
+   //   //
+   //   foreach(auto button, this->findChildren<QPushButton *>())
+   //   {
+   //       if("Close" != button->text())
+   //         button->setEnabled(false);
 
-          // disable enter key press event passing onto auto focus buttons
-          //
-          button->setDefault(false);
-          button->setAutoDefault(false);
-      }
-    }
+   //       // disable enter key press event passing onto auto focus buttons
+   //       //
+   //       button->setDefault(false);
+   //       button->setAutoDefault(false);
+   //   }
+   // }
 
 
   // Relay messages from the manager to the status bar

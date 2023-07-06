@@ -12,7 +12,7 @@ SignaturePadDialog::SignaturePadDialog(QWidget* parent, const CypressSession& se
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new SignaturePadManager(inputData));
+    m_manager.reset(new SignaturePadManager(session));
     connect(m_manager.get(), &SignaturePadManager::displaySignature, this, &SignaturePadDialog::renderSignature);
     m_manager->start();
 }

@@ -5,7 +5,8 @@
 #include "serial_port_manager.h"
 
 
-SerialPortManager::SerialPortManager()
+SerialPortManager::SerialPortManager(const CypressSession& session):
+    ManagerBase(session)
 {
     connect(&m_port, &QSerialPort::readyRead,
             this,    &SerialPortManager::readDevice);

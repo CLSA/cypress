@@ -12,10 +12,12 @@
 
 #include "ecg_manager.h"
 
-ECGManager::ECGManager(QJsonObject inputData)
+
+ECGManager::ECGManager(const CypressSession& session)
+    : ManagerBase(session)
 {
     m_test.setExpectedMeasurementCount(1);
-    m_inputData = jsonObjectToVariantMap(inputData);
+    m_inputData = jsonObjectToVariantMap(session.getInputData());
 }
 
 bool ECGManager::isAvailable()

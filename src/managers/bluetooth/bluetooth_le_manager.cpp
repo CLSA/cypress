@@ -18,7 +18,8 @@
  *
 */
 
-BluetoothLEManager::BluetoothLEManager()
+BluetoothLEManager::BluetoothLEManager(const CypressSession& session):
+    ManagerBase(session)
 {
     m_test.setExpectedMeasurementCount(2);
 }

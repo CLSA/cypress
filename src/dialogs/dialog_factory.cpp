@@ -40,7 +40,7 @@ DialogBase* DialogFactory::instantiate(const CypressSession& session)
         return new ChoiceReactionDialog(nullptr, session);
 
       case Constants::MeasureType::DxaWholeBody:
-        //return new DXADialog(nullptr, session);
+        return new DXADialog(nullptr, session);
 
       case Constants::MeasureType::ECG:
         return new EcgDialog(nullptr, session);

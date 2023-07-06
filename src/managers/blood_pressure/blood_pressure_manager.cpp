@@ -12,12 +12,10 @@
 #include <QStandardItemModel>
 #include <QtUsb/QtUsb>
 
-BloodPressureManager::BloodPressureManager(QJsonObject inputData)
-    : m_comm(new BPMCommunication())
+BloodPressureManager::BloodPressureManager(const CypressSession& session)
+    : ManagerBase(session), m_comm(new BPMCommunication())
 {
     m_test.setExpectedMeasurementCount(6);
-    m_inputData = jsonObjectToVariantMap(inputData);
-    qDebug() << "m_inputdata: " << m_inputData;
 }
 
 BloodPressureManager::~BloodPressureManager()

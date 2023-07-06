@@ -1,3 +1,6 @@
+#include "cypress_application.h"
+#include "cdtt_manager.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -7,15 +10,11 @@
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 
-#include "cypress_application.h"
-#include "auxiliary/json_settings.h"
 
-#include "cdtt_manager.h"
-
-CDTTManager::CDTTManager(QJsonObject inputData)
+CDTTManager::CDTTManager(const CypressSession& session):
+    ManagerBase(session)
 {
     m_test.setMinimumMeasurementCount(1);
-    m_inputData = jsonObjectToVariantMap(inputData);
     qDebug() << "CDTT input data: " << m_inputData;
 }
 

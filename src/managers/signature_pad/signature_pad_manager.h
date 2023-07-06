@@ -19,9 +19,8 @@ class SignaturePadManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit SignaturePadManager(QJsonObject inputData);
+    explicit SignaturePadManager(const CypressSession& session);
     ~SignaturePadManager();
-
 
     static bool isInstalled();
     static bool isAvailable();
@@ -44,8 +43,6 @@ private:
     QThread captureThread;
     QByteArray signature;
     QScopedPointer<SignaturePadCommunication> spc;
-
-    QString m_participantId; // from Pine
 
     // Reset the session
     bool clearData() override;

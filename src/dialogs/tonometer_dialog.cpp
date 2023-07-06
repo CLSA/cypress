@@ -14,7 +14,7 @@ TonometerDialog::TonometerDialog(QWidget* parent, const CypressSession& session)
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new TonometerManager(inputData));
+    m_manager.reset(new TonometerManager(session));
 
     this->setWindowTitle("Tonometer");
 }
@@ -33,27 +33,27 @@ void TonometerDialog::initializeModel()
 //
 void TonometerDialog::initializeConnections()
 {
-  QSharedPointer<TonometerManager> derived =
-    m_manager.staticCast<TonometerManager>();
+  //QSharedPointer<TonometerManager> derived =
+  //  m_manager.staticCast<TonometerManager>();
 
-  // Disable all buttons by default
-  //
+  //// Disable all buttons by default
+  ////
 
-  if (Cypress::getInstance().isSimulation()) {
-      //ui->measureWidget->enableMeasure();
-  }
-  else {
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
-      if("Close" != button->text())
-        button->setEnabled(false);
+  //if (Cypress::getInstance().isSimulation()) {
+  //    //ui->measureWidget->enableMeasure();
+  //}
+  //else {
+  //foreach(auto button, this->findChildren<QPushButton *>())
+  //{
+  //    if("Close" != button->text())
+  //      button->setEnabled(false);
 
-      // disable enter key press event passing onto auto focus buttons
-      //
-      button->setDefault(false);
-      button->setAutoDefault(false);
-  }
-  }
+  //    // disable enter key press event passing onto auto focus buttons
+  //    //
+  //    button->setDefault(false);
+  //    button->setAutoDefault(false);
+  //}
+  //}
 
   // Relay messages from the manager to the status bar
   //
@@ -93,71 +93,71 @@ void TonometerDialog::initializeConnections()
   //    }
   //});
 
-    connect(derived.get(),&TonometerManager::canSelectRunnable,
-            this,[this](){
-        foreach(auto button, this->findChildren<QPushButton *>())
-        {
-          if("Close" != button->text())
-            button->setEnabled(false);
-        }
-        ui->openButton->setEnabled(true);
-        static bool warn = true;
-        if(warn)
-        {
-            QMessageBox::warning(
-            this, QApplication::applicationName(),
-            tr("Select the exe by clicking Open and browsing to the "
-            "required executable (ORA.exe) and selecting the file.  If the executable "
-            "is valid click the Run button to start the test otherwise check the installation."));
-            warn = false;
-        }
-    });
+    //connect(derived.get(),&TonometerManager::canSelectRunnable,
+    //        this,[this](){
+    //    foreach(auto button, this->findChildren<QPushButton *>())
+    //    {
+    //      if("Close" != button->text())
+    //        button->setEnabled(false);
+    //    }
+    //    ui->openButton->setEnabled(true);
+    //    static bool warn = true;
+    //    if(warn)
+    //    {
+    //        QMessageBox::warning(
+    //        this, QApplication::applicationName(),
+    //        tr("Select the exe by clicking Open and browsing to the "
+    //        "required executable (ORA.exe) and selecting the file.  If the executable "
+    //        "is valid click the Run button to start the test otherwise check the installation."));
+    //        warn = false;
+    //    }
+    //});
 
-    connect(ui->openButton, &QPushButton::clicked,
-            derived.get(), &TonometerManager::select);
+    //connect(ui->openButton, &QPushButton::clicked,
+    //        derived.get(), &TonometerManager::select);
 
-    connect(derived.get(),&TonometerManager::canSelectDatabase,
-            this,[this](){
-        foreach(auto button, this->findChildren<QPushButton *>())
-        {
-          if("Close" != button->text())
-            button->setEnabled(false);
-        }
-        ui->openButton->setEnabled(true);
-        static bool warn = true;
-        if(warn)
-        {
-            QMessageBox::warning(
-            this, QApplication::applicationName(),
-            tr("Select the database by clicking Open and browsing to the "
-            "required file (ora.mdb) and selecting the file.  If the database "
-            "is valid click the Run button to start the test otherwise check the installation."));
-            warn = false;
-        }
-    });
+    //connect(derived.get(),&TonometerManager::canSelectDatabase,
+    //        this,[this](){
+    //    foreach(auto button, this->findChildren<QPushButton *>())
+    //    {
+    //      if("Close" != button->text())
+    //        button->setEnabled(false);
+    //    }
+    //    ui->openButton->setEnabled(true);
+    //    static bool warn = true;
+    //    if(warn)
+    //    {
+    //        QMessageBox::warning(
+    //        this, QApplication::applicationName(),
+    //        tr("Select the database by clicking Open and browsing to the "
+    //        "required file (ora.mdb) and selecting the file.  If the database "
+    //        "is valid click the Run button to start the test otherwise check the installation."));
+    //        warn = false;
+    //    }
+    //});
 
-    // Available to start measuring
-    //
-    //connect(derived.get(), &TonometerManager::canMeasure,
-    //        ui->measureWidget, &MeasureWidget::enableMeasure);
+    //// Available to start measuring
+    ////
+    ////connect(derived.get(), &TonometerManager::canMeasure,
+    ////        ui->measureWidget, &MeasureWidget::enableMeasure);
 
-    // Request a measurement from the device
-    //
-    //connect(ui->measureWidget, &MeasureWidget::measure,
-    //    derived.get(), &TonometerManager::measure);
+    //// Request a measurement from the device
+    ////
+    ////connect(ui->measureWidget, &MeasureWidget::measure,
+    ////    derived.get(), &TonometerManager::measure);
 
-    // Update the UI with any data
-    //
-    //connect(derived.get(), &TonometerManager::dataChanged,
-    //    ui->measureWidget, &MeasureWidget::updateModelView);
+    //// Update the UI with any data
+    ////
+    ////connect(derived.get(), &TonometerManager::dataChanged,
+    ////    ui->measureWidget, &MeasureWidget::updateModelView);
 
-    // All measurements received: enable write test results
-    //
-    //connect(derived.get(), &TonometerManager::canFinish,
-    //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
+    //// All measurements received: enable write test results
+    ////
+    ////connect(derived.get(), &TonometerManager::canFinish,
+    ////    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
-    // Close the application
-    //
-    //connect(ui->measureWidget, &MeasureWidget::closeApplication,
-    //    this, &DialogBase::close);
+    //// Close the application
+    ////
+    ////connect(ui->measureWidget, &MeasureWidget::closeApplication,
+    ////    this, &DialogBase::close);
 }

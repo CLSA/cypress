@@ -1,6 +1,5 @@
 #include <QMessageBox>
 
-#include "cypress_application.h"
 #include "retinal_camera_dialog.h"
 #include "managers/retinal_camera/retinal_camera_manager.h"
 #include "ui_retinal_camera_dialog.h"
@@ -12,17 +11,10 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
     ui(new Ui::RetinalCameraDialog)
 {
     ui->setupUi(this);
+    setWindowTitle("Retinal Camera");
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    if (Cypress::getInstance().isSimulation())
-    {
-        setWindowTitle("Retinal Camera (SIM)");
-    }
-    else {
-        setWindowTitle("Retinal Camera");
-    }
-
-    //m_manager.reset(new RetinalCameraManager());
+    m_manager.reset(new RetinalCameraManager(session));
 }
 
 RetinalCameraDialog::~RetinalCameraDialog()
@@ -38,15 +30,15 @@ void RetinalCameraDialog::initializeModel()
 
 void RetinalCameraDialog::initializeConnections()
 {
-    qDebug() << "RetinalCameraDialog::initializeConnections";
-    //QMessageBox::critical(this, QApplication::applicationName(), tr("The input does not match the expected barcode for this participant."));
+    //qDebug() << "RetinalCameraDialog::initializeConnections";
+    ////QMessageBox::critical(this, QApplication::applicationName(), tr("The input does not match the expected barcode for this participant."));
 
-    QSharedPointer<RetinalCameraManager> derived = m_manager.staticCast<RetinalCameraManager>();
-    connect(ui->measureButton, &QPushButton::clicked, derived.get(), &RetinalCameraManager::measure);
-    //connect(ui->completeButton, &QPushButton::clicked, this, &RetinalCameraDialog::userClose);
+    //QSharedPointer<RetinalCameraManager> derived = m_manager.staticCast<RetinalCameraManager>();
+    //connect(ui->measureButton, &QPushButton::clicked, derived.get(), &RetinalCameraManager::measure);
+    ////connect(ui->completeButton, &QPushButton::clicked, this, &RetinalCameraDialog::userClose);
 
-    QObject::connect(this, &RetinalCameraDialog::accepted, [&]() {
-    });
+    //QObject::connect(this, &RetinalCameraDialog::accepted, [&]() {
+    //});
 
-    ui->measureButton->setEnabled(true);
+    //ui->measureButton->setEnabled(true);
 }

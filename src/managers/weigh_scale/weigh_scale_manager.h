@@ -22,7 +22,7 @@ class WeighScaleManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit WeighScaleManager(QJsonObject inputData);
+    explicit WeighScaleManager(const CypressSession& session);
 
     static bool isAvailable();
     static bool isInstalled();

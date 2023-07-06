@@ -1,6 +1,7 @@
 #ifndef CDTT_MANAGER_H
 #define CDTT_MANAGER_H
 
+#include "cypress_session.h"
 #include "managers/manager_base.h"
 #include "data/cdtt/tests/cdtt_test.h"
 
@@ -26,7 +27,7 @@ class CDTTManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit CDTTManager(QJsonObject inputData);
+    explicit CDTTManager(const CypressSession& session);
     ~CDTTManager();
 
     static bool isAvailable();

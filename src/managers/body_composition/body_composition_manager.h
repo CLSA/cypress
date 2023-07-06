@@ -24,7 +24,7 @@ class BodyCompositionManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit BodyCompositionManager(QJsonObject inputData);
+    explicit BodyCompositionManager(const CypressSession& session);
 
     static bool isAvailable();
     static bool isInstalled();

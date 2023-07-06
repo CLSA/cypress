@@ -26,7 +26,7 @@ class SerialPortManager : public ManagerBase
     Q_PROPERTY(QString deviceName MEMBER m_deviceName NOTIFY deviceNameChanged)
 
 public:
-    explicit SerialPortManager();
+    explicit SerialPortManager(const CypressSession& session);
 
     bool isDefined(const QString&) const;
 

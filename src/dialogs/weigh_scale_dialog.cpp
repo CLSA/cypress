@@ -13,7 +13,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new WeighScaleManager(inputData));
+    m_manager.reset(new WeighScaleManager(session));
 }
 
 WeighScaleDialog::~WeighScaleDialog()
@@ -27,27 +27,27 @@ void WeighScaleDialog::initializeModel()
 
 void WeighScaleDialog::initializeConnections()
 {
-  QSharedPointer<WeighScaleManager> derived =
-    m_manager.staticCast<WeighScaleManager>();
+  //QSharedPointer<WeighScaleManager> derived =
+  //  m_manager.staticCast<WeighScaleManager>();
 
-  // Disable all buttons by default
-  //
+  //// Disable all buttons by default
+  ////
 
-  if (Cypress::getInstance().isSimulation()) {
-      //ui->measureWidget->enableMeasure();
-  }
-  else {
-      foreach(auto button, this->findChildren<QPushButton *>())
-        {
-      if("Close" != button->text())
-        button->setEnabled(false);
+  //if (Cypress::getInstance().isSimulation()) {
+  //    //ui->measureWidget->enableMeasure();
+  //}
+  //else {
+  //    foreach(auto button, this->findChildren<QPushButton *>())
+  //      {
+  //    if("Close" != button->text())
+  //      button->setEnabled(false);
 
-      // disable enter key press event passing onto auto focus buttons
-      //
-      button->setDefault(false);
-      button->setAutoDefault(false);
-  }
-  }
+  //    // disable enter key press event passing onto auto focus buttons
+  //    //
+  //    button->setDefault(false);
+  //    button->setAutoDefault(false);
+  //}
+  //}
 
   //connect(ui->completeButton, &QPushButton::clicked, this, &WeighScaleDialog::userClose);
 
@@ -70,87 +70,87 @@ void WeighScaleDialog::initializeConnections()
 
   // Scan for devices
   //
-  connect(derived.get(), &WeighScaleManager::scanningDevices,
-          ui->deviceComboBox, &QComboBox::clear);
+  //connect(derived.get(), &WeighScaleManager::scanningDevices,
+  //        ui->deviceComboBox, &QComboBox::clear);
 
-  // Update the drop down list as devices are discovered during scanning
-  //
-  connect(derived.get(), &WeighScaleManager::deviceDiscovered,
-          this, [this](const QString &label){
-      int index = ui->deviceComboBox->findText(label);
-      bool oldState = ui->deviceComboBox->blockSignals(true);
-      if(-1 == index)
-      {
-          ui->deviceComboBox->addItem(label);
-      }
-      ui->deviceComboBox->blockSignals(oldState);
-  });
+  //// Update the drop down list as devices are discovered during scanning
+  ////
+  //connect(derived.get(), &WeighScaleManager::deviceDiscovered,
+  //        this, [this](const QString &label){
+  //    int index = ui->deviceComboBox->findText(label);
+  //    bool oldState = ui->deviceComboBox->blockSignals(true);
+  //    if(-1 == index)
+  //    {
+  //        ui->deviceComboBox->addItem(label);
+  //    }
+  //    ui->deviceComboBox->blockSignals(oldState);
+  //});
 
-  connect(derived.get(), &WeighScaleManager::deviceSelected,
-          this,[this](const QString &label){
-      if(label != ui->deviceComboBox->currentText())
-      {
-          ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(label));
-      }
-  });
+  //connect(derived.get(), &WeighScaleManager::deviceSelected,
+  //        this,[this](const QString &label){
+  //    if(label != ui->deviceComboBox->currentText())
+  //    {
+  //        ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(label));
+  //    }
+  //});
 
-  // Prompt user to select a device from the drop down list when previously
-  // cached device information in the ini file is unavailable or invalid
-  //
-  connect(derived.get(), &WeighScaleManager::canSelectDevice,
-          this,[this](){
-      QMessageBox::warning(
-        this, QApplication::applicationName(),
-        tr("Select the port from the list.  If the device "
-        "is not in the list, quit the application and check that the port is "
-        "working and connect the audiometer to it before running this application."));
-  });
+  //// Prompt user to select a device from the drop down list when previously
+  //// cached device information in the ini file is unavailable or invalid
+  ////
+  //connect(derived.get(), &WeighScaleManager::canSelectDevice,
+  //        this,[this](){
+  //    QMessageBox::warning(
+  //      this, QApplication::applicationName(),
+  //      tr("Select the port from the list.  If the device "
+  //      "is not in the list, quit the application and check that the port is "
+  //      "working and connect the audiometer to it before running this application."));
+  //});
 
-  // Select a device (serial port) from drop down list
-  //
-  connect(ui->deviceComboBox, &QComboBox::currentTextChanged,
-          derived.get(),&WeighScaleManager::selectDevice);
+  //// Select a device (serial port) from drop down list
+  ////
+  //connect(ui->deviceComboBox, &QComboBox::currentTextChanged,
+  //        derived.get(),&WeighScaleManager::selectDevice);
 
-  // Select a device (serial port) from drop down list
-  //
-  connect(ui->deviceComboBox, QOverload<int>::of(&QComboBox::activated),
-    this,[this,derived](int index){
-      derived->selectDevice(ui->deviceComboBox->itemText(index));
-  });
+  //// Select a device (serial port) from drop down list
+  ////
+  //connect(ui->deviceComboBox, QOverload<int>::of(&QComboBox::activated),
+  //  this,[this,derived](int index){
+  //    derived->selectDevice(ui->deviceComboBox->itemText(index));
+  //});
 
-  // Ready to connect device
-  //
-  connect(derived.get(), &WeighScaleManager::canConnectDevice,
-          this,[this](){
-      ui->connectButton->setEnabled(true);
-      ui->disconnectButton->setEnabled(false);
+  //// Ready to connect device
+  ////
+  //connect(derived.get(), &WeighScaleManager::canConnectDevice,
+  //        this,[this](){
+  //    ui->connectButton->setEnabled(true);
+  //    ui->disconnectButton->setEnabled(false);
 
-      //TODO: fix MeasureWidget segfault when adding extra zero button
-      // ui->zeroButton->setEnabled(false);
-      //
-      //ui->measureWidget->disableMeasure();
-  });
+  //    //TODO: fix MeasureWidget segfault when adding extra zero button
+  //    // ui->zeroButton->setEnabled(false);
+  //    //
+  //    //ui->measureWidget->disableMeasure();
+  //});
 
-  // Connect to device
-  //
-  connect(ui->connectButton, &QPushButton::clicked,
-          derived.get(), &WeighScaleManager::connectDevice);
+  //// Connect to device
+  ////
+  //connect(ui->connectButton, &QPushButton::clicked,
+  //        derived.get(), &WeighScaleManager::connectDevice);
 
-  // Connection is established: enable measurement requests
-  //
-  //connect(derived.get(), &WeighScaleManager::canMeasure,
-  //        ui->measureWidget, &MeasureWidget::enableMeasure);
+  //// Connection is established: enable measurement requests
+  ////
+  ////connect(derived.get(), &WeighScaleManager::canMeasure,
+  ////        ui->measureWidget, &MeasureWidget::enableMeasure);
 
-  connect(m_manager.get(), &WeighScaleManager::canMeasure,
-          this,[this](){
-      ui->connectButton->setEnabled(false);
-      ui->disconnectButton->setEnabled(true);
-  });
+  //connect(m_manager.get(), &WeighScaleManager::canMeasure,
+  //        this,[this](){
+  //    ui->connectButton->setEnabled(false);
+  //    ui->disconnectButton->setEnabled(true);
+  //});
 
-  // Disconnect from device
-  //
-  connect(ui->disconnectButton, &QPushButton::clicked,
-          derived.get(), &WeighScaleManager::disconnectDevice);
+  //// Disconnect from device
+  ////
+  //connect(ui->disconnectButton, &QPushButton::clicked,
+  //        derived.get(), &WeighScaleManager::disconnectDevice);
 
   //TODO: fix MeasureWidget segfault when adding extra zero button
   /*      this code should be integrated into MeasureWidget

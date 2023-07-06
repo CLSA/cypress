@@ -13,14 +13,15 @@
 #include "cypress_application.h"
 
 
-DXAManager::DXAManager(QJsonObject inputData) /* : m_dicomWatcher(QDir::currentPath())*/
+DXAManager::DXAManager(const CypressSession& session) /* : m_dicomWatcher(QDir::currentPath())*/
+    : ManagerBase(session)
 {
-    m_inputData = jsonObjectToVariantMap(inputData);
-    qDebug() << "DXA inputData: " << inputData;
+    qDebug() << "DXAManager::New";
 }
 
 DXAManager::~DXAManager()
 {
+    qDebug() << "DXAManager::Destroy";
     //m_dicomSCP->stop();
     //delete m_dicomSCP;
 }
@@ -41,7 +42,7 @@ bool DXAManager::isInstalled()
 //
 void DXAManager::start()
 {
-
+    qDebug() << "start";
 }
 
 // retrieve a measurement from the device

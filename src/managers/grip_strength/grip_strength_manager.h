@@ -16,7 +16,7 @@ class GripStrengthManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit GripStrengthManager(QJsonObject inputData);
+    explicit GripStrengthManager(const CypressSession& session);
     ~GripStrengthManager();
 
     static bool isInstalled();

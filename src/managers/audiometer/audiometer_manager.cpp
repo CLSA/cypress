@@ -1,3 +1,8 @@
+#include "audiometer_manager.h"
+
+#include "cypress_application.h"
+#include "auxiliary/json_settings.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QJsonArray>
@@ -7,10 +12,7 @@
 #include <QStandardItemModel>
 #include <QtMath>
 
-#include "cypress_application.h"
-#include "auxiliary/json_settings.h"
 
-#include "audiometer_manager.h"
 
 QByteArray AudiometerManager::END_CODE = AudiometerManager::initEndCode();
 
@@ -38,10 +40,9 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr)
 }
 
 AudiometerManager::AudiometerManager(const CypressSession& session)
+    : SerialPortManager(session)
 {
     m_test.setExpectedMeasurementCount(16);
-    m_inputData = jsonObjectToVariantMap(session.getInputData());
-    qDebug() << "m_inputdata: " << m_inputData;
 }
 
 bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)

@@ -31,7 +31,7 @@ class DXAManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit DXAManager(QJsonObject inputData);
+    explicit DXAManager(const CypressSession& session);
     ~DXAManager();
 
     //DicomSCP* m_dicomSCP;
@@ -68,11 +68,11 @@ protected slots:
     void dicomServerExitCrash();
 
 private:
-    ApSpineTest m_apSpineTest;
-    ForearmTest m_forearmTest;
-    HipTest m_hipScanTest;
-    IVAImagingTest m_ivaImagingTest;
-    WholeBodyScanTest m_wholeBodyTest;
+    //ApSpineTest m_apSpineTest;
+    //ForearmTest m_forearmTest;
+    //HipTest m_hipScanTest;
+    //IVAImagingTest m_ivaImagingTest;
+    //WholeBodyScanTest m_wholeBodyTest;
 
     //DicomDirectoryWatcher m_dicomWatcher;
     //DcmRecv m_dcmRecv;

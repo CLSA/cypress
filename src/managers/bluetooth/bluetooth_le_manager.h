@@ -18,7 +18,7 @@ class BluetoothLEManager : public ManagerBase
     Q_PROPERTY(QString deviceName MEMBER m_deviceName NOTIFY deviceNameChanged)
 
 public:
-    explicit BluetoothLEManager();
+    explicit BluetoothLEManager(const CypressSession& session);
 
     // the host supports Bluetooth Low Energy discovery
     //

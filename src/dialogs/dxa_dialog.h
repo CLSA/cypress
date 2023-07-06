@@ -3,26 +3,16 @@
 
 #include <QWidget>
 #include "dialog_base.h"
-#include "managers/dxa/dxa_manager.h"
+#include "ui_dxa_dialog.h"
 
-namespace Ui {
-class DXADialog;
-}
 
-class DXADialog : public DialogBase
+class DXADialog : public DialogBase, public Ui::DXADialog
 {
     Q_OBJECT
 
 public:
     explicit DXADialog(QWidget* parent, const CypressSession& session);
     ~DXADialog();
-
-protected:
-    void initializeModel() override {};
-    void initializeConnections() override;
-
-    Ui::DXADialog *ui;
-    QScopedPointer<DXAManager> m_manager;
 
 public slots:
     void dicomFilesReceived(const QStringList& dicomFilePaths);
@@ -33,6 +23,9 @@ public slots:
 private slots:
     void on_openFileExplorer_released();
     void on_submitButton_clicked();
+
+private:
+    Ui::DXADialog *ui { Q_NULLPTR };
 };
 
 #endif // DXA_DIALOG_H

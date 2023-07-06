@@ -5,24 +5,22 @@
 
 #include <QCloseEvent>
 
-EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session) : DialogBase(parent, session), ui(new Ui::EcgDialog)
+EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session)
+    : DialogBase(parent, session)
+    , ui(new Ui::EcgDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new ECGManager());
+    m_manager.reset(new ECGManager(session));
     m_manager->start();
 
     if (Cypress::getInstance().isSimulation()) {
         ui->measureButton->setEnabled(true);
     }
 
-    connect(ui->measureButton, &QPushButton::clicked, m_manager.get(), &ECGManager::measure);
+    //connect(ui->measureButton, &QPushButton::clicked, m_manager.get(), &ECGManager::measure);
 }
-
-void EcgDialog::initializeConnections() {
-
-};
 
 EcgDialog::~EcgDialog()
 {

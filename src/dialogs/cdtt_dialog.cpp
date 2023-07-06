@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-#include "cypress_application.h"
 
 CDTTDialog::CDTTDialog(QWidget* parent, const CypressSession& session):
     DialogBase(parent, session),
@@ -16,7 +15,7 @@ CDTTDialog::CDTTDialog(QWidget* parent, const CypressSession& session):
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     this->setWindowTitle("Canadian Digit Triplet Test");
-    //m_manager.reset(new CDTTManager(inputData));
+    m_manager.reset(new CDTTManager(session));
 }
 
 CDTTDialog::~CDTTDialog()

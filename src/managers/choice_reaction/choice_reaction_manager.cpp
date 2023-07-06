@@ -15,9 +15,9 @@
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
-ChoiceReactionManager::ChoiceReactionManager(QJsonObject inputData)
+ChoiceReactionManager::ChoiceReactionManager(const CypressSession& session)
+    : ManagerBase(session)
 {
-    m_inputData = jsonObjectToVariantMap(inputData);
     qDebug() << "ChoiceReactionManager inputData: " << m_inputData;
 }
 

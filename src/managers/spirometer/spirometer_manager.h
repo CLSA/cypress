@@ -15,7 +15,7 @@ class SpirometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit SpirometerManager(QJsonObject inputData);
+    explicit SpirometerManager(const CypressSession& session);
     ~SpirometerManager() = default;
 
     static bool isInstalled();

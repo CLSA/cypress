@@ -1,11 +1,11 @@
 #include "vividi_manager.h"
 #include "auxiliary/json_settings.h"
+
 #include "cypress_application.h"
 
-VividiManager::VividiManager(QObject *parent)
+VividiManager::VividiManager(const CypressSession& session)
+    : ManagerBase(session)
 {
-    Q_UNUSED(parent)
-
 }
 
 bool VividiManager::isAvailable()

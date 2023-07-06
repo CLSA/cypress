@@ -1,8 +1,9 @@
+#include "cypress_session.h"
 #include "manager_base.h"
-#include <QStandardItemModel>
+#include "auxiliary/json_settings.h"
 #include "server/utils.h"
-#include <QException>
-#include <QDebug>
+
+#include <sstream>
 
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -14,21 +15,21 @@
 #include "Poco/Path.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
-#include <sstream>
 
-#include "auxiliary/json_settings.h"
-
+#include <QStandardItemModel>
+#include <QException>
+#include <QDebug>
 #include <QFile>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QVariantMap>
 
-ManagerBase::ManagerBase()
+ManagerBase::ManagerBase(const CypressSession& session): m_session(session)
 {
+    m_inputData = jsonObjectToVariantMap(m_session.getInputData());
 }
 
 ManagerBase::~ManagerBase()

@@ -30,7 +30,7 @@ class TonometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit TonometerManager(QJsonObject inputData);
+    explicit TonometerManager(const CypressSession& session);
     ~TonometerManager();
 
     // is the passed string an executable file
@@ -61,9 +61,7 @@ public slots:
     // calls isDefined to validate the passed arg
     //
     void selectRunnable(const QString&);
-
     void selectDatabase(const QString&);
-
     void select();
 
     void readOutput();

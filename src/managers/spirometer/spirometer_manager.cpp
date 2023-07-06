@@ -2,22 +2,20 @@
 #include <QFileDialog>
 #include <QStandardItemModel>
 
-
 #include "cypress_application.h"
 #include "spirometer_manager.h"
 #include "auxiliary/json_settings.h"
 
 #include "managers/emr/emr_plugin_writer.h"
 
-SpirometerManager::SpirometerManager(QJsonObject inputData)
+SpirometerManager::SpirometerManager(const CypressSession& session)
+    : ManagerBase(session)
 {
     //TODO: check if these upstream inputs are optional or required
     //
     //m_inputKeyList << "asthma"; // true/false
     //m_inputKeyList << "copd";   // true/false
     //m_inputKeyList << "ethnicity"; // caucasian, asian, african, hispanic, other_ethnic
-    m_inputData = jsonObjectToVariantMap(inputData);
-
     m_test.setExpectedMeasurementCount(4);
 }
 
@@ -33,9 +31,7 @@ bool SpirometerManager::isAvailable()
 
 void SpirometerManager::start()
 {
-    
     if (Cypress::getInstance().isSimulation()) {
-
         return;
     }
 

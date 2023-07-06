@@ -8,7 +8,7 @@ class VividiManager: public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit VividiManager(QObject *parent = nullptr);
+    explicit VividiManager(const CypressSession& session);
 
     static bool isAvailable();
     static bool isInstalled();

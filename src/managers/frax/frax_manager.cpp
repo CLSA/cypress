@@ -10,10 +10,10 @@
 
 #include "frax_manager.h"
 
-FraxManager::FraxManager(QJsonObject inputData)
+FraxManager::FraxManager(const CypressSession& session)
+    : ManagerBase(session)
 {
     m_test.setExpectedMeasurementCount(4);
-    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 bool FraxManager::isAvailable()

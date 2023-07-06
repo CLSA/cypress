@@ -14,10 +14,10 @@
 
 #include "tonometer_manager.h"
 
-TonometerManager::TonometerManager(QJsonObject inputData)
+TonometerManager::TonometerManager(const CypressSession& session)
+    : ManagerBase(session)
 {
     m_test.setExpectedMeasurementCount(2);
-    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 TonometerManager::~TonometerManager()

@@ -1,9 +1,11 @@
 #include "dxa_dialog.h"
 #include "ui_dxa_dialog.h"
+
+#include "managers/dxa/dxa_manager.h"
+
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QDesktopServices>
-#include "cypress_application.h"
 
 DXADialog::DXADialog(QWidget* parent, const CypressSession& session) :
     DialogBase(parent, session),
@@ -12,11 +14,11 @@ DXADialog::DXADialog(QWidget* parent, const CypressSession& session) :
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new DXAManager());
+    m_manager.reset(new DXAManager(session));
     //m_manager->start();
 
-    ui->submitButton->setEnabled(true);
-    connect(ui->submitButton, &QPushButton::clicked, m_manager.get(), &DXAManager::measure);
+    //ui->submitButton->setEnabled(true);
+    //connect(ui->submitButton, &QPushButton::clicked, m_manager.get(), &DXAManager::measure);
     //connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
     //connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
 }
@@ -25,13 +27,6 @@ DXADialog::~DXADialog()
 {
     delete ui;
 }
-
-void DXADialog::initializeConnections()
-{
-
-}
-
-
 
 void DXADialog::dicomServerStarted()
 {
@@ -58,7 +53,7 @@ void DXADialog::dicomFilesReceived(const QStringList& dicomFilePaths)
     }
 
     qDebug() << dicomFilePaths;
-    m_manager->dicomFilesReceived(dicomFilePaths);
+    //m_manager->dicomFilesReceived(dicomFilePaths);
 }
 
 void DXADialog::on_openFileExplorer_released()

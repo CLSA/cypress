@@ -28,7 +28,7 @@ class ECGManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ECGManager(QJsonObject inputData);
+    explicit ECGManager(const CypressSession& session);
 
     // is the passed string an executable file
     // with the correct path elements ?

@@ -13,7 +13,8 @@ GripStrengthDialog::GripStrengthDialog(QWidget* parent, const CypressSession& se
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
-    //m_manager.reset(new GripStrengthManager(inputData));
+
+    m_manager.reset(new GripStrengthManager(session));
 
     ui->measureButton->setEnabled(true);
 

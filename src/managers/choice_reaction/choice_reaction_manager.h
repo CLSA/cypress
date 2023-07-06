@@ -24,7 +24,7 @@ class ChoiceReactionManager: public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ChoiceReactionManager(QJsonObject inputData);
+    explicit ChoiceReactionManager(const CypressSession& session);
 
     static bool isAvailable();
     static bool isInstalled();

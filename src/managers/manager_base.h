@@ -22,23 +22,18 @@
 QT_FORWARD_DECLARE_CLASS(QSettings)
 QT_FORWARD_DECLARE_CLASS(QStandardItemModel)
 
+class CypressSession;
+
 class ManagerBase : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ManagerBase();
+    explicit ManagerBase(const CypressSession& session);
     ~ManagerBase();
 
     bool sendCancellation(QString device, QString uuid);
     bool sendComplete(QString device, QString uuid);
-
-
-    // The unique identifier representing this test session (for pine state management)
-    QString m_uuid;
-
-    // The ID to sent the response to (Pine)
-    qint32 m_answerId;
 
 public slots:
     // subclasses call methods after main initialization just prior
@@ -72,17 +67,13 @@ signals:
     void canFinish();
 
 protected:
-    // Input data from Pine
-    QString m_barcode { "" };
-    QString m_interviewer { "" };
+    const CypressSession& m_session;
+
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
 
     QVariant getInputDataValue(const QString &);
     QVariantMap jsonObjectToVariantMap(const QJsonObject& jsonObject);
-
-    virtual void sendHTTPRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
-    virtual void sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
 
     // Context dependent clear test data and possibly device data (eg., serial port info)
     // SerialPortManager class clears device data during setDevice() while
@@ -100,6 +91,9 @@ protected:
 
     // Clean up the device for next time
     virtual bool cleanUp() = 0;
+
+    virtual void sendHTTPRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
+    virtual void sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
 
     // Send the test results to Pine for storage & analysis
     virtual bool sendResultsToPine(const QString& filePath);

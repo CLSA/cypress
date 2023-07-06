@@ -87,6 +87,13 @@ if __name__ == '__main__':
     threading.Thread(target=lambda: app.run(port=5000)).start()
 
     wait_for_server_up()  
+    
+    test_dxa({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string"
+    })
 
     test_audiometer({
         "answer_id": "10199",
@@ -100,4 +107,77 @@ if __name__ == '__main__':
         "barcode": "string",
         "language": "en",
         "interviewer": "string"
+    })
+
+    test_body_composition({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string"
+    })
+    
+    test_bpm({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string"
+    })
+
+    test_choice_reaction({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string"
+    })
+
+
+    
+
+    test_ecg({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
+    })
+
+    test_frax({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
+    })
+
+    test_tonometer({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
+    })
+
+    test_retinal_camera({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
+    })
+
+    test_weight_scale({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
+    })
+
+    test_grip_strength({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
+    })
+
+    test_temperature({
+        "answer_id": "10199",
+        "barcode": "string",
+        "language": "en",
+        "interviewer": "string",
     })

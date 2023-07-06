@@ -13,7 +13,8 @@
 #include <QFile>
 #include <QtSql>
 
-GripStrengthManager::GripStrengthManager(QJsonObject inputData)
+GripStrengthManager::GripStrengthManager(const CypressSession& session)
+    :ManagerBase(session)
 {
 
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
@@ -40,8 +41,6 @@ GripStrengthManager::GripStrengthManager(QJsonObject inputData)
     //    qCritical() << error;
     //    throw std::runtime_error(error.toStdString());
     //}
-
-    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 GripStrengthManager::~GripStrengthManager()

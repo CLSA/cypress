@@ -14,7 +14,7 @@ FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new FraxManager(inputData));
+    m_manager.reset(new FraxManager(session));
 
     this->setWindowTitle("Frax Test");
 }
@@ -29,26 +29,26 @@ FraxDialog::~FraxDialog()
 //
 void FraxDialog::initializeConnections()
 {
-  QSharedPointer<FraxManager> derived = m_manager.staticCast<FraxManager>();
+  //QSharedPointer<FraxManager> derived = m_manager.staticCast<FraxManager>();
 
-  // Disable all buttons by default
-  //
+  //// Disable all buttons by default
+  ////
 
-  if (Cypress::getInstance().isSimulation()) {
-      //ui->measureWidget->enableMeasure();
-  }
-  else {
-  foreach(auto button, this->findChildren<QPushButton *>())
-  {
-      if("Close" != button->text())
-        button->setEnabled(false);
+  //if (Cypress::getInstance().isSimulation()) {
+  //    //ui->measureWidget->enableMeasure();
+  //}
+  //else {
+  //foreach(auto button, this->findChildren<QPushButton *>())
+  //{
+  //    if("Close" != button->text())
+  //      button->setEnabled(false);
 
-      // disable enter key press event passing onto auto focus buttons
-      //
-      button->setDefault(false);
-      button->setAutoDefault(false);
-  }
-  }
+  //    // disable enter key press event passing onto auto focus buttons
+  //    //
+  //    button->setDefault(false);
+  //    button->setAutoDefault(false);
+  //}
+  //}
 
   //connect(ui->completeButton, &QPushButton::clicked, this, &FraxDialog::userClose);
 
@@ -68,25 +68,25 @@ void FraxDialog::initializeConnections()
   // TODO: for DCS interviews, the first digit corresponds the the wave rank
   // for inhome interviews there is a host dependent prefix before the barcode
   //
-  connect(derived.get(),&FraxManager::canSelectRunnable,
-            this,[this](){
-        foreach(auto button, this->findChildren<QPushButton *>())
-        {
-          if("Close" != button->text())
-            button->setEnabled(false);
-        }
-        //ui->openButton->setEnabled(true);
-        static bool warn = true;
-        if(warn)
-        {
-            QMessageBox::warning(
-            this, QApplication::applicationName(),
-            tr("Select the exe by clicking Open and browsing to the "
-            "required executable (blackbox.exe) and selecting the file.  If the executable "
-            "is valid click the Run button to start the test otherwise check the installation."));
-            warn = false;
-        }
-    });
+  //connect(derived.get(),&FraxManager::canSelectRunnable,
+  //          this,[this](){
+  //      foreach(auto button, this->findChildren<QPushButton *>())
+  //      {
+  //        if("Close" != button->text())
+  //          button->setEnabled(false);
+  //      }
+  //      //ui->openButton->setEnabled(true);
+  //      static bool warn = true;
+  //      if(warn)
+  //      {
+  //          QMessageBox::warning(
+  //          this, QApplication::applicationName(),
+  //          tr("Select the exe by clicking Open and browsing to the "
+  //          "required executable (blackbox.exe) and selecting the file.  If the executable "
+  //          "is valid click the Run button to start the test otherwise check the installation."));
+  //          warn = false;
+  //      }
+  //  });
 
   //connect(ui->openButton, &QPushButton::clicked,
   //      this, [this, derived]() {

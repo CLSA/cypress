@@ -3,13 +3,10 @@
 
 #include <QDialog>
 #include "dialog_base.h"
-#include "managers/ecg/ecg_manager.h"
+#include "ui_ecg_dialog.h"
 
-namespace Ui {
-class EcgDialog;
-}
 
-class EcgDialog : public DialogBase
+class EcgDialog : public DialogBase, public Ui::EcgDialog
 {
     Q_OBJECT
 
@@ -17,12 +14,8 @@ public:
     explicit EcgDialog(QWidget* parent, const CypressSession& session);
     ~EcgDialog();
 
-protected:
-    void initializeConnections() override;
-
 private:
-    Ui::EcgDialog* ui;
-    QScopedPointer<ECGManager> m_manager;
+    Ui::EcgDialog* ui { Q_NULLPTR };
 };
 
 #endif // ECG_DIALOG_H

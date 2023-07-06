@@ -13,7 +13,7 @@ BodyCompositionDialog::BodyCompositionDialog(QWidget* parent, const CypressSessi
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    //m_manager.reset(new BodyCompositionManager(inputData));
+    m_manager.reset(new BodyCompositionManager(session));
 }
 
 BodyCompositionDialog::~BodyCompositionDialog()
@@ -23,27 +23,27 @@ BodyCompositionDialog::~BodyCompositionDialog()
 
 void BodyCompositionDialog::initializeConnections()
 {
-  QSharedPointer<BodyCompositionManager> derived =
-    m_manager.staticCast<BodyCompositionManager>();
+  //QSharedPointer<BodyCompositionManager> derived =
+  //  m_manager.staticCast<BodyCompositionManager>();
 
-    if (Cypress::getInstance().isSimulation()) {
-    //ui->measureWidget->enableMeasure();
-  }
+  //  if (Cypress::getInstance().isSimulation()) {
+  //  //ui->measureWidget->enableMeasure();
+  //}
 
-  else {
-    // Disable all buttons by default
-    //
-    foreach(auto button, this->findChildren<QPushButton *>())
-    {
-      if("Close" != button->text())
-        button->setEnabled(false);
+  //else {
+  //  // Disable all buttons by default
+  //  //
+  //  foreach(auto button, this->findChildren<QPushButton *>())
+  //  {
+  //    if("Close" != button->text())
+  //      button->setEnabled(false);
 
-      // disable enter key press event passing onto auto focus buttons
-      //
-      button->setDefault(false);
-      button->setAutoDefault(false);
-    }
-  }
+  //    // disable enter key press event passing onto auto focus buttons
+  //    //
+  //    button->setDefault(false);
+  //    button->setAutoDefault(false);
+  //  }
+  //}
 
 
   // Relay messages from the manager to the status bar
@@ -86,119 +86,119 @@ void BodyCompositionDialog::initializeConnections()
 
   // Scan for devices
   //
-  connect(derived.get(), &BodyCompositionManager::scanningDevices,
-          ui->deviceComboBox, &QComboBox::clear);
+  //connect(derived.get(), &BodyCompositionManager::scanningDevices,
+  //        ui->deviceComboBox, &QComboBox::clear);
 
-  // Update the drop down list as devices are discovered during scanning
-  //
-  connect(derived.get(), &BodyCompositionManager::deviceDiscovered,
-          this, [this](const QString &label){
-      int index = ui->deviceComboBox->findText(label);
-      bool oldState = ui->deviceComboBox->blockSignals(true);
-      if(-1 == index)
-      {
-          ui->deviceComboBox->addItem(label);
-      }
-      ui->deviceComboBox->blockSignals(oldState);
-  });
+  //// Update the drop down list as devices are discovered during scanning
+  ////
+  //connect(derived.get(), &BodyCompositionManager::deviceDiscovered,
+  //        this, [this](const QString &label){
+  //    int index = ui->deviceComboBox->findText(label);
+  //    bool oldState = ui->deviceComboBox->blockSignals(true);
+  //    if(-1 == index)
+  //    {
+  //        ui->deviceComboBox->addItem(label);
+  //    }
+  //    ui->deviceComboBox->blockSignals(oldState);
+  //});
 
-  connect(derived.get(), &BodyCompositionManager::deviceSelected,
-          this,[this](const QString &label){
-      if(label != ui->deviceComboBox->currentText())
-      {
-          ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(label));
-      }
-  });
+  //connect(derived.get(), &BodyCompositionManager::deviceSelected,
+  //        this,[this](const QString &label){
+  //    if(label != ui->deviceComboBox->currentText())
+  //    {
+  //        ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(label));
+  //    }
+  //});
 
-  // Prompt user to select a device from the drop down list when previously
-  // cached device information in the ini file is unavailable or invalid
-  //
-  connect(derived.get(), &BodyCompositionManager::canSelectDevice,
-          this,[this](){
-      //ui->statusBar->showMessage("Ready to select...");
-      QMessageBox::warning(
-        this, QApplication::applicationName(),
-        tr("Select the port from the list or connect to the currently visible port in the list.  If the device "
-        "is not in the list, quit the application and check that the port is "
-        "working and connect the analyzer to it before running this application."));
-  });
-
-  // Select a device (serial port) from drop down list
-  //
-  connect(ui->deviceComboBox, &QComboBox::currentTextChanged,
-          derived.get(),&BodyCompositionManager::selectDevice);
+  //// Prompt user to select a device from the drop down list when previously
+  //// cached device information in the ini file is unavailable or invalid
+  ////
+  //connect(derived.get(), &BodyCompositionManager::canSelectDevice,
+  //        this,[this](){
+  //    //ui->statusBar->showMessage("Ready to select...");
+  //    QMessageBox::warning(
+  //      this, QApplication::applicationName(),
+  //      tr("Select the port from the list or connect to the currently visible port in the list.  If the device "
+  //      "is not in the list, quit the application and check that the port is "
+  //      "working and connect the analyzer to it before running this application."));
+  //});
 
   // Select a device (serial port) from drop down list
   //
-  connect(ui->deviceComboBox, QOverload<int>::of(&QComboBox::activated),
-    this,[this,derived](int index){
-      derived->selectDevice(ui->deviceComboBox->itemText(index));
-  });
+  //connect(ui->deviceComboBox, &QComboBox::currentTextChanged,
+  //        derived.get(),&BodyCompositionManager::selectDevice);
+
+  // Select a device (serial port) from drop down list
+  //
+  //connect(ui->deviceComboBox, QOverload<int>::of(&QComboBox::activated),
+  //  this,[this,derived](int index){
+  //    derived->selectDevice(ui->deviceComboBox->itemText(index));
+  //});
 
   // Ready to connect device
   //
-  connect(derived.get(), &BodyCompositionManager::canConnectDevice,
-          this,[this](){
-      ui->connectButton->setEnabled(true);
-      ui->disconnectButton->setEnabled(false);
-      ui->resetButton->setEnabled(false);
-      ui->setButton->setEnabled(false);
-      ui->confirmButton->setEnabled(false);
-      //ui->measureWidget->disableMeasure();
-  });
+  //connect(derived.get(), &BodyCompositionManager::canConnectDevice,
+  //        this,[this](){
+  //    ui->connectButton->setEnabled(true);
+  //    ui->disconnectButton->setEnabled(false);
+  //    ui->resetButton->setEnabled(false);
+  //    ui->setButton->setEnabled(false);
+  //    ui->confirmButton->setEnabled(false);
+  //    //ui->measureWidget->disableMeasure();
+  //});
 
   // Connect to device
   //
-  connect(ui->connectButton, &QPushButton::clicked,
-          derived.get(), &BodyCompositionManager::connectDevice);
+  //connect(ui->connectButton, &QPushButton::clicked,
+  //        derived.get(), &BodyCompositionManager::connectDevice);
 
   // Connection is established: enable measurement requests
   //
   //connect(derived.get(), &BodyCompositionManager::canMeasure,
   //        ui->measureWidget, &MeasureWidget::enableMeasure);
 
-  connect(m_manager.get(), &BodyCompositionManager::canMeasure,
-          this,[this](){
-      ui->connectButton->setEnabled(false);
-      ui->disconnectButton->setEnabled(true);
-      ui->resetButton->setEnabled(true);
-      ui->setButton->setEnabled(false);
-      ui->confirmButton->setEnabled(true);
-  });
+  //connect(m_manager.get(), &BodyCompositionManager::canMeasure,
+  //        this,[this](){
+  //    ui->connectButton->setEnabled(false);
+  //    ui->disconnectButton->setEnabled(true);
+  //    ui->resetButton->setEnabled(true);
+  //    ui->setButton->setEnabled(false);
+  //    ui->confirmButton->setEnabled(true);
+  //});
 
-  // Connection is established and a successful reset was done
-  //
-  connect(derived.get(), &BodyCompositionManager::canInput,
-          this,[this](){
-      ui->connectButton->setEnabled(false);
-      ui->disconnectButton->setEnabled(true);
-      ui->resetButton->setEnabled(true);
-      ui->setButton->setEnabled(true);
-      ui->confirmButton->setEnabled(false);
-      //ui->measureWidget->disableMeasure();
-  });
+  //// Connection is established and a successful reset was done
+  ////
+  //connect(derived.get(), &BodyCompositionManager::canInput,
+  //        this,[this](){
+  //    ui->connectButton->setEnabled(false);
+  //    ui->disconnectButton->setEnabled(true);
+  //    ui->resetButton->setEnabled(true);
+  //    ui->setButton->setEnabled(true);
+  //    ui->confirmButton->setEnabled(false);
+  //    //ui->measureWidget->disableMeasure();
+  //});
 
-  // A successful confirmation of all inputs was done
-  //
-  connect(derived.get(), &BodyCompositionManager::canConfirm,
-          this,[this](){
-      ui->connectButton->setEnabled(false);
-      ui->disconnectButton->setEnabled(true);
-      ui->resetButton->setEnabled(true);
-      ui->setButton->setEnabled(true);
-      ui->confirmButton->setEnabled(true);
-      //ui->measureWidget->disableMeasure();
-  });
+  //// A successful confirmation of all inputs was done
+  ////
+  //connect(derived.get(), &BodyCompositionManager::canConfirm,
+  //        this,[this](){
+  //    ui->connectButton->setEnabled(false);
+  //    ui->disconnectButton->setEnabled(true);
+  //    ui->resetButton->setEnabled(true);
+  //    ui->setButton->setEnabled(true);
+  //    ui->confirmButton->setEnabled(true);
+  //    //ui->measureWidget->disableMeasure();
+  //});
 
-  // Disconnect from device
-  //
-  connect(ui->disconnectButton, &QPushButton::clicked,
-          derived.get(), &BodyCompositionManager::disconnectDevice);
+  //// Disconnect from device
+  ////
+  //connect(ui->disconnectButton, &QPushButton::clicked,
+  //        derived.get(), &BodyCompositionManager::disconnectDevice);
 
-  // Reset the device (clear all input settings)
-  //
-  connect(ui->resetButton, &QPushButton::clicked,
-        derived.get(), &BodyCompositionManager::resetDevice);
+  //// Reset the device (clear all input settings)
+  ////
+  //connect(ui->resetButton, &QPushButton::clicked,
+  //      derived.get(), &BodyCompositionManager::resetDevice);
 
   // Set the inputs to the analyzer
   //
@@ -239,8 +239,8 @@ void BodyCompositionDialog::initializeConnections()
 
   // Confirm inputs and check if measurement can proceed
   //
-  connect(ui->confirmButton, &QPushButton::clicked,
-        derived.get(), &BodyCompositionManager::confirmSettings);
+  //connect(ui->confirmButton, &QPushButton::clicked,
+  //      derived.get(), &BodyCompositionManager::confirmSettings);
 
   // Request a measurement from the device
   //
@@ -257,11 +257,11 @@ void BodyCompositionDialog::initializeConnections()
   //connect(derived.get(), &BodyCompositionManager::canFinish,
   //    ui->measureWidget, &MeasureWidget::enableWriteToFile);
 
-  QIntValidator *v_age = new QIntValidator(this);
-  v_age->setRange(
-    BodyCompositionManager::AGE_MIN,
-    BodyCompositionManager::AGE_MAX);
-  ui->ageLineEdit->setValidator(v_age);
+  //QIntValidator *v_age = new QIntValidator(this);
+  //v_age->setRange(
+  //  BodyCompositionManager::AGE_MIN,
+  //  BodyCompositionManager::AGE_MAX);
+  //ui->ageLineEdit->setValidator(v_age);
 
   // When the units are changed to imperial, the input field for
   // height input must change to accomodate 0.5" increments

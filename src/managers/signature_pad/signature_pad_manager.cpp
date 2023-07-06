@@ -1,11 +1,12 @@
 #include "signature_pad_manager.h"
 #include "signature_pad_communication.h"
 
+#include "cypress_session.h"
+
 #include "auxiliary/json_settings.h"
 
-
-
-SignaturePadManager::SignaturePadManager(QJsonObject inputData)
+SignaturePadManager::SignaturePadManager(const CypressSession& session):
+    ManagerBase(session)
 {
     spc.reset(new SignaturePadCommunication());
     spc->moveToThread(&captureThread);
@@ -13,12 +14,8 @@ SignaturePadManager::SignaturePadManager(QJsonObject inputData)
     connect(this, &SignaturePadManager::startCapture, spc.get(), &SignaturePadCommunication::start);
     connect(spc.get(), &SignaturePadCommunication::signatureOk, this, &SignaturePadManager::receiveSignature);
 
-    qDebug() << "signature pad manager" << inputData;
-    qDebug() << inputData.value("answer_id").toInt();
-    qDebug() << inputData.value("barcode").toString();
-
-    m_answerId = inputData.value("answer_id").toInt();
-    m_participantId = inputData.value("barcode").toString();
+    qDebug() << m_inputData.value("answer_id").toInt();
+    qDebug() << m_inputData.value("barcode").toString();
 }
 
 SignaturePadManager::~SignaturePadManager()
@@ -119,6 +116,6 @@ bool SignaturePadManager::cleanUp() {
 // set input parameters for the test
 void SignaturePadManager::setInputData(const QVariantMap& inputData)
 {
-    m_answerId = inputData.value("answerId").toInt();
-    m_participantId = inputData.value("participantId").toString();
+    //m_answerId = inputData.value("answerId").toInt();
+    // m_participantId = inputData.value("participantId").toString();
 }

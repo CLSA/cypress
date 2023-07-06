@@ -38,11 +38,10 @@ QMap<QByteArray,QString> BodyCompositionManager::incorrectLUT= BodyCompositionMa
 //
 QMap<QByteArray,QString> BodyCompositionManager::confirmLUT= BodyCompositionManager::initConfirmationLUT();
 
-BodyCompositionManager::BodyCompositionManager(QJsonObject inputData)
+BodyCompositionManager::BodyCompositionManager(const CypressSession& session)
+    : SerialPortManager(session)
 {
-  m_test.setExpectedMeasurementCount(1);
-  m_inputData = jsonObjectToVariantMap(inputData);
-  qDebug() << "m_inputdata: " << m_inputData;
+    m_test.setExpectedMeasurementCount(1);
 }
 
 bool BodyCompositionManager::isAvailable()

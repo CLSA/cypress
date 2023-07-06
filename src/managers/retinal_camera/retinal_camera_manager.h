@@ -13,7 +13,7 @@ class RetinalCameraManager: public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit RetinalCameraManager(QJsonObject inputData);
+    explicit RetinalCameraManager(const CypressSession& session);
     ~RetinalCameraManager();
 
     static bool isInstalled();

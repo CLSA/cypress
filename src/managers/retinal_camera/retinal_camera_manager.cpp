@@ -12,9 +12,9 @@
 
 #include "data/retinal_camera/database_manager.h"
 
-RetinalCameraManager::RetinalCameraManager(QJsonObject inputData)
+RetinalCameraManager::RetinalCameraManager(const CypressSession& session):
+    ManagerBase(session)
 {
-    m_inputData = jsonObjectToVariantMap(inputData);
 }
 
 
