@@ -23,6 +23,11 @@ DialogBase::DialogBase(QWidget* parent, const CypressSession& session)
     connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
 
     this->setAttribute(Qt::WA_DeleteOnClose);
+
+    if (Cypress::getInstance().isSimulation())
+    {
+        setWindowTitle(windowTitle() + "(SIM)");
+    }
 }
 
 void DialogBase::initialize()
