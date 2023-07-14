@@ -13,14 +13,20 @@ class CypressSession
 public:
     CypressSession();
     CypressSession(const Constants::MeasureType& deviceType, const QJsonObject& inputData);
+    CypressSession(const Constants::ReportType& reportType, const QJsonObject& inputData);
     CypressSession(const CypressSession& session);
 
     ~CypressSession();
 
-    bool start();
-    bool end();
+    void startDevice();
+    void endDevice();
+
+    void startReport();
+    void endReport();
 
     Constants::MeasureType getDeviceType() const;
+    Constants::ReportType getReportType() const;
+
     QJsonObject getInputData() const;
 
     QString getAnswerId() const;
@@ -30,16 +36,24 @@ public:
     QString getInterviewer() const;
 
 private:
-    // The device to be used for this session
-    const Constants::MeasureType m_deviceType;
+    // the device to be used for this session (if applicable)
+    //
+    const Constants::MeasureType m_deviceType { Constants::MeasureType::Unknown };
 
-    // The device UI
+    // the report to be used for this session (if applicable)
+    //
+    const Constants::ReportType m_reportType { Constants::ReportType::reportTypeUnknown };
+
+    // the device UI
+    //
     QScopedPointer<DialogBase> m_deviceDialog;
 
-    // Request body sent from Pine over the network
-    const QJsonObject m_inputData;
+    // request body sent from Pine over the network
+    //
+    QJsonObject m_inputData;
 
-    // Validated input data from m_inputData
+    // validated input data from m_inputData
+    //
     QString m_interviewer {};
     QString m_answerId {};
     QString m_sessionId {};
@@ -51,6 +65,7 @@ private:
     QDateTime m_endDateTime {};
 
     // Determines if the basic key/value pairs exist for a session or throws exception
+    //
     void validate(const QJsonObject& inputData) const;
 
     bool isValidString(const QJsonObject& inputData, const QString& key) const;

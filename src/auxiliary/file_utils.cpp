@@ -3,7 +3,7 @@
 #include <QFileInfo>
 #include <QCryptographicHash>
 
-#include "FileUtils.h"
+#include "file_utils.h"
 
 QJsonObject FileUtils::readJsonFile(const QString &filePath)
 {

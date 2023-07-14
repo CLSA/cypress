@@ -7,7 +7,7 @@ void ChoiceReactionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Choice_Reaction, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Choice_Reaction, requestData);
 
         if (false)
         {

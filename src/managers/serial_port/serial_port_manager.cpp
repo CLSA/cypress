@@ -114,11 +114,13 @@ bool SerialPortManager::scanDevices()
         if (!m_deviceList.contains(portNumber))
         {
             m_deviceList.insert(portNumber, info);
-            emit deviceDiscovered(portNumber);
+            //emit deviceDiscovered(portNumber);
         }
     }
 
     qInfo() << "found" << QString::number(m_deviceList.count()) << " serial ports";
+
+    emit devicesDiscovered(m_deviceList);
 
     // if we have a port from the ini file, check if it is still available on the system
     //

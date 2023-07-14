@@ -8,7 +8,7 @@ void ECGRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::ECG, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::ECG, requestData);
 
         if (false)
         {

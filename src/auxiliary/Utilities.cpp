@@ -5,6 +5,9 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QLoggingCategory>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QMessageBox>
 
 /*CRC-8 Lookup table based on:
     poly = x^8 + x^2 + x^1 + x^0 (100000111)
@@ -155,3 +158,22 @@ void Logging::disable()
 }
 
 void Logging::disabled(QtMsgType, const QMessageLogContext &, const QString &) {}
+
+bool Utilities::openUrl(QUrl url)
+{
+    bool success = QDesktopServices::openUrl(url);
+    if (!success)
+        qDebug() << "could not open URL: " << url;
+
+    return success;
+}
+
+
+void Utilities::showMessageBox(const QString& title, const QString& text)
+{
+    QMessageBox messageBox;
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.setText(text);
+    messageBox.setWindowTitle(title);
+    messageBox.exec();
+}

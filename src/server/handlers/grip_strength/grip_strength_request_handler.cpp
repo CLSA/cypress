@@ -18,7 +18,7 @@ void GripStrengthRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Grip_Strength, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Grip_Strength, requestData);
 
         if (false)
         {

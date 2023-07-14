@@ -8,7 +8,7 @@ void RetinalCameraRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Retinal_Camera, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Retinal_Camera, requestData);
 
         if (false)
         {

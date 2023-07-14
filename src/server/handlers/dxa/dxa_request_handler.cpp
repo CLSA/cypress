@@ -10,7 +10,7 @@ void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::DxaWholeBody, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::DxaWholeBody, requestData);
 
         if (false)
         {

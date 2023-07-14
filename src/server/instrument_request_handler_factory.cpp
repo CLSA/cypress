@@ -58,6 +58,7 @@
 #include "server/handlers/signature_pad/signature_pad_request_handler.h"
 #include "server/handlers/signature_pad/signature_pad_status_request_handler.h"
 
+#include "server/handlers/participant_report/participant_report_request_handler.h"
 
 using namespace Poco::Net;
 
@@ -122,6 +123,8 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/signature/?$)"), 	                   &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
     { QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
     { QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler    },
+
+    { QString(R"(^/participant_report/?$)"),               &InstrumentRequestHandlerFactory::createParticipantReportRequestHandler     },
 }};
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
@@ -327,5 +330,10 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadRequestHa
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler()
 {
     return new SignaturePadStatusRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createParticipantReportRequestHandler()
+{
+    return new ParticipantReportRequestHandler;
 }
 

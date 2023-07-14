@@ -47,6 +47,8 @@ public:
 
    static const quint8 crcLUT[256];
 
+   static bool openUrl(QUrl url);
+   static void showMessageBox(const QString& title, const QString& text);
 };
 
 /**

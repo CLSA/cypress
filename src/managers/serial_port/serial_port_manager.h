@@ -84,6 +84,9 @@ signals:
     //
     void deviceDiscovered(const QString&);
 
+    // The full list of ports that were discovered
+    void devicesDiscovered(const QMap<QString, QSerialPortInfo>&);
+
     // a list of scanned port devices is avaiable for selection
     // (update GUI to prompt for user to select a port)
     //

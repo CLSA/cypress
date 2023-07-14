@@ -28,9 +28,6 @@ class Cypress: public QObject
 {
     Q_OBJECT
 
-public slots:
-    bool startValidatedSession(CypressSession session);
-    void forceSessionEnd(QString sessionId);
 
 public:
     static Cypress& getInstance();
@@ -41,10 +38,7 @@ public:
     QString getSessionInfo();
     QJsonObject getStatus();
 
-    QSettings getSettings();
-
     bool endSession(const QString& uuid);
-
     void enableSimMode() { m_simulate = true; };
     void disableSimMode() { m_simulate = false; };
     bool isSimulation() { return m_simulate; };
@@ -55,6 +49,12 @@ public:
 
     void printActiveSessions() const;
 
+public slots:
+    void startValidatedDeviceSession(CypressSession session);
+    void startValidatedReportSession(CypressSession session);
+
+    void forceSessionEnd(QString sessionId);
+
 private:
     explicit Cypress(QObject *parent = Q_NULLPTR);
     ~Cypress();
@@ -62,8 +62,6 @@ private:
     static Cypress* app;
 
     void initialize();
-
-    Constants::MeasureType m_type { Constants::MeasureType::Unknown };
 
     bool m_simulate { true };
     bool m_verbose { false };

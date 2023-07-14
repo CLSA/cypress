@@ -19,7 +19,7 @@
 
 void DefaultDeleteSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
-    std::string uri = request.getURI();
+    std::string uri { request.getURI() };
     std::regex uuid_regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
     std::smatch match;
 
@@ -35,6 +35,7 @@ void DefaultDeleteSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequ
 
         std::ostream& out = response.send();
         out.flush();
+
         return;
     }
 

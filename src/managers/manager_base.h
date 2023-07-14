@@ -1,6 +1,8 @@
 #ifndef MANAGER_BASE_H
 #define MANAGER_BASE_H
 
+#include "cypress_settings.h"
+
 #include <QJsonObject>
 #include <QObject>
 #include <QWidget>
@@ -68,6 +70,7 @@ signals:
 
 protected:
     const CypressSession& m_session;
+    const CypressSettings& m_settings;
 
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;

@@ -8,7 +8,7 @@ void CDTTRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::CDTT, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::CDTT, requestData);
 
         if (false)
         {

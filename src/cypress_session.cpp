@@ -2,6 +2,7 @@
 
 #include "dialogs/dialog_factory.h"
 #include "auxiliary/Constants.h"
+#include "managers/participant_report/participant_report_manager.h"
 
 #include <QException>
 
@@ -16,7 +17,7 @@ CypressSession::CypressSession(const Constants::MeasureType& device, const QJson
     m_deviceType(device),
     m_inputData(inputData)
 {
-    qDebug() << "CypressSession::NewSession" << inputData;
+    qDebug() << "CypressSession::DeviceSession" << inputData;
 
     validate(inputData);
 
@@ -27,12 +28,31 @@ CypressSession::CypressSession(const Constants::MeasureType& device, const QJson
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 };
 
+CypressSession::CypressSession(const Constants::ReportType& report, const QJsonObject& inputData):
+    m_reportType(report),
+    m_inputData(inputData)
+{
+    qDebug() << "CypressSession::ReportSession" << inputData;
+
+    validate(inputData);
+
+    m_inputData = inputData;
+    m_barcode = m_inputData.value("barcode").toString();
+    m_answerId = m_inputData.value("answer_id").toString();
+    m_interviewer = m_inputData.value("interviewer").toString();
+    m_language = m_inputData.value("language").toString();
+    m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+};
+
+
 CypressSession::CypressSession(const CypressSession& session):
     m_deviceType(session.getDeviceType()),
+    m_reportType(session.getReportType()),
     m_inputData(session.getInputData())
 {
     qDebug() << "CypressSession::CopySession";
 
+    m_inputData = session.getInputData();
     m_barcode = session.getBarcode();
     m_answerId = session.getAnswerId();
     m_interviewer = session.getInterviewer();
@@ -63,7 +83,7 @@ void CypressSession::validate(const QJsonObject& inputData) const
         throw InvalidInterviewerException();
 }
 
-bool CypressSession::start()
+void CypressSession::startDevice()
 {
     qDebug() << "CypressSession::start()";
 
@@ -73,19 +93,33 @@ bool CypressSession::start()
     m_deviceDialog.reset(DialogFactory::instantiate(*this) /* pass a const reference of the session to the dialog */ );
     m_deviceDialog->run();
     m_deviceDialog->show();
-
-    return true;
 }
 
-bool CypressSession::end()
+void CypressSession::endDevice()
 {
     if (m_deviceDialog.isNull())
         throw QException();
 
     qDebug() << "end session" << getSessionId();
-
-    return true;
 }
+
+void CypressSession::startReport()
+{
+    if (m_reportType == Constants::ReportType::ParticipantReportEn)
+    {
+        ParticipantReportManager participantManager(*this);
+
+        participantManager.start();
+        participantManager.measure();
+        participantManager.finish();
+    }
+}
+
+void CypressSession::endReport()
+{
+
+}
+
 
 QString CypressSession::getSessionId() const
 {
@@ -115,6 +149,11 @@ QString CypressSession::getInterviewer() const
 Constants::MeasureType CypressSession::getDeviceType() const
 {
     return m_deviceType;
+}
+
+Constants::ReportType CypressSession::getReportType() const
+{
+    return m_reportType;
 }
 
 QJsonObject CypressSession::getInputData() const

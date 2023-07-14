@@ -71,6 +71,8 @@ public:
 
     static HTTPRequestHandler* createSignaturePadRequestHandler();
     static HTTPRequestHandler* createSignaturePadStatusRequestHandler();
+
+    static HTTPRequestHandler* createParticipantReportRequestHandler();
 };
 
 

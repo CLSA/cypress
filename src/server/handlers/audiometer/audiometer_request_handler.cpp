@@ -7,7 +7,7 @@ void AudiometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Audiometer, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Audiometer, requestData);
 
         if (false)
         {

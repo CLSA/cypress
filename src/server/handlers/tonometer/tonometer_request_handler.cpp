@@ -7,7 +7,7 @@ void TonometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reques
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Tonometer, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Tonometer, requestData);
 
         if (false)
         {

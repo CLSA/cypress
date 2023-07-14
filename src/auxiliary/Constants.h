@@ -18,6 +18,15 @@ public:
     };
     Q_ENUM(RunMode)
 
+    enum ReportType {
+        reportTypeUnknown,
+        ParticipantReportEn,
+        ParticipantReportFr,
+        ProxyConsentEn,
+        ProxyConsentFr,
+    };
+    Q_ENUM(ReportType)
+
     enum MeasureType {
         Unknown,
         Audiometer,
@@ -40,7 +49,6 @@ public:
         DxaForearmBone,
         DxaDualHip,
         Signature,
-
     };
     Q_ENUM(MeasureType)
 

@@ -9,7 +9,7 @@ void SignaturePadRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Signature, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Signature, requestData);
 
         if (false)
         {

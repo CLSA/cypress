@@ -1,6 +1,7 @@
 #ifndef TEST_INFO_WIDGET_H
 #define TEST_INFO_WIDGET_H
 
+#include "cypress_session.h"
 #include <QWidget>
 
 namespace Ui {
@@ -15,7 +16,11 @@ public:
     explicit TestInfoWidget(QWidget *parent = nullptr);
     ~TestInfoWidget();
 
+    void setSessionInformation(const CypressSession& session);
+    void setDeviceStatus(QString status);
 private:
+
+
     Ui::TestInfoWidget *ui;
 };
 

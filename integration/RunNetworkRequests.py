@@ -97,9 +97,9 @@ if __name__ == '__main__':
 
     test_audiometer({
         "answer_id": "10199",
-        "barcode": "string",
+        "barcode": "123456789",
         "language": "en",
-        "interviewer": "string"
+        "interviewer": "Anthony Hoare"
     })
 
     test_cdtt({
@@ -129,9 +129,6 @@ if __name__ == '__main__':
         "language": "en",
         "interviewer": "string"
     })
-
-
-    
 
     test_ecg({
         "answer_id": "10199",

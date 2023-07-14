@@ -33,11 +33,21 @@ Server::~Server()
     stop();
 }
 
-QString Server::requestSession(const Constants::MeasureType& device, const QJsonObject& inputData)
+QString Server::requestDevice(const Constants::MeasureType& device, const QJsonObject& inputData)
 {
     CypressSession session(device, inputData); // this validates the input data or throws exception
 
     emit startSession(session);
+
+    return session.getSessionId();
+}
+
+
+QString Server::requestReport(const Constants::ReportType& report, const QJsonObject& inputData)
+{
+    CypressSession session(report, inputData);
+
+    emit startReport(session);
 
     return session.getSessionId();
 }

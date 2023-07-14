@@ -1,12 +1,16 @@
-#include "spirometer_request_handler.h"
+#include "participant_report_request_handler.h"
 #include "cypress_application.h"
 #include "auxiliary/json_settings.h"
 
-void SpirometerRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+
+void ParticipantReportRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Spirometer, requestData);
+        qDebug() << "ParticipantReportRequestHandler::requestData()" << requestData;
+        QString sessionId = Cypress::getInstance().httpServer->requestReport(Constants::ReportType::ParticipantReportEn, requestData);
 
         if (false)
         {

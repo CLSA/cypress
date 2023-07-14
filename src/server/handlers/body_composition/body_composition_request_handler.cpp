@@ -9,7 +9,7 @@ void BodyCompositionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Body_Composition, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Body_Composition, requestData);
 
         if (false)
         {

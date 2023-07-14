@@ -30,8 +30,9 @@ Cypress::Cypress(QObject *parent) :
     httpServer(new Server)
 {
     try {
-        connect(httpServer.get(), &Server::startSession, this, &Cypress::startValidatedSession);
-        connect(httpServer.get(), &Server::endSession,   this, &Cypress::forceSessionEnd);
+        connect(httpServer.get(), &Server::startSession, this,  &Cypress::startValidatedDeviceSession);
+        connect(httpServer.get(), &Server::startReport,  this,  &Cypress::startValidatedReportSession);
+        connect(httpServer.get(), &Server::endSession,   this,  &Cypress::forceSessionEnd);
 
         httpServer->start();
     }
@@ -44,20 +45,27 @@ Cypress::Cypress(QObject *parent) :
 
 Cypress::~Cypress()
 {
-    if (isVerbose())
-        qDebug() << "destroy cypress";
-
     delete app;
 }
 
 // slot
-bool Cypress::startValidatedSession(CypressSession session)
+void Cypress::startValidatedDeviceSession(CypressSession session)
 {
     printActiveSessions();
     QSharedPointer<CypressSession> newSession { new CypressSession(session) };
     sessions.insert(newSession->getSessionId(), newSession);
-    return newSession->start();
+    newSession->startDevice();
 }
+
+
+void Cypress::startValidatedReportSession(CypressSession session)
+{
+    qDebug() << "startValidatedReportSession";
+    QSharedPointer<CypressSession> newSession { new CypressSession(session) };
+    sessions.insert(newSession->getSessionId(), newSession);
+    newSession->startReport();
+}
+
 
 // slot
 void Cypress::forceSessionEnd(QString sessionId)
@@ -67,6 +75,7 @@ void Cypress::forceSessionEnd(QString sessionId)
 
 bool Cypress::endSession(const QString& sessionId)
 {
+    // Ends the session by sessionId and removes it from the active sessions
     if (!sessions.contains(sessionId))
     {
         return true;
@@ -75,17 +84,12 @@ bool Cypress::endSession(const QString& sessionId)
     else
     {
         CypressSession& session = *sessions.value(sessionId);
-        bool ended = session.end();
-        if (!ended)
-        {
-            return false;
-        }
-        else
-        {
-            return sessions.remove(sessionId);
-        }
+
+        session.endDevice();
+        sessions.remove(sessionId);
     }
 
+    return true;
 }
 
 void Cypress::printActiveSessions() const

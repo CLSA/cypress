@@ -9,7 +9,7 @@ void FraxRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Frax, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Frax, requestData);
 
         if (false)
         {

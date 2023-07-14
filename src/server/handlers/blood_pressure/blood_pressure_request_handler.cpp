@@ -7,7 +7,7 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestSession(Constants::MeasureType::Blood_Pressure, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Blood_Pressure, requestData);
 
         if (false)
         {
