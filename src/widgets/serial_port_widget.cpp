@@ -16,12 +16,18 @@ SerialPortWidget::~SerialPortWidget()
 
 void SerialPortWidget::devicesDiscovered(QMap<QString, QSerialPortInfo> devices)
 {
-    ui->deviceComboBox->clear();
+    clear();
+
     for (const auto& device : devices)
     {
         QString label = device.portName();
         ui->deviceComboBox->addItem(label);
     }
+}
+
+void SerialPortWidget::clear()
+{
+    ui->deviceComboBox->clear();
 }
 
 void SerialPortWidget::comboBoxChanged(QString portNumber)

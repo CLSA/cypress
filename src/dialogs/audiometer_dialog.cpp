@@ -41,28 +41,28 @@ void AudiometerDialog::initializeConnections()
     connect(ui->serialPortWidget, &SerialPortWidget::deviceSelected, audiometerManager.get(), &SerialPortManager::deviceSelected);
 
     // Ready to connect device
-    connect(audiometerManager.get(), &SerialPortManager::canConnectDevice,
-      this,[this](){
-        ui->connectButton->setEnabled(true);
-        ui->disconnectButton->setEnabled(false);
-    });
+    //connect(audiometerManager.get(), &SerialPortManager::canConnectDevice,
+    //  this,[this](){
+    //    ui->connectButton->setEnabled(true);
+    //    ui->disconnectButton->setEnabled(false);
+    //});
 
     // Connect to device
-    connect(ui->connectButton, &QPushButton::clicked, audiometerManager.get(), &AudiometerManager::connectDevice);
+    //connect(ui->connectButton, &QPushButton::clicked, audiometerManager.get(), &AudiometerManager::connectDevice);
 
-    // Connection is established: enable measurement requests
-    connect(audiometerManager.get(), &AudiometerManager::canMeasure,
-            ui->measurements, &MeasurementTable::enableMeasureButton);
+    //// Connection is established: enable measurement requests
+    //connect(audiometerManager.get(), &AudiometerManager::canMeasure,
+    //        ui->measurements, &MeasurementTable::enableMeasureButton);
 
-    // allow disconnecting from the device
-    connect(audiometerManager.get(), &AudiometerManager::canMeasure,
-              this, [this](){
-      ui->connectButton->setEnabled(false);
-      ui->disconnectButton->setEnabled(true);
-    });
+    //// allow disconnecting from the device
+    //connect(audiometerManager.get(), &AudiometerManager::canMeasure,
+    //          this, [this](){
+    //  ui->connectButton->setEnabled(false);
+    //  ui->disconnectButton->setEnabled(true);
+    //});
 
-    // Disconnect from device
-    connect(ui->disconnectButton, &QPushButton::clicked, audiometerManager.get(), &AudiometerManager::disconnectDevice);
+    //// Disconnect from device
+    //connect(ui->disconnectButton, &QPushButton::clicked, audiometerManager.get(), &AudiometerManager::disconnectDevice);
 
 //  // Request a measurement from the device
 //  //

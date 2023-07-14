@@ -22,6 +22,7 @@ signals:
 
 public slots:
     void devicesDiscovered(QMap<QString, QSerialPortInfo> devices);
+    void clear();
 
 private slots:
     void comboBoxChanged(QString portNumber);
