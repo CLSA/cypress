@@ -19,6 +19,7 @@
 #include "retinal_camera_dialog.h"
 #include "signature_pad_dialog.h"
 #include "dxa_dialog.h"
+#include "cimt_vivid_i_dialog.h"
 
 DialogBase* DialogFactory::instantiate(const CypressSession& session)
 {
@@ -60,8 +61,9 @@ DialogBase* DialogFactory::instantiate(const CypressSession& session)
       case Constants::MeasureType::Tonometer:
         return new TonometerDialog(nullptr, session);
 
-      //case Constants::MeasureType::CarotidIntima:
-      //  return new UltrasoundDialog(session);
+      case Constants::MeasureType::CarotidIntima:
+        return new CimtVividiDialog(session);
+
       case Constants::MeasureType::Retinal_Camera:
         return new RetinalCameraDialog(nullptr, session);
 

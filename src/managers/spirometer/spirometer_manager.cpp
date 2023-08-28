@@ -303,40 +303,26 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::finish()
 {
-    //if (CypressApplication::getInstance().isSimulation())
-    //{
-    //    QJsonObject results = JsonSettings::readJsonFromFile(
-    //        "C:/dev/clsa/cypress/src/tests/fixtures/dxa/forearm/output.json"
-    //    );
-    //    if (results.empty()) return;
+    if(QProcess::NotRunning != m_process.state())
+    {
+       m_process.kill();
+    }
 
-    //    bool ok = sendResultsToPine(results);
-    //    if (!ok)
-    //    {
-    //        qDebug() << "Could not send results to Pine";
-    //    }
-
-    //}
-    //if(QProcess::NotRunning != m_process.state())
-    //{
-    //   m_process.kill();
-    //}
-
-    //restoreDatabases();
-    //removeXmlFiles();
+    restoreDatabases();
+    removeXmlFiles();
 
     //// delete pdf output file
     ////
-    //QString pdfFilePath = getOutputPdfPath();
-    //if(QFile::exists(pdfFilePath))
-    //{
-    //    qDebug() << "remove pdf" << pdfFilePath;
-    //    QFile::remove(pdfFilePath);
-    //}
+    QString pdfFilePath = getOutputPdfPath();
+    if(QFile::exists(pdfFilePath))
+    {
+        qDebug() << "remove pdf" << pdfFilePath;
+        QFile::remove(pdfFilePath);
+    }
 
-    //m_test.reset();
+    m_test.reset();
 
-    //QJsonObject results = m_test.toJsonObject();
+    QJsonObject results = m_test.toJsonObject();
 }
 
 void SpirometerManager::removeXmlFiles() const

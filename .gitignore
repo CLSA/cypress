@@ -21,7 +21,12 @@ build*
 /src/prototype/CognitiveTest/release
 /src/prototype/CognitiveTest/.qmake.stash
 /CDTT-2018-07-22/applicationFiles/Results
-/src/debug/*
-/src/debug
-/src/_CL_*
-/src/%SystemDrive%/*
+src/debug
+src/_CL_*
+src/%SystemDrive%/*
+/dep
+/integration
+
+poco/
+src/Cypress.pro
+*.pro

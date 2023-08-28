@@ -11,10 +11,17 @@ class DcmRecv : public QObject
     Q_OBJECT
 
 public:
-    explicit DcmRecv(QObject* parent = nullptr);
+    explicit DcmRecv(
+        const QString& executablePath,
+        const QString& configPath,
+        const QString& storageDir,
+        const QString& aetitle,
+        const QString& port,
+        QObject* parent = nullptr
+    );
     ~DcmRecv();
 
-    bool startDcmRecv(const QString& executablePath, const QString& aetitle, quint16 port);
+    bool start();
 
     QString receivedFilesDir() const;
 
@@ -37,7 +44,12 @@ private slots:
 
 private:
     QProcess m_process;
-    QTemporaryDir m_tempDir;
+
+    QString m_executablePath;
+    QString m_configPath;
+    QString m_outputDir;
+    QString m_aeTitle;
+    QString m_port;
 };
 
 

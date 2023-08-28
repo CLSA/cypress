@@ -3,7 +3,7 @@ import logging
 
 def test_ultrasound(payload):
   try:
-      response = requests.post("http://127.0.0.1:9000/ultrasound", json=payload)
+      response = requests.post("http://127.0.0.1:9000/ultrasound", json=payload, timeout=5)
       print(response.status_code)
       print(response.text)
 
@@ -19,7 +19,7 @@ def test_ultrasound(payload):
       print(response.text)
 
   except requests.exceptions.RequestException as e:
-      logging.error(f"Exception: {e}")
+    print(e)
 
 
 

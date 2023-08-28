@@ -12,11 +12,9 @@ DXADialog::DXADialog(QWidget* parent, const CypressSession& session) :
     ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
-
     m_manager.reset(new DXAManager(session));
-    //m_manager->start();
 
+    //m_manager->start();
     //ui->submitButton->setEnabled(true);
     //connect(ui->submitButton, &QPushButton::clicked, m_manager.get(), &DXAManager::measure);
     //connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);

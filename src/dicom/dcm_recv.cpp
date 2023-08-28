@@ -1,9 +1,27 @@
 #include "dcm_recv.h"
+#include "auxiliary/file_utils.h"
+
 #include <QDebug>
 
-DcmRecv::DcmRecv(QObject* parent) :
-    QObject(parent)
+DcmRecv::DcmRecv(
+    const QString& executablePath,
+    const QString& configPath,
+    const QString& outputDir,
+    const QString& aeTitle,
+    const QString& port,
+    QObject* parent
+):
+    QObject(parent),
+    m_executablePath(executablePath),
+    m_configPath(configPath),
+    m_outputDir(outputDir),
+    m_aeTitle(aeTitle),
+    m_port(port)
 {
+    // Reset the output directory
+    FileUtils::removeDirectory(m_outputDir);
+    FileUtils::createDirectory(m_outputDir);
+
     connect(&m_process, &QProcess::readyReadStandardOutput, this, &DcmRecv::onReadyReadStandardOutput);
     connect(&m_process, &QProcess::readyReadStandardError, this, &DcmRecv::onReadyReadStandardError);
     connect(&m_process, &QProcess::errorOccurred, this, &DcmRecv::onErrorOccurred);
@@ -12,48 +30,53 @@ DcmRecv::DcmRecv(QObject* parent) :
 
 DcmRecv::~DcmRecv()
 {
-    m_process.terminate();
-    m_process.waitForFinished();
+    if (m_process.state() != QProcess::ProcessState::NotRunning)
+    {
+        m_process.kill();
+        m_process.waitForFinished();
+    }
 }
 
-bool DcmRecv::startDcmRecv(const QString& executablePath, const QString& aetitle, quint16 port)
+bool DcmRecv::start()
 {
-    if (!m_tempDir.isValid())
-    {
-        qWarning() << "Temporary directory creation failed";
-        return false;
-    }
-
     QStringList arguments;
-    arguments << aetitle << QString::number(port) << "--output-directory" << m_tempDir.path();
-    m_process.start(executablePath, arguments);
+
+    arguments << m_port <<
+        "--config-file" << m_configPath << "default" <<
+        "--aetitle" << m_aeTitle <<
+        "--output-directory" << m_outputDir <<
+        "--filename-extension" << ".dcm";
+
+    m_process.start(m_executablePath, arguments);
 
     bool started = m_process.waitForStarted();
-    if (started)
+    if (!started)
     {
-        emit running();
+        qDebug() << "error: could not start DICOM server";
     }
+
+    emit running();
 
     return started;
 }
 
 QString DcmRecv::receivedFilesDir() const
 {
-    return m_tempDir.path();
+    return m_outputDir;
 }
 
 void DcmRecv::onReadyReadStandardOutput()
 {
     QByteArray output = m_process.readAllStandardOutput();
     qDebug() << "DCMRECV stdout:" << output;
-    emit logUpdate(output);
+    //emit logUpdate(output);
 }
 
 void DcmRecv::onReadyReadStandardError()
 {
     QByteArray error = m_process.readAllStandardError();
     qDebug() << "DCMRECV stderr:" << error;
-    emit logUpdate(error);
+    //emit logUpdate(error);
 }
 
 void DcmRecv::onErrorOccurred(QProcess::ProcessError error)

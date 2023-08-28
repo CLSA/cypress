@@ -20,6 +20,9 @@ public:
     static bool backupFile(const QString& fromPath, const QString& toPath);
     static bool restoreBackup(const QString& fromPath, const QString& toPath);
 
+    static bool createDirectory(const QString& dirPath);
+    static bool removeDirectory(const QString& dirPath);
+
 private:
     FileUtils() = default;
 };

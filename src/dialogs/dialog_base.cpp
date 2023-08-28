@@ -20,6 +20,8 @@ DialogBase::DialogBase(QWidget* parent, const CypressSession& session)
     : QDialog(parent),
     m_session(session)
 {
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
 
     this->setAttribute(Qt::WA_DeleteOnClose);

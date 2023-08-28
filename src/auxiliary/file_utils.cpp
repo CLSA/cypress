@@ -1,9 +1,10 @@
-#include <stdexcept>
+#include "file_utils.h"
 
+#include <QDir>
 #include <QFileInfo>
 #include <QCryptographicHash>
 
-#include "file_utils.h"
+#include <stdexcept>
 
 QJsonObject FileUtils::readJsonFile(const QString &filePath)
 {
@@ -104,6 +105,31 @@ bool FileUtils::restoreBackup(const QString& fromPath, const QString& toPath)
     }
 
     return false;
+}
+
+bool FileUtils::removeDirectory(const QString& dirPath)
+{
+    bool success { false };
+
+    QDir dir(dirPath);
+    if (dir.exists()) {
+        success = dir.removeRecursively(); // Removes the directory and its contents
+    }
+
+    return success;
+}
+
+bool FileUtils::createDirectory(const QString& dirPath)
+{
+    bool success { false };
+
+    QDir dir;
+    if (!dir.exists(dirPath))
+    {
+        success = dir.mkpath(dirPath);
+    }
+
+    return success;
 }
 
 

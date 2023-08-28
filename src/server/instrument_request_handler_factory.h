@@ -69,8 +69,8 @@ public:
     static HTTPRequestHandler* createECGRequestHandler();
     static HTTPRequestHandler* createECGStatusRequestHandler();
 
-    static HTTPRequestHandler* createSignaturePadRequestHandler();
-    static HTTPRequestHandler* createSignaturePadStatusRequestHandler();
+    //static HTTPRequestHandler* createSignaturePadRequestHandler();
+    //static HTTPRequestHandler* createSignaturePadStatusRequestHandler();
 
     static HTTPRequestHandler* createParticipantReportRequestHandler();
 };

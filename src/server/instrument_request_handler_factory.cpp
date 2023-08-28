@@ -120,9 +120,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/weight_scale/status/?$)"),              &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler      },
     { QString(R"(^/weight_scale/delete/?$)"),              &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/signature/?$)"), 	                   &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
-    { QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
-    { QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler    },
+    //{ QString(R"(^/signature/?$)"), 	                   &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
+    //{ QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    //{ QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler    },
 
     { QString(R"(^/participant_report/?$)"),               &InstrumentRequestHandlerFactory::createParticipantReportRequestHandler     },
 }};
@@ -322,15 +322,15 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createBodyCompositionStatus
     return new BodyCompositionStatusRequestHandler;
 }
 
-HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadRequestHandler()
-{
-    return new SignaturePadRequestHandler;
-}
-
-HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler()
-{
-    return new SignaturePadStatusRequestHandler;
-}
+//HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadRequestHandler()
+//{
+//    return new SignaturePadRequestHandler;
+//}
+//
+//HTTPRequestHandler* InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler()
+//{
+//    return new SignaturePadStatusRequestHandler;
+//}
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createParticipantReportRequestHandler()
 {
