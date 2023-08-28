@@ -15,6 +15,8 @@ public:
     explicit DicomWidget(QWidget *parent = nullptr);
     ~DicomWidget();
 
+    void setDicomLabels(const QString& aeTitle, const QString& hostname, const QString& port);
+
 private:
     Ui::DicomWidget *ui;
 };

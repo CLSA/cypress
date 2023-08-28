@@ -12,3 +12,10 @@ DicomWidget::~DicomWidget()
 {
     delete ui;
 }
+
+void DicomWidget::setDicomLabels(const QString& aeTitle, const QString& hostname, const QString& port)
+{
+    ui->aeTitleValue->setText(aeTitle);
+    ui->hostnameValue->setText(hostname);
+    ui->portValue->setText(port);
+}

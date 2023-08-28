@@ -1,0 +1,38 @@
+#include "tray_application.h"
+
+#include <QStyle>
+TrayApplication::TrayApplication(QWidget* mainWidget, QObject *parent)
+    : QObject{parent}, m_mainWidget(mainWidget)
+{
+    m_trayIcon = new QSystemTrayIcon(this);
+    m_trayMenu = new QMenu();
+
+    QAction *quitAction = new QAction(tr("Quit"), this);
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+
+    m_trayMenu->addAction(quitAction);
+
+    m_trayIcon->setContextMenu(m_trayMenu);
+    m_trayIcon->setIcon(QIcon::fromTheme("document-open"));
+    m_trayIcon->setToolTip("CLSA Cypress");
+
+    connect(m_trayIcon, &QSystemTrayIcon::activated, this, &TrayApplication::onTrayActivated);
+}
+
+
+void TrayApplication::show()
+{
+    m_trayIcon->show();
+}
+
+void TrayApplication::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::DoubleClick:
+        m_mainWidget->showNormal();
+        break;
+    default:
+        break;
+    }
+}

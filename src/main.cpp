@@ -6,9 +6,15 @@
 #include "managers/cdtt/cdtt_manager.h"
 #include "managers/choice_reaction/choice_reaction_manager.h"
 
+
+
+#include "cypress_main_window.h"
+#include "tray_application.h"
+
 #include "auxiliary/Constants.h"
 
 #include <QApplication>
+#include <QStyle>
 #include <QException>
 #include <QSettings>
 #include <QLocale>
@@ -176,6 +182,21 @@ int main(int argc, char *argv[])
 
     // Init app
     QApplication app(argc, argv);
+
+    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+        qWarning("System tray is not available!");
+        return -1;
+    }
+
+
+
+    CypressMainWindow mainWindow;
+    //mainWindow.show();
+
+    QSystemTrayIcon trayIcon;
+    trayIcon.setIcon(app.style()->standardIcon(QStyle::SP_ComputerIcon));
+    trayIcon.setToolTip("Test Tray Application");
+    trayIcon.show();
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

@@ -2,6 +2,7 @@
 #define MEASUREMENT_TABLE_H
 
 #include <QWidget>
+#include <QTableWidget>
 
 namespace Ui {
 class MeasurementTable;
@@ -15,8 +16,11 @@ public:
     explicit MeasurementTable(QWidget *parent = nullptr);
     ~MeasurementTable();
 
+    QTableWidget* getTable();
+
     void enableMeasureButton();
     void disableMeasureButton();
+
 private:
     Ui::MeasurementTable *ui;
 };

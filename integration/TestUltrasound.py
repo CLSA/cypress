@@ -1,5 +1,4 @@
 import requests
-import logging
 
 def test_ultrasound(payload):
   try:

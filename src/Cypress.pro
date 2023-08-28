@@ -16,37 +16,40 @@ SUBDIRS = tests
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
-INCLUDEPATH += C:/work/clsa/cypress/dep/QtUsb_x86/include
-LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
+INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
+LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
-LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/OpenSSL-Win32/include"
+LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Util/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
 
-LIBS += -LC:/work/clsa/cypress/dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
+
+LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/include/
-INCLUDEPATH += C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/lib/
-LIBS += -LC:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
-INCLUDEPATH += C:/work/clsa/cypress/dep/SigLib/Include/
-INCLUDEPATH += C:/work/clsa/cypress/dep/SigLib/SigTablt/Win32/
-DEPENDPATH += C:/work/clsa/cypress/dep/SigLib/SigTablt/Win32/
-LIBS += -LC:/work/clsa/cypress/dep/SigLib/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
+INCLUDEPATH += $$PWD/../dep/SigLib/Include/
+INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+LIBS += -L$$PWD/../dep/SigLib/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
 RC_ICONS = favicon.ico
 
 
 FORMS += \
+    cypress_main_window.ui \
   dialogs/audiometer_dialog.ui \
   dialogs/blood_pressure_dialog.ui \
   dialogs/body_composition_dialog.ui \
@@ -136,6 +139,7 @@ HEADERS += \
     auxiliary/json_settings.h \
     auxiliary/tracker5_util.h \
     cypress_application.h \
+    cypress_main_window.h \
     cypress_session.h \
     cypress_settings.h \
     data/Measurement.h \
@@ -271,6 +275,7 @@ HEADERS += \
     server/handlers/weigh_scale/weigh_scale_status_request_handler.h \
     server/instrument_request_handler_factory.h \
     server/utils.h \
+    tray_application.h \
     widgets/dicom_widget.h \
     widgets/measurement_table.h \
     widgets/serial_port_widget.h \
@@ -288,6 +293,7 @@ SOURCES += \
     auxiliary/json_settings.cpp \
     auxiliary/tracker5_util.cpp \
     cypress_application.cpp \
+    cypress_main_window.cpp \
     cypress_session.cpp \
     cypress_settings.cpp \
     data/Measurement.cpp \
@@ -423,6 +429,7 @@ SOURCES += \
     server/instrument_request_handler_factory.cpp \
     server/server.cpp \
     server/utils.cpp \
+    tray_application.cpp \
     widgets/dicom_widget.cpp \
     widgets/measurement_table.cpp \
     widgets/serial_port_widget.cpp \
