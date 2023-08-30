@@ -26,8 +26,6 @@ CimtVividiDialog::CimtVividiDialog(const CypressSession& session, QWidget *paren
     tableWidget->setColumnCount(4);
     tableWidget->setHorizontalHeaderLabels(QStringList() << patientId << studyInstanceId << fileNumber << laterality);
 
-
-
     // Add some data (optional)
     for (int row = 0; row < 5; ++row) {
         tableWidget->insertRow(row);

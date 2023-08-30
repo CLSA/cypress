@@ -7,7 +7,6 @@
 #include "managers/choice_reaction/choice_reaction_manager.h"
 
 
-
 #include "cypress_main_window.h"
 #include "tray_application.h"
 
@@ -180,23 +179,15 @@ int main(int argc, char *argv[])
 
     cleanupLogs();
 
+    //if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+    //    qWarning("System tray is not available!");
+    //    return -1;
+    //}
+
     // Init app
     QApplication app(argc, argv);
-
-    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-        qWarning("System tray is not available!");
-        return -1;
-    }
-
-
-
-    CypressMainWindow mainWindow;
-    //mainWindow.show();
-
-    QSystemTrayIcon trayIcon;
-    trayIcon.setIcon(app.style()->standardIcon(QStyle::SP_ComputerIcon));
-    trayIcon.setToolTip("Test Tray Application");
-    trayIcon.show();
+    //CypressMainWindow* mainWindow = new CypressMainWindow;
+    //TrayApplication trayApp(mainWindow, app.style());
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

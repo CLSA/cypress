@@ -2,6 +2,7 @@
 #define TRAYAPPLICATION_H
 
 #include <QObject>
+#include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
@@ -13,7 +14,7 @@ class TrayApplication : public QObject
 {
     Q_OBJECT
 public:
-    explicit TrayApplication(QWidget* mainWidget, QObject *parent = nullptr);
+    explicit TrayApplication(QMainWindow* mainWidget, QStyle* style, QObject* parent = nullptr);
 
     void show();
 
@@ -21,7 +22,7 @@ private slots:
     void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
-    QWidget* m_mainWidget;
+    QMainWindow* m_mainWidget;
     QSystemTrayIcon* m_trayIcon;
     QMenu* m_trayMenu;
 };

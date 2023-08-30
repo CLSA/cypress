@@ -1,9 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author/>
- <comment/>
- <exportmacro/>
  <class>CypressMainWindow</class>
- <widget name="CypressMainWindow" class="QMainWindow">
+ <widget class="QMainWindow" name="CypressMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,10 +13,55 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget name="menubar" class="QMenuBar"/>
-  <widget name="centralwidget" class="QWidget"/>
-  <widget name="statusbar" class="QStatusBar"/>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuCLSA">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionCIMT"/>
+    <addaction name="actionECG"/>
+    <addaction name="actionBPM"/>
+    <addaction name="actionAudiometer"/>
+    <addaction name="actionCDTT"/>
+   </widget>
+   <addaction name="menuCLSA"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionCIMT">
+   <property name="text">
+    <string>CIMT</string>
+   </property>
+  </action>
+  <action name="actionECG">
+   <property name="text">
+    <string>ECG</string>
+   </property>
+  </action>
+  <action name="actionBPM">
+   <property name="text">
+    <string>BPM</string>
+   </property>
+  </action>
+  <action name="actionAudiometer">
+   <property name="text">
+    <string>Audiometer</string>
+   </property>
+  </action>
+  <action name="actionCDTT">
+   <property name="text">
+    <string>CDTT</string>
+   </property>
+  </action>
  </widget>
- <pixmapfunction/>
+ <resources/>
  <connections/>
 </ui>
