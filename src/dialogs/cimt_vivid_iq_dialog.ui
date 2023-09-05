@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CimtVividiDialog</class>
- <widget class="QWidget" name="CimtVividiDialog">
+ <class>CimtVividIQDialog</class>
+ <widget class="QWidget" name="CimtVividIQDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,30 +11,17 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>GE VividI</string>
+   <string>GE Vivid IQ</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
+    <widget class="TestInfoWidget" name="widget" native="true"/>
    </item>
    <item>
-    <widget class="DicomWidget" name="dicomWidget" native="true"/>
+    <widget class="DicomWidget" name="widget_2" native="true"/>
    </item>
    <item>
-    <widget class="MeasurementTable" name="filesReceived" native="true"/>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+    <widget class="MeasurementTable" name="widget_3" native="true"/>
    </item>
   </layout>
  </widget>

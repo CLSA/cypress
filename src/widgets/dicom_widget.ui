@@ -55,7 +55,11 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="aeTitleValue"/>
+         <widget class="QLineEdit" name="aeTitleValue">
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -113,7 +117,11 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="portValue"/>
+         <widget class="QLineEdit" name="portValue">
+          <property name="focusPolicy">
+           <enum>Qt::ClickFocus</enum>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

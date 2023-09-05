@@ -56,6 +56,7 @@ FORMS += \
   dialogs/cdtt_dialog.ui \
   dialogs/choice_reaction_dialog.ui \
     dialogs/cimt_vivid_i_dialog.ui \
+    dialogs/cimt_vivid_iq_dialog.ui \
   dialogs/dxa_dialog.ui \
   dialogs/ecg_dialog.ui \
   dialogs/frax_dialog.ui \
@@ -67,8 +68,11 @@ FORMS += \
   dialogs/tonometer_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
     widgets/dicom_widget.ui \
+    widgets/directory_picker_widget.ui \
+    widgets/file_picker_widget.ui \
     widgets/measurement_table.ui \
     widgets/serial_port_widget.ui \
+    widgets/settings_dialog.ui \
     widgets/submission_buttons.ui \
   widgets/test_info_widget.ui \
 
@@ -195,6 +199,7 @@ HEADERS += \
     dialogs/cdtt_dialog.h \
     dialogs/choice_reaction_dialog.h \
     dialogs/cimt_vivid_i_dialog.h \
+    dialogs/cimt_vivid_iq_dialog.h \
     dialogs/dialog_base.h \
     dialogs/dialog_factory.h \
     dialogs/dxa_dialog.h \
@@ -277,8 +282,11 @@ HEADERS += \
     server/utils.h \
     tray_application.h \
     widgets/dicom_widget.h \
+    widgets/directory_picker_widget.h \
+    widgets/file_picker_widget.h \
     widgets/measurement_table.h \
     widgets/serial_port_widget.h \
+    widgets/settings_dialog.h \
     widgets/submission_buttons.h \
     widgets/test_info_widget.h
 
@@ -348,6 +356,7 @@ SOURCES += \
     dialogs/cdtt_dialog.cpp \
     dialogs/choice_reaction_dialog.cpp \
     dialogs/cimt_vivid_i_dialog.cpp \
+    dialogs/cimt_vivid_iq_dialog.cpp \
     dialogs/dialog_base.cpp \
     dialogs/dialog_factory.cpp \
     dialogs/dxa_dialog.cpp \
@@ -431,7 +440,10 @@ SOURCES += \
     server/utils.cpp \
     tray_application.cpp \
     widgets/dicom_widget.cpp \
+    widgets/directory_picker_widget.cpp \
+    widgets/file_picker_widget.cpp \
     widgets/measurement_table.cpp \
     widgets/serial_port_widget.cpp \
+    widgets/settings_dialog.cpp \
     widgets/submission_buttons.cpp \
     widgets/test_info_widget.cpp
