@@ -19,12 +19,11 @@ public:
     void setDicomLabels(const QString& aeTitle, const QString& hostname, const QString& port);
 
 signals:
-    void updateDicomSettings(const QString& newAeTitle, const QString& newPortValue);
+    void portChanged(QString port);
+    void aeTitleChanged(QString aeTitle);
 
 private slots:
-    void onSaveButtonClicked();
     void on_aeTitleValue_textChanged(const QString &arg1);
-    void on_portValue_textChanged(const QString &arg1);
 
 private:
     Ui::DicomWidget *ui;

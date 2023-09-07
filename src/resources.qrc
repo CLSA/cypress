@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>favicon.ico</file>
+        <file>ok.tif</file>
+        <file>please.tif</file>
+        <file>sign.tif</file>
+        <file>thankyou.tif</file>
+    </qresource>
+</RCC>

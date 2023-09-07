@@ -13,7 +13,7 @@ TrayApplication::TrayApplication(QMainWindow* mainWidget, QStyle* style, QObject
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     m_trayMenu->addAction(quitAction);
 
-    m_trayIcon->setIcon(style->standardIcon(QStyle::SP_ComputerIcon));
+    m_trayIcon->setIcon(QIcon(":/resources/favicon.ico"));
     m_trayIcon->setToolTip("CLSA Cypress");
     m_trayIcon->setContextMenu(m_trayMenu);
     m_trayIcon->show();

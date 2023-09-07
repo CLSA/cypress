@@ -86,7 +86,7 @@ void cleanupLogs()
     if (!dir.exists())
         return;
 
-    QStringList logFiles = dir.entryList(QStringList() << "log_*.txt", QDir::Files, QDir::Name);
+    QStringList logFiles = dir.entryList(QStringList() << "log*.txt", QDir::Files, QDir::Name);
     for(const QString &logFile : logFiles) {
         QFileInfo fileInfo(dir.absoluteFilePath(logFile));
         if (fileInfo.lastModified().date().addDays(30) < QDate::currentDate()) {
@@ -179,15 +179,9 @@ int main(int argc, char *argv[])
 
     cleanupLogs();
 
-    //if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-    //    qWarning("System tray is not available!");
-    //    return -1;
-    //}
-
-    // Init app
     QApplication app(argc, argv);
-    //CypressMainWindow* mainWindow = new CypressMainWindow;
-    //TrayApplication trayApp(mainWindow, app.style());
+    CypressMainWindow* mainWindow = new CypressMainWindow;
+    TrayApplication trayApp(mainWindow, app.style());
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -199,14 +193,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    CypressSettings::getInstance().setDefaultSettings();
+    //CypressSettings::getInstance().setDefaultSettings();
 
     logAppInfo();
     logSystemInfo();
     logNetworkInfo();
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Managers medical device data collection.");
+    parser.setApplicationDescription("CLSA DCS device integration and data collection suite.");
     parser.addHelpOption();
     parser.addVersionOption();
 
@@ -216,25 +210,10 @@ int main(int argc, char *argv[])
     parser.addOption(isDebug);
     parser.process(app);
 
-
-    if (parser.positionalArguments().length())
-    {
-        qInfo() << "args: ", parser.positionalArguments();
-    }
-
-    if (parser.isSet(isDebug))
-    {
-        qInfo("debug");
-    }
-    else
-    {
-        qInfo("production");
-    }
-
     // Make sure the network is up and that the Pine server is alive
     if (!checkAlive())
     {
-        qCritical() << "could not connect to the Pine server";
+        qCritical() << "Could not connect to the Pine server";
         return -1;
     }
 
@@ -246,7 +225,7 @@ int main(int argc, char *argv[])
             restartApplication(QCoreApplication::arguments());
         }
         else {
-            qCritical() << "could not download a new update";
+            qCritical() << "Could not download a new update";
         }
     }
 

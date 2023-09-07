@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QRegExpValidator>
 #include <QMessageBox>
+#include <QHostInfo>
 
 DicomWidget::DicomWidget(QWidget *parent) :
     QWidget(parent),
@@ -26,7 +27,13 @@ DicomWidget::DicomWidget(QWidget *parent) :
     ui->aeTitleValue->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
     ui->portValue->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
-    connect(ui->saveDicomSettings, &QPushButton::clicked, this, &DicomWidget::onSaveButtonClicked);
+    connect(ui->aeTitleValue, &QLineEdit::editingFinished, this, [=] {
+        emit aeTitleChanged(ui->aeTitleValue->text());
+    });
+
+    connect(ui->portValue, &QLineEdit::editingFinished, this, [=] {
+        emit portChanged(ui->portValue->text());
+    });
 }
 
 DicomWidget::~DicomWidget()
@@ -41,7 +48,15 @@ void DicomWidget::setDicomLabels(const QString& aeTitle, const QString& hostname
 
     m_aeTitle = aeTitle;
     m_port = port;
-    m_hostname = hostname;
+
+    if (hostname.isNull() || hostname.isEmpty())
+    {
+        m_hostname = QHostInfo::localHostName();
+    }
+    else
+    {
+        m_hostname = hostname;
+    }
 
     ui->aeTitleValue->setText(m_aeTitle);
     ui->hostnameValue->setText(m_hostname);
@@ -60,32 +75,8 @@ void DicomWidget::on_aeTitleValue_textChanged(const QString &arg1)
         ui->aeTitleValue->setText(upperText);
         ui->aeTitleValue->blockSignals(false);
     }
-
-    ui->saveDicomSettings->setEnabled(true);
 }
 
 
-void DicomWidget::on_portValue_textChanged(const QString &arg1)
-{
-    ui->saveDicomSettings->setEnabled(true);
-}
 
-void DicomWidget::onSaveButtonClicked()
-{
-    QMessageBox::StandardButton reply = QMessageBox::question(this,
-        "Confirm Action", "Are you sure you want to change the DICOM server settings? This will cause the server to restart.",
-        QMessageBox::Yes | QMessageBox::No
-    );
-
-    if (reply == QMessageBox::Yes) {
-        m_aeTitle = ui->aeTitleValue->text();
-        m_port = ui->portValue->text();
-
-        emit updateDicomSettings(m_aeTitle, m_port);
-    } else {
-        setDicomLabels(m_aeTitle, m_hostname, m_port);
-    }
-
-    ui->saveDicomSettings->setEnabled(false);
-}
 

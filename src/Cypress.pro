@@ -16,12 +16,12 @@ SUBDIRS = tests
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
-INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
-LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
+INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
+LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/OpenSSL-Win32/include"
-LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -35,9 +35,9 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 INCLUDEPATH += $$PWD/../dep/SigLib/Include/
@@ -67,16 +67,33 @@ FORMS += \
   dialogs/spirometer_dialog.ui \
   dialogs/tonometer_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
+    widgets/device_settings/audiometer_settings_widget.ui \
+    widgets/device_settings/blood_pressure_settings_widget.ui \
+    widgets/device_settings/body_composition_settings_widget.ui \
+    widgets/device_settings/cdtt_settings_widget.ui \
+    widgets/device_settings/choice_reaction_settings_widget.ui \
+    widgets/device_settings/dexa_settings_widget.ui \
+    widgets/device_settings/ecg_settings_widget.ui \
+    widgets/device_settings/frax_settings_widget.ui \
+    widgets/device_settings/grip_strength_settings_widget.ui \
+    widgets/device_settings/retinal_camera_settings_widget.ui \
+    widgets/device_settings/signature_pad_settings_widget.ui \
+    widgets/device_settings/spirometer_settings_widget.ui \
+    widgets/device_settings/tonometer_settings_widget.ui \
+    widgets/device_settings/vivid_i_settings_widget.ui \
+    widgets/device_settings/weight_scale_settings_widget.ui \
     widgets/dicom_widget.ui \
     widgets/directory_picker_widget.ui \
     widgets/file_picker_widget.ui \
     widgets/measurement_table.ui \
+    widgets/serial_port_picker_widget.ui \
     widgets/serial_port_widget.ui \
     widgets/settings_dialog.ui \
     widgets/submission_buttons.ui \
   widgets/test_info_widget.ui \
 
-RESOURCES +=
+RESOURCES += \
+    resources.qrc
     dialogs/cypress.qrc
 
 DISTFILES += \
@@ -281,10 +298,26 @@ HEADERS += \
     server/instrument_request_handler_factory.h \
     server/utils.h \
     tray_application.h \
+    widgets/device_settings/audiometer_settings_widget.h \
+    widgets/device_settings/blood_pressure_settings_widget.h \
+    widgets/device_settings/body_composition_settings_widget.h \
+    widgets/device_settings/cdtt_settings_widget.h \
+    widgets/device_settings/choice_reaction_settings_widget.h \
+    widgets/device_settings/dexa_settings_widget.h \
+    widgets/device_settings/ecg_settings_widget.h \
+    widgets/device_settings/frax_settings_widget.h \
+    widgets/device_settings/grip_strength_settings_widget.h \
+    widgets/device_settings/retinal_camera_settings_widget.h \
+    widgets/device_settings/signature_pad_settings_widget.h \
+    widgets/device_settings/spirometer_settings_widget.h \
+    widgets/device_settings/tonometer_settings_widget.h \
+    widgets/device_settings/vivid_i_settings_widget.h \
+    widgets/device_settings/weight_scale_settings_widget.h \
     widgets/dicom_widget.h \
     widgets/directory_picker_widget.h \
     widgets/file_picker_widget.h \
     widgets/measurement_table.h \
+    widgets/serial_port_picker_widget.h \
     widgets/serial_port_widget.h \
     widgets/settings_dialog.h \
     widgets/submission_buttons.h \
@@ -439,10 +472,26 @@ SOURCES += \
     server/server.cpp \
     server/utils.cpp \
     tray_application.cpp \
+    widgets/device_settings/audiometer_settings_widget.cpp \
+    widgets/device_settings/blood_pressure_settings_widget.cpp \
+    widgets/device_settings/body_composition_settings_widget.cpp \
+    widgets/device_settings/cdtt_settings_widget.cpp \
+    widgets/device_settings/choice_reaction_settings_widget.cpp \
+    widgets/device_settings/dexa_settings_widget.cpp \
+    widgets/device_settings/ecg_settings_widget.cpp \
+    widgets/device_settings/frax_settings_widget.cpp \
+    widgets/device_settings/grip_strength_settings_widget.cpp \
+    widgets/device_settings/retinal_camera_settings_widget.cpp \
+    widgets/device_settings/signature_pad_settings_widget.cpp \
+    widgets/device_settings/spirometer_settings_widget.cpp \
+    widgets/device_settings/tonometer_settings_widget.cpp \
+    widgets/device_settings/vivid_i_settings_widget.cpp \
+    widgets/device_settings/weight_scale_settings_widget.cpp \
     widgets/dicom_widget.cpp \
     widgets/directory_picker_widget.cpp \
     widgets/file_picker_widget.cpp \
     widgets/measurement_table.cpp \
+    widgets/serial_port_picker_widget.cpp \
     widgets/serial_port_widget.cpp \
     widgets/settings_dialog.cpp \
     widgets/submission_buttons.cpp \

@@ -17,12 +17,8 @@ public:
     explicit CypressMainWindow(QWidget *parent = nullptr);
     ~CypressMainWindow();
 
-    // QWidget interface
 protected:
     void closeEvent(QCloseEvent *event) override;
-
-private slots:
-    void onButtonClick();
 
 private:
     Ui::CypressMainWindow *ui;

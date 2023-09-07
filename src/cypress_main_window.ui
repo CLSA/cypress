@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CLSA Cypress</string>
   </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
@@ -23,17 +23,27 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuCLSA">
+   <widget class="QMenu" name="menuDevice_Settings">
     <property name="title">
-     <string>Settings</string>
+     <string>Device Settings</string>
     </property>
-    <addaction name="actionCIMT"/>
-    <addaction name="actionECG"/>
-    <addaction name="actionBPM"/>
-    <addaction name="actionAudiometer"/>
-    <addaction name="actionCDTT"/>
+    <addaction name="actionAudiometer_2"/>
+    <addaction name="actionCDTT_2"/>
+    <addaction name="actionCCB"/>
+    <addaction name="actionGrip_Strength"/>
+    <addaction name="actionVividI"/>
+    <addaction name="actionECG_2"/>
+    <addaction name="actionDEXA"/>
+    <addaction name="actionBody_Comp"/>
+    <addaction name="actionFrax"/>
+    <addaction name="actionRetinal_Cam"/>
+    <addaction name="actionSignature"/>
+    <addaction name="actionTonometer"/>
+    <addaction name="actionWeigh_Scale"/>
+    <addaction name="actionSpirometer"/>
+    <addaction name="actionBlood_Pressure"/>
    </widget>
-   <addaction name="menuCLSA"/>
+   <addaction name="menuDevice_Settings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionCIMT">
@@ -59,6 +69,81 @@
   <action name="actionCDTT">
    <property name="text">
     <string>CDTT</string>
+   </property>
+  </action>
+  <action name="actionAudiometer_2">
+   <property name="text">
+    <string>Audiometer</string>
+   </property>
+  </action>
+  <action name="actionCDTT_2">
+   <property name="text">
+    <string>CDTT</string>
+   </property>
+  </action>
+  <action name="actionCCB">
+   <property name="text">
+    <string>CCB</string>
+   </property>
+  </action>
+  <action name="actionGrip_Strength">
+   <property name="text">
+    <string>Grip Strength </string>
+   </property>
+  </action>
+  <action name="actionVividI">
+   <property name="text">
+    <string>GE VividI </string>
+   </property>
+  </action>
+  <action name="actionECG_2">
+   <property name="text">
+    <string>ECG (MAC800)</string>
+   </property>
+  </action>
+  <action name="actionDEXA">
+   <property name="text">
+    <string>DEXA</string>
+   </property>
+  </action>
+  <action name="actionBody_Comp">
+   <property name="text">
+    <string>Body Comp</string>
+   </property>
+  </action>
+  <action name="actionFrax">
+   <property name="text">
+    <string>Frax</string>
+   </property>
+  </action>
+  <action name="actionRetinal_Cam">
+   <property name="text">
+    <string>Retinal Cam</string>
+   </property>
+  </action>
+  <action name="actionSignature">
+   <property name="text">
+    <string>Signature</string>
+   </property>
+  </action>
+  <action name="actionTonometer">
+   <property name="text">
+    <string>Tonometer</string>
+   </property>
+  </action>
+  <action name="actionWeigh_Scale">
+   <property name="text">
+    <string>Weigh Scale</string>
+   </property>
+  </action>
+  <action name="actionSpirometer">
+   <property name="text">
+    <string>Spirometer</string>
+   </property>
+  </action>
+  <action name="actionBlood_Pressure">
+   <property name="text">
+    <string>Blood Pressure</string>
    </property>
   </action>
  </widget>
