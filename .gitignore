@@ -26,7 +26,4 @@ src/_CL_*
 src/%SystemDrive%/*
 /dep
 /integration
-
 poco/
-src/Cypress.pro
-*.pro

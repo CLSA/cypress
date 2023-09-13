@@ -154,6 +154,7 @@ HEADERS += \
     auxiliary/crc8.h \
     auxiliary/constants.h \
     auxiliary/file_utils.h \
+    auxiliary/pdf_form_filler.h \
     auxiliary/utilities.h \
     auxiliary/command_line_parser.h \
     auxiliary/file_compressor.h \
@@ -327,6 +328,7 @@ SOURCES += \
     #auxiliary/bluetooth_util.cpp \
     auxiliary/crc8.cpp \
     auxiliary/constants.cpp \
+    auxiliary/pdf_form_filler.cpp \
     auxiliary/utilities.cpp \
     auxiliary/command_line_parser.cpp \
     auxiliary/file_compressor.cpp \
