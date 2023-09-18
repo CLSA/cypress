@@ -15,6 +15,8 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new RetinalCameraManager(session));
+
+    //ui->measurementTable->initializeModel()
 }
 
 RetinalCameraDialog::~RetinalCameraDialog()

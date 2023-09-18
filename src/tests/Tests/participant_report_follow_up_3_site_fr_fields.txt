@@ -1,0 +1,264 @@
+---
+FieldType: Text
+FieldName: DATE
+FieldNameAlt: Date of appointment:
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: NAME
+FieldNameAlt: Name of participant:
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: AGE
+FieldNameAlt: Age of participant at DCS visit:
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: HEIGHT
+FieldNameAlt: Height of participant:
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: WEIGHT
+FieldNameAlt: Weight of participant:
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: BMI
+FieldNameAlt: Your Measurement_Body Mass Index*
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BMI_NORMAL
+FieldNameAlt: Normal Range_Body Mass Index*
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BMI_INTERP
+FieldNameAlt: Interpretation_Body Mass Index*
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: WAIST_TO_HIP_RATIO
+FieldNameAlt: Waist-to-Hip Ratio
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: WAIST_CIRC
+FieldNameAlt: Waist circumference
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HIP_CIRC
+FieldNameAlt: Hip circumference
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: WAIST_TO_HIP_RATIO_NORMAL
+FieldNameAlt: Waist-to-Hip Ratio
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: WAIST_TO_HIP_RATIO_INTERP
+FieldNameAlt: Waist-to-Hip Ratio
+FieldFlags: 8388608
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BP_SYSTOLIC
+FieldNameAlt: Your Measurement_∩é╖ Systolic
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BP_SYSTOLIC_NORMAL
+FieldNameAlt: Normal Range_∩é╖ Systolic
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BP_SYSTOLIC_INTERP
+FieldNameAlt: Interpretation_∩é╖ Systolic
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BP_DIASTOLIC
+FieldNameAlt: Your Measurement_∩é╖ Diastolic
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BP_DIASTOLIC_NORMAL
+FieldNameAlt: Normal Range_∩é╖ Diastolic
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: BP_DIASTOLIC_INTERP
+FieldNameAlt: Interpretation_∩é╖ Diastolic
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FVC
+FieldNameAlt: Your Measurement_∩é╖ Forced Vital Capacity (FVC) *
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FVC_NORMAL
+FieldNameAlt: Normal Range_∩é╖ Forced Vital Capacity (FVC) *
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FVC_INTERP
+FieldNameAlt: Interpretation_∩é╖ Forced Vital Capacity (FVC) *
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FEV1
+FieldNameAlt: Your Measurement_∩é╖ Forced Expiratory Volume(FEV1) *
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FEV1_NORMAL
+FieldNameAlt: Normal Range_∩é╖ Forced Expiratory Volume(FEV1) *
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FEV1_INTERP
+FieldNameAlt: Interpretation_∩é╖ Forced Expiratory Volume(FEV1) *
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FEV1_FVC
+FieldNameAlt: Your Measurement_∩é╖ FEV1/FVC
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FEV1_FVC_NORMAL
+FieldNameAlt: Normal Range_∩é╖ FEV1/FVC
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FEV1_FVC_INTERP
+FieldNameAlt: Interpretation_∩é╖ FEV1/FVC
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: FRAX
+FieldNameAlt: Your Measurement_Bone Fracture Risk -FRAX**
+FieldFlags: 8392704
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_500
+FieldNameAlt: Right Ear_500 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_500
+FieldNameAlt: Left Ear_500 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_1000
+FieldNameAlt: Right Ear_1000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_1000
+FieldNameAlt: Left Ear_1000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_2000
+FieldNameAlt: Right Ear_2000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_2000
+FieldNameAlt: Left Ear_2000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_3000
+FieldNameAlt: Right Ear_3000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_3000
+FieldNameAlt: Left Ear_3000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_4000
+FieldNameAlt: Right Ear_4000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_4000
+FieldNameAlt: Left Ear_4000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_6000
+FieldNameAlt: Right Ear_6000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_6000
+FieldNameAlt: Left Ear_6000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_RIGHT_8000
+FieldNameAlt: Right Ear_8000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: HEARING_LEFT_8000
+FieldNameAlt: Left Ear_8000 Hz
+FieldFlags: 0
+FieldJustification: Center
+---
+FieldType: Text
+FieldName: VISUAL_ACUITY
+FieldNameAlt: Visual acuity
+FieldFlags: 0
+FieldJustification: Center

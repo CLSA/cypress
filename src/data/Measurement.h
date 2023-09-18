@@ -34,10 +34,12 @@ class Measurement
 public:
     Measurement() = default;
     virtual ~Measurement() = default;
+
     Measurement(const Measurement &other)
     {
         m_attributes = other.m_attributes;
     }
+
     Measurement& operator=(const Measurement &other)
     {
         if(this != &other)

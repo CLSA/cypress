@@ -1,0 +1,140 @@
+%FDF-1.2
+%����
+1 0 obj 
+<<
+/FDF 
+<<
+/Fields [
+<<
+/V /
+/T (DMalready_mandatoryField)
+>> 
+<<
+/V ()
+/T (ProxyAddress)
+>> 
+<<
+/Kids [
+<<
+/V ()
+/T (enrollmentId)
+>> 
+<<
+/V ()
+/T (fullName)
+>>]
+/T (Participant)
+>> 
+<<
+/V ()
+/T (ProxyLastName)
+>> 
+<<
+/V ()
+/T (InformantLastName)
+>> 
+<<
+/V ()
+/T (Date)
+>> 
+<<
+/V ()
+/T (ProxyCity)
+>> 
+<<
+/V /
+/T (AcceptURL)
+>> 
+<<
+/V /
+/T (DCScontinue_mandatoryField)
+>> 
+<<
+/V ()
+/T (InformantPostalCode)
+>> 
+<<
+/Kids [
+<<
+/V ()
+/T (fullName)
+>>]
+/T (User)
+>> 
+<<
+/V /
+/T (informantIsProxy)
+>> 
+<<
+/V ()
+/T (InterviewerSignature_mandatoryField)
+>> 
+<<
+/V ()
+/T (InformantAddress)
+>> 
+<<
+/V ()
+/T (InformantAddress2)
+>> 
+<<
+/V ()
+/T (ProxyPostalCode)
+>> 
+<<
+/V ()
+/T (ParticipantSignature_mandatoryField)
+>> 
+<<
+/V ()
+/T (InformantProvince)
+>> 
+<<
+/V ()
+/T (InformantCity)
+>> 
+<<
+/V ()
+/T (ProxyProvince)
+>> 
+<<
+/V ()
+/T (InformantFirstName)
+>> 
+<<
+/V /
+/T (IPinformation_mandatoryField)
+>> 
+<<
+/V ()
+/T (ProxyTelephone)
+>> 
+<<
+/V /
+/T (AgreeGiveNumber_mandatoryField)
+>> 
+<<
+/V ()
+/T (ProxyAddress2)
+>> 
+<<
+/V ()
+/T (InformantTelephone)
+>> 
+<<
+/V ()
+/T (ProxyFirstName)
+>> 
+<<
+/V /
+/T (RefuseURL)
+>>]
+>>
+>>
+endobj 
+trailer
+
+<<
+/Root 1 0 R
+>>
+%%EOF

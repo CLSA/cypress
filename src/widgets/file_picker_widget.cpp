@@ -39,30 +39,31 @@ bool FilePickerWidget::validate(const QString& path)
         return FileUtils::doesFileExist(path, true);
     }
 
-    else if (m_isDir)
-    {
-        return FileUtils::doesDirExist(path, true);
-    }
-
     else if (m_isExe)
     {
         return FileUtils::doesExeExist(path);
     }
 
-    return false;
+    else if (m_isDir)
+    {
+        return FileUtils::doesDirExist(path, true);
+    }
+
+    return true;
 }
 
 QString FilePickerWidget::pickFile()
 {
     QString path;
-    if (m_isFile || m_isExe)
-    {
-        path = QFileDialog::getOpenFileName(this, tr("Choose File"), "", tr("All Files (*)"));
-    }
 
     if (m_isDir)
     {
         path = QFileDialog::getExistingDirectory(this, tr("Choose Directory"), "");
+    }
+
+    else
+    {
+        path = QFileDialog::getOpenFileName(this, tr("Choose File"), "", tr("All Files (*)"));
     }
 
     return path;

@@ -1,0 +1,180 @@
+---
+FieldType: Text
+FieldName: Participant.enrollmentId
+FieldNameAlt: Participant ID
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Participant.fullName
+FieldNameAlt: Participant Name
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Button
+FieldName: IPinformation_mandatoryField
+FieldFlags: 49152
+FieldJustification: Left
+FieldStateOption: No
+FieldStateOption: Off
+FieldStateOption: Yes
+---
+FieldType: Button
+FieldName: AgreeGiveNumber_mandatoryField
+FieldFlags: 49152
+FieldJustification: Left
+FieldStateOption: No
+FieldStateOption: Off
+FieldStateOption: Yes
+---
+FieldType: Button
+FieldName: DCScontinue_mandatoryField
+FieldFlags: 49152
+FieldJustification: Left
+FieldStateOption: No
+FieldStateOption: Off
+FieldStateOption: Yes
+---
+FieldType: Signature
+FieldName: ParticipantSignature_mandatoryField
+FieldNameAlt: Participant Signature
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: User.fullName
+FieldNameAlt: Name
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: Date
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Signature
+FieldName: InterviewerSignature_mandatoryField
+FieldNameAlt: Signature
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyFirstName
+FieldNameAlt: First Name
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyLastName
+FieldNameAlt: Last Name
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyAddress
+FieldNameAlt: Address 1
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyAddress2
+FieldNameAlt: Address 2
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyCity
+FieldNameAlt: City
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyProvince
+FieldNameAlt: Province
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyPostalCode
+FieldNameAlt: Postal Code
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: ProxyTelephone
+FieldNameAlt: Proxy Decision Maker Telephone
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Button
+FieldName: DMalready_mandatoryField
+FieldFlags: 49152
+FieldJustification: Left
+FieldStateOption: No
+FieldStateOption: Off
+FieldStateOption: Yes
+---
+FieldType: Text
+FieldName: InformantFirstName
+FieldNameAlt: First Name
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantLastName
+FieldNameAlt: Last Name
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantAddress
+FieldNameAlt: Address 1
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantAddress2
+FieldNameAlt: Address 2
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantCity
+FieldNameAlt: City
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantProvince
+FieldNameAlt: Province
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantPostalCode
+FieldNameAlt: Postal Code
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Text
+FieldName: InformantTelephone
+FieldNameAlt: Proxy Information Provider Telephone
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Button
+FieldName: informantIsProxy
+FieldFlags: 0
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Yes
+---
+FieldType: Button
+FieldName: AcceptURL
+FieldFlags: 65536
+FieldJustification: Left
+---
+FieldType: Button
+FieldName: RefuseURL
+FieldFlags: 65536
+FieldJustification: Left

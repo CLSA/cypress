@@ -82,6 +82,9 @@ public:
       m_metaData.setAttribute(key, value);
     }
 
+    const QVariant& getMetaData() const {
+      return m_metaData;
+    }
     QVariant getMetaData(const QString &key) const
     {
       return m_metaData.getAttributeValue(key);
@@ -102,6 +105,10 @@ public:
     bool hasMeasurement(const int&) const;
 
     T getMeasurement(const int&) const;
+
+    const QVector<T>& getMeasurements() const {
+      return m_measurementList;
+    };
 
     int getMeasurementCount() const
     {
@@ -138,8 +145,10 @@ public:
 protected:
     QVector<T> m_measurementList;
     MetaData m_metaData;
+
     int m_expectedMeasurementCount { 1 };
     int m_minimumMeasurementCount { 1 };
+
     Constants::UnitsSystem m_unitsSystem { Constants::UnitsSystem::systemMetric };
 };
 

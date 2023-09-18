@@ -13,20 +13,53 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>90</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ECG</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="FilePickerWidget" name="cardioPath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="initPath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="databasePath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="exportPath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="settingsFileName" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="winSettingsFileName" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="btrRecordFileName" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="btrDatabaseFileName" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="xmlFileName" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="pdfFileNameRestingEcg" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="pdfFileNameFullEcg" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="executableForParticipantInfo" native="true"/>
+   </item>
+  </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FilePickerWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/file_picker_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
