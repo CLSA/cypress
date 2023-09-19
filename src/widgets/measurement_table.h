@@ -44,7 +44,7 @@ public:
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
         QComboBox *editor = new QComboBox(parent);
         editor->addItems(items);
-        editor->setEditable(isEditable);
+        editor->setEditable(false);
         if (isEditable && !placeholderText.isEmpty()) {
             editor->setPlaceholderText(placeholderText);
         }
@@ -105,7 +105,7 @@ public:
             editor->setReadOnly(readOnly);
             return editor;
         }
-    }
+    };
 
     void setEditorData(QWidget *editor, const QModelIndex &index) const override {
         if (decimals == 0) {
@@ -117,7 +117,7 @@ public:
             QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
             spinBox->setValue(value);
         }
-    }
+    };
 
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
         if (decimals == 0) {
@@ -132,11 +132,11 @@ public:
                 model->setData(index, spinBox->value(), Qt::EditRole);
             }
         }
-    }
+    };
 
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
         editor->setGeometry(option.rect);
-    }
+    };
 };
 
 
@@ -165,6 +165,11 @@ public:
             editor->setValidator(new QRegExpValidator(regexPattern, editor));
         }
 
+        if (readOnly)
+        {
+            editor->setReadOnly(true);
+        }
+
         return editor;
     }
 
@@ -184,21 +189,13 @@ public:
     }
 };
 
-
-class MeasurementStandardItemModel: public QStandardItemModel {
-    Q_OBJECT
-
+class TableColumn {
 public:
-    MeasurementStandardItemModel(TestBase<Measurement>* test, QObject *parent = nullptr) : QStandardItemModel(parent), test(test) {
-    }
-
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-        qDebug() << "edit: " << index.row() << index.column() << value;
-        return QStandardItemModel::setData(index, value, role);
-    };
-
-private:
-    TestBase<Measurement>* test;
+    TableColumn(const QString& key, const QString& displayName, QStyledItemDelegate* delegate):
+        key(key), displayName(displayName), delegate(delegate) {}
+    QString key;
+    QString displayName;
+    QStyledItemDelegate* delegate;
 };
 
 class MeasurementTable : public QWidget
@@ -206,22 +203,34 @@ class MeasurementTable : public QWidget
     Q_OBJECT
 
 public:
-    explicit MeasurementTable(TestBase<Measurement>* test, QWidget *parent = nullptr);
+    explicit MeasurementTable(QWidget *parent = nullptr);
     ~MeasurementTable();
 
-    void initializeModel();
-    void updateModel();
+    void initializeModel(QList<TableColumn> columns);
+    void updateModel(TestBase<Measurement>* test);
 
     void enableMeasureButton();
     void disableMeasureButton();
 
+    void enableFinishButton();
+    void disableFinishButton();
+
+    void setColumnDelegate(int col, QItemDelegate* itemDelegate);
+
+signals:
+    void measure();
+    void finish();
+
 public slots:
+    void handleTestUpdate(TestBase<Measurement>* test);
+
+private slots:
     void handleChange(int row, int col);
 
 private:
     Ui::MeasurementTable *ui;
-    MeasurementStandardItemModel* m_model;
     TestBase<Measurement>* m_test;
+    QList<TableColumn> m_columns;
 };
 
 #endif // MEASUREMENT_TABLE_H

@@ -2,6 +2,7 @@
 #define RETINAL_CAMERA_MANAGER_H
 
 #include "managers/manager_base.h"
+#include "data/retinal_camera/retinal_camera_test.h"
 
 #include <QObject>
 #include <QProcess>
@@ -34,6 +35,8 @@ protected:
     void setInputData(const QVariantMap &) override;
 
 private:
+    RetinalCameraTest* m_test;
+
     QProcess m_process;
     QString m_uuid;
     QSqlDatabase m_db;
@@ -41,7 +44,6 @@ private:
     QString defaultPersonUUID = "11111111-2222-3333-4444-555555555555";
     QString defaultPatientUUID = "11111111-2222-3333-4444-555555555555";
 
-    bool simMode = false;
     bool startRetinalCamera();
     bool cleanupDatabase();
     bool initializeDatabase();

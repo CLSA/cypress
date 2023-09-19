@@ -237,7 +237,7 @@ QStringList ECGTest::toStringList() const
     QStringList list;
     if(isValid())
     {
-      ECGMeasurement m = getMeasurement(0);
+      const ECGMeasurement& m = getMeasurement(0);
       list = m.toStringList();
       foreach(const auto key, m_outputKeyList)
         list << QString("%1: %2").arg(key,getMetaDataAsString(key));

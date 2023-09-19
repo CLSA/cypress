@@ -4,6 +4,8 @@
 #include "Measurement.h"
 #include "../auxiliary/Constants.h"
 
+#include <QException>
+
 /*!
  * \class TestBase
  * \brief An abstract Test class templated over measurement type
@@ -82,9 +84,10 @@ public:
       m_metaData.setAttribute(key, value);
     }
 
-    const QVariant& getMetaData() const {
+    const MetaData getMetaData() const {
       return m_metaData;
     }
+
     QVariant getMetaData(const QString &key) const
     {
       return m_metaData.getAttributeValue(key);
@@ -104,7 +107,7 @@ public:
 
     bool hasMeasurement(const int&) const;
 
-    T getMeasurement(const int&) const;
+    const T& getMeasurement(const int&) const;
 
     const QVector<T>& getMeasurements() const {
       return m_measurementList;
@@ -113,6 +116,16 @@ public:
     int getMeasurementCount() const
     {
       return m_measurementList.size();
+    }
+
+    T& get(int index) {
+      if (index >= m_measurementList.size())
+      {
+          qCritical() << "index out of bounds at TestBase[]";
+          throw QException();
+      }
+
+      return m_measurementList[index];
     }
 
     void setExpectedMeasurementCount(const int& num)
@@ -173,18 +186,19 @@ void TestBase<T>::addMeasurement(const T &item)
 }
 
 template <class T>
-T TestBase<T>::getMeasurement(const int &index) const
+const T& TestBase<T>::getMeasurement(const int &index) const
 {
-    T m;
-    if(index < m_measurementList.size())
-      m = m_measurementList.at(index);
+    if (index >= m_measurementList.size())
+      throw QException();
+
+    const T& m = m_measurementList.at(index);
     return m;
 }
 
 template <class T>
 bool TestBase<T>::hasMeasurement(const int& index) const
 {
-    T m = getMeasurement(index);
+    const T& m = getMeasurement(index);
     return !m.isEmpty();
 }
 

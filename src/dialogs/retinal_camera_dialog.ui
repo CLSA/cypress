@@ -15,7 +15,23 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
+   </item>
+   <item>
     <widget class="MeasurementTable" name="measurementTable" native="true"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -24,6 +40,12 @@
    <class>MeasurementTable</class>
    <extends>QWidget</extends>
    <header>widgets/measurement_table.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TestInfoWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/test_info_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

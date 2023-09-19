@@ -2,6 +2,8 @@
 #define MANAGER_BASE_H
 
 #include "cypress_settings.h"
+#include "data/Measurement.h"
+#include "data/TestBase.h"
 
 #include <QJsonObject>
 #include <QObject>
@@ -58,15 +60,27 @@ signals:
     //
     void dataChanged();
 
+    // initialize UI with basic test info
+    void started(TestBase<Measurement>* test);
+
     // ready to measure and receive data
     // (update GUI enable measure button)
     //
     void canMeasure();
 
+    // measurements read, stored in the test
+    void measured(TestBase<Measurement>* test);
+
     // valid test completed and ready to write to output
     // (update GUI enable write button and update the results display)
     //
     void canFinish();
+
+    // Session successful, data sent to server
+    void success(const QString& successMsg);
+
+    // Something went wrong, critical error, couldn't save data
+    void error(const QString& errorMsg);
 
 protected:
     const CypressSession& m_session;

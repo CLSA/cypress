@@ -54,7 +54,7 @@ QStringList BodyCompositionTest::toStringList() const
       list << QString("test datetime: %1").arg(getMetaDataAsString("test_datetime"));
       list << QString("age: %1").arg(getMetaDataAsString("age"));
       list << QString("height: %1").arg(getMetaDataAsString("height"));
-      BodyCompositionMeasurement m = getMeasurement(0);
+      const BodyCompositionMeasurement& m = getMeasurement(0);
       list << QString("weight: %1").arg(m.getAttribute("weight").toString());
       list << QString("percent fat: %1").arg(m.getAttribute("percent_fat").toString());
       list << QString("fat mass: %1").arg(m.getAttribute("fat_mass").toString());

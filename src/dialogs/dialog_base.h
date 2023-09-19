@@ -32,6 +32,8 @@ signals:
 
 public slots:
     void complete(QJsonObject& results);
+    void error(const QString& errorMsg);
+    void success(const QString& successMsg);
 
 protected:
     void closeEvent(QCloseEvent *event) override;

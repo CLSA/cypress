@@ -8,9 +8,12 @@ class RetinalCameraMeasurement : public Measurement
 public:
     RetinalCameraMeasurement();
 
-    // Measurement interface
 public:
-    bool isValid() const;
+    bool isValid() const override;
+
+public:
+    QString toString() const override;
+    QStringList toStringList(const bool &no_keys) const override;
 };
 
 #endif // RETINALCAMERAMEASUREMENT_H

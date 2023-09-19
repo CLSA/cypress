@@ -79,3 +79,16 @@ void DialogBase::complete(QJsonObject& results)
     //results["id"] = m_uuid;
     emit sendResults(results);
 }
+
+
+
+void DialogBase::error(const QString& errorMsg)
+{
+    QMessageBox::critical(this, "Error", errorMsg);
+    //close();
+}
+
+void DialogBase::success(const QString& successMsg)
+{
+    QMessageBox::information(this, "Complete", "The data has been saved to Pine");
+}

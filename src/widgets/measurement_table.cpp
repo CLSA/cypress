@@ -1,9 +1,8 @@
 #include "measurement_table.h"
 #include "ui_measurement_table.h"
 
-MeasurementTable::MeasurementTable(TestBase<Measurement>* test, QWidget *parent) :
-    QWidget(parent), m_test(test),
-    ui(new Ui::MeasurementTable)
+MeasurementTable::MeasurementTable(QWidget *parent) :
+    QWidget(parent), ui(new Ui::MeasurementTable)
 {
     ui->setupUi(this);
 
@@ -22,9 +21,17 @@ MeasurementTable::MeasurementTable(TestBase<Measurement>* test, QWidget *parent)
         "gridline-color: #d3d3d3;"
     );
 
-    initializeModel();
+    // Request measurement
+    connect(ui->measureButton, &QPushButton::clicked, this, [=]() {
+        emit measure();
+    });
 
-    connect(ui->measurementTable, &QTableWidget::cellChanged, this, &MeasurementTable::handleChange)
+    // Measurement manually updated
+    connect(ui->measurementTable, &QTableWidget::cellChanged, this, &MeasurementTable::handleChange);
+
+    connect(ui->saveButton, &QPushButton::clicked, this, [=]() {
+        emit finish();
+    });
 }
 
 MeasurementTable::~MeasurementTable()
@@ -33,51 +40,79 @@ MeasurementTable::~MeasurementTable()
 }
 
 
-void MeasurementTable::initializeModel()
+void MeasurementTable::initializeModel(QList<TableColumn> columns)
 {
-    auto measurements = m_test->getMeasurements();
+    ui->measurementTable->clear();
 
-    if (!measurements.isEmpty())
+    m_columns = columns;
+
+    if (!columns.isEmpty())
     {
-        auto firstMeasure = measurements.first();
-        auto attributeKeys = firstMeasure.getAttributeKeys();
+        QStringList headerNames;
 
-        int row = 0;
-        int col = 0;
+        ui->measurementTable->setColumnCount(columns.length());
 
-        foreach (const auto attributeKey, attributeKeys)
+        for (int i = 0; i < columns.length(); i++)
         {
-            //QStandardItem* item = new QStandardItem();
-            m_model->setHeaderData(0, Qt::Horizontal, attributeKey, Qt::DisplayRole);
-            //ui->measurementTable->setItemDelegateForColumn(, col);
+            headerNames << columns[i].displayName;
+            ui->measurementTable->setItemDelegateForColumn(i, columns[i].delegate);
         }
+
+        ui->measurementTable->setHorizontalHeaderLabels(headerNames);
     }
 }
-
-void MeasurementTable::updateModel()
-{
-    auto measurements = m_test->getMeasurements();
-
-    if (!measurements.isEmpty())
-    {
-        auto firstMeasure = measurements.first();
-        auto attributeKeys = firstMeasure.getAttributeKeys();
-
-        foreach (auto measurement, measurements)
-        {
-            foreach (const auto attributeKey, attributeKeys)
-            {
-                //QStandardItem* item = new QStandardItem();
-                m_model->setHeaderData(0, Qt::Horizontal, measurement.getAttribute(attributeKey).value(), Qt::DisplayRole);
-            }
-        }
-    }
-}
-
 
 void MeasurementTable::handleChange(int row, int col)
 {
-    qDebug() << "cell changed: " << row << col;
+    Measurement& measure = m_test->get(row);
+    TableColumn& column = m_columns[col];
+
+    measure.setAttribute(column.key, ui->measurementTable->item(row, col)->data(Qt::EditRole));
+
+    qDebug() << m_test->getMeasurements();
+}
+
+void MeasurementTable::updateModel(TestBase<Measurement>* test)
+{
+    m_test = test;
+    if (!m_test)
+    {
+        return;
+    }
+
+    const QVector<Measurement> measurements = m_test->getMeasurements();
+
+    qDebug() << test->getMeasurements();
+    qDebug() << "len" << test->getMeasurementCount();
+    qDebug() << "valid" << test->isValid();
+
+    ui->measurementTable->setRowCount(0);
+
+    if (!measurements.isEmpty())
+    {
+        int row = 0;
+        int col = 0;
+
+        foreach (auto measurement, measurements)
+        {
+            ui->measurementTable->insertRow(row);
+
+            foreach (auto column, m_columns)
+            {
+                QTableWidgetItem* item = new QTableWidgetItem();
+                item->setData(Qt::EditRole, measurement.getAttributeValue(column.key));
+                ui->measurementTable->setItem(row, col++, item);
+            }
+
+            ++row;
+            col = 0;
+        }
+    }
+}
+
+void MeasurementTable::handleTestUpdate(TestBase<Measurement>* test)
+{
+    updateModel(test);
 }
 
 void MeasurementTable::enableMeasureButton()
@@ -89,3 +124,20 @@ void MeasurementTable::disableMeasureButton()
 {
     ui->measureButton->setEnabled(false);
 }
+
+void MeasurementTable::enableFinishButton()
+{
+    ui->saveButton->setEnabled(true);
+}
+
+void MeasurementTable::disableFinishButton()
+{
+    ui->saveButton->setEnabled(false);
+}
+
+void MeasurementTable::setColumnDelegate(int col, QItemDelegate* itemDelegate)
+{
+    ui->measurementTable->setItemDelegateForColumn(col, itemDelegate);
+}
+
+
