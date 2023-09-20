@@ -105,6 +105,17 @@ public:
 
     void addMeasurement(const T&);
 
+    void removeMeasurement(int index)
+    {
+      if (index < 0 || index >= m_measurementList.size())
+      {
+          qCritical() << "index out of bounds at TestBase";
+          throw QException();
+      }
+
+      m_measurementList.removeAt(index);
+    }
+
     bool hasMeasurement(const int&) const;
 
     const T& getMeasurement(const int&) const;
@@ -177,18 +188,22 @@ void TestBase<T>::reset()
 template <class T>
 void TestBase<T>::addMeasurement(const T &item)
 {
-    if(!m_measurementList.contains(item))
+    //if(!m_measurementList.contains(item))
+    //{
+    m_measurementList.append(item);
+    if(m_expectedMeasurementCount < m_measurementList.size())
     {
-      m_measurementList.append(item);
-      if(m_expectedMeasurementCount < m_measurementList.size())
         m_measurementList.pop_front();
     }
+
+    qDebug() << m_measurementList;
+    //}
 }
 
 template <class T>
 const T& TestBase<T>::getMeasurement(const int &index) const
 {
-    if (index >= m_measurementList.size())
+    if (index < 0 || index >= m_measurementList.size())
       throw QException();
 
     const T& m = m_measurementList.at(index);

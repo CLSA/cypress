@@ -59,7 +59,7 @@ void SpirometerManager::start()
         });
 
     configureProcess();
-    emit dataChanged();
+    //emit dataChanged();
 }
 
 bool SpirometerManager::isDefined(const QString& value, const SpirometerManager::FileType &fileType) const

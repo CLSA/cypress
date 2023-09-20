@@ -216,18 +216,30 @@ public:
     void disableFinishButton();
 
     void setColumnDelegate(int col, QItemDelegate* itemDelegate);
+    void toggleManualEntry(bool saveChanges);
 
 signals:
     void measure();
     void finish();
+    void addMeasurement();
 
 public slots:
     void handleTestUpdate(TestBase<Measurement>* test);
+
+    void addManualMeasurement();
+    void removeManualMeasurement();
 
 private slots:
     void handleChange(int row, int col);
 
 private:
+    void updateRowIds();
+    void setTableColumns();
+    void saveManualChanges();
+
+    bool manualEditsMade { false };
+    bool manualEntryMode { false };
+
     Ui::MeasurementTable *ui;
     TestBase<Measurement>* m_test;
     QList<TableColumn> m_columns;

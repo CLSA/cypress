@@ -6,7 +6,7 @@
 #include "../../TestBase.h"
 #include "../measurements/grip_strength_measurement.h"
 
-class GripStrengthTest : public TestBase<GripStrengthMeasurement>
+class GripStrengthTest : public TestBase<Measurement>
 {
 public:
     GripStrengthTest();

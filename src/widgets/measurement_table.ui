@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>456</width>
     <height>300</height>
    </rect>
   </property>
@@ -38,6 +38,13 @@
          <number>6</number>
         </property>
         <item>
+         <widget class="QPushButton" name="manualEntryToggle">
+          <property name="text">
+           <string>Manual Entry</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -61,12 +68,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="saveButton">
+         <widget class="QPushButton" name="addMeasureButton">
+          <property name="text">
+           <string>Manual</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="submitButton">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Save</string>
+           <string>Submit</string>
           </property>
          </widget>
         </item>

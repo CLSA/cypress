@@ -27,8 +27,10 @@ public slots:
     void measure() override;
     void finish() override;
 
+    void addManualMeasurement() override;
+
 private:
-    GripStrengthTest m_test;
+    GripStrengthTest* m_test;
     QProcess m_process;
     QSqlDatabase m_database;
 

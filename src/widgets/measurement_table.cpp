@@ -1,6 +1,8 @@
 #include "measurement_table.h"
 #include "ui_measurement_table.h"
 
+#include <QMessageBox>
+
 MeasurementTable::MeasurementTable(QWidget *parent) :
     QWidget(parent), ui(new Ui::MeasurementTable)
 {
@@ -15,23 +17,53 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
     ui->measurementTable->setGridStyle(Qt::SolidLine);
     ui->measurementTable->setAlternatingRowColors(true);
 
+    ui->addMeasureButton->setVisible(false);
+
+    ui->manualEntryToggle->setFocusPolicy(Qt::NoFocus);
+
     ui->measurementTable->setStyleSheet(
         "alternate-background-color: #e5e5e5;"
         "background-color: #f5f5f5;"
         "gridline-color: #d3d3d3;"
     );
 
-    // Request measurement
+    // Request automatic measurement
     connect(ui->measureButton, &QPushButton::clicked, this, [=]() {
+        if (manualEditsMade || ui->measurementTable->rowCount() > 0)
+        {
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(nullptr, "Confirmation", "Are you sure you want to measure again? This will overrite the measurements collected.",
+                                          QMessageBox::Yes | QMessageBox::No);
+
+            if (reply == QMessageBox::Yes) {
+                manualEditsMade = false;
+            } else {
+                return;
+            }
+        }
+
         emit measure();
     });
 
     // Measurement manually updated
     connect(ui->measurementTable, &QTableWidget::cellChanged, this, &MeasurementTable::handleChange);
 
-    connect(ui->saveButton, &QPushButton::clicked, this, [=]() {
-        emit finish();
+    connect(ui->submitButton, &QPushButton::clicked, this, [=]() {
+        if (m_test->isValid())
+        {
+            emit finish();
+        }
+        else {
+            QMessageBox::warning(this, "Test Incomplete", "The test is incomplete, please enter all required fields before saving.");
+        }
     });
+
+    connect(ui->manualEntryToggle, &QPushButton::clicked, this, [=]() {
+        toggleManualEntry(true);
+    });
+
+    connect(ui->addMeasureButton, &QPushButton::clicked, this, &MeasurementTable::addManualMeasurement);
+
 }
 
 MeasurementTable::~MeasurementTable()
@@ -46,30 +78,70 @@ void MeasurementTable::initializeModel(QList<TableColumn> columns)
 
     m_columns = columns;
 
-    if (!columns.isEmpty())
+    setTableColumns();
+}
+
+void MeasurementTable::handleChange(int row, int col)
+{
+    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
+    ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
+}
+
+void MeasurementTable::updateRowIds()
+{
+    for (int row = 0; row < ui->measurementTable->rowCount(); row++)
+    {
+        QWidget* widget = ui->measurementTable->cellWidget(row, ui->measurementTable->columnCount() - 1);
+        if (widget)
+        {
+            QPushButton* button = qobject_cast<QPushButton*>(widget);
+            if (button)
+            {
+                button->setProperty("row_id", row);
+            }
+        }
+    }
+}
+
+void MeasurementTable::setTableColumns()
+{
+    if (!m_columns.isEmpty())
     {
         QStringList headerNames;
 
-        ui->measurementTable->setColumnCount(columns.length());
+        int columnsCount = m_columns.length();
 
-        for (int i = 0; i < columns.length(); i++)
+        ui->measurementTable->setColumnCount(columnsCount);
+
+        for (int i = 0; i < m_columns.length(); i++)
         {
-            headerNames << columns[i].displayName;
-            ui->measurementTable->setItemDelegateForColumn(i, columns[i].delegate);
+            headerNames << m_columns[i].displayName;
+            ui->measurementTable->setItemDelegateForColumn(i, m_columns[i].delegate);
         }
 
         ui->measurementTable->setHorizontalHeaderLabels(headerNames);
     }
 }
 
-void MeasurementTable::handleChange(int row, int col)
+void MeasurementTable::saveManualChanges()
 {
-    Measurement& measure = m_test->get(row);
-    TableColumn& column = m_columns[col];
+    updateRowIds();
 
-    measure.setAttribute(column.key, ui->measurementTable->item(row, col)->data(Qt::EditRole));
+    for (int row = 0; row < ui->measurementTable->rowCount(); row++)
+    {
+        Measurement& measure = m_test->get(row);
 
-    qDebug() << m_test->getMeasurements();
+        for (int col = 0; col < ui->measurementTable->columnCount() - 1; col++)
+        {
+            TableColumn& column = m_columns[col];
+            measure.setAttribute(column.key, ui->measurementTable->item(row, col)->data(Qt::EditRole));
+        }
+
+        qDebug() << "MEASURE: " << measure << m_test->getMeasurementCount();
+    }
+
+    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
+    ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
 }
 
 void MeasurementTable::updateModel(TestBase<Measurement>* test)
@@ -81,10 +153,6 @@ void MeasurementTable::updateModel(TestBase<Measurement>* test)
     }
 
     const QVector<Measurement> measurements = m_test->getMeasurements();
-
-    qDebug() << test->getMeasurements();
-    qDebug() << "len" << test->getMeasurementCount();
-    qDebug() << "valid" << test->isValid();
 
     ui->measurementTable->setRowCount(0);
 
@@ -102,6 +170,17 @@ void MeasurementTable::updateModel(TestBase<Measurement>* test)
                 QTableWidgetItem* item = new QTableWidgetItem();
                 item->setData(Qt::EditRole, measurement.getAttributeValue(column.key));
                 ui->measurementTable->setItem(row, col++, item);
+            }
+
+            if (manualEntryMode)
+            {
+                QPushButton* btn = new QPushButton("Remove", this);
+
+                btn->setProperty("row_id", row);
+                btn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+                connect(btn, &QPushButton::clicked, this, &MeasurementTable::removeManualMeasurement);
+                ui->measurementTable->setCellWidget(row, col, btn);
             }
 
             ++row;
@@ -127,17 +206,88 @@ void MeasurementTable::disableMeasureButton()
 
 void MeasurementTable::enableFinishButton()
 {
-    ui->saveButton->setEnabled(true);
+    ui->submitButton->setEnabled(true);
 }
 
 void MeasurementTable::disableFinishButton()
 {
-    ui->saveButton->setEnabled(false);
+    ui->submitButton->setEnabled(false);
+}
+
+void MeasurementTable::addManualMeasurement()
+{
+    emit addMeasurement();
+}
+
+void MeasurementTable::removeManualMeasurement()
+{
+    QPushButton* btn = qobject_cast<QPushButton*>(sender()); // retrieve the button clicked
+    if (btn)
+    {
+        int row_id = btn->property("row_id").toInt();
+        qDebug() << row_id;
+        if (row_id < 0 || row_id >= ui->measurementTable->rowCount()) {
+            return;
+        }
+        m_test->removeMeasurement(row_id);
+        updateModel(m_test);
+        //ui->measurementTable->removeRow(row_id);
+    }
+
+    //updateRowIds();
+    //manualEditsMade = true;
 }
 
 void MeasurementTable::setColumnDelegate(int col, QItemDelegate* itemDelegate)
 {
     ui->measurementTable->setItemDelegateForColumn(col, itemDelegate);
+}
+
+void MeasurementTable::toggleManualEntry(bool saveChanges)
+{
+    manualEntryMode = !manualEntryMode;
+
+    if (manualEntryMode) {
+        ui->measurementTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
+
+        ui->manualEntryToggle->setText("Save");
+        ui->addMeasureButton->setVisible(true);
+        ui->measureButton->setVisible(false);
+
+
+        int newColumn = ui->measurementTable->columnCount();
+        ui->measurementTable->insertColumn(newColumn);
+
+        QTableWidgetItem *header = new QTableWidgetItem("Actions");
+        ui->measurementTable->setHorizontalHeaderItem(newColumn, header);
+
+        // Add removal button to each row in actions column
+        for (int row = 0; row < ui->measurementTable->rowCount(); row++)
+        {
+            QPushButton* btn = new QPushButton("Remove", this);
+
+            btn->setProperty("row_id", row);
+            btn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+            connect(btn, &QPushButton::clicked, this, &MeasurementTable::removeManualMeasurement);
+            ui->measurementTable->setCellWidget(row, newColumn, btn);
+        }
+    }
+    else {
+        if (saveChanges)
+        {
+            saveManualChanges();
+        }
+
+        ui->manualEntryToggle->setText("Manual Measure");
+        ui->addMeasureButton->setVisible(false);
+        ui->measureButton->setVisible(true);
+
+        ui->measurementTable->removeColumn(ui->measurementTable->columnCount() - 1);
+        ui->measurementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+        ui->measurementTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    }
 }
 
 

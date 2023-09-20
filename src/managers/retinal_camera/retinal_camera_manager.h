@@ -28,6 +28,8 @@ public slots:
     void finish() override;
     void cancel();
 
+    void addManualMeasurement() override;
+
 protected:
     bool setUp() override;
     bool clearData() override;

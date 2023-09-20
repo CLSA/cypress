@@ -1,6 +1,5 @@
 #include "grip_strength_manager.h"
-//#include "auxiliary/tracker5util.h"
-#include "auxiliary/json_settings.h"
+#include "data/grip_strength/tests/grip_strength_test.h"
 
 #include "cypress_application.h"
 
@@ -14,7 +13,7 @@
 #include <QtSql>
 
 GripStrengthManager::GripStrengthManager(const CypressSession& session)
-    :ManagerBase(session)
+    :ManagerBase(session), m_test(new GripStrengthTest)
 {
 
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
@@ -59,20 +58,31 @@ bool GripStrengthManager::isAvailable()
 
 void GripStrengthManager::start()
 {
-    setUp();
+    emit started(m_test);
+    emit canMeasure();
+    //setUp();
 }
 
 void GripStrengthManager::measure()
 {
+    m_test->reset();
+
+    emit measured(m_test);
+
+    if (m_test->isValid())
+    {
+        emit canFinish();
+    }
+
     //m_test.readMeasurements();
     //if (m_test.isValid())
     //{
     //    emit canFinish();
     //}
-    
-    if (Cypress::getInstance().isSimulation()) {
-        sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/grip_strength/output.json");
-    }
+
+    //if (Cypress::getInstance().isSimulation()) {
+    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/grip_strength/output.json");
+    //}
 
     //results["cypress_session"] = m_uuid;
     //results["answer_id"] = m_answerId;
@@ -90,7 +100,16 @@ void GripStrengthManager::measure()
 
 void GripStrengthManager::finish()
 {
-    cleanUp();
+    emit success("sent");
+    //cleanUp();
+}
+
+void GripStrengthManager::addManualMeasurement()
+{
+    GripStrengthMeasurement measurement;
+    m_test->addMeasurement(measurement);
+
+    emit dataChanged(m_test);
 }
 
 bool GripStrengthManager::setUp() {

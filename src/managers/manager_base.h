@@ -54,11 +54,14 @@ public slots:
     //
     virtual void finish() = 0;
 
+    // Request from the view to add a manual measurement
+    virtual void addManualMeasurement();
+
 signals:
 
     // the underlying test data has changed
     //
-    void dataChanged();
+    void dataChanged(TestBase<Measurement>* test);
 
     // initialize UI with basic test info
     void started(TestBase<Measurement>* test);

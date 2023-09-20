@@ -6,11 +6,13 @@
 #include <QSettings>
 #include <QMessageBox>
 
-#include "retinal_camera_manager.h"
-#include "qsqlerror.h"
-#include "cypress_application.h"
 
+#include "retinal_camera_manager.h"
+
+#include "data/retinal_camera/retinal_camera_measurement.h"
 #include "data/retinal_camera/database_manager.h"
+
+#include "qsqlerror.h"
 
 RetinalCameraManager::RetinalCameraManager(const CypressSession& session):
     ManagerBase(session), m_test(new RetinalCameraTest)
@@ -33,16 +35,24 @@ bool RetinalCameraManager::isAvailable()
     return false;
 }
 
+void RetinalCameraManager::addManualMeasurement()
+{
+    RetinalCameraMeasurement measurement;
+
+    measurement.setAttribute("EYE_PICT_VENDOR", "SIM");
+
+    m_test->addMeasurement(measurement);
+
+    emit dataChanged(m_test);
+}
+
 void RetinalCameraManager::start()
 {
     emit started(m_test);
-
     emit canMeasure();
 
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     //QStringList arguments;
-
-
 
     //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
     //{

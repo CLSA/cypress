@@ -23,39 +23,49 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
 
     RetinalCameraManager* manager = static_cast<RetinalCameraManager*>(m_manager.get());
 
-    QList<TableColumn> columns;
+    ui->testInfoWidget->setSessionInformation(session);
 
+    QList<TableColumn> columns;
     columns << TableColumn("EYE_PICT_VENDOR", "Picture", new TextDelegate("", QRegExp("^1234$"), true));
     columns << TableColumn("EYE_SIDE_VENDOR", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
 
+    // device started
     connect(manager, &RetinalCameraManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
         ui->measurementTable->initializeModel(columns);
     });
 
-    // Can measure
+    // can auto measure
     connect(manager, &RetinalCameraManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
 
-    // Request measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager, &RetinalCameraManager::measure);
-
-    // Measured
+    // auto measure
     connect(manager, &RetinalCameraManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
-    // Can finish (valid)
+    // can finish
     connect(manager, &RetinalCameraManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
     });
 
-    // Request Finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager, &RetinalCameraManager::finish);
-
-    // Finished
+    // finished
     connect(manager, &RetinalCameraManager::success, this, &RetinalCameraDialog::success);
 
-    // Critical Error
+    // critical error
     connect(manager, &RetinalCameraManager::error, this, &RetinalCameraDialog::error);
+
+    // data changed
+    connect(manager, &RetinalCameraManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &RetinalCameraManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &RetinalCameraManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &RetinalCameraManager::addManualMeasurement);
+
+    // update measurement
 }
 
 RetinalCameraDialog::~RetinalCameraDialog()

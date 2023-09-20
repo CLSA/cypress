@@ -3,7 +3,7 @@ import logging
 
 def test_grip_strength(payload):
   try:
-      response = requests.post("http://127.0.0.1:9000/grip_strength", payload)
+      response = requests.post("http://127.0.0.1:9000/grip_strength", json=payload)
       print(response.status_code)
       print(response.text)
 

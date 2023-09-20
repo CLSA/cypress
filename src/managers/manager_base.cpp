@@ -211,6 +211,11 @@ bool ManagerBase::sendComplete(QString device, QString uuid)
     return true;
 }
 
+void ManagerBase::addManualMeasurement()
+{
+    return;
+}
+
 bool ManagerBase::sendResultsToPine(const QString& filePath)
 {
     qDebug() << "sendResultsToPine: " << filePath;
