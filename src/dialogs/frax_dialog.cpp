@@ -1,6 +1,5 @@
 #include "frax_dialog.h"
 #include "managers/frax/frax_manager.h"
-#include "cypress_application.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -12,11 +11,64 @@ FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
     ui(new Ui::FraxDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
+
+    this->setWindowTitle("FRAX");
+    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new FraxManager(session));
 
-    this->setWindowTitle("Frax Test");
+    FraxManager* manager = static_cast<FraxManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+    columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+
+    //columns << TableColumn("TYPE");
+    //columns << TableColumn("COUNTRY_CODE");
+    //columns << TableColumn("AGE");
+    //columns << TableColumn("SEX");
+    //columns << TableColumn("BODY_MASS_INDEX");
+    //columns << TableColumn("PREVIOUS_FRACTURE");
+
+    // device started
+    connect(manager, &FraxManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &FraxManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &FraxManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &FraxManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &FraxManager::success, this, &FraxDialog::success);
+
+    // critical error
+    connect(manager, &FraxManager::error, this, &FraxDialog::error);
+
+    // data changed
+    connect(manager, &FraxManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &FraxManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &FraxManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &FraxManager::addManualMeasurement);
 }
 
 FraxDialog::~FraxDialog()

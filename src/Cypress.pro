@@ -16,12 +16,12 @@ SUBDIRS = tests
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
-INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
-LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
+INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
+LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
-LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/OpenSSL-Win32/include"
+LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -35,9 +35,9 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 INCLUDEPATH += $$PWD/../dep/SigLib/Include/
@@ -203,6 +203,8 @@ HEADERS += \
     data/hearing/tests/hearing_test.h \
     data/measurement_base.h \
     data/retinal_camera/database_manager.h \
+    data/retinal_camera/retinal_camera_measurement.h \
+    data/retinal_camera/retinal_camera_test.h \
     data/spirometer/measurements/spirometer_measurement.h \
     data/spirometer/tests/spirometer_test.h \
     data/temperature/measurements/temperature_measurement.h \
@@ -377,6 +379,8 @@ SOURCES += \
     data/hearing/tests/hearing_test.cpp \
     data/measurement_base.cpp \
     data/retinal_camera/database_manager.cpp \
+    data/retinal_camera/retinal_camera_measurement.cpp \
+    data/retinal_camera/retinal_camera_test.cpp \
     data/spirometer/measurements/spirometer_measurement.cpp \
     data/spirometer/tests/spirometer_test.cpp \
     data/temperature/measurements/temperature_measurement.cpp \

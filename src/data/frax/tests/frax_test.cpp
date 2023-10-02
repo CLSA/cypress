@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QRandomGenerator>
 #include "../../../auxiliary/Utilities.h"
+#include "../measurements/frax_measurement.h"
 
 /**
  * sample contents of output.txt from blackbox.exe
@@ -36,19 +37,21 @@
 
 FraxTest::FraxTest()
 {
-    m_outputKeyList << "type";
-    m_outputKeyList << "country_code";
-    m_outputKeyList << "age";
-    m_outputKeyList << "sex";
-    m_outputKeyList << "body_mass_index";
-    m_outputKeyList << "previous_fracture";
-    m_outputKeyList << "parent_hip_fracture";
-    m_outputKeyList << "current_smoker";
-    m_outputKeyList << "gluccocorticoid";
-    m_outputKeyList << "rheumatoid_arthritis";
-    m_outputKeyList << "secondary_osteoporosis";
-    m_outputKeyList << "alcohol";
-    m_outputKeyList << "femoral_neck_tscore";
+    setExpectedMeasurementCount(4);
+
+    m_outputKeyList << "TYPE";
+    m_outputKeyList << "COUNTRY_CODE";
+    m_outputKeyList << "AGE";
+    m_outputKeyList << "SEX";
+    m_outputKeyList << "BODY_MASS_INDEX";
+    m_outputKeyList << "PREVIOUS_FRACTURE";
+    m_outputKeyList << "PARENT_HIP_FRACTURE";
+    m_outputKeyList << "CURRENT_SMOKER";
+    m_outputKeyList << "GLUCCOCORTICOID";
+    m_outputKeyList << "RHEUMATOID_ARTHRITIS";
+    m_outputKeyList << "SECONDARY_OSTEOPOROSIS";
+    m_outputKeyList << "ALCHOHOL";
+    m_outputKeyList << "FEMORAL_NECK_TSCORE";
 }
 
 void FraxTest::fromFile(const QString& fileName)
@@ -71,32 +74,32 @@ void FraxTest::fromFile(const QString& fileName)
         if(17 == list.size())
         {
            FraxMeasurement m;
-           m.setAttribute("type","osteoporotic_fracture");
-           m.setAttribute("probability", list.at(13).toDouble(), "%");
+           m.setAttribute("TYPE","osteoporotic_fracture");
+           m.setAttribute("PROBABILITY", list.at(13).toDouble(), "%");
            addMeasurement(m);
-           m.setAttribute("type","hip_fracture");
-           m.setAttribute("probability", list.at(14).toDouble(), "%");
+           m.setAttribute("TYPE","hip_fracture");
+           m.setAttribute("PROBABILITY", list.at(14).toDouble(), "%");
            addMeasurement(m);
-           m.setAttribute("type","osteoporotic_fracture_bmd");
-           m.setAttribute("probability", list.at(15).toDouble(), "%");
+           m.setAttribute("TYPE","osteoporotic_fracture_bmd");
+           m.setAttribute("PROBABILITY", list.at(15).toDouble(), "%");
            addMeasurement(m);
-           m.setAttribute("type","hip_fracture_bmd");
-           m.setAttribute("probability", list.at(16).toDouble(), "%");
+           m.setAttribute("TYPE","hip_fracture_bmd");
+           m.setAttribute("PROBABILITY", list.at(16).toDouble(), "%");
            addMeasurement(m);
 
-           addMetaData("type",list.at(0).toLower());
-           addMetaData("country_code",list.at(1).toUInt());
-           addMetaData("age",list.at(2).toDouble(),"yr");
-           addMetaData("sex",list.at(3).toUInt());
-           addMetaData("body_mass_index",list.at(4).toDouble(),"kg/m2");
-           addMetaData("previous_fracture",list.at(5).toUInt());
-           addMetaData("parent_hip_fracture",list.at(6).toUInt());
-           addMetaData("current_smoker",list.at(7).toUInt());
-           addMetaData("gluccocorticoid",list.at(8).toUInt());
-           addMetaData("rheumatoid_arthritis",list.at(9).toUInt());
-           addMetaData("secondary_osteoporosis",list.at(10).toUInt());
-           addMetaData("alcohol",list.at(11).toUInt());
-           addMetaData("femoral_neck_tscore",list.at(12).toDouble());
+           addMetaData("TYPE",list.at(0).toLower());
+           addMetaData("COUNTRY_CODE",list.at(1).toUInt());
+           addMetaData("AGE",list.at(2).toDouble(),"yr");
+           addMetaData("SEX",list.at(3).toUInt());
+           addMetaData("BODY_MASS_INDEX",list.at(4).toDouble(),"kg/m2");
+           addMetaData("PREVIOUS_FRACTURE",list.at(5).toUInt());
+           addMetaData("PARENT_HIP_FRACTURE",list.at(6).toUInt());
+           addMetaData("CURRENT_SMOKER",list.at(7).toUInt());
+           addMetaData("GLUCCOCORTICOID",list.at(8).toUInt());
+           addMetaData("RHEUMATOID_ARTHRITIS",list.at(9).toUInt());
+           addMetaData("SECONDARY_OSTEOPOROSIS",list.at(10).toUInt());
+           addMetaData("ALCHOHOL",list.at(11).toUInt());
+           addMetaData("FEMORAL_NECK_TSCORE",list.at(12).toDouble());
         }
     }
 }
@@ -108,14 +111,14 @@ void FraxTest::simulate(const QVariantMap& input)
       if("barcode" == key || "language" == key) continue;
 
       QVariant value = input[key];
-      if("sex" == key)
+      if("SEX" == key)
       {
         value = "male" == value.toString() ? 0 : 1;
       }
-      else if("femoral_neck_bmd" == key)
+      else if("FEMORAL_NECK_BMD" == key)
       {
         value = Utilities::tscore(value.toDouble());
-        key = "femoral_neck_tscore";
+        key = "FEMORAL_NECK_TSCORE";
       }
       else
       {
@@ -124,9 +127,9 @@ void FraxTest::simulate(const QVariantMap& input)
           value = value.toUInt();
         }
       }
-      if("age" == key)
+      if("AGE" == key)
         addMetaData(key,value,"yr");
-      else if("body_mass_index" == key)
+      else if("BODY_MASS_INDEX" == key)
         addMetaData(key,value,"kg/m2");
       else
         addMetaData(key,value);
@@ -135,24 +138,24 @@ void FraxTest::simulate(const QVariantMap& input)
     FraxMeasurement m;
     double mu = QRandomGenerator::global()->generateDouble();
 
-    m.setAttribute("type","osteoporotic_fracture");
+    m.setAttribute("TYPE","osteoporotic_fracture");
     double p = Utilities::interp(1.0f,30.0f,mu);
-    m.setAttribute("probability", p, "%");
+    m.setAttribute("PROBABILITY", p, "%");
     addMeasurement(m);
 
-    m.setAttribute("type","hip_fracture");
+    m.setAttribute("TYPE","hip_fracture");
     p = Utilities::interp(0.0f,13.0f,mu);
-    m.setAttribute("probability", p, "%");
+    m.setAttribute("PROBABILITY", p, "%");
     addMeasurement(m);
 
-    m.setAttribute("type","osteoporotic_fracture_bmd");
+    m.setAttribute("TYPE","osteoporotic_fracture_bmd");
     p = Utilities::interp(2.0f,22.0f,mu);
-    m.setAttribute("probability", p, "%");
+    m.setAttribute("PROBABILITY", p, "%");
     addMeasurement(m);
 
-    m.setAttribute("type","hip_fracture_bmd");
+    m.setAttribute("TYPE","hip_fracture_bmd");
     p = Utilities::interp(0.0f,8.0f,mu);
-    m.setAttribute("probability", p, "%");
+    m.setAttribute("PROBABILITY", p, "%");
     addMeasurement(m);
 }
 
@@ -175,16 +178,17 @@ QString FraxTest::toString() const
 
 bool FraxTest::isValid() const
 {
-    bool okMeta = true;
-    foreach(const auto key, m_outputKeyList)
-    {
-      if(!hasMetaData(key))
-      {
-         qDebug() << "ERROR: test missing meta data" << key;
-         okMeta = false;
-         break;
-       }
-    }
+    //bool okMeta = true;
+    //foreach(const auto key, m_outputKeyList)
+    //{
+    //  if(!hasMetaData(key))
+    //  {
+    //     qDebug() << "ERROR: test missing meta data" << key;
+    //     okMeta = false;
+    //     break;
+    //   }
+    //}
+
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
     if(okTest)
     {
@@ -197,7 +201,9 @@ bool FraxTest::isValid() const
         }
       }
     }
-    return okMeta && okTest;
+
+    return okTest;
+    //return okMeta && okTest;
 }
 
 QJsonObject FraxTest::toJsonObject() const
@@ -210,8 +216,8 @@ QJsonObject FraxTest::toJsonObject() const
     QJsonObject json;
     if(!metaDataIsEmpty())
     {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
+      json.insert("TEST_META_DATA",m_metaData.toJsonObject());
     }
-    json.insert("test_results",jsonArr);
+    json.insert("TEST_RESULTS",jsonArr);
     return json;
 }

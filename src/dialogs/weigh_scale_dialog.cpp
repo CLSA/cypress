@@ -14,6 +14,51 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new WeighScaleManager(session));
+
+    WeighScaleManager* manager = static_cast<WeighScaleManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+    columns << TableColumn("WEIGHT", "Weight", new TextDelegate("", QRegExp(""), true));
+    columns << TableColumn("MODE", "Mode", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("TIMESTAMP", "Timestamp", new TextDelegate("", QRegExp(), true));
+
+    // device started
+    connect(manager, &WeighScaleManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &WeighScaleManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &WeighScaleManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &WeighScaleManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &WeighScaleManager::success, this, &WeighScaleDialog::success);
+
+    // critical error
+    connect(manager, &WeighScaleManager::error, this, &WeighScaleDialog::error);
+
+    // data changed
+    connect(manager, &WeighScaleManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &WeighScaleManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &WeighScaleManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &WeighScaleManager::addManualMeasurement);
 }
 
 WeighScaleDialog::~WeighScaleDialog()

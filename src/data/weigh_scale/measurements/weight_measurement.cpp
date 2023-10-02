@@ -11,9 +11,9 @@ void WeightMeasurement::fromArray(const QByteArray &arr)
       QList<QByteArray> parts = bytes.split(' ');
       if(3 <= parts.size())
       {
-        setAttribute("weight", parts[0].toDouble(), QString(parts[1]), 1);
-        setAttribute("mode", QString(parts[2]));
-        setAttribute("timestamp", QDateTime::currentDateTime());
+        setAttribute("WEIGHT", parts[0].toDouble(), QString(parts[1]), 1);
+        setAttribute("MODE", QString(parts[2]));
+        setAttribute("TIMESTAMP", QDateTime::currentDateTime());
       }
     }
 }
@@ -21,13 +21,13 @@ void WeightMeasurement::fromArray(const QByteArray &arr)
 bool WeightMeasurement::isValid() const
 {
     bool ok = false;
-    if(hasAttribute("weight"))
+    if(hasAttribute("WEIGHT"))
     {
-      float fval = getAttributeValue("weight").toDouble(&ok);
+      float fval = getAttributeValue("WEIGHT").toDouble(&ok);
       ok = ok
-        && getAttribute("weight").hasUnits()
-        && hasAttribute("mode")
-        && hasAttribute("timestamp")
+        && getAttribute("WEIGHT").hasUnits()
+        && hasAttribute("MODE")
+        && hasAttribute("TIMESTAMP")
         && 0.0f <= fval;
     }
     return ok;
@@ -35,7 +35,7 @@ bool WeightMeasurement::isValid() const
 
 bool WeightMeasurement::isZero() const
 {
-    return isValid() && 0.0f == getAttributeValue("weight").toDouble();
+    return isValid() && 0.0f == getAttributeValue("WEIGHT").toDouble();
 }
 
 QString WeightMeasurement::toString() const
@@ -44,9 +44,9 @@ QString WeightMeasurement::toString() const
   if(isValid())
   {
     QStringList list;
-    list << getAttribute("weight").toString();
-    list << getAttribute("mode").toString();
-    QDateTime dt = getAttributeValue("timestamp").toDateTime();
+    list << getAttribute("WEIGHT").toString();
+    list << getAttribute("MODE").toString();
+    QDateTime dt = getAttributeValue("TIMESTAMP").toDateTime();
     list << dt.date().toString("yyyy-MM-dd");
     list << dt.time().toString("hh:mm:ss");
     str = list.join(" ");

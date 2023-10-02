@@ -55,9 +55,9 @@ void WeighScaleTest::fromArray(const QByteArray &arr)
          bool ok = true;
          if(0 < getMeasurementCount())
          {
-           WeightMeasurement last = lastMeasurement();
-           QDateTime prev = last.getAttributeValue("timestamp").toDateTime();
-           QDateTime curr = m.getAttributeValue("timestamp").toDateTime();
+           Measurement last = lastMeasurement();
+           QDateTime prev = last.getAttributeValue("TIMESTAMP").toDateTime();
+           QDateTime curr = m.getAttributeValue("TIMESTAMP").toDateTime();
            ok =  DELAY < prev.secsTo(curr);
          }
          if(ok)

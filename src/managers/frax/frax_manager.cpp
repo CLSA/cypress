@@ -11,9 +11,8 @@
 #include "frax_manager.h"
 
 FraxManager::FraxManager(const CypressSession& session)
-    : ManagerBase(session)
+    : ManagerBase(session), m_test(new FraxTest)
 {
-    m_test.setExpectedMeasurementCount(4);
 }
 
 bool FraxManager::isAvailable()
@@ -28,6 +27,8 @@ bool FraxManager::isInstalled()
 
 void FraxManager::start()
 {
+    emit started(m_test);
+    emit canMeasure();
     // connect signals and slots to QProcess one time only
     //
     //connect(&m_process, &QProcess::started,
@@ -92,15 +93,23 @@ void FraxManager::selectRunnable(const QString &runnableName)
 
 void FraxManager::measure()
 {
+    m_test->reset();
+    m_test->simulate(QVariantMap());
+
+    emit measured(m_test);
+    if (m_test->isValid())
+    {
+        emit canFinish();
+    }
     //if (CypressApplication::getInstance().isSimulation()) return;
     //clearData();
     //// launch the process
     //m_process.start();
-    
-    if (Cypress::getInstance().isSimulation())
-    {
-        sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/frax/output.json");
-    }
+
+    //if (Cypress::getInstance().isSimulation())
+    //{
+    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/frax/output.json");
+    //}
     //QJsonObject results = JsonSettings::readJsonFromFile(
     //);
 
@@ -155,6 +164,7 @@ bool FraxManager::clearData()
 
 void FraxManager::finish()
 {
+    emit success("sent");
     //if (CypressApplication::getInstance().isSimulation())
     //{
     //    QJsonObject results = JsonSettings::readJsonFromFile(

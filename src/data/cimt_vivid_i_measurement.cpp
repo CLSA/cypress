@@ -64,9 +64,9 @@ bool CimtVividIMeasurement::isValid() const
         }
     }
 
-    if (m_attributes.contains("LATERALITY"))
+    if (!m_attributes.contains("LATERALITY") || m_attributes.isEmpty())
     {
-
+        return false;
     }
 
     return true;

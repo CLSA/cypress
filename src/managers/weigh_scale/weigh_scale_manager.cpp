@@ -16,9 +16,9 @@
 #include <QtMath>
 
 WeighScaleManager::WeighScaleManager(const CypressSession& session)
-    : SerialPortManager(session)
+    : ManagerBase(session), m_test(new WeighScaleTest)
 {
-  m_test.setExpectedMeasurementCount(2);
+    m_test->setExpectedMeasurementCount(2);
 }
 
 bool WeighScaleManager::isAvailable()
@@ -33,12 +33,18 @@ bool WeighScaleManager::isInstalled()
 
 bool WeighScaleManager::clearData()
 {
-    m_test.reset();
-    return false;
+    m_test->reset();
+    return true;
 }
 
+void WeighScaleManager::start()
+{
+    emit started(m_test);
+    emit canMeasure();
+}
 void WeighScaleManager::finish()
 {
+    emit success("sent");
     //QJsonObject results = JsonSettings::readJsonFromFile(
     //    "C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
     //);
@@ -61,139 +67,149 @@ void WeighScaleManager::finish()
     //    m_port.close();
 }
 
-void WeighScaleManager::connectDevice()
-{
-    if(m_port.isOpen())
-        m_port.close();
+//void WeighScaleManager::connectDevice()
+//{
+//    if(m_port.isOpen())
+//        m_port.close();
+//
+//    if(m_port.open(QSerialPort::ReadWrite))
+//    {
+//      m_port.setDataBits(QSerialPort::Data8);
+//      m_port.setParity(QSerialPort::NoParity);
+//      m_port.setStopBits(QSerialPort::OneStop);
+//      m_port.setBaudRate(QSerialPort::Baud9600);
+//
+//      connect(&m_port, &QSerialPort::readyRead,
+//               this, &WeighScaleManager::readDevice);
+//
+//      connect(&m_port, &QSerialPort::errorOccurred,
+//              this,[this](QSerialPort::SerialPortError error){
+//                  Q_UNUSED(error)
+//                  qDebug() << "AN ERROR OCCURED: " << m_port.errorString();
+//              });
+//
+//      connect(&m_port, &QSerialPort::dataTerminalReadyChanged,
+//              this,[](bool set){
+//          qDebug() << "data terminal ready DTR changed to " << (set?"high":"low");
+//      });
+//
+//      connect(&m_port, &QSerialPort::requestToSendChanged,
+//              this,[](bool set){
+//          qDebug() << "request to send RTS changed to " << (set?"high":"low");
+//      });
+//
+//      // try and read the scale ID, if we can do that then emit the
+//      // canMeasure signal
+//      // the canMeasure signal is emitted from readDevice slot on successful read
+//      //
+//      m_request = QByteArray("i");
+//      writeDevice();
+//    }
+//}
 
-    if(m_port.open(QSerialPort::ReadWrite))
-    {
-      m_port.setDataBits(QSerialPort::Data8);
-      m_port.setParity(QSerialPort::NoParity);
-      m_port.setStopBits(QSerialPort::OneStop);
-      m_port.setBaudRate(QSerialPort::Baud9600);
-
-      connect(&m_port, &QSerialPort::readyRead,
-               this, &WeighScaleManager::readDevice);
-
-      connect(&m_port, &QSerialPort::errorOccurred,
-              this,[this](QSerialPort::SerialPortError error){
-                  Q_UNUSED(error)
-                  qDebug() << "AN ERROR OCCURED: " << m_port.errorString();
-              });
-
-      connect(&m_port, &QSerialPort::dataTerminalReadyChanged,
-              this,[](bool set){
-          qDebug() << "data terminal ready DTR changed to " << (set?"high":"low");
-      });
-
-      connect(&m_port, &QSerialPort::requestToSendChanged,
-              this,[](bool set){
-          qDebug() << "request to send RTS changed to " << (set?"high":"low");
-      });
-
-      // try and read the scale ID, if we can do that then emit the
-      // canMeasure signal
-      // the canMeasure signal is emitted from readDevice slot on successful read
-      //
-      m_request = QByteArray("i");
-      writeDevice();
-    }
-}
-
-void WeighScaleManager::zeroDevice()
-{
-    m_request = QByteArray("z");
-    writeDevice();
-}
+//void WeighScaleManager::zeroDevice()
+//{
+//    m_request = QByteArray("z");
+//    writeDevice();
+//}
 
 void WeighScaleManager::measure()
 {
-    if (Cypress::getInstance().isSimulation()) {
-      QFile file("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
-      if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-          qDebug() << "Could not open file for write";
-          return;
-      }
-      QByteArray data = file.readAll();
+    m_test->reset();
+    //m_test->simulate();
 
-      QJsonDocument json = QJsonDocument::fromJson(data);
-      QJsonObject dataData = json.object();
+    emit measured(m_test);
 
-      QJsonObject valueObj = dataData["value"].toObject();
-      QJsonObject results = valueObj["results"].toObject();
+    if (m_test->isValid())
+    {
+        emit canFinish();
+    }
 
-      results["body_mass_index"] = valueObj["average_weight"].toObject()["value"].toDouble() / std::pow(m_inputData["height"].toDouble(), 2);
+    //if (Cypress::getInstance().isSimulation()) {
+    //  QFile file("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
+    //  if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+    //      qDebug() << "Could not open file for write";
+    //      return;
+    //  }
+    //  QByteArray data = file.readAll();
 
-      valueObj["results"] = results;
-      dataData["value"] = valueObj;
+    //  QJsonDocument json = QJsonDocument::fromJson(data);
+    //  QJsonObject dataData = json.object();
 
-      QJsonDocument doc(dataData);
-      QTextStream outStream(&file);
+    //  QJsonObject valueObj = dataData["value"].toObject();
+    //  QJsonObject results = valueObj["results"].toObject();
 
-      outStream << doc.toJson(QJsonDocument::Indented);
-      outStream.flush();
+    //  results["body_mass_index"] = valueObj["average_weight"].toObject()["value"].toDouble() / std::pow(m_inputData["height"].toDouble(), 2);
 
-      file.close();
+    //  valueObj["results"] = results;
+    //  dataData["value"] = valueObj;
 
-      sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
-      return;
-    };
+    //  QJsonDocument doc(dataData);
+    //  QTextStream outStream(&file);
+
+    //  outStream << doc.toJson(QJsonDocument::Indented);
+    //  outStream.flush();
+
+    //  file.close();
+
+    //  sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
+    //  return;
+    //};
 
     //m_request = QByteArray("p");
     //writeDevice();
 }
 
-void WeighScaleManager::readDevice()
-{
-      QByteArray data = m_port.readAll();
-      m_buffer += data;
-      qDebug() << "read device received buffer " << QString(m_buffer);
+//void WeighScaleManager::readDevice()
+//{
+//      QByteArray data = m_port.readAll();
+//      m_buffer += data;
+//      qDebug() << "read device received buffer " << QString(m_buffer);
+//
+//    if(!m_buffer.isEmpty())
+//    {
+//      if("i" == QString(m_request))
+//      {
+//        //m_deviceData.setAttribute("software_id", QString(m_buffer.simplified()));
+//        // signal the GUI that the measure button can be clicked
+//        //
+//        emit canMeasure();
+//      }
+//      else if("p" == QString(m_request))
+//      {
+//         m_test.fromArray(m_buffer);
+//         qDebug() << "received p request, read buffer" << m_buffer;
+//         if(m_test.isValid())
+//         {
+//           qDebug() << "test is valid, can save results";
+//           // emit the can write signal
+//           emit canFinish();
+//         }
+//         else
+//             qDebug() << "invalid test";
+//      }
+//      else if("z" == QString(m_request))
+//      {
+//          WeightMeasurement m;
+//          m.fromArray(m_buffer);
+//          if(m.isZero())
+//          {
+//            // signal the GUI that the measure button can be clicked
+//            //
+//            emit canMeasure();
+//          }
+//      }
+//
+//    }
+//}
 
-    if(!m_buffer.isEmpty())
-    {
-      if("i" == QString(m_request))
-      {
-        //m_deviceData.setAttribute("software_id", QString(m_buffer.simplified()));
-        // signal the GUI that the measure button can be clicked
-        //
-        emit canMeasure();
-      }
-      else if("p" == QString(m_request))
-      {
-         m_test.fromArray(m_buffer);
-         qDebug() << "received p request, read buffer" << m_buffer;
-         if(m_test.isValid())
-         {
-           qDebug() << "test is valid, can save results";
-           // emit the can write signal
-           emit canFinish();
-         }
-         else
-             qDebug() << "invalid test";
-      }
-      else if("z" == QString(m_request))
-      {
-          WeightMeasurement m;
-          m.fromArray(m_buffer);
-          if(m.isZero())
-          {
-            // signal the GUI that the measure button can be clicked
-            //
-            emit canMeasure();
-          }
-      }
-
-    }
-}
-
-void WeighScaleManager::writeDevice()
-{
-    // prepare to receive data
-    //
-    m_buffer.clear();
-    m_port.write(m_request);
-}
+//void WeighScaleManager::writeDevice()
+//{
+//    // prepare to receive data
+//    //
+//    m_buffer.clear();
+//    m_port.write(m_request);
+//}
 
 // set input parameters for the test
 void WeighScaleManager::setInputData(const QVariantMap& inputData)

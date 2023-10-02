@@ -18,21 +18,21 @@ CDTTTest::CDTTTest()
 {
     // test paramaters from Main sheet
     //
-    m_outputKeyList << "subject_id";
-    m_outputKeyList << "datetime";
-    m_outputKeyList << "language";
-    m_outputKeyList << "talker";
-    m_outputKeyList << "mode";
-    m_outputKeyList << "digits";
-    m_outputKeyList << "list_number";
-    m_outputKeyList << "msk_signal";
-    m_outputKeyList << "test_ear";
-    m_outputKeyList << "sp_level";
-    m_outputKeyList << "msk_level";
-    m_outputKeyList << "speech_reception_threshold";
-    m_outputKeyList << "standard_deviation";
-    m_outputKeyList << "reversal_count";
-    m_outputKeyList << "trial_count";
+    m_outputKeyList << "SUBJECT_ID";
+    m_outputKeyList << "DATETIME";
+    m_outputKeyList << "LANGUAGE";
+    m_outputKeyList << "TALKER";
+    m_outputKeyList << "MODE";
+    m_outputKeyList << "DIGITS";
+    m_outputKeyList << "LIST_NUMBER";
+    m_outputKeyList << "MSK_SIGNAL";
+    m_outputKeyList << "TEST_EAR";
+    m_outputKeyList << "SP_LEVEL";
+    m_outputKeyList << "MSK_LEVEL";
+    m_outputKeyList << "SPEECH_RECEPTION_THRESHOLD";
+    m_outputKeyList << "STANDARD_DEVIATION";
+    m_outputKeyList << "REVERSAL_COUNT";
+    m_outputKeyList << "TRIAL_COUNT";
 }
 
 void CDTTTest::simulate(const QString &barcode)

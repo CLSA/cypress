@@ -6,8 +6,11 @@
 
 BloodPressureMeasurement::BloodPressureMeasurement(
         const int& readingNum,
-        const int &sbp, const int& dbp, const int& pulse,
-        const QDateTime &start, const QDateTime& end)
+        const int& sbp,
+        const int& dbp,
+        const int& pulse,
+        const QDateTime &start,
+        const QDateTime& end)
 {
     setAttribute("reading_number",readingNum);
     setAttribute("systolic",sbp,"mmHg");

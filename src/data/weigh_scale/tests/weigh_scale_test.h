@@ -20,7 +20,7 @@
  *
  */
 
-class WeighScaleTest : public TestBase<WeightMeasurement>
+class WeighScaleTest : public TestBase<Measurement>
 {
 public:
     WeighScaleTest() = default;
@@ -43,7 +43,6 @@ public:
     // UI measure button click events
     //
     static const qint64 DELAY { 5 };
-
 };
 
 Q_DECLARE_METATYPE(WeighScaleTest);
