@@ -8,34 +8,63 @@
 #include <QHeaderView>
 
 
-CimtVividiDialog::CimtVividiDialog(const CypressSession& session, QWidget *parent) :
+CimtVividiDialog::CimtVividiDialog(QWidget *parent, const CypressSession& session) :
     DialogBase(parent, session),
     ui(new Ui::CimtVividiDialog)
 {
     ui->setupUi(this);
-    ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
 
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
 
-    QString patientId = tr("Patient ID");
-    QString studyInstanceId = tr("Study Instance ID");
-    QString fileNumber = tr("File Number");
-    QString laterality = tr("Laterality");
-
-    //QTableWidget* tableWidget = ui->filesReceived->getTable();
-
-    //tableWidget->setColumnCount(4);
-    //tableWidget->setHorizontalHeaderLabels(QStringList() << patientId << studyInstanceId << fileNumber << laterality);
-
-    //// Add some data (optional)
-    //for (int row = 0; row < 5; ++row) {
-    //    tableWidget->insertRow(row);
-    //    for (int col = 0; col < 4; ++col) {
-    //        QTableWidgetItem *item = new QTableWidgetItem(QString("Row %1, Col %2").arg(row + 1).arg(col + 1));
-    //        tableWidget->setItem(row, col, item);
-    //    }
-    //}
+    this->setWindowTitle("CIMT");
+    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new VividiManager(session));
+    VividiManager* manager = static_cast<VividiManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+    ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
+
+    QList<TableColumn> columns;
+    columns << TableColumn("STUDY_INSTANCE_ID", "ID", new TextDelegate("", QRegExp("^1234$"), true));
+    columns << TableColumn("SIDE", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
+
+    // device started
+    connect(manager, &VividiManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &VividiManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &VividiManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &VividiManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &VividiManager::success, this, &CimtVividiDialog::success);
+
+    // critical error
+    connect(manager, &VividiManager::error, this, &CimtVividiDialog::error);
+
+    // data changed
+    connect(manager, &VividiManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &VividiManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &VividiManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &VividiManager::addManualMeasurement);
 }
 
 CimtVividiDialog::~CimtVividiDialog()

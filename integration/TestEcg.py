@@ -24,4 +24,4 @@ def test_ecg(payload):
 
 
 if __name__ == '__main__':
-  test_ecg({ "answer_id": "10199", "barcode": "string", "language": "en", "interviewer": "string" })
+  test_ecg({ "answer_id": 10199, "barcode": "string", "language": "en", "interviewer": "string" })

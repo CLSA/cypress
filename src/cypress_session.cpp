@@ -6,6 +6,8 @@
 
 #include <QException>
 
+
+
 CypressSession::CypressSession():
     m_deviceType(Constants::MeasureType::Unknown),
     m_inputData(QJsonObject {})
@@ -22,10 +24,11 @@ CypressSession::CypressSession(const Constants::MeasureType& device, const QJson
     validate(inputData);
 
     m_barcode = m_inputData.value("barcode").toString();
-    m_answerId = m_inputData.value("answer_id").toString();
+    m_answerId = m_inputData.value("answer_id").toInt();
     m_interviewer = m_inputData.value("interviewer").toString();
     m_language = m_inputData.value("language").toString();
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    m_startDateTime = QDateTime::currentDateTimeUtc();
 };
 
 CypressSession::CypressSession(const Constants::ReportType& report, const QJsonObject& inputData):
@@ -38,7 +41,7 @@ CypressSession::CypressSession(const Constants::ReportType& report, const QJsonO
 
     m_inputData = inputData;
     m_barcode = m_inputData.value("barcode").toString();
-    m_answerId = m_inputData.value("answer_id").toString();
+    m_answerId = m_inputData.value("answer_id").toInt();
     m_interviewer = m_inputData.value("interviewer").toString();
     m_language = m_inputData.value("language").toString();
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -58,6 +61,8 @@ CypressSession::CypressSession(const CypressSession& session):
     m_interviewer = session.getInterviewer();
     m_language = session.getLanguage();
     m_sessionId = session.getSessionId();
+    m_startDateTime = session.m_startDateTime;
+    m_endDateTime = session.m_endDateTime;
 }
 
 CypressSession::~CypressSession()
@@ -73,7 +78,7 @@ void CypressSession::validate(const QJsonObject& inputData) const
     if (!isValidString(inputData, "barcode"))
         throw InvalidBarcodeException();
 
-    if (!isValidString(inputData, "answer_id"))
+    if (!isValidInteger(inputData, "answer_id"))
         throw InvalidAnswerIdException();
 
     if (!isValidString(inputData, "language"))
@@ -83,24 +88,25 @@ void CypressSession::validate(const QJsonObject& inputData) const
         throw InvalidInterviewerException();
 }
 
-void CypressSession::startDevice()
+void CypressSession::start()
 {
-    qDebug() << "CypressSession::start()";
+    m_startDateTime = QDateTime::currentDateTimeUtc();
+    m_status = SessionStatus::Started;
 
-    if (!m_deviceDialog.isNull())
-        throw QException();
-
-    m_deviceDialog.reset(DialogFactory::instantiate(*this) /* pass a const reference of the session to the dialog */ );
+    m_deviceDialog.reset(DialogFactory::instantiate(*this));
     m_deviceDialog->run();
     m_deviceDialog->show();
 }
 
-void CypressSession::endDevice()
+void CypressSession::end()
 {
     if (m_deviceDialog.isNull())
         throw QException();
 
-    qDebug() << "end session" << getSessionId();
+    m_status = SessionStatus::Ended;
+    m_endDateTime = QDateTime::currentDateTimeUtc();
+
+    qDebug() << "end session" << getSessionId() << m_endDateTime;
 }
 
 void CypressSession::startReport()
@@ -126,7 +132,7 @@ QString CypressSession::getSessionId() const
     return m_sessionId;
 }
 
-QString CypressSession::getAnswerId() const
+int CypressSession::getAnswerId() const
 {
     return m_answerId;
 }
@@ -146,6 +152,31 @@ QString CypressSession::getInterviewer() const
     return m_interviewer;
 }
 
+QDateTime CypressSession::getStartTime() const
+{
+    return m_startDateTime;
+}
+
+QDateTime CypressSession::getEndTime() const
+{
+    return m_endDateTime;
+}
+
+QJsonObject CypressSession::getJsonObject() const
+{
+    QJsonObject obj;
+
+    obj.insert("answer_id", getAnswerId());
+    obj.insert("session_id", getSessionId());
+    obj.insert("interviewer", getInterviewer());
+    obj.insert("start_time", getStartTime().toString("yyyy-MM-ddThh:mm:ss.zzzZ"));
+    obj.insert("end_time", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ss.zzzZ"));
+    obj.insert("barcode", getBarcode());
+    obj.insert("language", getLanguage());
+
+    return obj;
+}
+
 Constants::MeasureType CypressSession::getDeviceType() const
 {
     return m_deviceType;
@@ -154,6 +185,11 @@ Constants::MeasureType CypressSession::getDeviceType() const
 Constants::ReportType CypressSession::getReportType() const
 {
     return m_reportType;
+}
+
+SessionStatus CypressSession::getStatus() const
+{
+    return m_status;
 }
 
 QJsonObject CypressSession::getInputData() const

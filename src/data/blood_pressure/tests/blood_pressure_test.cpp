@@ -98,18 +98,26 @@ bool BloodPressureTest::isValid() const
 //
 QJsonObject BloodPressureTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
+    QJsonObject testJson {};
+    QJsonArray measurementArray {};
+
+    auto measurements { getMeasurements() };
+
     foreach(const auto m, m_measurementList)
     {
-      jsonArr.append(m.toJsonObject());
+      measurementArray.append(m.toJsonObject());
     }
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
-    }
-    json.insert("test_results",jsonArr);
-    return json;
+
+    QJsonObject valuesObject {};
+
+    valuesObject.insert("results", measurementArray);
+
+    valuesObject.insert("metadata", m_metaData.toJsonObject());
+    valuesObject.insert("manual_entry", getManualEntryMode());
+
+    testJson.insert("value", valuesObject);
+
+    return testJson;
 }
 
 bool BloodPressureTest::verifyDeviceAverage(const int& sbp, const int& dbp, const int& pulse) const
@@ -147,7 +155,7 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
       return;
     }
     // add the first measurement as separate test meta data
-    BloodPressureMeasurement first = m_measurementList.first();
+    Measurement first = m_measurementList.first();
     addMetaData("first_systolic",first.getAttribute("systolic"));
     addMetaData("first_diastolic",first.getAttribute("diastolic"));
     addMetaData("first_pulse",first.getAttribute("pulse"));
@@ -158,14 +166,14 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
     int count = 0;
     for(int i = 1; i < m_measurementList.count(); i++)
     {
-      BloodPressureMeasurement measurement = m_measurementList[i];
+      Measurement measurement = m_measurementList[i];
       if(measurement.isValid())
       {
         count++;
-        sbpTotal += measurement.getSbp();
-        dbpTotal += measurement.getDbp();
-        pulseTotal += measurement.getPulse();
-        qDebug() << QString("sbpTotal = %1 dbpTotal = %2 pulseTotal = %3").arg(sbpTotal).arg(dbpTotal).arg(pulseTotal);
+        //sbpTotal += measurement.getSbp();
+        //dbpTotal += measurement.getDbp();
+        //pulseTotal += measurement.getPulse();
+        //qDebug() << QString("sbpTotal = %1 dbpTotal = %2 pulseTotal = %3").arg(sbpTotal).arg(dbpTotal).arg(pulseTotal);
       }
     }
     if(1 > count)

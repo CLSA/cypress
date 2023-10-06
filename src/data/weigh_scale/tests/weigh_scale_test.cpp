@@ -3,6 +3,13 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QJsonValue>
+
+
+WeighScaleTest::WeighScaleTest()
+{
+    setExpectedMeasurementCount(2);
+}
 
 bool WeighScaleTest::isValid() const
 {
@@ -41,6 +48,18 @@ QString WeighScaleTest::toString() const
     return str;
 }
 
+void WeighScaleTest::simulate()
+{
+    WeightMeasurement weight1;
+    weight1.simulate();
+
+    WeightMeasurement weight2;
+    weight2.simulate();
+
+    addMeasurement(weight1);
+    addMeasurement(weight2);
+}
+
 void WeighScaleTest::fromArray(const QByteArray &arr)
 {
     if(!arr.isEmpty())
@@ -68,16 +87,30 @@ void WeighScaleTest::fromArray(const QByteArray &arr)
 
 QJsonObject WeighScaleTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
-    foreach(const auto m, m_measurementList)
+    QJsonObject testJson {
+    };
+
+    QJsonArray measurementArray;
+    auto measurements { getMeasurements() };
+
+    foreach(auto measurement, measurements)
     {
-      jsonArr.append(m.toJsonObject());
+        measurementArray << measurement.toJsonObject();
     }
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
-    }
-    json.insert("test_results",jsonArr);
-    return json;
+
+    QJsonObject valuesObject {};
+
+    valuesObject.insert("results", measurementArray);
+
+
+    double weight1 = valuesObject["results"].toArray()[0].toObject().value("weight").toObject().value("value").toDouble();
+    double weight2 = valuesObject["results"].toArray()[1].toObject().value("weight").toObject().value("value").toDouble();
+    double avg_weight { (weight1 + weight2) / 2 };
+
+    valuesObject.insert("manual_entry", getManualEntryMode());
+    valuesObject.insert("average_weight", avg_weight);
+
+    testJson.insert("value", valuesObject);
+
+    return testJson;
 }

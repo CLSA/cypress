@@ -20,9 +20,9 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
     ui->testInfoWidget->setSessionInformation(session);
 
     QList<TableColumn> columns;
-    columns << TableColumn("WEIGHT", "Weight", new TextDelegate("", QRegExp(""), true));
+    columns << TableColumn("WEIGHT", "Weight", new NumberDelegate(0, 1000, true, false, 2));
     columns << TableColumn("MODE", "Mode", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("TIMESTAMP", "Timestamp", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("TIMESTAMP", "Timestamp", new TextDelegate("", QRegExp(), false));
 
     // device started
     connect(manager, &WeighScaleManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
@@ -54,11 +54,16 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager, &WeighScaleManager::measure);
 
+    connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager, [=]() {
+        manager->setManualEntry(true);
+    });
+
     // request finish
     connect(ui->measurementTable, &MeasurementTable::finish, manager, &WeighScaleManager::finish);
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &WeighScaleManager::addManualMeasurement);
+
 }
 
 WeighScaleDialog::~WeighScaleDialog()

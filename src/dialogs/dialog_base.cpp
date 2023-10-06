@@ -26,10 +26,7 @@ DialogBase::DialogBase(QWidget* parent, const CypressSession& session)
 
     this->setAttribute(Qt::WA_DeleteOnClose);
 
-    if (Cypress::getInstance().isSimulation())
-    {
-        setWindowTitle(windowTitle() + "(SIM)");
-    }
+    startTime = QDateTime::currentDateTimeUtc();
 }
 
 void DialogBase::initialize()
@@ -63,32 +60,53 @@ void DialogBase::run()
 
 void DialogBase::closeEvent(QCloseEvent* event)
 {
-    bool sessionEnded = Cypress::getInstance().endSession(m_session.getSessionId());
-    if (!sessionEnded)
+    if (m_session.getStatus() != SessionStatus::Ended)
     {
-        event->ignore();
+        cancel("");
     }
-    else
-    {
-        QDialog::closeEvent(event);
-    }
+
+    QDialog::closeEvent(event);
 }
 
-void DialogBase::complete(QJsonObject& results)
+void DialogBase::cancel(const QString& cancelMsg)
 {
-    //results["id"] = m_uuid;
-    emit sendResults(results);
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this,
+        "Confirmation",
+        !cancelMsg.isEmpty() ? cancelMsg : "Are you sure you want to close? Any unsaved measurements will be lost.",
+        QMessageBox::Yes|QMessageBox::No
+    );
+
+    if (reply != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    m_manager->sendCancellation(m_session.getSessionId());
+
+    Cypress::getInstance().endSession(m_session.getSessionId());
+
+    close();
 }
-
-
 
 void DialogBase::error(const QString& errorMsg)
 {
-    QMessageBox::critical(this, "Error", errorMsg);
-    //close();
+    QMessageBox::critical(this, "Error", !errorMsg.isEmpty() ? errorMsg : "Unknown error");
+
+    m_manager->sendCancellation(m_session.getSessionId());
+
+    Cypress::getInstance().endSession(m_session.getSessionId());
+
+    close();
 }
 
 void DialogBase::success(const QString& successMsg)
 {
-    QMessageBox::information(this, "Complete", "The data has been saved to Pine");
+    QMessageBox::information(this, "Complete", !successMsg.isEmpty() ? successMsg : "The data has been saved to Pine");
+
+    m_manager->sendComplete(m_session.getSessionId());
+
+    Cypress::getInstance().endSession(m_session.getSessionId());
+
+    close();
 }

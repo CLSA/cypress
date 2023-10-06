@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>38</width>
+    <height>106</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <widget class="DicomWidget" name="dicomWidget" native="true"/>
    </item>
    <item>
-    <widget class="MeasurementTable" name="filesReceived" native="true"/>
+    <widget class="MeasurementTable" name="measurementTable" native="true"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -40,12 +40,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DicomWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/dicom_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>MeasurementTable</class>
    <extends>QWidget</extends>
    <header>widgets/measurement_table.h</header>
@@ -55,6 +49,12 @@
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DicomWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/dicom_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

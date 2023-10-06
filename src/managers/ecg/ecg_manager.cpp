@@ -1,3 +1,5 @@
+#include "cypress_application.h"
+#include "ecg_manager.h"
 
 #include <QDebug>
 #include <QDir>
@@ -6,18 +8,13 @@
 #include <QJsonObject>
 #include <QSettings>
 #include <QStandardItemModel>
-
-#include "cypress_application.h"
-#include "auxiliary/json_settings.h"
-
-#include "ecg_manager.h"
-
+#include <QJsonDocument>
 
 ECGManager::ECGManager(const CypressSession& session)
     : ManagerBase(session)
 {
-    m_test.setExpectedMeasurementCount(1);
-    m_inputData = jsonObjectToVariantMap(session.getInputData());
+    m_test.reset(new ECGTest);
+    m_test->setExpectedMeasurementCount(1);
 }
 
 bool ECGManager::isAvailable()
@@ -32,6 +29,9 @@ bool ECGManager::isInstalled()
 
 void ECGManager::start()
 {
+    emit started(m_test.get());
+    emit canMeasure();
+
     // connect signals and slots to QProcess one time only
     //
     //connect(&m_process, &QProcess::started,
@@ -61,86 +61,55 @@ void ECGManager::start()
     //emit dataChanged();
 }
 
-bool ECGManager::isDefined(const QString &fileName, const FileType &type) const
-{
-    Q_UNUSED(fileName)
-    Q_UNUSED(type)
-
-    return false;
-}
-
-void ECGManager::selectRunnable(const QString &runnableName)
-{
-    Q_UNUSED(runnableName)
-}
-
-void ECGManager::selectWorking(const QString& workingName)
-{
-    Q_UNUSED(workingName)
-}
-
-void ECGManager::select()
-{
-
-}
-
 void ECGManager::measure()
 {
-    if (Cypress::getInstance().isSimulation()) {
-        sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/ecg/output.json");
-        return;
+    m_test->reset();
+    m_test->simulate();
+
+    emit measured(m_test.get());
+
+    if (m_test->isValid())
+    {
+        emit canFinish();
     }
-
-
-    //results["cypress_session"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //if (results.empty()) return;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
-
-    //if (CypressApplication::getInstance().isSimulation()) return;
-
-    //clearData();
-    //// launch the process
-    //qDebug() << "starting process from measure";
-    //m_process.start();
 }
 
 void ECGManager::readOutput()
 {
-
 }
 
 void ECGManager::configureProcess()
 {
-
 }
 
 bool ECGManager::clearData()
 {
     m_test.reset();
-    return false;
+    return true;
 }
 
 void ECGManager::finish()
 {
-    //QJsonObject results = JsonSettings::readJsonFromFile(
-    //    "C:/dev/clsa/cypress/src/tests/fixtures/ecg/output.json"
-    //);
-    //if (results.empty()) return;
+    int answer_id = m_session.getAnswerId();
 
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject value = testJson.value("value").toObject();
+
+    value.insert("session", sessionObj);
+
+    testJson.insert("value", value);
+
+    QJsonDocument jsonDoc(testJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH",
+        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
+        "application/json",
+        serializedData
+    );
+
+    emit success("");
 }
 
 bool ECGManager::deleteDeviceData()

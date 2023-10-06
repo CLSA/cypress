@@ -222,6 +222,7 @@ signals:
     void measure();
     void finish();
     void addMeasurement();
+    void enterManualEntry();
 
 public slots:
     void handleTestUpdate(TestBase<Measurement>* test);

@@ -4,7 +4,7 @@
 #include "../../TestBase.h"
 #include "../../blood_pressure/measurements/blood_pressure_measurement.h"
 
-class BloodPressureTest : public TestBase<BloodPressureMeasurement>
+class BloodPressureTest : public TestBase<Measurement>
 {
 public:
     BloodPressureTest();
@@ -26,7 +26,7 @@ public:
 
     // simulate a complete test of 6 readings and computed averages
     //
-    void simulate();
+    void simulate() override;
 
     // String keys are converted to snake_case
     //

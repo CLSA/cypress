@@ -61,8 +61,6 @@ private slots:
     //void writeDevice() override;
 
 private:
-    WeighScaleTest* m_test;
-
     // Reset the session
     bool clearData() override;
 

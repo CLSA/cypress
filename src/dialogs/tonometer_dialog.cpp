@@ -71,10 +71,10 @@ void TonometerDialog::initializeConnections()
   // TODO: for DCS interviews, the first digit corresponds the the wave rank
   // for inhome interviews there is a host dependent prefix before the barcode
   //
-  if(Constants::RunMode::modeSimulate == m_mode)
-  {
+  //if(Constants::RunMode::modeSimulate == m_mode)
+  //{
     //ui->barcodeWidget->setBarcode(Constants::DefaultBarcode);
-  }
+  //}
 
   //connect(ui->barcodeWidget,&BarcodeWidget::validated,
   //        this,[this](const bool& valid)

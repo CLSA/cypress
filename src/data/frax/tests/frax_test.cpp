@@ -50,7 +50,7 @@ FraxTest::FraxTest()
     m_outputKeyList << "GLUCCOCORTICOID";
     m_outputKeyList << "RHEUMATOID_ARTHRITIS";
     m_outputKeyList << "SECONDARY_OSTEOPOROSIS";
-    m_outputKeyList << "ALCHOHOL";
+    m_outputKeyList << "ALCOHOL";
     m_outputKeyList << "FEMORAL_NECK_TSCORE";
 }
 
@@ -98,7 +98,7 @@ void FraxTest::fromFile(const QString& fileName)
            addMetaData("GLUCCOCORTICOID",list.at(8).toUInt());
            addMetaData("RHEUMATOID_ARTHRITIS",list.at(9).toUInt());
            addMetaData("SECONDARY_OSTEOPOROSIS",list.at(10).toUInt());
-           addMetaData("ALCHOHOL",list.at(11).toUInt());
+           addMetaData("ALCOHOL",list.at(11).toUInt());
            addMetaData("FEMORAL_NECK_TSCORE",list.at(12).toDouble());
         }
     }
@@ -208,16 +208,24 @@ bool FraxTest::isValid() const
 
 QJsonObject FraxTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
-    foreach(const auto m, m_measurementList)
+    QJsonObject testJson {
+
+    };
+
+    QJsonArray measurementArray;
+    auto measurements { getMeasurements() };
+
+    foreach(auto measurement, measurements)
     {
-      jsonArr.append(m.toJsonObject());
+        measurementArray << measurement.toJsonObject();
     }
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      json.insert("TEST_META_DATA",m_metaData.toJsonObject());
-    }
-    json.insert("TEST_RESULTS",jsonArr);
-    return json;
+
+    QJsonObject valuesObject {};
+
+    valuesObject.insert("metadata", getMetaData().toJsonObject());
+    valuesObject.insert("results", measurementArray);
+
+    testJson.insert("values", valuesObject);
+
+    return testJson;
 }

@@ -12,6 +12,8 @@ public:
     explicit WeighScaleDialog(QWidget* parent, const CypressSession& session);
     ~WeighScaleDialog();
 
+
+
 private:
     void initializeModel() override;
     void initializeConnections() override;

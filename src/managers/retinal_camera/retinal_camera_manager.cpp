@@ -13,6 +13,9 @@
 #include "data/retinal_camera/database_manager.h"
 
 #include "qsqlerror.h"
+#include "cypress_session.h"
+
+#include "auxiliary/file_utils.h"
 
 RetinalCameraManager::RetinalCameraManager(const CypressSession& session):
     ManagerBase(session), m_test(new RetinalCameraTest)
@@ -39,7 +42,7 @@ void RetinalCameraManager::addManualMeasurement()
 {
     RetinalCameraMeasurement measurement;
 
-    measurement.setAttribute("EYE_PICT_VENDOR", "SIM");
+    measurement.setAttribute("EYE_PICT_VENDOR", "");
 
     m_test->addMeasurement(measurement);
 
@@ -70,33 +73,8 @@ void RetinalCameraManager::start()
 
 void RetinalCameraManager::measure()
 {
-    //if (Cypress::getInstance().isSimulation()) {
     m_test->reset();
     m_test->simulate();
-    //}
-    // else {
-    //bool ok = false;
-    //ok = openDatabase();
-    //if (!ok)
-    //{
-    //    qCritical() << "RetinalCameraManager:start() - could not open database";
-    //    return;
-    //}
-
-    //ok = cleanupDatabase();
-    //if (!ok)
-    //{
-    //    qCritical() << "RetinalCameraManager:start() - could not cleanup database";
-    //    return;
-    //}
-
-    //ok = initializeDatabase();
-    //if (!ok)
-    //{
-    //    qCritical() << "RetinalCameraManager:start() - could not initialize database";
-    //    return;
-    //}
-    //}
 
     emit measured(m_test);
 
@@ -104,51 +82,38 @@ void RetinalCameraManager::measure()
     {
         emit canFinish();
     }
-
-    //}
-
-    //qDebug() << "RetinalCameraManager::measure";
-
-    //QMap<QString, QVariant> leftData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 1, "Left");
-    //qDebug() << "RetinalCameraManager::finish - left data: " << leftData;
-
-    //QMap<QString, QVariant> rightData = EyeExtractorQueryUtil::extractData(m_db, defaultPatientUUID, 2, "Right");
-    //qDebug() << "RetinalCameraManager::finish - right data: " << rightData;
-
-    //QJsonObject response {
-    //    { "cypress_session", m_uuid },
-    //    { "answer_id", m_answerId },
-    //};
-
-    //response["cypress_session"] = m_uuid;
-    //response["answer_id"] = m_answerId;
-    //response["barcode"] = m_barcode;
-    //response["interviewer"] = m_interviewer;
-
-    //sendResultsToPine(response);
-
-    //if (!leftData["EYE_PICT_VENDOR"].isNull())
-    //{
-    //    sendFileToPine(leftData["EYE_PICT_VENDOR"].toByteArray(), "left_eye.jpeg");
-    //}
-    //if (!rightData["EYE_PICT_VENDOR"].isNull())
-    //{
-    //    sendFileToPine(rightData["EYE_PICT_VENDOR"].toByteArray(), "right_eye.jpeg");
-    //}
 }
 
 void RetinalCameraManager::finish()
 {
+    int answer_id = m_session.getAnswerId();
+
+    for (int i = 0; i < m_test->getMeasurementCount(); i++)
+    {
+        Measurement& measure = m_test->get(i);
+        const QString& side = measure.getAttribute("SIDE").toString();
+
+        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=EYE_" + side + ".jpg", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("EYE_PICT_VENDOR").toString()));
+        measure.removeAttribute("EYE_PICT_VENDOR");
+    }
+
+    QJsonObject testJson = m_test->toJsonObject();
+
+    testJson.insert("language", m_session.getLanguage());
+    testJson.insert("session_id", m_session.getSessionId());
+    testJson.insert("answer_id", m_session.getAnswerId());
+    testJson.insert("barcode", m_session.getBarcode());
+    testJson.insert("interviewer", m_session.getInterviewer());
+
+    QJsonDocument jsonDoc(testJson);
+
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+
     emit success("sent");
 
-    //emit error("Test");
-    //emit sent();
-    //cleanupDatabase();
-    //m_db.close();
-
-    //sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/retinal_camera/output.json");
-    //sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/retinal_camera/left.jpg", "left.jpg");
-    //sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/retinal_camera/right.jpg", "right.jpg");
+    m_test->reset();
 }
 
 // collate test results and device and other meta data

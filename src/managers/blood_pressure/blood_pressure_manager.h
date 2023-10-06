@@ -112,8 +112,6 @@ signals:
     void cuffSizeChanged(const QString&);
 
 private:
-    BloodPressureTest m_test;
-
     // device data is separate from test data
     Measurement m_deviceData;
 

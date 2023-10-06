@@ -2,6 +2,7 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QRandomGenerator>
 
 void WeightMeasurement::fromArray(const QByteArray &arr)
 {
@@ -16,6 +17,13 @@ void WeightMeasurement::fromArray(const QByteArray &arr)
         setAttribute("TIMESTAMP", QDateTime::currentDateTime());
       }
     }
+}
+
+void WeightMeasurement::simulate()
+{
+    setAttribute("WEIGHT", QRandomGenerator::global()->generateDouble() * (100.0 - 50.0) + 50.0, "kg", 1);
+    setAttribute("MODE", "gross");
+    setAttribute("TIMESTAMP", QDateTime::currentDateTimeUtc());
 }
 
 bool WeightMeasurement::isValid() const

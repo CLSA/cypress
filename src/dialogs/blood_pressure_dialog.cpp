@@ -13,6 +13,55 @@ BloodPressureDialog::BloodPressureDialog(QWidget* parent, const CypressSession& 
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
     m_manager.reset(new BloodPressureManager(session));
+
+    BloodPressureManager* manager = static_cast<BloodPressureManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+    columns << TableColumn("diastolic", "Diastolic", new NumberDelegate(0, 1000, true, false, 2));
+    columns << TableColumn("pulse", "pulse", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("systolic", "Systolic", new TextDelegate("", QRegExp(), false));
+
+    // device started
+    connect(manager, &BloodPressureManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &BloodPressureManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &BloodPressureManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &BloodPressureManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &BloodPressureManager::success, this, &BloodPressureDialog::success);
+
+    // critical error
+    connect(manager, &BloodPressureManager::error, this, &BloodPressureDialog::error);
+
+    // data changed
+    connect(manager, &BloodPressureManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &BloodPressureManager::measure);
+
+    connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager, [=]() {
+        manager->setManualEntry(true);
+    });
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &BloodPressureManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &BloodPressureManager::addManualMeasurement);
 }
 
 BloodPressureDialog::~BloodPressureDialog()

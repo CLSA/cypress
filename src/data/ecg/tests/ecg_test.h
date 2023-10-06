@@ -2,11 +2,11 @@
 #define ECG_TEST_H
 
 #include "../../TestBase.h"
-#include "../measurements/ecg_measurement.h"
+
 
 QT_FORWARD_DECLARE_CLASS(QDomNode)
 
-class ECGTest : public TestBase<ECGMeasurement>
+class ECGTest : public TestBase<Measurement>
 {
 public:
     ECGTest();
@@ -14,19 +14,12 @@ public:
 
     void fromFile(const QString &);
 
-    // String representation for debug and GUI display purposes
-    //
-    QString toString() const override;
-
+    void simulate() override;
     bool isValid() const override;
 
+    QString toString() const override;
     QStringList toStringList() const;
-
-    // String keys are converted to snake_case
-    //
     QJsonObject toJsonObject() const override;
-
-    void simulate();
 
 private:
     QList<QString> m_outputKeyList;

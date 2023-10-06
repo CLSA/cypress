@@ -36,8 +36,10 @@ public:
     explicit ManagerBase(const CypressSession& session);
     ~ManagerBase();
 
-    bool sendCancellation(QString device, QString uuid);
-    bool sendComplete(QString device, QString uuid);
+    bool sendCancellation(QString uuid);
+    bool sendComplete(QString uuid);
+
+    void setManualEntry(bool isManualEntry);
 
 public slots:
     // subclasses call methods after main initialization just prior
@@ -91,6 +93,10 @@ protected:
 
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
+
+    QScopedPointer<TestBase<Measurement>> m_test;
+
+    bool manualEntryMode { false };
 
     QVariant getInputDataValue(const QString &);
     QVariantMap jsonObjectToVariantMap(const QJsonObject& jsonObject);

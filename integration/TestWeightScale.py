@@ -24,4 +24,4 @@ def test_weight_scale(payload):
 
 
 if __name__ == '__main__':
-  test_weight_scale({ "answer_id": "10199", "barcode": "string", "language": "en", "interviewer": "string" })
+  test_weight_scale({ "answer_id": 10199, "barcode": "100125263", "language": "en", "interviewer": "Anthony" })

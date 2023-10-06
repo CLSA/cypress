@@ -10,7 +10,6 @@ TRANSLATIONS += \
     Cypress_en_CA.ts
 
 CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations
-SUBDIRS = tests
 
 #QMAKE_LFLAGS += /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
@@ -105,48 +104,6 @@ DISTFILES += \
     please.tif \
     server/pages/index.html \
     sign.tif \
-    tests/fixtures/audiometer/input.json \
-    tests/fixtures/audiometer/output.json \
-    tests/fixtures/audiometer/settings.json \
-    tests/fixtures/blood_pressure/input.json \
-    tests/fixtures/blood_pressure/output.json \
-    tests/fixtures/blood_pressure/settings.json \
-    tests/fixtures/body_composition/input.json \
-    tests/fixtures/body_composition/output.json \
-    tests/fixtures/body_composition/settings.json \
-    tests/fixtures/cdtt/input.json \
-    tests/fixtures/cdtt/output.json \
-    tests/fixtures/cdtt/settings.json \
-    tests/fixtures/choice_reaction/input.json \
-    tests/fixtures/choice_reaction/output.json \
-    tests/fixtures/choice_reaction/settings.json \
-    tests/fixtures/dxa/hip/hip.json \
-    tests/fixtures/dxa/input.json \
-    tests/fixtures/dxa/iva/iva.json \
-    tests/fixtures/dxa/output.json \
-    tests/fixtures/dxa/spine/spine.json \
-    tests/fixtures/dxa/whole_body/whole_body.json \
-    tests/fixtures/frax/input.json \
-    tests/fixtures/frax/output.json \
-    tests/fixtures/frax/settings.json \
-    tests/fixtures/grip_strength/input.json \
-    tests/fixtures/grip_strength/output.json \
-    tests/fixtures/input.json \
-    tests/fixtures/output.json \
-    tests/fixtures/retinal_camera/input.json \
-    tests/fixtures/retinal_camera/output.json \
-    tests/fixtures/thermometer/input.json \
-    tests/fixtures/thermometer/output.json \
-    tests/fixtures/thermometer/settings.json \
-    tests/fixtures/tonometer/input.json \
-    tests/fixtures/tonometer/output.json \
-    tests/fixtures/tonometer/settings.json \
-    tests/fixtures/ultrasound/input.json \
-    tests/fixtures/ultrasound/output.json \
-    tests/fixtures/ultrasound/settings.json \
-    tests/fixtures/weigh_scale/input.json \
-    tests/fixtures/weigh_scale/output.json \
-    tests/fixtures/weigh_scale/settings.json \
     thankyou.tif
 
 HEADERS += \
@@ -177,6 +134,7 @@ HEADERS += \
     data/choice_reaction/measurements/choice_reaction_measurement.h \
     data/choice_reaction/tests/choice_reaction_test.h \
     data/cimt_vivid_i_measurement.h \
+    data/cimt_vivid_i_test.h \
     data/dxa/measurements/ap_spine_measurement.h \
     data/dxa/measurements/dxa_measurement.h \
     data/dxa/measurements/forearm_measurement.h \
@@ -283,6 +241,7 @@ HEADERS += \
     server/handlers/ecg/ecg_status_request_handler.h \
     server/handlers/frax/frax_request_handler.h \
     server/handlers/frax/frax_status_request_handler.h \
+    server/handlers/general_proxy_consent/general_proxy_consent_request_handler.h \
     server/handlers/grip_strength/grip_strength_request_handler.h \
     server/handlers/grip_strength/grip_strength_status_request_handler.h \
     server/handlers/participant_report/participant_report_request_handler.h \
@@ -353,6 +312,7 @@ SOURCES += \
     data/choice_reaction/measurements/choice_reaction_measurement.cpp \
     data/choice_reaction/tests/choice_reaction_test.cpp \
     data/cimt_vivid_i_measurement.cpp \
+    data/cimt_vivid_i_test.cpp \
     data/dxa/measurements/ap_spine_measurement.cpp \
     data/dxa/measurements/dxa_measurement.cpp \
     data/dxa/measurements/forearm_measurement.cpp \
@@ -459,6 +419,7 @@ SOURCES += \
     server/handlers/ecg/ecg_status_request_handler.cpp \
     server/handlers/frax/frax_request_handler.cpp \
     server/handlers/frax/frax_status_request_handler.cpp \
+    server/handlers/general_proxy_consent/general_proxy_consent_request_handler.cpp \
     server/handlers/grip_strength/grip_strength_request_handler.cpp \
     server/handlers/grip_strength/grip_strength_status_request_handler.cpp \
     server/handlers/participant_report/participant_report_request_handler.cpp \

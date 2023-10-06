@@ -23,4 +23,4 @@ def test_ultrasound(payload):
 
 
 if __name__ == '__main__':
-  test_ultrasound({ "answer_id": "10199", "barcode": "string", "language": "en", "interviewer": "string" })
+  test_ultrasound({ "barcode": "100125263", "answer_id": "10199", "language": "en", "interviewer": "SIM" })

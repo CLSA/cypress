@@ -15,11 +15,11 @@ RetinalCameraTest::RetinalCameraTest()
 void RetinalCameraTest::simulate()
 {
     RetinalCameraMeasurement leftEye;
-    leftEye.setAttribute("EYE_PICT_VENDOR", QByteArray("SIM"));
+    leftEye.setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/LEFT.jpg");
     leftEye.setAttribute("EYE_SIDE_VENDOR", "LEFT");
 
     RetinalCameraMeasurement rightEye;
-    rightEye.setAttribute("EYE_PICT_VENDOR", QByteArray("SIM"));
+    rightEye.setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/RIGHT.jpg");
     rightEye.setAttribute("EYE_SIDE_VENDOR", "RIGHT");
 
     this->addMeasurement(leftEye);
@@ -40,6 +40,8 @@ bool RetinalCameraTest::isValid() const
             return false;
         }
     }
+
+    return true;
 }
 
 QJsonObject RetinalCameraTest::toJsonObject() const
@@ -54,8 +56,12 @@ QJsonObject RetinalCameraTest::toJsonObject() const
         measurementArray << measurement.toJsonObject();
     }
 
-    testJson["measurements"] = measurementArray;
-    testJson["metadata"] = getMetaData().toJsonObject();
+    QJsonObject valuesObject {};
+
+    valuesObject.insert("metadata", getMetaData().toJsonObject());
+    valuesObject.insert("results", measurementArray);
+
+    testJson.insert("values", valuesObject);
 
     return testJson;
 }

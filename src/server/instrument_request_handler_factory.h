@@ -73,6 +73,7 @@ public:
     //static HTTPRequestHandler* createSignaturePadStatusRequestHandler();
 
     static HTTPRequestHandler* createParticipantReportRequestHandler();
+    static HTTPRequestHandler* createGeneralProxyConsentRequestHandler();
 };
 
 

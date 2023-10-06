@@ -1,6 +1,8 @@
 #include "blood_pressure_manager.h"
 #include "auxiliary/json_settings.h"
 
+#include "data/blood_pressure/tests/blood_pressure_test.h"
+
 #include "cypress_application.h"
 #include "bpm_communication.h"
 
@@ -15,7 +17,8 @@
 BloodPressureManager::BloodPressureManager(const CypressSession& session)
     : ManagerBase(session), m_comm(new BPMCommunication())
 {
-    m_test.setExpectedMeasurementCount(6);
+    m_test.reset(new BloodPressureTest);
+    m_test->setExpectedMeasurementCount(6);
 }
 
 BloodPressureManager::~BloodPressureManager()
@@ -31,6 +34,8 @@ BloodPressureManager::~BloodPressureManager()
 
 void BloodPressureManager::start()
 {
+    emit started(m_test.get());
+    emit canMeasure();
     // connect manager to communication
     //connect(this, &BloodPressureManager::attemptConnection, m_comm, &BPMCommunication::connect);
     //connect(this, &BloodPressureManager::startMeasurement, m_comm, &BPMCommunication::measure);
@@ -93,35 +98,39 @@ void BloodPressureManager::setDevice(const QUsb::Id &info)
 
 void BloodPressureManager::setCuffSize(const QString &size)
 {
-  if(size.isNull() || 0 == size.length()) return;
-  if(size.toLower() != m_cuffSize)
-  {
-    m_cuffSize = size.toLower();
-    m_test.setCuffSize(m_cuffSize);
-    emit cuffSizeChanged(m_cuffSize);
-  }
+  //if(size.isNull() || 0 == size.length()) return;
+  //if(size.toLower() != m_cuffSize)
+  //{
+  //  m_cuffSize = size.toLower();
+  //  m_test.setCuffSize(m_cuffSize);
+  //  emit cuffSizeChanged(m_cuffSize);
+  //}
 }
 
 void BloodPressureManager::setSide(const QString &side)
 {
-  if(side.isNull() || 0 == side.length()) return;
-  if(side.toLower() != m_side)
-  {
-    m_side = side.toLower();
-    m_test.setSide(m_side);
-    emit sideChanged(m_side);
-  }
+  //if(side.isNull() || 0 == side.length()) return;
+  //if(side.toLower() != m_side)
+  //{
+  //  m_side = side.toLower();
+  //  m_test.setSide(m_side);
+  //  emit sideChanged(m_side);
+  //}
 }
 
 // slot for UI communication
 //
 void BloodPressureManager::measure()
 {
-  if (Cypress::getInstance().isSimulation())
-  {
-    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/blood_pressure/output.json");
-    return;
-  }
+    m_test->reset();
+    m_test->simulate();
+
+    emit measured(m_test.get());
+
+    //if (m_test->isValid())
+    //{
+    emit canFinish();
+    //}
 }
 
 
@@ -140,6 +149,28 @@ void BloodPressureManager::disconnectDevice()
 //
 void BloodPressureManager::finish()
 {
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionObj = m_session.getJsonObject();
+
+    QJsonObject value = testJson.value("value").toObject();
+    value.insert("session", sessionObj);
+    value.insert("metadata", m_test->getMetaData().toJsonObject());
+    value.insert("manual_entry", m_test->getManualEntryMode());
+
+    testJson.insert("value", value);
+
+    QJsonDocument jsonDoc(testJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH",
+        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
+        "application/json",
+        serializedData
+    );
+
+    emit success("");
     //QJsonObject results = JsonSettings::readJsonFromFile(
     //    "C:/dev/clsa/cypress/src/tests/fixtures/blood_pressure/output.json"
     //);

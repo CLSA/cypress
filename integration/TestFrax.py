@@ -7,20 +7,30 @@ def test_frax(payload):
       print(response.status_code)
       print(response.text)
 
-      data = response.json()
-      session_id = data['sessionId']
-
       print("Press Enter to continue...")
       while input() != "":
         pass
-
-      response = requests.delete(f"http://127.0.0.1:9000/frax/${session_id}")
-      print(response.status_code)
-      print(response.text)
 
   except requests.exceptions.RequestException as e:
       logging.error(f"Exception: {e}")
 
 
 if __name__ == '__main__':
+  input_data = {
+     "type": "t",
+     "country_code": "ca",
+     "age": 82,
+     "sex": "F",
+     "bmi": 30,
+     "previous_fracture": "n",
+     "parent_hip_fracture": "n",
+     "current_smoker": "n",
+     "glucocorticoid": "n",
+     "rheumatoid_arthritis": "n",
+     "secondary_osteoporosis": "n",
+     "alcohol": "n",
+     "t_score": -2.5,
+     "z_score": -2.5,
+  }
+
   test_frax({ "answer_id": "10199", "barcode": "string", "language": "en", "interviewer": "string" })

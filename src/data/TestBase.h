@@ -54,6 +54,8 @@ public:
 
     virtual void reset();
 
+    virtual void simulate() {};
+
     void setUnitsSystem(const Constants::UnitsSystem& system)
     {
       m_unitsSystem = system;
@@ -166,9 +168,14 @@ public:
       return m_metaData.isEmpty();
     }
 
+    bool getManualEntryMode() const;
+    void setManualEntryMode(bool isManualEntry);
+
 protected:
     QVector<T> m_measurementList;
     MetaData m_metaData;
+
+    bool isManualEntryMode;
 
     int m_expectedMeasurementCount { 1 };
     int m_minimumMeasurementCount { 1 };
@@ -181,6 +188,7 @@ void TestBase<T>::reset()
 {
     m_metaData.reset();
     m_measurementList.clear();
+    setManualEntryMode(false);
 }
 
 // FIFO addition of measurements
@@ -188,16 +196,11 @@ void TestBase<T>::reset()
 template <class T>
 void TestBase<T>::addMeasurement(const T &item)
 {
-    //if(!m_measurementList.contains(item))
-    //{
     m_measurementList.append(item);
     if(m_expectedMeasurementCount < m_measurementList.size())
     {
         m_measurementList.pop_front();
     }
-
-    qDebug() << m_measurementList;
-    //}
 }
 
 template <class T>
@@ -224,6 +227,18 @@ T TestBase<T>::lastMeasurement() const
    if(!m_measurementList.isEmpty())
      m = m_measurementList.last();
    return m;
+}
+
+template<class T>
+bool TestBase<T>::getManualEntryMode() const
+{
+   return isManualEntryMode;
+}
+
+template<class T>
+void TestBase<T>::setManualEntryMode(bool isManualEntry)
+{
+   isManualEntryMode = isManualEntry;
 }
 
 #endif // TESTBASE_H

@@ -11,7 +11,7 @@
 #include <QSettings>
 
 #include "auxiliary/Constants.h"
-#include "server/server.h"
+#include "server/Server.h"
 
 Cypress* Cypress::app = nullptr;
 Cypress& Cypress::getInstance()
@@ -48,13 +48,12 @@ Cypress::~Cypress()
     delete app;
 }
 
-// slot
 void Cypress::startValidatedDeviceSession(CypressSession session)
 {
     printActiveSessions();
     QSharedPointer<CypressSession> newSession { new CypressSession(session) };
     sessions.insert(newSession->getSessionId(), newSession);
-    newSession->startDevice();
+    newSession->start();
 }
 
 
@@ -67,7 +66,6 @@ void Cypress::startValidatedReportSession(CypressSession session)
 }
 
 
-// slot
 void Cypress::forceSessionEnd(QString sessionId)
 {
     endSession(sessionId);
@@ -75,19 +73,13 @@ void Cypress::forceSessionEnd(QString sessionId)
 
 bool Cypress::endSession(const QString& sessionId)
 {
-    // Ends the session by sessionId and removes it from the active sessions
     if (!sessions.contains(sessionId))
     {
         return true;
     }
 
-    else
-    {
-        CypressSession& session = *sessions.value(sessionId);
-
-        session.endDevice();
-        sessions.remove(sessionId);
-    }
+    CypressSession& session = *sessions.value(sessionId);
+    session.end();
 
     return true;
 }
@@ -99,7 +91,11 @@ void Cypress::printActiveSessions() const
     {
         it.next();
         const CypressSession& session = *it.value();
-        qDebug() << " " << session.getAnswerId() << " " << session.getBarcode() << session.getDeviceType();
+
+        if (session.getStatus() == SessionStatus::Started)
+        {
+            qDebug() << " " << session.getAnswerId() << " " << session.getBarcode() << session.getDeviceType();
+        }
     }
 }
 

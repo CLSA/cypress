@@ -13,7 +13,7 @@ class CimtVividiDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit CimtVividiDialog(const CypressSession& session, QWidget *parent = nullptr);
+    explicit CimtVividiDialog(QWidget *parent, const CypressSession& session);
     ~CimtVividiDialog();
 
 private:

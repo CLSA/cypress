@@ -1,9 +1,7 @@
 //#include "auxiliary/Utilities.h"
-#include "auxiliary/json_settings.h"
 #include "data/weigh_scale/tests/weigh_scale_test.h"
-
 #include "weigh_scale_manager.h"
-#include "cypress_application.h"
+#include "cypress_session.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -14,10 +12,12 @@
 #include <QSettings>
 #include <QStandardItemModel>
 #include <QtMath>
+#include <QJsonDocument>
 
 WeighScaleManager::WeighScaleManager(const CypressSession& session)
-    : ManagerBase(session), m_test(new WeighScaleTest)
+    : ManagerBase(session)
 {
+    m_test.reset(new WeighScaleTest);
     m_test->setExpectedMeasurementCount(2);
 }
 
@@ -39,32 +39,32 @@ bool WeighScaleManager::clearData()
 
 void WeighScaleManager::start()
 {
-    emit started(m_test);
+    emit started(m_test.get());
     emit canMeasure();
 }
+
 void WeighScaleManager::finish()
 {
-    emit success("sent");
-    //QJsonObject results = JsonSettings::readJsonFromFile(
-    //    "C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json"
-    //);
-    //if (results.empty()) return;
+    int answer_id = m_session.getAnswerId();
 
-    //results["cypress_session"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionObj = m_session.getJsonObject();
 
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
-    //m_deviceData.reset();
-    //m_deviceList.clear();
-    //m_test.reset();
-    //if(m_port.isOpen())
-    //    m_port.close();
+    QJsonObject value = testJson.value("value").toObject();
+    value.insert("metadata", sessionObj);
+
+    testJson.insert("value", value);
+
+    QJsonDocument jsonDoc(testJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH",
+        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
+        "application/json",
+        serializedData
+    );
+
+    emit success("");
 }
 
 //void WeighScaleManager::connectDevice()
@@ -116,48 +116,14 @@ void WeighScaleManager::finish()
 void WeighScaleManager::measure()
 {
     m_test->reset();
-    //m_test->simulate();
+    m_test->simulate();
 
-    emit measured(m_test);
+    emit measured(m_test.get());
 
     if (m_test->isValid())
     {
         emit canFinish();
     }
-
-    //if (Cypress::getInstance().isSimulation()) {
-    //  QFile file("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
-    //  if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-    //      qDebug() << "Could not open file for write";
-    //      return;
-    //  }
-    //  QByteArray data = file.readAll();
-
-    //  QJsonDocument json = QJsonDocument::fromJson(data);
-    //  QJsonObject dataData = json.object();
-
-    //  QJsonObject valueObj = dataData["value"].toObject();
-    //  QJsonObject results = valueObj["results"].toObject();
-
-    //  results["body_mass_index"] = valueObj["average_weight"].toObject()["value"].toDouble() / std::pow(m_inputData["height"].toDouble(), 2);
-
-    //  valueObj["results"] = results;
-    //  dataData["value"] = valueObj;
-
-    //  QJsonDocument doc(dataData);
-    //  QTextStream outStream(&file);
-
-    //  outStream << doc.toJson(QJsonDocument::Indented);
-    //  outStream.flush();
-
-    //  file.close();
-
-    //  sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/weigh_scale/output.json");
-    //  return;
-    //};
-
-    //m_request = QByteArray("p");
-    //writeDevice();
 }
 
 //void WeighScaleManager::readDevice()

@@ -62,7 +62,7 @@ DialogBase* DialogFactory::instantiate(const CypressSession& session)
         return new TonometerDialog(nullptr, session);
 
       case Constants::MeasureType::CarotidIntima:
-        return new CimtVividiDialog(session);
+        return new CimtVividiDialog(nullptr, session);
 
       case Constants::MeasureType::Retinal_Camera:
         return new RetinalCameraDialog(nullptr, session);

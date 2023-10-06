@@ -31,6 +31,7 @@ public:
     bool isValid() const override;
 
     bool isZero() const;
+    void simulate();
 };
 
 Q_DECLARE_METATYPE(WeightMeasurement);

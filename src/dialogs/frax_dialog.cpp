@@ -24,15 +24,9 @@ FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
     ui->testInfoWidget->setSessionInformation(session);
 
     QList<TableColumn> columns;
+
     columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
-
-    //columns << TableColumn("TYPE");
-    //columns << TableColumn("COUNTRY_CODE");
-    //columns << TableColumn("AGE");
-    //columns << TableColumn("SEX");
-    //columns << TableColumn("BODY_MASS_INDEX");
-    //columns << TableColumn("PREVIOUS_FRACTURE");
 
     // device started
     connect(manager, &FraxManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {

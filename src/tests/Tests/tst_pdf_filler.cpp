@@ -6,6 +6,13 @@
 
 #include "../../Auxiliary/pdf_form_filler.h"
 
+#include "../../data/ecg/tests/ecg_test.h"
+
+#include "../../data/blood_pressure/tests/blood_pressure_test.h"
+
+#include "../../data/blood_pressure/tests/spirometry_test.h"
+
+
 class pdf_filler : public QObject
 {
     Q_OBJECT
@@ -18,13 +25,42 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
+    void test_ecg_simulation();
+    void test_bpm_simulation();
+
     void test_gen_proxy_pdf();
 
     void test_participant_report_en_pdf();
     void test_participant_report_fr_pdf();
-
 };
 
+void pdf_filler::test_ecg_simulation()
+{
+    ECGTest test;
+
+    test.simulate();
+
+    qDebug() << test.toJsonObject();
+}
+
+void pdf_filler::test_bpm_simulation()
+{
+    BloodPressureTest test;
+
+    test.simulate();
+
+    qDebug() << test.toJsonObject();
+}
+
+void pdf_filler::test_spirometry()
+{
+    SpirometryTest test;
+
+    test.simulate();
+
+    qDebug() << test.toJsonObject();
+
+}
 pdf_filler::pdf_filler()
 {
 

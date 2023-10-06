@@ -8,6 +8,12 @@
 #include <QJsonObject>
 #include <QException>
 
+enum SessionStatus {
+    Unknown,
+    Started,
+    Ended,
+};
+
 class CypressSession
 {
 public:
@@ -18,22 +24,28 @@ public:
 
     ~CypressSession();
 
-    void startDevice();
-    void endDevice();
+    void start();
+    void end();
 
     void startReport();
     void endReport();
 
     Constants::MeasureType getDeviceType() const;
     Constants::ReportType getReportType() const;
+    SessionStatus getStatus() const;
 
     QJsonObject getInputData() const;
 
-    QString getAnswerId() const;
+    int getAnswerId() const;
     QString getSessionId() const;
     QString getBarcode() const;
     QString getLanguage() const;
     QString getInterviewer() const;
+
+    QDateTime getStartTime() const;
+    QDateTime getEndTime() const;
+
+    QJsonObject getJsonObject() const;
 
 private:
     // the device to be used for this session (if applicable)
@@ -43,6 +55,9 @@ private:
     // the report to be used for this session (if applicable)
     //
     const Constants::ReportType m_reportType { Constants::ReportType::reportTypeUnknown };
+
+
+    SessionStatus m_status { SessionStatus::Unknown };
 
     // the device UI
     //
@@ -55,11 +70,10 @@ private:
     // validated input data from m_inputData
     //
     QString m_interviewer {};
-    QString m_answerId {};
+    int m_answerId {};
     QString m_sessionId {};
     QString m_barcode {};
     QString m_language {};
-
 
     QDateTime m_startDateTime {};
     QDateTime m_endDateTime {};

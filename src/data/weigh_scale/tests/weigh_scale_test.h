@@ -23,7 +23,7 @@
 class WeighScaleTest : public TestBase<Measurement>
 {
 public:
-    WeighScaleTest() = default;
+    WeighScaleTest();
     ~WeighScaleTest() = default;
 
     void fromArray(const QByteArray &);
@@ -37,6 +37,8 @@ public:
     // String keys are converted to snake_case
     //
     QJsonObject toJsonObject() const override;
+
+    void simulate();
 
     // ms of delay between performing a measurement to allow for
     // step on/off without implementing a delay timer between

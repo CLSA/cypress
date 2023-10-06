@@ -1,4 +1,5 @@
 #include "ecg_test.h"
+#include "../measurements/ecg_measurement.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -237,7 +238,7 @@ QStringList ECGTest::toStringList() const
     QStringList list;
     if(isValid())
     {
-      const ECGMeasurement& m = getMeasurement(0);
+      const Measurement& m = getMeasurement(0);
       list = m.toStringList();
       foreach(const auto key, m_outputKeyList)
         list << QString("%1: %2").arg(key,getMetaDataAsString(key));
@@ -277,7 +278,7 @@ bool ECGTest::isValid() const
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
     if(okTest)
     {
-      ECGMeasurement m = getMeasurement(0);
+      Measurement m = getMeasurement(0);
       okTest = m.isValid();
     }
     return okMeta && okTest;
@@ -286,11 +287,20 @@ bool ECGTest::isValid() const
 QJsonObject ECGTest::toJsonObject() const
 {
     QJsonObject json;
-    if(!metaDataIsEmpty())
+    QJsonArray measurementArray;
+
+    auto measurements { getMeasurements() };
+    foreach (auto measurement, measurements)
     {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
+        measurementArray << measurement.toJsonObject();
     }
-    ECGMeasurement m = getMeasurement(0);
-    json.insert("test_results",m.toJsonObject());
+
+    QJsonObject valueObject {};
+    valueObject.insert("metadata", m_metaData.toJsonObject());
+    valueObject.insert("results", measurementArray);
+    valueObject.insert("manual_entry", getManualEntryMode());
+
+    json.insert("value", valueObject);
+
     return json;
 }

@@ -55,9 +55,10 @@
 #include "server/handlers/ultrasound/ultrasound_request_handler.h"
 #include "server/handlers/ultrasound/ultrasound_status_request_handler.h"
 
-#include "server/handlers/signature_pad/signature_pad_request_handler.h"
-#include "server/handlers/signature_pad/signature_pad_status_request_handler.h"
+//#include "server/handlers/signature_pad/signature_pad_request_handler.h"
+//#include "server/handlers/signature_pad/signature_pad_status_request_handler.h"
 
+#include "server/handlers/general_proxy_consent/general_proxy_consent_request_handler.h"
 #include "server/handlers/participant_report/participant_report_request_handler.h"
 
 using namespace Poco::Net;
@@ -100,7 +101,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/grip_strength/status/?$)"),             &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler    },
     { QString(R"(^/grip_strength/delete/?$)"),             &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/retinal_camera/?$)"),            	   &InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler         },
+    { QString(R"(^/retinal_camera_left_eye/?$)"),          &InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler         },
+    { QString(R"(^/retinal_camera_right_eye/?$)"),         &InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler         },
+
     { QString(R"(^/retinal_camera/status/?$)"),     	   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
     { QString(R"(^/retinal_camera/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
@@ -112,19 +115,20 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/tonometer/status/?$)"),                 &InstrumentRequestHandlerFactory::createTonometerStatusRequestHandler	   },
     { QString(R"(^/tonometer/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/ultrasound/?$)"), 	   	               &InstrumentRequestHandlerFactory::createUltrasoundRequestHandler            },
-    { QString(R"(^/ultrasound/status/?$)"),                &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler      },
-    { QString(R"(^/ultrasound/delete/?$)"),                &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/carotid_intima/?$)"), 	   	               &InstrumentRequestHandlerFactory::createUltrasoundRequestHandler            },
+    { QString(R"(^/carotid_intima/status/?$)"),                &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler      },
+    { QString(R"(^/carotid_intima/delete/?$)"),                &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/weight_scale/?$)"),                     &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler            },
     { QString(R"(^/weight_scale/status/?$)"),              &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler      },
     { QString(R"(^/weight_scale/delete/?$)"),              &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     //{ QString(R"(^/signature/?$)"), 	                   &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
-    //{ QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
-    //{ QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler    },
+    //{ QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler      },
+    //{ QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler  },
 
     { QString(R"(^/participant_report/?$)"),               &InstrumentRequestHandlerFactory::createParticipantReportRequestHandler     },
+    { QString(R"(^/general_proxy_consent/?$)"),            &InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler   },
 }};
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
@@ -337,3 +341,7 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createParticipantReportRequ
     return new ParticipantReportRequestHandler;
 }
 
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler()
+{
+    return new GeneralProxyConsentRequestHandler;
+}

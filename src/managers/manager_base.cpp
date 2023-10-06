@@ -111,7 +111,7 @@ void ManagerBase::sendJsonData(const QString& filePath)
 
 }
 
-bool ManagerBase::sendCancellation(QString device, QString uuid)
+bool ManagerBase::sendCancellation(QString uuid)
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 
@@ -161,7 +161,7 @@ bool ManagerBase::sendCancellation(QString device, QString uuid)
     return true;
 }
 
-bool ManagerBase::sendComplete(QString device, QString uuid)
+bool ManagerBase::sendComplete(QString uuid)
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 
@@ -211,6 +211,15 @@ bool ManagerBase::sendComplete(QString device, QString uuid)
     return true;
 }
 
+void ManagerBase::setManualEntry(bool isManualEntry)
+{
+    qDebug() << "set manual entry";
+    if (!m_test.isNull()) {
+        qDebug() << "not null";
+        m_test->setManualEntryMode(isManualEntry);
+    }
+}
+
 void ManagerBase::addManualMeasurement()
 {
     return;
@@ -218,8 +227,6 @@ void ManagerBase::addManualMeasurement()
 
 bool ManagerBase::sendResultsToPine(const QString& filePath)
 {
-    qDebug() << "sendResultsToPine: " << filePath;
-
     try
     {
         QString answer_id = m_inputData["answer_id"].toString();
@@ -229,8 +236,6 @@ bool ManagerBase::sendResultsToPine(const QString& filePath)
             return false;
         }
         QByteArray data = file.readAll();
-
-
 
         Poco::Net::initializeSSL();
         Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
@@ -261,8 +266,6 @@ bool ManagerBase::sendResultsToPine(const QString& filePath)
         req.setContentLength(data.length());
         req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
 
-        qDebug() << "sendResultsToPine: " << data.size();
-
         std::ostream &os = session.sendRequest(req);
         os.write(data.constData(), data.size());
         os.flush();
@@ -288,7 +291,38 @@ void ManagerBase::sendHTTPRequest(const QString& method, const QString& endpoint
 
 void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data)
 {
+    Poco::Net::initializeSSL();
+    Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
+    Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
+        Poco::Net::Context::CLIENT_USE, "", "", "",
+        Poco::Net::Context::VERIFY_RELAXED, 9, true,
+        "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
+    );
+    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
 
+    const QString& pinePath = QString(endpoint);
+
+    Poco::URI uri(pinePath.toStdString());
+    Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
+
+    std::string path(uri.getPathAndQuery());
+    if (path.empty()) path = "/";
+
+    Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
+
+    req.setContentType(contentType.toUtf8().toStdString());
+    req.setContentLength(data.length());
+    req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
+
+    std::ostream &os = session.sendRequest(req);
+    os.write(data.constData(), data.size());
+    os.flush();
+
+    Poco::Net::HTTPResponse res;
+
+    std::istream &is = session.receiveResponse(res);
+    std::stringstream ss;
+    Poco::StreamCopier::copyStream(is, ss);
 }
 
 bool ManagerBase::sendFileToPine(const QString& filePath, const QString& fileName)
