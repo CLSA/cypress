@@ -38,7 +38,7 @@ public:
 
     bool isPartial() const;
 
-    void simulate() override;
+    void simulate(const QVariantMap& inputData) override;
 
     const HearingMeasurement &getMeasurement(const QString &, const int &) const;
 

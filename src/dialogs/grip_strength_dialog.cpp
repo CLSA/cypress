@@ -36,12 +36,12 @@ GripStrengthDialog::GripStrengthDialog(QWidget* parent, const CypressSession& se
     columns << TableColumn("REP_2", "Rep 2", new TextDelegate());
     columns << TableColumn("REP_3", "Rep 3", new TextDelegate());
 
-    columns << TableColumn("REP_1_Exclude", "Rep 1 Exclude", new TextDelegate());
-    columns << TableColumn("REP_2_Exclude", "Rep 2 Exclude", new TextDelegate());
-    columns << TableColumn("REP_3_Exclude", "Rep 3 Exclude", new TextDelegate());
+    columns << TableColumn("REP_1_Exclude", "Rep 1 Exclude", new ComboBoxDelegate(QStringList({"No", "Yes"}), true, true, false));
+    columns << TableColumn("REP_2_Exclude", "Rep 2 Exclude", new ComboBoxDelegate(QStringList({"No", "Yes"}), true, true, false));
+    columns << TableColumn("REP_3_Exclude", "Rep 3 Exclude", new ComboBoxDelegate(QStringList({"No", "Yes"}), true, true, false));
 
     // device started
-    connect(manager, &GripStrengthManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &GripStrengthManager::started, ui->measurementTable, [=](TestBase* test) {
         ui->measurementTable->initializeModel(columns);
     });
 

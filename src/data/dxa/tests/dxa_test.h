@@ -2,14 +2,13 @@
 #define DXA_TEST_H
 
 #include "data/test_base.h"
-#include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/ofstd/ofstdinc.h"
 
-enum Side {
-    LEFT,
-    RIGHT,
-    BOTH
-};
+#include "../measurements/ap_spine_measurement.h"
+#include "../measurements/forearm_measurement.h"
+#include "../measurements/hip_measurement.h"
+#include "../measurements/iva_imaging_measurement.h"
+#include "../measurements/whole_body_measurement.h"
 
 class DXATest : public TestBase
 {
@@ -17,21 +16,19 @@ public slots:
     void onDicomDirectoryChange(const QString& path);
 
 public:
+    QScopedPointer<WholeBodyScanMeasurement> wholeBodyMeasurement;
+    QScopedPointer<ForearmMeasurement> forarmMeasurement;
+    QScopedPointer<HipMeasurement> hipMeasurement;
+    QScopedPointer<ApSpineMeasurement> apSpineMeasurement;
+    QScopedPointer<IVAImagingMeasurement> ivaImagingMeasurement;
+
     static const QMap<QString, QString> ranges;
 
-    virtual bool isValid() const = 0;
-    virtual bool isValidDicom(DcmFileFormat &loadedFileFormat) const = 0;
-    virtual void reset() = 0;
+    bool isValid() const override;
+    void reset() override;
 
-    virtual Side getSide() = 0;
-    virtual quint8 getScanType() = 0;
-    virtual QString getName() = 0;
-    virtual QString getBodyPartName() = 0;
-    virtual QString getRefType() = 0;
-    virtual QString getRefSource() = 0;
-
-    virtual QJsonObject toJsonObject() const = 0;
-    virtual QString toString() const = 0;
+    virtual QJsonObject toJsonObject() const override;
+    virtual QString toString() const override;
 };
 
 #endif // DXA_TEST_H

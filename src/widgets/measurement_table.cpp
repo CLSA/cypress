@@ -159,7 +159,7 @@ void MeasurementTable::saveManualChanges()
     ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
 }
 
-void MeasurementTable::updateModel(TestBase<Measurement>* test)
+void MeasurementTable::updateModel(TestBase* test)
 {
     m_test = test;
     if (!m_test)
@@ -168,7 +168,8 @@ void MeasurementTable::updateModel(TestBase<Measurement>* test)
     }
 
     qDebug() << m_test->toJsonObject();
-    const QVector<Measurement> measurements = m_test->getMeasurements();
+
+    const QVector<QSharedPointer<Measurement>> measurements = m_test->getMeasurements();
 
     ui->measurementTable->setRowCount(0);
 
@@ -184,7 +185,7 @@ void MeasurementTable::updateModel(TestBase<Measurement>* test)
             foreach (auto column, m_columns)
             {
                 QTableWidgetItem* item = new QTableWidgetItem();
-                item->setData(Qt::EditRole, measurement.getAttributeValue(column.key));
+                item->setData(Qt::EditRole, measurement->getAttributeValue(column.key));
                 ui->measurementTable->setItem(row, col++, item);
             }
 
@@ -205,7 +206,7 @@ void MeasurementTable::updateModel(TestBase<Measurement>* test)
     }
 }
 
-void MeasurementTable::handleTestUpdate(TestBase<Measurement>* test)
+void MeasurementTable::handleTestUpdate(TestBase* test)
 {
     updateModel(test);
 }

@@ -40,9 +40,9 @@ bool RetinalCameraManager::isAvailable()
 
 void RetinalCameraManager::addManualMeasurement()
 {
-    RetinalCameraMeasurement measurement;
+    QSharedPointer<RetinalCameraMeasurement> measurement(new RetinalCameraMeasurement);
 
-    measurement.setAttribute("EYE_PICT_VENDOR", "");
+    measurement->setAttribute("EYE_PICT_VENDOR", "");
 
     m_test->addMeasurement(measurement);
 

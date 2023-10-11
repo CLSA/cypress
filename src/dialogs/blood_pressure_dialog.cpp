@@ -24,7 +24,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget* parent, const CypressSession& 
     columns << TableColumn("systolic", "Systolic", new TextDelegate("", QRegExp(), false));
 
     // device started
-    connect(manager, &BloodPressureManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &BloodPressureManager::started, ui->measurementTable, [=](TestBase* test) {
         ui->measurementTable->initializeModel(columns);
     });
 

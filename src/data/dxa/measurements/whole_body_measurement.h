@@ -3,10 +3,6 @@
 
 #include "dxa_measurement.h"
 
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
-
 class WholeBodyScanMeasurement : public DXAMeasurement
 {
 public:
@@ -23,6 +19,16 @@ public:
     // String keys are converted to snake_case
     //
     virtual QJsonObject toJsonObject() const;
+
+    // DXAMeasurement interface
+public:
+    bool isValidDicomFile(DcmFileFormat &dicomFileFormat) const;
+    Side getSide();
+    quint8 getScanType();
+    QString getName();
+    QString getBodyPartName();
+    QString getRefType();
+    QString getRefSource();
 };
 
 #endif // WHOLE_BODY_MEASUREMENT_H

@@ -39,7 +39,7 @@ EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session)
     columns << TableColumn("t_offset", "T Offset", new TextDelegate());
 
     // device started
-    connect(manager, &ECGManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &ECGManager::started, ui->measurementTable, [=](TestBase* test) {
         ui->measurementTable->initializeModel(columns);
     });
 

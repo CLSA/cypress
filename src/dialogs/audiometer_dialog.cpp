@@ -1,7 +1,5 @@
 #include "audiometer_dialog.h"
 #include "managers/audiometer/audiometer_manager.h"
-#include "widgets/serial_port_widget.h"
-#include "cypress_application.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -11,14 +9,58 @@ AudiometerDialog::AudiometerDialog(QWidget* parent, const CypressSession& sessio
     DialogBase(parent, session),
     ui(new Ui::AudiometerDialog)
 {
-    qDebug() << "AudiometerDialog::AudiometerDialog()";
-    m_manager.reset(new AudiometerManager(m_session));
-
     ui->setupUi(this);
-    ui->testInfoWidget->setSessionInformation(session);
-    ui->testInfoWidget->setDeviceStatus("Not connected");
-
     setWindowFlags(Qt::WindowFullscreenButtonHint);
+    m_manager.reset(new AudiometerManager(session));
+
+    AudiometerManager* manager = static_cast<AudiometerManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+    columns << TableColumn("side", "Side", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("test", "Test", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("level", "Level", new TextDelegate("", QRegExp(), true));
+
+    // device started
+    connect(manager, &AudiometerManager::started, ui->measurementTable, [=](TestBase* test) {
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &AudiometerManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &AudiometerManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &AudiometerManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &AudiometerManager::success, this, &AudiometerDialog::success);
+
+    // critical error
+    connect(manager, &AudiometerManager::error, this, &AudiometerDialog::error);
+
+    // data changed
+    connect(manager, &AudiometerManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &AudiometerManager::measure);
+
+    connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager, [=]() {
+        manager->setManualEntry(true);
+    });
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &AudiometerManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &AudiometerManager::addManualMeasurement);
 }
 
 AudiometerDialog::~AudiometerDialog()
@@ -31,14 +73,14 @@ AudiometerDialog::~AudiometerDialog()
 //
 void AudiometerDialog::initializeConnections()
 {
-    QSharedPointer<AudiometerManager> audiometerManager = m_manager.staticCast<AudiometerManager>(); // inherits from SerialPortManager
+    //QSharedPointer<AudiometerManager> audiometerManager = m_manager.staticCast<AudiometerManager>(); // inherits from SerialPortManager
 
-    // Scan for devices
-    connect(audiometerManager.get(), &SerialPortManager::scanningDevices, ui->serialPortWidget, &SerialPortWidget::clear);
+    //// Scan for devices
+    //connect(audiometerManager.get(), &SerialPortManager::scanningDevices, ui->serialPortWidget, &SerialPortWidget::clear);
 
-    // Update the drop down list as devices are discovered during scanning
-    connect(audiometerManager.get(), &SerialPortManager::devicesDiscovered, ui->serialPortWidget, &SerialPortWidget::devicesDiscovered);
-    connect(ui->serialPortWidget, &SerialPortWidget::deviceSelected, audiometerManager.get(), &SerialPortManager::deviceSelected);
+    //// Update the drop down list as devices are discovered during scanning
+    //connect(audiometerManager.get(), &SerialPortManager::devicesDiscovered, ui->serialPortWidget, &SerialPortWidget::devicesDiscovered);
+    //connect(ui->serialPortWidget, &SerialPortWidget::deviceSelected, audiometerManager.get(), &SerialPortManager::deviceSelected);
 
     // Ready to connect device
     //connect(audiometerManager.get(), &SerialPortManager::canConnectDevice,

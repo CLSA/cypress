@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QStringBuilder>
+#include <QRandomGenerator>
 
 HearingTest::HearingTest()
 {
@@ -51,7 +52,29 @@ bool HearingTest::isPartial() const
     return okTest;
 }
 
-void HearingTest::simulate() {}
+void HearingTest::simulate(const QVariantMap& inputData)
+{
+    addMetaData("patient_id", inputData["barcode"].toString());
+    addMetaData("test_datetime", QDateTime::currentDateTimeUtc());
+    addMetaData("last_calibration_date", QDateTime::currentDateTimeUtc());
+    addMetaData("test_id", 1);
+
+    QStringList sides = {"left", "right"};
+    QMap<int, QString> frequencyTests = HearingMeasurement::initFrequencyLookup();
+    QMap<int, QString>::const_iterator i;
+
+    foreach (auto side, sides) {
+      for (i = frequencyTests.constBegin(); i != frequencyTests.constEnd(); ++i)
+      {
+        QSharedPointer<HearingMeasurement> measurement(new HearingMeasurement);
+        measurement->setAttribute("side", side);
+        measurement->setAttribute("test", i.value());
+        measurement->setAttribute("level", QRandomGenerator::global()->bounded(1, 101));
+        qDebug() << "addMeasurement";
+        addMeasurement(measurement);
+      }
+    }
+}
 
 QString HearingTest::toString() const
 {

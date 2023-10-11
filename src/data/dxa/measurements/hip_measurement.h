@@ -3,10 +3,6 @@
 
 #include "dxa_measurement.h"
 
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
-
 class HipMeasurement : public DXAMeasurement
 {
 public:
@@ -14,15 +10,25 @@ public:
 
     // String representation for debug and GUI display purposes
     //
-    virtual QString toString() const;
+    virtual QString toString() const override;
 
-    virtual QStringList toStringList(const bool& no_keys = false) const;
+    virtual QStringList toStringList(const bool& no_keys = false) const override;
 
-    virtual bool isValid() const;
+    virtual bool isValid() const override;
 
     // String keys are converted to snake_case
     //
-    virtual QJsonObject toJsonObject() const;
+    virtual QJsonObject toJsonObject() const override;
+
+    // DXAMeasurement interface
+public:
+    bool isValidDicomFile(DcmFileFormat &dicomFileFormat) const override;
+    Side getSide() override;
+    quint8 getScanType() override;
+    QString getName() override;
+    QString getBodyPartName() override;
+    QString getRefType() override;
+    QString getRefSource() override;
 };
 
 #endif // HIP_MEASUREMENT_H

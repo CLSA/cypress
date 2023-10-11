@@ -39,6 +39,8 @@ public:
     static bool isAvailable();
 
 public slots:
+    void start() override;
+
     // retrieve a measurement from the device
     //
     void measure() override;
@@ -56,8 +58,6 @@ private slots:
     void writeDevice() override;
 
 private:
-    HearingTest m_test;
-
     bool hasEndCode(const QByteArray&);
 
     // Reset the session

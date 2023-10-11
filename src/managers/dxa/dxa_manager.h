@@ -14,12 +14,6 @@
 #include "../manager_base.h"
 #include "./dicom/dicom_scp.h"
 
-#include "data/dxa/tests/ap_spine_test.h"
-#include "data/dxa/tests/forearm_test.h"
-#include "data/dxa/tests/hip_test.h"
-#include "data/dxa/tests/iva_imaging_test.h"
-#include "data/dxa/tests/whole_body_test.h"
-
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
  * PatScanDb table (eg., Hip) and the corresponding bonerange code in the RefScanDb ReferenceCurve table (eg., 123.).
@@ -68,12 +62,6 @@ protected slots:
     void dicomServerExitCrash();
 
 private:
-    //ApSpineTest m_apSpineTest;
-    //ForearmTest m_forearmTest;
-    //HipTest m_hipScanTest;
-    //IVAImagingTest m_ivaImagingTest;
-    //WholeBodyScanTest m_wholeBodyTest;
-
     //DicomDirectoryWatcher m_dicomWatcher;
     //DcmRecv m_dcmRecv;
 

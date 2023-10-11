@@ -30,7 +30,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
     columns << TableColumn("EYE_SIDE_VENDOR", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
 
     // device started
-    connect(manager, &RetinalCameraManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &RetinalCameraManager::started, ui->measurementTable, [=](TestBase* test) {
         ui->measurementTable->initializeModel(columns);
     });
 

@@ -31,7 +31,7 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, const CypressSession& sessio
     columns << TableColumn("SIDE", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
 
     // device started
-    connect(manager, &VividiManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &VividiManager::started, ui->measurementTable, [=](TestBase* test) {
         ui->measurementTable->initializeModel(columns);
     });
 

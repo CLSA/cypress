@@ -29,7 +29,7 @@ FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
     columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
 
     // device started
-    connect(manager, &FraxManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &FraxManager::started, ui->measurementTable, [=](TestBase* test) {
         ui->measurementTable->initializeModel(columns);
     });
 

@@ -1,4 +1,5 @@
 #include "temperature_test.h"
+#include "../measurements/temperature_measurement.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -11,7 +12,7 @@ bool TemperatureTest::isValid() const
     {
       foreach(const auto m, m_measurementList)
       {
-        if(!m.isValid())
+            if(!m->isValid())
         {
           okTest = false;
           break;
@@ -29,7 +30,7 @@ QString TemperatureTest::toString() const
       QStringList list;
       foreach(const auto m, m_measurementList)
       {
-        list << m.toString();
+        list << m->toString();
       }
       str = list.join("\n");
     }
@@ -42,9 +43,9 @@ void TemperatureTest::fromArray(const QByteArray &arr)
     {
        // only add to the end and keep the last two tests
        //
-       TemperatureMeasurement m;
-       m.fromArray(arr);
-       if(m.isValid())
+      QSharedPointer<TemperatureMeasurement> m(new TemperatureMeasurement);
+      m->fromArray(arr);
+      if(m->isValid())
        {
          addMeasurement(m);
        }
@@ -56,13 +57,13 @@ QJsonObject TemperatureTest::toJsonObject() const
     QJsonArray jsonArr;
     foreach(const auto m, m_measurementList)
     {
-      jsonArr.append(m.toJsonObject());
+       jsonArr.append(m->toJsonObject());
     }
     QJsonObject json;
     if(!metaDataIsEmpty())
     {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
+      json.insert("metadata",m_metaData.toJsonObject());
     }
-    json.insert("test_results",jsonArr);
+    json.insert("results",jsonArr);
     return json;
 }

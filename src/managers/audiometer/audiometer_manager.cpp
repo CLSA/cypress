@@ -42,7 +42,8 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr)
 AudiometerManager::AudiometerManager(const CypressSession& session)
     : SerialPortManager(session)
 {
-    m_test.setExpectedMeasurementCount(16);
+    m_test.reset(new HearingTest);
+    m_test->setExpectedMeasurementCount(16);
 }
 
 bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
@@ -134,6 +135,12 @@ bool AudiometerManager::isAvailable()
     return false;
 }
 
+void AudiometerManager::start()
+{
+    emit started(m_test.get());
+    emit canMeasure();
+}
+
 bool AudiometerManager::setUp()
 {
     return true;
@@ -152,15 +159,21 @@ void AudiometerManager::setInputData(const QVariantMap& inputData)
 
 void AudiometerManager::measure()
 {
+    m_test->reset();
+    m_test->simulate(QVariantMap({{"barcode", m_session.getBarcode()}}));
+
+    emit measured(m_test.get());
+    emit canFinish();
+
     //clearData();
     //const char cmd[] = { 0x05, '4', 0x0d };
     //m_request = QByteArray::fromRawData(cmd, 3);
     //writeDevice();
-    if (Cypress::getInstance().isSimulation())
-    {
-      sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/audiometer/output.json");
-      return;
-    }
+    //if (Cypress::getInstance().isSimulation())
+    //{
+    //  sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/audiometer/output.json");
+    //  return;
+    //}
 
     //if (results.empty()) return;
 
@@ -180,6 +193,28 @@ void AudiometerManager::measure()
 
 void AudiometerManager::finish()
 {
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionObj = m_session.getJsonObject();
+
+    QJsonObject value = testJson.value("value").toObject();
+    value.insert("session", sessionObj);
+    value.insert("metadata", m_test->getMetaData().toJsonObject());
+    value.insert("manual_entry", m_test->getManualEntryMode());
+
+    testJson.insert("value", value);
+
+    QJsonDocument jsonDoc(testJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH",
+        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
+        "application/json",
+        serializedData
+    );
+
+    emit success("");
     //if(m_port.isOpen())
     //    m_port.close();
 

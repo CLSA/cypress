@@ -1,5 +1,9 @@
 #include "dxa_test.h"
+
+#include "dcmtk/dcmdata/dcfilefo.h"
+
 #include <QDir>
+#include <QJsonObject>
 
 const QMap<QString, QString> DXATest::ranges = {
     // forearm
@@ -67,15 +71,36 @@ void DXATest::onDicomDirectoryChange(const QString &path)
                 qCritical() << "Error loading DICOM file" << absoluteFilePath;
             }
 
-            if (isValidDicom(fileFormat)) {
-                qDebug() << "DICOM file is valid for measurement: " << getName();
-            }
+            //if (isValidDicom(fileFormat)) {
+            //    qDebug() << "DICOM file is valid for measurement: " << getName();
+            //}
         }
         catch (const std::exception& e)
         {
             qCritical() << "Error loading DICOM file" << absoluteFilePath << ": " << e.what();
         }
     }
+}
+
+bool DXATest::isValid() const
+{
+    return false;
+}
+
+void DXATest::reset()
+{
+
+}
+
+QJsonObject DXATest::toJsonObject() const
+{
+    QJsonObject obj{};
+    return obj;
+}
+
+QString DXATest::toString() const
+{
+    return "";
 }
 
 

@@ -104,7 +104,7 @@ bool ForearmMeasurement::isValid() const
     return false;
 }
 
-bool ForearmMeasurement::isValidDicom(DcmFileFormat &loadedFileFormat) const
+bool ForearmMeasurement::isValidDicomFile(DcmFileFormat &loadedFileFormat) const
 {
     OFString value = "";
     DcmDataset* dataset = loadedFileFormat.getDataset();

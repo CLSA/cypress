@@ -1,9 +1,11 @@
 #include "ap_spine_measurement.h"
-#include <QJsonObject>
-#include <QStringList>
 
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
+#include <QJsonObject>
+#include <QStringList>
 
 // { "L1_BMD",         "1..." },
 // { "L2_BMD",         ".2.." },
@@ -24,6 +26,41 @@
 //{ "TOT_L1L2L4_BMD", "12.4" },
 //{ "TOT_L1L3L4_BMD", "1.34" },
 //{ "TOT_L2L3L4_BMD", ".234" },
+
+const QList<QString> m_outputKeyList =
+{
+    "L1_INCLUDED",      // boolean
+    "L1_AREA", 		    // double
+    "L1_BMC",           // double
+    "L1_BMD", 		    // double
+
+    "L1_INCLUDED",      // boolean
+    "L1_AREA", 		    // double
+    "L1_BMC", 		    // double
+    "L1_BMD", 		    // double
+
+    "L1_INCLUDED",  	// boolean
+    "L1_AREA",      	// double
+    "L1_BMC",       	// double
+    "L1_BMD",       	// double
+
+    "L1_INCLUDED",  	// boolean
+    "L1_AREA", 			// double
+    "L1_BMC", 			// double
+    "L1_BMD", 			// double
+
+    "TOT_AREA", 		// double
+    "TOT_BMC", 			// double
+    "TOT_BMD", 			// double
+    "STD_TOT_BMD",  	// double
+    "ROI_TYPE", 		// long
+    "ROI_WIDTH", 		// double
+    "ROI_HEIGHT", 		// double
+
+    "NO_REGIONS", 	    // long
+    "STARTING_REGION",  // long
+    "PHYSICIAN_COMMENT" // string
+};
 
 
 ApSpineMeasurement::ApSpineMeasurement()
@@ -130,6 +167,11 @@ QStringList ApSpineMeasurement::toStringList(const bool& no_keys) const
 };
 
 bool ApSpineMeasurement::isValid() const
+{
+    return false;
+}
+
+bool ApSpineMeasurement::isValidDicomFile(DcmFileFormat& loadedFileFormat) const
 {
     OFString value = "";
     DcmDataset* dataset = loadedFileFormat.getDataset();

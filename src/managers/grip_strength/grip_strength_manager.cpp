@@ -106,7 +106,7 @@ void GripStrengthManager::finish()
 
 void GripStrengthManager::addManualMeasurement()
 {
-    GripStrengthMeasurement measurement;
+    QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
     m_test->addMeasurement(measurement);
 
     emit dataChanged(m_test);

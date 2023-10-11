@@ -100,7 +100,7 @@ void DeviceSimTests::test_ultrasound_sim()
 void DeviceSimTests::test_audiometer_sim()
 {
     HearingTest test;
-    test.simulate();
+    test.simulate(QVariantMap({{"barcode", "12345678" }}));
     qDebug() << test.toJsonObject();
 }
 

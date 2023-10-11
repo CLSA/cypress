@@ -34,10 +34,20 @@
     <widget class="SerialPortWidget" name="serialPortWidget" native="true"/>
    </item>
    <item>
-    <widget class="MeasurementTable" name="measurementTableWidget" native="true"/>
+    <widget class="MeasurementTable" name="measurementTable" native="true"/>
    </item>
    <item>
-    <widget class="SubmissionButtons" name="submissionButtonsWidget" native="true"/>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -52,12 +62,6 @@
    <class>MeasurementTable</class>
    <extends>QWidget</extends>
    <header>widgets/measurement_table.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SubmissionButtons</class>
-   <extends>QWidget</extends>
-   <header>widgets/submission_buttons.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

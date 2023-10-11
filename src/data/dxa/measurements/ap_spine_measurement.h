@@ -3,9 +3,7 @@
 
 #include "dxa_measurement.h"
 
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
+
 
 
 class ApSpineMeasurement : public DXAMeasurement
@@ -13,13 +11,13 @@ class ApSpineMeasurement : public DXAMeasurement
 public:
     ApSpineMeasurement();
 
-    virtual QString toString() const;
+    virtual QString toString() const override;
+    virtual QStringList toStringList(const bool& no_keys = false) const override;
 
-    virtual QStringList toStringList(const bool& no_keys = false) const;
+    bool isValidDicomFile(DcmFileFormat& loadedFileFormat) const override;
 
-    virtual bool isValid() const;
-
-    virtual QJsonObject toJsonObject() const;
+    virtual bool isValid() const override;
+    virtual QJsonObject toJsonObject() const override;
 
     // DXAMeasurement interface
 public:

@@ -1,8 +1,7 @@
 #ifndef TEMPERATURE_TEST_H
 #define TEMPERATURE_TEST_H
 
-#include "../../TestBase.h"
-#include "../measurements/temperature_measurement.h"
+#include "../../test_base.h"
 
 /*!
  * \class TemperatureTest
@@ -15,8 +14,7 @@
  *
  */
 
-class TemperatureTest : public TestBase<TemperatureMeasurement>
-{
+class TemperatureTest : public TestBase {
 public:
     TemperatureTest() = default;
     ~TemperatureTest() = default;
