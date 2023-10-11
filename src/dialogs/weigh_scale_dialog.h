@@ -13,7 +13,6 @@ public:
     ~WeighScaleDialog();
 
 
-
 private:
     void initializeModel() override;
     void initializeConnections() override;

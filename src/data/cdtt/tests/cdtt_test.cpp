@@ -1,6 +1,7 @@
 #include "cdtt_test.h"
-#include "auxiliary/Utilities.h"
-#include "data/excel_query_helper.h"
+#include "../../../auxiliary/Utilities.h"
+#include "../../excel_query_helper.h"
+#include "../measurements/cdtt_measurement.h"
 
 #include <QDebug>
 #include <QJsonObject>
@@ -18,27 +19,27 @@ CDTTTest::CDTTTest()
 {
     // test paramaters from Main sheet
     //
-    m_outputKeyList << "SUBJECT_ID";
-    m_outputKeyList << "DATETIME";
-    m_outputKeyList << "LANGUAGE";
-    m_outputKeyList << "TALKER";
-    m_outputKeyList << "MODE";
-    m_outputKeyList << "DIGITS";
-    m_outputKeyList << "LIST_NUMBER";
-    m_outputKeyList << "MSK_SIGNAL";
-    m_outputKeyList << "TEST_EAR";
-    m_outputKeyList << "SP_LEVEL";
-    m_outputKeyList << "MSK_LEVEL";
-    m_outputKeyList << "SPEECH_RECEPTION_THRESHOLD";
-    m_outputKeyList << "STANDARD_DEVIATION";
-    m_outputKeyList << "REVERSAL_COUNT";
-    m_outputKeyList << "TRIAL_COUNT";
+    m_outputKeyList << "subject_id";
+    m_outputKeyList << "datetime";
+    m_outputKeyList << "language";
+    m_outputKeyList << "talker";
+    m_outputKeyList << "mode";
+    m_outputKeyList << "digits";
+    m_outputKeyList << "list_number";
+    m_outputKeyList << "msk_signal";
+    m_outputKeyList << "test_ear";
+    m_outputKeyList << "sp_level";
+    m_outputKeyList << "msk_level";
+    m_outputKeyList << "speech_reception_threshold";
+    m_outputKeyList << "standard_deviation";
+    m_outputKeyList << "reversal_count";
+    m_outputKeyList << "trial_count";
 }
 
-void CDTTTest::simulate(const QString &barcode)
+void CDTTTest::simulate(const QVariantMap &inputData)
 {
   reset();
-  addMetaData("subject_id",barcode);
+  addMetaData("subject_id", inputData["barcode"].toInt());
   addMetaData("datetime",QDateTime::currentDateTime());
   addMetaData("language","EN_CA");
   addMetaData("talker","Male");
@@ -67,15 +68,14 @@ void CDTTTest::simulate(const QString &barcode)
 
   int numTrial = 24;
   this->setExpectedMeasurementCount(numTrial);
-  addMetaData("trial_count",numTrial);
+
+  addMetaData("trial_count", numTrial);
   int trial = 1;
-  do
-  {
-    CDTTMeasurement measure;
-    measure.simulate(trial);
-    addMeasurement(measure);
-  }
-  while(trial++ != numTrial);
+  do {
+      QSharedPointer<CDTTMeasurement> measure(new CDTTMeasurement);
+      measure->simulate(trial);
+      addMeasurement(measure);
+  } while (trial++ != numTrial);
 }
 
 QStringList CDTTTest::toStringList() const
@@ -99,7 +99,7 @@ QStringList CDTTTest::toStringList() const
     }
     foreach(const auto measure, m_measurementList)
     {
-      list << measure.toString();
+      list << measure->toString();
     }
 
     return list;
@@ -258,9 +258,9 @@ bool CDTTTest::readTrialData(const QSqlDatabase &db)
 
     qDebug() << "-----------getting stimulus digits...";
     // get the stimulus digits
-    helper = ExcelQueryHelper("B13",endCell,sheet);
+    helper = ExcelQueryHelper("B13", endCell, sheet);
 
-    QMap<int,CDTTMeasurement> measures;
+    QMap<int, QSharedPointer<CDTTMeasurement>> measures;
     if((ok = helper.buildQuery(db)))
     {
       helper.setOrder(ExcelQueryHelper::Order::Row);
@@ -268,14 +268,13 @@ bool CDTTTest::readTrialData(const QSqlDatabase &db)
       helper.processQuery();
       obj = helper.getOutput();
       int index = 0;
-      for(auto it = obj.constBegin(), end=obj.constEnd(); it!=end; it++)
-      {
-         CDTTMeasurement m;
-         index++;
-         int trial_number = it.key().remove(0,9).toInt()+1;
-         m.setAttribute("trial",trial_number);
-         m.setAttribute("stimulus",it.value().toVariant());
-         measures[trial_number] = m;
+      for (auto it = obj.constBegin(), end = obj.constEnd(); it != end; it++) {
+        QSharedPointer<CDTTMeasurement> m(new CDTTMeasurement);
+        index++;
+        int trial_number = it.key().remove(0, 9).toInt() + 1;
+        m->setAttribute("trial", trial_number);
+        m->setAttribute("stimulus", it.value().toVariant());
+        measures[trial_number] = m;
       }
       if(num_row != index)
       {
@@ -299,11 +298,10 @@ bool CDTTTest::readTrialData(const QSqlDatabase &db)
       for(auto it = obj.constBegin(), end=obj.constEnd(); it!=end; it++)
       {
         int trial_number = it.key().remove(0,9).toInt()+1;
-        if(measures.contains(trial_number))
-        {
-          CDTTMeasurement m = measures.take(trial_number);
-          m.setAttribute("response",it.value().toVariant());
-          measures[trial_number] = m;
+        if (measures.contains(trial_number)) {
+            QSharedPointer<CDTTMeasurement> m = measures.take(trial_number);
+            m->setAttribute("response", it.value().toVariant());
+            measures[trial_number] = m;
         }
         index++;
       }
@@ -329,9 +327,8 @@ QString CDTTTest::toString() const
     if(isValid())
     {
         QStringList list;
-        foreach(const auto m, m_measurementList)
-        {
-          list << m.toString();
+        foreach (const auto m, m_measurementList) {
+        list << m->toString();
         }
         str = list.join("\n");
     }
@@ -351,17 +348,14 @@ bool CDTTTest::isValid() const
        }
     }
     bool okTest = getMeasurementCount() >= getMinimumMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          qDebug() << "test invalid measurement"<<m;
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (const auto m, m_measurementList) {
+         if (!m->isValid()) {
+             qDebug() << "test invalid measurement" << m;
+             okTest = false;
+             break;
+         }
+       }
     }
     return okMeta && okTest;
 }
@@ -370,16 +364,18 @@ bool CDTTTest::isValid() const
 //
 QJsonObject CDTTTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
-    foreach(const auto m, m_measurementList)
-    {
-      jsonArr.append(m.toJsonObject());
+    QJsonObject value{};
+    QJsonArray jsonArr{};
+
+    foreach (const auto m, m_measurementList) {
+       jsonArr.append(m->toJsonObject());
     }
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
-    }
-    json.insert("test_results",jsonArr);
+
+    QJsonObject json{};
+    value.insert("metadata", m_metaData.toJsonObject());
+    value.insert("results", jsonArr);
+
+    json.insert("value", value);
+
     return json;
 }

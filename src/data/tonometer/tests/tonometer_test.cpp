@@ -1,5 +1,5 @@
 #include "tonometer_test.h"
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -105,11 +105,10 @@ void TonometerTest::fromVariant(const QVariant& var)
                meta = true;
             }
 
-            TonometerMeasurement m;
-            m.fromVariant(obj);
-            if(m.isValid())
-            {
-              addMeasurement(m);
+            QSharedPointer<TonometerMeasurement> m(new TonometerMeasurement);
+            m->fromVariant(obj);
+            if (m->isValid()) {
+               addMeasurement(m);
             }
           }
         }
@@ -119,22 +118,19 @@ void TonometerTest::fromVariant(const QVariant& var)
 QStringList TonometerTest::getMeasurementStrings(const QString &side) const
 {
     QStringList list;
-    if(isValid())
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(side == m.getAttribute("side").toString())
-        {
+    if (isValid()) {
+        foreach (const auto m, m_measurementList) {
+          if (side == m->getAttribute("side").toString()) {
             q_stringMap::const_iterator it = TonometerMeasurement::variableLUT.constBegin();
             while(it != TonometerMeasurement::variableLUT.constEnd())
             {
                QString key = it.key();
                it++;
                if("side" == key) continue;
-               list << QString("%1: %2").arg(key,m.getAttribute(key).toString());
+               list << QString("%1: %2").arg(key, m->getAttribute(key).toString());
             }
+          }
         }
-      }
     }
     return list;
 }
@@ -142,9 +138,13 @@ QStringList TonometerTest::getMeasurementStrings(const QString &side) const
 void TonometerTest::simulate(const QVariantMap& input)
 {
     reset();
+
     qDebug() << "generating simulated data";
-    addMetaData("id",input["barcode"].toString());
+
+    addMetaData("id", input["barcode"].toString());
+
     QVariant value = input["sex"].toString().toLower().startsWith("f") ? 0 : -1;
+
     addMetaData("sex",value);
     addMetaData("date_of_birth",input["date_of_birth"].toDateTime());
 
@@ -175,13 +175,11 @@ void TonometerTest::simulate(const QVariantMap& input)
     QStringList sides = {"left","right"};
     foreach(const auto side, sides)
     {
-        TonometerMeasurement m;
-        m.simulate(side);
-        if(m.isValid())
-        {
+        QSharedPointer<TonometerMeasurement> m(new TonometerMeasurement);
+        m->simulate(side);
+        if (m->isValid()) {
           addMeasurement(m);
-        }
-        else
+        } else
           qDebug() << "ERROR: simulated measurement is invalid";
     }
 }
@@ -194,9 +192,8 @@ QString TonometerTest::toString() const
     if(isValid())
     {
       QStringList list;
-      foreach(const auto m, m_measurementList)
-      {
-         list << m.toString();
+      foreach (const auto m, m_measurementList) {
+          list << m->toString();
       }
       str = list.join("\n");
     }
@@ -215,38 +212,44 @@ bool TonometerTest::isValid() const
        }
     }
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (const auto m, m_measurementList) {
+         if (!m->isValid()) {
+            okTest = false;
+            break;
+         }
+       }
     }
     return okMeta && okTest;
 }
 
 QJsonObject TonometerTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
-    foreach(const auto m, m_measurementList)
-    {
-      jsonArr.append(m.toJsonObject());
+    QJsonObject value{};
+    QJsonArray jsonArr{};
+
+    foreach (const auto m, m_measurementList) {
+       jsonArr.append(m->toJsonObject());
     }
-    QJsonObject json;
+
+    QJsonObject json{};
     if(!metaDataIsEmpty())
     {
         QJsonObject deviceJson;
         QJsonObject metaJson = m_metaData.toJsonObject();
+
         deviceJson.insert("ora_serial_number",metaJson.take("ora_serial_number"));
         deviceJson.insert("ora_software",metaJson.take("ora_software"));
         deviceJson.insert("pc_software",metaJson.take("pc_software"));
-        json.insert("device_data", deviceJson);
-        json.insert("test_meta_data", metaJson);
+
+        value.insert("device_data", deviceJson);
+        value.insert("metadata", metaJson);
     }
-    json.insert("test_results",jsonArr);
+
+    value.insert("results", jsonArr);
+    value.insert("manual_entry", getManualEntryMode());
+
+    json.insert("value", value);
+
     return json;
 }

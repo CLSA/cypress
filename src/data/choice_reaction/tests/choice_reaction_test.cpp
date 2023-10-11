@@ -1,4 +1,5 @@
 #include "choice_reaction_test.h"
+#include "../measurements/choice_reaction_measurement.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -57,10 +58,11 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
                 }
                 else if(ChoiceReactionMeasurement::TEST_CODE == code)
                 {
-                    ChoiceReactionMeasurement measure;
-                    measure.fromString(s);
+                    QSharedPointer<ChoiceReactionMeasurement> measure(new ChoiceReactionMeasurement);
+                    measure->fromString(s);
                     addMeasurement(measure);
-                    qDebug() << "found "<<(measure.isValid()?"VALID":"INVALID")<<"measurement item positions at line " << QString::number(n_line);
+                    qDebug() << "found " << (measure->isValid() ? "VALID" : "INVALID")
+                             << "measurement item positions at line " << QString::number(n_line);
                     qDebug() << measure;
                 }
                 else if((ChoiceReactionMeasurement::TEST_CODE+1) == code)
@@ -140,9 +142,8 @@ QString ChoiceReactionTest::toString() const
     if(isValid())
     {
         QStringList list;
-        foreach(const auto m, m_measurementList)
-        {
-          list << m.toString();
+        foreach (const auto m, m_measurementList) {
+            list << m->toString();
         }
         str = list.join("\n");
     }
@@ -161,16 +162,13 @@ bool ChoiceReactionTest::isValid() const
        }
     }
     bool okTest = 0 < getMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (const auto m, m_measurementList) {
+         if (!m->isValid()) {
+                okTest = false;
+                break;
+         }
+       }
     }
     return okMeta && okTest;
 }
@@ -179,16 +177,19 @@ bool ChoiceReactionTest::isValid() const
 //
 QJsonObject ChoiceReactionTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
-    foreach(const auto m, m_measurementList)
-    {
-      jsonArr.append(m.toJsonObject());
+    QJsonObject value{};
+    QJsonArray jsonArr{};
+
+    foreach (const auto m, m_measurementList) {
+       jsonArr.append(m->toJsonObject());
     }
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
-    }
-    json.insert("test_results",jsonArr);
+
+    QJsonObject json{};
+    value.insert("metadata", m_metaData.toJsonObject());
+    value.insert("results", jsonArr);
+    value.insert("manual_entry", getManualEntryMode());
+
+    json.insert("value", value);
+
     return json;
 }

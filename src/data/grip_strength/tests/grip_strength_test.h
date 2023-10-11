@@ -3,10 +3,10 @@
 
 #include <QDir>
 
-#include "../../TestBase.h"
+#include "../../test_base.h"
 #include "../measurements/grip_strength_measurement.h"
 
-class GripStrengthTest : public TestBase<Measurement>
+class GripStrengthTest : public TestBase
 {
 public:
     GripStrengthTest();

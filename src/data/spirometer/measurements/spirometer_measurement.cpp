@@ -221,9 +221,9 @@ void SpirometerMeasurement::simulate()
      setAttribute("trial_number",number);
      setAttribute("trial_rank",number);
      setAttribute("trial_rank_original",number);
-
      setAttribute("flow_sampling_interval",0.01);
      setAttribute("flow_time_zero_offset",Utilities::interp(-10.0,-5.0,mu),m_precision);
+
      // random array of 1000 flow values 18 digits precision
      QStringList flowValues;
      QStringList volumeValues;
@@ -232,6 +232,7 @@ void SpirometerMeasurement::simulate()
         double phi = QRandomGenerator::global()->generateDouble();
         double flow = Utilities::interp(0.0000000000000000001,2.0000000000000000001,phi);
         double volume = Utilities::interp(1.0000000000000000001,4.0000000000000000001,phi);
+
         flowValues << QString::number(flow,'g',18);
         volumeValues << QString::number(volume,'g',18);
      }

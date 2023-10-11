@@ -1,7 +1,7 @@
 #ifndef CIMTVIVIDIMEASUREMENT_H
 #define CIMTVIVIDIMEASUREMENT_H
 
-#include "Measurement.h"
+#include "measurement.h"
 
 #include <QJsonObject>
 

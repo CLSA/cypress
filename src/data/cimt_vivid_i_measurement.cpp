@@ -1,6 +1,6 @@
 #include "cimt_vivid_i_measurement.h"
 
-#include "auxiliary/file_utils.h"
+//#include "auxiliary/file_utils.h"
 
 CimtVividIMeasurement::CimtVividIMeasurement()
 {

@@ -1,7 +1,7 @@
 #ifndef DXA_TEST_H
 #define DXA_TEST_H
 
-#include "data/TestBase.h"
+#include "data/test_base.h"
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/ofstd/ofstdinc.h"
 
@@ -11,8 +11,7 @@ enum Side {
     BOTH
 };
 
-template <class DxaMeasurement>
-class DXATest: public TestBase<DxaMeasurement>
+class DXATest : public TestBase
 {
 public slots:
     void onDicomDirectoryChange(const QString& path);

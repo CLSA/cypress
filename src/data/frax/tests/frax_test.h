@@ -1,9 +1,9 @@
 #ifndef FRAX_TEST_H
 #define FRAX_TEST_H
 
-#include "../../TestBase.h"
+#include "../../test_base.h"
 
-class FraxTest : public TestBase<Measurement>
+class FraxTest : public TestBase
 {
 public:
     FraxTest();

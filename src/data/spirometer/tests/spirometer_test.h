@@ -1,13 +1,14 @@
 #ifndef SPIROMETER_TEST_H
 #define SPIROMETER_TEST_H
 
-#include "../../TestBase.h"
+#include "../../test_base.h"
 #include "../measurements/spirometer_measurement.h"
+
 #include <QJsonObject>
 
 QT_FORWARD_DECLARE_CLASS(QDomNode)
 
-class SpirometerTest : public TestBase<SpirometerMeasurement>
+class SpirometerTest : public TestBase
 {
 
 public:
@@ -16,13 +17,13 @@ public:
 
     void fromFile(const QString&);
 
-    void simulate(const QVariantMap&);
+    void simulate(const QVariantMap &inputData) override;
 
     // String representation for debug and GUI display purposes
     //
     QString toString() const override;
 
-    QList<QStringList> toStringListList() const;
+    QList<QStringList> toStringListList();
 
     bool isValid() const override;
 

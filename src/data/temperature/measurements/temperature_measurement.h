@@ -1,7 +1,7 @@
 #ifndef TEMPERATURE_MEASUREMENT_H
 #define TEMPERATURE_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 #include "../../../auxiliary/Constants.h"
 
 

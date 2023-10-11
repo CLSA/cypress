@@ -1,4 +1,5 @@
 #include "spirometer_test.h"
+#include "../measurements/spirometer_measurement.h"
 
 #include <QDomDocument>
 #include <QFile>
@@ -226,45 +227,53 @@ SpirometerTest::SpirometerTest()
     m_outputKeyList.append(patientMetaMap.values());
 }
 
-void SpirometerTest::simulate(const QVariantMap &obj)
+void SpirometerTest::simulate(const QVariantMap& inputData)
 {
-  addMetaData("patient_id", obj["barcode"].toString());
-  addMetaData("smoker",obj["smoker"].toBool());
-  addMetaData("gender",obj["gender"].toString());
-  addMetaData("height",obj["height"].toDouble(),"m");
-  addMetaData("weight",obj["weight"].toDouble(),"kg");
-  addMetaData("date_of_birth",obj["date_of_birth"].toDate());
+    //Date                  - date
+    //Number                - number
+    //Rank                  - rank
+    //RankOriginal          - rank_original
+    //Accepted              - accepted, bool
+    //AcceptedOriginal      - accepted_original, bool
 
-  addMetaData("device_type","SPIROSON_AS");
-  addMetaData("device_serial_number","200000");
-  addMetaData("device_software_version","1.4.1.2");
-  addMetaData("asthma",false);
-  addMetaData("copd",false);
-  addMetaData("ethnicity","caucasian");
-  addMetaData("lung_age",54,"yr");
-  addMetaData("original_quality_grade","A");
-  addMetaData("pdf_report_path",QString("C:\\ProgramData\\ndd\\Easy on-PC\\%1.pdf").arg(obj["patient_id"].toString()));
-  addMetaData("quality_grade","A");
-  addMetaData("test_date",QDateTime::currentDateTime());
-  addMetaData("test_type","FVC");
+    addMetaData("patient_id", inputData["barcode"].toString());
+    addMetaData("smoker", inputData["smoker"].toBool());
+    addMetaData("gender", inputData["gender"].toString());
+    addMetaData("height", inputData["height"].toDouble(), "m");
+    addMetaData("weight", inputData["weight"].toDouble(), "kg");
+    addMetaData("date_of_birth", inputData["date_of_birth"].toDate());
 
-  SpirometerMeasurement best;
-  best.setResultType(SpirometerMeasurement::ResultType::typeBestValues);
-  best.simulate();
-  if(best.isValid())
-  {
+    addMetaData("device_type", "SPIROSON_AS");
+    addMetaData("device_serial_number", "200000");
+    addMetaData("device_software_version", "1.4.1.2");
+
+    addMetaData("asthma", false);
+    addMetaData("copd", false);
+
+    addMetaData("ethnicity", "caucasian");
+    addMetaData("lung_age", 54, "yr");
+    addMetaData("original_quality_grade", "A");
+
+    //addMetaData("pdf_report_path",QString("C:\\ProgramData\\ndd\\Easy on-PC\\%1.pdf").arg(inputData["patient_id"].toString()));
+
+    addMetaData("quality_grade", "A");
+    addMetaData("test_date", QDateTime::currentDateTime());
+    addMetaData("test_type", "FVC");
+
+    QSharedPointer<SpirometerMeasurement> best(new SpirometerMeasurement);
+    best->setResultType(SpirometerMeasurement::ResultType::typeBestValues);
+    best->simulate();
+
     addMeasurement(best);
-  }
-  for(int i=0;i<3;i++)
-  {
-      SpirometerMeasurement trial;
-      trial.setResultType(SpirometerMeasurement::ResultType::typeTrial);
-      trial.simulate();
-      if(trial.isValid())
-      {
+
+    for (int i = 0; i < 3; i++) {
+        QSharedPointer<SpirometerMeasurement> trial(new SpirometerMeasurement);
+        trial->setResultType(SpirometerMeasurement::ResultType::typeTrial);
+        trial->simulate();
+
+        qDebug() << "adding trial" << i;
         addMeasurement(trial);
-      }
-  }
+    }
 }
 
 // parse CypressOut.xml
@@ -330,26 +339,28 @@ QString SpirometerTest::toString() const
     return output;
 }
 
-QList<QStringList> SpirometerTest::toStringListList() const
+QList<QStringList> SpirometerTest::toStringListList()
 {
     QList<QStringList> data;
+
     if(isValid())
     {
-        foreach(const auto measurement, m_measurementList)
-        {
-            if(SpirometerMeasurement::ResultType::typeTrial ==
-               static_cast<SpirometerMeasurement>(measurement).getResultType())
-            {
-              if(data.isEmpty())
-              {
-                  qDebug() << "adding attribute keys";
-                 data.append(measurement.getAttributeKeys());
+        for (int i = 0; i < m_measurementList.size(); i++) {
+            SpirometerMeasurement *m = static_cast<SpirometerMeasurement *>(
+                m_measurementList.at(i).get());
+
+            if (SpirometerMeasurement::ResultType::typeTrial == m->getResultType()) {
+              if (data.isEmpty()) {
+                qDebug() << "adding attribute keys";
+                data.append(m->getAttributeKeys());
               }
-              qDebug() << "adding trial" << measurement.getAttribute("trial_number").toString();
-              data.append(measurement.toStringList(true));
+
+              qDebug() << "adding trial" << m->getAttribute("trial_number").toString();
+              data.append(m->toStringList(true));
             }
         }
     }
+
     return data;
 }
 
@@ -365,20 +376,19 @@ bool SpirometerTest::isValid() const
          break;
        }
     }
+
+    qDebug() << "validating number of measurements (4)" << getMeasurementCount();
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    qDebug() << "validating number of measurements (4)"<<getMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          qDebug() << "test invalid measurement" ;
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (const auto m, m_measurementList) {
+         if (!m->isValid()) {
+              qDebug() << "test invalid measurement";
+              okTest = false;
+              break;
+         }
+       }
     }
+
     return okMeta && okTest;
 }
 
@@ -386,41 +396,54 @@ bool SpirometerTest::isValid() const
 //
 QJsonObject SpirometerTest::toJsonObject() const
 {
-    QJsonArray trialJson;
-    QJsonObject bestJson;
-    foreach(const auto measurement, m_measurementList)
-    {
-      if(SpirometerMeasurement::ResultType::typeBestValues ==
-         static_cast<SpirometerMeasurement>(measurement).getResultType())
-        bestJson = measurement.toJsonObject();
-      else
-        trialJson.append(measurement.toJsonObject());
+    QJsonObject value{};
+    QJsonArray trialJson{};
+    QJsonObject bestJson{};
+
+    for (int i = 0; i < m_measurementList.size(); i++) {
+       SpirometerMeasurement *m = static_cast<SpirometerMeasurement *>(
+           m_measurementList.at(i).get());
+       if (SpirometerMeasurement::ResultType::typeBestValues == m->getResultType()) {
+         bestJson = m->toJsonObject();
+       } else {
+         trialJson.append(m->toJsonObject());
+       }
     }
+
     QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      QJsonObject deviceJson;
-      QJsonObject metaJson = m_metaData.toJsonObject();
-      deviceJson.insert("device_type",metaJson.take("device_type"));
-      deviceJson.insert("device_serial_number",metaJson.take("device_serial_number"));
-      deviceJson.insert("device_software_version",metaJson.take("device_software_version"));
-      json.insert("device_data", deviceJson);
-      json.insert("test_meta_data", metaJson);
+    if (!metaDataIsEmpty()) {
+       QJsonObject deviceJson;
+       QJsonObject metaJson = m_metaData.toJsonObject();
+
+       deviceJson.insert("device_type", metaJson.take("device_type"));
+       deviceJson.insert("device_serial_number", metaJson.take("device_serial_number"));
+       deviceJson.insert("device_software_version", metaJson.take("device_software_version"));
+
+       value.insert("device_data", deviceJson);
+       value.insert("metadata", metaJson);
     }
-    json.insert("test_trials", trialJson);
-    json.insert("test_best_values",bestJson);
+
+    value.insert("results", trialJson);
+    value.insert("test_best_values", bestJson);
+    value.insert("manual_entry", getManualEntryMode());
+
+    json.insert("value", value);
+
     return json;
 }
 
 void SpirometerTest::readPDFReportPath(const QDomNode& node)
 {
     QDomElement child = node.firstChildElement("Parameter");
-    if(child.isNull())
-      return;
+    if (child.isNull()) {
+       return;
+    }
 
     qDebug() << child.hasAttribute("Name") << child.tagName() << child.text() << child.attribute("Name");
-    if(child.hasAttribute("Name") && "Attachment" == child.attribute("Name"))
-      addMetaData("pdf_report_path",child.text());
+
+    if (child.hasAttribute("Name") && "Attachment" == child.attribute("Name")) {
+       addMetaData("pdf_report_path", child.text());
+    }
 }
 
 void SpirometerTest::readPatients(const QDomNode& node)
@@ -492,80 +515,74 @@ void SpirometerTest::readPatients(const QDomNode& node)
 void SpirometerTest::readTrials(const QDomNode& node)
 {
     QDomNodeList trialNodeList = node.childNodes();
-    if(trialNodeList.isEmpty())
-    {
-        qDebug() << "no trial child nodes";
-        return;
+    if (trialNodeList.isEmpty()) {
+      qDebug() << "no trial child nodes";
+      return;
     }
 
     qDebug() << "n trials" << trialNodeList.size();
-    for(int i = 0; i < trialNodeList.size(); i++)
-    {
-        SpirometerMeasurement trial;
-        trial.setResultType(SpirometerMeasurement::ResultType::typeTrial);
 
-        QDomNode trialNode = trialNodeList.at(i);
-        if("Trial" != trialNode.toElement().tagName()) continue;
-        QDomNodeList nodeList = trialNode.childNodes();
-        for(int j=0; j<nodeList.size(); j++)
-        {
-          QDomNode node = nodeList.at(j);
-          QDomElement elem = node.toElement();
-          QString tag = elem.tagName();
-          if("ResultParameters" == tag)
-          {
-            readParameters(node, &trial);
-          }
-          else if(tag.startsWith("Channel"))
-          {
-            readChannel(node, &trial);
-          }
-          else if(SpirometerMeasurement::trialMap.contains(tag))
-          {
-            QString s = elem.text();
-            if(s.isEmpty())
-            {
-              trial.setAttribute(SpirometerMeasurement::trialMap[tag],QVariant());
-            }
-            else
-            {
-              if("true" == s || "false" == s)
-              {
-                trial.setAttribute(SpirometerMeasurement::trialMap[tag],"true" == s ? true : false);
-              }
-              else
-              {
-                if("Date" == tag)
-                  trial.setAttribute(SpirometerMeasurement::trialMap[tag],
-                    QDateTime::fromString(s,"yyyy-MM-dd'T'hh:mm:ss.z"));
-                else
-                  trial.setAttribute(SpirometerMeasurement::trialMap[tag],s.toInt());
+    for (int i = 0; i < trialNodeList.size(); i++) {
+      QSharedPointer<SpirometerMeasurement> trial(new SpirometerMeasurement);
+      trial->setResultType(SpirometerMeasurement::ResultType::typeTrial);
+      QDomNode trialNode = trialNodeList.at(i);
+
+      if ("Trial" != trialNode.toElement().tagName()) {
+       continue;
+      }
+
+      QDomNodeList nodeList = trialNode.childNodes();
+
+      for (int j = 0; j < nodeList.size(); j++) {
+       QDomNode node = nodeList.at(j);
+       QDomElement elem = node.toElement();
+       QString tag = elem.tagName();
+
+       if ("ResultParameters" == tag) {
+          readParameters(node, trial.get());
+       } else if (tag.startsWith("Channel")) {
+          readChannel(node, trial.get());
+       } else if (SpirometerMeasurement::trialMap.contains(tag)) {
+          QString s = elem.text();
+          if (s.isEmpty()) {
+            trial->setAttribute(SpirometerMeasurement::trialMap[tag], QVariant());
+          } else {
+            if ("true" == s || "false" == s) {
+              trial->setAttribute(SpirometerMeasurement::trialMap[tag], "true" == s ? true : false);
+            } else {
+              if ("Date" == tag) {
+                trial->setAttribute(SpirometerMeasurement::trialMap[tag],
+                                    QDateTime::fromString(s, "yyyy-MM-dd'T'hh:mm:ss.z"));
+              } else {
+                trial->setAttribute(SpirometerMeasurement::trialMap[tag], s.toInt());
               }
             }
           }
-        }
-        if(trial.isValid())
-        {
-          addMeasurement(trial);
-        }
-        else
-          qDebug() << "ERROR: failed to add trial";
+       }
+      }
+      if (trial->isValid()) {
+       addMeasurement(trial);
+      } else {
+       qDebug() << "ERROR: failed to add trial";
+      }
     }
 }
 
 void SpirometerTest::readBestValues(const QDomNode& node)
 {
-  SpirometerMeasurement best;
-  best.setResultType(SpirometerMeasurement::ResultType::typeBestValues);
-  readParameters(node, &best);
-  qDebug() << "read best values";
-  if(best.isValid())
-  {
-    qDebug() << "OK best values";
-    addMeasurement(best);
-  }
-  else
+    QSharedPointer<SpirometerMeasurement> best(new SpirometerMeasurement);
+
+    best->setResultType(SpirometerMeasurement::ResultType::typeBestValues);
+    readParameters(node, best.get());
+
+    qDebug() << "read best values";
+
+    if (best->isValid()) {
+      qDebug() << "OK best values";
+      addMeasurement(best);
+    } else {
       qDebug() << "ERROR: failed to add best values";
+    }
 }
 
 void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement* measure)
@@ -583,77 +600,70 @@ void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement*
     int precision = measure->getPrecision();
 
     QDomNodeList list = node.childNodes();
-    if(list.isEmpty())
-    {
-        qDebug() << "no parameter child nodes";
-        return;
+    if (list.isEmpty()) {
+      qDebug() << "no parameter child nodes";
+      return;
     }
-    for(int i=0; i<list.count(); i++)
-    {
-       QDomNode child = list.item(i);
-       QDomElement elem = child.toElement();
-       if(elem.hasAttribute("ID"))
-       {
-           QString tag = elem.attribute("ID");
-           if(SpirometerMeasurement::resultMap.contains(tag))
-           {
-               QString key = SpirometerMeasurement::resultMap[tag];
-               QDomNodeList clist = child.childNodes();
-               QJsonObject arr;
-               QJsonObject pred;
-               QJsonObject norm;
-               for(int j=0; j<clist.size(); j++)
-               {
-                   QDomElement celem = clist.item(j).toElement();
-                   QString ctag = celem.tagName();
-                   QString s = celem.text();
-                   if(SpirometerMeasurement::parameterList.contains(ctag) && !s.isEmpty() && "NaN" != s)
-                   {
-                       if("DataValue"==ctag)
-                       {
-                           arr.insert("value",QJsonValue::fromVariant(s.toDouble()));
-                       }
-                       else if("Unit"==ctag)
-                       {
-                           arr.insert("units",s);
-                           pred.insert("units",s);
-                           norm.insert("units",s);
-                       }
-                       else if("PredictedValue"==ctag)
-                       {
-                           pred.insert("value",QJsonValue::fromVariant(s.toDouble()));
-                       }
-                       else if("LLNormalValue"==ctag)
-                       {
-                           norm.insert("value",QJsonValue::fromVariant(s.toDouble()));
-                       }
-                   }
-               }
-               if(arr.contains("value"))
-               {
-                   if(arr.contains("units"))
-                     measure->setAttribute(key,arr["value"].toDouble(),arr["units"].toString(),precision);
-                   else
-                     measure->setAttribute(key,arr["value"].toDouble(),precision);
-               }
-               if(pred.contains("value"))
-               {
-                   QString predName = QString("%1_predicted").arg(key);
-                   if(pred.contains("units"))
-                     measure->setAttribute(predName,pred["value"].toDouble(),pred["units"].toString(),precision);
-                   else
-                     measure->setAttribute(predName,pred["value"].toDouble(),precision);
-               }
-               if(norm.contains("value"))
-               {
-                   QString normName = QString("%1_ll_normal").arg(key);
-                   if(norm.contains("units"))
-                     measure->setAttribute(normName,norm["value"].toDouble(),norm["units"].toString(),precision);
-                   else
-                     measure->setAttribute(normName,norm["value"].toDouble(),precision);
-               }
-           }
+    for (int i = 0; i < list.count(); i++) {
+      QDomNode child = list.item(i);
+      QDomElement elem = child.toElement();
+      if (elem.hasAttribute("ID")) {
+       QString tag = elem.attribute("ID");
+       if (SpirometerMeasurement::resultMap.contains(tag)) {
+          QString key = SpirometerMeasurement::resultMap[tag];
+          QDomNodeList clist = child.childNodes();
+          QJsonObject arr;
+          QJsonObject pred;
+          QJsonObject norm;
+          for (int j = 0; j < clist.size(); j++) {
+            QDomElement celem = clist.item(j).toElement();
+            QString ctag = celem.tagName();
+            QString s = celem.text();
+            if (SpirometerMeasurement::parameterList.contains(ctag) && !s.isEmpty() && "NaN" != s) {
+              if ("DataValue" == ctag) {
+                arr.insert("value", QJsonValue::fromVariant(s.toDouble()));
+              } else if ("Unit" == ctag) {
+                arr.insert("units", s);
+                pred.insert("units", s);
+                norm.insert("units", s);
+              } else if ("PredictedValue" == ctag) {
+                pred.insert("value", QJsonValue::fromVariant(s.toDouble()));
+              } else if ("LLNormalValue" == ctag) {
+                norm.insert("value", QJsonValue::fromVariant(s.toDouble()));
+              }
+            }
+          }
+          if (arr.contains("value")) {
+            if (arr.contains("units"))
+              measure->setAttribute(key,
+                                    arr["value"].toDouble(),
+                                    arr["units"].toString(),
+                                    precision);
+            else
+              measure->setAttribute(key, arr["value"].toDouble(), precision);
+          }
+          if (pred.contains("value")) {
+            QString predName = QString("%1_predicted").arg(key);
+            if (pred.contains("units"))
+              measure->setAttribute(predName,
+                                    pred["value"].toDouble(),
+                                    pred["units"].toString(),
+                                    precision);
+            else
+              measure->setAttribute(predName, pred["value"].toDouble(), precision);
+          }
+          if (norm.contains("value")) {
+            QString normName = QString("%1_ll_normal").arg(key);
+            if (norm.contains("units"))
+              measure->setAttribute(normName,
+                                    norm["value"].toDouble(),
+                                    norm["units"].toString(),
+                                    precision);
+            else
+              measure->setAttribute(normName, norm["value"].toDouble(), precision);
+          }
        }
+      }
     }
 }
 
@@ -666,33 +676,25 @@ void SpirometerTest::readChannel(const QDomNode& node, SpirometerMeasurement* me
     qDebug() << "reading" << prefix << "channel";
     int precision = measure->getPrecision();
 
-    foreach(const auto tag, SpirometerMeasurement::channelMap.toStdMap())
-    {
+    foreach (const auto tag, SpirometerMeasurement::channelMap.toStdMap()) {
       QDomNodeList list = elem.elementsByTagName(tag.first);
-      if(!list.isEmpty())
-      {
-        QDomElement elem = list.item(0).toElement();
-        QString key = QString("%1_%2").arg(prefix,tag.second);
+      if (!list.isEmpty()) {
+       QDomElement elem = list.item(0).toElement();
+       QString key = QString("%1_%2").arg(prefix, tag.second);
 
-        // only insert the sampling values if the xml element has the correct attribute
-        if("SamplingValues" == tag.first)
-        {
-          if(elem.hasAttribute("TypeOfData"))
-          {
+       // only insert the sampling values if the xml element has the correct attribute
+       if ("SamplingValues" == tag.first) {
+          if (elem.hasAttribute("TypeOfData")) {
             QStringList values = elem.text().split(" ");
-            measure->setAttribute(key,values.join(","));
+            measure->setAttribute(key, values.join(","));
             QString numKey = QString("%1_value_count").arg(prefix);
-            measure->setAttribute(numKey,values.count());
+            measure->setAttribute(numKey, values.count());
           }
-        }
-        else if("SamplingInterval" == tag.first || "TimeZeroOffset" == tag.first)
-        {
-          measure->setAttribute(key,elem.text().toDouble(),precision);
-        }
-        else
-        {
-          measure->setAttribute(key,elem.text().toInt());
-        }
+       } else if ("SamplingInterval" == tag.first || "TimeZeroOffset" == tag.first) {
+          measure->setAttribute(key, elem.text().toDouble(), precision);
+       } else {
+          measure->setAttribute(key, elem.text().toInt());
+       }
       }
     }
 }

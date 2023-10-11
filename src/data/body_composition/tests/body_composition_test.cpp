@@ -1,6 +1,6 @@
 #include "body_composition_test.h"
-
-#include "../../../auxiliary/Utilities.h"
+#include "auxiliary/Utilities.h"
+#include "data/body_composition/measurements/body_composition_measurement.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -30,16 +30,13 @@ bool BodyCompositionTest::isValid() const
        }
     }
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (const auto m, m_measurementList) {
+         if (!m->isValid()) {
+             okTest = false;
+             break;
+         }
+       }
     }
     return okMeta && okTest;
 }
@@ -54,7 +51,10 @@ QStringList BodyCompositionTest::toStringList() const
       list << QString("test datetime: %1").arg(getMetaDataAsString("test_datetime"));
       list << QString("age: %1").arg(getMetaDataAsString("age"));
       list << QString("height: %1").arg(getMetaDataAsString("height"));
-      const BodyCompositionMeasurement& m = getMeasurement(0);
+
+      const BodyCompositionMeasurement &m = static_cast<BodyCompositionMeasurement &>(
+          getMeasurement(0));
+
       list << QString("weight: %1").arg(m.getAttribute("weight").toString());
       list << QString("percent fat: %1").arg(m.getAttribute("percent_fat").toString());
       list << QString("fat mass: %1").arg(m.getAttribute("fat_mass").toString());
@@ -77,130 +77,130 @@ QString BodyCompositionTest::toString() const
     return str;
 }
 
-void BodyCompositionTest::simulate(
-        const double& age,
-        const QString& gender,
-        double height)
-{
-    addMetaData("test_datetime", QDateTime::currentDateTime());
-    addMetaData("body_type", "standard");
-    addMetaData("gender", gender);
-    addMetaData("age", age, "yr"); // integer
-
-    QString sys = Constants::getUnitsSystemName(m_unitsSystem);
-    QString units = "metric" == sys ? "cm" : "in";
-    addMetaData("height", height, units);
-
-    BodyCompositionMeasurement measure;
-    int precision = measure.getPrecision();
-    units = "metric" == sys ? "kg" : "lb";
-
-    double mu = QRandomGenerator::global()->generateDouble();
-
-    // BJ Devine formula 1974
-    // get number of inches over 5'
-    //
-    double weight = ("male" == gender) ? 50.0f : 45.5f;
-    double over = (("metric" == sys) ? height/2.54f : height ) - 60.0f;
-    if(0.0 < over)
-      weight += 2.3f*over;
-
-    weight = ("metric" == sys) ? weight : (weight * 2.20462f);
-    measure.setAttribute("weight", weight, units, precision);
-
-    double impedance = QRandomGenerator::global()->bounded(150,900);
-    measure.setAttribute("impedance", impedance, "ohm", precision);
-
-    // possible range is gender and age dependent
-    // for adults 40 - 60+ range is 14% - 35%
-    //
-    double pfat = Utilities::interp(14.0f,35.0f,mu);
-    measure.setAttribute("percent_fat", pfat, "%", precision);
-    double fmass = 0.01f * pfat * weight;
-    measure.setAttribute("fat_mass", fmass, units, precision);
-    double ffmass = weight - fmass;
-    measure.setAttribute("fat_free_mass", ffmass, units, precision);
-
-    // normal range for women varies betw 45% and 60%
-    // normal range for men varies betw 50% and 65%
-    //
-    double wmass = weight * Utilities::interp(0.45f,0.65f,mu);
-    measure.setAttribute("total_body_water", wmass, units, precision);
-
-    units = "metric" == sys ? "kg/cm2" : "lb/in2";
-    double bmi = weight / (height*height);
-    measure.setAttribute("body_mass_index", bmi, units, precision);
-
-    // TODO: check if bmr is always givin in kJ
-    // conversions:
-    // 1 kcal = 4.187 kJ
-    // 1 kJ = 0.2388 kcal
-    //
-
-    // metric bmr formula [Tanita blog source]:
-    // men = 66 + 13.7*weight(kg) + 5*height(cm) - 6.85*age(yr) [calories]
-    // women = 655 + 9.6*weight(kg) + 1.85*height(cm) - 4.7*age(yr) [calories]
-    //
-    double wcoeff = ("male" == gender) ? 13.7f : 9.6f;
-    double hcoeff = ("male" == gender) ? 5.0f : 1.85f;
-    double acoeff = ("male" == gender) ? 6.85f : 4.7f;
-    double bcoeff = ("male" == gender) ? 66.0f : 655.0f;
-
-    if("imperial" == sys)
-    {
-       weight *= 0.453592f;
-       height *= 2.54f;
-    }
-    double bmr = bcoeff + wcoeff*weight + hcoeff*height + acoeff*age;
-    bmr = bmr * 4.184f / 1000.0f;
-    measure.setAttribute("basal_metabolic_rate", bmr, "kJ", precision);
-
-    addMeasurement(measure);
-}
+//void BodyCompositionTest::simulate(
+//        const double& age,
+//        const QString& gender,
+//        double height)
+//{
+//    addMetaData("test_datetime", QDateTime::currentDateTime());
+//    addMetaData("body_type", "standard");
+//    addMetaData("gender", gender);
+//    addMetaData("age", age, "yr"); // integer
+//
+//    QString sys = Constants::getUnitsSystemName(m_unitsSystem);
+//    QString units = "metric" == sys ? "cm" : "in";
+//    addMetaData("height", height, units);
+//
+//    BodyCompositionMeasurement measure;
+//    int precision = measure.getPrecision();
+//    units = "metric" == sys ? "kg" : "lb";
+//
+//    double mu = QRandomGenerator::global()->generateDouble();
+//
+//    // BJ Devine formula 1974
+//    // get number of inches over 5'
+//    //
+//    double weight = ("male" == gender) ? 50.0f : 45.5f;
+//    double over = (("metric" == sys) ? height/2.54f : height ) - 60.0f;
+//    if(0.0 < over)
+//      weight += 2.3f*over;
+//
+//    weight = ("metric" == sys) ? weight : (weight * 2.20462f);
+//    measure.setAttribute("weight", weight, units, precision);
+//
+//    double impedance = QRandomGenerator::global()->bounded(150,900);
+//    measure.setAttribute("impedance", impedance, "ohm", precision);
+//
+//    // possible range is gender and age dependent
+//    // for adults 40 - 60+ range is 14% - 35%
+//    //
+//    double pfat = Utilities::interp(14.0f,35.0f,mu);
+//    measure.setAttribute("percent_fat", pfat, "%", precision);
+//    double fmass = 0.01f * pfat * weight;
+//    measure.setAttribute("fat_mass", fmass, units, precision);
+//    double ffmass = weight - fmass;
+//    measure.setAttribute("fat_free_mass", ffmass, units, precision);
+//
+//    // normal range for women varies betw 45% and 60%
+//    // normal range for men varies betw 50% and 65%
+//    //
+//    double wmass = weight * Utilities::interp(0.45f,0.65f,mu);
+//    measure.setAttribute("total_body_water", wmass, units, precision);
+//
+//    units = "metric" == sys ? "kg/cm2" : "lb/in2";
+//    double bmi = weight / (height*height);
+//    measure.setAttribute("body_mass_index", bmi, units, precision);
+//
+//    // TODO: check if bmr is always givin in kJ
+//    // conversions:
+//    // 1 kcal = 4.187 kJ
+//    // 1 kJ = 0.2388 kcal
+//    //
+//
+//    // metric bmr formula [Tanita blog source]:
+//    // men = 66 + 13.7*weight(kg) + 5*height(cm) - 6.85*age(yr) [calories]
+//    // women = 655 + 9.6*weight(kg) + 1.85*height(cm) - 4.7*age(yr) [calories]
+//    //
+//    double wcoeff = ("male" == gender) ? 13.7f : 9.6f;
+//    double hcoeff = ("male" == gender) ? 5.0f : 1.85f;
+//    double acoeff = ("male" == gender) ? 6.85f : 4.7f;
+//    double bcoeff = ("male" == gender) ? 66.0f : 655.0f;
+//
+//    if("imperial" == sys)
+//    {
+//       weight *= 0.453592f;
+//       height *= 2.54f;
+//    }
+//    double bmr = bcoeff + wcoeff*weight + hcoeff*height + acoeff*age;
+//    bmr = bmr * 4.184f / 1000.0f;
+//    measure.setAttribute("basal_metabolic_rate", bmr, "kJ", precision);
+//
+//    addMeasurement(measure);
+//}
 
 // The manager class provides the data after validating
 // it via hasEndCode(arr) before passing to this class
 //
 void BodyCompositionTest::fromArray(const QByteArray &arr)
 {
-    if(!arr.isEmpty())
-    {
-      reset();
-      m_array = arr;
-      Constants::UnitsSystem unitsSystem = getUnitsSystem();
-      QString sys = Constants::getUnitsSystemName(unitsSystem);
+    //if(!arr.isEmpty())
+    //{
+    //  reset();
+    //  m_array = arr;
+    //  Constants::UnitsSystem unitsSystem = getUnitsSystem();
+    //  QString sys = Constants::getUnitsSystemName(unitsSystem);
 
-      // NOTE: input body type can be overridden by the analyzer
-      // depending on age and gender.  The body type used by
-      // analyzer is recovered from the test output data here.
-      //
-      addMetaData("test_datetime", QDateTime::currentDateTime());
-      addMetaData("body_type", readBodyType());
-      addMetaData("gender", readGender());
-      addMetaData("age", readAge());
+    //  // NOTE: input body type can be overridden by the analyzer
+    //  // depending on age and gender.  The body type used by
+    //  // analyzer is recovered from the test output data here.
+    //  //
+    //  addMetaData("test_datetime", QDateTime::currentDateTime());
+    //  addMetaData("body_type", readBodyType());
+    //  addMetaData("gender", readGender());
+    //  addMetaData("age", readAge());
 
-      QString units = "metric" == sys ? "cm" : "in";
-      addMetaData("height", readHeight(), units);
+    //  QString units = "metric" == sys ? "cm" : "in";
+    //  addMetaData("height", readHeight(), units);
 
-      BodyCompositionMeasurement m;
-      units = "metric" == sys ? "kg" : "lb";
-      m.setAttribute("weight", readWeight(), units);
-      m.setAttribute("impedance", readImpedance(), "ohm");
-      m.setAttribute("percent_fat", readFatPercent(), "%");
-      m.setAttribute("fat_mass", readFatMass(), units);
-      m.setAttribute("fat_free_mass", readFatFreeMass(), units);
-      m.setAttribute("total_body_water", readTotalBodyWater(), units);
-      units = "metric" == sys ? "kg/cm2" : "lb/in2";
-      m.setAttribute("body_mass_index", readBMI(), units);
+    //  BodyCompositionMeasurement m;
+    //  units = "metric" == sys ? "kg" : "lb";
+    //  m.setAttribute("weight", readWeight(), units);
+    //  m.setAttribute("impedance", readImpedance(), "ohm");
+    //  m.setAttribute("percent_fat", readFatPercent(), "%");
+    //  m.setAttribute("fat_mass", readFatMass(), units);
+    //  m.setAttribute("fat_free_mass", readFatFreeMass(), units);
+    //  m.setAttribute("total_body_water", readTotalBodyWater(), units);
+    //  units = "metric" == sys ? "kg/cm2" : "lb/in2";
+    //  m.setAttribute("body_mass_index", readBMI(), units);
 
-      // TODO: check if bmr is always givin in kJ
-      // conversions:
-      // 1 kcal = 4.187 kJ
-      // 1 kJ = 0.2388 kcal
-      //
-      m.setAttribute("basal_metabolic_rate", readBMR(), "kJ");
-      addMeasurement(m);
-    }
+    //  // TODO: check if bmr is always givin in kJ
+    //  // conversions:
+    //  // 1 kcal = 4.187 kJ
+    //  // 1 kJ = 0.2388 kcal
+    //  //
+    //  m.setAttribute("basal_metabolic_rate", readBMR(), "kJ");
+    //  addMeasurement(m);
+    //}
 }
 
 QString BodyCompositionTest::readArray(const quint8 &begin, const quint8 &end) const
@@ -379,13 +379,13 @@ QJsonObject BodyCompositionTest::toJsonObject() const
     QJsonArray jsonArr;
     foreach(const auto m, m_measurementList)
     {
-      jsonArr.append(m.toJsonObject());
+      jsonArr.append(m->toJsonObject());
     }
     QJsonObject json;
     if(!metaDataIsEmpty())
     {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
+      json.insert("metadata", m_metaData.toJsonObject());
     }
-    json.insert("test_results",jsonArr);
+    json.insert("results", jsonArr);
     return json;
 }

@@ -1,14 +1,14 @@
 #ifndef RETINALCAMERATEST_H
 #define RETINALCAMERATEST_H
 
-#include "data/TestBase.h"
+#include "../test_base.h"
 
-class RetinalCameraTest : public TestBase<Measurement>
+class RetinalCameraTest : public TestBase
 {
 public:
     RetinalCameraTest();
 
-    void simulate();
+    void simulate() override;
     bool isValid() const override;
 
     QJsonObject toJsonObject() const override;

@@ -27,10 +27,10 @@
 #include <QJsonDocument>
 #include <QVariantMap>
 
-ManagerBase::ManagerBase(const CypressSession& session):
-    m_session(session),
-    m_inputData(jsonObjectToVariantMap(m_session.getInputData())),
-    m_settings(CypressSettings::getInstance())
+ManagerBase::ManagerBase(const CypressSession &session)
+    : m_session(session)
+    , m_settings(CypressSettings::getInstance())
+    , m_inputData(jsonObjectToVariantMap(m_session.getInputData()))
 {
 }
 

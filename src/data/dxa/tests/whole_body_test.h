@@ -4,25 +4,15 @@
 #include <QString>
 #include <QList>
 
-#include "./dxa_test.h"
-#include "../measurements/whole_body_measurement.h"
+#include "data/test_base.h"
 
-
-class WholeBodyScanTest: public DXATest<WholeBodyScanMeasurement>
+class WholeBodyScanTest : public TestBase
 {
 public:
     explicit WholeBodyScanTest();
 
     bool isValid() const override;
-    bool isValidDicom(DcmFileFormat &loadedFileFormat) const override;
     void reset() override;
-
-    Side getSide() override;
-    quint8 getScanType() override;
-    QString getName() override;
-    QString getBodyPartName() override;
-    QString getRefType() override;
-    QString getRefSource() override;
 
     QString toString() const override;
     QJsonObject toJsonObject() const override;

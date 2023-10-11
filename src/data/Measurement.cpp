@@ -1,4 +1,4 @@
-#include "Measurement.h"
+#include "measurement.h"
 #include "../auxiliary/Constants.h"
 
 #include <QDebug>
@@ -27,6 +27,91 @@ void Measurement::reset()
     m_attributes.clear();
 }
 
+void Measurement::remove(const QStringList &list)
+{
+    foreach (const auto key, list)
+      removeAttribute(key);
+}
+
+void Measurement::removeAttribute(const QString &key)
+{
+    m_attributes.remove(key);
+}
+
+void Measurement::setAttribute(const QString &key,
+                               const QVariant &value,
+                               const QString &units,
+                               const quint16 &precision)
+{
+    setAttribute(key, Measurement::Value(value, units, precision));
+}
+
+void Measurement::setAttribute(const QString &key, const QVariant &value)
+{
+    setAttribute(key, Measurement::Value(value));
+}
+
+void Measurement::setAttribute(const QString &key, const QVariant &value, const quint16 &precision)
+{
+    setAttribute(key, Measurement::Value(value, precision));
+}
+
+void Measurement::setAttribute(const QString &key, const Value &value)
+{
+    m_attributes[key] = value;
+}
+
+Measurement::Value Measurement::getAttribute(const QString &key) const
+{
+    return m_attributes.contains(key) ? m_attributes[key] : Value();
+}
+
+QVariant Measurement::getAttributeValue(const QString &key) const
+{
+    return m_attributes.contains(key) ? m_attributes[key].value() : QVariant();
+}
+
+const QMap<QString, Measurement::Value> Measurement::getAttributes() const
+{
+    return m_attributes;
+}
+
+const QList<QString> Measurement::getAttributeKeys() const
+{
+    return m_attributes.keys();
+}
+
+bool Measurement::hasAttribute(const QString &key) const
+{
+    return m_attributes.contains(key) && !m_attributes[key].isNull();
+}
+
+bool Measurement::hasUnits(const QString &key) const
+{
+    return (hasAttribute(key) && m_attributes[key].hasUnits());
+}
+
+int Measurement::size() const
+{
+    return m_attributes.size();
+}
+
+bool Measurement::isEmpty() const
+{
+    return m_attributes.isEmpty();
+}
+
+void Measurement::setPrecision(const int &precision)
+{
+    if (0 < precision)
+      m_precision = precision;
+}
+
+int Measurement::getPrecision() const
+{
+    return m_precision;
+}
+
 QStringList Measurement::toStringList(const bool& no_keys) const
 {
     QStringList list;
@@ -37,6 +122,46 @@ QStringList Measurement::toStringList(const bool& no_keys) const
       list << (no_keys ? value.toString() : QString("%1: %2").arg(key,value.toString()));
     }
     return list;
+}
+
+Measurement::Measurement() {}
+
+Measurement::Measurement(const Measurement &other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement::Measurement(Measurement &other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement::Measurement(const Measurement &&other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement::Measurement(Measurement &&other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement &Measurement::operator=(const Measurement &other)
+{
+    if (this != &other) {
+      m_attributes = other.m_attributes;
+    }
+    return *this;
+}
+
+bool Measurement::operator==(const Measurement &rhs) const
+{
+    return (this->getAttributes() == rhs.getAttributes());
+}
+
+bool Measurement::operator!=(const Measurement &rhs)
+{
+    return !(*this == rhs);
 }
 
 QString Measurement::toString() const
@@ -109,6 +234,17 @@ Measurement::Value& Measurement::Value::operator=(const Value& other)
     return *this;
 }
 
+bool Measurement::Value::operator==(const Value &rhs) const
+{
+    return (this->value() == rhs.value() && this->units() == rhs.units()
+            && this->precision() == rhs.precision());
+}
+
+bool Measurement::Value::operator!=(const Value &rhs) const
+{
+    return !(*this == rhs);
+}
+
 bool Measurement::Value::hasUnits() const
 {
     return (!m_units.isEmpty() && 0 < m_units.length());
@@ -116,7 +252,7 @@ bool Measurement::Value::hasUnits() const
 
 bool Measurement::Value::isNull() const
 {
-   return m_value.isNull();
+    return m_value.isNull();
 }
 
 QString Measurement::Value::toString() const
@@ -170,4 +306,19 @@ QString Measurement::Value::toString() const
     {
       return str;
     }
+}
+
+QVariant Measurement::Value::value() const
+{
+    return m_value;
+}
+
+QString Measurement::Value::units() const
+{
+    return m_units;
+}
+
+quint16 Measurement::Value::precision() const
+{
+    return m_precision;
 }

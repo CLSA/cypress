@@ -71,35 +71,40 @@ void FraxTest::fromFile(const QString& fileName)
         reset();
 
         QStringList list = line.split(",");
-        if(17 == list.size())
-        {
-           FraxMeasurement m;
-           m.setAttribute("TYPE","osteoporotic_fracture");
-           m.setAttribute("PROBABILITY", list.at(13).toDouble(), "%");
-           addMeasurement(m);
-           m.setAttribute("TYPE","hip_fracture");
-           m.setAttribute("PROBABILITY", list.at(14).toDouble(), "%");
-           addMeasurement(m);
-           m.setAttribute("TYPE","osteoporotic_fracture_bmd");
-           m.setAttribute("PROBABILITY", list.at(15).toDouble(), "%");
-           addMeasurement(m);
-           m.setAttribute("TYPE","hip_fracture_bmd");
-           m.setAttribute("PROBABILITY", list.at(16).toDouble(), "%");
-           addMeasurement(m);
+        if (17 == list.size()) {
+          QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
+          measure1->setAttribute("TYPE", "osteoporotic_fracture");
+          measure1->setAttribute("PROBABILITY", list.at(13).toDouble(), "%");
+          addMeasurement(measure1);
 
-           addMetaData("TYPE",list.at(0).toLower());
-           addMetaData("COUNTRY_CODE",list.at(1).toUInt());
-           addMetaData("AGE",list.at(2).toDouble(),"yr");
-           addMetaData("SEX",list.at(3).toUInt());
-           addMetaData("BODY_MASS_INDEX",list.at(4).toDouble(),"kg/m2");
-           addMetaData("PREVIOUS_FRACTURE",list.at(5).toUInt());
-           addMetaData("PARENT_HIP_FRACTURE",list.at(6).toUInt());
-           addMetaData("CURRENT_SMOKER",list.at(7).toUInt());
-           addMetaData("GLUCCOCORTICOID",list.at(8).toUInt());
-           addMetaData("RHEUMATOID_ARTHRITIS",list.at(9).toUInt());
-           addMetaData("SECONDARY_OSTEOPOROSIS",list.at(10).toUInt());
-           addMetaData("ALCOHOL",list.at(11).toUInt());
-           addMetaData("FEMORAL_NECK_TSCORE",list.at(12).toDouble());
+          QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
+          measure2->setAttribute("TYPE", "hip_fracture");
+          measure2->setAttribute("PROBABILITY", list.at(14).toDouble(), "%");
+          addMeasurement(measure2);
+
+          QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
+          measure3->setAttribute("TYPE", "osteoporotic_fracture_bmd");
+          measure3->setAttribute("PROBABILITY", list.at(15).toDouble(), "%");
+          addMeasurement(measure3);
+
+          QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
+          measure4->setAttribute("TYPE", "hip_fracture_bmd");
+          measure4->setAttribute("PROBABILITY", list.at(16).toDouble(), "%");
+          addMeasurement(measure4);
+
+          addMetaData("TYPE", list.at(0).toLower());
+          addMetaData("COUNTRY_CODE", list.at(1).toUInt());
+          addMetaData("AGE", list.at(2).toDouble(), "yr");
+          addMetaData("SEX", list.at(3).toUInt());
+          addMetaData("BODY_MASS_INDEX", list.at(4).toDouble(), "kg/m2");
+          addMetaData("PREVIOUS_FRACTURE", list.at(5).toUInt());
+          addMetaData("PARENT_HIP_FRACTURE", list.at(6).toUInt());
+          addMetaData("CURRENT_SMOKER", list.at(7).toUInt());
+          addMetaData("GLUCCOCORTICOID", list.at(8).toUInt());
+          addMetaData("RHEUMATOID_ARTHRITIS", list.at(9).toUInt());
+          addMetaData("SECONDARY_OSTEOPOROSIS", list.at(10).toUInt());
+          addMetaData("ALCOHOL", list.at(11).toUInt());
+          addMetaData("FEMORAL_NECK_TSCORE", list.at(12).toDouble());
         }
     }
 }
@@ -135,28 +140,31 @@ void FraxTest::simulate(const QVariantMap& input)
         addMetaData(key,value);
     }
 
-    FraxMeasurement m;
+    QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
     double mu = QRandomGenerator::global()->generateDouble();
 
-    m.setAttribute("TYPE","osteoporotic_fracture");
+    measure1->setAttribute("TYPE", "osteoporotic_fracture");
     double p = Utilities::interp(1.0f,30.0f,mu);
-    m.setAttribute("PROBABILITY", p, "%");
-    addMeasurement(m);
+    measure1->setAttribute("PROBABILITY", p, "%");
+    addMeasurement(measure1);
 
-    m.setAttribute("TYPE","hip_fracture");
+    QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
+    measure2->setAttribute("TYPE", "hip_fracture");
     p = Utilities::interp(0.0f,13.0f,mu);
-    m.setAttribute("PROBABILITY", p, "%");
-    addMeasurement(m);
+    measure2->setAttribute("PROBABILITY", p, "%");
+    addMeasurement(measure2);
 
-    m.setAttribute("TYPE","osteoporotic_fracture_bmd");
+    QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
+    measure3->setAttribute("TYPE", "osteoporotic_fracture_bmd");
     p = Utilities::interp(2.0f,22.0f,mu);
-    m.setAttribute("PROBABILITY", p, "%");
-    addMeasurement(m);
+    measure3->setAttribute("PROBABILITY", p, "%");
+    addMeasurement(measure3);
 
-    m.setAttribute("TYPE","hip_fracture_bmd");
+    QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
+    measure4->setAttribute("TYPE", "hip_fracture_bmd");
     p = Utilities::interp(0.0f,8.0f,mu);
-    m.setAttribute("PROBABILITY", p, "%");
-    addMeasurement(m);
+    measure4->setAttribute("PROBABILITY", p, "%");
+    addMeasurement(measure4);
 }
 
 // String representation for debug and GUI display purposes
@@ -169,7 +177,7 @@ QString FraxTest::toString() const
       QStringList list;
       foreach(const auto measurement, m_measurementList)
       {
-        list << measurement.toString();
+        list << measurement->toString();
       }
       str = list.join("\n");
     }
@@ -194,8 +202,7 @@ bool FraxTest::isValid() const
     {
       foreach(const auto m, m_measurementList)
       {
-        if(!m.isValid())
-        {
+        if (!m->isValid()) {
           okTest = false;
           break;
         }
@@ -215,9 +222,8 @@ QJsonObject FraxTest::toJsonObject() const
     QJsonArray measurementArray;
     auto measurements { getMeasurements() };
 
-    foreach(auto measurement, measurements)
-    {
-        measurementArray << measurement.toJsonObject();
+    foreach (auto measurement, measurements) {
+      measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject valuesObject {};

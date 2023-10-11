@@ -17,8 +17,8 @@
 #include <QLineEdit>
 #include <QRegExpValidator>
 
-#include "data/TestBase.h"
-#include "data/measurement_base.h"
+#include "data/measurement.h"
+#include "data/test_base.h"
 
 namespace Ui {
 class MeasurementTable;
@@ -207,7 +207,7 @@ public:
     ~MeasurementTable();
 
     void initializeModel(QList<TableColumn> columns);
-    void updateModel(TestBase<Measurement>* test);
+    void updateModel(TestBase *test);
 
     void enableMeasureButton();
     void disableMeasureButton();
@@ -225,7 +225,7 @@ signals:
     void enterManualEntry();
 
 public slots:
-    void handleTestUpdate(TestBase<Measurement>* test);
+    void handleTestUpdate(TestBase *test);
 
     void addManualMeasurement();
     void removeManualMeasurement();
@@ -242,7 +242,7 @@ private:
     bool manualEntryMode { false };
 
     Ui::MeasurementTable *ui;
-    TestBase<Measurement>* m_test;
+    TestBase *m_test;
     QList<TableColumn> m_columns;
 };
 

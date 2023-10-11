@@ -1,14 +1,14 @@
 #ifndef CIMTVIVIDITEST_H
 #define CIMTVIVIDITEST_H
 
-#include "TestBase.h"
+#include "test_base.h"
 
-class CimtVividiTest : public TestBase<Measurement>
+class CimtVividiTest : public TestBase
 {
 public:
     CimtVividiTest();
 
-    void simulate();
+    void simulate() override;
     bool isValid() const override;
 
     QJsonObject toJsonObject() const override;

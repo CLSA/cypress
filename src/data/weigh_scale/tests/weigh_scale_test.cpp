@@ -1,10 +1,10 @@
 #include "weigh_scale_test.h"
+#include "../measurements/weight_measurement.h"
 
 #include <QDebug>
-#include <QJsonObject>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QJsonValue>
-
 
 WeighScaleTest::WeighScaleTest()
 {
@@ -19,16 +19,13 @@ bool WeighScaleTest::isValid() const
     //
     bool okTest = (getMeasurementCount() == getExpectedMeasurementCount()) ||
                   (0 < getMeasurementCount());
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
+    if (okTest) {
+        foreach (const auto m, m_measurementList) {
+            if (!m->isValid()) {
+                okTest = false;
+                break;
+            }
         }
-      }
     }
     return okTest;
 }
@@ -39,9 +36,8 @@ QString WeighScaleTest::toString() const
     if(isValid())
     {
       QStringList list;
-      foreach(const auto m, m_measurementList)
-      {
-        list << m.toString();
+      foreach (const auto m, m_measurementList) {
+          list << m->toString();
       }
       str = list.join("\n");
     }
@@ -50,11 +46,11 @@ QString WeighScaleTest::toString() const
 
 void WeighScaleTest::simulate()
 {
-    WeightMeasurement weight1;
-    weight1.simulate();
+    QSharedPointer<WeightMeasurement> weight1(new WeightMeasurement);
+    weight1->simulate();
 
-    WeightMeasurement weight2;
-    weight2.simulate();
+    QSharedPointer<WeightMeasurement> weight2(new WeightMeasurement);
+    weight2->simulate();
 
     addMeasurement(weight1);
     addMeasurement(weight2);
@@ -62,26 +58,24 @@ void WeighScaleTest::simulate()
 
 void WeighScaleTest::fromArray(const QByteArray &arr)
 {
-    if(!arr.isEmpty())
-    {
-       // only add to the end and keep the last two tests
-       //
-       WeightMeasurement m;
-       m.fromArray(arr);
+    if (!arr.isEmpty()) {
+      // only add to the end and keep the last two tests
+      //
+      QSharedPointer<WeightMeasurement> m(new WeightMeasurement);
+      m->fromArray(arr);
 
-       if(m.isValid())
-       {
-         bool ok = true;
-         if(0 < getMeasurementCount())
-         {
-           Measurement last = lastMeasurement();
-           QDateTime prev = last.getAttributeValue("TIMESTAMP").toDateTime();
-           QDateTime curr = m.getAttributeValue("TIMESTAMP").toDateTime();
-           ok =  DELAY < prev.secsTo(curr);
-         }
-         if(ok)
-           addMeasurement(m);
-       }
+      if (m->isValid()) {
+          bool ok = true;
+          if (0 < getMeasurementCount()) {
+              Measurement &last = lastMeasurement();
+              QDateTime prev = last.getAttributeValue("TIMESTAMP").toDateTime();
+              QDateTime curr = m->getAttributeValue("TIMESTAMP").toDateTime();
+              ok = DELAY < prev.secsTo(curr);
+          }
+          if (ok) {
+              addMeasurement(m);
+          }
+      }
     }
 }
 
@@ -91,17 +85,14 @@ QJsonObject WeighScaleTest::toJsonObject() const
     };
 
     QJsonArray measurementArray;
-    auto measurements { getMeasurements() };
 
-    foreach(auto measurement, measurements)
-    {
-        measurementArray << measurement.toJsonObject();
+    foreach (auto measurement, m_measurementList) {
+      measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject valuesObject {};
 
     valuesObject.insert("results", measurementArray);
-
 
     double weight1 = valuesObject["results"].toArray()[0].toObject().value("weight").toObject().value("value").toDouble();
     double weight2 = valuesObject["results"].toArray()[1].toObject().value("weight").toObject().value("value").toDouble();

@@ -14,13 +14,14 @@ RetinalCameraTest::RetinalCameraTest()
 
 void RetinalCameraTest::simulate()
 {
-    RetinalCameraMeasurement leftEye;
-    leftEye.setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/LEFT.jpg");
-    leftEye.setAttribute("EYE_SIDE_VENDOR", "LEFT");
+    QSharedPointer<RetinalCameraMeasurement> leftEye(new RetinalCameraMeasurement);
+    leftEye->setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/LEFT.jpg");
+    leftEye->setAttribute("EYE_SIDE_VENDOR", "LEFT");
 
-    RetinalCameraMeasurement rightEye;
-    rightEye.setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/RIGHT.jpg");
-    rightEye.setAttribute("EYE_SIDE_VENDOR", "RIGHT");
+    QSharedPointer<RetinalCameraMeasurement> rightEye(new RetinalCameraMeasurement);
+    rightEye->setAttribute("EYE_PICT_VENDOR",
+                           "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/RIGHT.jpg");
+    rightEye->setAttribute("EYE_SIDE_VENDOR", "RIGHT");
 
     this->addMeasurement(leftEye);
     this->addMeasurement(rightEye);
@@ -35,8 +36,7 @@ bool RetinalCameraTest::isValid() const
     auto measurements = getMeasurements();
     foreach (auto measurement, measurements)
     {
-        if (!measurement.isValid())
-        {
+        if (!measurement->isValid()) {
             return false;
         }
     }
@@ -49,19 +49,17 @@ QJsonObject RetinalCameraTest::toJsonObject() const
     QJsonObject testJson;
     QJsonArray measurementArray;
 
-    auto measurements { getMeasurements() };
-
-    foreach(auto measurement, measurements)
-    {
-        measurementArray << measurement.toJsonObject();
+    foreach (auto measurement, m_measurementList) {
+        measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject valuesObject {};
 
     valuesObject.insert("metadata", getMetaData().toJsonObject());
     valuesObject.insert("results", measurementArray);
+    valuesObject.insert("manual_entry", getManualEntryMode());
 
-    testJson.insert("values", valuesObject);
+    testJson.insert("value", valuesObject);
 
     return testJson;
 }

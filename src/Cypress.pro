@@ -15,12 +15,12 @@ CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
-INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
-LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
+INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
+LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/OpenSSL-Win32/include"
-LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -34,9 +34,9 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 INCLUDEPATH += $$PWD/../dep/SigLib/Include/
@@ -121,8 +121,7 @@ HEADERS += \
     cypress_main_window.h \
     cypress_session.h \
     cypress_settings.h \
-    data/Measurement.h \
-    data/TestBase.h \
+    data/measurement.h \
     data/access_query_helper.h \
     data/blood_pressure/measurements/blood_pressure_measurement.h \
     data/blood_pressure/tests/blood_pressure_test.h \
@@ -159,7 +158,6 @@ HEADERS += \
     data/grip_strength/tests/grip_strength_test.h \
     data/hearing/measurements/hearing_measurement.h \
     data/hearing/tests/hearing_test.h \
-    data/measurement_base.h \
     data/retinal_camera/database_manager.h \
     data/retinal_camera/retinal_camera_measurement.h \
     data/retinal_camera/retinal_camera_test.h \
@@ -167,6 +165,7 @@ HEADERS += \
     data/spirometer/tests/spirometer_test.h \
     data/temperature/measurements/temperature_measurement.h \
     data/temperature/tests/temperature_test.h \
+    data/test_base.h \
     data/tonometer/measurements/tonometer_measurement.h \
     data/tonometer/tests/tonometer_test.h \
     data/weigh_scale/measurements/weight_measurement.h \
@@ -300,7 +299,7 @@ SOURCES += \
     cypress_main_window.cpp \
     cypress_session.cpp \
     cypress_settings.cpp \
-    data/Measurement.cpp \
+    data/measurement.cpp \
     data/access_query_helper.cpp \
     data/blood_pressure/measurements/blood_pressure_measurement.cpp \
     data/blood_pressure/tests/blood_pressure_test.cpp \
@@ -337,7 +336,6 @@ SOURCES += \
     data/grip_strength/tests/grip_strength_test.cpp \
     data/hearing/measurements/hearing_measurement.cpp \
     data/hearing/tests/hearing_test.cpp \
-    data/measurement_base.cpp \
     data/retinal_camera/database_manager.cpp \
     data/retinal_camera/retinal_camera_measurement.cpp \
     data/retinal_camera/retinal_camera_test.cpp \
@@ -345,6 +343,7 @@ SOURCES += \
     data/spirometer/tests/spirometer_test.cpp \
     data/temperature/measurements/temperature_measurement.cpp \
     data/temperature/tests/temperature_test.cpp \
+    data/test_base.cpp \
     data/tonometer/measurements/tonometer_measurement.cpp \
     data/tonometer/tests/tonometer_test.cpp \
     data/weigh_scale/measurements/weight_measurement.cpp \

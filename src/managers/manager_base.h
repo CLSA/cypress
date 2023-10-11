@@ -2,8 +2,7 @@
 #define MANAGER_BASE_H
 
 #include "cypress_settings.h"
-#include "data/Measurement.h"
-#include "data/TestBase.h"
+#include "data/test_base.h"
 
 #include <QJsonObject>
 #include <QObject>
@@ -63,10 +62,10 @@ signals:
 
     // the underlying test data has changed
     //
-    void dataChanged(TestBase<Measurement>* test);
+    void dataChanged(TestBase *test);
 
     // initialize UI with basic test info
-    void started(TestBase<Measurement>* test);
+    void started(TestBase *test);
 
     // ready to measure and receive data
     // (update GUI enable measure button)
@@ -74,7 +73,7 @@ signals:
     void canMeasure();
 
     // measurements read, stored in the test
-    void measured(TestBase<Measurement>* test);
+    void measured(TestBase *test);
 
     // valid test completed and ready to write to output
     // (update GUI enable write button and update the results display)
@@ -94,7 +93,7 @@ protected:
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
 
-    QScopedPointer<TestBase<Measurement>> m_test;
+    QScopedPointer<TestBase> m_test;
 
     bool manualEntryMode { false };
 

@@ -3,6 +3,10 @@
 
 #include "dxa_measurement.h"
 
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
 class IVAImagingMeasurement : public DXAMeasurement
 {
 public:

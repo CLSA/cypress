@@ -1,7 +1,7 @@
 #ifndef HEARING_MEASUREMENT_H
 #define HEARING_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 
 /*!
  * \class HearingMeasurement

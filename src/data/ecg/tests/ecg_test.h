@@ -1,12 +1,11 @@
 #ifndef ECG_TEST_H
 #define ECG_TEST_H
 
-#include "../../TestBase.h"
-
+#include "../../test_base.h"
 
 QT_FORWARD_DECLARE_CLASS(QDomNode)
 
-class ECGTest : public TestBase<Measurement>
+class ECGTest : public TestBase
 {
 public:
     ECGTest();

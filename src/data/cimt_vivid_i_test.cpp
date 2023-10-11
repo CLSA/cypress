@@ -41,22 +41,30 @@ QByteArray readFileIntoByteArray(QString filePath)
 
 void CimtVividiTest::simulate()
 {
-    CimtVividIMeasurement measurementLeft;
-    CimtVividIMeasurement measurementRight;
+    QSharedPointer<CimtVividIMeasurement> measurementLeft(new CimtVividIMeasurement);
+    QSharedPointer<CimtVividIMeasurement> measurementRight(new CimtVividIMeasurement);
 
-    measurementLeft.setAttribute("SIDE", "LEFT");
-    measurementLeft.setAttribute("CINELOOP_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Left/CINELOOP_1");
-    measurementLeft.setAttribute("STILL_IMAGE_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Left/STILL_IMAGE_1");
-    measurementLeft.setAttribute("STILL_IMAGE_2", "C:/Users/Anthony/Downloads/CIMT_SIM/Left/STILL_IMAGE_2");
-    measurementLeft.setAttribute("STILL_IMAGE_3", "C:/Users/Anthony/Downloads/CIMT_SIM/Left/STILL_IMAGE_3");
-    measurementLeft.setAttribute("SR_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Left/SR_1");
+    measurementLeft->setAttribute("SIDE", "LEFT");
+    measurementLeft->setAttribute("CINELOOP_1",
+                                  "C:/Users/Anthony/Downloads/CIMT_SIM/Left/CINELOOP_1");
+    measurementLeft->setAttribute("STILL_IMAGE_1",
+                                  "C:/Users/Anthony/Downloads/CIMT_SIM/Left/STILL_IMAGE_1");
+    measurementLeft->setAttribute("STILL_IMAGE_2",
+                                  "C:/Users/Anthony/Downloads/CIMT_SIM/Left/STILL_IMAGE_2");
+    measurementLeft->setAttribute("STILL_IMAGE_3",
+                                  "C:/Users/Anthony/Downloads/CIMT_SIM/Left/STILL_IMAGE_3");
+    measurementLeft->setAttribute("SR_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Left/SR_1");
 
-    measurementRight.setAttribute("SIDE", "RIGHT");
-    measurementRight.setAttribute("CINELOOP_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Right/CINELOOP_1");
-    measurementRight.setAttribute("STILL_IMAGE_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Right/STILL_IMAGE_1");
-    measurementRight.setAttribute("STILL_IMAGE_2", "C:/Users/Anthony/Downloads/CIMT_SIM/Right/STILL_IMAGE_2");
-    measurementRight.setAttribute("STILL_IMAGE_3", "C:/Users/Anthony/Downloads/CIMT_SIM/Right/STILL_IMAGE_3");
-    measurementRight.setAttribute("SR_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Right/SR_1");
+    measurementRight->setAttribute("SIDE", "RIGHT");
+    measurementRight->setAttribute("CINELOOP_1",
+                                   "C:/Users/Anthony/Downloads/CIMT_SIM/Right/CINELOOP_1");
+    measurementRight->setAttribute("STILL_IMAGE_1",
+                                   "C:/Users/Anthony/Downloads/CIMT_SIM/Right/STILL_IMAGE_1");
+    measurementRight->setAttribute("STILL_IMAGE_2",
+                                   "C:/Users/Anthony/Downloads/CIMT_SIM/Right/STILL_IMAGE_2");
+    measurementRight->setAttribute("STILL_IMAGE_3",
+                                   "C:/Users/Anthony/Downloads/CIMT_SIM/Right/STILL_IMAGE_3");
+    measurementRight->setAttribute("SR_1", "C:/Users/Anthony/Downloads/CIMT_SIM/Right/SR_1");
 
     this->addMeasurement(measurementLeft);
     this->addMeasurement(measurementRight);
@@ -72,8 +80,7 @@ bool CimtVividiTest::isValid() const
     auto measurements = getMeasurements();
     foreach (auto measurement, measurements)
     {
-        if (!measurement.isValid())
-        {
+        if (!measurement->isValid()) {
             return false;
         }
     }
@@ -92,7 +99,7 @@ QJsonObject CimtVividiTest::toJsonObject() const
 
     foreach(auto measurement, measurements)
     {
-        measurementArray << measurement.toJsonObject();
+        measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject valuesObject {};

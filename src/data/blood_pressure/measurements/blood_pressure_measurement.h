@@ -1,7 +1,7 @@
 #ifndef BLOOD_PRESSURE_MEASUREMENT_H
 #define BLOOD_PRESSURE_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 
 /*!
  * \class BloodPressureMeasurement
@@ -28,7 +28,7 @@ public:
 
     QString toString() const override;
 
-    static BloodPressureMeasurement simulate(const int&);
+    void simulate(const int &);
 
     int getSbp() const { return getAttributeValue("systolic").toInt(); }
     int getDbp() const { return getAttributeValue("diastolic").toInt(); }

@@ -16,26 +16,21 @@ HearingTest::HearingTest()
 
 bool HearingTest::isValid() const
 {
-    bool okMeta = true;
-    foreach(const auto key, m_outputKeyList)
-    {
-      if(!hasMetaData(key))
-      {
-         okMeta = false;
-         break;
-       }
+  bool okMeta = true;
+  foreach (const auto key, m_outputKeyList) {
+      if (!hasMetaData(key)) {
+          okMeta = false;
+          break;
+      }
     }
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
+    if (okTest) {
+        foreach (const auto m, m_measurementList) {
+            if (!m->isValid()) {
+                okTest = false;
+                break;
+            }
         }
-      }
     }
     return okMeta && okTest;
 }
@@ -47,8 +42,7 @@ bool HearingTest::isPartial() const
     {
       foreach(const auto m, m_measurementList)
       {
-        if(!m.isValid())
-        {
+        if (!m->isValid()) {
           okTest = false;
           break;
         }
@@ -56,6 +50,8 @@ bool HearingTest::isPartial() const
     }
     return okTest;
 }
+
+void HearingTest::simulate() {}
 
 QString HearingTest::toString() const
 {
@@ -67,9 +63,8 @@ QString HearingTest::toString() const
         list << QString("test id: ") % getMetaData("test_id").toString();
         list << QString("test datetime: ") % getMetaData("test_datetime").toDateTime().toString("yyyy-MM-dd hh:mm:ss");
         list << QString("last calibration date: ") % getMetaData("last_calibration_date").toDate().toString("yyyy-MM-dd");
-        foreach(const auto m, m_measurementList)
-        {
-          list << m.toString();
+        foreach (const auto m, m_measurementList) {
+        list << m->toString();
         }
         str = list.join("\n");
     }
@@ -99,13 +94,13 @@ void HearingTest::fromArray(const QByteArray &arr)
         addMetaData("test_datetime",readTestDateTime());
         addMetaData("last_calibration_date",readCalibrationDate());
 
-        QStringList sides = {"left","right"};
-        foreach(const auto side, sides)
-        {
-          foreach(const auto m, readHearingThresholdLevels(side))
-          {
-            addMeasurement(m);
-          }
+        QStringList sides = {"left", "right"};
+
+        foreach (auto side, sides) {
+        foreach (auto m, readHearingThresholdLevels(side)) {
+          QSharedPointer<HearingMeasurement> measure(new HearingMeasurement(m));
+          addMeasurement(measure);
+        }
         }
     }
 }
@@ -157,33 +152,37 @@ QList<HearingMeasurement> HearingTest::readHearingThresholdLevels(const QString&
   return htl;
 }
 
-HearingMeasurement HearingTest::getMeasurement(const QString& side, const int& index) const
+const HearingMeasurement &HearingTest::getMeasurement(const QString &side, const int &index) const
 {
-    HearingMeasurement measure;
-    foreach(const auto m, m_measurementList)
-    {
-        if(side == m.getAttributeValue("side").toString() &&
-           HearingMeasurement::frequencyLookup[index] == m.getAttributeValue("test").toString())
-        {
-          measure = m;
-          break;
-        }
+  for (int i = 0; i < m_measurementList.size(); i++) {
+    const HearingMeasurement *measure = static_cast<HearingMeasurement *>(
+        m_measurementList[i].get());
+
+    if (side == measure->getAttributeValue("side").toString()
+        && HearingMeasurement::frequencyLookup[index]
+               == measure->getAttributeValue("test").toString()) {
+        return *measure;
     }
-    return measure;
+  }
+
+  throw QException();
 }
 
 QJsonObject HearingTest::toJsonObject() const
 {
-    QJsonArray jsonArr;
-    foreach(const auto m, m_measurementList)
-    {
-      jsonArr.append(m.toJsonObject());
-    }
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
-    }
-    json.insert("test_results",jsonArr);
-    return json;
+  QJsonObject value{};
+  QJsonArray jsonArr{};
+
+  foreach (const auto m, m_measurementList) {
+    jsonArr.append(m->toJsonObject());
+  }
+
+  QJsonObject json{};
+  value.insert("metadata", m_metaData.toJsonObject());
+  value.insert("results", jsonArr);
+  value.insert("manual_entry", getManualEntryMode());
+
+  json.insert("value", value);
+
+  return json;
 }

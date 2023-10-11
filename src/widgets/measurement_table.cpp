@@ -1,7 +1,7 @@
 #include "measurement_table.h"
 #include "ui_measurement_table.h"
 
-#include "data/Measurement.h"
+#include "data/measurement.h"
 
 #include <QMessageBox>
 #include <QJsonObject>

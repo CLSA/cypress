@@ -1,8 +1,7 @@
 #ifndef WEIGH_SCALE_TEST_H
 #define WEIGH_SCALE_TEST_H
 
-#include "../../TestBase.h"
-#include "../measurements/weight_measurement.h"
+#include "../../test_base.h"
 
 /*!
  * \class WeighScaleTest
@@ -20,7 +19,7 @@
  *
  */
 
-class WeighScaleTest : public TestBase<Measurement>
+class WeighScaleTest : public TestBase
 {
 public:
     WeighScaleTest();
@@ -38,7 +37,7 @@ public:
     //
     QJsonObject toJsonObject() const override;
 
-    void simulate();
+    void simulate() override;
 
     // ms of delay between performing a measurement to allow for
     // step on/off without implementing a delay timer between

@@ -1,10 +1,9 @@
 #ifndef CHOICE_REACTION_TEST_H
 #define CHOICE_REACTION_TEST_H
 
-#include "../../TestBase.h"
-#include "../measurements/choice_reaction_measurement.h"
+#include "../../test_base.h"
 
-class ChoiceReactionTest : public TestBase<ChoiceReactionMeasurement>
+class ChoiceReactionTest : public TestBase
 {
 public:
     ChoiceReactionTest();

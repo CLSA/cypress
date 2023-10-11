@@ -1,9 +1,13 @@
 #ifndef WHOLE_BODY_MEASUREMENT_H
 #define WHOLE_BODY_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "dxa_measurement.h"
 
-class WholeBodyScanMeasurement : public Measurement
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
+class WholeBodyScanMeasurement : public DXAMeasurement
 {
 public:
     WholeBodyScanMeasurement();

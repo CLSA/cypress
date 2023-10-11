@@ -5,7 +5,7 @@
 #include <QSerialPortInfo>
 
 #include "managers/manager_base.h"
-#include "data/Measurement.h"
+#include "data/measurement.h"
 
 /*!
  * \class SerialPortManager

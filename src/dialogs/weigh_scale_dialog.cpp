@@ -25,7 +25,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
     columns << TableColumn("TIMESTAMP", "Timestamp", new TextDelegate("", QRegExp(), false));
 
     // device started
-    connect(manager, &WeighScaleManager::started, ui->measurementTable, [=](TestBase<Measurement>* test) {
+    connect(manager, &WeighScaleManager::started, ui->measurementTable, [=](TestBase *test) {
         ui->measurementTable->initializeModel(columns);
     });
 

@@ -1,7 +1,7 @@
 #ifndef ECG_MEASUREMENT_H
 #define ECG_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 
 /*!
 * \class ECGMeasurement

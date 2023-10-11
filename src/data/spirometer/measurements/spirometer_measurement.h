@@ -1,7 +1,7 @@
 #ifndef SPIROMETER_MEASUREMENT_H
 #define SPIROMETER_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 
 /*!
 * \class SpirometerMeasurement
@@ -15,7 +15,6 @@ typedef QMap<QString,QString> q_stringMap;
 class SpirometerMeasurement : public Measurement
 {
 public:
-
     enum ResultType {
         typeUnknown,
         typeBestValues,
@@ -24,9 +23,6 @@ public:
 
     void setResultType(const ResultType& type){m_type = type;};
     ResultType getResultType(){return m_type;}
-
-    SpirometerMeasurement() = default;
-    ~SpirometerMeasurement() = default;
 
     bool isValid() const override;
 

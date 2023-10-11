@@ -1,7 +1,7 @@
 #ifndef BODY_COMPOSITION_MEASUREMENT_H
 #define BODY_COMPOSITION_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 
 class BodyCompositionMeasurement : public Measurement
 {

@@ -1,10 +1,9 @@
 #ifndef BODY_COMPOSITION_TEST_H
 #define BODY_COMPOSITION_TEST_H
 
-#include "../../TestBase.h"
-#include "../measurements/body_composition_measurement.h"
+#include "data/test_base.h"
 
-class BodyCompositionTest : public TestBase<BodyCompositionMeasurement>
+class BodyCompositionTest : public TestBase
 {
 public:
     BodyCompositionTest();
@@ -12,7 +11,7 @@ public:
 
     void fromArray(const QByteArray &);
 
-    void simulate(const double&, const QString&, double);
+    //void simulate(const double&, const QString&, double);
 
     // String representation for debug and GUI display purposes
     //

@@ -2,24 +2,24 @@
 #define AP_SPINE_TEST_H
 
 #include <QJsonObject>
-#include "dxa_test.h"
-#include "../measurements/ap_spine_measurement.h"
 
-class ApSpineTest : public DXATest<ApSpineMeasurement>
+#include "data/test_base.h"
+
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+#include "dcmtk/dcmdata/dcuid.h"
+
+class ApSpineTest : public TestBase
 {
 public:
     explicit ApSpineTest();
 
     bool isValid() const override;
-    bool isValidDicom(DcmFileFormat &loadedFileFormat) const override;
-    void reset() override;
 
-    Side getSide() override;
-    quint8 getScanType() override;
-    QString getName() override;
-    QString getBodyPartName() override;
-    QString getRefType() override;
-    QString getRefSource() override;
+    bool isValidDicom(DcmFileFormat &loadedFileFormat) const;
+
+    void reset() override;
 
     QJsonObject toJsonObject() const override;
     QString toString() const override;

@@ -1,9 +1,13 @@
 #ifndef DXA_MEASUREMENT_H
 #define DXA_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "data/measurement.h"
+
 #include "dcmtk/dcmdata/dcfilefo.h"
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
+
 #include "dcmtk/ofstd/ofstdinc.h"
 
 struct ValidDCMTag {
@@ -15,22 +19,37 @@ struct ValidDCMTag {
     OFString value;
 };
 
+enum Side {
+    LEFT,
+    RIGHT,
+    BOTH
+};
+
 class DXAMeasurement : public Measurement
 {
 public:
     DXAMeasurement();
+
+    QStringList m_mdb_keys {};
 
     QList<ValidDCMTag> m_metaInfoTagExistsWithValue {};
     QList<ValidDCMTag> m_metaInfoTagExists {};
     QList<ValidDCMTag> m_datasetTagExistsWithValue {};
     QList<ValidDCMTag> m_datasetTagExists {};
 
-    bool isValidDicomFile(DcmFileFormat& dicomFileFormat) const;
+    virtual bool isValidDicomFile(DcmFileFormat& dicomFileFormat) const;
 
-    virtual bool isValid() const;
-    virtual QJsonObject toJsonObject() const;
-    virtual QString toString() const;
-    virtual QStringList toStringList(const bool& no_keys = false) const;
+    virtual Side getSide() = 0;
+    virtual quint8 getScanType() = 0;
+    virtual QString getName() = 0;
+    virtual QString getBodyPartName() = 0;
+    virtual QString getRefType() = 0;
+    virtual QString getRefSource() = 0;
+
+    virtual bool isValid() const override;
+    virtual QJsonObject toJsonObject() const override;
+    virtual QString toString() const override;
+    virtual QStringList toStringList(const bool& no_keys = false) const override;
 };
 
 #endif // DXA_MEASUREMENT_H

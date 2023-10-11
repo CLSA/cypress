@@ -1,7 +1,7 @@
 #ifndef HEARING_TEST_H
 #define HEARING_TEST_H
 
-#include "../../TestBase.h"
+#include "../../test_base.h"
 #include "../measurements/hearing_measurement.h"
 
 /*!
@@ -22,7 +22,7 @@
  *
  */
 
-class HearingTest : public TestBase<HearingMeasurement>
+class HearingTest : public TestBase
 {
 public:
     HearingTest();
@@ -38,7 +38,9 @@ public:
 
     bool isPartial() const;
 
-    HearingMeasurement getMeasurement(const QString &, const int &) const;
+    void simulate() override;
+
+    const HearingMeasurement &getMeasurement(const QString &, const int &) const;
 
     // String keys are converted to snake_case
     //

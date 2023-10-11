@@ -1,7 +1,7 @@
 #ifndef CHOICE_REACTION_MEASUREMENT_H
 #define CHOICE_REACTION_MEASUREMENT_H
 
-#include "../../Measurement.h"
+#include "../../measurement.h"
 
 /*!
 * \class ChoiceReationMeasurement

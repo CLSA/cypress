@@ -32,6 +32,7 @@ void ECGTest::fromFile(const QString &fileName)
        qDebug() << "ERROR: failed to read xml file for parsing" << fileName;
        return;
     }
+
     QDomDocument doc("ecgDocument");
     if(!doc.setContent(&file))
     {
@@ -39,37 +40,40 @@ void ECGTest::fromFile(const QString &fileName)
         qDebug() << "ERROR: failed to set DOM content from xml file"<< fileName;
         return;
     }
+
     file.close();
 
     QDomElement docElem = doc.documentElement();
     QDomNode node = docElem.firstChild();
     reset();
-    ECGMeasurement m;
-    while(!node.isNull())
-    {
-      QDomElement elem = node.toElement();
-      if(!elem.isNull())
-      {
-        QString tag = elem.tagName();
-        qDebug() << tag;
 
-        if("ClinicalInfo" == tag)
-          readClinicalInfo(node);
-        else if("FilterSetting" == tag)
-          readFilterSetting(node);
-        else if("ObservationDateTime" == tag)
-          readObservationDatetime(node);
-        else if("PatientInfo" == tag)
-          readPatientInfo(node);
-        else if("Interpretation" == tag)
-          m.fromDomNode(node);
-        else if("RestingECGMeasurements" == tag)
-          m.fromDomNode(node);
-      }
-      node = node.nextSibling();
+    QSharedPointer<ECGMeasurement> m(new ECGMeasurement);
+
+    while (!node.isNull()) {
+        QDomElement elem = node.toElement();
+        if (!elem.isNull()) {
+            QString tag = elem.tagName();
+            qDebug() << tag;
+
+            if ("ClinicalInfo" == tag)
+                readClinicalInfo(node);
+            else if ("FilterSetting" == tag)
+                readFilterSetting(node);
+            else if ("ObservationDateTime" == tag)
+                readObservationDatetime(node);
+            else if ("PatientInfo" == tag)
+                readPatientInfo(node);
+            else if ("Interpretation" == tag)
+                m->fromDomNode(node);
+            else if ("RestingECGMeasurements" == tag)
+                m->fromDomNode(node);
+        }
+        node = node.nextSibling();
     }
-    if(m.isValid())
-      addMeasurement(m);
+
+    if (m->isValid()) {
+        addMeasurement(m);
+    }
 }
 
 void ECGTest::readObservationDatetime(const QDomNode& node)
@@ -226,10 +230,11 @@ void ECGTest::simulate()
    addMetaData("cubic_spline",false);
    addMetaData("filter_50_Hz",true);
    addMetaData("filter_60_Hz",false);
-   addMetaData("low_pass",150,"Hz");
+   addMetaData("low_pass", 150, "Hz");
 
-   ECGMeasurement m;
-   m.simulate();
+   QSharedPointer<ECGMeasurement> m(new ECGMeasurement);
+   m->simulate();
+
    addMeasurement(m);
 }
 
@@ -251,12 +256,10 @@ QStringList ECGTest::toStringList() const
 QString ECGTest::toString() const
 {
     QString str;
-    if(isValid())
-    {
+    if (isValid()) {
       QStringList list;
-      foreach(const auto measurement, m_measurementList)
-      {
-        list << measurement.toString();
+      foreach (const auto measurement, m_measurementList) {
+        list << measurement->toString();
       }
       str = list.join("\n");
     }
@@ -286,20 +289,18 @@ bool ECGTest::isValid() const
 
 QJsonObject ECGTest::toJsonObject() const
 {
-    QJsonObject json;
-    QJsonArray measurementArray;
+    QJsonObject json{};
+    QJsonArray measurementArray{};
 
     auto measurements { getMeasurements() };
-    foreach (auto measurement, measurements)
-    {
-        measurementArray << measurement.toJsonObject();
+    foreach (auto measurement, measurements) {
+      measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject valueObject {};
     valueObject.insert("metadata", m_metaData.toJsonObject());
     valueObject.insert("results", measurementArray);
     valueObject.insert("manual_entry", getManualEntryMode());
-
     json.insert("value", valueObject);
 
     return json;

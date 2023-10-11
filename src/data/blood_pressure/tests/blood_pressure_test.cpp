@@ -27,6 +27,8 @@ BloodPressureTest::BloodPressureTest()
     m_outputKeyList << "total_avg_diastolic";
     m_outputKeyList << "total_avg_pulse";
     m_outputKeyList << "total_avg_count";
+
+    setExpectedMeasurementCount(2);
 }
 
 // String representation for debug and GUI display purposes
@@ -37,9 +39,8 @@ QString BloodPressureTest::toString() const
     if(isValid())
     {
         QStringList list;
-        foreach(const auto m, m_measurementList)
-        {
-          list << m.toString();
+        foreach (const auto m, m_measurementList) {
+            list << m->toString();
         }
         str = list.join("\n");
     }
@@ -52,18 +53,25 @@ void BloodPressureTest::simulate()
     int systolicAvg = 0;
     int diastolicAvg = 0;
     int pulseAvg = 0;
-    for(int i = 0; i < count; i++)
-    {
-      BloodPressureMeasurement m = BloodPressureMeasurement::simulate(i+1);
-      addMeasurement(m);
-      if(0 == i) continue;
-      systolicAvg += m.getSbp();
-      diastolicAvg += m.getDbp();
-      pulseAvg += m.getPulse();
+
+    for (int i = 0; i < count; i++) {
+        QSharedPointer<BloodPressureMeasurement> measurement(new BloodPressureMeasurement);
+
+        measurement->simulate(i);
+        addMeasurement(measurement);
+
+        if (i == 0) {
+            continue;
+        }
+
+        systolicAvg += measurement->getSbp();
+        diastolicAvg += measurement->getDbp();
+        pulseAvg += measurement->getPulse();
     }
-    systolicAvg = qRound(systolicAvg * 1.0f/(count-1));
-    diastolicAvg = qRound(diastolicAvg * 1.0f/(count-1));
-    pulseAvg = qRound(pulseAvg * 1.0f/(count-1));
+
+    systolicAvg = qRound(systolicAvg * 1.0f / (count - 1));
+    diastolicAvg = qRound(diastolicAvg * 1.0f / (count - 1));
+    pulseAvg = qRound(pulseAvg * 1.0f / (count - 1));
 
     addDeviceAverage(systolicAvg,diastolicAvg,pulseAvg);
 }
@@ -80,16 +88,13 @@ bool BloodPressureTest::isValid() const
        }
     }
     bool okTest = 1 <= getMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (const auto m, m_measurementList) {
+         if (!m->isValid()) {
+             okTest = false;
+             break;
+         }
+       }
     }
     return okMeta && okTest;
 }
@@ -101,11 +106,8 @@ QJsonObject BloodPressureTest::toJsonObject() const
     QJsonObject testJson {};
     QJsonArray measurementArray {};
 
-    auto measurements { getMeasurements() };
-
-    foreach(const auto m, m_measurementList)
-    {
-      measurementArray.append(m.toJsonObject());
+    foreach (const auto m, m_measurementList) {
+       measurementArray.append(m->toJsonObject());
     }
 
     QJsonObject valuesObject {};
@@ -149,38 +151,47 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
     int sbpTotal = 0;
     int dbpTotal = 0;
     int pulseTotal = 0;
+
     if(m_measurementList.isEmpty())
     {
       qDebug() << "No measurements to average";
       return;
     }
     // add the first measurement as separate test meta data
-    Measurement first = m_measurementList.first();
-    addMetaData("first_systolic",first.getAttribute("systolic"));
-    addMetaData("first_diastolic",first.getAttribute("diastolic"));
-    addMetaData("first_pulse",first.getAttribute("pulse"));
-    addMetaData("first_start_time",first.getAttribute("start_time"));
-    addMetaData("first_end_time",first.getAttribute("end_time"));
+    Measurement first = *m_measurementList.first().get();
+
+    addMetaData("first_systolic", first.getAttribute("systolic"));
+    addMetaData("first_diastolic", first.getAttribute("diastolic"));
+    addMetaData("first_pulse", first.getAttribute("pulse"));
+    addMetaData("first_start_time", first.getAttribute("start_time"));
+    addMetaData("first_end_time", first.getAttribute("end_time"));
 
     // skip the first measurement
     int count = 0;
     for(int i = 1; i < m_measurementList.count(); i++)
     {
-      Measurement measurement = m_measurementList[i];
-      if(measurement.isValid())
-      {
-        count++;
-        //sbpTotal += measurement.getSbp();
-        //dbpTotal += measurement.getDbp();
-        //pulseTotal += measurement.getPulse();
-        //qDebug() << QString("sbpTotal = %1 dbpTotal = %2 pulseTotal = %3").arg(sbpTotal).arg(dbpTotal).arg(pulseTotal);
+      BloodPressureMeasurement *measurement = static_cast<BloodPressureMeasurement *>(
+          m_measurementList[i].get());
+      if (measurement->isValid()) {
+          count++;
+
+          sbpTotal += measurement->getSbp();
+          dbpTotal += measurement->getDbp();
+          pulseTotal += measurement->getPulse();
+
+          qDebug() << QString("sbpTotal = %1 dbpTotal = %2 pulseTotal = %3")
+                          .arg(sbpTotal)
+                          .arg(dbpTotal)
+                          .arg(pulseTotal);
       }
     }
+
     if(1 > count)
     {
         qDebug() << "ERROR: not enough measurements to validated device contributed averages";
         return;
     }
+
     double avgSbpCalc = sbpTotal * 1.0f / count;
     double avgDbpCalc = dbpTotal * 1.0f / count;
     double avgPulseCalc = pulseTotal * 1.0f / count;
@@ -190,6 +201,7 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
     qDebug() << QString("Averages: sbp(%1:%2) dbp(%3:%4) pulse(%5:%6)").arg(sbpAvg).arg(avgSbpCalc).arg(dbpAvg).arg(avgDbpCalc).arg(pulseAvg).arg(avgPulseCalc);
 
     bool ok = true;
+
     if(qRound(avgSbpCalc) == sbpAvg)
     {
       addMetaData("avg_systolic",sbpAvg,"mmHg");
@@ -199,6 +211,7 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
       qDebug() << QString("WARNING: SBP average (%1) does not align with calculated average (%2)").arg(sbpAvg).arg(avgSbpCalc);
       ok = false;
     }
+
     if(qRound(avgDbpCalc) == dbpAvg)
     {
       addMetaData("avg_diastolic",dbpAvg,"mmHg");
@@ -208,6 +221,7 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
       qDebug() << QString("WARNING: DBP average (%1) does not align with calculated average (%2)").arg(dbpAvg).arg(avgDbpCalc);
       ok = false;
     }
+
     if(qRound(avgPulseCalc) == pulseAvg)
     {
       addMetaData("avg_pulse",pulseAvg,"bpm");
@@ -218,8 +232,9 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
       ok = false;
     }
 
-    if(ok)
+    if (ok) {
       computeTotalAverage(sbpTotal, dbpTotal, pulseTotal);
+    }
 }
 
 void BloodPressureTest::computeTotalAverage(int sbpTotal, int dbpTotal, int pulseTotal)
@@ -227,10 +242,12 @@ void BloodPressureTest::computeTotalAverage(int sbpTotal, int dbpTotal, int puls
     if(hasFirstMeasurement())
     {
       int count = m_measurementList.count() + 1;
+
       sbpTotal += getMetaData("first_systolic").toInt();
       dbpTotal += getMetaData("first_diastolic").toInt();
       pulseTotal += getMetaData("first_pulse").toInt();
-      addMetaData("total_avg_systolic",qRound(sbpTotal * 1.0f / count),"mmHg");
+
+      addMetaData("total_avg_systolic", qRound(sbpTotal * 1.0f / count), "mmHg");
       addMetaData("total_avg_diastolic",qRound(dbpTotal * 1.0f / count),"mmHg");
       addMetaData("total_avg_pulse",qRound(pulseTotal * 1.0f / count),"bpm");
       addMetaData("total_avg_count",count);
@@ -285,8 +302,10 @@ bool BloodPressureTest::armInformationSet() const
 void BloodPressureTest::reset()
 {
     QList<QString> keys = m_outputKeyList;
+
     keys.removeAll("cuff_size");
     keys.removeAll("side");
+
     m_metaData.remove(keys);
     m_measurementList.clear();
 }

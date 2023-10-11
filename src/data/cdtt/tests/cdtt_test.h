@@ -1,13 +1,13 @@
 #ifndef CDTT_TEST_H
 #define CDTT_TEST_H
 
-#include "../../TestBase.h"
-#include "../measurements/cdtt_measurement.h"
+#include "../../test_base.h"
+
 #include <QJsonObject>
 
 QT_FORWARD_DECLARE_CLASS(QSqlDatabase)
 
-class CDTTTest : public TestBase<CDTTMeasurement>
+class CDTTTest : public TestBase
 {
 public:
     CDTTTest();
@@ -17,25 +17,16 @@ public:
     //
     void fromDatabase(const QSqlDatabase&);
 
-    // generate a fictitious set of results
-    // arg is the interview barcode
-    //
-    void simulate(const QString&);
+    void simulate(const QVariantMap &inputData) override;
 
-    // String representation for debug and GUI display purposes
-    //
     QString toString() const override;
 
     bool isValid() const override;
 
-    // String keys are converted to snake_case
-    //
     QJsonObject toJsonObject() const override;
-
     QStringList toStringList() const;
 
 private:
-
     QList<QString> m_outputKeyList;
     QJsonObject m_jsonObj;
 

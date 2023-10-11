@@ -32,22 +32,23 @@ class Measurement
 {
 
 public:
-    Measurement() = default;
+    Measurement();
+
     virtual ~Measurement() = default;
 
-    Measurement(const Measurement &other)
-    {
-        m_attributes = other.m_attributes;
-    }
+    Measurement(const Measurement &other);
 
-    Measurement& operator=(const Measurement &other)
-    {
-        if(this != &other)
-        {
-          m_attributes = other.m_attributes;
-        }
-        return *this;
-    }
+    Measurement(Measurement &other);
+
+    Measurement(const Measurement &&other);
+
+    Measurement(Measurement &&other);
+
+    Measurement &operator=(const Measurement &other);
+
+    bool operator==(const Measurement &rhs) const;
+
+    bool operator!=(const Measurement &rhs);
 
     class Value
     {
@@ -59,15 +60,19 @@ public:
         Value &operator=(const Value&);
         ~Value() = default;
 
+        bool operator==(const Measurement::Value &rhs) const;
+
+        bool operator!=(const Measurement::Value &rhs) const;
+
         bool hasUnits() const;
         bool isNull() const;
         QString toString() const;
 
-        QVariant value() const { return m_value; }
-        QString units() const { return m_units; }
-        quint16 precision() const { return m_precision; }
+        QVariant value() const;
+        QString units() const;
+        quint16 precision() const;
 
-      private:
+    private:
         QVariant m_value;
         QString m_units;
 
@@ -90,87 +95,44 @@ public:
 
     void reset();
 
-    void remove(const QStringList& list)
-    {
-      foreach(const auto key, list)
-        removeAttribute(key);
-    }
+    void remove(const QStringList &list);
 
-    void removeAttribute(const QString& key)
-    {
-      m_attributes.remove(key);
-    }
+    void removeAttribute(const QString &key);
 
-    void setAttribute(const QString& key, const QVariant &value, const QString& units, const quint16& precision = 0)
-    {
-      setAttribute(key,Measurement::Value(value,units,precision));
-    }
+    void setAttribute(const QString &key,
+                      const QVariant &value,
+                      const QString &units,
+                      const quint16 &precision = 0);
 
-    void setAttribute(const QString& key, const QVariant &value)
-    {
-      setAttribute(key,Measurement::Value(value));
-    }
+    void setAttribute(const QString &key, const QVariant &value);
 
-    void setAttribute(const QString& key, const QVariant &value, const quint16& precision)
-    {
-      setAttribute(key,Measurement::Value(value,precision));
-    }
+    void setAttribute(const QString &key, const QVariant &value, const quint16 &precision);
 
-    void setAttribute(const QString &key, const Value &value)
-    {
-      m_attributes[key]=value;
-    }
+    void setAttribute(const QString &key, const Value &value);
 
-    inline Value getAttribute(const QString &key) const
-    {
-        return m_attributes.contains(key) ?
-               m_attributes[key] : Value();
-    }
+    Value getAttribute(const QString &key) const;
 
-    inline QVariant getAttributeValue(const QString& key) const
-    {
-        return m_attributes.contains(key) ?
-               m_attributes[key].value() : QVariant();
-    }
+    QVariant getAttributeValue(const QString &key) const;
 
-    QMap<QString,Value> getAttributes() const
-    {
-      return m_attributes;
-    }
+    const QMap<QString, Value> getAttributes() const;
 
-    QList<QString> getAttributeKeys() const
-    {
-        return m_attributes.keys();
-    }
+    const QList<QString> getAttributeKeys() const;
 
-    inline bool hasAttribute(const QString &key) const
-    {
-      return m_attributes.contains(key) &&
-            !m_attributes[key].isNull();
-    }
+    bool hasAttribute(const QString &key) const;
 
-    inline bool hasUnits(const QString &key) const
-    {
-      return (hasAttribute(key) && m_attributes[key].hasUnits());
-    }
+    bool hasUnits(const QString &key) const;
 
-    int size() const { return m_attributes.size(); }
+    int size() const;
 
-    bool isEmpty() const { return m_attributes.isEmpty(); }
+    bool isEmpty() const;
 
     // precision should be set before reading any values from the output.
     // derived classes can set precision as needed per data variable
     // ie., setting precision does not apply to all attribute values
     //
-    void setPrecision(const int& precision)
-    {
-        if(0 < precision) m_precision = precision;
-    }
+    void setPrecision(const int &precision);
 
-    int getPrecision() const
-    {
-        return m_precision;
-    }
+    int getPrecision() const;
 
 protected:
     QMap<QString,Value> m_attributes;
@@ -180,31 +142,11 @@ protected:
     int m_precision = { 4 };
 };
 
+QDebug operator<<(QDebug dbg, const Measurement &);
+
 Q_DECLARE_METATYPE(Measurement);
 Q_DECLARE_METATYPE(Measurement::Value)
 
 typedef Measurement MetaData;
-
-inline bool operator==(const Measurement &lhs, const Measurement &rhs)
-{
-    return (lhs.getAttributes() == rhs.getAttributes());
-}
-
-inline bool operator!=(const Measurement &lhs, const Measurement &rhs)
-{
-    return !(lhs == rhs);
-}
-
-inline bool operator==(const Measurement::Value &lhs, const Measurement::Value &rhs)
-{
-    return (lhs.value() == rhs.value() && lhs.units() == rhs.units() && lhs.precision() == rhs.precision());
-}
-
-inline bool operator!=(const Measurement::Value &lhs, const Measurement::Value &rhs)
-{
-    return !(lhs == rhs);
-}
-
-QDebug operator<<(QDebug dbg, const Measurement &);
 
 #endif // MEASUREMENT_H

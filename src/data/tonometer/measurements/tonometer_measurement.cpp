@@ -1,5 +1,5 @@
 #include "tonometer_measurement.h"
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QDateTime>
 #include <QDebug>

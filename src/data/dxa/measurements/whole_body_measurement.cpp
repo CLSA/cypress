@@ -1,6 +1,8 @@
 #include "whole_body_measurement.h"
 #include <QJsonObject>
 
+// { "WBTOT_BMD",      "NULL" },
+
 WholeBodyScanMeasurement::WholeBodyScanMeasurement()
 {
 

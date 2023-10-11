@@ -119,9 +119,9 @@ bool GripStrengthTest::readMeasurements()
                 record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toDouble());
             }
 
-            GripStrengthMeasurement measurement;
-            measurement.fromRecord(&record);
-            if (measurement.isValid()) {
+            QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
+            measurement->fromRecord(&record);
+            if (measurement->isValid()) {
                 addMeasurement(measurement);
             }
         }
@@ -147,9 +147,8 @@ QString GripStrengthTest::toString() const
     if(isValid())
     {
       QStringList list;
-      foreach(auto measurement, m_measurementList)
-      {
-        list << measurement.toString();
+      foreach (auto measurement, m_measurementList) {
+            list << measurement->toString();
       }
       str = list.join("\n");
     }
@@ -168,16 +167,13 @@ bool GripStrengthTest::isValid() const
        }
     }
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if(okTest)
-    {
-      foreach(auto m, m_measurementList)
-      {
-        if(!m.isValid())
-        {
-          okTest = false;
-          break;
-        }
-      }
+    if (okTest) {
+       foreach (auto m, m_measurementList) {
+         if (!m->isValid()) {
+                okTest = false;
+                break;
+         }
+       }
     }
     return okMeta && okTest;
 }
@@ -185,15 +181,17 @@ bool GripStrengthTest::isValid() const
 QJsonObject GripStrengthTest::toJsonObject() const
 {
     QJsonArray jsonArr;
-    foreach(auto m, m_measurementList)
-    {
-      jsonArr.append(m.toJsonObject());
+    foreach (auto m, m_measurementList) {
+       jsonArr.append(m->toJsonObject());
     }
+
     QJsonObject json;
     if(!metaDataIsEmpty())
     {
-      json.insert("test_meta_data",m_metaData.toJsonObject());
+       json.insert("metadata", m_metaData.toJsonObject());
     }
-    json.insert("test_results",jsonArr);
+
+    json.insert("results", jsonArr);
+
     return json;
 }
