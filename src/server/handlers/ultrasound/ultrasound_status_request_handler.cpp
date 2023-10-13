@@ -6,7 +6,7 @@ void UltrasoundStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest 
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", "Available"}
+            {"status", "available"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

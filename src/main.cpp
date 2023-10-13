@@ -39,6 +39,8 @@ const QString appVersion = "v0.1.0";
 // Custom message handler to write to a log file and stdout
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context)
+
     QString txt;
     switch (type) {
     case QtDebugMsg:

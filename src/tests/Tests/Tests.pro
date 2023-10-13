@@ -18,20 +18,20 @@ INCLUDEPATH += "C:/OpenSSL-Win32/include"
 LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
-INCLUDEPATH += $$PWD/../../../dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += $$PWD/../../../dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += $$PWD/../../../dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += $$PWD/../../../dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += $$PWD/../../../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Foundation/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Util/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Net/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Crypto/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/bin
 
-INCLUDEPATH += $$PWD/../../../dep/poco-1.12.4-all/bin
-
-LIBS += -L$$PWD/../../../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+LIBS += -L"C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/lib/" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../../../dep/dcmtk-3.6.7-win32/include/
-INCLUDEPATH += $$PWD/../../../dep/dcmtk-3.6.7-win32/lib/
-LIBS += -L$$PWD/../../../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/include
+INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/lib/
+
+LIBS += -L"C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/lib/" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 #INCLUDEPATH += $$PWD/../../../dep/SigLib/Include/
@@ -54,6 +54,13 @@ SOURCES +=  tst_pdf_filler.cpp \
     ../../data/choice_reaction/tests/choice_reaction_test.cpp \
     ../../data/cimt_vivid_i_measurement.cpp \
     ../../data/cimt_vivid_i_test.cpp \
+    ../../data/dxa/measurements/ap_spine_measurement.cpp \
+    ../../data/dxa/measurements/dxa_measurement.cpp \
+    ../../data/dxa/measurements/forearm_measurement.cpp \
+    ../../data/dxa/measurements/hip_measurement.cpp \
+    ../../data/dxa/measurements/iva_imaging_measurement.cpp \
+    ../../data/dxa/measurements/whole_body_measurement.cpp \
+    ../../data/dxa/tests/dxa_test.cpp \
     ../../data/excel_query_helper.cpp \
     ../../data/frax/measurements/frax_measurement.cpp \
     ../../data/frax/tests/frax_test.cpp \
@@ -92,6 +99,13 @@ HEADERS += \
     ../../data/choice_reaction/tests/choice_reaction_test.h \
     ../../data/cimt_vivid_i_measurement.h \
     ../../data/cimt_vivid_i_test.h \
+    ../../data/dxa/measurements/ap_spine_measurement.h \
+    ../../data/dxa/measurements/dxa_measurement.h \
+    ../../data/dxa/measurements/forearm_measurement.h \
+    ../../data/dxa/measurements/hip_measurement.h \
+    ../../data/dxa/measurements/iva_imaging_measurement.h \
+    ../../data/dxa/measurements/whole_body_measurement.h \
+    ../../data/dxa/tests/dxa_test.h \
     ../../data/excel_query_helper.h \
     ../../data/frax/measurements/frax_measurement.h \
     ../../data/frax/tests/frax_test.h \

@@ -414,6 +414,7 @@ void BodyCompositionManager::measure()
 //
 void BodyCompositionManager::updateInputData(const QVariantMap& input)
 {
+    Q_UNUSED(input)
     //if(input.isEmpty()) return;
 
     //QString units = "metric";

@@ -19,6 +19,7 @@ QString CimtVividIMeasurement::toString() const
 
 QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
 {
+    Q_UNUSED(no_keys)
     return QStringList {};
 }
 

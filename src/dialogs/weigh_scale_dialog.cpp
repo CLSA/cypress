@@ -20,12 +20,13 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
     ui->testInfoWidget->setSessionInformation(session);
 
     QList<TableColumn> columns;
-    columns << TableColumn("WEIGHT", "Weight", new NumberDelegate(0, 1000, true, false, 2));
+    columns << TableColumn("WEIGHT", "Weight", new NumberDelegate(0, 1000, true, false, false, 2));
     columns << TableColumn("MODE", "Mode", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("TIMESTAMP", "Timestamp", new TextDelegate("", QRegExp(), false));
 
     // device started
     connect(manager, &WeighScaleManager::started, ui->measurementTable, [=](TestBase *test) {
+        Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 

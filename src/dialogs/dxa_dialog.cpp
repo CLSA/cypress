@@ -6,19 +6,64 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QDesktopServices>
+#include <QHostInfo>
 
 DXADialog::DXADialog(QWidget* parent, const CypressSession& session) :
     DialogBase(parent, session),
     ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
-    m_manager.reset(new DXAManager(session));
 
-    //m_manager->start();
-    //ui->submitButton->setEnabled(true);
-    //connect(ui->submitButton, &QPushButton::clicked, m_manager.get(), &DXAManager::measure);
-    //connect(m_manager->m_dicomSCP, &DicomSCP::logUpdate, this, &DXADialog::dicomLogUpdate);
-    //connect(m_manager->m_dicomSCP, &DicomSCP::dicomFilesReceived, this, &DXADialog::dicomFilesReceived);
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
+
+    this->setWindowTitle("CIMT");
+    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+
+    m_manager.reset(new DXAManager(session));
+    DXAManager* manager = static_cast<DXAManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+    ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
+
+    QList<TableColumn> columns;
+
+    // device started
+    connect(manager, &DXAManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &DXAManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &DXAManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &DXAManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &DXAManager::success, this, &DXADialog::success);
+
+    // critical error
+    connect(manager, &DXAManager::error, this, &DXADialog::error);
+
+    // data changed
+    connect(manager, &DXAManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &DXAManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &DXAManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &DXAManager::addManualMeasurement);
 }
 
 DXADialog::~DXADialog()
@@ -38,19 +83,20 @@ void DXADialog::dicomServerEnded()
 
 void DXADialog::dicomLogUpdate(QString line)
 {
-    ui->logBrowser->append(line);
+    //ui->logBrowser->append(line);
 }
 
 void DXADialog::dicomFilesReceived(const QStringList& dicomFilePaths)
 {
-    ui->filesList->clear();
-    QStringList::ConstIterator iterator;
-    for (iterator = dicomFilePaths.begin(); iterator != dicomFilePaths.end(); ++iterator)
-    {
-       ui->filesList->append((*iterator).toLocal8Bit().constData());
-    }
+    Q_UNUSED(dicomFilePaths)
+    //ui->filesList->clear();
+    //QStringList::ConstIterator iterator;
+    //for (iterator = dicomFilePaths.begin(); iterator != dicomFilePaths.end(); ++iterator)
+    //{
+    //   ui->filesList->append((*iterator).toLocal8Bit().constData());
+    //}
 
-    qDebug() << dicomFilePaths;
+    //qDebug() << dicomFilePaths;
     //m_manager->dicomFilesReceived(dicomFilePaths);
 }
 

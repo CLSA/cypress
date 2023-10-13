@@ -3,27 +3,21 @@
 
 #include "dxa_measurement.h"
 
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
+
 
 class ForearmMeasurement : public DXAMeasurement
 {
 public:
     ForearmMeasurement();
 
+    QString toString() const override;
+    QStringList toStringList(const bool& no_keys = false) const override;
 
-    virtual QString toString() const override;
-
-    virtual QStringList toStringList(const bool& no_keys = false) const override;
-
-    virtual bool isValid() const override;
-
-    virtual QJsonObject toJsonObject() const override;
+    bool isValid() const override;
 
     // DXAMeasurement interface
 public:
-    virtual bool isValidDicomFile(DcmFileFormat& loadedFileFormat) const override;
+    bool isValidDicomFile(DcmFileFormat& loadedFileFormat) const override;
 
     Side getSide() override;
     quint8 getScanType() override;
@@ -31,6 +25,7 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+    void simulate() override;
 };
 
 #endif // FOREARM_MEASUREMENT_H

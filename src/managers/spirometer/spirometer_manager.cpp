@@ -16,7 +16,9 @@ SpirometerManager::SpirometerManager(const CypressSession& session)
     //m_inputKeyList << "asthma"; // true/false
     //m_inputKeyList << "copd";   // true/false
     //m_inputKeyList << "ethnicity"; // caucasian, asian, african, hispanic, other_ethnic
-    m_test.setExpectedMeasurementCount(4);
+
+    m_test.reset(new SpirometerTest);
+    m_test->setExpectedMeasurementCount(4);
 }
 
 bool SpirometerManager::isInstalled()
@@ -29,38 +31,7 @@ bool SpirometerManager::isAvailable()
     return false;
 }
 
-void SpirometerManager::start()
-{
-    if (Cypress::getInstance().isSimulation()) {
-        return;
-    }
 
-    // connect signals and slots to QProcess one time only
-    //
-    connect(&m_process, &QProcess::started,
-        this, [this]() {
-            qDebug() << "process started: " << m_process.arguments().join(" ");
-        });
-
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        this, &SpirometerManager::readOutput);
-
-    connect(&m_process, &QProcess::errorOccurred,
-        this, [](QProcess::ProcessError error)
-        {
-            QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
-        });
-
-    connect(&m_process, &QProcess::stateChanged,
-        this, [](QProcess::ProcessState state) {
-            QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "process state: " << s.join(" ").toLower();
-        });
-
-    configureProcess();
-    //emit dataChanged();
-}
 
 bool SpirometerManager::isDefined(const QString& value, const SpirometerManager::FileType &fileType) const
 {
@@ -86,12 +57,61 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
     return ok;
 }
 
+void SpirometerManager::start()
+{
+    emit started(m_test.get());
+    emit canMeasure();
+
+    //if (Cypress::getInstance().isSimulation()) {
+    //    return;
+    //}
+
+    //// connect signals and slots to QProcess one time only
+    ////
+    //connect(&m_process, &QProcess::started,
+    //    this, [this]() {
+    //        qDebug() << "process started: " << m_process.arguments().join(" ");
+    //    });
+
+    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    //    this, &SpirometerManager::readOutput);
+
+    //connect(&m_process, &QProcess::errorOccurred,
+    //    this, [](QProcess::ProcessError error)
+    //    {
+    //        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+    //    });
+
+    //connect(&m_process, &QProcess::stateChanged,
+    //    this, [](QProcess::ProcessState state) {
+    //        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    //        qDebug() << "process state: " << s.join(" ").toLower();
+    //    });
+
+    //configureProcess();
+    //emit dataChanged();
+}
+
 void SpirometerManager::measure()
 {
-    if (Cypress::getInstance().isSimulation()) {
-        sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/spirometer/output.json");
-        return;
-    }
+    m_test->reset();
+    m_test->simulate(QVariantMap({
+                               {"barcode", "12345678"},
+                               {"smoker", true 	},
+                               {"gender", "M"},
+                               {"height", 1.87},
+                               {"weight", 80},
+                               {"date_of_birth", "12.06.1960"},
+    }));
+
+    emit measured(m_test.get());
+    emit canFinish();
+
+    //if (Cypress::getInstance().isSimulation()) {
+    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/spirometer/output.json");
+    //    return;
+    //}
 
     //QJsonObject response {
     //    { "answer_id", m_answerId },
@@ -118,6 +138,52 @@ void SpirometerManager::measure()
 
     //// launch the process
     //m_process.start();
+}
+
+void SpirometerManager::finish()
+{
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionObj = m_session.getJsonObject();
+    testJson.insert("session", sessionObj);
+
+    QJsonObject responseJson;
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    qDebug() << responseJson;
+
+    sendHTTPSRequest("PATCH",
+        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
+        "application/json",
+        serializedData
+    );
+
+    emit success("");
+
+    //if(QProcess::NotRunning != m_process.state())
+    //{
+    //   m_process.kill();
+    //}
+
+    //restoreDatabases();
+    //removeXmlFiles();
+
+    ////// delete pdf output file
+    //////
+    //QString pdfFilePath = getOutputPdfPath();
+    //if(QFile::exists(pdfFilePath))
+    //{
+    //    qDebug() << "remove pdf" << pdfFilePath;
+    //    QFile::remove(pdfFilePath);
+    //}
+
+    //m_test.reset();
+
+    //QJsonObject results = m_test.toJsonObject();
 }
 
 void SpirometerManager::select()
@@ -301,29 +367,7 @@ void SpirometerManager::configureProcess()
         qDebug() << "failed to configure process";
 }
 
-void SpirometerManager::finish()
-{
-    if(QProcess::NotRunning != m_process.state())
-    {
-       m_process.kill();
-    }
 
-    restoreDatabases();
-    removeXmlFiles();
-
-    //// delete pdf output file
-    ////
-    QString pdfFilePath = getOutputPdfPath();
-    if(QFile::exists(pdfFilePath))
-    {
-        qDebug() << "remove pdf" << pdfFilePath;
-        QFile::remove(pdfFilePath);
-    }
-
-    m_test.reset();
-
-    QJsonObject results = m_test.toJsonObject();
-}
 
 void SpirometerManager::removeXmlFiles() const
 {
@@ -348,13 +392,14 @@ void SpirometerManager::removeXmlFiles() const
 
 QString SpirometerManager::getOutputPdfPath() const
 {
-    if(m_test.isValid() &&
-       m_test.hasMetaData("pdf_report_path"))
-    {
-      return m_test.getMetaDataAsString("pdf_report_path");
-    }
-    else
-      return QString();
+    //if(m_test.isValid() &&
+    //   m_test.hasMetaData("pdf_report_path"))
+    //{
+    //  return m_test.getMetaDataAsString("pdf_report_path");
+    //}
+    //else
+    //  return QString();
+    return "";
 }
 
 bool SpirometerManager::outputPdfExists() const

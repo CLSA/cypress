@@ -2,6 +2,12 @@
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 
+#include "../measurements/ap_spine_measurement.h"
+#include "../measurements/forearm_measurement.h"
+#include "../measurements/whole_body_measurement.h"
+#include "../measurements/hip_measurement.h"
+#include "../measurements/iva_imaging_measurement.h"
+
 #include <QDir>
 #include <QJsonObject>
 
@@ -82,21 +88,90 @@ void DXATest::onDicomDirectoryChange(const QString &path)
     }
 }
 
+DXATest::DXATest()
+{
+    wholeBodyMeasurement.reset(new WholeBodyScanMeasurement);
+    apSpineMeasurement.reset(new ApSpineMeasurement);
+    hipMeasurement.reset(new HipMeasurement);
+    forarmMeasurement.reset(new ForearmMeasurement);
+    ivaImagingMeasurement.reset(new IVAImagingMeasurement);
+}
+
 bool DXATest::isValid() const
 {
-    return false;
+    return 	wholeBodyMeasurement->isValid() 	||
+            apSpineMeasurement->isValid() 		||
+            forarmMeasurement->isValid() 		||
+            ivaImagingMeasurement->isValid() 	||
+            hipMeasurement->isValid();
 }
 
 void DXATest::reset()
 {
+    wholeBodyMeasurement->reset();
+    apSpineMeasurement->reset();
+    forarmMeasurement->reset();
+    ivaImagingMeasurement->reset();
+    hipMeasurement->reset();
+}
 
+void DXATest::simulate()
+{
+    wholeBodyMeasurement->simulate();
+    apSpineMeasurement->simulate();
+    forarmMeasurement->simulate();
+    ivaImagingMeasurement->simulate();
+    hipMeasurement->simulate();
 }
 
 QJsonObject DXATest::toJsonObject() const
 {
-    QJsonObject obj{};
-    return obj;
+    QJsonObject wholeBody {};
+    if (wholeBodyMeasurement)
+    {
+        wholeBody = wholeBodyMeasurement->toJsonObject();
+    }
+
+    QJsonObject apSpine {};
+    if (apSpineMeasurement)
+    {
+        apSpine = apSpineMeasurement->toJsonObject();
+    }
+
+    QJsonObject forearm {};
+    if (forarmMeasurement)
+    {
+        forearm = apSpineMeasurement->toJsonObject();
+    }
+
+    QJsonObject iva {};
+    if (ivaImagingMeasurement)
+    {
+        iva = ivaImagingMeasurement->toJsonObject();
+    }
+
+    QJsonObject hip {};
+    if (hipMeasurement)
+    {
+        hip = hipMeasurement->toJsonObject();
+    }
+
+    QJsonObject value {};
+
+    QJsonObject results {};
+    results.insert("ap_spine", apSpine);
+    results.insert("whole_body", wholeBody);
+    results.insert("forearm", forearm);
+    results.insert("iva", iva);
+    results.insert("hip", hip);
+
+    value.insert("results", results);
+    value.insert("manual_entry", getManualEntryMode());
+
+    QJsonObject json;
+    return value;
 }
+
 
 QString DXATest::toString() const
 {

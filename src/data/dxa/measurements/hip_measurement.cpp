@@ -86,16 +86,23 @@ QStringList HipMeasurement::toStringList(const bool& no_keys) const
 {
     Q_UNUSED(no_keys)
     return QStringList {{}};
-};
+}
+
+void HipMeasurement::simulate()
+{
+    QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/hip.json");
+
+    QStringList keys = json.keys();
+    for (const QString &key : keys)
+    {
+        QJsonValue value = json.value(key);
+        setAttribute(key, value);
+    }
+}
 
 bool HipMeasurement::isValid() const
 {
     return false;
-};
-
-QJsonObject HipMeasurement::toJsonObject() const
-{
-    return QJsonObject();
 }
 
 bool HipMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) const

@@ -40,6 +40,7 @@ EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session)
 
     // device started
     connect(manager, &ECGManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 

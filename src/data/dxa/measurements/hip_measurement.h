@@ -8,20 +8,15 @@ class HipMeasurement : public DXAMeasurement
 public:
     HipMeasurement();
 
-    // String representation for debug and GUI display purposes
-    //
-    virtual QString toString() const override;
+    QString toString() const override;
 
-    virtual QStringList toStringList(const bool& no_keys = false) const override;
+    QStringList toStringList(const bool& no_keys = false) const override;
 
-    virtual bool isValid() const override;
-
-    // String keys are converted to snake_case
-    //
-    virtual QJsonObject toJsonObject() const override;
+    bool isValid() const override;
 
     // DXAMeasurement interface
 public:
+    void simulate() override;
     bool isValidDicomFile(DcmFileFormat &dicomFileFormat) const override;
     Side getSide() override;
     quint8 getScanType() override;

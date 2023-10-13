@@ -218,6 +218,7 @@ HEADERS += \
     server/default_delete_request_handler.h \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
+    server/frax_session.h \
     server/handlers/audiometer/audiometer_request_handler.h \
     server/handlers/audiometer/audiometer_status_request_handler.h \
     server/handlers/blood_pressure/blood_pressure_request_handler.h \
@@ -391,6 +392,7 @@ SOURCES += \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
+    server/frax_session.cpp \
     server/handlers/audiometer/audiometer_request_handler.cpp \
     server/handlers/audiometer/audiometer_status_request_handler.cpp \
     server/handlers/blood_pressure/blood_pressure_request_handler.cpp \

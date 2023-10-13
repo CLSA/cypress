@@ -9,7 +9,9 @@ void TestBase::reset()
 
 void TestBase::simulate() {}
 
-void TestBase::simulate(const QVariantMap &inputData) {}
+void TestBase::simulate(const QVariantMap &inputData) {
+    Q_UNUSED(inputData)
+}
 
 void TestBase::setUnitsSystem(const Constants::UnitsSystem &system)
 {

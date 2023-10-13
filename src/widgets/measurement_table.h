@@ -42,6 +42,9 @@ public:
         : QStyledItemDelegate(parent), items(items), isEditable(isEditable), required(required), readOnly(readOnly), placeholderText(placeholderText) {}
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        Q_UNUSED(index);
+        Q_UNUSED(option);
+
         QComboBox *editor = new QComboBox(parent);
         editor->addItems(items);
         editor->setEditable(false);
@@ -72,6 +75,7 @@ public:
     }
 
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        Q_UNUSED(index);
         editor->setGeometry(option.rect);
     }
 };
@@ -91,6 +95,9 @@ public:
         : QStyledItemDelegate(parent), min(min), max(max), required(required), readOnly(readOnly), allowEmpty(allowEmpty), decimals(decimals) {}
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        Q_UNUSED(index);
+        Q_UNUSED(option);
+
         if (decimals == 0) {  // Integer
             QSpinBox *editor = new QSpinBox(parent);
             editor->setMinimum(min);
@@ -135,6 +142,7 @@ public:
     };
 
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        Q_UNUSED(index)
         editor->setGeometry(option.rect);
     };
 };
@@ -155,6 +163,9 @@ public:
         : QStyledItemDelegate(parent), placeholderText(placeholderText), regexPattern(regexPattern), readOnly(readOnly), required(required) {}
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        Q_UNUSED(index)
+        Q_UNUSED(option)
+
         QLineEdit *editor = new QLineEdit(parent);
 
         if (!placeholderText.isEmpty()) {
@@ -185,6 +196,7 @@ public:
     }
 
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        Q_UNUSED(index)
         editor->setGeometry(option.rect);
     }
 };

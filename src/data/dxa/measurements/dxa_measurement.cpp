@@ -1,9 +1,39 @@
 #include "dxa_measurement.h"
+
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
+#include <QFile>
 #include <QJsonObject>
+#include <QJsonDocument>
 
 DXAMeasurement::DXAMeasurement()
 {
 
+}
+
+QJsonObject DXAMeasurement::readJsonFile(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        switch (file.error()) {
+            case QFile::OpenError:
+                throw std::runtime_error("Open error");
+            case QFile::PermissionsError:
+                throw std::runtime_error("Permission error");
+            case QFile::ReadError:
+                throw std::runtime_error("Permission error");
+            default:
+                throw std::runtime_error(file.errorString().toStdString());
+        }
+    }
+
+    QByteArray jsonData = file.readAll();
+    QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonData));
+
+    return jsonDoc.object();
 }
 
 QString DXAMeasurement::toString() const
@@ -84,11 +114,4 @@ bool DXAMeasurement::isValidDicomFile(DcmFileFormat& dicomFileFormat) const
     }
 
     return true;
-};
-
-// String keys are converted to snake_case
-//
-QJsonObject DXAMeasurement::toJsonObject() const
-{
-   return QJsonObject();
 };

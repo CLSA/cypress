@@ -34,20 +34,20 @@ const QList<QString> m_outputKeyList =
     "L1_BMC",           // double
     "L1_BMD", 		    // double
 
-    "L1_INCLUDED",      // boolean
-    "L1_AREA", 		    // double
-    "L1_BMC", 		    // double
-    "L1_BMD", 		    // double
+    "L2_INCLUDED",      // boolean
+    "L2_AREA", 		    // double
+    "L2_BMC", 		    // double
+    "L2_BMD", 		    // double
 
-    "L1_INCLUDED",  	// boolean
-    "L1_AREA",      	// double
-    "L1_BMC",       	// double
-    "L1_BMD",       	// double
+    "L3_INCLUDED",  	// boolean
+    "L3_AREA",      	// double
+    "L3_BMC",       	// double
+    "L3_BMD",       	// double
 
-    "L1_INCLUDED",  	// boolean
-    "L1_AREA", 			// double
-    "L1_BMC", 			// double
-    "L1_BMD", 			// double
+    "L4_INCLUDED",  	// boolean
+    "L4_AREA", 			// double
+    "L4_BMC", 			// double
+    "L4_BMD", 			// double
 
     "TOT_AREA", 		// double
     "TOT_BMC", 			// double
@@ -66,29 +66,35 @@ const QList<QString> m_outputKeyList =
 ApSpineMeasurement::ApSpineMeasurement()
 {
     m_mdb_keys = QStringList({
+        "NO_REGIONS", 	    // long
+        "STARTING_REGION",  // long
+
         "L1_INCLUDED",      // boolean
         "L1_AREA", 		    // double
         "L1_BMC",           // double
         "L1_BMD", 		    // double
 
-        "L1_INCLUDED",      // boolean
-        "L1_AREA", 		    // double
-        "L1_BMC", 		    // double
-        "L1_BMD", 		    // double
+        "L2_INCLUDED",      // boolean
+        "L2_AREA", 		    // double
+        "L2_BMC", 		    // double
+        "L2_BMD", 		    // double
 
-        "L1_INCLUDED",  	// boolean
-        "L1_AREA",      	// double
-        "L1_BMC",       	// double
-        "L1_BMD",       	// double
+        "L3_INCLUDED",  	// boolean
+        "L3_AREA",      	// double
+        "L3_BMC",       	// double
+        "L3_BMD",       	// double
 
-        "L1_INCLUDED",  	// boolean
-        "L1_AREA", 			// double
-        "L1_BMC", 			// double
-        "L1_BMD", 			// double
+        "L4_INCLUDED",  	// boolean
+        "L4_AREA", 			// double
+        "L4_BMC", 			// double
+        "L4_BMD", 			// double
 
         "TOT_AREA", 		// double
         "TOT_BMC", 			// double
         "TOT_BMD", 			// double
+
+        "TOT_T",
+        "TOT_Z",
 
         "STD_TOT_BMD",  	// double
 
@@ -96,8 +102,6 @@ ApSpineMeasurement::ApSpineMeasurement()
         "ROI_WIDTH", 		// double
         "ROI_HEIGHT", 		// double
 
-        "NO_REGIONS", 	    // long
-        "STARTING_REGION",  // long
         "PHYSICIAN_COMMENT" // string
     });
 
@@ -163,7 +167,19 @@ QString ApSpineMeasurement::toString() const
 QStringList ApSpineMeasurement::toStringList(const bool& no_keys) const
 {
     Q_UNUSED(no_keys)
-    return QStringList {{}};
+   return QStringList {{}};
+}
+
+void ApSpineMeasurement::simulate()
+{
+    QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/spine.json");
+
+    QStringList keys = json.keys();
+    for (const QString &key : keys)
+    {
+        QJsonValue value = json.value(key);
+        setAttribute(key, value);
+    }
 };
 
 bool ApSpineMeasurement::isValid() const
@@ -212,9 +228,4 @@ bool ApSpineMeasurement::isValidDicomFile(DcmFileFormat& loadedFileFormat) const
     if (value != mediaStorageSOPClassUID) return false;
 
     return true;
-};
-
-QJsonObject ApSpineMeasurement::toJsonObject() const
-{
-   return QJsonObject();
 };

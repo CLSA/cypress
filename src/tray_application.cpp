@@ -6,6 +6,8 @@
 TrayApplication::TrayApplication(QMainWindow* mainWidget, QStyle* style, QObject *parent)
     : QObject{parent}, m_mainWidget(mainWidget)
 {
+    Q_UNUSED(style)
+
     m_trayIcon = new QSystemTrayIcon(this);
     m_trayMenu = new QMenu();
 

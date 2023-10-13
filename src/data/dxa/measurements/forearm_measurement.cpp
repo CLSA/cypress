@@ -1,4 +1,9 @@
 #include "forearm_measurement.h"
+
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
 #include <QJsonObject>
 
 // { "RU13TOT_BMD",    "1.." },
@@ -99,6 +104,18 @@ QString ForearmMeasurement::getRefSource() {
     return "ref";
 }
 
+void ForearmMeasurement::simulate()
+{
+    QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/forearm.json");
+
+    QStringList keys = json.keys();
+    for (const QString &key : keys)
+    {
+        QJsonValue value = json.value(key);
+        setAttribute(key, value);
+    }
+}
+
 bool ForearmMeasurement::isValid() const
 {
     return false;
@@ -164,9 +181,4 @@ QStringList ForearmMeasurement::toStringList(const bool& no_keys) const
 {
     Q_UNUSED(no_keys)
     return QStringList {{}};
-};
-
-QJsonObject ForearmMeasurement::toJsonObject() const
-{
-    return QJsonObject();
 };

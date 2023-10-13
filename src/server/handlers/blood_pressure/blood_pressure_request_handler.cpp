@@ -31,49 +31,13 @@ void BloodPressureRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
         out << responseData.toStdString();
         out.flush();
     }
-    catch (const InvalidBarcodeException& exception)
+    catch (const ValidationError& exception)
     {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         response.setContentType("application/json");
 
         std::ostream& out = response.send();
-        out << "invalid barcode";
-        out.flush();
-    }
-    catch (const InvalidAnswerIdException& exception)
-    {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        response.setContentType("application/json");
-
-        std::ostream& out = response.send();
-        out << "invalid answer id";
-        out.flush();
-    }
-    catch (const InvalidInterviewerException& exception)
-    {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        response.setContentType("application/json");
-
-        std::ostream& out = response.send();
-        out << "invalid interviewer option";
-        out.flush();
-    }
-    catch (const InvalidLanguageException& exception)
-    {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        response.setContentType("application/json");
-
-        std::ostream& out = response.send();
-        out << "invalid language option";
-        out.flush();
-    }
-    catch (const InvalidInputDataException& exception)
-    {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        response.setContentType("application/json");
-
-        std::ostream& out = response.send();
-        out << "invalid input data";
+        out << exception.what();
         out.flush();
     }
 }

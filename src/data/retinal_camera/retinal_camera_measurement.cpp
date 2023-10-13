@@ -21,5 +21,6 @@ QString RetinalCameraMeasurement::toString() const
 
 QStringList RetinalCameraMeasurement::toStringList(const bool &no_keys) const
 {
+    Q_UNUSED(no_keys)
     return QStringList { };
 }

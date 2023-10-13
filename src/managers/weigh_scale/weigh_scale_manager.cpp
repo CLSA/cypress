@@ -50,12 +50,12 @@ void WeighScaleManager::finish()
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session.getJsonObject();
 
-    QJsonObject value = testJson.value("value").toObject();
-    value.insert("metadata", sessionObj);
+    QJsonObject responseJson;
+    testJson.insert("session", sessionObj);
 
-    testJson.insert("value", value);
+    responseJson.insert("value", testJson);
 
-    QJsonDocument jsonDoc(testJson);
+    QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
     sendHTTPSRequest("PATCH",

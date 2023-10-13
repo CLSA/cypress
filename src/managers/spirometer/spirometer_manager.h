@@ -90,8 +90,6 @@ private:
 
     QProcess m_process;
 
-    SpirometerTest m_test;
-
     // Reset the session
     bool clearData() override;
 

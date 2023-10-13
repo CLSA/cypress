@@ -13,6 +13,8 @@
 #include "auxiliary/Constants.h"
 #include "server/Server.h"
 
+#include "server/frax_session.h"
+
 Cypress* Cypress::app = nullptr;
 Cypress& Cypress::getInstance()
 {
@@ -62,7 +64,7 @@ void Cypress::startValidatedReportSession(CypressSession session)
     qDebug() << "startValidatedReportSession";
     QSharedPointer<CypressSession> newSession { new CypressSession(session) };
     sessions.insert(newSession->getSessionId(), newSession);
-    newSession->startReport();
+    //newSession->startReport();
 }
 
 
@@ -94,7 +96,7 @@ void Cypress::printActiveSessions() const
 
         if (session.getStatus() == SessionStatus::Started)
         {
-            qDebug() << " " << session.getAnswerId() << " " << session.getBarcode() << session.getDeviceType();
+            qDebug() << " " << session.getAnswerId() << " " << session.getBarcode();
         }
     }
 }
@@ -152,4 +154,30 @@ QJsonObject Cypress::getStatus()
     };
 
     return statusJson;
+}
+
+QString Cypress::requestSession(Constants::MeasureType type, QJsonObject inputData)
+{
+    QSharedPointer<CypressSession> session;
+    if (type == Constants::MeasureType::Frax)
+    {
+        session.reset(new FraxSession(inputData));
+    }
+    else
+    {
+        session.reset(new CypressSession(inputData));
+    }
+
+    if (!session)
+    {
+        throw QException();
+    }
+
+    session->validate();
+    session->calculateInputs();
+
+    sessions.insert(session->getSessionId(), session);
+    session->start();
+
+    return session->getSessionId();
 }

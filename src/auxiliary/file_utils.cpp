@@ -43,6 +43,8 @@ QJsonObject FileUtils::readJsonFile(const QString &filePath)
 
 void FileUtils::sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data)
 {
+    Q_UNUSED(method)
+
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(

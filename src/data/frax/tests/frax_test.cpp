@@ -215,10 +215,6 @@ bool FraxTest::isValid() const
 
 QJsonObject FraxTest::toJsonObject() const
 {
-    QJsonObject testJson {
-
-    };
-
     QJsonArray measurementArray;
     auto measurements { getMeasurements() };
 
@@ -230,8 +226,7 @@ QJsonObject FraxTest::toJsonObject() const
 
     valuesObject.insert("metadata", getMetaData().toJsonObject());
     valuesObject.insert("results", measurementArray);
+    valuesObject.insert("manual_entry", getManualEntryMode());
 
-    testJson.insert("values", valuesObject);
-
-    return testJson;
+    return valuesObject;
 }

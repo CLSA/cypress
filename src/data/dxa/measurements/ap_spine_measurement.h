@@ -11,13 +11,13 @@ class ApSpineMeasurement : public DXAMeasurement
 public:
     ApSpineMeasurement();
 
-    virtual QString toString() const override;
-    virtual QStringList toStringList(const bool& no_keys = false) const override;
+    QString toString() const override;
+    QStringList toStringList(const bool& no_keys = false) const override;
+
+    void simulate() override;
 
     bool isValidDicomFile(DcmFileFormat& loadedFileFormat) const override;
-
-    virtual bool isValid() const override;
-    virtual QJsonObject toJsonObject() const override;
+    bool isValid() const override;
 
     // DXAMeasurement interface
 public:

@@ -21,236 +21,49 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <layout class="QVBoxLayout" name="page">
-     <item>
-      <widget class="QGroupBox" name="form">
-       <property name="title">
-        <string/>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <item>
-         <layout class="QVBoxLayout" name="fields">
-          <item>
-           <layout class="QVBoxLayout" name="display">
-            <item>
-             <layout class="QHBoxLayout" name="participant">
-              <item>
-               <widget class="QLabel" name="participantLabel">
-                <property name="minimumSize">
-                 <size>
-                  <width>100</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>100</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::NoFrame</enum>
-                </property>
-                <property name="text">
-                 <string>Participant ID: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="participantValue">
-                <property name="text">
-                 <string>100125263</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="scan">
-              <item>
-               <widget class="QLabel" name="scanLabel">
-                <property name="minimumSize">
-                 <size>
-                  <width>100</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>100</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Scan:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="scanValue">
-                <property name="text">
-                 <string>Hip (B)</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="status">
-              <item>
-               <widget class="QLabel" name="statusLabel">
-                <property name="minimumSize">
-                 <size>
-                  <width>100</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>100</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Status:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="statusValue">
-                <property name="text">
-                 <string>Incomplete (1/5)</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="buttons">
-          <item>
-           <layout class="QHBoxLayout" name="buttonRow">
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="completeButton">
-              <property name="text">
-               <string>Complete</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="collectButton">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Collect</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="submitButton">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Submit</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTabWidget" name="tabs">
-       <property name="tabPosition">
-        <enum>QTabWidget::North</enum>
-       </property>
-       <property name="tabShape">
-        <enum>QTabWidget::Rounded</enum>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <property name="elideMode">
-        <enum>Qt::ElideNone</enum>
-       </property>
-       <property name="documentMode">
-        <bool>false</bool>
-       </property>
-       <property name="movable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="filesTab">
-        <attribute name="title">
-         <string>Files</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QTextBrowser" name="filesList"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="logTab">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <attribute name="title">
-         <string>Log</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QTextBrowser" name="logBrowser">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Plain</enum>
-           </property>
-           <property name="autoFormatting">
-            <set>QTextEdit::AutoBulletList</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="openFileExplorer">
-           <property name="text">
-            <string>View Files</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="optionsTab">
-        <attribute name="title">
-         <string>Options</string>
-        </attribute>
-       </widget>
-      </widget>
-     </item>
-    </layout>
+    <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="DicomWidget" name="dicomWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="MeasurementTable" name="measurementTable" native="true"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MeasurementTable</class>
+   <extends>QWidget</extends>
+   <header>widgets/measurement_table.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TestInfoWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/test_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DicomWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/dicom_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -98,6 +98,7 @@ void BloodPressureManager::setDevice(const QUsb::Id &info)
 
 void BloodPressureManager::setCuffSize(const QString &size)
 {
+    Q_UNUSED(size)
   //if(size.isNull() || 0 == size.length()) return;
   //if(size.toLower() != m_cuffSize)
   //{
@@ -109,6 +110,7 @@ void BloodPressureManager::setCuffSize(const QString &size)
 
 void BloodPressureManager::setSide(const QString &side)
 {
+    Q_UNUSED(side)
   //if(side.isNull() || 0 == side.length()) return;
   //if(side.toLower() != m_side)
   //{

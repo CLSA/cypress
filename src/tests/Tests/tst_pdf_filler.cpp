@@ -1,4 +1,6 @@
 
+
+#include "../../data/dxa/tests/dxa_test.h"
 #include "../../data/ecg/tests/ecg_test.h"
 #include "../../data/blood_pressure/tests/blood_pressure_test.h"
 #include "../../data/spirometer/tests/spirometer_test.h"
@@ -33,30 +35,54 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    void test_dexa_sim();
-    void test_audiometer_sim();
+    void test_dexa_sim(); 			// done
+    void test_audiometer_sim(); 	// done
+    void test_weight_scale_sim(); 	// done
+    void test_spirometer_sim(); 	// done
+
+    void test_ultrasound_sim();
+    void test_bpm_sim();
+
+    void test_ecg_sim();
+    void test_tonometer_sim();
+
+    void test_retinal_camera_sim_left();
+    void test_retinal_camera_sim_right();
+
+    void test_cdtt_sim();
+
     void test_grip_strength_sim();
     void test_choice_reaction_sim();
+
     void test_gen_proxy_sim();
     void test_participant_report_en_sim();
     void test_participant_report_fr_sim();
-
-    void test_ecg_sim();
-    void test_bpm_sim();
-    void test_weight_scale_sim();
-    void test_spirometer_sim();
-    void test_tonometer_sim();
-    void test_ultrasound_sim();
-    void test_retinal_camera_sim();
-    void test_cdtt_sim();
 };
+
+DeviceSimTests::DeviceSimTests()
+{
+
+}
+
+DeviceSimTests::~DeviceSimTests()
+{
+
+}
+
+void DeviceSimTests::initTestCase()
+{
+
+}
+
+void DeviceSimTests::cleanupTestCase()
+{
+
+}
 
 void DeviceSimTests::test_ecg_sim()
 {
     ECGTest test;
-
     test.simulate();
-
     qDebug() << test.toJsonObject();
 }
 
@@ -90,11 +116,16 @@ void DeviceSimTests::test_spirometer_sim()
 
 void DeviceSimTests::test_dexa_sim()
 {
-
+    DXATest test;
+    test.simulate();
+    qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_ultrasound_sim()
 {
+    CimtVividiTest test;
+    test.simulate();
+    qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_audiometer_sim()
@@ -104,7 +135,15 @@ void DeviceSimTests::test_audiometer_sim()
     qDebug() << test.toJsonObject();
 }
 
-void DeviceSimTests::test_retinal_camera_sim()
+void DeviceSimTests::test_retinal_camera_sim_left()
+{
+    RetinalCameraTest test;
+    test.simulate();
+    qDebug() << test.toJsonObject();
+}
+
+
+void DeviceSimTests::test_retinal_camera_sim_right()
 {
     RetinalCameraTest test;
     test.simulate();
@@ -140,25 +179,7 @@ void DeviceSimTests::test_choice_reaction_sim()
     qDebug() << test.toJsonObject();
 }
 
-DeviceSimTests::DeviceSimTests()
-{
 
-}
-
-DeviceSimTests::~DeviceSimTests()
-{
-
-}
-
-void DeviceSimTests::initTestCase()
-{
-
-}
-
-void DeviceSimTests::cleanupTestCase()
-{
-
-}
 
 void DeviceSimTests::test_gen_proxy_sim()
 {

@@ -87,6 +87,9 @@ void MeasurementTable::initializeModel(QList<TableColumn> columns)
 
 void MeasurementTable::handleChange(int row, int col)
 {
+    Q_UNUSED(row)
+    Q_UNUSED(col)
+
     ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
     ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
 }

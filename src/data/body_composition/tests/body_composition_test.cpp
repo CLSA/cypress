@@ -163,6 +163,7 @@ QString BodyCompositionTest::toString() const
 //
 void BodyCompositionTest::fromArray(const QByteArray &arr)
 {
+    Q_UNUSED(arr)
     //if(!arr.isEmpty())
     //{
     //  reset();

@@ -38,7 +38,10 @@ public:
     QString getSessionInfo();
     QJsonObject getStatus();
 
+    QString requestSession(Constants::MeasureType type, QJsonObject inputData);
+
     bool endSession(const QString& uuid);
+
     void enableSimMode() { m_simulate = true; };
     void disableSimMode() { m_simulate = false; };
     bool isSimulation() { return m_simulate; };

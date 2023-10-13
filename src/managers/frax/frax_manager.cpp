@@ -34,12 +34,13 @@ void FraxManager::start()
 
 bool FraxManager::isDefined(const QString &exeName) const
 {
+    Q_UNUSED(exeName)
     return true;
 }
 
 void FraxManager::selectRunnable(const QString &runnableName)
 {
-
+    Q_UNUSED(runnableName)
 }
 
 void FraxManager::measure()
@@ -49,22 +50,22 @@ void FraxManager::measure()
     QVariantMap map;
     QJsonObject inputData = m_session.getInputData();
 
-    map.insert("TYPE", inputData.value("type"));
-    map.insert("COUNTRY_CODE", inputData.value("country_code"));
-    map.insert("AGE", inputData.value("age"));
-    map.insert("SEX", inputData.value("sex"));
-    map.insert("BMI", inputData.value("bmi"));
-    map.insert("PREVIOUS_FRACTURE", inputData.value("previous_fracture"));
-    map.insert("PARENT_HIP_FRACTURE", inputData.value("parent_hip_fracture"));
-    map.insert("CURRENT_SMOKER", inputData.value("current_smoker"));
-    map.insert("GLUCCOCORTICOID", inputData.value("gluccocorticoid"));
-    map.insert("RHEUMATOID_ARTHRITIS", inputData.value("rheumatoid_arthritis"));
-    map.insert("SECONDARY_OSTEOPOROSIS", inputData.value("secondary_osteoporosis"));
-    map.insert("T_SCORE", inputData.value("t_score"));
-    map.insert("Z_SCORE", inputData.value("z_score"));
-    map.insert("ALCOHOL", inputData.value("alcohol"));
-    map.insert("BIRTH_DATE", inputData.value("birth_date"));
-    map.insert("INTERVIEW_DATE", inputData.value("interview_date"));
+    map.insert("type", 						inputData.value("type"));
+    map.insert("country_code", 				inputData.value("country_code"));
+    map.insert("age", 						inputData.value("age"));
+    map.insert("sex", 						inputData.value("sex"));
+    map.insert("bmi", 						inputData.value("bmi"));
+    map.insert("previous_fracture", 		inputData.value("previous_fracture"));
+    map.insert("parent_hip_fracture", 		inputData.value("parent_hip_fracture"));
+    map.insert("current_smoker", 			inputData.value("current_smoker"));
+    map.insert("gluccocorticoid", 			inputData.value("gluccocorticoid"));
+    map.insert("rheumatoid_arthritis", 		inputData.value("rheumatoid_arthritis"));
+    map.insert("secondary_osteoporosis", 	inputData.value("secondary_osteoporosis"));
+    map.insert("t_score", 					inputData.value("t_score"));
+    map.insert("z_score", 					inputData.value("z_score"));
+    map.insert("alcohol", 					inputData.value("alcohol"));
+    map.insert("birth_date", 				inputData.value("birth_date"));
+    map.insert("interview_date", 			inputData.value("interview_date"));
 
     m_test->simulate(map);
 
@@ -91,13 +92,19 @@ bool FraxManager::clearData()
 
 void FraxManager::finish()
 {
+    QJsonObject responseJson {};
+
     int answer_id = m_session.getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonDocument jsonDoc(testJson);
+    testJson.insert("session", m_session.getJsonObject());
+
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + answer_id, "application/json", serializedData);
+    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
 
     emit success("sent");
 }

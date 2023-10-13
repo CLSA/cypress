@@ -35,21 +35,18 @@ Server::~Server()
 
 QString Server::requestDevice(const Constants::MeasureType& device, const QJsonObject& inputData)
 {
-    CypressSession session(device, inputData); // this validates the input data or throws exception
-
-    emit startSession(session);
-
-    return session.getSessionId();
+    //emit requestSession(device, inputData);
 }
 
 
 QString Server::requestReport(const Constants::ReportType& report, const QJsonObject& inputData)
 {
-    CypressSession session(report, inputData);
+    //CypressSession session(report, inputData);
 
-    emit startReport(session);
+    //emit startReport(session);
 
-    return session.getSessionId();
+    //return session.getSessionId();
+    return "";
 }
 
 void Server::forceSessionEnd(QString sessionId)

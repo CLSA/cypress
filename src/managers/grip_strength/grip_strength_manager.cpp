@@ -173,6 +173,7 @@ bool GripStrengthManager::cleanUp() {
 
 void GripStrengthManager::setInputData(const QVariantMap& inputData)
 {
+    Q_UNUSED(inputData);
    //m_inputData = inputData;
 }
 

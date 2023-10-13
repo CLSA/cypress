@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QException>
 
 SerialPortPickerWidget::SerialPortPickerWidget(QWidget *parent) :
     QWidget(parent),
@@ -67,6 +68,8 @@ const QSerialPortInfo& SerialPortPickerWidget::selectDevice(const QString& label
             return *it;
         }
     }
+
+    throw QException();
 }
 
 void SerialPortPickerWidget::setBaudRate(QSerialPort::BaudRate baudRate)

@@ -31,6 +31,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
 
     // device started
     connect(manager, &RetinalCameraManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 

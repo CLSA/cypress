@@ -19,12 +19,13 @@ BloodPressureDialog::BloodPressureDialog(QWidget* parent, const CypressSession& 
     ui->testInfoWidget->setSessionInformation(session);
 
     QList<TableColumn> columns;
-    columns << TableColumn("diastolic", "Diastolic", new NumberDelegate(0, 1000, true, false, 2));
+    columns << TableColumn("diastolic", "Diastolic", new NumberDelegate(0, 1000, true, false, false, 2));
     columns << TableColumn("pulse", "pulse", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("systolic", "Systolic", new TextDelegate("", QRegExp(), false));
 
     // device started
     connect(manager, &BloodPressureManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 

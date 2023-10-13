@@ -8,27 +8,23 @@ class WholeBodyScanMeasurement : public DXAMeasurement
 public:
     WholeBodyScanMeasurement();
 
-    // String representation for debug and GUI display purposes
-    //
-    virtual QString toString() const;
+    QString toString() const override;
 
-    virtual QStringList toStringList(const bool& no_keys = false) const;
+    QStringList toStringList(const bool& no_keys = false) const override;
 
-    virtual bool isValid() const;
-
-    // String keys are converted to snake_case
-    //
-    virtual QJsonObject toJsonObject() const;
+    bool isValid() const override;
 
     // DXAMeasurement interface
 public:
-    bool isValidDicomFile(DcmFileFormat &dicomFileFormat) const;
-    Side getSide();
-    quint8 getScanType();
-    QString getName();
-    QString getBodyPartName();
-    QString getRefType();
-    QString getRefSource();
+    void simulate() override;
+    bool isValidDicomFile(DcmFileFormat &dicomFileFormat) const override;
+
+    Side getSide() override;
+    quint8 getScanType() override;
+    QString getName() override;
+    QString getBodyPartName() override;
+    QString getRefType() override;
+    QString getRefSource() override;
 };
 
 #endif // WHOLE_BODY_MEASUREMENT_H

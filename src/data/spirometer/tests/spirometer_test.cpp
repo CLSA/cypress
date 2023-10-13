@@ -396,8 +396,8 @@ bool SpirometerTest::isValid() const
 //
 QJsonObject SpirometerTest::toJsonObject() const
 {
-    QJsonObject value{};
-    QJsonArray trialJson{};
+    QJsonObject value {};
+    QJsonArray trialJson {};
     QJsonObject bestJson{};
 
     for (int i = 0; i < m_measurementList.size(); i++) {
@@ -411,25 +411,22 @@ QJsonObject SpirometerTest::toJsonObject() const
     }
 
     QJsonObject json;
-    if (!metaDataIsEmpty()) {
-       QJsonObject deviceJson;
-       QJsonObject metaJson = m_metaData.toJsonObject();
 
-       deviceJson.insert("device_type", metaJson.take("device_type"));
-       deviceJson.insert("device_serial_number", metaJson.take("device_serial_number"));
-       deviceJson.insert("device_software_version", metaJson.take("device_software_version"));
+    QJsonObject deviceJson {};
+    QJsonObject metaJson = m_metaData.toJsonObject();
 
-       value.insert("device_data", deviceJson);
-       value.insert("metadata", metaJson);
-    }
+    deviceJson.insert("device_type", metaJson.take("device_type"));
+    deviceJson.insert("device_serial_number", metaJson.take("device_serial_number"));
+    deviceJson.insert("device_software_version", metaJson.take("device_software_version"));
 
-    value.insert("results", trialJson);
-    value.insert("test_best_values", bestJson);
+    value.insert("device_data", deviceJson);
+    value.insert("metadata", metaJson);
+
     value.insert("manual_entry", getManualEntryMode());
+    value.insert("results", trialJson);
+    value.insert("best_values", bestJson);
 
-    json.insert("value", value);
-
-    return json;
+    return value;
 }
 
 void SpirometerTest::readPDFReportPath(const QDomNode& node)

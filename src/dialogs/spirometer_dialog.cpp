@@ -9,13 +9,59 @@
 
 SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& session):
     DialogBase(parent, session),
-    ui(new Ui::RunnableDialog)
+    ui(new Ui::SpirometerDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new SpirometerManager(session));
-    this->setWindowTitle("Spirometer");
+
+    SpirometerManager* manager = static_cast<SpirometerManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+
+    // device started
+    connect(manager, &SpirometerManager::started, ui->measurementTable, [=](TestBase *test) {
+        Q_UNUSED(test)
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &SpirometerManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &SpirometerManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &SpirometerManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &SpirometerManager::success, this, &SpirometerDialog::success);
+
+    // critical error
+    connect(manager, &SpirometerManager::error, this, &SpirometerDialog::error);
+
+    // data changed
+    connect(manager, &SpirometerManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &SpirometerManager::measure);
+
+    connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager, [=]() {
+        manager->setManualEntry(true);
+    });
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &SpirometerManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &SpirometerManager::addManualMeasurement);
 }
 
 SpirometerDialog::~SpirometerDialog()

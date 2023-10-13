@@ -22,14 +22,11 @@ public:
 
     bool readMeasurements();
 
-
     QString getTrackerDatabaseFolder();
     QJsonObject toJsonObject() const override;
 
 private:
     QStringList m_outputKeyList;
-
-
 };
 
 Q_DECLARE_METATYPE(GripStrengthTest);

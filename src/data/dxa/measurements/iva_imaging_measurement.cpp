@@ -1,5 +1,11 @@
-#include <QJsonObject>
+
 #include "iva_imaging_measurement.h"
+
+#include "dcmtk/dcmdata/dcuid.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcmetinf.h"
+
+#include <QJsonObject>
 
 IVAImagingMeasurement::IVAImagingMeasurement()
 {
@@ -17,15 +23,22 @@ QStringList IVAImagingMeasurement::toStringList(const bool& no_keys) const
     return QStringList {{}};
 };
 
+void IVAImagingMeasurement::simulate()
+{
+    QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/iva.json");
+
+    QStringList keys = json.keys();
+    for (const QString &key : keys)
+    {
+        QJsonValue value = json.value(key);
+        setAttribute(key, value);
+    }
+}
+
 bool IVAImagingMeasurement::isValid() const
 {
     return false;
 };
-
-QJsonObject IVAImagingMeasurement::toJsonObject() const
-{
-    return QJsonObject();
-}
 
 bool IVAImagingMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) const
 {

@@ -75,6 +75,8 @@ void VividiManager::cancel()
 
 void VividiManager::finish()
 {
+    QJsonObject responseJson {};
+
     int answer_id = m_session.getAnswerId();
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
@@ -97,11 +99,9 @@ void VividiManager::finish()
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session.getJsonObject();
-    QJsonObject value = testJson.value("value").toObject();
 
-    value.insert("metadata", sessionObj);
-
-    testJson.insert("value", value);
+    testJson.insert("session", sessionObj);
+    responseJson.insert("value", responseJson);
 
     QJsonDocument jsonDoc(testJson);
     QByteArray serializedData = jsonDoc.toJson();

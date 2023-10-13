@@ -116,6 +116,7 @@ bool SignaturePadManager::cleanUp() {
 // set input parameters for the test
 void SignaturePadManager::setInputData(const QVariantMap& inputData)
 {
+    Q_UNUSED(inputData)
     //m_answerId = inputData.value("answerId").toInt();
     // m_participantId = inputData.value("participantId").toString();
 }

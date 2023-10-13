@@ -1,27 +1,22 @@
 #include "cypress_session.h"
 
-#include "dialogs/dialog_factory.h"
-#include "auxiliary/Constants.h"
-#include "managers/participant_report/participant_report_manager.h"
+//#include "dialogs/dialog_factory.h"
+//#include "auxiliary/Constants.h"
+//#include "managers/participant_report/participant_report_manager.h"
 
 #include <QException>
 
 
-
-CypressSession::CypressSession():
-    m_deviceType(Constants::MeasureType::Unknown),
-    m_inputData(QJsonObject {})
+CypressSession::CypressSession()
 {
 
 }
 
-CypressSession::CypressSession(const Constants::MeasureType& device, const QJsonObject& inputData):
-    m_deviceType(device),
+
+CypressSession::CypressSession(const QJsonObject& inputData):
     m_inputData(inputData)
 {
     qDebug() << "CypressSession::DeviceSession" << inputData;
-
-    validate(inputData);
 
     m_barcode = m_inputData.value("barcode").toString();
     m_answerId = m_inputData.value("answer_id").toInt();
@@ -31,27 +26,8 @@ CypressSession::CypressSession(const Constants::MeasureType& device, const QJson
     m_startDateTime = QDateTime::currentDateTimeUtc();
 };
 
-CypressSession::CypressSession(const Constants::ReportType& report, const QJsonObject& inputData):
-    m_reportType(report),
-    m_inputData(inputData)
-{
-    qDebug() << "CypressSession::ReportSession" << inputData;
 
-    validate(inputData);
-
-    m_inputData = inputData;
-    m_barcode = m_inputData.value("barcode").toString();
-    m_answerId = m_inputData.value("answer_id").toInt();
-    m_interviewer = m_inputData.value("interviewer").toString();
-    m_language = m_inputData.value("language").toString();
-    m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-};
-
-
-CypressSession::CypressSession(const CypressSession& session):
-    m_deviceType(session.getDeviceType()),
-    m_reportType(session.getReportType()),
-    m_inputData(session.getInputData())
+CypressSession::CypressSession(const CypressSession& session): m_inputData(session.getInputData())
 {
     qDebug() << "CypressSession::CopySession";
 
@@ -70,60 +46,57 @@ CypressSession::~CypressSession()
     qDebug() << "CypressSession::Destroyed";
 }
 
-void CypressSession::validate(const QJsonObject& inputData) const
+void CypressSession::validate() const
 {
-    if (inputData.isEmpty())
-        throw InvalidInputDataException();
+    if (m_inputData.isEmpty())
+    {
+        throw ValidationError("empty");
+    }
 
-    if (!isValidString(inputData, "barcode"))
-        throw InvalidBarcodeException();
+    if (!isValidString("barcode"))
+    {
+        throw ValidationError("barcode");
+    }
 
-    if (!isValidInteger(inputData, "answer_id"))
-        throw InvalidAnswerIdException();
+    if (!isValidInteger("answer_id"))
+    {
+        throw ValidationError("answer_id");
+    }
 
-    if (!isValidString(inputData, "language"))
-        throw InvalidLanguageException();
+    if (!isValidString("language"))
+    {
+        throw ValidationError("language");
+    }
 
-    if (!isValidString(inputData, "interviewer"))
-        throw InvalidInterviewerException();
+    if (!isValidString("interviewer"))
+    {
+        throw ValidationError("interviewer");
+    }
 }
 
 void CypressSession::start()
 {
+    if (m_dialog.isNull())
+        throw QException();
+
     m_startDateTime = QDateTime::currentDateTimeUtc();
     m_status = SessionStatus::Started;
 
-    m_deviceDialog.reset(DialogFactory::instantiate(*this));
-    m_deviceDialog->run();
-    m_deviceDialog->show();
+    m_dialog->run();
+    m_dialog->show();
+
+    qDebug() << "start session" << getSessionId() << m_startDateTime;
 }
 
 void CypressSession::end()
 {
-    if (m_deviceDialog.isNull())
+    if (m_dialog.isNull())
         throw QException();
 
     m_status = SessionStatus::Ended;
     m_endDateTime = QDateTime::currentDateTimeUtc();
 
     qDebug() << "end session" << getSessionId() << m_endDateTime;
-}
-
-void CypressSession::startReport()
-{
-    if (m_reportType == Constants::ReportType::ParticipantReportEn)
-    {
-        ParticipantReportManager participantManager(*this);
-
-        participantManager.start();
-        participantManager.measure();
-        participantManager.finish();
-    }
-}
-
-void CypressSession::endReport()
-{
-
 }
 
 
@@ -164,28 +137,19 @@ QDateTime CypressSession::getEndTime() const
 
 QJsonObject CypressSession::getJsonObject() const
 {
-    QJsonObject obj;
+    QJsonObject obj = m_inputData;
 
-    obj.insert("answer_id", getAnswerId());
-    obj.insert("session_id", getSessionId());
-    obj.insert("interviewer", getInterviewer());
-    obj.insert("start_time", getStartTime().toString("yyyy-MM-ddThh:mm:ss.zzzZ"));
-    obj.insert("end_time", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ss.zzzZ"));
-    obj.insert("barcode", getBarcode());
-    obj.insert("language", getLanguage());
+    obj.insert("answer_id", 	getAnswerId());
+    obj.insert("session_id", 	getSessionId());
+    obj.insert("interviewer", 	getInterviewer());
+    obj.insert("start_time", 	getStartTime().toString("yyyy-MM-ddThh:mm:ss.zzzZ"));
+    obj.insert("end_time", 		QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ss.zzzZ"));
+    obj.insert("barcode", 		getBarcode());
+    obj.insert("language", 		getLanguage());
 
     return obj;
 }
 
-Constants::MeasureType CypressSession::getDeviceType() const
-{
-    return m_deviceType;
-}
-
-Constants::ReportType CypressSession::getReportType() const
-{
-    return m_reportType;
-}
 
 SessionStatus CypressSession::getStatus() const
 {
@@ -198,11 +162,11 @@ QJsonObject CypressSession::getInputData() const
 }
 
 
-bool CypressSession::isValidString(const QJsonObject& inputData, const QString& key) const
+bool CypressSession::isValidString(const QString& key) const
 {
-    if (!inputData.contains(key)) return false;
+    if (!m_inputData.contains(key)) return false;
 
-    QJsonValue val { inputData.value(key) };
+    QJsonValue val { m_inputData.value(key) };
 
     if (!val.isString())      return false;
     if (val.toString() == "") return false;
@@ -211,25 +175,65 @@ bool CypressSession::isValidString(const QJsonObject& inputData, const QString& 
 }
 
 
-bool CypressSession::isValidDouble(const QJsonObject& inputData, const QString& key) const
+bool CypressSession::isValidDouble(const QString& key) const
 {
-    if (!inputData.contains(key)) return false;
+    if (!m_inputData.contains(key)) return false;
 
-    QJsonValue val { inputData.value(key) };
+    QJsonValue val { m_inputData.value(key) };
     if (val.isDouble()) return true;
 
     return false;
 }
 
 
-bool CypressSession::isValidInteger(const QJsonObject& inputData, const QString& key) const
+bool CypressSession::isValidInteger(const QString& key) const
 {
-    if (!inputData.contains(key)) return false;
+    if (!m_inputData.contains(key)) return false;
 
-    QJsonValue val { inputData.value(key) };
+    QJsonValue val { m_inputData.value(key) };
     if (val.isDouble()) return true;
 
     return false;
+}
+
+
+bool CypressSession::isValidBool(const QString& key) const
+{
+    if (!m_inputData.contains(key)) return false;
+
+    QJsonValue val { m_inputData.value(key) };
+
+    if (val.isBool()) return true;
+
+    return false;
+}
+
+
+bool CypressSession::isValidDate(const QString& key, const QString& dateFormat) const
+{
+    if (!m_inputData.contains(key)) return false;
+
+    QJsonValue val { m_inputData.value(key) };
+
+    if (!val.isString()) return false;
+
+    QDate date = QDate::fromString(val.toString(), dateFormat);
+
+    return date.isValid();
+}
+
+
+bool CypressSession::isValidDateTime(const QString& key, const QString& dateFormat) const
+{
+    if (!m_inputData.contains(key)) return false;
+
+    QJsonValue val { m_inputData.value(key) };
+
+    if (!val.isString()) return false;
+
+    QDate date = QDate::fromString(val.toString(), dateFormat);
+
+    return date.isValid();
 }
 
 

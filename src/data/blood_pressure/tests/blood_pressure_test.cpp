@@ -113,7 +113,6 @@ QJsonObject BloodPressureTest::toJsonObject() const
     QJsonObject valuesObject {};
 
     valuesObject.insert("results", measurementArray);
-
     valuesObject.insert("metadata", m_metaData.toJsonObject());
     valuesObject.insert("manual_entry", getManualEntryMode());
 

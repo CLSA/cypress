@@ -42,6 +42,7 @@ GripStrengthDialog::GripStrengthDialog(QWidget* parent, const CypressSession& se
 
     // device started
     connect(manager, &GripStrengthManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 

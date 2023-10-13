@@ -32,6 +32,7 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, const CypressSession& sessio
 
     // device started
     connect(manager, &VividiManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 

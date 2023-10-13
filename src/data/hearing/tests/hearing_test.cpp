@@ -67,10 +67,11 @@ void HearingTest::simulate(const QVariantMap& inputData)
       for (i = frequencyTests.constBegin(); i != frequencyTests.constEnd(); ++i)
       {
         QSharedPointer<HearingMeasurement> measurement(new HearingMeasurement);
+
         measurement->setAttribute("side", side);
         measurement->setAttribute("test", i.value());
         measurement->setAttribute("level", QRandomGenerator::global()->bounded(1, 101));
-        qDebug() << "addMeasurement";
+
         addMeasurement(measurement);
       }
     }
@@ -193,7 +194,6 @@ const HearingMeasurement &HearingTest::getMeasurement(const QString &side, const
 
 QJsonObject HearingTest::toJsonObject() const
 {
-  QJsonObject value{};
   QJsonArray jsonArr{};
 
   foreach (const auto m, m_measurementList) {
@@ -201,11 +201,10 @@ QJsonObject HearingTest::toJsonObject() const
   }
 
   QJsonObject json{};
-  value.insert("metadata", m_metaData.toJsonObject());
-  value.insert("results", jsonArr);
-  value.insert("manual_entry", getManualEntryMode());
 
-  json.insert("value", value);
+  json.insert("metadata", m_metaData.toJsonObject());
+  json.insert("results", jsonArr);
+  json.insert("manual_entry", getManualEntryMode());
 
   return json;
 }

@@ -198,14 +198,12 @@ void AudiometerManager::finish()
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session.getJsonObject();
 
-    QJsonObject value = testJson.value("value").toObject();
-    value.insert("session", sessionObj);
-    value.insert("metadata", m_test->getMetaData().toJsonObject());
-    value.insert("manual_entry", m_test->getManualEntryMode());
+    testJson.insert("session", sessionObj);
 
-    testJson.insert("value", value);
+    QJsonObject responseJson {};
+    responseJson.insert("value", testJson);
 
-    QJsonDocument jsonDoc(testJson);
+    QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
     sendHTTPSRequest("PATCH",

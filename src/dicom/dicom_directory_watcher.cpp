@@ -26,6 +26,7 @@ DicomDirectoryWatcher::DicomDirectoryWatcher(const QString &directoryPath, QObje
 
 void DicomDirectoryWatcher::onDirectoryChanged(const QString &path)
 {
+    Q_UNUSED(path)
     m_timer.start(TIMER_WAIT);
 }
 

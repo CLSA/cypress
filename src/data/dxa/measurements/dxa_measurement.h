@@ -1,13 +1,9 @@
 #ifndef DXA_MEASUREMENT_H
 #define DXA_MEASUREMENT_H
 
-#include "data/measurement.h"
+#include "../../measurement.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
-#include "dcmtk/dcmdata/dcuid.h"
-#include "dcmtk/dcmdata/dcdeftag.h"
-#include "dcmtk/dcmdata/dcmetinf.h"
-
 #include "dcmtk/ofstd/ofstdinc.h"
 
 struct ValidDCMTag {
@@ -32,6 +28,8 @@ public:
 
     QStringList m_mdb_keys {};
 
+    QJsonObject readJsonFile(const QString &filePath);
+
     QList<ValidDCMTag> m_metaInfoTagExistsWithValue {};
     QList<ValidDCMTag> m_metaInfoTagExists {};
     QList<ValidDCMTag> m_datasetTagExistsWithValue {};
@@ -46,8 +44,9 @@ public:
     virtual QString getRefType() = 0;
     virtual QString getRefSource() = 0;
 
+    virtual void simulate() {};
+
     virtual bool isValid() const override;
-    virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
     virtual QStringList toStringList(const bool& no_keys = false) const override;
 };

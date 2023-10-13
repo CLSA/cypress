@@ -1,7 +1,7 @@
 #include "cypress_session.h"
 #include "manager_base.h"
 #include "auxiliary/json_settings.h"
-#include "server/utils.h"
+//#include "server/utils.h"
 
 #include <sstream>
 
@@ -9,10 +9,10 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/SSLManager.h"
-#include "Poco/Net/SecureStreamSocket.h"
+//#include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Path.h"
+//#include "Poco/Path.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
 
@@ -286,11 +286,16 @@ bool ManagerBase::sendResultsToPine(const QString& filePath)
 
 void ManagerBase::sendHTTPRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data)
 {
-
+    Q_UNUSED(data)
+    Q_UNUSED(method)
+    Q_UNUSED(endpoint)
+    Q_UNUSED(contentType)
 }
 
 void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data)
 {
+    Q_UNUSED(method)
+
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
