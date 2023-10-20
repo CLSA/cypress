@@ -15,9 +15,9 @@
 #include "tonometer_manager.h"
 
 TonometerManager::TonometerManager(const CypressSession& session)
-    : ManagerBase(session)
+    : ManagerBase(session), m_test(new TonometerTest)
 {
-    m_test.setExpectedMeasurementCount(2);
+    m_test->setExpectedMeasurementCount(2);
 }
 
 TonometerManager::~TonometerManager()
@@ -37,7 +37,8 @@ bool TonometerManager::isInstalled()
 
 void TonometerManager::start()
 {
-  if (Cypress::getInstance().isSimulation()) return;
+    emit started(m_test);
+    emit canMeasure();
 
     // connect signals and slots to QProcess one time only
     //
@@ -98,15 +99,21 @@ void TonometerManager::selectDatabase(const QString &dbName)
 
 void TonometerManager::measure()
 {
+    m_test->reset();
+    m_test->simulate({});
+
+    emit measured(m_test);
+    emit canFinish();
+
     //QJsonObject response {
     //    {"uuid", m_uuid,},
     //    {"answer_id", m_answerId }
     //};
 
     //sendResultsToPine(response);
-    if (Cypress::getInstance().isSimulation()) {
-      sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/tonometer/output.json");
-    }
+    //if (Cypress::getInstance().isSimulation()) {
+    //  sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/tonometer/output.json");
+    //}
 
     //results["cypress_session"] = m_uuid;
     //results["answer_id"] = m_answerId;
@@ -134,12 +141,28 @@ void TonometerManager::configureProcess()
 
 bool TonometerManager::clearData()
 {
-    m_test.reset();
+    m_test->reset();
     return false;
 }
 
 void TonometerManager::finish()
 {
+    QJsonObject responseJson {};
+
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session.getJsonObject());
+
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+
+    emit success("sent");
+
     //if (CypressApplication::getInstance().isSimulation())
     //{
     //    QJsonObject results = JsonSettings::readJsonFromFile(

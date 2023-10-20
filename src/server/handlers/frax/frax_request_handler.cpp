@@ -2,7 +2,6 @@
 
 #include "cypress_application.h"
 
-#include "../../frax_session.h"
 #include "frax_request_handler.h"
 
 #include "auxiliary/json_settings.h"

@@ -42,7 +42,7 @@ GripStrengthTest::GripStrengthTest()
 {
     m_outputKeyList << "participant_id";
     m_outputKeyList.append(testMetaMap.values());
-    setExpectedMeasurementCount(1);
+    setExpectedMeasurementCount(2);
 }
 
 //bool GripStrengthTest::readGripTestOptions()
@@ -59,6 +59,38 @@ GripStrengthTest::GripStrengthTest()
 //        }
 //    }
 //}
+
+
+void GripStrengthTest::simulate()
+{
+    auto values = testMetaMap.values();
+    for (auto value : values)
+    {
+        addMetaData(value, QVariant());
+    }
+
+    for (int i = 0; i < getExpectedMeasurementCount(); i++)
+    {
+        QJsonObject record;
+        record.insert("ExamId",   1);
+        record.insert("TestId",   i);
+        record.insert("Position", "");
+        record.insert("Side", 	  "");
+
+        record.insert("Rep1",  "");
+        record.insert("Rep2",  "");
+        record.insert("Rep3",  "");
+
+        record.insert("Average", "");
+        record.insert("Maximum", "");
+        record.insert("CV",      "");
+
+        QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
+        measurement->fromRecord(&record);
+        addMeasurement(measurement);
+    }
+
+}
 
 bool GripStrengthTest::readMeasurements()
 {
@@ -185,13 +217,11 @@ QJsonObject GripStrengthTest::toJsonObject() const
        jsonArr.append(m->toJsonObject());
     }
 
-    QJsonObject json;
-    if(!metaDataIsEmpty())
-    {
-       json.insert("metadata", m_metaData.toJsonObject());
-    }
+    QJsonObject valuesObject {};
 
-    json.insert("results", jsonArr);
+    valuesObject.insert("metadata", m_metaData.toJsonObject());
+    valuesObject.insert("results", jsonArr);
+    valuesObject.insert("manual_entry", getManualEntryMode());
 
-    return json;
+    return valuesObject;
 }

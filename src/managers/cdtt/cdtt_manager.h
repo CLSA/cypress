@@ -51,7 +51,7 @@ public slots:
 
 private:
     QProcess m_process;
-    CDTTTest m_test;
+    CDTTTest* m_test;
 
     // Reset the session
     bool clearData() override;

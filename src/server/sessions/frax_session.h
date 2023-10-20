@@ -1,13 +1,14 @@
 #ifndef FRAXSESSION_H
 #define FRAXSESSION_H
 
-#include <cypress_session.h>
+#include "cypress_session.h"
 
 class FraxSession : public CypressSession
 {
 public:
-    FraxSession(const QJsonObject& inputData);
+    FraxSession(QObject* parent, const QJsonObject& inputData);
 
+    void start() override;
     void validate() const override;
     void calculateInputs() override;
 

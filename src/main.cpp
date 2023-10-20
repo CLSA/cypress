@@ -6,7 +6,7 @@
 #include "managers/cdtt/cdtt_manager.h"
 #include "managers/choice_reaction/choice_reaction_manager.h"
 
-
+#include "cypress_session.h"
 #include "cypress_main_window.h"
 #include "tray_application.h"
 
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
-    qRegisterMetaType<CypressSession>("CypressSession");
+    qRegisterMetaType<CypressSession*>("CypressSession*");
 
     qInstallMessageHandler(messageHandler);
 

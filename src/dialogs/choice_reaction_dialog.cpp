@@ -9,13 +9,62 @@
 
 ChoiceReactionDialog::ChoiceReactionDialog(QWidget* parent, const CypressSession& session):
     DialogBase(parent, session),
-    ui(new Ui::RunnableDialog)
+    ui(new Ui::ChoiceReactionDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
 
     this->setWindowTitle("Choice Reaction Test");
+    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new ChoiceReactionManager(session));
+
+    ChoiceReactionManager* manager = static_cast<ChoiceReactionManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+
+    columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+
+    // device started
+    connect(manager, &ChoiceReactionManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &ChoiceReactionManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &ChoiceReactionManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &ChoiceReactionManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &ChoiceReactionManager::success, this, &ChoiceReactionDialog::success);
+
+    // critical error
+    connect(manager, &ChoiceReactionManager::error, this, &ChoiceReactionDialog::error);
+
+    // data changed
+    connect(manager, &ChoiceReactionManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &ChoiceReactionManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &ChoiceReactionManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &ChoiceReactionManager::addManualMeasurement);
 }
 
 ChoiceReactionDialog::~ChoiceReactionDialog()

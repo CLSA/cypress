@@ -218,7 +218,13 @@ HEADERS += \
     server/default_delete_request_handler.h \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
-    server/frax_session.h \
+    server/sessions/audiometer_session.h \
+    server/sessions/bpm_session.h \
+    server/sessions/cdtt_session.h \
+    server/sessions/choice_reaction_session.h \
+    server/sessions/dxa_session.h \
+    server/sessions/ecg_session.h \
+    server/sessions/frax_session.h \
     server/handlers/audiometer/audiometer_request_handler.h \
     server/handlers/audiometer/audiometer_status_request_handler.h \
     server/handlers/blood_pressure/blood_pressure_request_handler.h \
@@ -253,6 +259,15 @@ HEADERS += \
     server/handlers/weigh_scale/weigh_scale_request_handler.h \
     server/handlers/weigh_scale/weigh_scale_status_request_handler.h \
     server/instrument_request_handler_factory.h \
+    server/sessions/frax_session.h \
+    server/sessions/gen_proxy_session.h \
+    server/sessions/grip_strength_session.h \
+    server/sessions/participant_report_session.h \
+    server/sessions/retinal_camera_session.h \
+    server/sessions/spirometer_session.h \
+    server/sessions/tonometer_session.h \
+    server/sessions/ultrasound_session.h \
+    server/sessions/weigh_scale_session.h \
     server/utils.h \
     tray_application.h \
     widgets/device_settings/audiometer_settings_widget.h \
@@ -392,7 +407,13 @@ SOURCES += \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
-    server/frax_session.cpp \
+    server/sessions/audiometer_session.cpp \
+    server/sessions/bpm_session.cpp \
+    server/sessions/cdtt_session.cpp \
+    server/sessions/choice_reaction_session.cpp \
+    server/sessions/dxa_session.cpp \
+    server/sessions/ecg_session.cpp \
+    server/sessions/frax_session.cpp \
     server/handlers/audiometer/audiometer_request_handler.cpp \
     server/handlers/audiometer/audiometer_status_request_handler.cpp \
     server/handlers/blood_pressure/blood_pressure_request_handler.cpp \
@@ -428,6 +449,15 @@ SOURCES += \
     server/handlers/weigh_scale/weigh_scale_status_request_handler.cpp \
     server/instrument_request_handler_factory.cpp \
     server/server.cpp \
+    server/sessions/frax_session.cpp \
+    server/sessions/gen_proxy_session.cpp \
+    server/sessions/grip_strength_session.cpp \
+    server/sessions/participant_report_session.cpp \
+    server/sessions/retinal_camera_session.cpp \
+    server/sessions/spirometer_session.cpp \
+    server/sessions/tonometer_session.cpp \
+    server/sessions/ultrasound_session.cpp \
+    server/sessions/weigh_scale_session.cpp \
     server/utils.cpp \
     tray_application.cpp \
     widgets/device_settings/audiometer_settings_widget.cpp \

@@ -38,7 +38,6 @@ public:
     QString getSessionInfo();
     QJsonObject getStatus();
 
-    QString requestSession(Constants::MeasureType type, QJsonObject inputData);
 
     bool endSession(const QString& uuid);
 
@@ -53,9 +52,7 @@ public:
     void printActiveSessions() const;
 
 public slots:
-    void startValidatedDeviceSession(CypressSession session);
-    void startValidatedReportSession(CypressSession session);
-
+    void requestSession(CypressSession* session);
     void forceSessionEnd(QString sessionId);
 
 private:

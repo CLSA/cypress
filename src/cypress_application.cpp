@@ -13,7 +13,7 @@
 #include "auxiliary/Constants.h"
 #include "server/Server.h"
 
-#include "server/frax_session.h"
+#include "server/sessions/frax_session.h"
 
 Cypress* Cypress::app = nullptr;
 Cypress& Cypress::getInstance()
@@ -32,8 +32,9 @@ Cypress::Cypress(QObject *parent) :
     httpServer(new Server)
 {
     try {
-        connect(httpServer.get(), &Server::startSession, this,  &Cypress::startValidatedDeviceSession);
-        connect(httpServer.get(), &Server::startReport,  this,  &Cypress::startValidatedReportSession);
+        connect(httpServer.get(), &Server::startSession, this,  &Cypress::requestSession);
+        //connect(httpServer.get(), &Server::startReport,  this,  &Cypress::startValidatedReportSession);
+
         connect(httpServer.get(), &Server::endSession,   this,  &Cypress::forceSessionEnd);
 
         httpServer->start();
@@ -49,24 +50,6 @@ Cypress::~Cypress()
 {
     delete app;
 }
-
-void Cypress::startValidatedDeviceSession(CypressSession session)
-{
-    printActiveSessions();
-    QSharedPointer<CypressSession> newSession { new CypressSession(session) };
-    sessions.insert(newSession->getSessionId(), newSession);
-    newSession->start();
-}
-
-
-void Cypress::startValidatedReportSession(CypressSession session)
-{
-    qDebug() << "startValidatedReportSession";
-    QSharedPointer<CypressSession> newSession { new CypressSession(session) };
-    sessions.insert(newSession->getSessionId(), newSession);
-    //newSession->startReport();
-}
-
 
 void Cypress::forceSessionEnd(QString sessionId)
 {
@@ -156,28 +139,13 @@ QJsonObject Cypress::getStatus()
     return statusJson;
 }
 
-QString Cypress::requestSession(Constants::MeasureType type, QJsonObject inputData)
+void Cypress::requestSession(CypressSession* session)
 {
-    QSharedPointer<CypressSession> session;
-    if (type == Constants::MeasureType::Frax)
-    {
-        session.reset(new FraxSession(inputData));
-    }
-    else
-    {
-        session.reset(new CypressSession(inputData));
-    }
-
     if (!session)
     {
-        throw QException();
+        return;
     }
 
-    session->validate();
-    session->calculateInputs();
-
-    sessions.insert(session->getSessionId(), session);
+    //sessions.insert(session->getSessionId(), QSharedPointer<CypressSession>(*session));
     session->start();
-
-    return session->getSessionId();
 }

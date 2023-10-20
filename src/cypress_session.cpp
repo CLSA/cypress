@@ -7,43 +7,16 @@
 #include <QException>
 
 
-CypressSession::CypressSession()
+CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData):
+    QObject(parent), m_inputData(inputData)
 {
-
-}
-
-
-CypressSession::CypressSession(const QJsonObject& inputData):
-    m_inputData(inputData)
-{
-    qDebug() << "CypressSession::DeviceSession" << inputData;
-
     m_barcode = m_inputData.value("barcode").toString();
     m_answerId = m_inputData.value("answer_id").toInt();
     m_interviewer = m_inputData.value("interviewer").toString();
     m_language = m_inputData.value("language").toString();
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
     m_startDateTime = QDateTime::currentDateTimeUtc();
-};
 
-
-CypressSession::CypressSession(const CypressSession& session): m_inputData(session.getInputData())
-{
-    qDebug() << "CypressSession::CopySession";
-
-    m_inputData = session.getInputData();
-    m_barcode = session.getBarcode();
-    m_answerId = session.getAnswerId();
-    m_interviewer = session.getInterviewer();
-    m_language = session.getLanguage();
-    m_sessionId = session.getSessionId();
-    m_startDateTime = session.m_startDateTime;
-    m_endDateTime = session.m_endDateTime;
-}
-
-CypressSession::~CypressSession()
-{
-    qDebug() << "CypressSession::Destroyed";
 }
 
 void CypressSession::validate() const

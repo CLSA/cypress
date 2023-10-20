@@ -226,30 +226,24 @@ bool TonometerTest::isValid() const
 QJsonObject TonometerTest::toJsonObject() const
 {
     QJsonObject value{};
-    QJsonArray jsonArr{};
 
+    QJsonArray jsonArr{};
     foreach (const auto m, m_measurementList) {
        jsonArr.append(m->toJsonObject());
     }
 
-    QJsonObject json{};
-    if(!metaDataIsEmpty())
-    {
-        QJsonObject deviceJson;
-        QJsonObject metaJson = m_metaData.toJsonObject();
+    QJsonObject deviceJson;
+    QJsonObject metaJson = m_metaData.toJsonObject();
 
-        deviceJson.insert("ora_serial_number",metaJson.take("ora_serial_number"));
-        deviceJson.insert("ora_software",metaJson.take("ora_software"));
-        deviceJson.insert("pc_software",metaJson.take("pc_software"));
+    deviceJson.insert("ora_serial_number",metaJson.take("ora_serial_number"));
+    deviceJson.insert("ora_software",metaJson.take("ora_software"));
+    deviceJson.insert("pc_software",metaJson.take("pc_software"));
 
-        value.insert("device_data", deviceJson);
-        value.insert("metadata", metaJson);
-    }
+    value.insert("device_data", deviceJson);
+    value.insert("metadata", metaJson);
 
     value.insert("results", jsonArr);
     value.insert("manual_entry", getManualEntryMode());
 
-    json.insert("value", value);
-
-    return json;
+    return value;
 }

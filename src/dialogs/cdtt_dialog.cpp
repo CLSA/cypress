@@ -12,10 +12,59 @@ CDTTDialog::CDTTDialog(QWidget* parent, const CypressSession& session):
     ui(new Ui::CDTTDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
 
-    this->setWindowTitle("Canadian Digit Triplet Test");
+    this->setWindowTitle("FRAX");
+    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+
     m_manager.reset(new CDTTManager(session));
+
+    CDTTManager* manager = static_cast<CDTTManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+
+    columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+
+    // device started
+    connect(manager, &CDTTManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &CDTTManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &CDTTManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &CDTTManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &CDTTManager::success, this, &CDTTDialog::success);
+
+    // critical error
+    connect(manager, &CDTTManager::error, this, &CDTTDialog::error);
+
+    // data changed
+    connect(manager, &CDTTManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &CDTTManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &CDTTManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &CDTTManager::addManualMeasurement);
 }
 
 CDTTDialog::~CDTTDialog()

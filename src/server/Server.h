@@ -49,11 +49,11 @@ public:
 signals:
     // signals the main thread to start a new device session
     //
-    void startSession(CypressSession session);
+    void startSession(CypressSession* session);
 
-    // signals the main thread to start a new report session
-    //
-    void startReport(CypressSession session);
+    //// signals the main thread to start a new report session
+    ////
+    //void startReport(CypressSession session);
 
     // signals the main thread to end the device or report session
     //
@@ -67,6 +67,8 @@ private:
     // The thread this class runs in, communication must be done with Qt's signals/slots to the main thread
     //
     QThread serverThread;
+
+    QThread* mainThread;
 };
 
 #endif // SERVER_H

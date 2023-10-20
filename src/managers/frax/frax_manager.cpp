@@ -70,10 +70,7 @@ void FraxManager::measure()
     m_test->simulate(map);
 
     emit measured(m_test);
-    if (m_test->isValid())
-    {
-        emit canFinish();
-    }
+    emit canFinish();
 }
 
 void FraxManager::readOutput()

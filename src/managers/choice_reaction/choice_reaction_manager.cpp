@@ -1,3 +1,6 @@
+#include "cypress_session.h"
+#include "choice_reaction_manager.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -6,17 +9,13 @@
 #include <QProcess>
 #include <QSettings>
 #include <QStandardItemModel>
-
-#include "cypress_application.h"
-#include "auxiliary/json_settings.h"
-
-#include "choice_reaction_manager.h"
+#include <QJsonDocument>
 
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
 ChoiceReactionManager::ChoiceReactionManager(const CypressSession& session)
-    : ManagerBase(session)
+    : ManagerBase(session), m_test(new ChoiceReactionTest)
 {
     qDebug() << "ChoiceReactionManager inputData: " << m_inputData;
 }
@@ -33,6 +32,9 @@ bool ChoiceReactionManager::isInstalled()
 
 void ChoiceReactionManager::start()
 {
+    emit started(m_test);
+    emit canMeasure();
+
     // connect signals and slots to QProcess one time only
     //
     //connect(&m_process, &QProcess::started,
@@ -74,10 +76,15 @@ void ChoiceReactionManager::readOutput()
 
 void ChoiceReactionManager::measure()
 {
-    if (Cypress::getInstance().isSimulation()) {
-        sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/choice_reaction/output.json");
-        return;
-    }
+    m_test->reset();
+    m_test->simulate({});
+
+    emit measured(m_test);
+    emit canFinish();
+    //if (Cypress::getInstance().isSimulation()) {
+    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/choice_reaction/output.json");
+    //    return;
+    //}
 
 
     //if (results.empty()) return;
@@ -96,6 +103,21 @@ void ChoiceReactionManager::measure()
 
 void ChoiceReactionManager::finish()
 {
+    QJsonObject responseJson {};
+
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session.getJsonObject());
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+
+    emit success("sent");
+
     //if (CypressApplication::getInstance().isSimulation())
     //{
     //    QJsonObject results = JsonSettings::readJsonFromFile(

@@ -12,11 +12,59 @@ TonometerDialog::TonometerDialog(QWidget* parent, const CypressSession& session)
     ui(new Ui::RunnableDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
+
+    this->setWindowTitle("Tonometer");
+    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new TonometerManager(session));
 
-    this->setWindowTitle("Tonometer");
+    TonometerManager* manager = static_cast<TonometerManager*>(m_manager.get());
+
+    ui->testInfoWidget->setSessionInformation(session);
+
+    QList<TableColumn> columns;
+
+    columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+
+    // device started
+    connect(manager, &TonometerManager::started, ui->measurementTable, [=](TestBase* test) {
+        Q_UNUSED(test)
+        ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager, &TonometerManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // auto measure
+    connect(manager, &TonometerManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // can finish
+    connect(manager, &TonometerManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->enableFinishButton();
+    });
+
+    // finished
+    connect(manager, &TonometerManager::success, this, &TonometerDialog::success);
+
+    // critical error
+    connect(manager, &TonometerManager::error, this, &TonometerDialog::error);
+
+    // data changed
+    connect(manager, &TonometerManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &TonometerManager::measure);
+
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &TonometerManager::finish);
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &TonometerManager::addManualMeasurement);
 }
 
 TonometerDialog::~TonometerDialog()

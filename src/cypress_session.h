@@ -13,14 +13,13 @@ enum SessionStatus {
     Ended,
 };
 
-class CypressSession
+class CypressSession : public QObject
 {
+    Q_OBJECT
 public:
-    CypressSession();
-    CypressSession(const CypressSession& session);
-    CypressSession(const QJsonObject& inputData);
+    CypressSession(QObject* parent, const QJsonObject& inputData);
 
-    ~CypressSession();
+    virtual ~CypressSession() {};
 
     // Determines if the basic key/value pairs exist for a session or throws exception
     virtual void validate() const;

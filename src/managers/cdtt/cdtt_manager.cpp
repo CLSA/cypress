@@ -9,13 +9,13 @@
 #include <QSettings>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
+#include <QJsonDocument>
 
 
 CDTTManager::CDTTManager(const CypressSession& session):
-    ManagerBase(session)
+    ManagerBase(session), m_test(new CDTTTest)
 {
-    m_test.setMinimumMeasurementCount(1);
-    qDebug() << "CDTT input data: " << m_inputData;
+    m_test->setMinimumMeasurementCount(1);
 }
 
 CDTTManager::~CDTTManager()
@@ -35,6 +35,11 @@ bool CDTTManager::isInstalled()
 
 void CDTTManager::start()
 {
+    m_test->reset();
+
+    emit started(m_test);
+    emit canMeasure();
+
     // connect signals and slots to QProcess one time only
     //
     //connect(&m_process, &QProcess::started,
@@ -66,9 +71,17 @@ void CDTTManager::start()
 
 void CDTTManager::measure()
 {
-    if (Cypress::getInstance().isSimulation()) {
-        sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/cdtt/output.json");
-    };
+    m_test->reset();
+
+    m_test->simulate({});
+
+    emit measured(m_test);
+    emit canFinish();
+    //if (Cypress::getInstance().isSimulation()) {
+    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/cdtt/output.json");
+    //};
+
+
 
     //if (results.empty()) return;
 
@@ -97,6 +110,22 @@ bool CDTTManager::clearData()
 
 void CDTTManager::finish()
 {
+    QJsonObject responseJson {};
+
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session.getJsonObject());
+
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+
+    emit success("sent");
+
     //if (CypressApplication::getInstance().isSimulation())
     //{
     //    QJsonObject results = JsonSettings::readJsonFromFile(

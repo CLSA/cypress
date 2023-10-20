@@ -39,19 +39,19 @@ FraxTest::FraxTest()
 {
     setExpectedMeasurementCount(4);
 
-    m_outputKeyList << "TYPE";
-    m_outputKeyList << "COUNTRY_CODE";
-    m_outputKeyList << "AGE";
-    m_outputKeyList << "SEX";
-    m_outputKeyList << "BODY_MASS_INDEX";
-    m_outputKeyList << "PREVIOUS_FRACTURE";
-    m_outputKeyList << "PARENT_HIP_FRACTURE";
-    m_outputKeyList << "CURRENT_SMOKER";
-    m_outputKeyList << "GLUCCOCORTICOID";
-    m_outputKeyList << "RHEUMATOID_ARTHRITIS";
-    m_outputKeyList << "SECONDARY_OSTEOPOROSIS";
-    m_outputKeyList << "ALCOHOL";
-    m_outputKeyList << "FEMORAL_NECK_TSCORE";
+    m_outputKeyList << "type";
+    m_outputKeyList << "country_code";
+    m_outputKeyList << "age";
+    m_outputKeyList << "sex";
+    m_outputKeyList << "body_mass_index";
+    m_outputKeyList << "previous_fracture";
+    m_outputKeyList << "parent_hip_fracture";
+    m_outputKeyList << "current_smoker";
+    m_outputKeyList << "gluccocorticoid";
+    m_outputKeyList << "rheumatoid_arthritis";
+    m_outputKeyList << "secondary_osteoporosis";
+    m_outputKeyList << "alcohol";
+    m_outputKeyList << "femoral_neck_tscore";
 }
 
 void FraxTest::fromFile(const QString& fileName)

@@ -16,6 +16,8 @@ public:
 
     QString toString() const override;
 
+    void simulate() override;
+
     bool isValid() const override;
 
     void openDatabase();

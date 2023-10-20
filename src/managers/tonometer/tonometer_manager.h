@@ -89,7 +89,7 @@ private:
     QString m_temporaryFile; // store a copy of ora.mdb
 
     QProcess m_process;
-    TonometerTest m_test;
+    TonometerTest* m_test;
 
     // Reset the session
     bool clearData() override;

@@ -66,13 +66,10 @@ void GripStrengthManager::start()
 void GripStrengthManager::measure()
 {
     m_test->reset();
+    m_test->simulate();
 
     emit measured(m_test);
-
-    if (m_test->isValid())
-    {
-        emit canFinish();
-    }
+    emit canFinish();
 
     //m_test.readMeasurements();
     //if (m_test.isValid())
@@ -100,6 +97,20 @@ void GripStrengthManager::measure()
 
 void GripStrengthManager::finish()
 {
+    QJsonObject responseJson {};
+
+    int answer_id = m_session.getAnswerId();
+
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session.getJsonObject());
+
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+
     emit success("sent");
     //cleanUp();
 }

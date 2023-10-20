@@ -2,9 +2,9 @@
 #define CHOICE_REACTION_DIALOG_H
 
 #include "dialog_base.h"
-#include "ui_runnable_dialog.h"
+#include "ui_choice_reaction_dialog.h"
 
-class ChoiceReactionDialog : public DialogBase, public Ui::RunnableDialog
+class ChoiceReactionDialog : public DialogBase, public Ui::ChoiceReactionDialog
 {
     Q_OBJECT
 
@@ -15,7 +15,7 @@ public:
 private:
     void initializeConnections() override;
 
-    Ui::RunnableDialog *ui { Q_NULLPTR };
+    Ui::ChoiceReactionDialog *ui { Q_NULLPTR };
 };
 
 #endif // CHOICE_REACTION_DIALOG_H
