@@ -218,6 +218,8 @@ HEADERS += \
     server/default_delete_request_handler.h \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
+    server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
+    server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/sessions/audiometer_session.h \
     server/sessions/bpm_session.h \
     server/sessions/cdtt_session.h \
@@ -407,6 +409,8 @@ SOURCES += \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
+    server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
+    server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
     server/sessions/bpm_session.cpp \
     server/sessions/cdtt_session.cpp \

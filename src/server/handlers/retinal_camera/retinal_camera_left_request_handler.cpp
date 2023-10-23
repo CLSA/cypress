@@ -1,15 +1,14 @@
-#include <QDebug>
-
 #include "cypress_application.h"
 #include "auxiliary/json_settings.h"
-#include "retinal_camera_request_handler.h"
 
-void RetinalCameraRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+#include "retinal_camera_left_request_handler.h"
+
+void RetinalCameraLeftRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     try {
         QJsonObject requestData = getRequestData(request);
 
-        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Retinal_Camera, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Retinal_Camera_Left, requestData);
 
         if (false)
         {

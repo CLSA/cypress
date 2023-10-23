@@ -38,6 +38,8 @@ public:
         Frax,
         Grip_Strength,
         Retinal_Camera,
+        Retinal_Camera_Left,
+        Retinal_Camera_Right,
         Spirometer,
         Thermometer,
         Tonometer,

@@ -2,9 +2,9 @@
 #define TONOMETER_DIALOG_H
 
 #include "dialog_base.h"
-#include "ui_runnable_dialog.h"
+#include "ui_tonometer_dialog.h"
 
-class TonometerDialog : public DialogBase, public Ui::RunnableDialog
+class TonometerDialog : public DialogBase, public Ui::TonometerDialog
 {
     Q_OBJECT
 
@@ -16,7 +16,7 @@ private:
     void initializeModel() override;
     void initializeConnections() override;
 
-    Ui::RunnableDialog *ui { Q_NULLPTR };
+    Ui::TonometerDialog *ui { Q_NULLPTR };
 };
 
 #endif // TONOMETER_DIALOG_H

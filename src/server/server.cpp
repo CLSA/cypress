@@ -2,17 +2,12 @@
 #include <QSettings>
 #include <QDebug>
 
-#include "auxiliary/json_settings.h"
-
 #include <string>
 #include <iostream>
 
 #include "Poco/Net/HTTPServer.h"
 #include "server/instrument_request_handler_factory.h"
 #include "server/Server.h"
-
-#include "cypress_application.h"
-
 
 #include "sessions/frax_session.h"
 #include "sessions/audiometer_session.h"
@@ -86,7 +81,10 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Grip_Strength:
             session = new GripStrengthSession(nullptr, inputData);
             break;
-        case Constants::MeasureType::Retinal_Camera:
+        case Constants::MeasureType::Retinal_Camera_Right:
+            session = new RetinalCameraSession(nullptr, inputData);
+            break;
+        case Constants::MeasureType::Retinal_Camera_Left:
             session = new RetinalCameraSession(nullptr, inputData);
             break;
         case Constants::MeasureType::Spirometer:
@@ -121,7 +119,6 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
 
     return session->getSessionId();
 }
-
 
 QString Server::requestReport(const Constants::ReportType& report, const QJsonObject& inputData)
 {

@@ -9,7 +9,7 @@
 
 TonometerDialog::TonometerDialog(QWidget* parent, const CypressSession& session):
     DialogBase { parent, session },
-    ui(new Ui::RunnableDialog)
+    ui(new Ui::TonometerDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
