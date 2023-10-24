@@ -2,6 +2,8 @@
 #define BLOOD_PRESSURE_DIALOG_H
 
 #include "dialog_base.h"
+#include "server/sessions/bpm_session.h"
+
 #include "ui_blood_pressure_dialog.h"
 
 class BloodPressureDialog : public DialogBase, public Ui::BloodPressureDialog
@@ -9,7 +11,7 @@ class BloodPressureDialog : public DialogBase, public Ui::BloodPressureDialog
     Q_OBJECT
 
 public:
-    BloodPressureDialog(QWidget* parent, const CypressSession& session);
+    BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSession> session);
     ~BloodPressureDialog();
 
 private:

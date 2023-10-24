@@ -19,7 +19,7 @@ void TonometerSession::calculateInputs()
 
 void TonometerSession::start()
 {
-    m_dialog.reset(new TonometerDialog(nullptr, *this));
+    m_dialog.reset(new TonometerDialog(nullptr, QSharedPointer<TonometerSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

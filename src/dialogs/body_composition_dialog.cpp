@@ -6,9 +6,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-BodyCompositionDialog::BodyCompositionDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::BodyCompositionDialog)
+BodyCompositionDialog::BodyCompositionDialog(QWidget *parent, QSharedPointer<CypressSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::BodyCompositionDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);

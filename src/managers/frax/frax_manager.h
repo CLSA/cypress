@@ -2,6 +2,8 @@
 #define FRAX_MANAGER_H
 
 #include "managers/manager_base.h"
+#include "server/sessions/frax_session.h"
+
 #include "data/frax/tests/frax_test.h"
 #include <QProcess>
 
@@ -23,7 +25,7 @@ class FraxManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit FraxManager(const CypressSession& session);
+    explicit FraxManager(QSharedPointer<FraxSession> session);
 
     // is the passed string an executable file
     // with the correct path elements ?

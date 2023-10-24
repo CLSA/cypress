@@ -20,7 +20,7 @@ void GripStrengthSession::calculateInputs()
 
 void GripStrengthSession::start()
 {
-    m_dialog.reset(new GripStrengthDialog(nullptr, *this));
+    m_dialog.reset(new GripStrengthDialog(nullptr, QSharedPointer<GripStrengthSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

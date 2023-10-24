@@ -5,8 +5,8 @@
 
 #include "auxiliary/json_settings.h"
 
-SignaturePadManager::SignaturePadManager(const CypressSession& session):
-    ManagerBase(session)
+SignaturePadManager::SignaturePadManager(QSharedPointer<CypressSession> session)
+    : ManagerBase(session)
 {
     spc.reset(new SignaturePadCommunication());
     spc->moveToThread(&captureThread);

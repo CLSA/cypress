@@ -2,6 +2,8 @@
 #define RETINAL_CAMERA_MANAGER_H
 
 #include "managers/manager_base.h"
+#include "server/sessions/retinal_camera_session.h"
+
 #include "data/retinal_camera/retinal_camera_test.h"
 
 #include <QObject>
@@ -14,7 +16,7 @@ class RetinalCameraManager: public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit RetinalCameraManager(const CypressSession& session);
+    explicit RetinalCameraManager(QSharedPointer<RetinalCameraSession> session);
     ~RetinalCameraManager();
 
     static bool isInstalled();

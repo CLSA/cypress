@@ -8,7 +8,7 @@
 #include <QUrl>
 #include <QMessageBox>
 
-ParticipantReportManager::ParticipantReportManager(const CypressSession& session)
+ParticipantReportManager::ParticipantReportManager(QSharedPointer<CypressSession> session)
     : ManagerBase(session)
 {
 
@@ -24,9 +24,8 @@ void ParticipantReportManager::start()
 void ParticipantReportManager::measure()
 {
     qDebug() << "ParticipantReportManager::measure()";
-    QString reportPath {
-        m_session.getLanguage() == "en" ? "participant_report_en_path" : "participant_report_fr_path"
-    };
+    QString reportPath{m_session->getLanguage() == "en" ? "participant_report_en_path"
+                                                        : "participant_report_fr_path"};
 
     QUrl url;
     url = QUrl::fromLocalFile(m_settings.readSetting(reportPath).toString());

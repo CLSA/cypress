@@ -27,6 +27,8 @@ public:
     QString getPineEndpoint() const;
     void setPineEndpoint(const QString &newEndpoint);
 
+    QString getAnswerUrl(int answer_id) const;
+
     // Read setting from the cypress.ini file
     QVariant readSetting(const QString& key) const;
 

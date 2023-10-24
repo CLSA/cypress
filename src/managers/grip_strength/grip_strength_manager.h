@@ -1,22 +1,23 @@
 #ifndef GRIP_STRENGTH_MANAGER_H
 #define GRIP_STRENGTH_MANAGER_H
 
-#include <QObject>
+#include "data/grip_strength/tests/grip_strength_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/grip_strength_session.h"
+
 #include <QJsonDocument>
+#include <QObject>
 #include <QProcess>
-#include <QTemporaryDir>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-
-#include "managers/manager_base.h"
-#include "data/grip_strength/tests/grip_strength_test.h"
+#include <QTemporaryDir>
 
 class GripStrengthManager : public ManagerBase
 {
     Q_OBJECT
 
 public:
-    explicit GripStrengthManager(const CypressSession& session);
+    explicit GripStrengthManager(QSharedPointer<GripStrengthSession> session);
     ~GripStrengthManager();
 
     static bool isInstalled();

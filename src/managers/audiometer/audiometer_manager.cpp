@@ -39,7 +39,7 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr)
     return ok;
 }
 
-AudiometerManager::AudiometerManager(const CypressSession& session)
+AudiometerManager::AudiometerManager(QSharedPointer<AudiometerSession> session)
     : SerialPortManager(session)
 {
     m_test.reset(new HearingTest);
@@ -160,7 +160,7 @@ void AudiometerManager::setInputData(const QVariantMap& inputData)
 void AudiometerManager::measure()
 {
     m_test->reset();
-    m_test->simulate(QVariantMap({{"barcode", m_session.getBarcode()}}));
+    m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
 
     emit measured(m_test.get());
     emit canFinish();
@@ -193,10 +193,10 @@ void AudiometerManager::measure()
 
 void AudiometerManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
 
     testJson.insert("session", sessionObj);
 
@@ -206,13 +206,8 @@ void AudiometerManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host{CypressSettings::getInstance().getPineHost()};
-    QString endpoint{CypressSettings::getInstance().getPineEndpoint()};
-
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("");
     //if(m_port.isOpen())

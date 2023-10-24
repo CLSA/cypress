@@ -19,7 +19,7 @@ class SignaturePadManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit SignaturePadManager(const CypressSession& session);
+    explicit SignaturePadManager(QSharedPointer<CypressSession> session);
     ~SignaturePadManager();
 
     static bool isInstalled();

@@ -14,7 +14,7 @@ class SignaturePadDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit SignaturePadDialog(QWidget* parent, const CypressSession& session);
+    explicit SignaturePadDialog(QWidget *parent, QSharedPointer<CypressSession> session);
     ~SignaturePadDialog();
 
 private slots:

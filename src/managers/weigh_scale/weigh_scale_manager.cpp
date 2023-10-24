@@ -14,7 +14,7 @@
 #include <QtMath>
 #include <QJsonDocument>
 
-WeighScaleManager::WeighScaleManager(const CypressSession& session)
+WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     : ManagerBase(session)
 {
     m_test.reset(new WeighScaleTest);
@@ -45,35 +45,21 @@ void WeighScaleManager::start()
 
 void WeighScaleManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
-
-    QJsonObject responseJson;
+    QJsonObject sessionObj = m_session->getJsonObject();
     testJson.insert("session", sessionObj);
 
+    QJsonObject responseJson;
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
-    qDebug() << host << endpoint;
-
-    try {
-        sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id),
-                         "application/json",
-                         serializedData);
-
-    } catch (QException e) {
-        qDebug() << e.what();
-    }
-
-    qDebug() << "success";
     emit success("");
 }
 

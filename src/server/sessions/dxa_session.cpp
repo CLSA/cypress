@@ -20,7 +20,7 @@ void DXASession::calculateInputs()
 
 void DXASession::start()
 {
-    m_dialog.reset(new DXADialog(nullptr, *this));
+    m_dialog.reset(new DXADialog(nullptr, QSharedPointer<DXASession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

@@ -70,7 +70,7 @@ CypressSettings::CypressSettings(): settings(QSettings::IniFormat, QSettings::Us
 QString CypressSettings::getPineHost() const
 {
     QSettings &settings = getSettings();
-    QString host = settings.value("pine/host", "https://blueberry.clsa-elcv.ca").toString();
+    QString host = settings.value("pine/host", "127.0.0.1:9000").toString();
 
     return host;
 }
@@ -98,6 +98,16 @@ void CypressSettings::setPineEndpoint(const QString &newEndpoint)
 
     QSettings &settings = getSettings();
     settings.setValue("pine/endpoint", newEndpoint);
+}
+
+QString CypressSettings::getAnswerUrl(int answer_id) const
+{
+    QString host = getPineHost();
+    QString endpoint = getPineEndpoint();
+
+    QString answerUrl{QString("%1%2%3").arg(host, endpoint, QString::number(answer_id))};
+
+    return answerUrl;
 }
 
 // .ini file can be found at C:\Users\<User>\AppData\Roaming\CLSA\Cypress.ini

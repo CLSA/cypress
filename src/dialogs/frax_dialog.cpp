@@ -6,9 +6,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::FraxDialog)
+FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::FraxDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
@@ -21,7 +21,7 @@ FraxDialog::FraxDialog(QWidget* parent, const CypressSession& session):
 
     FraxManager* manager = static_cast<FraxManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

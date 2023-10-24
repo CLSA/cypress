@@ -14,8 +14,9 @@
 #include <QStandardItemModel>
 #include <QtUsb/QtUsb>
 
-BloodPressureManager::BloodPressureManager(const CypressSession& session)
-    : ManagerBase(session), m_comm(new BPMCommunication())
+BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
+    : ManagerBase(session)
+    , m_comm(new BPMCommunication())
 {
     m_test.reset(new BloodPressureTest);
     m_test->setExpectedMeasurementCount(6);
@@ -151,10 +152,10 @@ void BloodPressureManager::disconnectDevice()
 //
 void BloodPressureManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
 
     QJsonObject value = testJson.value("value").toObject();
     value.insert("session", sessionObj);
@@ -166,13 +167,8 @@ void BloodPressureManager::finish()
     QJsonDocument jsonDoc(testJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
-
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("");
     //QJsonObject results = JsonSettings::readJsonFromFile(

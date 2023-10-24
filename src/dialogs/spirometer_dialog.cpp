@@ -1,15 +1,14 @@
 #include "spirometer_dialog.h"
 #include "managers/spirometer/spirometer_manager.h"
-#include "cypress_application.h"
 
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QCloseEvent>
 
-SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::SpirometerDialog)
+SpirometerDialog::SpirometerDialog(QWidget *parent, QSharedPointer<SpirometerSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::SpirometerDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -18,7 +17,7 @@ SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& sessio
 
     SpirometerManager* manager = static_cast<SpirometerManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

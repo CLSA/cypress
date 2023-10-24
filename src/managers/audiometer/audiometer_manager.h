@@ -3,6 +3,9 @@
 
 #include "managers/serial_port/serial_port_manager.h"
 #include "data/hearing/tests/hearing_test.h"
+
+#include "server/sessions/audiometer_session.h"
+
 #include "cypress_session.h"
 
 /*!
@@ -29,7 +32,7 @@ class AudiometerManager : public SerialPortManager
     Q_OBJECT
 
 public:
-    explicit AudiometerManager(const CypressSession& session);
+    explicit AudiometerManager(QSharedPointer<AudiometerSession> session);
 
     static QByteArray initEndCode();
     static QByteArray END_CODE;

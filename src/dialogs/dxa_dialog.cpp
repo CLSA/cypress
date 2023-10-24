@@ -8,22 +8,22 @@
 #include <QDesktopServices>
 #include <QHostInfo>
 
-DXADialog::DXADialog(QWidget* parent, const CypressSession& session) :
-    DialogBase(parent, session),
-    ui(new Ui::DXADialog)
+DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
 
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
 
-    this->setWindowTitle("CIMT");
+    this->setWindowTitle("DXA");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new DXAManager(session));
     DXAManager* manager = static_cast<DXAManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
     ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
 
     QList<TableColumn> columns;

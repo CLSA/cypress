@@ -1,8 +1,9 @@
 #ifndef WEIGH_SCALE_MANAGER_H
 #define WEIGH_SCALE_MANAGER_H
 
-#include "managers/serial_port/serial_port_manager.h"
 #include "data/weigh_scale/tests/weigh_scale_test.h"
+#include "managers/serial_port/serial_port_manager.h"
+#include "server/sessions/weigh_scale_session.h"
 
 /*!
  * \class WeighScaleManager
@@ -22,7 +23,7 @@ class WeighScaleManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit WeighScaleManager(const CypressSession& session);
+    explicit WeighScaleManager(QSharedPointer<WeighScaleSession> &session);
 
     static bool isAvailable();
     static bool isInstalled();

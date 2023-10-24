@@ -20,7 +20,7 @@ void UltrasoundSession::calculateInputs()
 
 void UltrasoundSession::start()
 {
-    m_dialog.reset(new CimtVividiDialog(nullptr, *this));
+    m_dialog.reset(new CimtVividiDialog(nullptr, QSharedPointer<UltrasoundSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

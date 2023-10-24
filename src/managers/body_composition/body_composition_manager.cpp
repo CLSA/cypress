@@ -38,7 +38,7 @@ QMap<QByteArray,QString> BodyCompositionManager::incorrectLUT= BodyCompositionMa
 //
 QMap<QByteArray,QString> BodyCompositionManager::confirmLUT= BodyCompositionManager::initConfirmationLUT();
 
-BodyCompositionManager::BodyCompositionManager(const CypressSession& session)
+BodyCompositionManager::BodyCompositionManager(QSharedPointer<CypressSession> session)
     : SerialPortManager(session)
 {
     m_test.setExpectedMeasurementCount(1);

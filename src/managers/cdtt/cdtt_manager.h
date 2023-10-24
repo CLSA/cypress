@@ -2,8 +2,9 @@
 #define CDTT_MANAGER_H
 
 #include "cypress_session.h"
-#include "managers/manager_base.h"
 #include "data/cdtt/tests/cdtt_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/cdtt_session.h"
 
 #include <QProcess>
 
@@ -27,7 +28,7 @@ class CDTTManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit CDTTManager(const CypressSession& session);
+    explicit CDTTManager(QSharedPointer<CDTTSession> session);
     ~CDTTManager();
 
     static bool isAvailable();

@@ -6,9 +6,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-BloodPressureDialog::BloodPressureDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::BloodPressureDialog)
+BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::BloodPressureDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -16,7 +16,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget* parent, const CypressSession& 
 
     BloodPressureManager* manager = static_cast<BloodPressureManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
     columns << TableColumn("diastolic", "Diastolic", new NumberDelegate(0, 1000, true, false, false, 2));

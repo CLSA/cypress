@@ -19,7 +19,7 @@ void AudiometerSession::calculateInputs()
 
 void AudiometerSession::start()
 {
-    m_dialog.reset(new AudiometerDialog(nullptr, *this));
+    m_dialog.reset(new AudiometerDialog(nullptr, QSharedPointer<AudiometerSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

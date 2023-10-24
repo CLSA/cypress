@@ -1,15 +1,13 @@
 #include "grip_strength_dialog.h"
 #include "managers/grip_strength/grip_strength_manager.h"
 
-
+#include <QCloseEvent>
 #include <QDebug>
 #include <QMessageBox>
-#include <QCloseEvent>
 
-
-GripStrengthDialog::GripStrengthDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::GripStrengthDialog)
+GripStrengthDialog::GripStrengthDialog(QWidget *parent, QSharedPointer<GripStrengthSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::GripStrengthDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
@@ -21,7 +19,7 @@ GripStrengthDialog::GripStrengthDialog(QWidget* parent, const CypressSession& se
     m_manager.reset(new GripStrengthManager(session));
 
     GripStrengthManager* manager = static_cast<GripStrengthManager*>(m_manager.get());
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

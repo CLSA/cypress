@@ -1,8 +1,9 @@
 #ifndef TONOMETER_MANAGER_H
 #define TONOMETER_MANAGER_H
 
-#include "managers/manager_base.h"
 #include "data/tonometer/tests/tonometer_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/tonometer_session.h"
 
 #include <QProcess>
 
@@ -30,7 +31,7 @@ class TonometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit TonometerManager(const CypressSession& session);
+    explicit TonometerManager(QSharedPointer<TonometerSession> session);
     ~TonometerManager();
 
     // is the passed string an executable file

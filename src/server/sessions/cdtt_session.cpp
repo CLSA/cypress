@@ -19,7 +19,7 @@ void CDTTSession::calculateInputs()
 
 void CDTTSession::start()
 {
-    m_dialog.reset(new CDTTDialog(nullptr, *this));
+    m_dialog.reset(new CDTTDialog(nullptr, QSharedPointer<CDTTSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

@@ -12,8 +12,9 @@
 #include <QFile>
 #include <QtSql>
 
-GripStrengthManager::GripStrengthManager(const CypressSession& session)
-    :ManagerBase(session), m_test(new GripStrengthTest)
+GripStrengthManager::GripStrengthManager(QSharedPointer<GripStrengthSession> session)
+    : ManagerBase(session)
+    , m_test(new GripStrengthTest)
 {
 
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
@@ -99,25 +100,20 @@ void GripStrengthManager::finish()
 {
     QJsonObject responseJson {};
 
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    testJson.insert("session", m_session.getJsonObject());
+    testJson.insert("session", m_session->getJsonObject());
 
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
-
-    emit success("sent");
+    emit success("Measurements sent to Pine");
     //cleanUp();
 }
 

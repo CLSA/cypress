@@ -7,9 +7,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-TonometerDialog::TonometerDialog(QWidget* parent, const CypressSession& session):
-    DialogBase { parent, session },
-    ui(new Ui::TonometerDialog)
+TonometerDialog::TonometerDialog(QWidget *parent, QSharedPointer<TonometerSession> session)
+    : DialogBase{parent, session}
+    , ui(new Ui::TonometerDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
@@ -22,7 +22,7 @@ TonometerDialog::TonometerDialog(QWidget* parent, const CypressSession& session)
 
     TonometerManager* manager = static_cast<TonometerManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

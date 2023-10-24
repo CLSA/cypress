@@ -1,8 +1,9 @@
 #ifndef CIMT_VIVID_I_DIALOG_H
 #define CIMT_VIVID_I_DIALOG_H
 
-#include "dialog_base.h"
 #include <QWidget>
+#include "dialog_base.h"
+#include "server/sessions/ultrasound_session.h"
 
 namespace Ui {
 class CimtVividiDialog;
@@ -13,7 +14,7 @@ class CimtVividiDialog : public DialogBase
     Q_OBJECT
 
 public:
-    explicit CimtVividiDialog(QWidget *parent, const CypressSession& session);
+    explicit CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSession> session);
     ~CimtVividiDialog();
 
 private:

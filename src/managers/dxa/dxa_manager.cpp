@@ -12,17 +12,16 @@
 //#include "auxiliary/json_settings.h"
 //#include "cypress_application.h"
 
-#include <QMap>
-#include <QVariant>
-#include <QString>
-#include <QSql>
-#include <QProcess>
-#include <QSettings>
 #include <QException>
 #include <QJsonDocument>
+#include <QMap>
+#include <QProcess>
+#include <QSettings>
+#include <QSql>
+#include <QString>
+#include <QVariant>
 
-
-DXAManager::DXAManager(const CypressSession& session) /* : m_dicomWatcher(QDir::currentPath())*/
+DXAManager::DXAManager(QSharedPointer<DXASession> session) /* : m_dicomWatcher(QDir::currentPath())*/
     : ManagerBase(session)
 {
     qDebug() << "DXAManager::New";
@@ -112,8 +111,8 @@ void DXAManager::measure()
 //
 void DXAManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
-    QString barcode = m_session.getBarcode();
+    int answer_id = m_session->getAnswerId();
+    QString barcode = m_session->getBarcode();
 
     // Whole body
     QByteArray wb_1 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/WB/WB_DICOM_1.dcm");
@@ -160,7 +159,7 @@ void DXAManager::finish()
     int fa_1_size = fa_1.size();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
 
     QJsonObject files = {};

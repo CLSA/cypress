@@ -9,7 +9,7 @@ class ParticipantReportManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    ParticipantReportManager(const CypressSession& session);
+    ParticipantReportManager(QSharedPointer<CypressSession> session);
 
     // ManagerBase interface
 public slots:

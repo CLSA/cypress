@@ -19,7 +19,7 @@ void BPMSession::calculateInputs()
 
 void BPMSession::start()
 {
-    m_dialog.reset(new BloodPressureDialog(nullptr, *this));
+    m_dialog.reset(new BloodPressureDialog(nullptr, QSharedPointer<BPMSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

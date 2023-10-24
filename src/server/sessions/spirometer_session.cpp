@@ -33,7 +33,7 @@ void SpirometerSession::calculateInputs()
 
 void SpirometerSession::start()
 {
-    m_dialog.reset(new SpirometerDialog(nullptr, *this));
+    m_dialog.reset(new SpirometerDialog(nullptr, QSharedPointer<SpirometerSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

@@ -4,16 +4,16 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
 #include <QSettings>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
-#include <QJsonDocument>
 
-
-CDTTManager::CDTTManager(const CypressSession& session):
-    ManagerBase(session), m_test(new CDTTTest)
+CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
+    : ManagerBase(session)
+    , m_test(new CDTTTest)
 {
     m_test->setMinimumMeasurementCount(1);
 }
@@ -112,39 +112,20 @@ void CDTTManager::finish()
 {
     QJsonObject responseJson {};
 
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    testJson.insert("session", m_session.getJsonObject());
+    testJson.insert("session", m_session->getJsonObject());
 
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
-
-    emit success("sent");
-
-    //if (CypressApplication::getInstance().isSimulation())
-    //{
-    //    QJsonObject results = JsonSettings::readJsonFromFile(
-    //        "C:/dev/clsa/cypress/src/tests/fixtures/cdtt/output.json"
-    //    );
-    //    if (results.empty()) return;
-
-    //    bool ok = sendResultsToPine(results);
-    //    if (!ok)
-    //    {
-    //        qDebug() << "Could not send results to Pine";
-    //    }
-    //}
+    emit success("Measurements saved to Pine");
 }
 
 void CDTTManager::configureProcess()

@@ -1,11 +1,12 @@
 #include "ecg_dialog.h"
 #include "ui_ecg_dialog.h"
-#include "managers/ecg/ecg_manager.h"
+
 #include "cypress_application.h"
+#include "managers/ecg/ecg_manager.h"
 
 #include <QCloseEvent>
 
-EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session)
+EcgDialog::EcgDialog(QWidget *parent, QSharedPointer<ECGSession> session)
     : DialogBase(parent, session)
     , ui(new Ui::EcgDialog)
 {
@@ -16,7 +17,7 @@ EcgDialog::EcgDialog(QWidget* parent, const CypressSession& session)
 
     ECGManager* manager = static_cast<ECGManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

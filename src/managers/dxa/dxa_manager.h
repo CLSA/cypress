@@ -1,18 +1,18 @@
 #ifndef DXA_MANAGER_H
 #define DXA_MANAGER_H
 
-#include <QObject>
-#include <QMap>
-#include <QVariant>
-#include <QString>
-
-#include "dcmtk/dcmdata/dcfilefo.h"
-
-#include "dicom/dicom_directory_watcher.h"
-#include "dicom/dcm_recv.h"
-
 #include "../manager_base.h"
 #include "./dicom/dicom_scp.h"
+#include "server/sessions/dxa_session.h"
+
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dicom/dcm_recv.h"
+#include "dicom/dicom_directory_watcher.h"
+
+#include <QMap>
+#include <QObject>
+#include <QString>
+#include <QVariant>
 
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
@@ -25,7 +25,7 @@ class DXAManager : public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit DXAManager(const CypressSession& session);
+    explicit DXAManager(QSharedPointer<DXASession> session);
     ~DXAManager();
 
     //DicomSCP* m_dicomSCP;

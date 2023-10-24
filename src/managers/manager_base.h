@@ -32,7 +32,7 @@ class ManagerBase : public QObject
     Q_OBJECT
 
 public:
-    explicit ManagerBase(const CypressSession& session);
+    explicit ManagerBase(QSharedPointer<CypressSession> session);
     ~ManagerBase();
 
     bool sendCancellation(QString uuid);
@@ -87,8 +87,9 @@ signals:
     void error(const QString& errorMsg);
 
 protected:
-    const CypressSession& m_session;
-    const CypressSettings& m_settings;
+    QSharedPointer<CypressSession> m_session;
+
+    const CypressSettings &m_settings;
 
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;

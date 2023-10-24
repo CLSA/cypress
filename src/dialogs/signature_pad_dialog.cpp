@@ -5,9 +5,9 @@
 
 #include <QCloseEvent>
 
-SignaturePadDialog::SignaturePadDialog(QWidget* parent, const CypressSession& session) :
-    DialogBase(parent, session),
-    ui(new Ui::SignaturePadDialog)
+SignaturePadDialog::SignaturePadDialog(QWidget *parent, QSharedPointer<CypressSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::SignaturePadDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);

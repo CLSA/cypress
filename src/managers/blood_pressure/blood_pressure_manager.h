@@ -1,8 +1,9 @@
 #ifndef BLOOD_PRESSURE_MANAGER_H
 #define BLOOD_PRESSURE_MANAGER_H
 
-#include "managers/manager_base.h"
 #include "data/blood_pressure/tests/blood_pressure_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/bpm_session.h"
 
 #include <QObject>
 #include <QThread>
@@ -38,7 +39,7 @@ class BloodPressureManager : public ManagerBase
     Q_PROPERTY(QString side MEMBER m_side NOTIFY sideChanged)
 
 public:
-    explicit BloodPressureManager(const CypressSession& session);
+    explicit BloodPressureManager(QSharedPointer<BPMSession> session);
     ~BloodPressureManager();
 
     const quint16 BPTRU_VENDOR_ID { 4279 };

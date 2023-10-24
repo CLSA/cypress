@@ -17,8 +17,9 @@
 
 #include "auxiliary/file_utils.h"
 
-RetinalCameraManager::RetinalCameraManager(const CypressSession& session):
-    ManagerBase(session), m_test(new RetinalCameraTest)
+RetinalCameraManager::RetinalCameraManager(QSharedPointer<RetinalCameraSession> session)
+    : ManagerBase(session)
+    , m_test(new RetinalCameraTest)
 {
 }
 
@@ -86,7 +87,7 @@ void RetinalCameraManager::measure()
 
 void RetinalCameraManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     //side = session
     for (int i = 0; i < m_test->getMeasurementCount(); i++) {
@@ -108,11 +109,11 @@ void RetinalCameraManager::finish()
 
     QJsonObject testJson = m_test->toJsonObject();
 
-    testJson.insert("language", m_session.getLanguage());
-    testJson.insert("session_id", m_session.getSessionId());
-    testJson.insert("answer_id", m_session.getAnswerId());
-    testJson.insert("barcode", m_session.getBarcode());
-    testJson.insert("interviewer", m_session.getInterviewer());
+    testJson.insert("language", m_session->getLanguage());
+    testJson.insert("session_id", m_session->getSessionId());
+    testJson.insert("answer_id", m_session->getAnswerId());
+    testJson.insert("barcode", m_session->getBarcode());
+    testJson.insert("interviewer", m_session->getInterviewer());
 
     QJsonDocument jsonDoc(testJson);
 

@@ -7,10 +7,9 @@
 #include <QTableWidget>
 #include <QHeaderView>
 
-
-CimtVividiDialog::CimtVividiDialog(QWidget *parent, const CypressSession& session) :
-    DialogBase(parent, session),
-    ui(new Ui::CimtVividiDialog)
+CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::CimtVividiDialog)
 {
     ui->setupUi(this);
 
@@ -23,7 +22,7 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, const CypressSession& sessio
     m_manager.reset(new VividiManager(session));
     VividiManager* manager = static_cast<VividiManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
     ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
 
     QList<TableColumn> columns;

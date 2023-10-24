@@ -16,9 +16,9 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 
-DialogBase::DialogBase(QWidget* parent, const CypressSession& session)
-    : QDialog(parent),
-    m_session(session)
+DialogBase::DialogBase(QWidget *parent, QSharedPointer<CypressSession> session)
+    : QDialog(parent)
+    , m_session(session)
 {
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
@@ -60,8 +60,7 @@ void DialogBase::run()
 
 void DialogBase::closeEvent(QCloseEvent* event)
 {
-    if (m_session.getStatus() != SessionStatus::Ended)
-    {
+    if (m_session->getStatus() != SessionStatus::Ended) {
         cancel("");
     }
 
@@ -82,9 +81,9 @@ void DialogBase::cancel(const QString& cancelMsg)
         return;
     }
 
-    m_manager->sendCancellation(m_session.getSessionId());
+    m_manager->sendCancellation(m_session->getSessionId());
 
-    Cypress::getInstance().endSession(m_session.getSessionId());
+    Cypress::getInstance().endSession(m_session->getSessionId());
 
     close();
 }
@@ -93,9 +92,9 @@ void DialogBase::error(const QString& errorMsg)
 {
     QMessageBox::critical(this, "Error", !errorMsg.isEmpty() ? errorMsg : "Unknown error");
 
-    m_manager->sendCancellation(m_session.getSessionId());
+    m_manager->sendCancellation(m_session->getSessionId());
 
-    Cypress::getInstance().endSession(m_session.getSessionId());
+    Cypress::getInstance().endSession(m_session->getSessionId());
 
     close();
 }
@@ -104,9 +103,9 @@ void DialogBase::success(const QString& successMsg)
 {
     QMessageBox::information(this, "Complete", !successMsg.isEmpty() ? successMsg : "The data has been saved to Pine");
 
-    m_manager->sendComplete(m_session.getSessionId());
+    m_manager->sendComplete(m_session->getSessionId());
 
-    Cypress::getInstance().endSession(m_session.getSessionId());
+    Cypress::getInstance().endSession(m_session->getSessionId());
 
     close();
 }

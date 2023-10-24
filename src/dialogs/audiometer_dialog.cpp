@@ -5,9 +5,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-AudiometerDialog::AudiometerDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::AudiometerDialog)
+AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -15,7 +15,7 @@ AudiometerDialog::AudiometerDialog(QWidget* parent, const CypressSession& sessio
 
     AudiometerManager* manager = static_cast<AudiometerManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
     columns << TableColumn("side", "Side", new TextDelegate("", QRegExp(), true));

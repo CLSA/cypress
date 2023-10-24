@@ -1,21 +1,22 @@
+//#include "data/AccessQueryHelper.h"
+
+#include "tonometer_manager.h"
+#include "server/sessions/tonometer_session.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 
-#include "cypress_application.h"
-#include "auxiliary/json_settings.h"
-//#include "data/AccessQueryHelper.h"
-
-#include "tonometer_manager.h"
-
-TonometerManager::TonometerManager(const CypressSession& session)
-    : ManagerBase(session), m_test(new TonometerTest)
+TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
+    : ManagerBase(session)
+    , m_test(new TonometerTest)
 {
     m_test->setExpectedMeasurementCount(2);
 }
@@ -147,12 +148,12 @@ bool TonometerManager::clearData()
 
 void TonometerManager::finish()
 {
-    QJsonObject responseJson {};
+    QJsonObject responseJson{};
 
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    testJson.insert("session", m_session.getJsonObject());
+    testJson.insert("session", m_session->getJsonObject());
 
     responseJson.insert("value", testJson);
 
@@ -162,10 +163,8 @@ void TonometerManager::finish()
     QString host = CypressSettings::getInstance().getPineHost();
     QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("sent");
 }

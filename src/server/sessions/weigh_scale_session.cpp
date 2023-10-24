@@ -20,7 +20,7 @@ void WeighScaleSession::calculateInputs()
 
 void WeighScaleSession::start()
 {
-    m_dialog.reset(new WeighScaleDialog(nullptr, *this));
+    m_dialog.reset(new WeighScaleDialog(nullptr, QSharedPointer<WeighScaleSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

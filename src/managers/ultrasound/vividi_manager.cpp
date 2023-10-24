@@ -5,8 +5,9 @@
 
 #include <QJsonDocument>
 
-VividiManager::VividiManager(const CypressSession& session)
-    : ManagerBase(session), m_test(new CimtVividiTest)
+VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
+    : ManagerBase(session)
+    , m_test(new CimtVividiTest)
 {
     //m_dcmRecv.reset(new DcmRecv(
     //    "C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/bin/dcmrecv.exe",
@@ -80,7 +81,7 @@ void VividiManager::finish()
     QString host = CypressSettings::getInstance().getPineHost();
     QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
     {
@@ -126,7 +127,7 @@ void VividiManager::finish()
     }
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
 
     testJson.insert("session", sessionObj);
     responseJson.insert("value", responseJson);

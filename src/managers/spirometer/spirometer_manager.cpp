@@ -1,14 +1,12 @@
-#include <QSettings>
-#include <QFileDialog>
-#include <QStandardItemModel>
-
-#include "cypress_application.h"
 #include "spirometer_manager.h"
-#include "auxiliary/json_settings.h"
-
 #include "managers/emr/emr_plugin_writer.h"
 
-SpirometerManager::SpirometerManager(const CypressSession& session)
+#include <QFileDialog>
+#include <QJsonDocument>
+#include <QSettings>
+#include <QStandardItemModel>
+
+SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
     : ManagerBase(session)
 {
     //TODO: check if these upstream inputs are optional or required
@@ -98,12 +96,12 @@ void SpirometerManager::measure()
 {
     m_test->reset();
     m_test->simulate(QVariantMap({
-        {"barcode", m_session.getBarcode()},
-        {"smoker", m_session.getInputData()["smoker"].toBool()},
-        {"gender", m_session.getInputData()["gender"].toString()},
-        {"height", m_session.getInputData()["height"].toDouble()},
-        {"weight", m_session.getInputData()["weight"].toDouble()},
-        {"date_of_birth", m_session.getInputData()["date_of_birth"].toString()},
+        {"barcode", m_session->getBarcode()},
+        {"smoker", m_session->getInputData()["smoker"].toBool()},
+        {"gender", m_session->getInputData()["gender"].toString()},
+        {"height", m_session->getInputData()["height"].toDouble()},
+        {"weight", m_session->getInputData()["weight"].toDouble()},
+        {"date_of_birth", m_session->getInputData()["date_of_birth"].toString()},
     }));
 
     emit measured(m_test.get());
@@ -143,10 +141,10 @@ void SpirometerManager::measure()
 
 void SpirometerManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
     testJson.insert("session", sessionObj);
 
     QJsonObject responseJson;
@@ -157,15 +155,10 @@ void SpirometerManager::finish()
 
     qDebug() << responseJson;
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
-
-    emit success("sent");
+    emit success("Measurements have been sent to Pine");
 
     //if(QProcess::NotRunning != m_process.state())
     //{

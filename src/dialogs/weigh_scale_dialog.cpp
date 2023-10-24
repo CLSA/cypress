@@ -1,14 +1,13 @@
 #include "weigh_scale_dialog.h"
 #include "managers/weigh_scale/weigh_scale_manager.h"
-#include "cypress_application.h"
 
 #include <QDebug>
 #include <QMessageBox>
 #include <QCloseEvent>
 
-WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::WeighScaleDialog)
+WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::WeighScaleDialog)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -17,7 +16,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget* parent, const CypressSession& sessio
 
     WeighScaleManager* manager = static_cast<WeighScaleManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
     columns << TableColumn("WEIGHT", "Weight", new NumberDelegate(0, 1000, true, false, false, 2));

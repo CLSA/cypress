@@ -1,16 +1,17 @@
 #include <QMessageBox>
 
 #include "retinal_camera_dialog.h"
+
 #include "managers/retinal_camera/retinal_camera_manager.h"
 #include "ui_retinal_camera_dialog.h"
 
 #include <QCloseEvent>
 #include <QMessageBox>
 
-
-RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& session) :
-    DialogBase { parent, session },
-    ui(new Ui::RetinalCameraDialog)
+RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
+                                         QSharedPointer<RetinalCameraSession> session)
+    : DialogBase{parent, session}
+    , ui(new Ui::RetinalCameraDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
@@ -23,7 +24,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget* parent, const CypressSession& 
 
     RetinalCameraManager* manager = static_cast<RetinalCameraManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
     columns << TableColumn("EYE_PICT_VENDOR", "Picture", new TextDelegate("", QRegExp("^1234$"), true));

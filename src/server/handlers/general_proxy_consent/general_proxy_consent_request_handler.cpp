@@ -32,10 +32,10 @@ void GeneralProxyConsentRequestHandler::handleRequest(Poco::Net::HTTPServerReque
 
         inputData["DMalready_mandatoryField"] = "Yes";
 
-        inputData["InformantFirstName"] = "Sally";
+        inputData["InformantFirstName"] = "Jane";
         inputData["InformantLastName"] = "Smith";
         inputData["InformantAddress"] = "123 Lane St.";
-        inputData["InformantAddress2"] = "Apt 2";
+        inputData["InformantAddress2"] = "1";
         inputData["InformantCity"] = "Hamilton";
         inputData["InformantProvince"] = "ON";
         inputData["InformantPostalCode"] = "123 456";

@@ -19,7 +19,7 @@ void ChoiceReactionSession::calculateInputs()
 
 void ChoiceReactionSession::start()
 {
-    m_dialog.reset(new ChoiceReactionDialog(nullptr, *this));
+    m_dialog.reset(new ChoiceReactionDialog(nullptr, QSharedPointer<ChoiceReactionSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

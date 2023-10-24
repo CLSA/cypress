@@ -7,9 +7,10 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 
-ChoiceReactionDialog::ChoiceReactionDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::ChoiceReactionDialog)
+ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent,
+                                           QSharedPointer<ChoiceReactionSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::ChoiceReactionDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
@@ -22,7 +23,7 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget* parent, const CypressSession
 
     ChoiceReactionManager* manager = static_cast<ChoiceReactionManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

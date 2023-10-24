@@ -9,7 +9,7 @@ FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData): Cypress
 
 void FraxSession::start()
 {
-    m_dialog.reset(new FraxDialog(nullptr, *this));
+    m_dialog.reset(new FraxDialog(nullptr, QSharedPointer<FraxSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

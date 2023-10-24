@@ -1,17 +1,19 @@
 #ifndef DXA_DIALOG_H
 #define DXA_DIALOG_H
 
-#include <QWidget>
 #include "dialog_base.h"
+#include "server/sessions/dxa_session.h"
+
 #include "ui_dxa_dialog.h"
 
+#include <QWidget>
 
 class DXADialog : public DialogBase, public Ui::DXADialog
 {
     Q_OBJECT
 
 public:
-    explicit DXADialog(QWidget* parent, const CypressSession& session);
+    explicit DXADialog(QWidget *parent, QSharedPointer<DXASession> session);
     ~DXADialog();
 
 public slots:

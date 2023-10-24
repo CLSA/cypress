@@ -2,6 +2,8 @@
 #define VIVIDI_MANAGER_H
 
 #include "managers/manager_base.h"
+#include "server/sessions/ultrasound_session.h"
+
 #include "dicom/dcm_recv.h"
 #include "dicom/dicom_directory_watcher.h"
 #include "data/cimt_vivid_i_test.h"
@@ -12,7 +14,7 @@ class VividiManager: public ManagerBase
 {
     Q_OBJECT
 public:
-    explicit VividiManager(const CypressSession& session);
+    explicit VividiManager(QSharedPointer<UltrasoundSession> session);
 
     static bool isAvailable();
     static bool isInstalled();

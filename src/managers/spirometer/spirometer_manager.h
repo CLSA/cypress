@@ -1,8 +1,9 @@
 #ifndef SPIROMETER_MANAGER_H
 #define SPIROMETER_MANAGER_H
 
-#include "managers/manager_base.h"
 #include "data/spirometer/tests/spirometer_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/spirometer_session.h"
 
 #include <QProcess>
 
@@ -15,7 +16,7 @@ class SpirometerManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit SpirometerManager(const CypressSession& session);
+    explicit SpirometerManager(QSharedPointer<SpirometerSession> session);
     ~SpirometerManager() = default;
 
     static bool isInstalled();

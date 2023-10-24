@@ -20,7 +20,7 @@ void ECGSession::calculateInputs()
 
 void ECGSession::start()
 {
-    m_dialog.reset(new EcgDialog(nullptr, *this));
+    m_dialog.reset(new EcgDialog(nullptr, QSharedPointer<ECGSession>(this)));
     if (m_dialog.isNull())
         throw QException();
 

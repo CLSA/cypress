@@ -1,9 +1,11 @@
 #ifndef ECG_MANAGER_H
 #define ECG_MANAGER_H
 
-#include "managers/manager_base.h"
-#include "data/ecg/tests/ecg_test.h"
 #include <QProcess>
+
+#include "data/ecg/tests/ecg_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/ecg_session.h"
 
 /*!
  * \class ECGManager
@@ -28,7 +30,7 @@ class ECGManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ECGManager(const CypressSession& session);
+    explicit ECGManager(QSharedPointer<ECGSession> session);
 
     static bool isAvailable();
     static bool isInstalled();

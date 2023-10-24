@@ -1,8 +1,9 @@
 #ifndef CHOICE_REACTION_MANAGER_H
 #define CHOICE_REACTION_MANAGER_H
 
-#include "managers/manager_base.h"
 #include "data/choice_reaction/tests/choice_reaction_test.h"
+#include "managers/manager_base.h"
+#include "server/sessions/choice_reaction_session.h"
 
 #include <QProcess>
 
@@ -24,7 +25,7 @@ class ChoiceReactionManager: public ManagerBase
     Q_OBJECT
 
 public:
-    explicit ChoiceReactionManager(const CypressSession& session);
+    explicit ChoiceReactionManager(QSharedPointer<ChoiceReactionSession> session);
 
     static bool isAvailable();
     static bool isInstalled();

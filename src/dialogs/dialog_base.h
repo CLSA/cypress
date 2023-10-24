@@ -14,7 +14,7 @@ class DialogBase : public QDialog
     Q_OBJECT
 
 public:
-    DialogBase(QWidget *parent, const CypressSession& session);
+    DialogBase(QWidget *parent, QSharedPointer<CypressSession> session);
     ~DialogBase();
 
     void initialize();
@@ -30,7 +30,7 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
-    const CypressSession& m_session;
+    QSharedPointer<CypressSession> m_session;
 
     bool isManualEntryMode { false };
 

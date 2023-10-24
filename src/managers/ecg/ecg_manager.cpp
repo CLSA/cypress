@@ -1,4 +1,3 @@
-#include "cypress_application.h"
 #include "ecg_manager.h"
 
 #include <QDebug>
@@ -10,7 +9,7 @@
 #include <QStandardItemModel>
 #include <QJsonDocument>
 
-ECGManager::ECGManager(const CypressSession& session)
+ECGManager::ECGManager(QSharedPointer<ECGSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new ECGTest);
@@ -90,14 +89,13 @@ bool ECGManager::clearData()
 
 void ECGManager::finish()
 {
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session.getJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject value = testJson.value("value").toObject();
 
     value.insert("session", sessionObj);
-
     testJson.insert("value", value);
 
     QJsonDocument jsonDoc(testJson);
@@ -106,12 +104,10 @@ void ECGManager::finish()
     QString host = CypressSettings::getInstance().getPineHost();
     QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
-    emit success("");
+    emit success("Measurements saved to Pine");
 }
 
 bool ECGManager::deleteDeviceData()

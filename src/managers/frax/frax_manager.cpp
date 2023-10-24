@@ -1,17 +1,18 @@
+
+
+#include "frax_manager.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
 #include <QStandardItemModel>
 
-#include "cypress_application.h"
-#include "auxiliary/json_settings.h"
-
-#include "frax_manager.h"
-
-FraxManager::FraxManager(const CypressSession& session)
-    : ManagerBase(session), m_test(new FraxTest)
+FraxManager::FraxManager(QSharedPointer<FraxSession> session)
+    : ManagerBase(session)
+    , m_test(new FraxTest)
 {
 }
 
@@ -48,7 +49,7 @@ void FraxManager::measure()
     m_test->reset();
 
     QVariantMap map;
-    QJsonObject inputData = m_session.getInputData();
+    QJsonObject inputData = m_session->getInputData();
 
     map.insert("type", 						inputData.value("type"));
     map.insert("country_code", 				inputData.value("country_code"));
@@ -89,25 +90,20 @@ bool FraxManager::clearData()
 
 void FraxManager::finish()
 {
-    QJsonObject responseJson {};
+    QJsonObject responseJson{};
 
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    testJson.insert("session", m_session.getJsonObject());
+    testJson.insert("session", m_session->getJsonObject());
 
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
-
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("sent");
 }

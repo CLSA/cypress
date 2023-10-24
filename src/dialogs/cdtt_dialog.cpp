@@ -1,15 +1,14 @@
 #include "cdtt_dialog.h"
 #include "managers/cdtt/cdtt_manager.h"
 
+#include <QCloseEvent>
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QCloseEvent>
 
-
-CDTTDialog::CDTTDialog(QWidget* parent, const CypressSession& session):
-    DialogBase(parent, session),
-    ui(new Ui::CDTTDialog)
+CDTTDialog::CDTTDialog(QWidget *parent, QSharedPointer<CDTTSession> session)
+    : DialogBase(parent, session)
+    , ui(new Ui::CDTTDialog)
 {
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
@@ -22,7 +21,7 @@ CDTTDialog::CDTTDialog(QWidget* parent, const CypressSession& session):
 
     CDTTManager* manager = static_cast<CDTTManager*>(m_manager.get());
 
-    ui->testInfoWidget->setSessionInformation(session);
+    ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
 

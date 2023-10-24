@@ -14,8 +14,9 @@
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
-ChoiceReactionManager::ChoiceReactionManager(const CypressSession& session)
-    : ManagerBase(session), m_test(new ChoiceReactionTest)
+ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSession> session)
+    : ManagerBase(session)
+    , m_test(new ChoiceReactionTest)
 {
     qDebug() << "ChoiceReactionManager inputData: " << m_inputData;
 }
@@ -105,38 +106,19 @@ void ChoiceReactionManager::finish()
 {
     QJsonObject responseJson {};
 
-    int answer_id = m_session.getAnswerId();
+    int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
-    testJson.insert("session", m_session.getJsonObject());
+    testJson.insert("session", m_session->getJsonObject());
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
-
-    emit success("sent");
-
-    //if (CypressApplication::getInstance().isSimulation())
-    //{
-    //    QJsonObject results = JsonSettings::readJsonFromFile(
-    //        "C:/dev/clsa/cypress/src/tests/fixtures/choice_reaction/output.json"
-    //    );
-    //    if (results.empty()) return;
-
-    //    bool ok = sendResultsToPine(results);
-    //    if (!ok)
-    //    {
-    //        qDebug() << "Could not send results to Pine";
-    //    }
-    //}
+    emit success("Measurements saved to Pine");
 }
 
 bool ChoiceReactionManager::clearData()
