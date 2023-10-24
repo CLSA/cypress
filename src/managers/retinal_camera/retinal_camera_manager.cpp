@@ -1,3 +1,15 @@
+#include "retinal_camera_manager.h"
+
+#include "data/retinal_camera/retinal_camera_measurement.h"
+#include "data/retinal_camera/database_manager.h"
+
+#include "auxiliary/Utilities.h"
+#include "cypress_settings.h"
+
+#include "qsqlerror.h"
+#include "cypress_session.h"
+#include "auxiliary/file_utils.h"
+
 #include <QProcess>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -5,17 +17,8 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QMessageBox>
+#include <QJsonObject>
 
-
-#include "retinal_camera_manager.h"
-
-#include "data/retinal_camera/retinal_camera_measurement.h"
-#include "data/retinal_camera/database_manager.h"
-
-#include "qsqlerror.h"
-#include "cypress_session.h"
-
-#include "auxiliary/file_utils.h"
 
 RetinalCameraManager::RetinalCameraManager(QSharedPointer<RetinalCameraSession> session)
     : ManagerBase(session)
@@ -74,8 +77,10 @@ void RetinalCameraManager::start()
 
 void RetinalCameraManager::measure()
 {
+    RetinalCameraSession& session = dynamic_cast<RetinalCameraSession&>(*m_session);
+
     m_test->reset();
-    m_test->simulate();
+    m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
 
     emit measured(m_test);
 
@@ -89,13 +94,21 @@ void RetinalCameraManager::finish()
 {
     int answer_id = m_session->getAnswerId();
 
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session->getJsonObject());
+
     //side = session
     for (int i = 0; i < m_test->getMeasurementCount(); i++) {
         Measurement& measure = m_test->get(i);
-        const QString &side = measure.getAttribute("SIDE").toString();
+        const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").toString();
 
         QString host = CypressSettings::getInstance().getPineHost();
         QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+        QByteArray fileContents = FileUtils::readFileIntoByteArray(measure.getAttribute("EYE_PICT_VENDOR").toString());
+        QString fileName = "EYE_" + side;
+
+        testJson.insert("files", QJsonObject {{ fileName, Utilities::bytesToSize(fileContents.size())}});
 
         sendHTTPSRequest("PATCH",
                          host + endpoint + QString::number(answer_id) + "?filename=EYE_" + side
@@ -107,29 +120,21 @@ void RetinalCameraManager::finish()
         measure.removeAttribute("EYE_PICT_VENDOR");
     }
 
-    QJsonObject testJson = m_test->toJsonObject();
 
-    testJson.insert("language", m_session->getLanguage());
-    testJson.insert("session_id", m_session->getSessionId());
-    testJson.insert("answer_id", m_session->getAnswerId());
-    testJson.insert("barcode", m_session->getBarcode());
-    testJson.insert("interviewer", m_session->getInterviewer());
 
-    QJsonDocument jsonDoc(testJson);
+    QJsonObject values {};
+    values.insert("value", testJson);
 
+    QJsonDocument jsonDoc(values);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
-
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
+                     answerUrl,
                      "application/json",
                      serializedData);
 
     emit success("sent");
-
-    m_test->reset();
 }
 
 // collate test results and device and other meta data

@@ -6,7 +6,7 @@ RetinalCameraSession::RetinalCameraSession(QObject *parent, const QJsonObject &i
     : CypressSession{parent, inputData}
     , m_side(side)
 {
-
+    qDebug() << side;
 }
 
 void RetinalCameraSession::validate() const

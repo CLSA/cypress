@@ -78,7 +78,7 @@ void ChoiceReactionManager::readOutput()
 void ChoiceReactionManager::measure()
 {
     m_test->reset();
-    m_test->simulate({});
+    m_test->simulate();
 
     emit measured(m_test);
     emit canFinish();

@@ -27,6 +27,9 @@ public:
     static HTTPRequestHandler* createRetinalCameraRequestHandler();
     static HTTPRequestHandler* createRetinalCameraStatusRequestHandler();
 
+    static HTTPRequestHandler* createRetinalCameraLeftRequestHandler();
+    static HTTPRequestHandler* createRetinalCameraRightRequestHandler();
+
     static HTTPRequestHandler* createAudiometerRequestHandler();
     static HTTPRequestHandler* createAudiometerStatusRequestHandler();
 

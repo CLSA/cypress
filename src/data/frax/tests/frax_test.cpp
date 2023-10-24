@@ -73,38 +73,38 @@ void FraxTest::fromFile(const QString& fileName)
         QStringList list = line.split(",");
         if (17 == list.size()) {
           QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
-          measure1->setAttribute("TYPE", "osteoporotic_fracture");
-          measure1->setAttribute("PROBABILITY", list.at(13).toDouble(), "%");
+          measure1->setAttribute("type", "osteoporotic_fracture");
+          measure1->setAttribute("probability", list.at(13).toDouble(), "%");
           addMeasurement(measure1);
 
           QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
-          measure2->setAttribute("TYPE", "hip_fracture");
-          measure2->setAttribute("PROBABILITY", list.at(14).toDouble(), "%");
+          measure2->setAttribute("type", "hip_fracture");
+          measure2->setAttribute("probability", list.at(14).toDouble(), "%");
           addMeasurement(measure2);
 
           QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
-          measure3->setAttribute("TYPE", "osteoporotic_fracture_bmd");
-          measure3->setAttribute("PROBABILITY", list.at(15).toDouble(), "%");
+          measure3->setAttribute("type", "osteoporotic_fracture_bmd");
+          measure3->setAttribute("probability", list.at(15).toDouble(), "%");
           addMeasurement(measure3);
 
           QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
-          measure4->setAttribute("TYPE", "hip_fracture_bmd");
-          measure4->setAttribute("PROBABILITY", list.at(16).toDouble(), "%");
+          measure4->setAttribute("type", "hip_fracture_bmd");
+          measure4->setAttribute("probability", list.at(16).toDouble(), "%");
           addMeasurement(measure4);
 
-          addMetaData("TYPE", list.at(0).toLower());
-          addMetaData("COUNTRY_CODE", list.at(1).toUInt());
-          addMetaData("AGE", list.at(2).toDouble(), "yr");
-          addMetaData("SEX", list.at(3).toUInt());
-          addMetaData("BODY_MASS_INDEX", list.at(4).toDouble(), "kg/m2");
-          addMetaData("PREVIOUS_FRACTURE", list.at(5).toUInt());
-          addMetaData("PARENT_HIP_FRACTURE", list.at(6).toUInt());
-          addMetaData("CURRENT_SMOKER", list.at(7).toUInt());
-          addMetaData("GLUCCOCORTICOID", list.at(8).toUInt());
-          addMetaData("RHEUMATOID_ARTHRITIS", list.at(9).toUInt());
-          addMetaData("SECONDARY_OSTEOPOROSIS", list.at(10).toUInt());
-          addMetaData("ALCOHOL", list.at(11).toUInt());
-          addMetaData("FEMORAL_NECK_TSCORE", list.at(12).toDouble());
+          addMetaData("type", list.at(0).toLower());
+          addMetaData("country_code", list.at(1).toUInt());
+          addMetaData("age", list.at(2).toDouble(), "yr");
+          addMetaData("sex", list.at(3).toUInt());
+          addMetaData("body_mass_index", list.at(4).toDouble(), "kg/m2");
+          addMetaData("previous_fracture", list.at(5).toUInt());
+          addMetaData("parent_hip_fracture", list.at(6).toUInt());
+          addMetaData("current_smoker", list.at(7).toUInt());
+          addMetaData("gluccocorticoid", list.at(8).toUInt());
+          addMetaData("rheumatoid_arthritis", list.at(9).toUInt());
+          addMetaData("secondary_osteoporosis", list.at(10).toUInt());
+          addMetaData("alcohol", list.at(11).toUInt());
+          addMetaData("femoral_neck_tscore", list.at(12).toDouble());
         }
     }
 }
@@ -120,10 +120,10 @@ void FraxTest::simulate(const QVariantMap& input)
       {
         value = "male" == value.toString() ? 0 : 1;
       }
-      else if("FEMORAL_NECK_BMD" == key)
+      else if("femoral_neck_bmd" == key)
       {
         value = Utilities::tscore(value.toDouble());
-        key = "FEMORAL_NECK_TSCORE";
+        key = "femoral_neck_tscore";
       }
       else
       {
@@ -132,9 +132,9 @@ void FraxTest::simulate(const QVariantMap& input)
           value = value.toUInt();
         }
       }
-      if("AGE" == key)
+      if("age" == key)
         addMetaData(key,value,"yr");
-      else if("BODY_MASS_INDEX" == key)
+      else if("body_mass_index" == key)
         addMetaData(key,value,"kg/m2");
       else
         addMetaData(key,value);
@@ -143,27 +143,27 @@ void FraxTest::simulate(const QVariantMap& input)
     QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
     double mu = QRandomGenerator::global()->generateDouble();
 
-    measure1->setAttribute("TYPE", "osteoporotic_fracture");
+    measure1->setAttribute("type", "osteoporotic_fracture");
     double p = Utilities::interp(1.0f,30.0f,mu);
-    measure1->setAttribute("PROBABILITY", p, "%");
+    measure1->setAttribute("probability", p, "%");
     addMeasurement(measure1);
 
     QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
-    measure2->setAttribute("TYPE", "hip_fracture");
+    measure2->setAttribute("type", "hip_fracture");
     p = Utilities::interp(0.0f,13.0f,mu);
-    measure2->setAttribute("PROBABILITY", p, "%");
+    measure2->setAttribute("probability", p, "%");
     addMeasurement(measure2);
 
     QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
     measure3->setAttribute("TYPE", "osteoporotic_fracture_bmd");
     p = Utilities::interp(2.0f,22.0f,mu);
-    measure3->setAttribute("PROBABILITY", p, "%");
+    measure3->setAttribute("probability", p, "%");
     addMeasurement(measure3);
 
     QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
     measure4->setAttribute("TYPE", "hip_fracture_bmd");
     p = Utilities::interp(0.0f,8.0f,mu);
-    measure4->setAttribute("PROBABILITY", p, "%");
+    measure4->setAttribute("probability", p, "%");
     addMeasurement(measure4);
 }
 

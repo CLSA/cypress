@@ -9,6 +9,8 @@
 #include <QSettings>
 #include <QException>
 
+#include "auxiliary/Utilities.h"
+
 #include "../../../auxiliary/tracker5_util.h"
 //#include "managers/grip_strength/ParadoxReader.h"
 
@@ -74,8 +76,8 @@ void GripStrengthTest::simulate()
         QJsonObject record;
         record.insert("ExamId",   1);
         record.insert("TestId",   i);
-        record.insert("Position", "");
-        record.insert("Side", 	  "");
+        record.insert("Position", "Left");
+        record.insert("Side", 	  "Left");
 
         record.insert("Rep1",  "");
         record.insert("Rep2",  "");

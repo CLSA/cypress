@@ -27,8 +27,8 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent,
 
     QList<TableColumn> columns;
 
-    columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+    //columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
+    //columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager, &ChoiceReactionManager::started, ui->measurementTable, [=](TestBase* test) {

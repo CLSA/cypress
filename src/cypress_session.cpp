@@ -191,6 +191,7 @@ bool CypressSession::isValidDate(const QString& key, const QString& dateFormat) 
     if (!val.isString()) return false;
 
     QDate date = QDate::fromString(val.toString(), dateFormat);
+    qDebug() << date;
 
     return date.isValid();
 }

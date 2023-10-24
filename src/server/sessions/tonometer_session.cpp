@@ -10,11 +10,15 @@ TonometerSession::TonometerSession(QObject *parent, const QJsonObject& inputData
 void TonometerSession::validate() const
 {
     CypressSession::validate();
+    if (!isValidDate("dob", "yyyy-MM-dd"))
+        throw ValidationError("dob");
+
+    if (!isValidString("sex"))
+        throw ValidationError("sex");
 }
 
 void TonometerSession::calculateInputs()
 {
-
 }
 
 void TonometerSession::start()
@@ -34,5 +38,5 @@ void TonometerSession::start()
 
 void TonometerSession::end()
 {
-
+    m_status = SessionStatus::Ended;
 }

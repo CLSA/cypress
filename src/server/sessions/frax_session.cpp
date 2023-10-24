@@ -9,6 +9,7 @@ FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData): Cypress
 
 void FraxSession::start()
 {
+    qDebug() << "start session" << getSessionId() << m_startDateTime;
     m_dialog.reset(new FraxDialog(nullptr, QSharedPointer<FraxSession>(this)));
     if (m_dialog.isNull())
         throw QException();
@@ -29,7 +30,7 @@ void FraxSession::validate() const
     if (!isValidString("age"))
         throw ValidationError("age");
 
-    if (!isValidDate("dob", "yyyy-mm-dd"))
+    if (!isValidDate("dob", "yyyy-MM-dd"))
         throw ValidationError("dob");
 
     if (!isValidString("alcohol"))
@@ -50,23 +51,23 @@ void FraxSession::validate() const
     if (!isValidString("femoral_neck_bmd"))
         throw ValidationError("femoral_neck_bmd");
 
-    if (!isValidString("glucocorticoid_age"))
+    if (!isValidInteger("glucocorticoid_age") && !m_inputData.value("glucocorticoid_age").isUndefined() && !m_inputData.value("glucocorticoid_age").toString().isEmpty())
         throw ValidationError("glucocorticoid_age");
 
-    if (!isValidString("glucocorticoid_number"))
+    if (!isValidInteger("glucocorticoid_number") && !m_inputData.value("glucocorticoid_number").isUndefined() && !m_inputData.value("glucocorticoid_number").toString().isEmpty())
         throw ValidationError("glucocorticoid_number");
 
-    if (!isValidDate("glucocorticoid_year", "yyyy-mm-dd"))
+    if (!isValidInteger("glucocorticoid_year") && !m_inputData.value("glucocorticoid_year").isUndefined() && !m_inputData.value("glucocorticoid_year").toString().isEmpty())
         throw ValidationError("glucocorticoid_year");
 
     if (!isValidString("height"))
         throw ValidationError("height");
 
-    if (!isValidString("previous_fracture"))
+    if (!isValidString("previous_fracture") && !m_inputData.value("previous_fracture").isUndefined() && !m_inputData.value("previous_fracture").toString().isEmpty())
         throw ValidationError("previous_fracture");
 
-    if (!isValidString("rheumatoid_arthritis"))
-        throw ValidationError("rheumatoid_arthritis");
+    if (!isValidString("ra_medications") && !m_inputData.value("ra_medications").isUndefined() && !m_inputData.value("ra_medications").toString().isEmpty())
+        throw ValidationError("ra_medications"); // empty, None, or "dafadfkj,ad;fklad,adfkaldj"
 
     if (!isValidString("sex"))
         throw ValidationError("sex");
@@ -76,31 +77,50 @@ void FraxSession::validate() const
 
     if (!isValidString("weight"))
         throw ValidationError("weight");
+
+    qDebug("validated");
 }
 
 void FraxSession::calculateInputs()
 {
     validate();
 
-    int age = m_inputData.value("age").toInt();
+    qDebug() << m_inputData;
+
+    qDebug("calculate inputs");
+
+    int age = m_inputData.value("age").toString().toInt();
+    qDebug() << "calculate inputs";
     if (age <= 0)
-        throw std::invalid_argument("age must be greater than 0");
+        throw ValidationError("age must be greater than 0");
 
-    double weight = m_inputData.value("weight").toDouble();
+    double weight = m_inputData.value("weight").toString().toDouble();
     if (weight <= 0)
-        throw std::invalid_argument("weight must be greater than 0");
+        throw ValidationError("weight must be greater than 0");
 
-    double height = m_inputData.value("height").toDouble();
+    double height = m_inputData.value("height").toString().toDouble();
     if (height <= 0)
-        throw std::invalid_argument("height must be greater than 0");
+        throw ValidationError("height must be greater than 0");
 
     double bmi = calculateBMI(weight, height);
-    bool glucocorticoid = calculateGlucocorticoid(age);
-    bool father_hip_fracture = m_inputData.value("father_hip_fracture").toString() == "Yes" ? true : false;
-    bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toString() == "Yes" ? true : false;
-    bool previous_fracture = father_hip_fracture || mother_hip_fracture;
-    double t_score = calculateTScore(m_inputData.value("femoral_neck_bmd").toDouble());
+    qDebug() << "bmi";
 
+    bool glucocorticoid = calculateGlucocorticoid(age);
+    qDebug() << "glucco";
+
+    bool father_hip_fracture = m_inputData.value("father_hip_fracture").toString() == "Yes" ? true : false;
+    qDebug() << "father hip";
+
+    bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toString() == "Yes" ? true : false;
+    qDebug() << "mother hip";
+
+    bool previous_fracture = father_hip_fracture || mother_hip_fracture;
+    qDebug() << "previous fracture";
+
+    double t_score = calculateTScore(m_inputData.value("femoral_neck_bmd").toDouble());
+    qDebug() << "t score";
+
+    m_inputData.insert("rheumatoid_arthritis", (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
     m_inputData.insert("bmi", bmi);
     m_inputData.insert("previous_fracture", previous_fracture);
     m_inputData.insert("glucocorticoid", glucocorticoid);
@@ -137,27 +157,45 @@ double FraxSession::calculateTScore(double femoral_neck_bmd)
     return t_score;
 }
 
-bool FraxSession::calculateGlucocorticoid(int age)
+bool FraxSession::calculateGlucocorticoid(int _age)
 {
-    int v2 = age;
-    int v3 = m_inputData.value("glucocorticoid_number").toInt();
-    int v4 = m_inputData.value("glucocorticoid_year").toInt();
-    int v5 = m_inputData.value("glucocorticoid_age").toInt();
+    int age = _age;
+
+    int glucocorticoid_number = -1;
+    int glucocorticoid_year = -1;
+    int glucocorticoid_age = -1;
+
+
+    if (!m_inputData.value("glucocorticoid_number").isNull())
+    {
+        glucocorticoid_number = m_inputData.value("glucocorticoid_number").toString().toInt();
+    }
+
+
+    if (!m_inputData.value("glucocorticoid_year").isNull())
+    {
+        glucocorticoid_year = m_inputData.value("glucocorticoid_year").toString().toInt();
+    }
+
+    if (!m_inputData.value("glucocorticoid_age").isNull())
+    {
+        glucocorticoid_age = m_inputData.value("glucocorticoid_age").toString().toInt();
+    }
 
     int res = 0;
 
-    if (v2 && v3)
+    if (age && glucocorticoid_number)
     {
-        res = (v2 - v3) <= 1 ? 1 : 0;
+        res = (age - glucocorticoid_number) <= 1 ? 1 : 0;
     }
-    else if (v4)
+    else if (glucocorticoid_year)
     {
-        res = (QDate::currentDate().year() - v4) <= 1 ? 1 : 0;
+        res = (QDate::currentDate().year() - glucocorticoid_year) <= 1 ? 1 : 0;
     }
 
     if (res == 1)
     {
-        res = v5 >= 3 ? 1 : 0 ;
+        res = glucocorticoid_age >= 3 ? 1 : 0 ;
     }
 
     return res;

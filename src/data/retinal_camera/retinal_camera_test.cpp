@@ -9,22 +9,27 @@ RetinalCameraTest::RetinalCameraTest()
     m_outputKeyList << "EYE_PICT_VENDOR";
     m_outputKeyList << "EYE_SIDE_VENDOR";
 
-    setExpectedMeasurementCount(2);
+    setExpectedMeasurementCount(1);
 }
 
-void RetinalCameraTest::simulate()
+void RetinalCameraTest::simulate(const QVariantMap& inputData)
 {
-    QSharedPointer<RetinalCameraMeasurement> leftEye(new RetinalCameraMeasurement);
-    leftEye->setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/LEFT.jpg");
-    leftEye->setAttribute("EYE_SIDE_VENDOR", "LEFT");
-
-    QSharedPointer<RetinalCameraMeasurement> rightEye(new RetinalCameraMeasurement);
-    rightEye->setAttribute("EYE_PICT_VENDOR",
+    if (inputData["side"] == "left")
+    {
+        QSharedPointer<RetinalCameraMeasurement> leftEye(new RetinalCameraMeasurement);
+        leftEye->setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/LEFT.jpg");
+        leftEye->setAttribute("EYE_SIDE_VENDOR", "LEFT");
+        this->addMeasurement(leftEye);
+    }
+    else if (inputData["side"] == "right")
+    {
+        QSharedPointer<RetinalCameraMeasurement> rightEye(new RetinalCameraMeasurement);
+        rightEye->setAttribute("EYE_PICT_VENDOR",
                            "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/RIGHT.jpg");
-    rightEye->setAttribute("EYE_SIDE_VENDOR", "RIGHT");
+        rightEye->setAttribute("EYE_SIDE_VENDOR", "RIGHT");
+        this->addMeasurement(rightEye);
+    }
 
-    this->addMeasurement(leftEye);
-    this->addMeasurement(rightEye);
 }
 
 bool RetinalCameraTest::isValid() const
@@ -59,9 +64,7 @@ QJsonObject RetinalCameraTest::toJsonObject() const
     valuesObject.insert("results", measurementArray);
     valuesObject.insert("manual_entry", getManualEntryMode());
 
-    testJson.insert("value", valuesObject);
-
-    return testJson;
+    return valuesObject;
 }
 
 QString RetinalCameraTest::toString() const

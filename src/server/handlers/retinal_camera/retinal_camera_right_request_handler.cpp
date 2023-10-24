@@ -43,4 +43,13 @@ void RetinalCameraRightRequestHandler::handleRequest(Poco::Net::HTTPServerReques
         out << exception.what();
         out.flush();
     }
+    catch (QException e)
+    {
+        qDebug() << e.what() ;
+    }
+
+    catch (std::exception e)
+    {
+        qDebug() << e.what();
+    }
 }

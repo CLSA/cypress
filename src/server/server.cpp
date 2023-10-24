@@ -48,7 +48,7 @@ Server::~Server()
 
 QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObject& inputData)
 {
-    CypressSession* session { nullptr };
+    CypressSession* session = nullptr;
 
     switch (type)
     {
@@ -103,15 +103,19 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
             throw QException();
     }
 
+        qDebug() << session;
+
     if (!session)
     {
+            qDebug() << "weird exception";
         throw QException();
     }
 
     session->validate();
     session->calculateInputs();
-    //session->moveToThread(mainThread);
+    //QString sessionId = session->getSessionId();
 
+    //session->moveToThread(mainThread);
     emit startSession(session);
 
     //sessions.insert(session->getSessionId(), session);

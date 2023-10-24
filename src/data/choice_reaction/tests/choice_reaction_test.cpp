@@ -134,6 +134,20 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
     }
 }
 
+void ChoiceReactionTest::simulate()
+{
+    addMetaData("version", "CLSA_ELCV");
+    addMetaData("clinic", "CYPRESS");
+    addMetaData("user_id", 1);
+
+    for (int i = 0; i < getExpectedMeasurementCount(); i++)
+    {
+        QSharedPointer<ChoiceReactionMeasurement> measurement(new ChoiceReactionMeasurement());
+        measurement->simulate();
+        addMeasurement(measurement);
+    }
+}
+
 // String representation for debug and GUI display purposes
 //
 QString ChoiceReactionTest::toString() const
@@ -189,7 +203,5 @@ QJsonObject ChoiceReactionTest::toJsonObject() const
     value.insert("results", jsonArr);
     value.insert("manual_entry", getManualEntryMode());
 
-    json.insert("value", value);
-
-    return json;
+    return value;
 }

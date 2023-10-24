@@ -146,6 +146,6 @@ void Cypress::requestSession(CypressSession* session)
         return;
     }
 
-    //sessions.insert(session->getSessionId(), QSharedPointer<CypressSession>(*session));
+    sessions.insert(session->getSessionId(), QSharedPointer<CypressSession>(session));
     session->start();
 }

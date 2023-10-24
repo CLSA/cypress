@@ -4,6 +4,7 @@
 
 #include "data/dxa/tests/dxa_test.h"
 #include "managers/dxa/dxa_manager.h"
+#include "auxiliary/Utilities.h"
 
 #include "../../auxiliary/file_utils.h"
 
@@ -109,6 +110,9 @@ void DXAManager::measure()
 // implementation of final clean up of device after disconnecting and all
 // data has been retrieved and processed by any upstream classes
 //
+
+
+
 void DXAManager::finish()
 {
     int answer_id = m_session->getAnswerId();
@@ -163,14 +167,14 @@ void DXAManager::finish()
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
 
     QJsonObject files = {};
-    files.insert(wb_1_file_name, wb_1_size);
-    files.insert(wb_2_file_name, wb_2_size);
-    files.insert(sp_1_file_name, sp_1_size);
-    files.insert(iva_ot_file_name, iva_ot_size);
-    files.insert(iva_pr_file_name, iva_pr_size);
-    files.insert(iva_measure_file_name, iva_measure_size);
-    files.insert(hip_1_file_name, hip_1_size);
-    files.insert(fa_1_file_name, fa_1_size);
+    files.insert(wb_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(wb_1_size));
+    files.insert(wb_2_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(wb_2_size));
+    files.insert(sp_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(sp_1_size));
+    files.insert(iva_ot_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_ot_size));
+    files.insert(iva_pr_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_pr_size));
+    files.insert(iva_measure_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_measure_size));
+    files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(hip_1_size));
+    files.insert(fa_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(fa_1_size));
 
     testJson.insert("session", sessionObj);
     testJson.insert("files", files);

@@ -16,7 +16,8 @@
 #include "server/handlers/grip_strength/grip_strength_request_handler.h"
 #include "server/handlers/grip_strength/grip_strength_status_request_handler.h"
 
-#include "server/handlers/retinal_camera/retinal_camera_request_handler.h"
+#include "server/handlers/retinal_camera/retinal_camera_left_request_handler.h"
+#include "server/handlers/retinal_camera/retinal_camera_right_request_handler.h"
 #include "server/handlers/retinal_camera/retinal_camera_status_request_handler.h"
 
 #include "server/handlers/blood_pressure/blood_pressure_request_handler.h"
@@ -81,9 +82,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/cdtt/status/?$)"),                      &InstrumentRequestHandlerFactory::createCDTTStatusRequestHandler            },
     { QString(R"(^/cdtt/delete/?$)"),                      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/choice_reaction/?$)"),                  &InstrumentRequestHandlerFactory::createChoiceReactionRequestHandler        },
-    { QString(R"(^/choice_reaction/status/?$)"),           &InstrumentRequestHandlerFactory::createChoiceReactionStatusRequestHandler  },
-    { QString(R"(^/choice_reaction/delete/?$)"),           &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/choice_reaction_test/?$)"),                  &InstrumentRequestHandlerFactory::createChoiceReactionRequestHandler        },
+    { QString(R"(^/choice_reaction_test/status/?$)"),           &InstrumentRequestHandlerFactory::createChoiceReactionStatusRequestHandler  },
+    { QString(R"(^/choice_reaction_test/delete/?$)"),           &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/dxa/?$)"),                              &InstrumentRequestHandlerFactory::createDxaRequestHandler                   },
     { QString(R"(^/dxa/status/?$)"),                       &InstrumentRequestHandlerFactory::createDxaStatusRequestHandler             },
@@ -101,11 +102,14 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/grip_strength/status/?$)"),             &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler    },
     { QString(R"(^/grip_strength/delete/?$)"),             &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/retinal_camera_left_eye/?$)"),          &InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler         },
-    { QString(R"(^/retinal_camera_right_eye/?$)"),         &InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler         },
+    { QString(R"(^/retinal_camera_left/?$)"),          	&InstrumentRequestHandlerFactory::createRetinalCameraLeftRequestHandler},
+    { QString(R"(^/retinal_camera_right/?$)"),         &InstrumentRequestHandlerFactory::createRetinalCameraRightRequestHandler},
 
-    { QString(R"(^/retinal_camera/status/?$)"),     	   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
-    { QString(R"(^/retinal_camera/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/retinal_camera_left/status/?$)"),     	   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
+    { QString(R"(^/retinal_camera_left/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+
+    { QString(R"(^/retinal_camera_right/status/?$)"),     	   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
+    { QString(R"(^/retinal_camera_right/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/spirometer/?$)"),                       &InstrumentRequestHandlerFactory::createSpirometerRequestHandler            },
     { QString(R"(^/spirometer/status/?$)"),                &InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler      },
@@ -206,9 +210,14 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createGripStrengthStatusReq
    return new GripStrengthStatusRequestHandler;
 }
 
-HTTPRequestHandler* InstrumentRequestHandlerFactory::createRetinalCameraRequestHandler()
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createRetinalCameraLeftRequestHandler()
 {
-   return new RetinalCameraRequestHandler;
+   return new RetinalCameraLeftRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createRetinalCameraRightRequestHandler()
+{
+   return new RetinalCameraRightRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler()

@@ -4,7 +4,10 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
+#include "auxiliary/Utilities.h"
+
 #include <QJsonObject>
+#include <QRandomGenerator>
 
 // hip
 // { "NECK_BMD",       "1..." },
@@ -98,6 +101,8 @@ void HipMeasurement::simulate()
         QJsonValue value = json.value(key);
         setAttribute(key, value);
     }
+
+    setAttribute("hip_neck_bmd", Utilities::interp(0.0, 1.0, QRandomGenerator::global()->generateDouble()), "g/cm^2");
 }
 
 bool HipMeasurement::isValid() const

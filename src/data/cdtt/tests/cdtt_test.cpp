@@ -371,12 +371,9 @@ QJsonObject CDTTTest::toJsonObject() const
        jsonArr.append(m->toJsonObject());
     }
 
-    QJsonObject json{};
     value.insert("metadata", m_metaData.toJsonObject());
     value.insert("results", jsonArr);
-    value.insert("manual_entry", false);
+    value.insert("manual_entry", getManualEntryMode());
 
-    json.insert("value", value);
-
-    return json;
+    return value;
 }
