@@ -35,26 +35,27 @@ bool SpirometerManager::isAvailable()
 
 bool SpirometerManager::isDefined(const QString& value, const SpirometerManager::FileType &fileType) const
 {
-    if(value.isEmpty())
-        return false;
+    //if(value.isEmpty())
+    //    return false;
 
-    bool ok = false;
-    if(fileType == SpirometerManager::FileType::EasyWareExe)
-    {
-        QFileInfo info(value);
-        if(info.exists() /* && "exe" == info.completeSuffix()*/)
-        {
-            ok = true;
-        }
-    }
-    else if(fileType == SpirometerManager::FileType::EMRDataPath)
-    {
-        if(QDir(value).exists())
-        {
-            ok = true;
-        }
-    }
-    return ok;
+    //bool ok = false;
+    //if(fileType == SpirometerManager::FileType::EasyWareExe)
+    //{
+    //    QFileInfo info(value);
+    //    if(info.exists() /* && "exe" == info.completeSuffix()*/)
+    //    {
+    //        ok = true;
+    //    }
+    //}
+    //else if(fileType == SpirometerManager::FileType::EMRDataPath)
+    //{
+    //    if(QDir(value).exists())
+    //    {
+    //        ok = true;
+    //    }
+    //}
+    //return ok;
+    return false;
 }
 
 void SpirometerManager::start()
@@ -97,12 +98,12 @@ void SpirometerManager::measure()
 {
     m_test->reset();
     m_test->simulate(QVariantMap({
-                               {"barcode", "12345678"},
-                               {"smoker", true 	},
-                               {"gender", "M"},
-                               {"height", 1.87},
-                               {"weight", 80},
-                               {"date_of_birth", "12.06.1960"},
+        {"barcode", m_session.getBarcode()},
+        {"smoker", m_session.getInputData()["smoker"].toBool()},
+        {"gender", m_session.getInputData()["gender"].toString()},
+        {"height", m_session.getInputData()["height"].toDouble()},
+        {"weight", m_session.getInputData()["weight"].toDouble()},
+        {"date_of_birth", m_session.getInputData()["date_of_birth"].toString()},
     }));
 
     emit measured(m_test.get());
@@ -156,13 +157,15 @@ void SpirometerManager::finish()
 
     qDebug() << responseJson;
 
-    sendHTTPSRequest("PATCH",
-        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
-        "application/json",
-        serializedData
-    );
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
-    emit success("");
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id),
+                     "application/json",
+                     serializedData);
+
+    emit success("sent");
 
     //if(QProcess::NotRunning != m_process.state())
     //{

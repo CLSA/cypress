@@ -183,20 +183,47 @@ void DXAManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH",
-        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
-        "application/json",
-        serializedData
-    );
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + wb_1_file_name, "application/octet-stream", wb_1);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + wb_2_file_name, "application/octet-stream", wb_2);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + sp_1_file_name, "application/octet-stream", sp_1);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + iva_ot_file_name, "application/octet-stream", iva_ot);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + iva_pr_file_name, "application/octet-stream", iva_pr);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + iva_measure_file_name, "application/octet-stream", iva_measure);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + hip_1_file_name, "application/octet-stream", hip_1);
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=" + fa_1_file_name, "application/octet-stream", fa_1);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id),
+                     "application/json",
+                     serializedData);
+
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_1_file_name,
+                     "application/octet-stream",
+                     wb_1);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_2_file_name,
+                     "application/octet-stream",
+                     wb_2);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + sp_1_file_name,
+                     "application/octet-stream",
+                     sp_1);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_ot_file_name,
+                     "application/octet-stream",
+                     iva_ot);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_pr_file_name,
+                     "application/octet-stream",
+                     iva_pr);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id)
+                         + "?filename=" + iva_measure_file_name,
+                     "application/octet-stream",
+                     iva_measure);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + hip_1_file_name,
+                     "application/octet-stream",
+                     hip_1);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + fa_1_file_name,
+                     "application/octet-stream",
+                     fa_1);
 
     emit success("");
 }

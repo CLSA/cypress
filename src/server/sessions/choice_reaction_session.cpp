@@ -9,7 +9,7 @@ ChoiceReactionSession::ChoiceReactionSession(QObject *parent, const QJsonObject&
 
 void ChoiceReactionSession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void ChoiceReactionSession::calculateInputs()

@@ -10,7 +10,7 @@ ECGSession::ECGSession(QObject *parent, const QJsonObject& inputData)
 
 void ECGSession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void ECGSession::calculateInputs()

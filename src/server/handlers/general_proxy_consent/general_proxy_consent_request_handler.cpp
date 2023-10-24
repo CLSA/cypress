@@ -52,11 +52,14 @@ void GeneralProxyConsentRequestHandler::handleRequest(Poco::Net::HTTPServerReque
         QDesktopServices::openUrl(outputPath);
         QByteArray responseData = FileUtils::readFileIntoByteArray(outputPath);
 
-        FileUtils::sendHTTPSRequest(
-            "PATCH",
-            "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + requestData["answer_id"].toString() + "?filename=general_proxy_consent_" + requestData["barcode"].toString() + ".pdf",
-            "application/octet-stream",
-            responseData);
+        QString host = CypressSettings::getInstance().getPineHost();
+        QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+        FileUtils::sendHTTPSRequest("PATCH",
+                                    host + endpoint + requestData["answer_id"].toString()
+                                        + "?filename=general_proxy_consent.pdf",
+                                    "application/octet-stream",
+                                    responseData);
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");

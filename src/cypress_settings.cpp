@@ -64,7 +64,40 @@ static const QMap<QString, QVariant> defaultSettings = {{
 
 CypressSettings::CypressSettings(): settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress")
 {
+    
+}
 
+QString CypressSettings::getPineHost() const
+{
+    QSettings &settings = getSettings();
+    QString host = settings.value("pine/host", "https://blueberry.clsa-elcv.ca").toString();
+
+    return host;
+}
+
+void CypressSettings::setPineHost(const QString &host)
+{
+    if (host.isEmpty() || host.isNull())
+        return;
+
+    QSettings &settings = getSettings();
+    settings.setValue("pine/host", host);
+}
+
+QString CypressSettings::getPineEndpoint() const
+{
+    QSettings &settings = getSettings();
+    QString endpoint{settings.value("pine/endpoint", "/qa/pine/api/answer/").toString()};
+    return endpoint;
+}
+
+void CypressSettings::setPineEndpoint(const QString &newEndpoint)
+{
+    if (newEndpoint.isEmpty() || newEndpoint.isNull())
+        return;
+
+    QSettings &settings = getSettings();
+    settings.setValue("pine/endpoint", newEndpoint);
 }
 
 // .ini file can be found at C:\Users\<User>\AppData\Roaming\CLSA\Cypress.ini

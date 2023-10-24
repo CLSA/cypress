@@ -10,7 +10,20 @@ SpirometerSession::SpirometerSession(QObject *parent, const QJsonObject& inputDa
 
 void SpirometerSession::validate() const
 {
+    CypressSession::validate();
 
+    if (!isValidString("age"))
+        throw ValidationError("age");
+    if (!isValidString("ethnicity"))
+        throw ValidationError("ethnicity");
+    if (!isValidString("date_of_birth"))
+        throw ValidationError("date_of_birth");
+    if (!isValidString("smoker"))
+        throw ValidationError("date_of_birth");
+    if (!isValidString("copd"))
+        throw ValidationError("date_of_birth");
+    if (!isValidString("gender"))
+        throw ValidationError("date_of_birth");
 }
 
 void SpirometerSession::calculateInputs()
@@ -31,7 +44,6 @@ void SpirometerSession::start()
     m_dialog->show();
 
     qDebug() << "start session" << getSessionId() << m_startDateTime;
-
 }
 
 void SpirometerSession::end()

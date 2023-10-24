@@ -9,7 +9,7 @@ CDTTSession::CDTTSession(QObject *parent, const QJsonObject& inputData)
 
 void CDTTSession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void CDTTSession::calculateInputs()

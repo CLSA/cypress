@@ -58,12 +58,22 @@ void WeighScaleManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH",
-        "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id),
-        "application/json",
-        serializedData
-    );
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
+    qDebug() << host << endpoint;
+
+    try {
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id),
+                         "application/json",
+                         serializedData);
+
+    } catch (QException e) {
+        qDebug() << e.what();
+    }
+
+    qDebug() << "success";
     emit success("");
 }
 

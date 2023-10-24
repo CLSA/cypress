@@ -19,7 +19,13 @@ public:
 
     // Singleton, delete the copy constructor and assignment operator
     CypressSettings(const CypressSettings&) = delete;
-    CypressSettings& operator=(const CypressSettings&) = delete;
+    CypressSettings &operator=(const CypressSettings &) = delete;
+
+    QString getPineHost() const;
+    void setPineHost(const QString &host);
+
+    QString getPineEndpoint() const;
+    void setPineEndpoint(const QString &newEndpoint);
 
     // Read setting from the cypress.ini file
     QVariant readSetting(const QString& key) const;

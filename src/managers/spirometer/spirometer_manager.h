@@ -86,7 +86,12 @@ private:
     QString getEWPDbName() const { return QString("%1/%2").arg(m_dataPath,"EasyWarePro.mdb"); }
     QString getEWPDbCopyName() const { return QString("%1/%2").arg(m_dataPath,"EasyWareProCopy.mdb"); }
     QString getEWPOptionsDbName() const { return QString("%1/%2").arg(m_dataPath,"EwpOptions.mdb"); }
-    QString getEWPOptionsDbCopyName() const { return QString("%1/%2").arg(m_dataPath,"EwpOptionsCopy.mdb");}
+    QString getEWPOptionsDbCopyName() const
+    {
+        return QString("%1/%2").arg(m_dataPath, "EwpOptionsCopy.mdb");
+    }
+
+    QSharedPointer<SpirometerTest> m_test;
 
     QProcess m_process;
 

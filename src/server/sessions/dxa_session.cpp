@@ -10,7 +10,7 @@ DXASession::DXASession(QObject *parent, const QJsonObject& inputData)
 
 void DXASession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void DXASession::calculateInputs()

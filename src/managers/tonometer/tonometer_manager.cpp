@@ -159,23 +159,15 @@ void TonometerManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id),
+                     "application/json",
+                     serializedData);
 
     emit success("sent");
-
-    //if (CypressApplication::getInstance().isSimulation())
-    //{
-    //    QJsonObject results = JsonSettings::readJsonFromFile(
-    //        "C:/dev/clsa/cypress/src/tests/fixtures/tonometer/output.json"
-    //    );
-    //    if (results.empty()) return;
-
-    //    bool ok = sendResultsToPine(results);
-    //    if (!ok)
-    //    {
-    //        qDebug() << "Could not send results to Pine";
-    //    }
-    //}
 }
 
 // set input parameters for the test

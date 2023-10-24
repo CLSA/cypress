@@ -101,7 +101,13 @@ void FraxManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id),
+                     "application/json",
+                     serializedData);
 
     emit success("sent");
 }

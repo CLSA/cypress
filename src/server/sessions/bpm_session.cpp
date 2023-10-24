@@ -9,7 +9,7 @@ BPMSession::BPMSession(QObject *parent, const QJsonObject& inputData)
 
 void BPMSession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void BPMSession::calculateInputs()

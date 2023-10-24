@@ -22,6 +22,24 @@ SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& sessio
 
     QList<TableColumn> columns;
 
+    columns << TableColumn("rank",
+                           "Rank of Trial",
+                           new NumberDelegate(0, 1000, true, false, false, 2));
+    columns << TableColumn("quality_grade",
+                           "Acceptability",
+                           new ComboBoxDelegate(QStringList({"A", "B", "C", "D", "E", "F"}),
+                                                true,
+                                                true));
+    columns << TableColumn("fvc",
+                           "FVC (liters)",
+                           new NumberDelegate(0, 1000, true, false, false, 2));
+    columns << TableColumn("fev",
+                           "FEV (liters)",
+                           new NumberDelegate(0, 1000, true, false, false, 2));
+    columns << TableColumn("fev1_fvc",
+                           "FEV/FVC Ratio (FEV1%)",
+                           new NumberDelegate(0, 1000, true, false, false, 2));
+
     // device started
     connect(manager, &SpirometerManager::started, ui->measurementTable, [=](TestBase *test) {
         Q_UNUSED(test)
@@ -34,7 +52,10 @@ SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& sessio
     });
 
     // auto measure
-    connect(manager, &SpirometerManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+    connect(manager,
+            &SpirometerManager::measured,
+            ui->measurementTable,
+            &MeasurementTable::handleTestUpdate);
 
     // can finish
     connect(manager, &SpirometerManager::canFinish, ui->measurementTable, [=]() {
@@ -48,7 +69,10 @@ SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& sessio
     connect(manager, &SpirometerManager::error, this, &SpirometerDialog::error);
 
     // data changed
-    connect(manager, &SpirometerManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+    connect(manager,
+            &SpirometerManager::dataChanged,
+            ui->measurementTable,
+            &MeasurementTable::handleTestUpdate);
 
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager, &SpirometerManager::measure);
@@ -61,7 +85,10 @@ SpirometerDialog::SpirometerDialog(QWidget* parent, const CypressSession& sessio
     connect(ui->measurementTable, &MeasurementTable::finish, manager, &SpirometerManager::finish);
 
     // request adding manual measurement
-    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &SpirometerManager::addManualMeasurement);
+    connect(ui->measurementTable,
+            &MeasurementTable::addMeasurement,
+            manager,
+            &SpirometerManager::addManualMeasurement);
 }
 
 SpirometerDialog::~SpirometerDialog()

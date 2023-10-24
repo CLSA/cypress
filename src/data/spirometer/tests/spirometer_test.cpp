@@ -1,9 +1,13 @@
 #include "spirometer_test.h"
 #include "../measurements/spirometer_measurement.h"
 
+#include "auxiliary/Utilities.h"
+
 #include <QDomDocument>
 #include <QFile>
 #include <QJsonArray>
+#include <QRandomGenerator>
+#include <QVariant>
 
 /*
 
@@ -21,6 +25,7 @@
 
 PER TRIAL DATA:
 
+
 ATI          - unitless, not required ?
 AmbHumidity  - ambient_humidity, % (ambient humidity)
 AmbPressure  - ambient_pressure, hPa (ambient pressure)
@@ -35,6 +40,7 @@ FEF25        - fef_25, L/s (forced expiratory flow at 25% of vital capacity - sy
 FEF2575      - fef_25_75, L/s (forced expiratory flow at 25% to 75% of vital capacity - synonymous with MMEF)
 FEF2575_6    - fef_25_75_6, L/s (FEF2575 based on FEV6 instead of FVC)
 FEF2575_FVC  - fef_25_75_fvc, 1/s (ratio of FEF2575 to FVC)
+
 FEF40        - fef_40, L/s (forced expiratory flow at 40% of vital capacity - synonymous with MEF60)
 FEF50        - fef_50, L/s (forced expiratory flow at 50% of vital capacity - synonymous with MEF50)
 FEF50_FVC    - fef_50_fvc, 1/s (ratio of FEF50 to FVC)
@@ -155,6 +161,7 @@ FEV1_FEV6            - fev_1_fev_6, fev_1_fev_6_predicted, fev_1_fev_6_ll_normal
 FEV1_FVC             - fev_1_fvc, fev_1_fvc_predicted, fev_1_fvc_ll_normal
 FEV1_VCext           - *fev_1_vcext (always NaN for FVC test), fev_1_vcext_predicted, fev_1_vcext_ll_normal
 FEV1_VCmax           - fev_1_vcmax, fev_1_vcmax_predicted, fev_1_vcmax_ll_normal
+
 FEV3                 - fev_3, L
 FEV3_FVC             - fev_3_fvc
 FEV3_VCmax           - fev_3_vcmax
@@ -162,10 +169,12 @@ FEV6                 - fev_6, fev_6_predicted, fev_6_ll_normal, L
 FEV_25               - fev_25, L
 FEV_5                - fev_5, L
 FEV_5_FVC            - fev_5_fvc
+
 FEV_75               - fev_75, L
 FEV_75_FEV6          - fev_75_fev_6
 FEV_75_FVC           - fev_75_fvc
 FEV_75_VCmax         - fev_75_vcmax
+
 FVC                  - fvc, fvc_predicted, fvc_ll_normal, L
 MEF20                - mef_20, L/s
 MEF25                - mef_25, L/s
@@ -237,10 +246,18 @@ void SpirometerTest::simulate(const QVariantMap& inputData)
     //AcceptedOriginal      - accepted_original, bool
 
     addMetaData("patient_id", inputData["barcode"].toString());
-    addMetaData("smoker", inputData["smoker"].toBool());
-    addMetaData("gender", inputData["gender"].toString());
     addMetaData("height", inputData["height"].toDouble(), "m");
     addMetaData("weight", inputData["weight"].toDouble(), "kg");
+    addMetaData("gender", inputData["gender"].toString());
+    addMetaData("ethnicity", "caucasian");
+    addMetaData("smoker", inputData["smoker"].toBool());
+
+    addMetaData("lung_age", QVariant());
+    addMetaData("test_type", QVariant());
+    addMetaData("test_date", QVariant());
+
+    addMetaData("original_quality_grade", QVariant());
+
     addMetaData("date_of_birth", inputData["date_of_birth"].toDate());
 
     addMetaData("device_type", "SPIROSON_AS");
@@ -250,15 +267,17 @@ void SpirometerTest::simulate(const QVariantMap& inputData)
     addMetaData("asthma", false);
     addMetaData("copd", false);
 
-    addMetaData("ethnicity", "caucasian");
     addMetaData("lung_age", 54, "yr");
-    addMetaData("original_quality_grade", "A");
-
-    //addMetaData("pdf_report_path",QString("C:\\ProgramData\\ndd\\Easy on-PC\\%1.pdf").arg(inputData["patient_id"].toString()));
 
     addMetaData("quality_grade", "A");
+    addMetaData("original_quality_grade", "A");
+
     addMetaData("test_date", QDateTime::currentDateTime());
     addMetaData("test_type", "FVC");
+
+    addMetaData("pdf_report_path",
+                QString("C:\\ProgramData\\ndd\\Easy on-PC\\%1.pdf")
+                    .arg(inputData["patient_id"].toString()));
 
     QSharedPointer<SpirometerMeasurement> best(new SpirometerMeasurement);
     best->setResultType(SpirometerMeasurement::ResultType::typeBestValues);
@@ -268,10 +287,302 @@ void SpirometerTest::simulate(const QVariantMap& inputData)
 
     for (int i = 0; i < 3; i++) {
         QSharedPointer<SpirometerMeasurement> trial(new SpirometerMeasurement);
+
         trial->setResultType(SpirometerMeasurement::ResultType::typeTrial);
         trial->simulate();
 
+        /*
+         * 
+         */
+
         qDebug() << "adding trial" << i;
+
+        trial->setAttribute("date", QVariant());
+        trial->setAttribute("number", QVariant());
+        trial->setAttribute("rank", i);
+        trial->setAttribute("rank_original", QVariant());
+        trial->setAttribute("accepted", true);
+        trial->setAttribute("accepted_original", true);
+        trial->setAttribute("manual_ambient_override", false);
+
+        trial->setAttribute("ati", QVariant());
+        trial->setAttribute("ambient_humidity",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "%");
+        trial->setAttribute("ambient_pressure",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "hPa");
+        trial->setAttribute("ambient_temperature",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "C");
+        trial->setAttribute("ambient_temperature_fahr",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "F");
+
+        trial->setAttribute("bev",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("btps_ex", false);
+        trial->setAttribute("btps_in", false);
+        trial->setAttribute("eotv",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+
+        trial->setAttribute("fef_10",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_25",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_25_75",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_25_75_6",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_25_75_fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+
+        trial->setAttribute("fef_40",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_50",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_50_fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()));
+        trial->setAttribute("fef_50_vcmax",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fef_60",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_75",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_75_85",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fef_80",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("fet",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "s");
+        trial->setAttribute("fet_25_75",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "s");
+
+        trial->setAttribute("fev_1",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_1_fev_6",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_1_fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble())
+                                * 100.0,
+                            "%");
+        trial->setAttribute("fev_1_fvc_max",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble())
+                                * 100.0,
+                            "%");
+
+        trial->setAttribute("fev_3",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_3_fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble())
+                                * 100.0,
+                            "%");
+        trial->setAttribute("fev_3_vcmax",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_6",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_25",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_5",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_5_fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+
+        trial->setAttribute("fev_75",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_75_fev_6",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_75_fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("fev_75_vcmax",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+
+        trial->setAttribute("fvc",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+
+        trial->setAttribute("mef_20",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("mef_25",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("mef_40",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("mef_50",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("mef_60",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("mef_75",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("mef_90",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+
+        trial->setAttribute("mmef",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+
+        trial->setAttribute("mtc_1", QVariant());
+        trial->setAttribute("mtc_2", QVariant());
+        trial->setAttribute("mtc_3", QVariant());
+        trial->setAttribute("mtc_r", QVariant());
+
+        trial->setAttribute("pef",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/s");
+        trial->setAttribute("peft",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "s");
+        trial->setAttribute("pef_l_min",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L/min");
+
+        trial->setAttribute("t0",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "s");
+
+        trial->setAttribute("vcext",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+        trial->setAttribute("vcmax",
+                            Utilities::interp(0.00,
+                                              1.00,
+                                              QRandomGenerator::global()->generateDouble()),
+                            "L");
+
         addMeasurement(trial);
     }
 }

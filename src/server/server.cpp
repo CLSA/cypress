@@ -81,12 +81,13 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Grip_Strength:
             session = new GripStrengthSession(nullptr, inputData);
             break;
-        case Constants::MeasureType::Retinal_Camera_Right:
-            session = new RetinalCameraSession(nullptr, inputData);
-            break;
         case Constants::MeasureType::Retinal_Camera_Left:
             session = new RetinalCameraSession(nullptr, inputData);
             break;
+        case Constants::MeasureType::Retinal_Camera_Right:
+            session = new RetinalCameraSession(nullptr, inputData);
+            break;
+
         case Constants::MeasureType::Spirometer:
             session = new SpirometerSession(nullptr, inputData);
             break;

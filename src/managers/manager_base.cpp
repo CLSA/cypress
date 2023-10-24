@@ -296,6 +296,8 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
 {
     Q_UNUSED(method)
 
+    qDebug() << "initialize ssl";
+
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
@@ -304,8 +306,9 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
         "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
     );
     Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
+    qDebug() << "finish ssl";
 
-    const QString& pinePath = QString(endpoint);
+    const QString &pinePath = QString(endpoint);
 
     Poco::URI uri(pinePath.toStdString());
     Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
@@ -319,6 +322,7 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
     req.setContentLength(data.length());
     req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
 
+    qDebug() << "sent data";
     std::ostream &os = session.sendRequest(req);
     os.write(data.constData(), data.size());
     os.flush();
@@ -328,6 +332,7 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
     std::istream &is = session.receiveResponse(res);
     std::stringstream ss;
     Poco::StreamCopier::copyStream(is, ss);
+    qDebug() << "received data";
 }
 
 bool ManagerBase::sendFileToPine(const QString& filePath, const QString& fileName)

@@ -75,20 +75,48 @@ void VividiManager::cancel()
 
 void VividiManager::finish()
 {
-    QJsonObject responseJson {};
+    QJsonObject responseJson{};
+
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
 
     int answer_id = m_session.getAnswerId();
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
     {
         Measurement& measure = m_test->get(i);
-        const QString& side = measure.getAttribute("SIDE").toString();
+        const QString &side = measure.getAttribute("SIDE").toString();
 
-        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=CINELOOP_1_" + side + ".dcm", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("CINELOOP_1").toString()));
-        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=STILL_IMAGE_1_" + side + ".dcm", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("STILL_IMAGE_1").toString()));
-        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=STILL_IMAGE_2_" + side + ".dcm", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("STILL_IMAGE_2").toString()));
-        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=STILL_IMAGE_3_" + side + ".dcm", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("STILL_IMAGE_3").toString()));
-        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=SR_1_" + side + ".dcm", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("SR_1").toString()));
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id) + "?filename=CINELOOP_1_"
+                             + side + ".dcm",
+                         "application/octet-stream",
+                         FileUtils::readFileIntoByteArray(
+                             measure.getAttribute("CINELOOP_1").toString()));
+
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id) + "?filename=STILL_IMAGE_1_"
+                             + side + ".dcm",
+                         "application/octet-stream",
+                         FileUtils::readFileIntoByteArray(
+                             measure.getAttribute("STILL_IMAGE_1").toString()));
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id) + "?filename=STILL_IMAGE_2_"
+                             + side + ".dcm",
+                         "application/octet-stream",
+                         FileUtils::readFileIntoByteArray(
+                             measure.getAttribute("STILL_IMAGE_2").toString()));
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id) + "?filename=STILL_IMAGE_3_"
+                             + side + ".dcm",
+                         "application/octet-stream",
+                         FileUtils::readFileIntoByteArray(
+                             measure.getAttribute("STILL_IMAGE_3").toString()));
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id) + "?filename=SR_1_" + side
+                             + ".dcm",
+                         "application/octet-stream",
+                         FileUtils::readFileIntoByteArray(measure.getAttribute("SR_1").toString()));
 
         measure.removeAttribute("CINELOOP_1");
         measure.removeAttribute("STILL_IMAGE_1");
@@ -106,7 +134,10 @@ void VividiManager::finish()
     QJsonDocument jsonDoc(testJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id),
+                     "application/json",
+                     serializedData);
 
     emit success("sent");
 }

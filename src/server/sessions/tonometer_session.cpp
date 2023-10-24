@@ -9,7 +9,7 @@ TonometerSession::TonometerSession(QObject *parent, const QJsonObject& inputData
 
 void TonometerSession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void TonometerSession::calculateInputs()

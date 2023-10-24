@@ -88,12 +88,21 @@ void RetinalCameraManager::finish()
 {
     int answer_id = m_session.getAnswerId();
 
-    for (int i = 0; i < m_test->getMeasurementCount(); i++)
-    {
+    //side = session
+    for (int i = 0; i < m_test->getMeasurementCount(); i++) {
         Measurement& measure = m_test->get(i);
-        const QString& side = measure.getAttribute("SIDE").toString();
+        const QString &side = measure.getAttribute("SIDE").toString();
 
-        sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id) + "?filename=EYE_" + side + ".jpg", "application/octet-stream", FileUtils::readFileIntoByteArray(measure.getAttribute("EYE_PICT_VENDOR").toString()));
+        QString host = CypressSettings::getInstance().getPineHost();
+        QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+        sendHTTPSRequest("PATCH",
+                         host + endpoint + QString::number(answer_id) + "?filename=EYE_" + side
+                             + ".jpg",
+                         "application/octet-stream",
+                         FileUtils::readFileIntoByteArray(
+                             measure.getAttribute("EYE_PICT_VENDOR").toString()));
+
         measure.removeAttribute("EYE_PICT_VENDOR");
     }
 
@@ -109,7 +118,13 @@ void RetinalCameraManager::finish()
 
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + QString::number(answer_id), "application/json", serializedData);
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+    sendHTTPSRequest("PATCH",
+                     host + endpoint + QString::number(answer_id),
+                     "application/json",
+                     serializedData);
 
     emit success("sent");
 

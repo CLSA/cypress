@@ -2,20 +2,26 @@
 
 #include "dialogs/retinal_camera_dialog.h"
 
-RetinalCameraSession::RetinalCameraSession(QObject *parent, const QJsonObject& inputData)
+RetinalCameraSession::RetinalCameraSession(QObject *parent, const QJsonObject &inputData, Side side)
     : CypressSession{parent, inputData}
+    , m_side(side)
 {
 
 }
 
 void RetinalCameraSession::validate() const
 {
-
+    CypressSession::validate();
 }
 
 void RetinalCameraSession::calculateInputs()
 {
 
+}
+
+Side RetinalCameraSession::getSide()
+{
+    return m_side;
 }
 
 void RetinalCameraSession::start()
@@ -31,7 +37,6 @@ void RetinalCameraSession::start()
     m_dialog->show();
 
     qDebug() << "start session" << getSessionId() << m_startDateTime;
-
 }
 
 void RetinalCameraSession::end()
