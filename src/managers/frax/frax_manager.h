@@ -79,8 +79,6 @@ private:
     QString m_temporaryFile; // store a copy of the default input.txt
     QProcess m_process;
 
-    FraxTest* m_test;
-
     // Reset the session
     bool clearData() override;
 

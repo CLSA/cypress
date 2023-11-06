@@ -379,31 +379,6 @@ void BodyCompositionManager::confirmSettings()
 
 void BodyCompositionManager::measure()
 {
-    if (Cypress::getInstance().isSimulation())
-    {
-      sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/body_composition/output.json");
-      return;
-    }
-
-    //QJsonObject results = JsonSettings::readJsonFromFile(
-    //    "C:/dev/clsa/cypress/src/tests/fixtures/body_composition/output.json"
-    //);
-
-    //if (results.empty()) return;
-
-    //results["uuid"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
-
-    //qDebug() << "measure called";
-
     ////clearQueue();
     ////m_queue.enqueue(BodyCompositionManager::defaultLUT["measure_body_fat"]);
     ////writeDevice();

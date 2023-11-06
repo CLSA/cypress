@@ -4,7 +4,7 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QJsonObject>
 #include <QRandomGenerator>

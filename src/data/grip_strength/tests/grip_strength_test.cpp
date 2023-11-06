@@ -8,11 +8,9 @@
 #include <QSqlError>
 #include <QSettings>
 #include <QException>
-
-#include "auxiliary/Utilities.h"
+#include <QRandomGenerator>
 
 #include "../../../auxiliary/tracker5_util.h"
-//#include "managers/grip_strength/ParadoxReader.h"
 
 
 const q_stringMap GripStrengthTest::testMetaMap = {
@@ -65,33 +63,30 @@ GripStrengthTest::GripStrengthTest()
 
 void GripStrengthTest::simulate()
 {
-    auto values = testMetaMap.values();
-    for (auto value : values)
-    {
-        addMetaData(value, QVariant());
-    }
+    addMetaData("rung", 2);
+    addMetaData("max_reps", 3);
+    addMetaData("sequence", "RR");
+    addMetaData("rest_time", 15, "s");
+    addMetaData("threshold", 5);
 
     for (int i = 0; i < getExpectedMeasurementCount(); i++)
     {
-        QJsonObject record;
-        record.insert("ExamId",   1);
-        record.insert("TestId",   i);
-        record.insert("Position", "Left");
-        record.insert("Side", 	  "Left");
-
-        record.insert("Rep1",  "");
-        record.insert("Rep2",  "");
-        record.insert("Rep3",  "");
-
-        record.insert("Average", "");
-        record.insert("Maximum", "");
-        record.insert("CV",      "");
-
         QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
-        measurement->fromRecord(&record);
+        measurement->simulate(i);
         addMeasurement(measurement);
     }
 
+    double examMax = 0;
+    for (int i = 0; i < m_measurementList.size(); i++)
+    {
+        double val = m_measurementList[i]->getAttribute("maximum").value().toDouble();
+        if (val > examMax)
+        {
+            examMax = val;
+        }
+    }
+
+    addMetaData("max", examMax, "kg");
 }
 
 bool GripStrengthTest::readMeasurements()

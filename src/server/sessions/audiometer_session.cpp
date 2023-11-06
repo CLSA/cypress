@@ -19,8 +19,8 @@ void AudiometerSession::calculateInputs()
 
 void AudiometerSession::start()
 {
-    m_dialog.reset(new AudiometerDialog(nullptr, QSharedPointer<AudiometerSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new AudiometerDialog(nullptr, QSharedPointer<AudiometerSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

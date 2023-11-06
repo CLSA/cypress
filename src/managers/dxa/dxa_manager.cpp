@@ -1,17 +1,11 @@
-
-
-//#include "dcmtk/dcmdata/dcfilefo.h"
+#include "cypress_application.h"
+#include "cypress_session.h"
 
 #include "data/dxa/tests/dxa_test.h"
 #include "managers/dxa/dxa_manager.h"
 #include "auxiliary/Utilities.h"
 
 #include "../../auxiliary/file_utils.h"
-
-#include "cypress_session.h"
-
-//#include "auxiliary/json_settings.h"
-//#include "cypress_application.h"
 
 #include <QException>
 #include <QJsonDocument>
@@ -61,50 +55,12 @@ void DXAManager::start()
 void DXAManager::measure()
 {
     m_test->reset();
-    m_test->simulate();
+
+    if (Cypress::getInstance().isSimulation())
+        m_test->simulate();
 
     emit measured(m_test.get());
-
-    //if (m_test->isValid())
-    //{
     emit canFinish();
-    //}
-
-    //qDebug() << "measure"; //if (Cypress::getInstance().isSimulation()) {
-    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/dxa/output.json");
-    //    sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/dxa/whole_body.dcm", "whole_body.dcm");
-    //    sendFileToPine("C:/dev/clsa/cypress/src/tests/fixtures/dxa/whole_body2.dcm", "whole_body2.dcm");
-    //    return;
-    //}
-
-    //QVariantMap participantData = getParticipantData();
-    //if (validatedDicomFiles.empty()) return;
-
-    //QVariantMap scanAnalysisData = extractScanAnalysisData();
-    //if (scanAnalysisData.isEmpty()) return;
-
-    //QVariantMap scores = computeTandZScores();
-    //if (scores.isEmpty()) return;
-
-    //scanAnalysisJson = QJsonObject::fromVariantMap(scanAnalysisData);
-    //scoresJson = QJsonObject::fromVariantMap(scanAnalysisData);
-
-    //QJsonObject results = JsonSettings::readJsonFromFile(
-    //    "C:/dev/clsa/cypress/src/tests/fixtures/ultrasound/output.json"
-    //);
-
-    //results["cypress_session"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //if (results.empty()) return;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
 }
 
 // implementation of final clean up of device after disconnecting and all
@@ -148,12 +104,6 @@ void DXAManager::finish()
     int iva_pr_size = iva_pr.size();
     int iva_measure_size = iva_measure.size();
 
-    // Hip
-    QString hip_1_file_name = "HIP_DICOM.dcm";
-
-    QByteArray hip_1 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/HIP/HIP_DICOM.dcm");
-
-    int hip_1_size = hip_1.size();
 
     // Forearm
     QString fa_1_file_name = "FA_DICOM.dcm";
@@ -173,7 +123,6 @@ void DXAManager::finish()
     files.insert(iva_ot_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_ot_size));
     files.insert(iva_pr_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_pr_size));
     files.insert(iva_measure_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_measure_size));
-    files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(hip_1_size));
     files.insert(fa_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(fa_1_size));
 
     testJson.insert("session", sessionObj);
@@ -193,38 +142,33 @@ void DXAManager::finish()
                      host + endpoint + QString::number(answer_id),
                      "application/json",
                      serializedData);
-
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_1_file_name,
+                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_1_file_name + ".dcm",
                      "application/octet-stream",
                      wb_1);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_2_file_name,
+                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_2_file_name + ".dcm",
                      "application/octet-stream",
                      wb_2);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + sp_1_file_name,
+                     host + endpoint + QString::number(answer_id) + "?filename=" + sp_1_file_name + ".dcm",
                      "application/octet-stream",
                      sp_1);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_ot_file_name,
+                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_ot_file_name + ".dcm",
                      "application/octet-stream",
                      iva_ot);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_pr_file_name,
+                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_pr_file_name + ".dcm",
                      "application/octet-stream",
                      iva_pr);
     sendHTTPSRequest("PATCH",
                      host + endpoint + QString::number(answer_id)
-                         + "?filename=" + iva_measure_file_name,
+                         + "?filename=" + iva_measure_file_name + ".dcm",
                      "application/octet-stream",
                      iva_measure);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + hip_1_file_name,
-                     "application/octet-stream",
-                     hip_1);
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + fa_1_file_name,
+                     host + endpoint + QString::number(answer_id) + "?filename=" + fa_1_file_name + ".dcm",
                      "application/octet-stream",
                      fa_1);
 

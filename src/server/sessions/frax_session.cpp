@@ -10,8 +10,8 @@ FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData): Cypress
 void FraxSession::start()
 {
     qDebug() << "start session" << getSessionId() << m_startDateTime;
-    m_dialog.reset(new FraxDialog(nullptr, QSharedPointer<FraxSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new FraxDialog(nullptr, QSharedPointer<FraxSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();
@@ -27,43 +27,42 @@ void FraxSession::validate() const
 {
     CypressSession::validate();
 
-    if (!isValidString("age"))
+    qDebug() << m_inputData;
+
+    if (!isValidInteger("age"))
         throw ValidationError("age");
 
     if (!isValidDate("dob", "yyyy-MM-dd"))
         throw ValidationError("dob");
 
-    if (!isValidString("alcohol"))
+    if (!isValidBool("alcohol"))
         throw ValidationError("alcohol");
 
-    if (!isValidString("country_code"))
+    if (!isValidInteger("country_code"))
         throw ValidationError("country_code");
 
     if (!isValidBool("current_smoker"))
         throw ValidationError("current_smoker");
 
-    if (!isValidString("father_hip_fracture"))
+    if (!isValidBool("father_hip_fracture"))
         throw ValidationError("father_hip_fracture");
 
-    if (!isValidString("mother_hip_fracture"))
+    if (!isValidBool("mother_hip_fracture"))
         throw ValidationError("mother_hip_fracture");
 
-    if (!isValidString("femoral_neck_bmd"))
+    if (!isValidDouble("femoral_neck_bmd"))
         throw ValidationError("femoral_neck_bmd");
 
-    if (!isValidInteger("glucocorticoid_age") && !m_inputData.value("glucocorticoid_age").isUndefined() && !m_inputData.value("glucocorticoid_age").toString().isEmpty())
+    if (!isValidDouble("glucocorticoid_age") && !m_inputData.value("glucocorticoid_age").isUndefined() && !m_inputData.value("glucocorticoid_age").toString().isEmpty())
         throw ValidationError("glucocorticoid_age");
 
-    if (!isValidInteger("glucocorticoid_number") && !m_inputData.value("glucocorticoid_number").isUndefined() && !m_inputData.value("glucocorticoid_number").toString().isEmpty())
+    if (!isValidDouble("glucocorticoid_number") && !m_inputData.value("glucocorticoid_number").isUndefined() && !m_inputData.value("glucocorticoid_number").toString().isEmpty())
         throw ValidationError("glucocorticoid_number");
 
-    if (!isValidInteger("glucocorticoid_year") && !m_inputData.value("glucocorticoid_year").isUndefined() && !m_inputData.value("glucocorticoid_year").toString().isEmpty())
+    if (!isValidDouble("glucocorticoid_year") && !m_inputData.value("glucocorticoid_year").isUndefined() && !m_inputData.value("glucocorticoid_year").toString().isEmpty())
         throw ValidationError("glucocorticoid_year");
 
-    if (!isValidString("height"))
-        throw ValidationError("height");
-
-    if (!isValidString("previous_fracture") && !m_inputData.value("previous_fracture").isUndefined() && !m_inputData.value("previous_fracture").toString().isEmpty())
+    if (!isValidBool("previous_fracture"))
         throw ValidationError("previous_fracture");
 
     if (!isValidString("ra_medications") && !m_inputData.value("ra_medications").isUndefined() && !m_inputData.value("ra_medications").toString().isEmpty())
@@ -74,9 +73,6 @@ void FraxSession::validate() const
 
     if (!isValidString("type"))
         throw ValidationError("type");
-
-    if (!isValidString("weight"))
-        throw ValidationError("weight");
 
     qDebug("validated");
 }
@@ -89,29 +85,18 @@ void FraxSession::calculateInputs()
 
     qDebug("calculate inputs");
 
-    int age = m_inputData.value("age").toString().toInt();
+    int age = m_inputData.value("age").toInt();
     qDebug() << "calculate inputs";
     if (age <= 0)
         throw ValidationError("age must be greater than 0");
 
-    double weight = m_inputData.value("weight").toString().toDouble();
-    if (weight <= 0)
-        throw ValidationError("weight must be greater than 0");
-
-    double height = m_inputData.value("height").toString().toDouble();
-    if (height <= 0)
-        throw ValidationError("height must be greater than 0");
-
-    double bmi = calculateBMI(weight, height);
-    qDebug() << "bmi";
-
     bool glucocorticoid = calculateGlucocorticoid(age);
     qDebug() << "glucco";
 
-    bool father_hip_fracture = m_inputData.value("father_hip_fracture").toString() == "Yes" ? true : false;
+    bool father_hip_fracture = m_inputData.value("father_hip_fracture").toBool();
     qDebug() << "father hip";
 
-    bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toString() == "Yes" ? true : false;
+    bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toBool();
     qDebug() << "mother hip";
 
     bool previous_fracture = father_hip_fracture || mother_hip_fracture;
@@ -121,12 +106,10 @@ void FraxSession::calculateInputs()
     qDebug() << "t score";
 
     m_inputData.insert("rheumatoid_arthritis", (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
-    m_inputData.insert("bmi", bmi);
     m_inputData.insert("previous_fracture", previous_fracture);
     m_inputData.insert("glucocorticoid", glucocorticoid);
     m_inputData.insert("t_score", t_score);
 
-    qDebug() << "bmi: " << bmi;
     qDebug() << "glucocorticoid: " << glucocorticoid;
     qDebug() << "father_hip_fracture: " << father_hip_fracture;
     qDebug() << "mother_hip_fracture: " << mother_hip_fracture;

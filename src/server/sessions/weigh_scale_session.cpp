@@ -20,8 +20,8 @@ void WeighScaleSession::calculateInputs()
 
 void WeighScaleSession::start()
 {
-    m_dialog.reset(new WeighScaleDialog(nullptr, QSharedPointer<WeighScaleSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new WeighScaleDialog(nullptr, QSharedPointer<WeighScaleSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

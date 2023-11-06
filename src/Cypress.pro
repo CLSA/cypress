@@ -57,6 +57,7 @@ FORMS += \
     dialogs/cimt_vivid_i_dialog.ui \
     dialogs/cimt_vivid_iq_dialog.ui \
   dialogs/dxa_dialog.ui \
+    dialogs/dxa_hip_dialog.ui \
   dialogs/ecg_dialog.ui \
   dialogs/frax_dialog.ui \
   dialogs/grip_strength_dialog.ui \
@@ -121,6 +122,7 @@ HEADERS += \
     cypress_main_window.h \
     cypress_session.h \
     cypress_settings.h \
+    data/dxa/tests/dxa_hip_test.h \
     data/measurement.h \
     data/access_query_helper.h \
     data/blood_pressure/measurements/blood_pressure_measurement.h \
@@ -175,6 +177,7 @@ HEADERS += \
     dialogs/dialog_base.h \
     dialogs/dialog_factory.h \
     dialogs/dxa_dialog.h \
+    dialogs/dxa_hip_dialog.h \
     dialogs/ecg_dialog.h \
     dialogs/frax_dialog.h \
     dialogs/grip_strength_dialog.h \
@@ -196,10 +199,12 @@ HEADERS += \
     managers/choice_reaction/choice_reaction_manager.h \
     managers/dxa/dicom/LogWorker.h \
     managers/dxa/dicom/dicom_scp.h \
+    managers/dxa/dxa_hip_manager.h \
     managers/dxa/dxa_manager.h \
     managers/ecg/ecg_manager.h \
     managers/emr/emr_plugin_writer.h \
     managers/frax/frax_manager.h \
+    managers/general_proxy_form/general_proxy_manager.h \
     managers/grip_strength/grip_strength_manager.h \
     managers/grip_strength/paradox_reader.h \
     managers/manager_base.h \
@@ -218,13 +223,16 @@ HEADERS += \
     server/default_delete_request_handler.h \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
+    server/handlers/dxa/dxa_hip_request_handler.h \
+    server/handlers/dxa/dxa_hip_status_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/sessions/audiometer_session.h \
     server/sessions/bpm_session.h \
     server/sessions/cdtt_session.h \
     server/sessions/choice_reaction_session.h \
-    server/sessions/dxa_session.h \
+    server/sessions/dxa/dxa_hip_session.h \
+    server/sessions/dxa/dxa_session.h \
     server/sessions/ecg_session.h \
     server/sessions/frax_session.h \
     server/handlers/audiometer/audiometer_request_handler.h \
@@ -312,6 +320,7 @@ SOURCES += \
     cypress_main_window.cpp \
     cypress_session.cpp \
     cypress_settings.cpp \
+    data/dxa/tests/dxa_hip_test.cpp \
     data/measurement.cpp \
     data/access_query_helper.cpp \
     data/blood_pressure/measurements/blood_pressure_measurement.cpp \
@@ -366,6 +375,7 @@ SOURCES += \
     dialogs/dialog_base.cpp \
     dialogs/dialog_factory.cpp \
     dialogs/dxa_dialog.cpp \
+    dialogs/dxa_hip_dialog.cpp \
     dialogs/ecg_dialog.cpp \
     dialogs/frax_dialog.cpp \
     dialogs/grip_strength_dialog.cpp \
@@ -388,10 +398,12 @@ SOURCES += \
     managers/choice_reaction/choice_reaction_manager.cpp \
     managers/dxa/dicom/LogWorker.cpp \
     managers/dxa/dicom/dicom_scp.cpp \
+    managers/dxa/dxa_hip_manager.cpp \
     managers/dxa/dxa_manager.cpp \
     managers/ecg/ecg_manager.cpp \
     managers/emr/emr_plugin_writer.cpp \
     managers/frax/frax_manager.cpp \
+    managers/general_proxy_form/general_proxy_manager.cpp \
     managers/grip_strength/grip_strength_manager.cpp \
     managers/grip_strength/paradox_reader.cpp \
     managers/manager_base.cpp \
@@ -409,13 +421,16 @@ SOURCES += \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
+    server/handlers/dxa/dxa_hip_request_handler.cpp \
+    server/handlers/dxa/dxa_hip_status_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
     server/sessions/bpm_session.cpp \
     server/sessions/cdtt_session.cpp \
     server/sessions/choice_reaction_session.cpp \
-    server/sessions/dxa_session.cpp \
+    server/sessions/dxa/dxa_hip_session.cpp \
+    server/sessions/dxa/dxa_session.cpp \
     server/sessions/ecg_session.cpp \
     server/sessions/frax_session.cpp \
     server/handlers/audiometer/audiometer_request_handler.cpp \

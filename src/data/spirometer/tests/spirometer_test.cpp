@@ -1,7 +1,7 @@
 #include "spirometer_test.h"
 #include "../measurements/spirometer_measurement.h"
 
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QDomDocument>
 #include <QFile>
@@ -264,8 +264,8 @@ void SpirometerTest::simulate(const QVariantMap& inputData)
     addMetaData("device_serial_number", "200000");
     addMetaData("device_software_version", "1.4.1.2");
 
-    addMetaData("asthma", false);
-    addMetaData("copd", false);
+    addMetaData("asthma", inputData["asthma"].toBool());
+    addMetaData("copd", inputData["copd"].toBool());
 
     addMetaData("lung_age", 54, "yr");
 
@@ -292,7 +292,7 @@ void SpirometerTest::simulate(const QVariantMap& inputData)
         trial->simulate();
 
         /*
-         * 
+         *
          */
 
         qDebug() << "adding trial" << i;

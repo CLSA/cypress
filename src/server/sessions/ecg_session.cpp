@@ -20,8 +20,8 @@ void ECGSession::calculateInputs()
 
 void ECGSession::start()
 {
-    m_dialog.reset(new EcgDialog(nullptr, QSharedPointer<ECGSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new EcgDialog(nullptr, QSharedPointer<ECGSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

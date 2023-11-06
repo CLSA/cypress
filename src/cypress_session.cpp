@@ -49,7 +49,7 @@ void CypressSession::validate() const
 
 void CypressSession::start()
 {
-    if (m_dialog.isNull())
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();
@@ -63,7 +63,7 @@ void CypressSession::start()
 
 void CypressSession::end()
 {
-    if (m_dialog.isNull())
+    if (m_dialog == nullptr)
         throw QException();
 
     m_status = SessionStatus::Ended;

@@ -19,8 +19,8 @@ void CDTTSession::calculateInputs()
 
 void CDTTSession::start()
 {
-    m_dialog.reset(new CDTTDialog(nullptr, QSharedPointer<CDTTSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new CDTTDialog(nullptr, QSharedPointer<CDTTSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

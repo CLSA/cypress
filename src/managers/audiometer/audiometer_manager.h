@@ -61,7 +61,7 @@ private slots:
     void writeDevice() override;
 
 private:
-    bool hasEndCode(const QByteArray&);
+    bool hasEndCode(const QByteArray&) const;
 
     // Reset the session
     bool clearData() override;

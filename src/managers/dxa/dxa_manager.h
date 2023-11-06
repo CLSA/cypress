@@ -3,7 +3,7 @@
 
 #include "../manager_base.h"
 #include "./dicom/dicom_scp.h"
-#include "server/sessions/dxa_session.h"
+#include "server/sessions/dxa/dxa_session.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dicom/dcm_recv.h"

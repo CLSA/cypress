@@ -1,16 +1,19 @@
 #include "audiometer_manager.h"
 
+#include "../../data/hearing/tests/hearing_test.h"
+
 #include "cypress_application.h"
-#include "auxiliary/json_settings.h"
 
 #include <QDateTime>
 #include <QDebug>
-#include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QSerialPortInfo>
 #include <QSettings>
 #include <QStandardItemModel>
 #include <QtMath>
+#include <QMessageBox>
 
 
 
@@ -23,7 +26,7 @@ QByteArray AudiometerManager::initEndCode()
     return QByteArray(data);
 }
 
-bool AudiometerManager::hasEndCode(const QByteArray &arr)
+bool AudiometerManager::hasEndCode(const QByteArray &arr) const
 {
     bool ok = false;
     int len = arr.size() - 1;
@@ -64,15 +67,10 @@ bool AudiometerManager::isInstalled()
 {
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
     if (portList.isEmpty()) {
-      qInfo() << "no RS232 ports available.";
-      qInfo() << "-------------------------------------";
       return false;
-    } else {
-      qInfo() << "checking for installed devices on available COM ports:";
-      bool isInstalled { false };
+    }
 
-      for (const QSerialPortInfo& portInfo : portList) {
-
+    for (const QSerialPortInfo& portInfo : portList) {
         if (!isRS232Port(portInfo))
         {
             continue;
@@ -80,17 +78,13 @@ bool AudiometerManager::isInstalled()
 
         QSerialPort serialPort;
         serialPort.setPort(portInfo);
+
         if (serialPort.open(QIODevice::ReadWrite)) {
-            qDebug() << "device installed on port" << portInfo.portName();
             serialPort.close();
-            isInstalled = true;
-        } else {
-            qDebug() << "no device installed on port" << portInfo.portName();
+            return true;
         }
-        qInfo() << "-------------------------------------";
-      }
-      return isInstalled;
     }
+
     return false;
 }
 
@@ -98,41 +92,33 @@ bool AudiometerManager::isAvailable()
 {
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
     if (portList.isEmpty()) {
-      qWarning() << "audiometer: no RS232 ports available.";
-      return false;
-    } else {
-      qInfo() << "audiometer: available RS232 ports with supported baud rates between 600 and 19200:";
-      bool supportsBaudRates = false;
-      for (const QSerialPortInfo& portInfo : portList) {
-          if (!isRS232Port(portInfo))
-          {
-              continue;
-          }
-
-          QList<qint32> baudRates = portInfo.standardBaudRates();
-          for (qint32 baudRate : baudRates) {
-              if (baudRate >= 600 && baudRate <= 19200) {
-                  supportsBaudRates = true;
-                  break;
-              }
-          }
-
-          if (supportsBaudRates) {
-            qInfo() << "port:"                 << portInfo.portName();
-            qInfo() << "supported baud rates:" << baudRates;
-            qInfo() << "description:"          << portInfo.description();
-            qInfo() << "manufacturer:"         << portInfo.manufacturer();
-            qInfo() << "serial number:"        << portInfo.serialNumber();
-            qInfo() << "system location:"      << portInfo.systemLocation();
-            qInfo() << "vendor identifier:"    << portInfo.vendorIdentifier();
-            qInfo() << "product identifier:"   << portInfo.productIdentifier();
-            qInfo() << "-------------------------------------";
-          }
-      }
-
-      return supportsBaudRates;
+        return false;
     }
-    return false;
+
+    bool supportsBaudRates = false;
+    for (const QSerialPortInfo& portInfo : portList) {
+        if (!isRS232Port(portInfo))
+            continue;
+
+        QList<qint32> baudRates = portInfo.standardBaudRates();
+        for (qint32 baudRate : baudRates) {
+            if (baudRate >= 600 && baudRate <= 19200) {
+                qInfo() << "port:"                 << portInfo.portName();
+                qInfo() << "supported baud rates:" << baudRates;
+                qInfo() << "description:"          << portInfo.description();
+                qInfo() << "manufacturer:"         << portInfo.manufacturer();
+                qInfo() << "serial number:"        << portInfo.serialNumber();
+                qInfo() << "system location:"      << portInfo.systemLocation();
+                qInfo() << "vendor identifier:"    << portInfo.vendorIdentifier();
+                qInfo() << "product identifier:"   << portInfo.productIdentifier();
+                qInfo() << "-------------------------------------";
+
+                supportsBaudRates = true;
+            }
+        }
+    }
+
+    return supportsBaudRates;
 }
 
 void AudiometerManager::start()
@@ -149,46 +135,23 @@ bool AudiometerManager::setUp()
 void AudiometerManager::setInputData(const QVariantMap& inputData)
 {
     m_inputData = inputData;
-    qDebug() << "INPUT DATA";
-    //if (inputData.value("participant_id").isNull())
-    //{
-    //    qDebug() << "no participant id";
-    //}
-    //m_test.addMetaData("participant_id", inputData.value("participant_id"));
 }
 
 void AudiometerManager::measure()
 {
-    m_test->reset();
-    m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
+    m_test.reset();
 
-    emit measured(m_test.get());
-    emit canFinish();
+    if (Cypress::getInstance().isSimulation())
+    {
+        m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
 
-    //clearData();
-    //const char cmd[] = { 0x05, '4', 0x0d };
-    //m_request = QByteArray::fromRawData(cmd, 3);
-    //writeDevice();
-    //if (Cypress::getInstance().isSimulation())
-    //{
-    //  sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/audiometer/output.json");
-    //  return;
-    //}
+        emit measured(m_test.get());
+        emit canFinish();
+    }
 
-    //if (results.empty()) return;
-
-    //results["uuid"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
-
-    //qDebug() << "measure called";
+    const char cmd[] = { 0x05, '4', 0x0d };
+    m_request = QByteArray::fromRawData(cmd, 3);
+    writeDevice();
 }
 
 void AudiometerManager::finish()
@@ -210,43 +173,18 @@ void AudiometerManager::finish()
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("");
-    //if(m_port.isOpen())
-    //    m_port.close();
 
-    //QJsonObject results;
-    //if (CypressApplication::getInstance().isSimulation())
-    //{
-    //    results = JsonSettings::readJsonFromFile(
-    //        QCoreApplication::applicationDirPath() + "/src/tests/fixtures/audiometer/output.json"
-    //    );
-    //}
-    //else
-    //{
-    //    results = m_test.toJsonObject();
-    //}
-
-    //if (results.empty())
-    //{
-    //    qCritical() << "AudiometerManager::finish - error: test results are empty";
-    //    return;
-    //}
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qCritical() << "AudiometerManager::finish - error: unable to send results";
-    //}
-
-    //ok = cleanUp();
-    //if (!ok)
-    //{
-    //    qCritical() << "AudiometerManager::finish - error: device cleanup failed";
-    //}
+    cleanUp();
 }
 
 bool AudiometerManager::cleanUp()
 {
-    //clearData();
+    clearData();
+
+    m_buffer.clear();
+    m_deviceList.clear();
+    //m_deviceData.reset();
+
     return true;
 }
 
@@ -255,40 +193,38 @@ void AudiometerManager::readDevice()
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
 
-    //QByteArray data = m_port.readAll();
+    QByteArray data = m_port.readAll();
 
-    //m_buffer += data;
+    m_buffer += data;
 
-    //if(hasEndCode(m_buffer))
-    //{
-    //    m_test.fromArray(m_buffer);
-    //    if(m_test.isValid())
-    //    {
-    //        // emit the can write signal
-    //        qDebug() << "Audiometer::readDevice - test is valid";
-    //        emit canFinish();
-    //    }
-    //}
+    HearingTest* hearingTest = static_cast<HearingTest*>(m_test.get());
+
+    if(hasEndCode(m_buffer))
+    {
+        hearingTest->fromArray(m_buffer);
+        if(hearingTest->isValid())
+        {
+            emit measured(m_test.get());
+            emit canFinish();
+        }
+    }
 }
 
 void AudiometerManager::writeDevice()
 {
     // send a request to the audiometer to start data collection
     //
-    //m_buffer.clear();
-    //const int bytesWritten = m_port.write(m_request);
-    //if (bytesWritten < 0) {
-    //    qCritical() << "AudiometerManager::writeDevice - Error: could not write data to the serial port";
-    //}
+    m_buffer.clear();
+    const int bytesWritten = m_port.write(m_request);
+    if (bytesWritten < 0) {
+        QMessageBox::critical(nullptr, "Error", "Could not write data to the serial port");
+    }
 }
 
 bool AudiometerManager::clearData()
 {
-    //// Reset the device and data
-    //m_buffer.clear();
-    ////m_deviceList.clear();
-    ////m_deviceData.reset();
-    //m_test.reset();
+    m_test.reset();
+
     return true;
 }
 

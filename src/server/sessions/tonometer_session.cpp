@@ -23,8 +23,8 @@ void TonometerSession::calculateInputs()
 
 void TonometerSession::start()
 {
-    m_dialog.reset(new TonometerDialog(nullptr, QSharedPointer<TonometerSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new TonometerDialog(nullptr, QSharedPointer<TonometerSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

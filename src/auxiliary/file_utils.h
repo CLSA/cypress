@@ -15,6 +15,8 @@ public:
     static QByteArray readFileAsBase64(QFile& file);
     static QString generateHash(const QByteArray& bytes);
 
+    static QString copyFile(const QString& src, const QString& dest);
+
     static bool doesExeExist(const QString &absolutePath);
     static bool doesFileExist(const QString &absolutePath, const bool isWritable);
     static bool doesDirExist(const QString &absolutePath, const bool isWritable);

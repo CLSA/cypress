@@ -84,13 +84,12 @@ signals:
     void canSelectDatabase();
 
 private:
+    QProcess m_process;
+
     QString m_runnableName;// full pathspec to ora.exe
     QString m_runnablePath;// path to ora.exe
     QString m_databaseName;// full pathspec to ora.mdb
     QString m_temporaryFile; // store a copy of ora.mdb
-
-    QProcess m_process;
-    TonometerTest* m_test;
 
     // Reset the session
     bool clearData() override;

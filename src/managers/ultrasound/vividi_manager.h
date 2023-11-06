@@ -35,8 +35,6 @@ protected:
     void setInputData(const QVariantMap&) override;
 
 private:
-    CimtVividiTest* m_test;
-
     QScopedPointer<DcmRecv> m_dcmRecv;
     QScopedPointer<DicomDirectoryWatcher> m_dcmWatcher;
 };

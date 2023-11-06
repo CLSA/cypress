@@ -52,7 +52,7 @@ public slots:
 
 private:
     QProcess m_process;
-    CDTTTest* m_test;
+    QString m_outputFile;
 
     // Reset the session
     bool clearData() override;
@@ -67,6 +67,8 @@ private:
     bool cleanUp() override;
 
     void configureProcess();
+
+    void readOutput();
 };
 
 #endif // CDTT_MANAGER_H

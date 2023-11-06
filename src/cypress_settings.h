@@ -27,15 +27,14 @@ public:
     QString getPineEndpoint() const;
     void setPineEndpoint(const QString &newEndpoint);
 
+    QString getDeviceEndpoint() const;
+
+    QString getPineCredentials() const;
     QString getAnswerUrl(int answer_id) const;
 
-    // Read setting from the cypress.ini file
     QVariant readSetting(const QString& key) const;
-
-    // Write setting to the cypress.ini file
     void writeSetting(const QString& key, const QVariant& value);
 
-    // Resets all Cypress settings to defaults
     void setDefaultSettings();
 
 private:

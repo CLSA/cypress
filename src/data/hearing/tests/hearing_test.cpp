@@ -70,7 +70,11 @@ void HearingTest::simulate(const QVariantMap& inputData)
 
         measurement->setAttribute("side", side);
         measurement->setAttribute("test", i.value());
-        measurement->setAttribute("level", QRandomGenerator::global()->bounded(1, 101));
+
+        double level = QRandomGenerator::global()->bounded(1, 101);
+
+        measurement->setAttribute("level", level);
+        measurement->setAttribute("pass", level < 40);
 
         addMeasurement(measurement);
       }
@@ -194,16 +198,29 @@ const HearingMeasurement &HearingTest::getMeasurement(const QString &side, const
 
 QJsonObject HearingTest::toJsonObject() const
 {
-  QJsonArray jsonArr{};
+  QJsonArray leftResults {};
+  QJsonArray rightResults {};
 
   foreach (const auto m, m_measurementList) {
-    jsonArr.append(m->toJsonObject());
+    QJsonObject measureJson = m->toJsonObject();
+    QString side = measureJson["side"].toString();
+    measureJson.remove("side");
+
+    if (side == "left")
+    {
+        leftResults.append(measureJson);
+    }
+    else if (side == "right") {
+        rightResults.append(measureJson);
+    }
+    else {
+        throw std::exception("Invalid side");
+    }
   }
 
   QJsonObject json{};
-
   json.insert("metadata", m_metaData.toJsonObject());
-  json.insert("results", jsonArr);
+  json.insert("results", QJsonObject { { "left", leftResults }, { "right", rightResults }});
   json.insert("manual_entry", getManualEntryMode());
 
   return json;

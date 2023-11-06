@@ -12,29 +12,60 @@ void SpirometerSession::validate() const
 {
     CypressSession::validate();
 
-    if (!isValidString("age"))
-        throw ValidationError("age");
-    if (!isValidString("ethnicity"))
-        throw ValidationError("ethnicity");
-    if (!isValidString("date_of_birth"))
-        throw ValidationError("date_of_birth");
-    if (!isValidString("smoker"))
-        throw ValidationError("date_of_birth");
-    if (!isValidString("copd"))
-        throw ValidationError("date_of_birth");
-    if (!isValidString("gender"))
-        throw ValidationError("date_of_birth");
+    qDebug() << m_inputData;
+    //if (!isValidString("age"))
+    //    throw ValidationError("age");
+    //if (!isValidString("ethnicity"))
+    //    throw ValidationError("ethnicity");
+    if (!isValidDate("dob", "yyyy-MM-dd"))
+        throw ValidationError("dob");
+
+    if (!isValidBool("asthma"))
+        throw ValidationError("asthma");
+
+    if (!isValidBool("smoker"))
+        throw ValidationError("smoker");
+
+    if (!isValidBool("copd"))
+        throw ValidationError("copd");
+
+    if (!isValidString("sex"))
+        throw ValidationError("sex");
+
+    if (!isValidDouble("height"))
+        throw ValidationError("height");
+
+    if (!isValidDouble("weight"))
+        throw ValidationError("weight");
+}
+
+int computeAge(const QString &birthdateStr) {
+    QDate birthdate = QDate::fromString(birthdateStr, "yyyy-MM-dd");
+    QDate currentDate = QDate::currentDate();
+
+    int years = currentDate.year() - birthdate.year();
+
+    // Subtract a year if the birthday hasn't occurred yet this year
+    if ((birthdate.month() > currentDate.month()) ||
+        ((birthdate.month() == currentDate.month()) &&
+         (birthdate.day() > currentDate.day()))) {
+        years--;
+    }
+
+    return years;
 }
 
 void SpirometerSession::calculateInputs()
 {
-
+    // TODO calculate age from DOB
+    m_inputData["age"] = computeAge(m_inputData["dob"].toString());
+    m_inputData["ethnicity"] = "caucasian";
 }
 
 void SpirometerSession::start()
 {
-    m_dialog.reset(new SpirometerDialog(nullptr, QSharedPointer<SpirometerSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new SpirometerDialog(nullptr, QSharedPointer<SpirometerSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

@@ -51,6 +51,8 @@ public:
         DxaForearmBone,
         DxaDualHip,
         Signature,
+        Gen_Proxy_Consent,
+        Participant_Report
     };
     Q_ENUM(MeasureType)
 

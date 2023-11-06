@@ -156,15 +156,31 @@ void FraxTest::simulate(const QVariantMap& input)
 
     QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
     measure3->setAttribute("TYPE", "osteoporotic_fracture_bmd");
-    p = Utilities::interp(2.0f,22.0f,mu);
+    p = Utilities::interp(0.0f, 30.0f, mu);
     measure3->setAttribute("probability", p, "%");
     addMeasurement(measure3);
+
+    QString interp = "N/A";
+    if (p > 20)
+    {
+      interp = "High";
+    }
+    else if (p >= 10 && p <= 20)
+    {
+      interp = "Moderate";
+    }
+    else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5) {
+      interp = "Low";
+    }
+
+    addMetaData("osteoporotic_fracture_bmd_interp", interp);
 
     QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
     measure4->setAttribute("TYPE", "hip_fracture_bmd");
     p = Utilities::interp(0.0f,8.0f,mu);
     measure4->setAttribute("probability", p, "%");
     addMeasurement(measure4);
+
 }
 
 // String representation for debug and GUI display purposes

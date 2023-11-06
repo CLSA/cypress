@@ -45,7 +45,6 @@ void FileUtils::sendHTTPSRequest(const QString& method, const QString& endpoint,
 {
     Q_UNUSED(method)
 
-    qDebug() << "initialize ssl";
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
@@ -54,8 +53,6 @@ void FileUtils::sendHTTPSRequest(const QString& method, const QString& endpoint,
         "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
     );
     Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
-
-    qDebug() << "finish ssl";
 
     const QString& pinePath = QString(endpoint);
 
@@ -75,15 +72,11 @@ void FileUtils::sendHTTPSRequest(const QString& method, const QString& endpoint,
     os.write(data.constData(), data.size());
     os.flush();
 
-    qDebug() << "sent";
-
     Poco::Net::HTTPResponse res;
 
     std::istream &is = session.receiveResponse(res);
     std::stringstream ss;
     Poco::StreamCopier::copyStream(is, ss);
-
-    qDebug() << "received";
 }
 
 QByteArray FileUtils::readFileIntoByteArray(const QString &filePath)
@@ -230,4 +223,20 @@ QString FileUtils::generateHash(const QByteArray& bytes)
 {
     QByteArray hash = QCryptographicHash::hash(bytes, QCryptographicHash::Sha256);
     return hash;
+}
+
+QString FileUtils::copyFile(const QString &src, const QString &dest)
+{
+    QFile file(src);
+    if (file.exists()) {
+        if (file.copy(dest)) {
+                qDebug() << "File copied successfully!";
+        } else {
+                qDebug() << "Failed to copy file. Error:" << file.errorString();
+        }
+    } else {
+        qDebug() << "File does not exist!";
+    }
+
+    return QFileInfo(file).absoluteFilePath();
 }

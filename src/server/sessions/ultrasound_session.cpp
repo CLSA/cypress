@@ -5,23 +5,31 @@
 UltrasoundSession::UltrasoundSession(QObject *parent, const QJsonObject& inputData)
     : CypressSession{parent, inputData}
 {
+    qDebug() << "create ultrsound session";
+}
 
+UltrasoundSession::~UltrasoundSession()
+{
+    qDebug() << "delete session";
 }
 
 void UltrasoundSession::validate() const
 {
     CypressSession::validate();
+    qDebug() << "validate ultrsound session";
 }
 
 void UltrasoundSession::calculateInputs()
 {
-
+    CypressSession::calculateInputs();
+    qDebug() << "calculateInputs ultrsound session";
 }
 
 void UltrasoundSession::start()
 {
-    m_dialog.reset(new CimtVividiDialog(nullptr, QSharedPointer<UltrasoundSession>(this)));
-    if (m_dialog.isNull())
+    qDebug() << "ultrsound session start";
+    m_dialog = new CimtVividiDialog(nullptr, QSharedPointer<UltrasoundSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();
@@ -35,5 +43,6 @@ void UltrasoundSession::start()
 
 void UltrasoundSession::end()
 {
-
+    qDebug() << "ultrsound session end";
+    CypressSession::end();
 }

@@ -2,7 +2,7 @@
 #define DXA_DIALOG_H
 
 #include "dialog_base.h"
-#include "server/sessions/dxa_session.h"
+#include "server/sessions/dxa/dxa_session.h"
 
 #include "ui_dxa_dialog.h"
 

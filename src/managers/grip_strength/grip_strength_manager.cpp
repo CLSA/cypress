@@ -14,9 +14,8 @@
 
 GripStrengthManager::GripStrengthManager(QSharedPointer<GripStrengthSession> session)
     : ManagerBase(session)
-    , m_test(new GripStrengthTest)
 {
-
+    m_test.reset(new GripStrengthTest);
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     //m_workingDirPath = settings.value("instruments/grip_strength/working_dir").toString();
     //if (m_workingDirPath.isEmpty() || m_workingDirPath.isNull())
@@ -59,41 +58,19 @@ bool GripStrengthManager::isAvailable()
 
 void GripStrengthManager::start()
 {
-    emit started(m_test);
+    emit started(m_test.get());
     emit canMeasure();
-    //setUp();
 }
 
 void GripStrengthManager::measure()
 {
     m_test->reset();
-    m_test->simulate();
 
-    emit measured(m_test);
+    if (Cypress::getInstance().isSimulation())
+        m_test->simulate();
+
+    emit measured(m_test.get());
     emit canFinish();
-
-    //m_test.readMeasurements();
-    //if (m_test.isValid())
-    //{
-    //    emit canFinish();
-    //}
-
-    //if (Cypress::getInstance().isSimulation()) {
-    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/grip_strength/output.json");
-    //}
-
-    //results["cypress_session"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //if (results.empty()) return;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
 }
 
 void GripStrengthManager::finish()
@@ -122,7 +99,7 @@ void GripStrengthManager::addManualMeasurement()
     QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
     m_test->addMeasurement(measurement);
 
-    emit dataChanged(m_test);
+    emit dataChanged(m_test.get());
 }
 
 bool GripStrengthManager::setUp() {

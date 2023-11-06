@@ -15,7 +15,7 @@ class DialogBase : public QDialog
 
 public:
     DialogBase(QWidget *parent, QSharedPointer<CypressSession> session);
-    ~DialogBase();
+    virtual ~DialogBase();
 
     void initialize();
     void run();

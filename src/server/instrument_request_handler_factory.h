@@ -36,6 +36,9 @@ public:
     static HTTPRequestHandler* createBloodPressureRequestHandler();
     static HTTPRequestHandler* createBloodPressureStatusRequestHandler();
 
+    static HTTPRequestHandler* createDxaHipRequestHandler();
+    static HTTPRequestHandler* createDxaHipStatusRequestHandler();
+
     static HTTPRequestHandler* createDxaRequestHandler();
     static HTTPRequestHandler* createDxaStatusRequestHandler();
 

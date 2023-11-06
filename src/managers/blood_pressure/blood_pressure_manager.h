@@ -116,6 +116,10 @@ private:
     // device data is separate from test data
     Measurement m_deviceData;
 
+    // communications handling
+    QThread m_thread;
+    BPMCommunication* m_comm { Q_NULLPTR };
+
     // Set up device
     bool setUp() override;
 
@@ -128,13 +132,10 @@ private:
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;
 
-    // Send the results to Pine for storage & analysis
-    //bool sendResultsToPine(const QJsonObject &data) override;
-
     bool m_aborted { false };
 
     // usb hid devices plugged in and openable
-    //QMap<QString,QUsb::Id> m_deviceList;
+    QMap<QString,QUsb::Id> m_deviceList;
 
     // called when loading from settings
     void selectDeviceById(const QUsb::Id&);
@@ -145,10 +146,6 @@ private:
     quint16 m_vendorIDFilter { 0 };
     QString m_cuffSize { "" };
     QString m_side { "" };
-
-    // communications handling
-    QThread m_thread;
-    BPMCommunication* m_comm { Q_NULLPTR };
 };
 
 

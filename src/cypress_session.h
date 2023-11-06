@@ -19,6 +19,10 @@ class CypressSession : public QObject
 public:
     CypressSession(QObject* parent, const QJsonObject& inputData);
 
+    // Delete copy constructor and copy assignment operator.
+    CypressSession(const CypressSession&) = delete;
+    CypressSession& operator=(const CypressSession&) = delete;
+
     virtual ~CypressSession() {};
 
     // Determines if the basic key/value pairs exist for a session or throws exception
@@ -48,7 +52,7 @@ protected:
 
     // the device UI
     //
-    QScopedPointer<DialogBase> m_dialog;
+    DialogBase* m_dialog;
 
     // request body sent from Pine
     //

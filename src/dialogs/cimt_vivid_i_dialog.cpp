@@ -16,7 +16,7 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
 
-    this->setWindowTitle("CIMT");
+    this->setWindowTitle("Carotid Intima");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new VividiManager(session));
@@ -26,29 +26,36 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
 
     QList<TableColumn> columns;
-    columns << TableColumn("STUDY_INSTANCE_ID", "ID", new TextDelegate("", QRegExp("^1234$"), true));
     columns << TableColumn("SIDE", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
+    columns << TableColumn("FILE", "File", new TextDelegate("", QRegExp(), true, false));
+    columns << TableColumn("SIZE", "Size", new TextDelegate("", QRegExp(), true, false));
 
-    // device started
+    // device/server started
     connect(manager, &VividiManager::started, ui->measurementTable, [=](TestBase* test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 
-    // can auto measure
+    // setup complete, can now measure
     connect(manager, &VividiManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
+    // request auto measure
+    connect(ui->measurementTable, &MeasurementTable::measure, manager, &VividiManager::measure);
+
+    // measure complete
     connect(manager, &VividiManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
-    // can finish
+    // measures valid, can finish test
     connect(manager, &VividiManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
     });
 
-    // finished
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager, &VividiManager::finish);
+
+    // successful test
     connect(manager, &VividiManager::success, this, &CimtVividiDialog::success);
 
     // critical error
@@ -56,12 +63,6 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
 
     // data changed
     connect(manager, &VividiManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
-    // request auto measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager, &VividiManager::measure);
-
-    // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager, &VividiManager::finish);
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &VividiManager::addManualMeasurement);

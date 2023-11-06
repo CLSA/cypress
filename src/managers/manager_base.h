@@ -120,13 +120,6 @@ protected:
 
     virtual void sendHTTPRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
     virtual void sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
-
-    // Send the test results to Pine for storage & analysis
-    virtual bool sendResultsToPine(const QString& filePath);
-    virtual bool sendFileToPine(const QString& filePath, const QString& fileName);
-
-    virtual void sendJsonData(const QString& filePath);
-    virtual void sendOctetStream(const QString& filePath);
 };
 
 #endif // MANAGER_BASE_H

@@ -4,17 +4,17 @@
 
 CimtVividIMeasurement::CimtVividIMeasurement()
 {
-    this->setAttribute("CINELOOP_1", "");
-    this->setAttribute("STILL_IMAGE_1", "");
-    this->setAttribute("STILL_IMAGE_2", "");
-    this->setAttribute("STILL_IMAGE_3", "");
-    this->setAttribute("SR_1", "");
-    this->setAttribute("SIDE", "");
+    this->setAttribute("side", QVariant());
+    this->setAttribute("name", QVariant());
+    this->setAttribute("size", QVariant());
 }
 
 QString CimtVividIMeasurement::toString() const
 {
-    return "";
+    return QString("Side: %1, Name: %2, Size: %4").arg(
+        getAttribute("side").toString(),
+        getAttribute("name").toString(),
+        getAttribute("size").toString());
 }
 
 QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
@@ -25,59 +25,8 @@ QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
 
 bool CimtVividIMeasurement::isValid() const
 {
-    return true;
-    //if (m_attributes.contains("CINELOOP_1"))
-    //{
-    //    if (!FileUtils::doesFileExist(m_attributes["CINELOOP_1"].toString(), false))
-    //    {
-    //        return false;
-    //    }
-    //}
+    if (hasAttribute("side") && hasAttribute("name") && hasAttribute("size"))
+        return true;
 
-
-    //if (m_attributes.contains("STILL_IMAGE_1"))
-    //{
-    //    if (!FileUtils::doesFileExist(m_attributes["STILL_IMAGE"].toString(), false))
-    //    {
-    //        return false;
-    //    }
-    //}
-
-    //if (m_attributes.contains("STILL_IMAGE_2"))
-    //{
-    //    if (!FileUtils::doesFileExist(m_attributes["STILL_IMAGE"].toString(), false))
-    //    {
-    //        return false;
-    //    }
-    //}
-
-    //if (m_attributes.contains("STILL_IMAGE_3"))
-    //{
-    //    if (!FileUtils::doesFileExist(m_attributes["STILL_IMAGE"].toString(), false))
-    //    {
-    //        return false;
-    //    }
-    //}
-
-    //if (m_attributes.contains("SR_1"))
-    //{
-    //    if (!FileUtils::doesFileExist(m_attributes["SR"].toString(), false))
-    //    {
-    //        return false;
-    //    }
-    //}
-
-    //if (!m_attributes.contains("SIDE") || m_attributes.isEmpty())
-    //{
-    //    return false;
-    //}
-
-    return true;
-}
-
-QJsonObject CimtVividIMeasurement::toJsonObject() const
-{
-    return QJsonObject {
-
-    };
+    return false;
 }

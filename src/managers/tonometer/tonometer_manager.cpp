@@ -1,4 +1,5 @@
 //#include "data/AccessQueryHelper.h"
+#include "cypress_application.h"
 
 #include "tonometer_manager.h"
 #include "server/sessions/tonometer_session.h"
@@ -16,8 +17,8 @@
 
 TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
     : ManagerBase(session)
-    , m_test(new TonometerTest)
 {
+    m_test.reset(new TonometerTest);
     m_test->setExpectedMeasurementCount(2);
 }
 
@@ -38,7 +39,7 @@ bool TonometerManager::isInstalled()
 
 void TonometerManager::start()
 {
-    emit started(m_test);
+    emit started(m_test.get());
     emit canMeasure();
 
     // connect signals and slots to QProcess one time only
@@ -101,33 +102,12 @@ void TonometerManager::selectDatabase(const QString &dbName)
 void TonometerManager::measure()
 {
     m_test->reset();
-    m_test->simulate({});
 
-    emit measured(m_test);
+    if (Cypress::getInstance().isSimulation())
+        m_test->simulate({});
+
+    emit measured(m_test.get());
     emit canFinish();
-
-    //QJsonObject response {
-    //    {"uuid", m_uuid,},
-    //    {"answer_id", m_answerId }
-    //};
-
-    //sendResultsToPine(response);
-    //if (Cypress::getInstance().isSimulation()) {
-    //  sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/tonometer/output.json");
-    //}
-
-    //results["cypress_session"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //if (results.empty()) return;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
 }
 
 void TonometerManager::readOutput()

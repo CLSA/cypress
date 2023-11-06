@@ -19,8 +19,8 @@ void ChoiceReactionSession::calculateInputs()
 
 void ChoiceReactionSession::start()
 {
-    m_dialog.reset(new ChoiceReactionDialog(nullptr, QSharedPointer<ChoiceReactionSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new ChoiceReactionDialog(nullptr, QSharedPointer<ChoiceReactionSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

@@ -21,10 +21,11 @@ public:
     void fromRecord(const QJsonObject* record);
 
     bool isValid() const override;
+    void simulate(int i);
 
     QString toString() const override;
 
-    static GripStrengthMeasurement simulate();
+
     static const q_stringMap trialMap;
 };
 

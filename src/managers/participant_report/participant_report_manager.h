@@ -1,27 +1,25 @@
 #ifndef PARTICIPANTREPORTMANAGER_H
 #define PARTICIPANTREPORTMANAGER_H
 
-#include "managers/manager_base.h"
-
-#include <QObject>
+#include "../manager_base.h"
+#include "server/sessions/participant_report_session.h"
 
 class ParticipantReportManager : public ManagerBase
 {
-    Q_OBJECT
 public:
-    ParticipantReportManager(QSharedPointer<CypressSession> session);
+    ParticipantReportManager(QSharedPointer<ParticipantReportSession> session);
 
     // ManagerBase interface
 public slots:
-    void start() override;
-    void measure() override;
-    void finish() override;
+    void start();
+    void measure();
+    void finish();
 
 protected:
-    void setInputData(const QVariantMap &) override;
-    bool setUp() override;
-    bool clearData() override;
-    bool cleanUp() override;
+    void setInputData(const QVariantMap &);
+    bool setUp();
+    bool clearData();
+    bool cleanUp();
 };
 
 #endif // PARTICIPANTREPORTMANAGER_H

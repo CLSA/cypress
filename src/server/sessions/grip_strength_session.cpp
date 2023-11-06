@@ -20,8 +20,8 @@ void GripStrengthSession::calculateInputs()
 
 void GripStrengthSession::start()
 {
-    m_dialog.reset(new GripStrengthDialog(nullptr, QSharedPointer<GripStrengthSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new GripStrengthDialog(nullptr, QSharedPointer<GripStrengthSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

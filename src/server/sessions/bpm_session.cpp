@@ -19,8 +19,8 @@ void BPMSession::calculateInputs()
 
 void BPMSession::start()
 {
-    m_dialog.reset(new BloodPressureDialog(nullptr, QSharedPointer<BPMSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new BloodPressureDialog(nullptr, QSharedPointer<BPMSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

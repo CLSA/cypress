@@ -24,7 +24,6 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
     ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
-
     columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
 

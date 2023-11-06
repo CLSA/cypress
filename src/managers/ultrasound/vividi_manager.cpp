@@ -7,8 +7,8 @@
 
 VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     : ManagerBase(session)
-    , m_test(new CimtVividiTest)
 {
+    m_test.reset(new CimtVividiTest);
     //m_dcmRecv.reset(new DcmRecv(
     //    "C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/bin/dcmrecv.exe",
     //    "C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/etc/dcmtk/storescp.cfg",
@@ -50,18 +50,18 @@ void VividiManager::setInputData(const QVariantMap& inputData)
 
 void VividiManager::start()
 {
-    qDebug() << "started!";
-
-    emit started(m_test);
+    emit started(m_test.get());
     emit canMeasure();
 }
 
 void VividiManager::measure()
 {
     m_test->reset();
-    m_test->simulate();
 
-    emit measured(m_test);
+    if (Cypress::getInstance().isSimulation())
+        m_test->simulate();
+
+    emit measured(m_test.get());
 
     if (m_test->isValid())
     {
@@ -71,7 +71,6 @@ void VividiManager::measure()
 
 void VividiManager::cancel()
 {
-    qDebug() << "VividIManager::cancel";
 }
 
 void VividiManager::finish()
@@ -80,67 +79,34 @@ void VividiManager::finish()
 
     QString host = CypressSettings::getInstance().getPineHost();
     QString endpoint = CypressSettings::getInstance().getPineEndpoint();
-
-    int answer_id = m_session->getAnswerId();
+    QString pine_path = CypressSettings::getInstance().getAnswerUrl(m_session->getAnswerId());
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
     {
         Measurement& measure = m_test->get(i);
-        const QString &side = measure.getAttribute("SIDE").toString();
+        const QString &side = measure.getAttribute("side").toString();
+        QByteArray data = FileUtils::readFileIntoByteArray(measure.getAttribute("path").toString());
 
         sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id) + "?filename=CINELOOP_1_"
-                             + side + ".dcm",
+                         pine_path + "?filename=" + measure.getAttribute("name").toString(),
                          "application/octet-stream",
-                         FileUtils::readFileIntoByteArray(
-                             measure.getAttribute("CINELOOP_1").toString()));
+                         data);
 
-        sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id) + "?filename=STILL_IMAGE_1_"
-                             + side + ".dcm",
-                         "application/octet-stream",
-                         FileUtils::readFileIntoByteArray(
-                             measure.getAttribute("STILL_IMAGE_1").toString()));
-        sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id) + "?filename=STILL_IMAGE_2_"
-                             + side + ".dcm",
-                         "application/octet-stream",
-                         FileUtils::readFileIntoByteArray(
-                             measure.getAttribute("STILL_IMAGE_2").toString()));
-        sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id) + "?filename=STILL_IMAGE_3_"
-                             + side + ".dcm",
-                         "application/octet-stream",
-                         FileUtils::readFileIntoByteArray(
-                             measure.getAttribute("STILL_IMAGE_3").toString()));
-        sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id) + "?filename=SR_1_" + side
-                             + ".dcm",
-                         "application/octet-stream",
-                         FileUtils::readFileIntoByteArray(measure.getAttribute("SR_1").toString()));
-
-        measure.removeAttribute("CINELOOP_1");
-        measure.removeAttribute("STILL_IMAGE_1");
-        measure.removeAttribute("STILL_IMAGE_2");
-        measure.removeAttribute("STILL_IMAGE_3");
-        measure.removeAttribute("SR_1");
+        measure.removeAttribute("PATH");
     }
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
 
     testJson.insert("session", sessionObj);
-    responseJson.insert("value", responseJson);
+    responseJson.insert("value", testJson);
 
-    QJsonDocument jsonDoc(testJson);
+    QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    sendHTTPSRequest("PATCH", pine_path, "application/json", serializedData);
 
-    emit success("sent");
+    emit success("Sent measurements to Pine, you can now close this window");
 }
 
 

@@ -1,4 +1,6 @@
 #include "spirometer_manager.h"
+#include "cypress_application.h"
+
 #include "managers/emr/emr_plugin_writer.h"
 
 #include <QFileDialog>
@@ -95,42 +97,21 @@ void SpirometerManager::start()
 void SpirometerManager::measure()
 {
     m_test->reset();
-    m_test->simulate(QVariantMap({
-        {"barcode", m_session->getBarcode()},
-        {"smoker", m_session->getInputData()["smoker"].toBool()},
-        {"gender", m_session->getInputData()["gender"].toString()},
-        {"height", m_session->getInputData()["height"].toDouble()},
-        {"weight", m_session->getInputData()["weight"].toDouble()},
-        {"date_of_birth", m_session->getInputData()["date_of_birth"].toString()},
-    }));
+
+    if (Cypress::getInstance().isSimulation())
+    {
+        m_test->simulate(QVariantMap({
+            {"barcode", m_session->getBarcode()},
+            {"smoker", m_session->getInputData()["smoker"].toBool()},
+            {"gender", m_session->getInputData()["gender"].toString()},
+            {"height", m_session->getInputData()["height"].toDouble()},
+            {"weight", m_session->getInputData()["weight"].toDouble()},
+            {"date_of_birth", m_session->getInputData()["date_of_birth"].toString()},
+        }));
+    }
 
     emit measured(m_test.get());
     emit canFinish();
-
-    //if (Cypress::getInstance().isSimulation()) {
-    //    sendResultsToPine("C:/dev/clsa/cypress/src/tests/fixtures/spirometer/output.json");
-    //    return;
-    //}
-
-    //QJsonObject response {
-    //    { "answer_id", m_answerId },
-    //    { "session_id", m_uuid },
-    //};
-
-    //results["cypress_session"] = m_uuid;
-    //results["answer_id"] = m_answerId;
-    //results["barcode"] = m_barcode;
-    //results["interviewer"] = m_interviewer;
-
-    //if (results.empty()) return;
-
-    //bool ok = sendResultsToPine(results);
-    //if (!ok)
-    //{
-    //    qDebug() << "Could not send results to Pine";
-    //}
-
-    //if (CypressApplication::getInstance().isSimulation()) return;
 
     //qDebug() << "Starting process from measure";
     //clearData();

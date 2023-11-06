@@ -1,21 +1,27 @@
 
-
-#include "../../data/dxa/tests/dxa_test.h"
-#include "../../data/ecg/tests/ecg_test.h"
-#include "../../data/blood_pressure/tests/blood_pressure_test.h"
-#include "../../data/spirometer/tests/spirometer_test.h"
-
-#include "../../data/tonometer/tests/tonometer_test.h"
-#include "../../data/weigh_scale/tests/weigh_scale_test.h"
+//#include "../../data/dxa/tests/dxa_test.h"
+//#include "../../data/ecg/tests/ecg_test.h"
+//#include "../../data/blood_pressure/tests/blood_pressure_test.h"
+//#include "../../data/spirometer/tests/spirometer_test.h"
+//
+//#include "../../data/tonometer/tests/tonometer_test.h"
+//#include "../../data/weigh_scale/tests/weigh_scale_test.h"
+//
+//#include "../../data/cimt_vivid_i_test.h"
+//#include "../../data/grip_strength/tests/grip_strength_test.h"
+//#include "../../data/retinal_camera/retinal_camera_test.h"
+//
+//#include "../../data/cdtt/tests/cdtt_test.h"
+//#include "../../data/choice_reaction/tests/choice_reaction_test.h"
+//
+//#include "../../data/hearing/tests/hearing_test.h"
 
 #include "../../data/cimt_vivid_i_test.h"
-#include "../../data/grip_strength/tests/grip_strength_test.h"
-#include "../../data/retinal_camera/retinal_camera_test.h"
 
-#include "../../data/cdtt/tests/cdtt_test.h"
-#include "../../data/choice_reaction/tests/choice_reaction_test.h"
-
-#include "../../data/hearing/tests/hearing_test.h"
+#include <QSql>
+#include <QSqlQuery>
+#include <QSqlDatabase>
+#include <QSqlError>
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -35,10 +41,10 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
-    void test_dexa_sim(); 			// done
-    void test_audiometer_sim(); 	// done
-    void test_weight_scale_sim(); 	// done
-    void test_spirometer_sim(); 	// done
+    void test_dexa_sim();
+    void test_audiometer_sim();
+    void test_weight_scale_sim();
+    void test_spirometer_sim();
 
     void test_ultrasound_sim();
     void test_bpm_sim();
@@ -81,44 +87,67 @@ void DeviceSimTests::cleanupTestCase()
 
 void DeviceSimTests::test_ecg_sim()
 {
-    ECGTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //ECGTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_bpm_sim()
 {
-    BloodPressureTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //BloodPressureTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_weight_scale_sim()
 {
-    WeighScaleTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //WeighScaleTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_spirometer_sim()
 {
-    SpirometerTest test;
-    test.simulate(QVariantMap({
-                               {"barcode", "12345678"},
-                               {"smoker", true 	},
-                               {"gender", "M"},
-                               {"height", 1.87},
-                               {"weight", 80},
-                               {"date_of_birth", "12.06.1960"},
-    }));
-    qDebug() << test.toJsonObject();
+    //SpirometerTest test;
+    //test.simulate(QVariantMap({
+    //                           {"barcode", "12345678"},
+    //                           {"smoker", true 	},
+    //                           {"gender", "M"},
+    //                           {"height", 1.87},
+    //                           {"weight", 80},
+    //                           {"date_of_birth", "12.06.1960"},
+    //}));
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_dexa_sim()
 {
-    DXATest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //DXATest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+
+    // Using a DSN (if you've set up one)
+    // db.setDatabaseName("DSN=YourDSNName");
+
+    QString filePath = "C:/Users/Anthony/Desktop/PatScan.mdb";
+
+    // Directly using the MDB file (DSN-less connection)
+    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};FIL={MS Access};DBQ=" + filePath);
+
+    if (!db.open()) {
+        qDebug() << "Error: " << db.lastError().text();
+    }
+
+    QSqlQuery query("SELECT * FROM Hip", db); // Replace with your table name
+    while (query.next()) {
+        QString someField = query.value("SCANID").toString(); // Replace FieldName with your field name
+        qDebug() << someField;
+    }
+
+    db.close();
+    //return true;
 }
 
 void DeviceSimTests::test_ultrasound_sim()
@@ -130,53 +159,53 @@ void DeviceSimTests::test_ultrasound_sim()
 
 void DeviceSimTests::test_audiometer_sim()
 {
-    HearingTest test;
-    test.simulate(QVariantMap({{"barcode", "12345678" }}));
-    qDebug() << test.toJsonObject();
+    //HearingTest test;
+    //test.simulate(QVariantMap({{"barcode", "12345678" }}));
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_retinal_camera_sim_left()
 {
-    RetinalCameraTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //RetinalCameraTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 
 void DeviceSimTests::test_retinal_camera_sim_right()
 {
-    RetinalCameraTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //RetinalCameraTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_tonometer_sim()
 {
-    TonometerTest test;
-    test.simulate(
-        QVariantMap({{"sex", "f"}, {"date_of_birth", "1960.12.06"}, {"barcode", "12345678"}}));
-    qDebug() << test.toJsonObject();
+    //TonometerTest test;
+    //test.simulate(
+    //    QVariantMap({{"sex", "f"}, {"date_of_birth", "1960.12.06"}, {"barcode", "12345678"}}));
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_grip_strength_sim()
 {
-    GripStrengthTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //GripStrengthTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_cdtt_sim()
 {
-    CDTTTest test;
-    test.simulate(QVariantMap({{"barcode", "12345678"}}));
-    qDebug() << test.toJsonObject();
+    //CDTTTest test;
+    //test.simulate(QVariantMap({{"barcode", "12345678"}}));
+    //qDebug() << test.toJsonObject();
 }
 
 void DeviceSimTests::test_choice_reaction_sim()
 {
-    ChoiceReactionTest test;
-    test.simulate();
-    qDebug() << test.toJsonObject();
+    //ChoiceReactionTest test;
+    //test.simulate();
+    //qDebug() << test.toJsonObject();
 }
 
 

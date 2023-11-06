@@ -1,7 +1,9 @@
 #include "grip_strength_measurement.h"
+#include "../../../auxiliary/Utilities.h"
 
 #include <QDebug>
 #include <QJsonObject>
+#include <QRandomGenerator>
 
 const q_stringMap GripStrengthMeasurement::trialMap =
 {
@@ -21,6 +23,7 @@ const q_stringMap GripStrengthMeasurement::trialMap =
     {"Rep2Exclude", "rep2Exclude"},
     {"Rep3Exclude", "rep3Exclude"},
 };
+
 
 void GripStrengthMeasurement::fromRecord(const QJsonObject* record)
 {
@@ -54,10 +57,25 @@ QString GripStrengthMeasurement::toString() const
         .arg(getAttribute("exam_cv").value().toString());
 }
 
-GripStrengthMeasurement GripStrengthMeasurement::simulate()
+void GripStrengthMeasurement::simulate(int i)
 {
-    GripStrengthMeasurement simulatedMeasurement;
-    return simulatedMeasurement;
+    setAttribute("rung_position",  2);
+    setAttribute("side", "Right");
+
+    double rep1 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
+    double rep2 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
+    double rep3 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
+
+    double average = (rep1 + rep2 + rep3) / 3;
+    double maximum = qMax(qMax(rep1, rep2), rep3);
+
+    setAttribute("rep_1", rep1, "kg");
+    setAttribute("rep_2", rep2, "kg");
+    setAttribute("rep_3", rep3, "kg");
+
+    setAttribute("average", average, "kg");
+    setAttribute("maximum", maximum, "kg");
+    setAttribute("cv",      5);
 }
 
 QDebug operator<<(QDebug dbg, const GripStrengthMeasurement& item)

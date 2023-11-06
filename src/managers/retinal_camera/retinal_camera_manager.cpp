@@ -1,4 +1,5 @@
 #include "retinal_camera_manager.h"
+#include "cypress_application.h"
 
 #include "data/retinal_camera/retinal_camera_measurement.h"
 #include "data/retinal_camera/database_manager.h"
@@ -80,7 +81,9 @@ void RetinalCameraManager::measure()
     RetinalCameraSession& session = dynamic_cast<RetinalCameraSession&>(*m_session);
 
     m_test->reset();
-    m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
+
+    if (Cypress::getInstance().isSimulation())
+        m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
 
     emit measured(m_test);
 
@@ -119,8 +122,6 @@ void RetinalCameraManager::finish()
 
         measure.removeAttribute("EYE_PICT_VENDOR");
     }
-
-
 
     QJsonObject values {};
     values.insert("value", testJson);

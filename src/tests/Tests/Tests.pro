@@ -44,6 +44,7 @@ SOURCES +=  tst_pdf_filler.cpp \
     ../../auxiliary/Constants.cpp \
     ../../auxiliary/Utilities.cpp \
     ../../auxiliary/file_compressor.cpp \
+    ../../auxiliary/file_utils.cpp \
     ../../auxiliary/json_settings.cpp \
     ../../auxiliary/pdf_form_filler.cpp \
     ../../auxiliary/tracker5_util.cpp \
@@ -88,6 +89,7 @@ HEADERS += \
     ../../auxiliary/CRC8.h \
     ../../auxiliary/Constants.h \
     ../../auxiliary/Utilities.h \
+    ../../auxiliary/file_utils.h \
     ../../auxiliary/file_compressor.h \
     ../../auxiliary/json_settings.h \
     ../../auxiliary/pdf_form_filler.h \

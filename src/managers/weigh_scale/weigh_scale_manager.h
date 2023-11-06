@@ -18,7 +18,7 @@
  *
  */
 
-class WeighScaleManager : public ManagerBase
+class WeighScaleManager : public SerialPortManager
 {
     Q_OBJECT
 
@@ -34,11 +34,11 @@ public slots:
     // connects the port readyRead signal to the readDevice slot
     // emits canMeasure signal if the port is open
     //
-    //void connectDevice() override;
+    void connectDevice() override;
 
     // zero the weigh scale
     //
-    //void zeroDevice();
+    void zeroDevice();
 
     void start() override;
 
@@ -57,9 +57,9 @@ private slots:
     // emits canFinish signal if the test data is valid
     // Read is based on the last written code
     //
-    //void readDevice() override;
+    void readDevice() override;
 
-    //void writeDevice() override;
+    void writeDevice() override;
 
 private:
     // Reset the session

@@ -7,9 +7,8 @@
 
 static const QMap<QString, QVariant> defaultSettings = {{
   {"pine/host",                    "127.0.0.1" },
-  {"pine/port",                    5000 },
-  {"pine/username",                "" },
-  {"pine/password",                "" },
+  {"pine/port",                    5000        },
+  {"pine/credentials",             ""},
 
   {"client/server/host",           "127.0.0.1" },
   {"client/server/port",           9000 },
@@ -64,7 +63,7 @@ static const QMap<QString, QVariant> defaultSettings = {{
 
 CypressSettings::CypressSettings(): settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress")
 {
-    
+
 }
 
 QString CypressSettings::getPineHost() const
@@ -100,6 +99,14 @@ void CypressSettings::setPineEndpoint(const QString &newEndpoint)
     settings.setValue("pine/endpoint", newEndpoint);
 }
 
+QString CypressSettings::getPineCredentials() const
+{
+    QSettings &settings = getSettings();
+    QString credentials { settings.value("pine/credentials", "cypress:H9DqvCGjJdJE").toString() };
+
+    return credentials;
+}
+
 QString CypressSettings::getAnswerUrl(int answer_id) const
 {
     QString host = getPineHost();
@@ -108,6 +115,12 @@ QString CypressSettings::getAnswerUrl(int answer_id) const
     QString answerUrl{QString("%1%2%3").arg(host, endpoint, QString::number(answer_id))};
 
     return answerUrl;
+}
+
+QString CypressSettings::getDeviceEndpoint() const
+{
+    QSettings &settings = getSettings();
+    return settings.value("pine/device_endpoint", "/host/pine/api/answer_device/uuid=").toString();
 }
 
 // .ini file can be found at C:\Users\<User>\AppData\Roaming\CLSA\Cypress.ini

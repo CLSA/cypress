@@ -26,8 +26,8 @@ Side RetinalCameraSession::getSide()
 
 void RetinalCameraSession::start()
 {
-    m_dialog.reset(new RetinalCameraDialog(nullptr, QSharedPointer<RetinalCameraSession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new RetinalCameraDialog(nullptr, QSharedPointer<RetinalCameraSession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();

@@ -1,47 +1,70 @@
 #include "participant_report_manager.h"
+#include "auxiliary/pdf_form_filler.h"
+#include "auxiliary/file_utils.h"
 
-#include "cypress_settings.h"
-#include "cypress_session.h"
-#include "auxiliary/utilities.h"
-
+#include <QDir>
 #include <QDesktopServices>
-#include <QUrl>
-#include <QMessageBox>
 
-ParticipantReportManager::ParticipantReportManager(QSharedPointer<CypressSession> session)
-    : ManagerBase(session)
+ParticipantReportManager::ParticipantReportManager(QSharedPointer<ParticipantReportSession> session): ManagerBase(session)
 {
 
 }
-
 
 void ParticipantReportManager::start()
 {
-    qDebug() << "ParticipantReportManager::start()";
+    finish();
 }
-
 
 void ParticipantReportManager::measure()
 {
-    qDebug() << "ParticipantReportManager::measure()";
-    QString reportPath{m_session->getLanguage() == "en" ? "participant_report_en_path"
-                                                        : "participant_report_fr_path"};
 
-    QUrl url;
-    url = QUrl::fromLocalFile(m_settings.readSetting(reportPath).toString());
-
-    // Open the file
-    Utilities::openUrl(url);
 }
 
 void ParticipantReportManager::finish()
 {
-    qDebug() << "ParticipantReportManager::finish()";
+    PDFFormFiller filler;
+
+    QString currentDir = QDir::currentPath();
+    QString outputPath = filler.fillPDF(
+        "C:/Users/Anthony/Documents/GitHub/cypress/src/tests/Tests/participant_report_follow_up_3_site_en.pdf",
+        "C:/Users/Anthony/Documents/GitHub/cypress/src/tests/Tests/participant_report_follow_up_3_site_en.fdf",
+        m_session->getInputData(),
+        "C:/Users/Anthony/Documents/GitHub/cypress/src/tests/Tests/participant_report_follow_up_3_site_en_output.pdf");
+
+    QDesktopServices::openUrl(outputPath);
+
+    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(m_session->getAnswerId());
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+
+    QByteArray responseData = FileUtils::readFileIntoByteArray(outputPath);
+
+    QJsonObject responseJson;
+    QJsonObject testJson = {};
+
+    testJson.insert("session", m_session->getJsonObject());
+    testJson.insert("results", m_session->getInputData());
+    testJson.insert("manual_entry", false);
+
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+
+    sendHTTPSRequest("PATCH", answerUrl, "application/json", jsonDoc.toJson());
+
+    FileUtils::sendHTTPSRequest("PATCH",
+                                host + endpoint + m_session->getAnswerId()
+                                    + "?filename=participant_report.pdf",
+                                "application/octet-stream",
+                                responseData);
+
+    sendComplete(m_session->getSessionId());
+    emit success("");
 }
 
-void ParticipantReportManager::setInputData(const QVariantMap& inputData)
+void ParticipantReportManager::setInputData(const QVariantMap &)
 {
-    m_inputData = inputData;
+
 }
 
 bool ParticipantReportManager::setUp()
@@ -58,6 +81,3 @@ bool ParticipantReportManager::cleanUp()
 {
     return true;
 }
-
-
-

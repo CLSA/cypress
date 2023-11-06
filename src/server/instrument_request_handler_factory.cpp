@@ -32,6 +32,9 @@
 #include "server/handlers/choice_reaction/choice_reaction_request_handler.h"
 #include "server/handlers/choice_reaction/choice_reaction_status_request_handler.h"
 
+#include "server/handlers/dxa/dxa_hip_request_handler.h"
+#include "server/handlers/dxa/dxa_hip_status_request_handler.h"
+
 #include "server/handlers/dxa/dxa_request_handler.h"
 #include "server/handlers/dxa/dxa_status_request_handler.h"
 
@@ -82,13 +85,17 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/cdtt/status/?$)"),                      &InstrumentRequestHandlerFactory::createCDTTStatusRequestHandler            },
     { QString(R"(^/cdtt/delete/?$)"),                      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/choice_reaction_test/?$)"),                  &InstrumentRequestHandlerFactory::createChoiceReactionRequestHandler        },
-    { QString(R"(^/choice_reaction_test/status/?$)"),           &InstrumentRequestHandlerFactory::createChoiceReactionStatusRequestHandler  },
-    { QString(R"(^/choice_reaction_test/delete/?$)"),           &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/choice_reaction_test/?$)"),             &InstrumentRequestHandlerFactory::createChoiceReactionRequestHandler        },
+    { QString(R"(^/choice_reaction_test/status/?$)"),      &InstrumentRequestHandlerFactory::createChoiceReactionStatusRequestHandler  },
+    { QString(R"(^/choice_reaction_test/delete/?$)"),      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/dxa/?$)"),                              &InstrumentRequestHandlerFactory::createDxaRequestHandler                   },
-    { QString(R"(^/dxa/status/?$)"),                       &InstrumentRequestHandlerFactory::createDxaStatusRequestHandler             },
-    { QString(R"(^/dxa/delete/?$)"),                       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/dxa1/?$)"),                             &InstrumentRequestHandlerFactory::createDxaHipRequestHandler                },
+    { QString(R"(^/dxa1/status/?$)"),                      &InstrumentRequestHandlerFactory::createDxaHipStatusRequestHandler          },
+    { QString(R"(^/dxa1/delete/?$)"),                      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+
+    { QString(R"(^/dxa2/?$)"),                             &InstrumentRequestHandlerFactory::createDxaRequestHandler                   },
+    { QString(R"(^/dxa2/status/?$)"),                      &InstrumentRequestHandlerFactory::createDxaStatusRequestHandler             },
+    { QString(R"(^/dxa2/delete/?$)"),                      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/ecg/?$)"), 	                           &InstrumentRequestHandlerFactory::createECGRequestHandler                   },
     { QString(R"(^/ecg/status/?$)"),                       &InstrumentRequestHandlerFactory::createECGStatusRequestHandler             },
@@ -98,18 +105,18 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/frax/status/?$)"), 	                   &InstrumentRequestHandlerFactory::createFraxStatusRequestHandler 		   },
     { QString(R"(^/frax/delete/?$)"),                      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/grip_strength/?$)"),                    &InstrumentRequestHandlerFactory::createGripStrengthRequestHandler  	       },
-    { QString(R"(^/grip_strength/status/?$)"),             &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler    },
-    { QString(R"(^/grip_strength/delete/?$)"),             &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/hand_grip/?$)"),                        &InstrumentRequestHandlerFactory::createGripStrengthRequestHandler  	       },
+    { QString(R"(^/hand_grip/status/?$)"),                 &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler    },
+    { QString(R"(^/hand_grip/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/retinal_camera_left/?$)"),          	&InstrumentRequestHandlerFactory::createRetinalCameraLeftRequestHandler},
-    { QString(R"(^/retinal_camera_right/?$)"),         &InstrumentRequestHandlerFactory::createRetinalCameraRightRequestHandler},
+    { QString(R"(^/retinal_camera_left/?$)"),          	   &InstrumentRequestHandlerFactory::createRetinalCameraLeftRequestHandler     },
+    { QString(R"(^/retinal_camera_right/?$)"),             &InstrumentRequestHandlerFactory::createRetinalCameraRightRequestHandler    },
 
-    { QString(R"(^/retinal_camera_left/status/?$)"),     	   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
-    { QString(R"(^/retinal_camera_left/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/retinal_camera_left/status/?$)"),       &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
+    { QString(R"(^/retinal_camera_left/delete/?$)"),       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/retinal_camera_right/status/?$)"),     	   &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
-    { QString(R"(^/retinal_camera_right/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/retinal_camera_right/status/?$)"),      &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler   },
+    { QString(R"(^/retinal_camera_right/delete/?$)"),      &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/spirometer/?$)"),                       &InstrumentRequestHandlerFactory::createSpirometerRequestHandler            },
     { QString(R"(^/spirometer/status/?$)"),                &InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler      },
@@ -119,9 +126,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/tonometer/status/?$)"),                 &InstrumentRequestHandlerFactory::createTonometerStatusRequestHandler	   },
     { QString(R"(^/tonometer/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
-    { QString(R"(^/carotid_intima/?$)"), 	   	               &InstrumentRequestHandlerFactory::createUltrasoundRequestHandler            },
-    { QString(R"(^/carotid_intima/status/?$)"),                &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler      },
-    { QString(R"(^/carotid_intima/delete/?$)"),                &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
+    { QString(R"(^/carotid_intima/?$)"), 	   	           &InstrumentRequestHandlerFactory::createUltrasoundRequestHandler            },
+    { QString(R"(^/carotid_intima/status/?$)"),            &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler      },
+    { QString(R"(^/carotid_intima/delete/?$)"),            &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler        },
 
     { QString(R"(^/weight_scale/?$)"),                     &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler            },
     { QString(R"(^/weight_scale/status/?$)"),              &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler      },
@@ -132,7 +139,10 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     //{ QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler  },
 
     { QString(R"(^/participant_report/?$)"),               &InstrumentRequestHandlerFactory::createParticipantReportRequestHandler     },
+    { QString(R"(^/participant_report/status?$)"),         &InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler      },
+
     { QString(R"(^/general_proxy_consent/?$)"),            &InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler   },
+    { QString(R"(^/general_proxy_consent/status?$)"),      &InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler      },
 }};
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
@@ -198,6 +208,16 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createBloodPressureRequestH
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createBloodPressureStatusRequestHandler()
 {
     return new BloodPressureStatusRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaHipRequestHandler()
+{
+    return new DxaHipRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaHipStatusRequestHandler()
+{
+    return new DxaHipStatusRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createGripStrengthRequestHandler()

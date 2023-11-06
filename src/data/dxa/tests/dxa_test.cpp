@@ -5,7 +5,6 @@
 #include "../measurements/ap_spine_measurement.h"
 #include "../measurements/forearm_measurement.h"
 #include "../measurements/whole_body_measurement.h"
-#include "../measurements/hip_measurement.h"
 #include "../measurements/iva_imaging_measurement.h"
 
 #include <QDir>
@@ -92,7 +91,6 @@ DXATest::DXATest()
 {
     wholeBodyMeasurement.reset(new WholeBodyScanMeasurement);
     apSpineMeasurement.reset(new ApSpineMeasurement);
-    hipMeasurement.reset(new HipMeasurement);
     forarmMeasurement.reset(new ForearmMeasurement);
     ivaImagingMeasurement.reset(new IVAImagingMeasurement);
 }
@@ -102,8 +100,7 @@ bool DXATest::isValid() const
     return 	wholeBodyMeasurement->isValid() 	||
             apSpineMeasurement->isValid() 		||
             forarmMeasurement->isValid() 		||
-            ivaImagingMeasurement->isValid() 	||
-            hipMeasurement->isValid();
+           ivaImagingMeasurement->isValid();
 }
 
 void DXATest::reset()
@@ -112,7 +109,6 @@ void DXATest::reset()
     apSpineMeasurement->reset();
     forarmMeasurement->reset();
     ivaImagingMeasurement->reset();
-    hipMeasurement->reset();
 }
 
 void DXATest::simulate()
@@ -121,7 +117,6 @@ void DXATest::simulate()
     apSpineMeasurement->simulate();
     forarmMeasurement->simulate();
     ivaImagingMeasurement->simulate();
-    hipMeasurement->simulate();
 }
 
 QJsonObject DXATest::toJsonObject() const
@@ -150,20 +145,13 @@ QJsonObject DXATest::toJsonObject() const
         iva = ivaImagingMeasurement->toJsonObject();
     }
 
-    QJsonObject hip {};
-    if (hipMeasurement)
-    {
-        hip = hipMeasurement->toJsonObject();
-    }
-
     QJsonObject value {};
-
     QJsonObject results {};
+
     results.insert("ap_spine", apSpine);
     results.insert("whole_body", wholeBody);
     results.insert("forearm", forearm);
     results.insert("iva", iva);
-    results.insert("hip", hip);
 
     value.insert("results", results);
     value.insert("manual_entry", getManualEntryMode());

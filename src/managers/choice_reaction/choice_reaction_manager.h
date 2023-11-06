@@ -62,9 +62,8 @@ private:
 
     QString m_outputPath;     // path to output .csv files
     QString m_outputFile;     // full pathspec to working output .csv file
-    QProcess m_process;
 
-    ChoiceReactionTest* m_test;
+    QProcess m_process;
 
     // Reset the session
     bool clearData() override;

@@ -15,13 +15,16 @@
 #include "sessions/cdtt_session.h"
 #include "sessions/ultrasound_session.h"
 #include "sessions/choice_reaction_session.h"
-#include "sessions/dxa_session.h"
+#include "sessions/dxa/dxa_session.h"
+#include "sessions/dxa/dxa_hip_session.h"
 #include "sessions/ecg_session.h"
 #include "sessions/grip_strength_session.h"
 #include "sessions/retinal_camera_session.h"
 #include "sessions/spirometer_session.h"
 #include "sessions/tonometer_session.h"
 #include "sessions/weigh_scale_session.h"
+#include "sessions/gen_proxy_session.h"
+#include "sessions/participant_report_session.h"
 
 
 using namespace Poco::Net;
@@ -69,6 +72,9 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Choice_Reaction:
             session = new ChoiceReactionSession(nullptr, inputData);
             break;
+        case Constants::MeasureType::DxaDualHip:
+            session = new DxaHipSession(nullptr, inputData);
+            break;
         case Constants::MeasureType::DxaWholeBody:
             session = new DXASession(nullptr, inputData);
             break;
@@ -99,6 +105,12 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Weigh_Scale:
             session = new WeighScaleSession(nullptr, inputData);
             break;
+        case Constants::MeasureType::Gen_Proxy_Consent:
+            session = new GenProxySession(nullptr, inputData);
+            break;
+        case Constants::MeasureType::Participant_Report:
+            session = new ParticipantReportSession(nullptr, inputData);
+            break;
         default:
             throw QException();
     }
@@ -115,7 +127,7 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
     session->calculateInputs();
     //QString sessionId = session->getSessionId();
 
-    //session->moveToThread(mainThread);
+    session->moveToThread(mainThread);
     emit startSession(session);
 
     //sessions.insert(session->getSessionId(), session);

@@ -9,6 +9,7 @@ class UltrasoundSession : public CypressSession
 {
 public:
     explicit UltrasoundSession(QObject *parent, const QJsonObject& inputData);
+    ~UltrasoundSession();
 
     // CypressSession interface
 public:

@@ -20,8 +20,8 @@ void DXASession::calculateInputs()
 
 void DXASession::start()
 {
-    m_dialog.reset(new DXADialog(nullptr, QSharedPointer<DXASession>(this)));
-    if (m_dialog.isNull())
+    m_dialog = new DXADialog(nullptr, QSharedPointer<DXASession>(this));
+    if (m_dialog == nullptr)
         throw QException();
 
     m_startDateTime = QDateTime::currentDateTimeUtc();
@@ -36,5 +36,4 @@ void DXASession::start()
 
 void DXASession::end()
 {
-
 }

@@ -1,7 +1,6 @@
-#include "cypress_session.h"
 #include "manager_base.h"
+#include "cypress_session.h"
 #include "auxiliary/json_settings.h"
-//#include "server/utils.h"
 
 #include <sstream>
 
@@ -9,12 +8,9 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/SSLManager.h"
-//#include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/StreamCopier.h"
-//#include "Poco/Path.h"
 #include "Poco/URI.h"
-#include "Poco/Exception.h"
 
 #include <QStandardItemModel>
 #include <QException>
@@ -26,6 +22,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QVariantMap>
+#include <QMessageBox>
 
 ManagerBase::ManagerBase(QSharedPointer<CypressSession> session)
     : m_session(session)
@@ -55,158 +52,40 @@ QVariantMap ManagerBase::jsonObjectToVariantMap(const QJsonObject& jsonObject)
     return variantMap;
 }
 
-void ManagerBase::sendOctetStream(const QString& filePath)
-{
-
-    QString answer_id = m_inputData["answer_id"].toString();
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Cannot open file for reading: " << qPrintable(file.errorString());
-        return;
-    }
-
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QNetworkRequest request;
-
-    request.setUrl(QUrl("http://127.0.0.1:5000/api/answer/" + answer_id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
-
-    QNetworkReply *reply = manager->post(request, file.readAll());
-
-    connect(reply, &QNetworkReply::finished, [reply]() {
-        if (reply->error()) {
-            qDebug() << "Error: " << reply->errorString();
-        } else {
-            qDebug() << "success";
-        }
-        reply->deleteLater();
-    });
-}
-
-void ManagerBase::sendJsonData(const QString& filePath)
-{
-    QString answer_id = m_inputData["answer_id"].toString();
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Cannot open file for reading: " << qPrintable(file.errorString());
-        return;
-    }
-
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QNetworkRequest request;
-
-    request.setUrl(QUrl("http://127.0.0.1:5000/api/answer/" + answer_id));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    QNetworkReply *reply = manager->post(request, file.readAll());
-
-    connect(reply, &QNetworkReply::finished, [reply]() {
-        if (reply->error()) {
-            qDebug() << "Error: " << reply->errorString();
-        } else {
-            qDebug() << "success";
-        }
-        reply->deleteLater();
-    });
-
-}
-
 bool ManagerBase::sendCancellation(QString uuid)
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-
-    Poco::Net::initializeSSL();
-    Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
-    Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
-        Poco::Net::Context::CLIENT_USE, "", "", "",
-        Poco::Net::Context::VERIFY_RELAXED, 9, true,
-        "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-    );
-    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
+    if (uuid.isEmpty() || uuid.isNull())
+        throw std::exception("ManagerBase::sendCancellation - UUID parameter cannot be null or empty");
 
     QJsonObject data {
         { "status", "cancelled" }
     };
 
-    QString serializedData = JsonSettings::serializeJson(data);
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getDeviceEndpoint() + uuid;
 
-    qDebug() << serializedData;
+    QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
 
-    const QString& url = settings.value("answer_device_endpoint", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer_device/uuid=").toString();
-    const QString& pinePath = QString(url + uuid);
-
-    qDebug() << pinePath;
-
-    Poco::URI uri(pinePath.toStdString());
-    Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
-
-    std::string path(uri.getPathAndQuery());
-    if (path.empty()) path = "/";
-
-    Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
-    req.setContentType("application/json");
-    req.setContentLength(serializedData.toStdString().length());
-    req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
-
-    std::ostream &os = session.sendRequest(req);
-    os << serializedData.toStdString();
-    os.flush();
-
-    // Get response
-    Poco::Net::HTTPResponse res;
-    std::istream &is = session.receiveResponse(res);
-    std::stringstream ss;
-    Poco::StreamCopier::copyStream(is, ss);
+    sendHTTPSRequest("PATCH", host + endpoint, "application/json", serializedData);
 
     return true;
 }
 
 bool ManagerBase::sendComplete(QString uuid)
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-
-    Poco::Net::initializeSSL();
-    Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
-    Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
-        Poco::Net::Context::CLIENT_USE, "", "", "",
-        Poco::Net::Context::VERIFY_RELAXED, 9, true,
-        "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-    );
-    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
+    if (uuid.isEmpty() || uuid.isNull())
+        throw std::exception("ManagerBase::sendComplete - UUID parameter cannot be null or empty");
 
     QJsonObject data {
         { "status", "completed" }
     };
 
-    QString serializedData = JsonSettings::serializeJson(data);
+    QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
 
-    qDebug() << serializedData;
+    QString host = CypressSettings::getInstance().getPineHost();
+    QString endpoint = CypressSettings::getInstance().getDeviceEndpoint() + uuid;
 
-    const QString& url = settings.value("answer_device_endpoint", "https://blueberry.clsa-elcv.ca/qa/pine/api/answer_device/uuid=").toString();
-    const QString& pinePath = QString(url + uuid);
-
-    qDebug() << pinePath;
-
-    Poco::URI uri(pinePath.toStdString());
-    Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
-
-    std::string path(uri.getPathAndQuery());
-    if (path.empty()) path = "/";
-
-    Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
-    req.setContentType("application/json");
-    req.setContentLength(serializedData.toStdString().length());
-    req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
-
-    std::ostream &os = session.sendRequest(req);
-    os << serializedData.toStdString();
-    os.flush();
-
-    // Get response
-    Poco::Net::HTTPResponse res;
-    std::istream &is = session.receiveResponse(res);
-    std::stringstream ss;
-    Poco::StreamCopier::copyStream(is, ss);
+    sendHTTPSRequest("PATCH", host + endpoint, "application/json", serializedData);
 
     return true;
 }
@@ -225,65 +104,6 @@ void ManagerBase::addManualMeasurement()
     return;
 }
 
-bool ManagerBase::sendResultsToPine(const QString& filePath)
-{
-    try
-    {
-        QString answer_id = m_inputData["answer_id"].toString();
-        QFile file(filePath);
-        if (!file.open(QIODevice::ReadOnly)) {
-            qDebug() << "Cannot open file for reading: " << qPrintable(file.errorString());
-            return false;
-        }
-        QByteArray data = file.readAll();
-
-        Poco::Net::initializeSSL();
-        Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
-        Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
-            Poco::Net::Context::CLIENT_USE, "", "", "",
-            Poco::Net::Context::VERIFY_RELAXED, 9, true,
-            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-        );
-        Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
-
-        //Poco::Net::SocketAddress address("drummer.clsa-elcv.ca:443");
-        //Poco::Net::SecureStreamSocket socket(address);
-        //if (socket.havePeerCertificate())
-        //{
-        //    Poco::Net::X509Certificate cert = socket.peerCertificate();
-        //}
-        const QString& pinePath = QString("https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + answer_id);
-        qDebug() << pinePath;
-
-        Poco::URI uri(pinePath.toStdString());
-        Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
-
-        std::string path(uri.getPathAndQuery());
-        if (path.empty()) path = "/";
-
-        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
-        req.setContentType("application/json");
-        req.setContentLength(data.length());
-        req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
-
-        std::ostream &os = session.sendRequest(req);
-        os.write(data.constData(), data.size());
-        os.flush();
-
-        // Get response
-        Poco::Net::HTTPResponse res;
-        std::istream &is = session.receiveResponse(res);
-        std::stringstream ss;
-        Poco::StreamCopier::copyStream(is, ss);
-    }
-    catch (Poco::Exception &e)
-    {
-        qDebug() << e.what();
-    }
-
-    return false;
-}
-
 void ManagerBase::sendHTTPRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data)
 {
     Q_UNUSED(data)
@@ -296,8 +116,6 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
 {
     Q_UNUSED(method)
 
-    qDebug() << "initialize ssl";
-
     Poco::Net::initializeSSL();
     Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
     Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
@@ -306,7 +124,6 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
         "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
     );
     Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
-    qDebug() << "finish ssl";
 
     const QString &pinePath = QString(endpoint);
 
@@ -318,11 +135,12 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
 
     Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
 
+    QString credentials = CypressSettings::getInstance().getPineCredentials();
+
     req.setContentType(contentType.toUtf8().toStdString());
     req.setContentLength(data.length());
-    req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
+    req.setCredentials("Basic", credentials.toUtf8().toBase64().toStdString());
 
-    qDebug() << "sent data";
     std::ostream &os = session.sendRequest(req);
     os.write(data.constData(), data.size());
     os.flush();
@@ -332,67 +150,26 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
     std::istream &is = session.receiveResponse(res);
     std::stringstream ss;
     Poco::StreamCopier::copyStream(is, ss);
-    qDebug() << "received data";
-}
 
-bool ManagerBase::sendFileToPine(const QString& filePath, const QString& fileName)
-{
-    try
+    switch (res.getStatus())
     {
-        QString answer_id = m_inputData["answer_id"].toString();
-        QFile file(filePath);
-        if (!file.open(QIODevice::ReadOnly)) {
-            qDebug() << "Cannot open file for reading: " << qPrintable(file.errorString());
-            return false;
-        }
-        QByteArray data = file.readAll();
-
-        Poco::Net::initializeSSL();
-        Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
-        Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
-            Poco::Net::Context::CLIENT_USE, "", "", "",
-            Poco::Net::Context::VERIFY_RELAXED, 9, true,
-            "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-        );
-        Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
-
-        //Poco::Net::SocketAddress address("drummer.clsa-elcv.ca:443");
-        //Poco::Net::SecureStreamSocket socket(address);
-        //if (socket.havePeerCertificate())
-        //{
-        //    Poco::Net::X509Certificate cert = socket.peerCertificate();
-        //}
-
-        //const QString& pinePath = QString("https://drummer.clsa-elcv.ca/patrick/pine/api/answer/" + QString::number(m_answerId) + "?filename=" + fileName);
-        const QString& pinePath = QString("https://blueberry.clsa-elcv.ca/qa/pine/api/answer/" + answer_id + "?filename=" + fileName);
-
-        Poco::URI uri(pinePath.toStdString());
-        Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
-
-        std::string path(uri.getPathAndQuery());
-        if (path.empty()) path = "/";
-
-        Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
-
-        req.setContentType("application/octet-stream");
-        req.setContentLength(data.length());
-        req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
-
-        std::ostream &os = session.sendRequest(req);
-        os.write(data.constData(), data.size());
-        os.flush();
-
-        Poco::Net::HTTPResponse res;
-
-        std::istream &is = session.receiveResponse(res);
-        std::stringstream ss;
-        Poco::StreamCopier::copyStream(is, ss);
+    case Poco::Net::HTTPResponse::HTTP_BAD_REQUEST:
+        QMessageBox::critical(nullptr, "Bad Request", "Please contact support");
+        break;
+    case Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR:
+        QMessageBox::critical(nullptr, "Internal Server Error", "Please contact support");
+        break;
+    case Poco::Net::HTTPResponse::HTTP_FORBIDDEN:
+        QMessageBox::critical(nullptr, "Forbidden", "Please contact support");
+        break;
+    case Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED:
+        QMessageBox::critical(nullptr, "Unauthorized", "Please contact support");
+        break;
+    case Poco::Net::HTTPResponse::HTTP_GATEWAY_TIMEOUT:
+        QMessageBox::critical(nullptr, "Gateway Timeout", "Please contact support");
+        break;
+    default:
+        QMessageBox::critical(nullptr, "HTTP Error", QString::fromStdString(res.getReason()));
+        break;
     }
-    catch (Poco::Exception &e)
-    {
-        qDebug() << e.code();
-        qDebug() << e.what();
-    }
-
-    return true;
 }
