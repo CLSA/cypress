@@ -1,6 +1,7 @@
 #ifndef DXA_TEST_H
 #define DXA_TEST_H
 
+#include "dicom/dcm_recv.h"
 #include "../../test_base.h"
 
 #include "../measurements/ap_spine_measurement.h"
@@ -12,26 +13,26 @@
 
 class DXATest : public TestBase
 {
-public slots:
-    void onDicomDirectoryChange(const QString& path);
 
 public:
     DXATest();
-
-    QScopedPointer<WholeBodyScanMeasurement> wholeBodyMeasurement;
-    QScopedPointer<ForearmMeasurement> forarmMeasurement;
-    QScopedPointer<ApSpineMeasurement> apSpineMeasurement;
-    QScopedPointer<IVAImagingMeasurement> ivaImagingMeasurement;
 
     static const QMap<QString, QString> ranges;
 
     bool isValid() const override;
     void reset() override;
 
+    void fromDicomFiles(QList<DicomFile> files);
+
     void simulate() override;
 
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
+
+    QScopedPointer<WholeBodyScanMeasurement> wholeBodyMeasurement;
+    QScopedPointer<ForearmMeasurement> forearmMeasurement;
+    QScopedPointer<ApSpineMeasurement> apSpineMeasurement;
+    QScopedPointer<IVAImagingMeasurement> ivaImagingMeasurement;
 };
 
 #endif // DXA_TEST_H

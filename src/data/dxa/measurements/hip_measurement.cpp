@@ -110,11 +110,15 @@ bool HipMeasurement::isValid() const
     return false;
 }
 
-bool HipMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) const
+bool HipMeasurement::isValidDicomFile(DicomFile file) const
 {
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+        return false;
+
     bool valid = true;
     OFString value = "";
-    DcmDataset* dataset = dicomFileFormat.getDataset();
+    DcmDataset* dataset = loadedFileFormat.getDataset();
 
     OFString modality = "OT";
     OFString bodyPartExamined = "HIP";
@@ -215,19 +219,24 @@ bool HipMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) const
         return false;
     }
 
-    dicomFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID);
+    loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID);
     if (!valid)
     {
         return false;
     }
 
-    dicomFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
     if (value != mediaStorageSOPClassUID)
     {
         return false;
     }
 
     return valid;
+}
+
+void HipMeasurement::addDicomFile(DicomFile file)
+{
+    qDebug() << "add hip measure";
 }
 
 Side HipMeasurement::getSide() {

@@ -20,12 +20,40 @@ DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session) /* : m_dicom
     : ManagerBase(session)
 {
     m_test.reset(new DxaHipTest);
+
+    QDir workingDir = QDir::current();
+    QString workingDirPath = workingDir.absolutePath() + "/";
+
+    const QString executablePath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/executable").toString();
+    const QString aeTitle = CypressSettings::getInstance().readSetting("dxa/dicom/aeTitle").toString();
+    const QString host = CypressSettings::getInstance().readSetting("dxa/dicom/host").toString();
+    const QString port = CypressSettings::getInstance().readSetting("dxa/dicom/port").toString();
+
+    const QString storageDirPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/storagePath").toString();
+    const QString logConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/log_config").toString();
+    const QString ascConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/asc_config").toString();
+
+    m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
+    connect(m_dicomServer.get(), &DcmRecv::dicomFilesReceived, this, &DxaHipManager::dicomFilesReceived);
+
+    m_networkFileCopier.reset(new SMBFileCopier());
+    connect(m_networkFileCopier.get(), &SMBFileCopier::fileCopied, this, &DxaHipManager::databaseCopied);
+
+    m_dicomServer->start();
 }
 
 DxaHipManager::~DxaHipManager()
 {
-    //m_dicomSCP->stop();
-    //delete m_dicomSCP;
+}
+
+void DxaHipManager::databaseCopied(QFileInfo fileInfo)
+{
+    // Get name of files
+    QString patscanDbFileName = "";
+    QString refDbFileName = "";
+
+
+
 }
 
 
@@ -55,10 +83,25 @@ void DxaHipManager::measure()
     m_test->reset();
 
     if (Cypress::getInstance().isSimulation())
+    {
         m_test->simulate();
 
-    emit measured(m_test.get());
-    emit canFinish();
+        emit measured(m_test.get());
+        emit canFinish();
+
+        return;
+    }
+
+    // copy over patscan and refscan db
+    m_networkFileCopier->copyFileFromSMB(QUrl(), "");
+    m_networkFileCopier->copyFileFromSMB(QUrl(), "");
+
+    // pass dicom files to test class
+    if (m_test->isValid())
+    {
+        emit measured(m_test.get());
+        emit canFinish();
+    }
 }
 
 // implementation of final clean up of device after disconnecting and all
@@ -110,6 +153,15 @@ void DxaHipManager::finish()
     emit success("");
 }
 
+void DxaHipManager::dicomFilesReceived()
+{
+    const QList<DicomFile> &files = m_dicomServer->receivedFiles;
+
+    // pass received dicom files to test class
+    DxaHipTest* test = static_cast<DxaHipTest*>(m_test.get());
+    //test->fromDicomFiles(m_dicomServer->receivedFiles);
+}
+
 bool DxaHipManager::isCompleteDicom(DcmFileFormat &file)
 {
     Q_UNUSED(file)
@@ -128,21 +180,6 @@ bool DxaHipManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
     bool isCorrect = isCompleteDicom(loadedFileFormat);
 
     return isComplete && isCorrect;
-}
-
-void DxaHipManager::dicomFilesReceived(QStringList paths)
-{
-    QVariantMap deviceData = retrieveDeviceData();
-    if (deviceData.isEmpty()) {
-        qInfo() << "No device data..";
-        return;
-    }
-
-    validatedDicomFiles = getValidatedFiles(paths);
-    if (validatedDicomFiles.isEmpty()) {
-        qInfo() << "No valid dicom files received..";
-        return;
-    }
 }
 
 QList<DcmFileFormat> DxaHipManager::getValidatedFiles(QStringList filePaths)
@@ -183,18 +220,6 @@ QList<DcmFileFormat> DxaHipManager::getValidatedFiles(QStringList filePaths)
     }
 
     return validatedDicomFiles;
-}
-
-bool DxaHipManager::startDicomServer()
-{
-    //return m_dicomSCP->start();
-    return true;
-}
-
-bool DxaHipManager::endDicomServer()
-{
-    //return m_dicomSCP->stop();
-    return true;
 }
 
 void DxaHipManager::dicomServerExitNormal()

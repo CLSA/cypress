@@ -121,8 +121,12 @@ bool ForearmMeasurement::isValid() const
     return false;
 }
 
-bool ForearmMeasurement::isValidDicomFile(DcmFileFormat &loadedFileFormat) const
+bool ForearmMeasurement::isValidDicomFile(DicomFile file) const
 {
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+        return false;
+
     OFString value = "";
     DcmDataset* dataset = loadedFileFormat.getDataset();
 
@@ -161,7 +165,7 @@ bool ForearmMeasurement::isValidDicomFile(DcmFileFormat &loadedFileFormat) const
     if (value != photometricInterpretation) return false;
 
     dataset->findAndGetOFString(DCM_Laterality, value);
-    if (value != laterality) return false;
+    if (value != "L" && value != "R") return false;
 
     dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
     if (value != samplesPerPixel) return false;
@@ -181,4 +185,10 @@ QStringList ForearmMeasurement::toStringList(const bool& no_keys) const
 {
     Q_UNUSED(no_keys)
     return QStringList {{}};
-};
+}
+
+void ForearmMeasurement::addDicomFile(DicomFile file)
+{
+    qDebug() << "add forearm measure";
+    forearmDicomFile = file;
+}

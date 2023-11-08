@@ -3,6 +3,8 @@
 
 #include "../../measurement.h"
 
+#include "dicom/dcm_recv.h"
+
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/ofstd/ofstdinc.h"
 
@@ -35,7 +37,7 @@ public:
     QList<ValidDCMTag> m_datasetTagExistsWithValue {};
     QList<ValidDCMTag> m_datasetTagExists {};
 
-    virtual bool isValidDicomFile(DcmFileFormat& dicomFileFormat) const;
+    virtual bool isValidDicomFile(DicomFile file) const;
 
     virtual Side getSide() = 0;
     virtual quint8 getScanType() = 0;

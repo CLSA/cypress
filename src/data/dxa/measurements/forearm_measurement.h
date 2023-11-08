@@ -3,7 +3,7 @@
 
 #include "dxa_measurement.h"
 
-
+#include "dicom/dcm_recv.h"
 
 class ForearmMeasurement : public DXAMeasurement
 {
@@ -13,11 +13,15 @@ public:
     QString toString() const override;
     QStringList toStringList(const bool& no_keys = false) const override;
 
+    void addDicomFile(DicomFile);
+
     bool isValid() const override;
 
     // DXAMeasurement interface
 public:
-    bool isValidDicomFile(DcmFileFormat& loadedFileFormat) const override;
+    bool isValidDicomFile(DicomFile file) const override;
+
+    DicomFile forearmDicomFile;
 
     Side getSide() override;
     quint8 getScanType() override;

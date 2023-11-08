@@ -2,6 +2,7 @@
 #define IVA_IMAGING_MEASUREMENT_H
 
 #include "dxa_measurement.h"
+#include "dicom/dcm_recv.h"
 
 class IVAImagingMeasurement : public DXAMeasurement
 {
@@ -17,7 +18,9 @@ public:
     // DXAMeasurement interface
 public:
     void simulate() override;
-    bool isValidDicomFile(DcmFileFormat &dicomFileFormat) const override;
+    bool isValidDicomFile(DicomFile file) const override;
+
+    void addDicomFile(DicomFile);
 
     Side getSide() override;
     quint8 getScanType() override;

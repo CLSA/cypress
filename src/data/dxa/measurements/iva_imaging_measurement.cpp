@@ -40,10 +40,14 @@ bool IVAImagingMeasurement::isValid() const
     return false;
 };
 
-bool IVAImagingMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) const
+bool IVAImagingMeasurement::isValidDicomFile(DicomFile file) const
 {
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+        return false;
+
     OFString value = "";
-    DcmDataset* dataset = dicomFileFormat.getDataset();
+    DcmDataset* dataset = loadedFileFormat.getDataset();
 
     OFString modality = "OT";
     OFString bodyPartExamined = "LSPINE";
@@ -63,7 +67,7 @@ bool IVAImagingMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) con
     if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation)) return false;
     if (!dataset->tagExists(DCM_PixelSpacing)) return false;
     if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel)) return false;
-    if (!dicomFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
+    if (!loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
 
     dataset->findAndGetOFString(DCM_Modality, value);
     if (value != modality) return false;
@@ -80,10 +84,15 @@ bool IVAImagingMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) con
     dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
     if (value != samplesPerPixel) return false;
 
-    dicomFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
     if (value != mediaStorageSOPClassUID) return false;
 
     return true;
+}
+
+void IVAImagingMeasurement::addDicomFile(DicomFile file)
+{
+    qDebug() << "add iva imaging file";
 }
 
 Side IVAImagingMeasurement::getSide() {

@@ -9,28 +9,34 @@ VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new CimtVividiTest);
-    //m_dcmRecv.reset(new DcmRecv(
-    //    "C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/bin/dcmrecv.exe",
-    //    "C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32-install/etc/dcmtk/storescp.cfg",
-    //    "C:/Users/antho/Documents/dicom",
-    //    "CLSADICOM",
-    //    "9001"));
 
-    //m_dcmWatcher.reset(new DicomDirectoryWatcher("C:/Users/antho/Documents/dicom"));
-    //connect(m_dcmWatcher.get(), &DicomDirectoryWatcher::dicomDirectoryChanged, [=]() {
-    //    // perform validation on files
-    //    // update UI
-    //    QDir directory("C:/Users/antho/Documents/dicom");
-    //    QStringList dcmFiles = directory.entryList(QStringList() << "*.dcm", QDir::Files);
+    QDir workingDir = QDir::current();
+    QString workingDirPath = workingDir.absolutePath() + "/";
 
-    //    foreach(QString filename, dcmFiles) {
-    //        QFileInfo fileInfo(directory, filename);
+    const QString executablePath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/executable").toString();
+    const QString aeTitle = CypressSettings::getInstance().readSetting("ultrasound/dicom/aeTitle").toString();
+    const QString host = CypressSettings::getInstance().readSetting("ultrasound/dicom/host").toString();
+    const QString port = CypressSettings::getInstance().readSetting("ultrasound/dicom/port").toString();
 
-    //        if(fileInfo.isReadable() && fileInfo.isFile()) {
-    //            qDebug() << fileInfo.absoluteFilePath() << "is a readable .dcm file.";
-    //        }
-    //    }
-    //});
+    const QString storageDirPath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/storagePath").toString();
+    const QString logConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/log_config").toString();
+    const QString ascConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/asc_config").toString();
+
+
+    m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
+    connect(m_dicomServer.get(), &DcmRecv::dicomFilesReceived, this, &VividiManager::dicomFilesReceived);
+
+    m_dicomServer->start();
+}
+
+void VividiManager::dicomFilesReceived()
+{
+    QList<DicomFile> &files = m_dicomServer->receivedFiles;
+
+    foreach (DicomFile file, files)
+    {
+        qDebug() << file.patientId << file.modality << file.studyDate << file.studyId << file.fileInfo.absoluteFilePath();
+    }
 }
 
 bool VividiManager::isAvailable()
@@ -59,13 +65,10 @@ void VividiManager::measure()
     m_test->reset();
 
     if (Cypress::getInstance().isSimulation())
-        m_test->simulate();
-
-    emit measured(m_test.get());
-
-    if (m_test->isValid())
     {
-      emit canFinish();
+        m_test->simulate();
+        emit measured(m_test.get());
+        emit canFinish();
     }
 }
 

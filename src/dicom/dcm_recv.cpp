@@ -1,7 +1,12 @@
 #include "dcm_recv.h"
-#include "auxiliary/file_utils.h"
+#include "../auxiliary/file_utils.h"
+#include "dicom_directory_watcher.h"
+
 
 #include <QDebug>
+#include <QMessageBox>
+
+
 
 DcmRecv::DcmRecv(
     const QString& executablePath,
@@ -26,15 +31,74 @@ DcmRecv::DcmRecv(
     connect(&m_process, &QProcess::readyReadStandardError, this, &DcmRecv::onReadyReadStandardError);
     connect(&m_process, &QProcess::errorOccurred, this, &DcmRecv::onErrorOccurred);
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &DcmRecv::onFinished);
+
+    m_watcher.reset(new DicomDirectoryWatcher(outputDir));
+
+    connect(m_watcher.get(), &DicomDirectoryWatcher::dicomDirectoryChanged, this, &DcmRecv::onFilesReceived);
 }
 
 DcmRecv::~DcmRecv()
 {
-    if (m_process.state() != QProcess::ProcessState::NotRunning)
-    {
-        m_process.kill();
-        m_process.waitForFinished();
+    m_process.kill();
+    m_process.waitForFinished();
+}
+
+void DcmRecv::onFilesReceived()
+{
+    receivedFiles.clear();
+
+    // perform validation on files
+    // update UI
+    QDir directory(m_outputDir);
+    QStringList dcmFiles = directory.entryList(QStringList() << "*", QDir::Files);
+
+    foreach(QString fileName, dcmFiles) {
+        QFileInfo fileInfo(directory, fileName);
+
+        if(fileInfo.isReadable() && fileInfo.isFile()) {
+
+            DcmFileFormat fileFormat;
+            OFCondition loadResult = fileFormat.loadFile(fileInfo.absoluteFilePath().toStdString().c_str());
+
+            if (loadResult.good())
+            {
+                DcmDataset* dataset = fileFormat.getDataset();
+                OFString studyInstanceUID;
+                OFString patientId;
+                OFString fileName;
+                OFString modality;
+                OFString studyDate;
+                OFString bodyPartExamined;
+
+                DicomFile dicomFile;
+                dicomFile.fileInfo = fileInfo;
+
+                if (dataset->findAndGetOFString(DCM_StudyInstanceUID, studyInstanceUID).good()) {
+                    dicomFile.studyId = studyInstanceUID.c_str();
+                }
+
+                if (dataset->findAndGetOFString(DCM_PatientID, patientId).good()) {
+                    dicomFile.patientId = patientId.c_str();
+                }
+
+                if (dataset->findAndGetOFString(DCM_BodyPartExamined, bodyPartExamined).good()) {
+                    dicomFile.bodyPartExamined = bodyPartExamined.c_str();
+                }
+
+                if (dataset->findAndGetOFString(DCM_Modality, modality).good()) {
+                    dicomFile.modality = modality.c_str();
+                }
+
+                if (dataset->findAndGetOFString(DCM_StudyDate, studyDate).good()) {
+                    dicomFile.studyDate = studyDate.c_str();
+                }
+
+                receivedFiles.append(dicomFile);
+            }
+        }
     }
+
+    emit dicomFilesReceived();
 }
 
 bool DcmRecv::start()
@@ -58,6 +122,12 @@ bool DcmRecv::start()
     emit running();
 
     return started;
+}
+
+bool DcmRecv::stop()
+{
+    m_process.kill();
+    return true;
 }
 
 QString DcmRecv::receivedFilesDir() const

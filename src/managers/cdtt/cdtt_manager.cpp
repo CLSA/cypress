@@ -102,7 +102,7 @@ void CDTTManager::configureProcess()
 
     QString command = "java";
     QStringList arguments;
-    arguments << "-jar" << runnablePath << getInputDataValue("barcode").toString();
+    arguments << "-jar" << runnablePath << m_session->getBarcode();
 
     m_process.setProgram(command);
     m_process.setArguments(arguments);

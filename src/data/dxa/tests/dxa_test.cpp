@@ -1,4 +1,5 @@
 #include "dxa_test.h"
+#include "dicom/dcm_recv.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 
@@ -57,41 +58,11 @@ const QMap<QString, QString> DXATest::ranges = {
     {"TOT_L2L3L4_BMD", ".234"},
 };
 
-void DXATest::onDicomDirectoryChange(const QString &path)
-{
-    QDir dir(path);
-    QStringList filters { "*.dcm", "*.dicom"};
-
-    const QStringList dicomFiles = dir.entryList(filters, QDir::Files | QDir::NoDotAndDotDot);
-
-    DcmFileFormat fileFormat;
-
-    for (const QString& filePath : dicomFiles)
-    {
-        QString absoluteFilePath = dir.absoluteFilePath(filePath);
-        try
-        {
-            if (!fileFormat.loadFile(absoluteFilePath.toLocal8Bit().constData()).good())
-            {
-                qCritical() << "Error loading DICOM file" << absoluteFilePath;
-            }
-
-            //if (isValidDicom(fileFormat)) {
-            //    qDebug() << "DICOM file is valid for measurement: " << getName();
-            //}
-        }
-        catch (const std::exception& e)
-        {
-            qCritical() << "Error loading DICOM file" << absoluteFilePath << ": " << e.what();
-        }
-    }
-}
-
 DXATest::DXATest()
 {
     wholeBodyMeasurement.reset(new WholeBodyScanMeasurement);
     apSpineMeasurement.reset(new ApSpineMeasurement);
-    forarmMeasurement.reset(new ForearmMeasurement);
+    forearmMeasurement.reset(new ForearmMeasurement);
     ivaImagingMeasurement.reset(new IVAImagingMeasurement);
 }
 
@@ -99,7 +70,7 @@ bool DXATest::isValid() const
 {
     return 	wholeBodyMeasurement->isValid() 	||
             apSpineMeasurement->isValid() 		||
-            forarmMeasurement->isValid() 		||
+            forearmMeasurement->isValid() 		||
            ivaImagingMeasurement->isValid();
 }
 
@@ -107,15 +78,47 @@ void DXATest::reset()
 {
     wholeBodyMeasurement->reset();
     apSpineMeasurement->reset();
-    forarmMeasurement->reset();
+    forearmMeasurement->reset();
     ivaImagingMeasurement->reset();
+}
+
+void DXATest::fromDicomFiles(QList<DicomFile> files)
+{
+    foreach (const DicomFile& file, files)
+    {
+        qDebug() << file.bodyPartExamined;
+
+        if (ivaImagingMeasurement->isValidDicomFile(file))
+        {
+            qDebug("iva");
+            ivaImagingMeasurement->addDicomFile(file);
+        }
+        else if (wholeBodyMeasurement->isValidDicomFile(file))
+        {
+            qDebug("wb");
+            wholeBodyMeasurement->addDicomFile(file);
+        }
+        else if (forearmMeasurement->isValidDicomFile(file))
+        {
+            qDebug("fa");
+            forearmMeasurement->addDicomFile(file);
+        }
+        else if (apSpineMeasurement->isValidDicomFile(file))
+        {
+            qDebug("spine");
+            apSpineMeasurement->addDicomFile(file);
+        }
+        else {
+            qDebug() << "Unknown file";
+        }
+    }
 }
 
 void DXATest::simulate()
 {
     wholeBodyMeasurement->simulate();
     apSpineMeasurement->simulate();
-    forarmMeasurement->simulate();
+    forearmMeasurement->simulate();
     ivaImagingMeasurement->simulate();
 }
 
@@ -134,7 +137,7 @@ QJsonObject DXATest::toJsonObject() const
     }
 
     QJsonObject forearm {};
-    if (forarmMeasurement)
+    if (forearmMeasurement)
     {
         forearm = apSpineMeasurement->toJsonObject();
     }

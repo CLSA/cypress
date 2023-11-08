@@ -18,6 +18,8 @@
 
 #include "../../data/cimt_vivid_i_test.h"
 
+#include "../../dicom/dcm_recv.h"
+
 #include <QSql>
 #include <QSqlQuery>
 #include <QSqlDatabase>
@@ -41,6 +43,7 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
 
+    void test_dicom_recv();
     void test_dexa_sim();
     void test_audiometer_sim();
     void test_weight_scale_sim();
@@ -78,6 +81,10 @@ DeviceSimTests::~DeviceSimTests()
 void DeviceSimTests::initTestCase()
 {
 
+}
+
+void DeviceSimTests::test_dicom_recv()
+{
 }
 
 void DeviceSimTests::cleanupTestCase()

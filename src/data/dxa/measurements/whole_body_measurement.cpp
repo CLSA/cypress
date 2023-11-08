@@ -322,8 +322,12 @@ bool WholeBodyScanMeasurement::isValid() const
 };
 
 
-bool WholeBodyScanMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) const
+bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file) const
 {
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+        return false;
+
     const OFString modality = "OT";
     const OFString bodyPartExamined = "";
     const OFString imageAndFluoroscopyAreaDoseProduct = "";
@@ -335,7 +339,7 @@ bool WholeBodyScanMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) 
     const OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
 
     OFString value = "";
-    DcmDataset* dataset = dicomFileFormat.getDataset();
+    DcmDataset* dataset = loadedFileFormat.getDataset();
 
     //const QString dicom1Name = getResultPrefix() + "_DICOM_1";
     //const QString dicom2Name = getResultPrefix() + "_DICOM_2";
@@ -347,7 +351,7 @@ bool WholeBodyScanMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) 
     if (!dataset->tagExistsWithValue(DCM_BitsAllocated)) return false;
     if (!dataset->tagExists(DCM_PixelSpacing)) return false;
     if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel)) return false;
-    if (!dicomFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
+    if (!loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
     if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation)) return false;
 
     dataset->findAndGetOFString(DCM_Modality, value);
@@ -362,11 +366,18 @@ bool WholeBodyScanMeasurement::isValidDicomFile(DcmFileFormat &dicomFileFormat) 
     dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
     if (value != samplesPerPixel) return false;
 
-    dicomFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    dataset->findAndGetOFString(DCM_BodyPartExamined, value);
+    if (value != "") return false;
+
+    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
     if (value != mediaStorageSOPClassUID) return false;
 
     return true;
+}
 
+void WholeBodyScanMeasurement::addDicomFile(DicomFile)
+{
+    qDebug() << "whole body add dicom file";
 }
 
 Side WholeBodyScanMeasurement::getSide() {

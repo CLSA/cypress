@@ -184,11 +184,15 @@ void ApSpineMeasurement::simulate()
 
 bool ApSpineMeasurement::isValid() const
 {
-    return false;
+    return isValidDicomFile(apSpineFile);
 }
 
-bool ApSpineMeasurement::isValidDicomFile(DcmFileFormat& loadedFileFormat) const
+bool ApSpineMeasurement::isValidDicomFile(DicomFile file) const
 {
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+        return false;
+
     OFString value = "";
     DcmDataset* dataset = loadedFileFormat.getDataset();
 
@@ -202,30 +206,97 @@ bool ApSpineMeasurement::isValidDicomFile(DcmFileFormat& loadedFileFormat) const
     OFString samplesPerPixel = "3";
     OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
 
-    if (!dataset->tagExistsWithValue(DCM_Modality)) return false;
-    if (!dataset->tagExists(DCM_BodyPartExamined)) return false;
-    if (!dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct)) return false;
-    if (!dataset->tagExists(DCM_PatientOrientation)) return false;
-    if (!dataset->tagExistsWithValue(DCM_BitsAllocated)) return false;
-    if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation)) return false;
-    if (!dataset->tagExists(DCM_PixelSpacing)) return false;
-    if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel)) return false;
-    if (!loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
+    if (!dataset->tagExistsWithValue(DCM_Modality))
+    {
+        qDebug() << "modality";
+        return false;
+    }
+
+    if (!dataset->tagExists(DCM_BodyPartExamined))
+    {
+        qDebug() << "body part";
+        return false;
+    }
+
+    if (!dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct))
+    {
+        qDebug() << "dose product";
+        return false;
+    }
+
+    if (!dataset->tagExists(DCM_PatientOrientation))
+    {
+        qDebug() << "orientation";
+        return false;
+    }
+
+    if (!dataset->tagExistsWithValue(DCM_BitsAllocated))
+    {
+        return false;
+    }
+
+    if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation))
+    {
+        return false;
+    }
+
+    if (!dataset->tagExists(DCM_PixelSpacing))
+    {
+        qDebug() << "pixel spacing";
+        return false;
+    }
+
+    if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel))
+    {
+        qDebug() << "samples per pixel";
+        return false;
+    }
+
+    if (!loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID))
+    {
+        qDebug() << "media storage";
+        return false;
+    }
 
     dataset->findAndGetOFString(DCM_Modality, value);
-    if (value != modality) return false;
+    if (value != modality)
+    {
+        qDebug() << "modality 2";
+        return false;
+    }
 
     dataset->findAndGetOFString(DCM_BitsAllocated, value);
-    if (value != bitsAllocated) return false;
+    if (value != bitsAllocated)
+    {
+        qDebug() << "bits allocated";
+        return false;
+    }
 
     dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
-    if (value != photometricInterpretation) return false;
+    if (value != photometricInterpretation)
+    {
+        qDebug() << "photometric";
+        return false;
+    }
 
     dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
-    if (value != samplesPerPixel) return false;
+    if (value != samplesPerPixel)
+    {
+        qDebug() << "samples per pixel";
+        return false;
+    }
 
     loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
-    if (value != mediaStorageSOPClassUID) return false;
+    if (value != mediaStorageSOPClassUID)
+    {
+        qDebug() << "media storage sop class";
+        return false;
+    }
 
     return true;
-};
+}
+
+void ApSpineMeasurement::addDicomFile(DicomFile file)
+{
+    apSpineFile = file;
+}

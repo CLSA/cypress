@@ -53,10 +53,14 @@ bool DXAMeasurement::isValid() const
     return false;
 }
 
-bool DXAMeasurement::isValidDicomFile(DcmFileFormat& dicomFileFormat) const
+bool DXAMeasurement::isValidDicomFile(DicomFile file) const
 {
-    DcmMetaInfo *metaInfo = dicomFileFormat.getMetaInfo();
-    DcmDataset *dataset = dicomFileFormat.getDataset();
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+        return false;
+
+    DcmMetaInfo *metaInfo = loadedFileFormat.getMetaInfo();
+    DcmDataset *dataset = loadedFileFormat.getDataset();
     OFString tagValue;
 
     if (metaInfo == nullptr || dataset == nullptr) return false;

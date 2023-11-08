@@ -27,6 +27,8 @@ public slots:
 
     void addManualMeasurement() override {};
 
+    void dicomFilesReceived();
+
 protected:
     bool setUp() override;
     bool clearData() override;
@@ -35,8 +37,7 @@ protected:
     void setInputData(const QVariantMap&) override;
 
 private:
-    QScopedPointer<DcmRecv> m_dcmRecv;
-    QScopedPointer<DicomDirectoryWatcher> m_dcmWatcher;
+    QScopedPointer<DcmRecv> m_dicomServer;
 };
 
 #endif // VIVIDI_MANAGER_H

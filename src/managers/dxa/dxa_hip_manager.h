@@ -3,11 +3,14 @@
 
 #include "../manager_base.h"
 #include "./dicom/dicom_scp.h"
+
 #include "server/sessions/dxa/dxa_hip_session.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dicom/dcm_recv.h"
 #include "dicom/dicom_directory_watcher.h"
+
+#include "../../data/dxa/smbfilecopier.h"
 
 #include <QMap>
 #include <QObject>
@@ -44,11 +47,6 @@ public:
     QMap<QString, QVariant> extractScanAnalysisData();
     QMap<QString, QVariant> computeTandZScores();
 
-    void dicomFilesReceived(QStringList paths);
-    bool validateDicomFile(DcmFileFormat &loadedFileFormat);
-    bool startDicomServer();
-    bool endDicomServer();
-
     bool isCorrectDicom(DcmFileFormat &file);
     bool isCompleteDicom(DcmFileFormat &file);
 
@@ -57,13 +55,22 @@ public slots:
     void measure() override;
     void finish() override;
 
+    void dicomFilesReceived();
+
 protected slots:
     void dicomServerExitNormal();
     void dicomServerExitCrash();
 
+    void databaseCopied(QFileInfo fileInfo);
+
 private:
-    //DicomDirectoryWatcher m_dicomWatcher;
-    //DcmRecv m_dcmRecv;
+    QScopedPointer<DcmRecv> m_dicomServer;
+    QScopedPointer<SMBFileCopier> m_networkFileCopier;
+
+    QFileInfo m_patscanDbFileInfo;
+    QFileInfo m_refDbFileInfo;
+
+    bool validateDicomFile(DcmFileFormat &loadedFileFormat);
 
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;

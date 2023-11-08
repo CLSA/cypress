@@ -84,13 +84,13 @@ void ChoiceReactionManager::configureProcess()
         command << m_runnableName;
 
         if(m_inputData.contains("interviewer_id"))
-            command << "/i" + getInputDataValue("interviewer_id").toString();
+            command << "/i" + m_session->getInterviewer();
         else
             command << "/iNone";
 
         // minimum required input to identify the file belonging to the participant
         //
-        command << "/u" + getInputDataValue("barcode").toString();
+        command << "/u" + m_session->getBarcode();
 
         // TODO: consider using upstream host "clinic" identifier
         //
@@ -98,7 +98,7 @@ void ChoiceReactionManager::configureProcess()
 
         // required language "en" or "fr" converted to E or F
         //
-        QString s = getInputDataValue("language").toString().toUpper();
+        QString s = m_session->getLanguage().toUpper();
         if(!s.isEmpty())
         {
             command << "/l" + QString(s.at(0));

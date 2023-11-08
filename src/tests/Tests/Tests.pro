@@ -40,6 +40,8 @@ LIBS += -L"C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/lib/"
 #LIBS += -L$$PWD/../../../dep/SigLib/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
 
 SOURCES +=  tst_pdf_filler.cpp \
+    ../../dicom/dcm_recv.cpp \
+    ../../dicom/dicom_directory_watcher.cpp \
     ../../auxiliary/CRC8.cpp \
     ../../auxiliary/Constants.cpp \
     ../../auxiliary/Utilities.cpp \
@@ -86,6 +88,8 @@ SOURCES +=  tst_pdf_filler.cpp \
     ../../data/weigh_scale/tests/weigh_scale_test.cpp
 
 HEADERS += \
+    ../../dicom/dcm_recv.h \
+    ../../dicom/dicom_directory_watcher.h \
     ../../auxiliary/CRC8.h \
     ../../auxiliary/Constants.h \
     ../../auxiliary/Utilities.h \

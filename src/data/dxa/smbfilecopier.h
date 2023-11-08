@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QFileInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -25,6 +26,9 @@ class SMBFileCopier : public QObject {
 public:
     // Function to copy a file from an SMB share to a local path
     void copyFileFromSMB(const QUrl& smbUrl, const QString& localPath);
+
+signals:
+    void fileCopied(QFileInfo fileInfo);
 
 private slots:
     // Slot for handling data received from the SMB file

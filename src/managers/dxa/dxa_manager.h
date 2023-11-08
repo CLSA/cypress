@@ -44,10 +44,7 @@ public:
     QMap<QString, QVariant> extractScanAnalysisData();
     QMap<QString, QVariant> computeTandZScores();
 
-    void dicomFilesReceived(QStringList paths);
     bool validateDicomFile(DcmFileFormat &loadedFileFormat);
-    bool startDicomServer();
-    bool endDicomServer();
 
     bool isCorrectDicom(DcmFileFormat &file);
     bool isCompleteDicom(DcmFileFormat &file);
@@ -57,13 +54,14 @@ public slots:
     void measure() override;
     void finish() override;
 
+    void dicomFilesReceived();
+
 protected slots:
     void dicomServerExitNormal();
     void dicomServerExitCrash();
 
 private:
-    //DicomDirectoryWatcher m_dicomWatcher;
-    //DcmRecv m_dcmRecv;
+    QScopedPointer<DcmRecv> m_dicomServer;
 
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;

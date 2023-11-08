@@ -1,6 +1,8 @@
 #ifndef AP_SPINE_MEASUREMENT_H
 #define AP_SPINE_MEASUREMENT_H
 
+#include "dicom/dcm_recv.h"
+
 #include "dxa_measurement.h"
 
 
@@ -14,13 +16,18 @@ public:
     QString toString() const override;
     QStringList toStringList(const bool& no_keys = false) const override;
 
+    void addDicomFile(DicomFile);
+
     void simulate() override;
 
-    bool isValidDicomFile(DcmFileFormat& loadedFileFormat) const override;
+    bool isValidDicomFile(DicomFile file) const override;
     bool isValid() const override;
+
 
     // DXAMeasurement interface
 public:
+    DicomFile apSpineFile;
+
     Side getSide() override;
     quint8 getScanType() override;
     QString getName() override;
