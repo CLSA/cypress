@@ -69,6 +69,7 @@ void DcmRecv::onFilesReceived()
                 OFString modality;
                 OFString studyDate;
                 OFString bodyPartExamined;
+                OFString seriesNumber;
 
                 DicomFile dicomFile;
                 dicomFile.fileInfo = fileInfo;
@@ -91,6 +92,10 @@ void DcmRecv::onFilesReceived()
 
                 if (dataset->findAndGetOFString(DCM_StudyDate, studyDate).good()) {
                     dicomFile.studyDate = studyDate.c_str();
+                }
+
+                if (dataset->findAndGetOFString(DCM_SeriesNumber, seriesNumber).good()) {
+                    dicomFile.seriesNumber = seriesNumber.c_str();
                 }
 
                 receivedFiles.append(dicomFile);
@@ -117,6 +122,7 @@ bool DcmRecv::start()
     if (!started)
     {
         qDebug() << "error: could not start DICOM server";
+        qDebug() << m_process.errorString();
     }
 
     emit running();

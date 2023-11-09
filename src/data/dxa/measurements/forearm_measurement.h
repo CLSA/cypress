@@ -13,15 +13,13 @@ public:
     QString toString() const override;
     QStringList toStringList(const bool& no_keys = false) const override;
 
-    void addDicomFile(DicomFile);
-
     bool isValid() const override;
 
-    // DXAMeasurement interface
 public:
     bool isValidDicomFile(DicomFile file) const override;
+    void addDicomFile(DicomFile);
 
-    DicomFile forearmDicomFile;
+    DicomFile m_forearmDicomFile{};
 
     Side getSide() override;
     quint8 getScanType() override;
@@ -29,7 +27,15 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
     void simulate() override;
+
+private:
+    bool hasForearmFile{false};
+
+    // DXAMeasurement interface
+public:
+    bool hasAllNeededFiles() const override;
 };
 
 #endif // FOREARM_MEASUREMENT_H

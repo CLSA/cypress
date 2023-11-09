@@ -155,11 +155,9 @@ void DxaHipManager::finish()
 
 void DxaHipManager::dicomFilesReceived()
 {
-    const QList<DicomFile> &files = m_dicomServer->receivedFiles;
-
     // pass received dicom files to test class
     DxaHipTest* test = static_cast<DxaHipTest*>(m_test.get());
-    //test->fromDicomFiles(m_dicomServer->receivedFiles);
+    test->fromDicomFiles(m_dicomServer->receivedFiles);
 }
 
 bool DxaHipManager::isCompleteDicom(DcmFileFormat &file)

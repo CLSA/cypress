@@ -16,15 +16,18 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
 
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+    ui->measurementTable->hideManualEntry();
 
-    this->setWindowTitle("DXA");
+    this->setWindowTitle("DXA 2");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new DXAManager(session));
     DXAManager* manager = static_cast<DXAManager*>(m_manager.get());
 
     ui->testInfoWidget->setSessionInformation(*session);
-    ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
+
+    ui->dicomWidget->setDicomLabels("ONYXDICOM", QHostInfo::localHostName(), "8900");
+    ui->dicomWidget->setReadOnly(true);
 
     QList<TableColumn> columns;
 
@@ -40,7 +43,10 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     });
 
     // auto measure
-    connect(manager, &DXAManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+    connect(manager,
+            &DXAManager::updateDicomTable,
+            ui->measurementTable,
+            &MeasurementTable::handleDicomFiles);
 
     // can finish
     connect(manager, &DXAManager::canFinish, ui->measurementTable, [=]() {
@@ -52,9 +58,6 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
 
     // critical error
     connect(manager, &DXAManager::error, this, &DXADialog::error);
-
-    // data changed
-    connect(manager, &DXAManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager, &DXAManager::measure);
@@ -98,15 +101,4 @@ void DXADialog::dicomFilesReceived(const QStringList& dicomFilePaths)
 
     //qDebug() << dicomFilePaths;
     //m_manager->dicomFilesReceived(dicomFilePaths);
-}
-
-void DXADialog::on_openFileExplorer_released()
-{
-    QDesktopServices::openUrl(QUrl(QDir::currentPath() + "/dcmtk-3.6.7/storage"));
-}
-
-
-void DXADialog::on_submitButton_clicked()
-{
-    //m_manager->measure();
 }

@@ -20,6 +20,8 @@ public:
     void simulate() override;
     bool isValidDicomFile(DicomFile file) const override;
 
+    DicomFile m_hipDicomFile;
+
     void addDicomFile(DicomFile);
 
     Side getSide() override;
@@ -28,6 +30,13 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+private:
+    bool m_hasHipFile{false};
+
+    // DXAMeasurement interface
+public:
+    bool hasAllNeededFiles() const override;
 };
 
 #endif // HIP_MEASUREMENT_H

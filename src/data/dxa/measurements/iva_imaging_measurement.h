@@ -28,6 +28,20 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+    bool isDicomMeasureFile(DcmFileFormat &file) const;
+    bool isDicomPRFile(DcmFileFormat &file) const;
+    bool isDicomOTFile(DcmFileFormat &file) const;
+
+    DicomFile m_dicomMeasureFile{};
+    DicomFile m_dicomPrFile{};
+    DicomFile m_dicomOtFile{};
+
+    bool hasMeasureFile{false};
+    bool hasOtFile{false};
+    bool hasPrFile{false};
+
+    bool hasAllNeededFiles() const override;
 };
 
 #endif // IVA_IMAGING_MEASUREMENT_H

@@ -1,6 +1,7 @@
 #ifndef DXA_MANAGER_H
 #define DXA_MANAGER_H
 
+#include "../../data/dxa/smbfilecopier.h"
 #include "../manager_base.h"
 #include "./dicom/dicom_scp.h"
 #include "server/sessions/dxa/dxa_session.h"
@@ -55,13 +56,18 @@ public slots:
     void finish() override;
 
     void dicomFilesReceived();
+    void copiedDatabaseFile(QFileInfo file);
 
 protected slots:
     void dicomServerExitNormal();
     void dicomServerExitCrash();
 
+signals:
+    void updateDicomTable(QList<DicomFile> files);
+
 private:
     QScopedPointer<DcmRecv> m_dicomServer;
+    QScopedPointer<SMBFileCopier> m_networkFileCopier;
 
     // set input parameters for the test
     void setInputData(const QVariantMap& inputData) override;
@@ -74,6 +80,9 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
+
+    QFileInfo m_patscanDb{};
+    QFileInfo m_referenceDb{};
 };
 
 #endif // DXA_MANAGER_H

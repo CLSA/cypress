@@ -39,6 +39,8 @@ public:
 
     virtual bool isValidDicomFile(DicomFile file) const;
 
+    virtual bool hasAllNeededFiles() const = 0;
+
     virtual Side getSide() = 0;
     virtual quint8 getScanType() = 0;
     virtual QString getName() = 0;

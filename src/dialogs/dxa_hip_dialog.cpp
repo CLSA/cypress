@@ -16,8 +16,9 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
 
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+    ui->measurementTable->hideManualEntry();
 
-    this->setWindowTitle("DXA Hip");
+    this->setWindowTitle("DXA 1");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new DxaHipManager(session));
@@ -25,6 +26,7 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
+    ui->dicomWidget->setReadOnly(true);
 
     QList<TableColumn> columns;
 

@@ -22,10 +22,6 @@ public slots:
     void dicomServerEnded();
     void dicomLogUpdate(QString line);
 
-private slots:
-    void on_openFileExplorer_released();
-    void on_submitButton_clicked();
-
 private:
     Ui::DXADialog *ui { Q_NULLPTR };
 };

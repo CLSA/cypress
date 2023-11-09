@@ -9,13 +9,9 @@
 
 class DxaHipTest: public TestBase
 {
-public slots:
-    void onDicomDirectoryChange(const QString& path);
-
 public:
     DxaHipTest();
 
-    QScopedPointer<HipMeasurement> hipMeasurement;
 
     static const QMap<QString, QString> ranges;
 
@@ -26,6 +22,10 @@ public:
 
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
+
+    void fromDicomFiles(QList<DicomFile> files);
+
+    QScopedPointer<HipMeasurement> hipMeasurement;
 };
 
 #endif // DXAHIPTEST_H

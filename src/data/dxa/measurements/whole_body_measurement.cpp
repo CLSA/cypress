@@ -1,5 +1,7 @@
 #include "whole_body_measurement.h"
 
+#include "auxiliary/Utilities.h"
+
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
@@ -318,9 +320,8 @@ void WholeBodyScanMeasurement::simulate()
 
 bool WholeBodyScanMeasurement::isValid() const
 {
-    return false;
-};
-
+    return hasWholeBody1File && hasWholeBody2File;
+}
 
 bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file) const
 {
@@ -328,56 +329,33 @@ bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file) const
     if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
         return false;
 
-    const OFString modality = "OT";
-    const OFString bodyPartExamined = "";
-    const OFString imageAndFluoroscopyAreaDoseProduct = "";
-    const OFString patientOrientation = "";
-    const OFString bitsAllocated = "8";
-    const OFString photometricInterpretation = "RGB";
-    const OFString pixelSpacing = "";
-    const OFString samplesPerPixel = "3";
-    const OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
-
-    OFString value = "";
-    DcmDataset* dataset = loadedFileFormat.getDataset();
-
-    //const QString dicom1Name = getResultPrefix() + "_DICOM_1";
-    //const QString dicom2Name = getResultPrefix() + "_DICOM_2";
-
-    if (!dataset->tagExistsWithValue(DCM_Modality)) return false;
-    if (!dataset->tagExists(DCM_BodyPartExamined)) return false;
-    if (!dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct)) return false;
-    if (!dataset->tagExists(DCM_PatientOrientation)) return false;
-    if (!dataset->tagExistsWithValue(DCM_BitsAllocated)) return false;
-    if (!dataset->tagExists(DCM_PixelSpacing)) return false;
-    if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel)) return false;
-    if (!loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID)) return false;
-    if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation)) return false;
-
-    dataset->findAndGetOFString(DCM_Modality, value);
-    if (value != modality) return false;
-
-    dataset->findAndGetOFString(DCM_BitsAllocated, value);
-    if (value != bitsAllocated) return false;
-
-    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
-    if (value != photometricInterpretation) return false;
-
-    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
-    if (value != samplesPerPixel) return false;
-
-    dataset->findAndGetOFString(DCM_BodyPartExamined, value);
-    if (value != "") return false;
-
-    loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
-    if (value != mediaStorageSOPClassUID) return false;
-
-    return true;
+    return isWholeBody1(loadedFileFormat) || isWholeBody2(loadedFileFormat);
 }
 
-void WholeBodyScanMeasurement::addDicomFile(DicomFile)
+void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
 {
-    qDebug() << "whole body add dicom file";
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good()) {
+        return;
+    }
+
+    if (isWholeBody1(loadedFileFormat)) {
+        qDebug() << "adding dicom 1";
+        m_wholeBody1 = file;
+        m_wholeBody1.name = "WB_DICOM_1";
+        m_wholeBody1.size = Utilities::bytesToSize(m_wholeBody1.fileInfo.size());
+
+        hasWholeBody1File = true;
+    }
+
+    else if (isWholeBody2(loadedFileFormat)) {
+        qDebug() << "adding dicom 2";
+        m_wholeBody2 = file;
+        m_wholeBody2.name = "WB_DICOM_2";
+        m_wholeBody2.size = Utilities::bytesToSize(m_wholeBody2.fileInfo.size());
+
+        hasWholeBody2File = true;
+    }
 }
 
 Side WholeBodyScanMeasurement::getSide() {
@@ -402,4 +380,134 @@ QString WholeBodyScanMeasurement::getRefType() {
 
 QString WholeBodyScanMeasurement::getRefSource() {
     return "ref";
+}
+
+bool WholeBodyScanMeasurement::isWholeBody1(DcmFileFormat &file) const
+{
+    const OFString modality = "OT";
+    const OFString bodyPartExamined = "";
+    const OFString imageAndFluoroscopyAreaDoseProduct = "";
+    const OFString patientOrientation = "";
+    const OFString bitsAllocated = "8";
+    const OFString photometricInterpretation = "RGB";
+    const OFString pixelSpacing = "";
+    const OFString samplesPerPixel = "3";
+    const OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    OFString value = "";
+    DcmDataset *dataset = file.getDataset();
+
+    if (!dataset->tagExistsWithValue(DCM_Modality))
+        return false;
+    if (!dataset->tagExists(DCM_BodyPartExamined))
+        return false;
+    if (!dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct))
+        return false;
+    if (!dataset->tagExists(DCM_PatientOrientation))
+        return false;
+    if (!dataset->tagExistsWithValue(DCM_BitsAllocated))
+        return false;
+    if (!dataset->tagExists(DCM_PixelSpacing))
+        return false;
+    if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel))
+        return false;
+    if (!file.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID))
+        return false;
+    if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation))
+        return false;
+
+    dataset->findAndGetOFString(DCM_Modality, value);
+    if (value != modality)
+        return false;
+
+    dataset->findAndGetOFString(DCM_BitsAllocated, value);
+    if (value != bitsAllocated)
+        return false;
+
+    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
+    if (value != photometricInterpretation)
+        return false;
+
+    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
+    if (value != samplesPerPixel)
+        return false;
+
+    dataset->findAndGetOFString(DCM_BodyPartExamined, value);
+    if (value != "")
+        return false;
+
+    file.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    if (value != mediaStorageSOPClassUID)
+        return false;
+
+    return true;
+}
+
+bool WholeBodyScanMeasurement::isWholeBody2(DcmFileFormat &file) const
+{
+    const OFString modality = "OT";
+    const OFString bodyPartExamined = "";
+    const OFString imageAndFluoroscopyAreaDoseProduct = "";
+    const OFString patientOrientation = "";
+    const OFString bitsAllocated = "8";
+    const OFString photometricInterpretation = "RGB";
+    const OFString pixelSpacing = "";
+    const OFString samplesPerPixel = "3";
+    const OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
+
+    OFString value = "";
+    DcmDataset *dataset = file.getDataset();
+
+    //const QString dicom1Name = getResultPrefix() + "_DICOM_1";
+    //const QString dicom2Name = getResultPrefix() + "_DICOM_2";
+
+    if (!dataset->tagExistsWithValue(DCM_Modality))
+        return false;
+    if (!dataset->tagExists(DCM_BodyPartExamined))
+        return false;
+    if (dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct))
+        return false;
+    if (!dataset->tagExists(DCM_PatientOrientation))
+        return false;
+    if (!dataset->tagExistsWithValue(DCM_BitsAllocated))
+        return false;
+    if (!dataset->tagExists(DCM_PixelSpacing))
+        return false;
+    if (!dataset->tagExistsWithValue(DCM_SamplesPerPixel))
+        return false;
+    if (!file.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID))
+        return false;
+    if (!dataset->tagExistsWithValue(DCM_PhotometricInterpretation))
+        return false;
+
+    dataset->findAndGetOFString(DCM_Modality, value);
+    if (value != modality)
+        return false;
+
+    dataset->findAndGetOFString(DCM_BitsAllocated, value);
+    if (value != bitsAllocated)
+        return false;
+
+    dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
+    if (value != photometricInterpretation)
+        return false;
+
+    dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
+    if (value != samplesPerPixel)
+        return false;
+
+    dataset->findAndGetOFString(DCM_BodyPartExamined, value);
+    if (value != "")
+        return false;
+
+    file.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
+    if (value != mediaStorageSOPClassUID)
+        return false;
+
+    return true;
+}
+
+bool WholeBodyScanMeasurement::hasAllNeededFiles() const
+{
+    return hasWholeBody1File && hasWholeBody2File;
 }

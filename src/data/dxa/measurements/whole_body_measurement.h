@@ -28,6 +28,20 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+    DicomFile m_wholeBody1{};
+    DicomFile m_wholeBody2{};
+
+private:
+    bool isWholeBody1(DcmFileFormat &file) const;
+    bool isWholeBody2(DcmFileFormat &file) const;
+
+    bool hasWholeBody1File{false};
+    bool hasWholeBody2File{false};
+
+    // DXAMeasurement interface
+public:
+    bool hasAllNeededFiles() const override;
 };
 
 #endif // WHOLE_BODY_MEASUREMENT_H

@@ -1,4 +1,5 @@
 #include "forearm_measurement.h"
+#include "auxiliary/Utilities.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -116,9 +117,14 @@ void ForearmMeasurement::simulate()
     }
 }
 
+bool ForearmMeasurement::hasAllNeededFiles() const
+{
+    return hasForearmFile;
+}
+
 bool ForearmMeasurement::isValid() const
 {
-    return false;
+    return hasForearmFile;
 }
 
 bool ForearmMeasurement::isValidDicomFile(DicomFile file) const
@@ -190,5 +196,10 @@ QStringList ForearmMeasurement::toStringList(const bool& no_keys) const
 void ForearmMeasurement::addDicomFile(DicomFile file)
 {
     qDebug() << "add forearm measure";
-    forearmDicomFile = file;
+
+    m_forearmDicomFile = file;
+    m_forearmDicomFile.name = "FA_DICOM";
+    m_forearmDicomFile.size = Utilities::bytesToSize(file.fileInfo.size());
+
+    hasForearmFile = true;
 }

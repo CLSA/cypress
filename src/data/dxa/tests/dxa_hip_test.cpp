@@ -53,39 +53,21 @@ const QMap<QString, QString> DxaHipTest::ranges = {
     {"TOT_L2L3L4_BMD", ".234"},
 };
 
-void DxaHipTest::onDicomDirectoryChange(const QString &path)
-{
-    QDir dir(path);
-    QStringList filters { "*.dcm", "*.dicom"};
-
-    const QStringList dicomFiles = dir.entryList(filters, QDir::Files | QDir::NoDotAndDotDot);
-
-    DcmFileFormat fileFormat;
-
-    for (const QString& filePath : dicomFiles)
-    {
-        QString absoluteFilePath = dir.absoluteFilePath(filePath);
-        try
-        {
-            if (!fileFormat.loadFile(absoluteFilePath.toLocal8Bit().constData()).good())
-            {
-                qCritical() << "Error loading DICOM file" << absoluteFilePath;
-            }
-
-            //if (isValidDicom(fileFormat)) {
-            //    qDebug() << "DICOM file is valid for measurement: " << getName();
-            //}
-        }
-        catch (const std::exception& e)
-        {
-            qCritical() << "Error loading DICOM file" << absoluteFilePath << ": " << e.what();
-        }
-    }
-}
-
 DxaHipTest::DxaHipTest()
 {
     hipMeasurement.reset(new HipMeasurement);
+}
+
+void DxaHipTest::fromDicomFiles(QList<DicomFile> files)
+{
+    foreach (const DicomFile &file, files) {
+        if (file.bodyPartExamined == "HIP") {
+            if (hipMeasurement->isValidDicomFile(file)) {
+                qDebug() << "Found Hip";
+                hipMeasurement->addDicomFile(file);
+            }
+        }
+    }
 }
 
 bool DxaHipTest::isValid() const

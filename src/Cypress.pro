@@ -15,12 +15,12 @@ CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
-INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
-LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
+INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
+LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/OpenSSL-Win32/include"
-LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -34,15 +34,15 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
-INCLUDEPATH += $$PWD/../dep/SigLib/Include/
-INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
-DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
-LIBS += -L$$PWD/../dep/SigLib/SigTablt/Win32/ -lhid -lLibJpeg -llibtiff -lSigLib -lzlib -lsetupapi -lmsvcrt -luser32 -lwinmm -llegacy_stdio_definitions
+# INCLUDEPATH += $$PWD/../dep/SigLib/Include/
+# INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+# DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+LIBS += -L$$PWD/../dep/SigLib/SigTablt/Win32/ -lzlib
 
 RC_ICONS = favicon.ico
 
@@ -63,7 +63,7 @@ FORMS += \
   dialogs/grip_strength_dialog.ui \
   dialogs/retinal_camera_dialog.ui \
   dialogs/runnable_dialog.ui \
-  dialogs/signature_pad_dialog.ui \
+  #dialogs/signature_pad_dialog.ui \
   dialogs/spirometer_dialog.ui \
   dialogs/tonometer_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
@@ -77,7 +77,7 @@ FORMS += \
     widgets/device_settings/frax_settings_widget.ui \
     widgets/device_settings/grip_strength_settings_widget.ui \
     widgets/device_settings/retinal_camera_settings_widget.ui \
-    widgets/device_settings/signature_pad_settings_widget.ui \
+    #widgets/device_settings/signature_pad_settings_widget.ui \
     widgets/device_settings/spirometer_settings_widget.ui \
     widgets/device_settings/tonometer_settings_widget.ui \
     widgets/device_settings/vivid_i_settings_widget.ui \
@@ -182,7 +182,7 @@ HEADERS += \
     dialogs/frax_dialog.h \
     dialogs/grip_strength_dialog.h \
     dialogs/retinal_camera_dialog.h \
-    dialogs/signature_pad_dialog.h \
+    #dialogs/signature_pad_dialog.h \
     dialogs/spirometer_dialog.h \
     dialogs/tonometer_dialog.h \
     dialogs/weigh_scale_dialog.h \
@@ -213,8 +213,8 @@ HEADERS += \
     managers/serial_port/serial_port_manager.h \
     managers/session_manager.h \
     managers/settings_manager.h \
-    managers/signature_pad/signature_pad_communication.h \
-    managers/signature_pad/signature_pad_manager.h \
+    #managers/signature_pad/signature_pad_communication.h \
+    #managers/signature_pad/signature_pad_manager.h \
     managers/spirometer/spirometer_manager.h \
     managers/tonometer/tonometer_manager.h \
     managers/ultrasound/vividi_manager.h \
@@ -258,8 +258,8 @@ HEADERS += \
     server/handlers/participant_report/participant_report_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_status_request_handler.h \
-    server/handlers/signature_pad/signature_pad_request_handler.h \
-    server/handlers/signature_pad/signature_pad_status_request_handler.h \
+    #server/handlers/signature_pad/signature_pad_request_handler.h \
+    #server/handlers/signature_pad/signature_pad_status_request_handler.h \
     server/handlers/spirometer/spirometer_request_handler.h \
     server/handlers/spirometer/spirometer_status_request_handler.h \
     server/handlers/tonometer/tonometer_request_handler.h \
@@ -290,7 +290,7 @@ HEADERS += \
     widgets/device_settings/frax_settings_widget.h \
     widgets/device_settings/grip_strength_settings_widget.h \
     widgets/device_settings/retinal_camera_settings_widget.h \
-    widgets/device_settings/signature_pad_settings_widget.h \
+    #widgets/device_settings/signature_pad_settings_widget.h \
     widgets/device_settings/spirometer_settings_widget.h \
     widgets/device_settings/tonometer_settings_widget.h \
     widgets/device_settings/vivid_i_settings_widget.h \
@@ -380,7 +380,7 @@ SOURCES += \
     dialogs/frax_dialog.cpp \
     dialogs/grip_strength_dialog.cpp \
     dialogs/retinal_camera_dialog.cpp \
-    dialogs/signature_pad_dialog.cpp \
+    #dialogs/signature_pad_dialog.cpp \
     dialogs/spirometer_dialog.cpp \
     dialogs/tonometer_dialog.cpp \
     dialogs/weigh_scale_dialog.cpp \
@@ -412,8 +412,8 @@ SOURCES += \
     managers/serial_port/serial_port_manager.cpp \
     managers/session_manager.cpp \
     managers/settings_manager.cpp \
-    managers/signature_pad/signature_pad_communication.cpp \
-    managers/signature_pad/signature_pad_manager.cpp \
+    #managers/signature_pad/signature_pad_communication.cpp \
+    #managers/signature_pad/signature_pad_manager.cpp \
     managers/spirometer/spirometer_manager.cpp \
     managers/tonometer/tonometer_manager.cpp \
     managers/ultrasound/vividi_manager.cpp \
@@ -456,8 +456,8 @@ SOURCES += \
     server/handlers/participant_report/participant_report_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_status_request_handler.cpp \
-    server/handlers/signature_pad/signature_pad_request_handler.cpp \
-    server/handlers/signature_pad/signature_pad_status_request_handler.cpp \
+    #server/handlers/signature_pad/signature_pad_request_handler.cpp \
+    #server/handlers/signature_pad/signature_pad_status_request_handler.cpp \
     server/handlers/spirometer/spirometer_request_handler.cpp \
     server/handlers/spirometer/spirometer_status_request_handler.cpp \
     server/handlers/tonometer/tonometer_request_handler.cpp \
@@ -489,7 +489,7 @@ SOURCES += \
     widgets/device_settings/frax_settings_widget.cpp \
     widgets/device_settings/grip_strength_settings_widget.cpp \
     widgets/device_settings/retinal_camera_settings_widget.cpp \
-    widgets/device_settings/signature_pad_settings_widget.cpp \
+    #widgets/device_settings/signature_pad_settings_widget.cpp \
     widgets/device_settings/spirometer_settings_widget.cpp \
     widgets/device_settings/tonometer_settings_widget.cpp \
     widgets/device_settings/vivid_i_settings_widget.cpp \

@@ -32,19 +32,41 @@ DXAManager::DXAManager(QSharedPointer<DXASession> session) /* : m_dicomWatcher(Q
 
     const QString storageDirPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/storagePath").toString();
     const QString logConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/log_config").toString();
-    const QString ascConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/asc_config").toString();
+    const QString ascConfigPath
+        = workingDirPath
+          + CypressSettings::getInstance().readSetting("dxa/dicom/asc_config").toString();
 
     m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
-    connect(m_dicomServer.get(), &DcmRecv::dicomFilesReceived, this, &DXAManager::dicomFilesReceived);
+    connect(m_dicomServer.get(),
+            &DcmRecv::dicomFilesReceived,
+            this,
+            &DXAManager::dicomFilesReceived);
 
+    m_networkFileCopier.reset(new SMBFileCopier());
+    connect(m_networkFileCopier.get(),
+            &SMBFileCopier::fileCopied,
+            this,
+            &DXAManager::copiedDatabaseFile);
     m_dicomServer->start();
 }
 
 DXAManager::~DXAManager()
 {
-    qDebug() << "DXAManager::Destroy";
-    //m_dicomSCP->stop();
-    //delete m_dicomSCP;
+}
+
+void DXAManager::copiedDatabaseFile(QFileInfo file)
+{
+    if (file.fileName() == "PatScan.mdb") {
+        m_patscanDb = file;
+    } else if (file.fileName() == "Reference.mdb") {
+        m_referenceDb = file;
+    } else {
+        qDebug() << "file is not PatScan.mdb or Reference.mdb";
+    }
+
+    if (m_patscanDb.exists() && m_referenceDb.exists()) {
+        emit canFinish();
+    }
 }
 
 void DXAManager::dicomFilesReceived()
@@ -54,8 +76,13 @@ void DXAManager::dicomFilesReceived()
     // pass received dicom files to test class
     DXATest* test = static_cast<DXATest*>(m_test.get());
     test->fromDicomFiles(m_dicomServer->receivedFiles);
-}
 
+    if (test->areDicomFilesValid()) {
+        emit canMeasure();
+    }
+
+    emit updateDicomTable(files);
+}
 
 bool DXAManager::isAvailable()
 {
@@ -73,17 +100,14 @@ bool DXAManager::isInstalled()
 void DXAManager::start()
 {
     emit started(m_test.get());
-    emit canMeasure();
 }
 
 // retrieve a measurement from the device
 //
 void DXAManager::measure()
 {
-    m_test->reset();
-
-    if (Cypress::getInstance().isSimulation())
-    {
+    if (Cypress::getInstance().isSimulation()) {
+        m_test->reset();
         m_test->simulate();
 
         emit measured(m_test.get());
@@ -92,79 +116,82 @@ void DXAManager::measure()
         return;
     }
 
+    //qDebug() << "measuring";
     // copy over patscan and refscandbs
-
-
+    //m_networkFileCopier->copyFileFromSMB(QUrl(), "");
+    //m_networkFileCopier->copyFileFromSMB(QUrl(), "");
 
     // check if valid
-    if (m_test)
-    {
-
+    DXATest *test = static_cast<DXATest *>(m_test.get());
+    if (test->areDicomFilesValid()) {
+        emit measured(test);
+        emit canFinish();
     }
-
 }
 
 // implementation of final clean up of device after disconnecting and all
 // data has been retrieved and processed by any upstream classes
 //
-
-
-
 void DXAManager::finish()
 {
     int answer_id = m_session->getAnswerId();
     QString barcode = m_session->getBarcode();
 
+    DXATest *test = static_cast<DXATest *>(m_test.get());
+
     // Whole body
-    QByteArray wb_1 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/WB/WB_DICOM_1.dcm");
-    QByteArray wb_2 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/WB/WB_DICOM_2.dcm");
+    QByteArray wb_1 = FileUtils::readFileIntoByteArray(
+        test->wholeBodyMeasurement->m_wholeBody1.fileInfo.absoluteFilePath());
+    QByteArray wb_2 = FileUtils::readFileIntoByteArray(
+        test->wholeBodyMeasurement->m_wholeBody2.fileInfo.absoluteFilePath());
 
-    QString wb_1_file_name = "WB_DICOM_1.dcm";
-    QString wb_2_file_name = "WB_DICOM_2.dcm";
+    QString wb_1_file_name = test->wholeBodyMeasurement->m_wholeBody1.name + ".dcm";
+    QString wb_2_file_name = test->wholeBodyMeasurement->m_wholeBody2.name + ".dcm";
 
-    int wb_1_size = wb_1.size();
-    int wb_2_size = wb_2.size();
+    QByteArray sp_1 = FileUtils::readFileIntoByteArray(
+        test->apSpineMeasurement->m_apSpineFile.fileInfo.absoluteFilePath());
 
     // AP Lumbar Spine
-    QString sp_1_file_name = "SP_DICOM_1.dcm";
+    QString sp_1_file_name = test->apSpineMeasurement->m_apSpineFile.name + ".dcm";
 
-    QByteArray sp_1 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/SP/SP_DICOM_1.dcm");
-
-    int sp_1_size = sp_1.size();
+    QByteArray iva_ot = FileUtils::readFileIntoByteArray(
+        test->ivaImagingMeasurement->m_dicomOtFile.fileInfo.absoluteFilePath());
+    QByteArray iva_pr = FileUtils::readFileIntoByteArray(
+        test->ivaImagingMeasurement->m_dicomPrFile.fileInfo.absoluteFilePath());
+    QByteArray iva_measure = FileUtils::readFileIntoByteArray(
+        test->ivaImagingMeasurement->m_dicomMeasureFile.fileInfo.absoluteFilePath());
 
     // IVA
-    QString iva_ot_file_name = "SEL_DICOM_OT.dcm";
-    QString iva_pr_file_name = "SEL_DICOM_PR.dcm";
-    QString iva_measure_file_name = "SEL_DICOM_MEASURE.dcm";
-
-    QByteArray iva_ot = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/IVA/SEL_DICOM_OT.dcm");
-    QByteArray iva_pr = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/IVA/SEL_DICOM_PR.dcm");
-    QByteArray iva_measure = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/IVA/SEL_DICOM_MEASURE.dcm");
-
-    int iva_ot_size = iva_ot.size();
-    int iva_pr_size = iva_pr.size();
-    int iva_measure_size = iva_measure.size();
-
+    QString iva_ot_file_name = test->ivaImagingMeasurement->m_dicomOtFile.name + ".dcm";
+    QString iva_pr_file_name = test->ivaImagingMeasurement->m_dicomPrFile.name + ".dcm";
+    QString iva_measure_file_name = test->ivaImagingMeasurement->m_dicomMeasureFile.name + ".dcm";
 
     // Forearm
     QString fa_1_file_name = "FA_DICOM.dcm";
-
-    QByteArray fa_1 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/FA/FA_DICOM.dcm");
-
-    int fa_1_size = fa_1.size();
+    QByteArray fa_1 = FileUtils::readFileIntoByteArray(
+        "C:/Users/Anthony/Downloads/DEXA_SIM/FA/FA_DICOM.dcm");
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
 
     QJsonObject files = {};
-    files.insert(wb_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(wb_1_size));
-    files.insert(wb_2_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(wb_2_size));
-    files.insert(sp_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(sp_1_size));
-    files.insert(iva_ot_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_ot_size));
-    files.insert(iva_pr_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_pr_size));
-    files.insert(iva_measure_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(iva_measure_size));
-    files.insert(fa_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(fa_1_size));
+    files.insert(wb_1_file_name.replace(QRegExp(".dcm"), ""),
+                 test->wholeBodyMeasurement->m_wholeBody1.size);
+    files.insert(wb_2_file_name.replace(QRegExp(".dcm"), ""),
+                 test->wholeBodyMeasurement->m_wholeBody2.size);
+    files.insert(sp_1_file_name.replace(QRegExp(".dcm"), ""),
+                 test->apSpineMeasurement->m_apSpineFile.size);
+    files.insert(iva_ot_file_name.replace(QRegExp(".dcm"), ""),
+                 test->ivaImagingMeasurement->m_dicomOtFile.size);
+    files.insert(iva_pr_file_name.replace(QRegExp(".dcm"), ""),
+                 test->ivaImagingMeasurement->m_dicomPrFile.size);
+    files.insert(iva_measure_file_name.replace(QRegExp(".dcm"), ""),
+                 test->ivaImagingMeasurement->m_dicomMeasureFile.size);
+    files.insert(fa_1_file_name.replace(QRegExp(".dcm"), ""),
+                 test->forearmMeasurement->m_forearmDicomFile.size);
+
+    qDebug() << files;
 
     testJson.insert("session", sessionObj);
     testJson.insert("files", files);
@@ -184,23 +211,28 @@ void DXAManager::finish()
                      "application/json",
                      serializedData);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_1_file_name + ".dcm",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_1_file_name
+                         + ".dcm",
                      "application/octet-stream",
                      wb_1);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_2_file_name + ".dcm",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + wb_2_file_name
+                         + ".dcm",
                      "application/octet-stream",
                      wb_2);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + sp_1_file_name + ".dcm",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + sp_1_file_name
+                         + ".dcm",
                      "application/octet-stream",
                      sp_1);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_ot_file_name + ".dcm",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_ot_file_name
+                         + ".dcm",
                      "application/octet-stream",
                      iva_ot);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_pr_file_name + ".dcm",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + iva_pr_file_name
+                         + ".dcm",
                      "application/octet-stream",
                      iva_pr);
     sendHTTPSRequest("PATCH",
@@ -209,7 +241,8 @@ void DXAManager::finish()
                      "application/octet-stream",
                      iva_measure);
     sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + fa_1_file_name + ".dcm",
+                     host + endpoint + QString::number(answer_id) + "?filename=" + fa_1_file_name
+                         + ".dcm",
                      "application/octet-stream",
                      fa_1);
 

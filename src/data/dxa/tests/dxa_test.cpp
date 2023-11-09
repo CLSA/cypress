@@ -82,33 +82,35 @@ void DXATest::reset()
     ivaImagingMeasurement->reset();
 }
 
+bool DXATest::areDicomFilesValid() const
+{
+    return wholeBodyMeasurement->hasAllNeededFiles() && apSpineMeasurement->hasAllNeededFiles()
+           && forearmMeasurement->hasAllNeededFiles();
+}
+
 void DXATest::fromDicomFiles(QList<DicomFile> files)
 {
-    foreach (const DicomFile& file, files)
-    {
-        qDebug() << file.bodyPartExamined;
+    foreach (const DicomFile &file, files) {
+        QString bodyPartExamined = file.bodyPartExamined;
 
-        if (ivaImagingMeasurement->isValidDicomFile(file))
-        {
-            qDebug("iva");
+        if (bodyPartExamined == "HIP") // hip done in different stage
+            continue;
+
+        qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
+
+        if (ivaImagingMeasurement->isValidDicomFile(file)) {
+            qDebug("Found IVA");
             ivaImagingMeasurement->addDicomFile(file);
-        }
-        else if (wholeBodyMeasurement->isValidDicomFile(file))
-        {
-            qDebug("wb");
+        } else if (wholeBodyMeasurement->isValidDicomFile(file)) {
+            qDebug("Found WB");
             wholeBodyMeasurement->addDicomFile(file);
-        }
-        else if (forearmMeasurement->isValidDicomFile(file))
-        {
-            qDebug("fa");
+        } else if (forearmMeasurement->isValidDicomFile(file)) {
+            qDebug("Found Forearm");
             forearmMeasurement->addDicomFile(file);
-        }
-        else if (apSpineMeasurement->isValidDicomFile(file))
-        {
-            qDebug("spine");
+        } else if (apSpineMeasurement->isValidDicomFile(file)) {
+            qDebug("Found Spine");
             apSpineMeasurement->addDicomFile(file);
-        }
-        else {
+        } else {
             qDebug() << "Unknown file";
         }
     }

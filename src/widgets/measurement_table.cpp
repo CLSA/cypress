@@ -45,6 +45,7 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
             }
         }
 
+        qDebug() << "measure";
         emit measure();
     });
 
@@ -90,8 +91,8 @@ void MeasurementTable::handleChange(int row, int col)
     Q_UNUSED(row)
     Q_UNUSED(col)
 
-    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
-    ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
+    //ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
+    //ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
 }
 
 void MeasurementTable::updateRowIds()
@@ -214,6 +215,37 @@ void MeasurementTable::handleTestUpdate(TestBase* test)
     updateModel(test);
 }
 
+void MeasurementTable::handleDicomFiles(QList<DicomFile> files)
+{
+    int row = 0;
+
+    ui->measurementTable->clear();
+    ui->measurementTable->setRowCount(0);
+    ui->measurementTable->setColumnCount(4);
+
+    QStringList headerNames = {"StudyID", "Name", "Type", "Size"};
+
+    ui->measurementTable->setHorizontalHeaderLabels(headerNames);
+
+    foreach (auto file, files) {
+        ui->measurementTable->insertRow(row);
+
+        QTableWidgetItem *study = new QTableWidgetItem(file.studyId);
+        ui->measurementTable->setItem(row, 0, study);
+
+        QTableWidgetItem *name = new QTableWidgetItem(file.name);
+        ui->measurementTable->setItem(row, 1, name);
+
+        QTableWidgetItem *type = new QTableWidgetItem(file.bodyPartExamined);
+        ui->measurementTable->setItem(row, 2, type);
+
+        QTableWidgetItem *size = new QTableWidgetItem(file.size);
+        ui->measurementTable->setItem(row, 3, size);
+
+        row++;
+    }
+}
+
 void MeasurementTable::enableMeasureButton()
 {
     ui->measureButton->setEnabled(true);
@@ -232,6 +264,18 @@ void MeasurementTable::enableFinishButton()
 void MeasurementTable::disableFinishButton()
 {
     ui->submitButton->setEnabled(false);
+}
+
+void MeasurementTable::hideManualEntry()
+{
+    ui->manualEntryToggle->hide();
+    ui->manualEntryToggle->setEnabled(false);
+}
+
+void MeasurementTable::showManualEntry()
+{
+    ui->manualEntryToggle->hide();
+    ui->manualEntryToggle->setEnabled(false);
 }
 
 void MeasurementTable::addManualMeasurement()
@@ -268,7 +312,6 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
         ui->manualEntryToggle->setText("Save");
         ui->addMeasureButton->setVisible(true);
         ui->measureButton->setVisible(false);
-
 
         int newColumn = ui->measurementTable->columnCount();
         ui->measurementTable->insertColumn(newColumn);

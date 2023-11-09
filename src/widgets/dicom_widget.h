@@ -18,6 +18,7 @@ public:
 
     void setDicomLabels(const QString& aeTitle, const QString& hostname, const QString& port);
 
+    void setReadOnly(bool value);
 signals:
     void portChanged(QString port);
     void aeTitleChanged(QString aeTitle);

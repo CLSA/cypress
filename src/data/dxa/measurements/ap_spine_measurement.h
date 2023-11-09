@@ -26,7 +26,7 @@ public:
 
     // DXAMeasurement interface
 public:
-    DicomFile apSpineFile;
+    DicomFile m_apSpineFile;
 
     Side getSide() override;
     quint8 getScanType() override;
@@ -34,6 +34,12 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+    // DXAMeasurement interface
+public:
+    bool m_hasApSpineFile{false};
+
+    bool hasAllNeededFiles() const override;
 };
 
 #endif // AP_SPINE_MEASUREMENT_H

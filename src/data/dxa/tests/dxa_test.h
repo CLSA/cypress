@@ -22,6 +22,8 @@ public:
     bool isValid() const override;
     void reset() override;
 
+    bool areDicomFilesValid() const;
+
     void fromDicomFiles(QList<DicomFile> files);
 
     void simulate() override;

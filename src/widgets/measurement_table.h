@@ -19,14 +19,14 @@
 
 #include "data/measurement.h"
 #include "data/test_base.h"
+#include "dicom/dcm_recv.h"
 
 namespace Ui {
 class MeasurementTable;
 }
 
-
-#include <QStyledItemDelegate>
 #include <QComboBox>
+#include <QStyledItemDelegate>
 
 class ComboBoxDelegate : public QStyledItemDelegate {
     Q_OBJECT
@@ -85,14 +85,27 @@ class NumberDelegate : public QStyledItemDelegate {
     Q_OBJECT
 
 public:
-    double min, max;
+    double _min, _max;
     bool required;
     bool readOnly;
     bool allowEmpty;
     int decimals;
 
-    NumberDelegate(double min = -10000, double max = 10000, bool required = true, bool readOnly = false, bool allowEmpty = true, int decimals = 2, QObject *parent = nullptr)
-        : QStyledItemDelegate(parent), min(min), max(max), required(required), readOnly(readOnly), allowEmpty(allowEmpty), decimals(decimals) {}
+    NumberDelegate(double min = -10000,
+                   double max = 10000,
+                   bool required = true,
+                   bool readOnly = false,
+                   bool allowEmpty = true,
+                   int decimals = 2,
+                   QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+        , _min(min)
+        , _max(max)
+        , required(required)
+        , readOnly(readOnly)
+        , allowEmpty(allowEmpty)
+        , decimals(decimals)
+    {}
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
         Q_UNUSED(index);
@@ -100,14 +113,14 @@ public:
 
         if (decimals == 0) {  // Integer
             QSpinBox *editor = new QSpinBox(parent);
-            editor->setMinimum(min);
-            editor->setMaximum(max);
+            editor->setMinimum(_min);
+            editor->setMaximum(_max);
             editor->setReadOnly(readOnly);
             return editor;
         } else {  // Float
             QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-            editor->setMinimum(min);
-            editor->setMaximum(max);
+            editor->setMinimum(_min);
+            editor->setMaximum(_max);
             editor->setDecimals(decimals);
             editor->setReadOnly(readOnly);
             return editor;
@@ -230,6 +243,8 @@ public:
     void setColumnDelegate(int col, QItemDelegate* itemDelegate);
     void toggleManualEntry(bool saveChanges);
 
+    void hideManualEntry();
+    void showManualEntry();
 signals:
     void measure();
     void finish();
@@ -241,6 +256,8 @@ public slots:
 
     void addManualMeasurement();
     void removeManualMeasurement();
+
+    void handleDicomFiles(QList<DicomFile> files);
 
 private slots:
     void handleChange(int row, int col);

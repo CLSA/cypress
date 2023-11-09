@@ -107,7 +107,7 @@ void HipMeasurement::simulate()
 
 bool HipMeasurement::isValid() const
 {
-    return false;
+    return m_hasHipFile;
 }
 
 bool HipMeasurement::isValidDicomFile(DicomFile file) const
@@ -237,6 +237,12 @@ bool HipMeasurement::isValidDicomFile(DicomFile file) const
 void HipMeasurement::addDicomFile(DicomFile file)
 {
     qDebug() << "add hip measure";
+
+    m_hipDicomFile = file;
+    m_hipDicomFile.name = "HIP_DICOM";
+    m_hipDicomFile.size = Utilities::bytesToSize(m_hipDicomFile.fileInfo.size());
+
+    m_hasHipFile = true;
 }
 
 Side HipMeasurement::getSide() {
@@ -261,4 +267,9 @@ QString HipMeasurement::getRefType() {
 
 QString HipMeasurement::getRefSource() {
     return "ref";
+}
+
+bool HipMeasurement::hasAllNeededFiles() const
+{
+    return m_hasHipFile;
 }

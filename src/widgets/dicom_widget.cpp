@@ -66,6 +66,12 @@ void DicomWidget::setDicomLabels(const QString& aeTitle, const QString& hostname
     ui->portValue->blockSignals(false);
 }
 
+void DicomWidget::setReadOnly(bool value)
+{
+    ui->aeTitleValue->setReadOnly(value);
+    ui->portValue->setReadOnly(value);
+}
+
 void DicomWidget::on_aeTitleValue_textChanged(const QString &arg1)
 {
     QString upperText = arg1.toUpper();

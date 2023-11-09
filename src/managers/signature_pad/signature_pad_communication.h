@@ -10,7 +10,7 @@
 
 #ifndef SIGLIB_H
 #define SIGLIB_H
-#include "SigLib.h"
+//#include "SigLib.h"
 #endif
 
 class SignaturePadCommunication : public QObject
@@ -32,15 +32,15 @@ signals:
     void signatureReset();
 
 private:
-    Signature* signature;
-    TabletInterface* tablet;
-    LCDInterface* lcd;
+    //Signature* signature;
+    //TabletInterface* tablet;
+    //LCDInterface* lcd;
 
-    LCDGraphicBitmap* please;
-    LCDGraphicBitmap* thanks;
-    LCDGraphicBitmap* sign;
-    LCDGraphicBitmap* clear;
-    LCDGraphicBitmap* ok;
+    //LCDGraphicBitmap* please;
+    //LCDGraphicBitmap* thanks;
+    //LCDGraphicBitmap* sign;
+    //LCDGraphicBitmap* clear;
+    //LCDGraphicBitmap* ok;
 
     void toggleDisplay(bool on);
 
