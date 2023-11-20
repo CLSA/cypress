@@ -25,11 +25,6 @@ CDTTManager::~CDTTManager()
     QSqlDatabase::removeDatabase("xlsx_connection");
 }
 
-bool CDTTManager::isAvailable()
-{
-    return false;
-}
-
 bool CDTTManager::isInstalled()
 {
     return false;
@@ -52,7 +47,7 @@ bool CDTTManager::setUp()
 void CDTTManager::measure()
 {
     m_test->reset();
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
     {
         m_test->simulate({});
 
@@ -85,7 +80,7 @@ void CDTTManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("Measurements saved to Pine");
@@ -215,9 +210,3 @@ bool CDTTManager::cleanUp()
     }
     return true;
 }
-
-void CDTTManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
-}
-

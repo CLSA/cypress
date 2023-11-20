@@ -33,11 +33,11 @@ void ParticipantReportManager::finish()
 
     QDesktopServices::openUrl(outputPath);
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(m_session->getAnswerId());
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString answerUrl = CypressSettings::getAnswerUrl(m_session->getAnswerId());
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
 
-    QByteArray responseData = FileUtils::readFileIntoByteArray(outputPath);
+    QByteArray responseData = FileUtils::readFile(outputPath);
 
     QJsonObject responseJson;
     QJsonObject testJson = {};
@@ -52,7 +52,7 @@ void ParticipantReportManager::finish()
 
     sendHTTPSRequest("PATCH", answerUrl, "application/json", jsonDoc.toJson());
 
-    FileUtils::sendHTTPSRequest("PATCH",
+    sendHTTPSRequest("PATCH",
                                 host + endpoint + m_session->getAnswerId()
                                     + "?filename=participant_report.pdf",
                                 "application/octet-stream",

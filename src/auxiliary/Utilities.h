@@ -49,7 +49,6 @@ public:
 
    static bool openUrl(QUrl url);
    static void showMessageBox(const QString& title, const QString& text);
-   static QString bytesToSize(qint64 size);
 };
 
 /**

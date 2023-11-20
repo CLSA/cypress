@@ -16,6 +16,7 @@
 #include <QStandardItemModel>
 #include <QtMath>
 #include <QJsonDocument>
+#include <QMessageBox>
 
 WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     : SerialPortManager(session)
@@ -24,41 +25,35 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     m_test->setExpectedMeasurementCount(2);
 }
 
-bool WeighScaleManager::isAvailable()
-{
-    return false;
-}
-
 bool WeighScaleManager::isInstalled()
 {
     return false;
 }
 
-bool WeighScaleManager::clearData()
-{
-    m_test->reset();
-    return true;
-}
+
 
 void WeighScaleManager::start()
 {
+    scanDevices();
+
     emit started(m_test.get());
-    emit canMeasure();
+    //emit canMeasure();
 }
 
 void WeighScaleManager::measure()
 {
-    m_test->reset();
-
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
+    {
         m_test->simulate();
 
-    emit measured(m_test.get());
-
-    if (m_test->isValid())
-    {
+        emit measured(m_test.get());
         emit canFinish();
+
+        return;
     }
+
+    m_request = QByteArray("p");
+    writeDevice();
 }
 
 void WeighScaleManager::finish()
@@ -75,7 +70,7 @@ void WeighScaleManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("");
@@ -90,40 +85,27 @@ void WeighScaleManager::connectDevice()
         m_port.close();
     }
 
-    if (!m_port.open(QSerialPort::ReadWrite))
-    {
-        return;
-    }
-
     m_port.setDataBits(QSerialPort::Data8);
     m_port.setParity(QSerialPort::NoParity);
     m_port.setStopBits(QSerialPort::OneStop);
     m_port.setBaudRate(QSerialPort::Baud9600);
 
-    connect(&m_port, &QSerialPort::readyRead, this, &WeighScaleManager::readDevice);
-
-    connect(&m_port, &QSerialPort::errorOccurred, this,[this](QSerialPort::SerialPortError error)
+    if (m_port.open(QSerialPort::ReadWrite))
     {
-        Q_UNUSED(error)
-        qDebug() << "AN ERROR OCCURED: " << m_port.errorString();
-    });
+        qDebug() << "connected";
+        emit deviceConnected();
 
-    connect(&m_port, &QSerialPort::dataTerminalReadyChanged,
-          this,[](bool set){
-      qDebug() << "data terminal ready DTR changed to " << (set?"high":"low");
-    });
-
-    connect(&m_port, &QSerialPort::requestToSendChanged,
-          this,[](bool set){
-      qDebug() << "request to send RTS changed to " << (set?"high":"low");
-    });
-
-    // try and read the scale ID, if we can do that then emit the
-    // canMeasure signal
-    // the canMeasure signal is emitted from readDevice slot on successful read
-    //
-    m_request = QByteArray("i");
-    writeDevice();
+        // try and read the scale ID, if we can do that then emit the
+        // canMeasure signal
+        // the canMeasure signal is emitted from readDevice slot on successful read
+        //
+        m_request = QByteArray("i");
+        writeDevice();
+    }
+    else
+    {
+        qDebug() << "could not open port";
+    }
 }
 
 void WeighScaleManager::zeroDevice()
@@ -162,11 +144,14 @@ void WeighScaleManager::readDevice()
         {
             qDebug() << "test is valid, can save results";
             // emit the can write signal
+            emit measured(m_test.get());
             emit canFinish();
         }
         else
         {
-            qDebug() << "invalid test";
+            QMessageBox::critical(nullptr, "Received invalid data", "Data received was invalid");
+
+            emit canMeasure();
         }
     }
     else if("z" == QString(m_request))
@@ -190,12 +175,6 @@ void WeighScaleManager::writeDevice()
     m_port.write(m_request);
 }
 
-// set input parameters for the test
-void WeighScaleManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
-}
-
 bool WeighScaleManager::setUp()
 {
     return true;
@@ -203,6 +182,12 @@ bool WeighScaleManager::setUp()
 
 bool WeighScaleManager::cleanUp()
 {
+    return clearData();
+}
+
+bool WeighScaleManager::clearData()
+{
+    m_test->reset();
     return true;
 }
 

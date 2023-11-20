@@ -2,11 +2,8 @@
 #define AUDIOMETER_MANAGER_H
 
 #include "managers/serial_port/serial_port_manager.h"
-#include "data/hearing/tests/hearing_test.h"
-
 #include "server/sessions/audiometer_session.h"
 
-#include "cypress_session.h"
 
 /*!
  * \class AudiometerManager
@@ -38,8 +35,8 @@ public:
     static QByteArray END_CODE;
 
     static bool isRS232Port(const QSerialPortInfo& portInfo);
+
     static bool isInstalled();
-    static bool isAvailable();
 
 public slots:
     void start() override;
@@ -71,9 +68,6 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 };
 
 #endif // AUDIOMETER_MANAGER_H

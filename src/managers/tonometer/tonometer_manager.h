@@ -39,9 +39,6 @@ public:
     //
     bool isDefined(const QString&, const TonometerManager::FileType& type = ORAApplication) const;
 
-    static bool isAvailable();
-    static bool isInstalled();
-
 public slots:
 
     // what the manager does in response to the main application
@@ -101,9 +98,6 @@ private:
     bool cleanUp() override;
 
     void configureProcess();
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 };
 
 #endif // TONOMETER_MANAGER_H

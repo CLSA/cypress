@@ -26,7 +26,6 @@
 
 ManagerBase::ManagerBase(QSharedPointer<CypressSession> session)
     : m_session(session)
-    , m_settings(CypressSettings::getInstance())
     , m_inputData(jsonObjectToVariantMap(m_session->getInputData()))
 {
 }
@@ -61,8 +60,8 @@ bool ManagerBase::sendCancellation(QString uuid)
         { "status", "cancelled" }
     };
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getDeviceEndpoint() + uuid;
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getDeviceEndpoint() + uuid;
 
     QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
 
@@ -82,8 +81,8 @@ bool ManagerBase::sendComplete(QString uuid)
 
     QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getDeviceEndpoint() + uuid;
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getDeviceEndpoint() + uuid;
 
     sendHTTPSRequest("PATCH", host + endpoint, "application/json", serializedData);
 
@@ -135,7 +134,7 @@ void ManagerBase::sendHTTPSRequest(const QString& method, const QString& endpoin
 
     Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
 
-    QString credentials = CypressSettings::getInstance().getPineCredentials();
+    QString credentials = CypressSettings::getPineCredentials();
 
     req.setContentType(contentType.toUtf8().toStdString());
     req.setContentLength(data.length());

@@ -78,15 +78,15 @@ void GeneralProxyManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     ////QDesktopServices::openUrl(outputPath);
-    QByteArray responseData = FileUtils::readFileIntoByteArray(outputPath);
+    QByteArray responseData = FileUtils::readFile(outputPath);
     sendHTTPSRequest("PATCH", answerUrl, "application/octet-stream", responseData);
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
 
     sendHTTPSRequest("PATCH",
                      host + endpoint + QString::number(answer_id) + "?filename=general_proxy_consent.pdf",

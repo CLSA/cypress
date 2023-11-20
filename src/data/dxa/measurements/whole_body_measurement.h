@@ -2,7 +2,7 @@
 #define WHOLE_BODY_MEASUREMENT_H
 
 #include "dxa_measurement.h"
-#include "dicom/dcm_recv.h"
+#include "../../../dicom/dcm_recv.h"
 
 class WholeBodyScanMeasurement : public DXAMeasurement
 {

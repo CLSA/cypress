@@ -29,8 +29,6 @@ public:
     explicit DXAManager(QSharedPointer<DXASession> session);
     ~DXAManager();
 
-    //DicomSCP* m_dicomSCP;
-    static bool isAvailable();
     static bool isInstalled();
 
     QJsonObject scanAnalysisJson;
@@ -66,11 +64,11 @@ signals:
     void updateDicomTable(QList<DicomFile> files);
 
 private:
+    QFileInfo m_patscanDb{};
+    QFileInfo m_referenceDb{};
+
     QScopedPointer<DcmRecv> m_dicomServer;
     QScopedPointer<SMBFileCopier> m_networkFileCopier;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 
     // Reset the session
     bool clearData() override;
@@ -80,9 +78,6 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    QFileInfo m_patscanDb{};
-    QFileInfo m_referenceDb{};
 };
 
 #endif // DXA_MANAGER_H

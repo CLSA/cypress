@@ -67,31 +67,6 @@ bool AudiometerManager::isInstalled()
 {
     QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
     if (portList.isEmpty()) {
-      return false;
-    }
-
-    for (const QSerialPortInfo& portInfo : portList) {
-        if (!isRS232Port(portInfo))
-        {
-            continue;
-        }
-
-        QSerialPort serialPort;
-        serialPort.setPort(portInfo);
-
-        if (serialPort.open(QIODevice::ReadWrite)) {
-            serialPort.close();
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool AudiometerManager::isAvailable()
-{
-    QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
-    if (portList.isEmpty()) {
         return false;
     }
 
@@ -132,16 +107,11 @@ bool AudiometerManager::setUp()
     return true;
 }
 
-void AudiometerManager::setInputData(const QVariantMap& inputData)
-{
-    m_inputData = inputData;
-}
-
 void AudiometerManager::measure()
 {
     m_test.reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
     {
         m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
 
@@ -169,7 +139,7 @@ void AudiometerManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("");

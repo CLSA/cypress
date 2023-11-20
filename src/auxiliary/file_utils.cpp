@@ -6,21 +6,9 @@
 
 #include <stdexcept>
 
-#include "Poco/Net/HTTPSClientSession.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/SSLManager.h"
-#include "Poco/Net/SecureStreamSocket.h"
-#include "Poco/Net/AcceptCertificateHandler.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/Path.h"
-#include "Poco/URI.h"
-#include "Poco/Exception.h"
-
-
-QJsonObject FileUtils::readJsonFile(const QString &filePath)
+QJsonObject FileUtils::readJson(const QString &absoluteFilePath)
 {
-    QFile file(filePath);
+    QFile file(absoluteFilePath);
     if (!file.open(QIODevice::ReadOnly))
     {
         switch (file.error()) {
@@ -41,183 +29,125 @@ QJsonObject FileUtils::readJsonFile(const QString &filePath)
     return jsonDoc.object();
 }
 
-void FileUtils::sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data)
-{
-    Q_UNUSED(method)
-
-    Poco::Net::initializeSSL();
-    Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrHandler = new Poco::Net::AcceptCertificateHandler(false);
-    Poco::Net::Context::Ptr ptrContext = new Poco::Net::Context(
-        Poco::Net::Context::CLIENT_USE, "", "", "",
-        Poco::Net::Context::VERIFY_RELAXED, 9, true,
-        "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
-    );
-    Poco::Net::SSLManager::instance().initializeClient(0, ptrHandler, ptrContext);
-
-    const QString& pinePath = QString(endpoint);
-
-    Poco::URI uri(pinePath.toStdString());
-    Poco::Net::HTTPSClientSession session(uri.getHost(), uri.getPort());
-
-    std::string path(uri.getPathAndQuery());
-    if (path.empty()) path = "/";
-
-    Poco::Net::HTTPRequest req(Poco::Net::HTTPRequest::HTTP_PATCH, path, Poco::Net::HTTPMessage::HTTP_1_1);
-
-    req.setContentType(contentType.toUtf8().toStdString());
-    req.setContentLength(data.length());
-    req.setCredentials("Basic", QString("cypress:H9DqvCGjJdJE").toUtf8().toBase64().toStdString());
-
-    std::ostream &os = session.sendRequest(req);
-    os.write(data.constData(), data.size());
-    os.flush();
-
-    Poco::Net::HTTPResponse res;
-
-    std::istream &is = session.receiveResponse(res);
-    std::stringstream ss;
-    Poco::StreamCopier::copyStream(is, ss);
-}
-
-QByteArray FileUtils::readFileIntoByteArray(const QString &filePath)
-{
-    QByteArray fileContent;
-
-    // Open the file with the provided file path
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        // Error opening file
-        qWarning("Cannot open file for reading: %s", qPrintable(file.errorString()));
-        return fileContent;
+bool FileUtils::createFile(const QString& destinationAbsolutePath, const QByteArray& bytes) {
+    QFile file(destinationAbsolutePath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        return false;
     }
-
-    // Read the content of the file
-    fileContent = file.readAll();
-
-    // Close the file
+    file.write(bytes);
     file.close();
-
-    return fileContent;
-}
-
-bool FileUtils::doesExeExist(const QString &absolutePath)
-{
-    if (absolutePath.isEmpty()) return false;
-    if (absolutePath.isNull())  return false;
-
-    QFileInfo info(absolutePath);
-    if (!info.isAbsolute())   return false;
-    if (!info.exists()) 	  return false;
-    if (!info.isExecutable()) return false;
-
     return true;
 }
 
-bool FileUtils::doesFileExist(const QString &absolutePath, const bool checkWritable)
-{
-    if (absolutePath.isEmpty()) return false;
-    if (absolutePath.isNull())  return false;
-
-    QFileInfo info(absolutePath);
-    if (!info.isAbsolute()) return false;
-    if (!info.isFile()) 	return false;
-    if (!info.isReadable()) return false;
-
-    if (checkWritable && !info.isWritable()) return false;
-
-    return true;
+QByteArray FileUtils::readFile(const QString& absoluteFilePath) {
+    QFile file(absoluteFilePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return QByteArray();
+    }
+    QByteArray data = file.readAll();
+    file.close();
+    return data;
 }
 
-bool FileUtils::doesDirExist(const QString &absolutePath, const bool checkWritable)
-{
-    Q_UNUSED(checkWritable)
-    if (absolutePath.isEmpty()) return false;
-    if (absolutePath.isNull())  return false;
-
-    QFileInfo info(absolutePath);
-    if (!info.isAbsolute()) 	return false;
-    if (!info.isDir()) 			return false;
-    if (!info.isWritable())		return false;
-
-    return true;
+bool FileUtils::copyFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath) {
+    return QFile::copy(sourceAbsolutePath, destinationAbsolutePath);
 }
 
-bool FileUtils::backupFile(const QString& fromPath, const QString& toPath)
-{
-    bool fromExists = doesFileExist(fromPath, false);
-    bool toExists = doesDirExist(toPath, true);
-
-    if (!fromExists)
-    {
-
-    }
-
-    if (!toExists)
-    {
-
-    }
-
-    return false;
+bool FileUtils::moveFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath) {
+    return QFile::rename(sourceAbsolutePath, destinationAbsolutePath);
 }
 
-bool FileUtils::restoreBackup(const QString& fromPath, const QString& toPath)
-{
-    bool fromExists = doesFileExist(fromPath, false);
-    bool toExists = doesDirExist(toPath, true);
-
-    if (!fromExists)
-    {
-
-    }
-
-    if (!toExists)
-    {
-
-    }
-
-    return false;
+bool FileUtils::deleteFile(const QString& absoluteFilePath) {
+    return QFile::remove(absoluteFilePath);
 }
 
-bool FileUtils::removeDirectory(const QString& dirPath)
-{
-    bool success { false };
-
-    QDir dir(dirPath);
-    if (dir.exists()) {
-        success = dir.removeRecursively(); // Removes the directory and its contents
-    }
-
-    return success;
+bool FileUtils::doesFileExist(const QString &absoluteFilePath) {
+    return QFileInfo::exists(absoluteFilePath);
 }
 
-bool FileUtils::createDirectory(const QString& dirPath)
-{
-    bool success { false };
+bool FileUtils::isFileReadable(const QString& absoluteFilePath) {
+    QFileInfo fileInfo(absoluteFilePath);
+    return fileInfo.isReadable();
+}
 
+bool FileUtils::isFileWritable(const QString& absoluteFilePath) {
+    QFileInfo fileInfo(absoluteFilePath);
+    return fileInfo.isWritable();
+}
+
+bool FileUtils::isFileExecutable(const QString& absoluteFilePath) {
+    QFileInfo fileInfo(absoluteFilePath);
+    return fileInfo.isExecutable();
+}
+
+bool FileUtils::createDirectory(const QString &absoluteDirectoryPath)
+{
     QDir dir;
-    if (!dir.exists(dirPath))
-    {
-        success = dir.mkpath(dirPath);
-    }
-
-    return success;
+    return dir.mkpath(absoluteDirectoryPath);
 }
 
-
-QByteArray FileUtils::readFileAsBase64(QFile& file)
+bool FileUtils::copyDirectory(const QString &sourceAbsolutePath, const QString &destinationAbsolutePath)
 {
-    bool opened = file.open(QIODevice::ReadOnly);
-    if (!opened)
-    {
-        throw std::exception();
+    QDir sourceDir(sourceAbsolutePath);
+    if (!sourceDir.exists()) {
+        return false;
     }
 
-    QByteArray bytes = file.readAll().toBase64();
+    QDir destinationDir;
+    if (!destinationDir.mkpath(destinationAbsolutePath)) {
+        return false;
+    }
 
-    return bytes;
+    QStringList files = sourceDir.entryList(QDir::Files);
+    foreach (const QString &file, files) {
+        const QString srcName = sourceAbsolutePath + QDir::separator() + file;
+        const QString destName = destinationAbsolutePath + QDir::separator() + file;
+        if (!QFile::copy(srcName, destName)) {
+                return false;
+        }
+    }
+
+    QStringList directories = sourceDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (const QString &dir, directories) {
+        const QString srcName = sourceAbsolutePath + QDir::separator() + dir;
+        const QString destName = destinationAbsolutePath + QDir::separator() + dir;
+        if (!copyDirectory(srcName, destName)) {
+                return false;
+        }
+    }
+
+    return true;
 }
 
+bool FileUtils::moveDirectory(const QString &sourceAbsolutePath, const QString &destinationAbsolutePath)
+{
+    QDir dir;
+    return dir.rename(sourceAbsolutePath, destinationAbsolutePath);
+}
+
+bool FileUtils::removeDirectory(const QString &absoluteDirectoryPath)
+{
+    QDir dir(absoluteDirectoryPath);
+    return dir.removeRecursively();
+}
+
+bool FileUtils::doesDirectoryExist(const QString &absoluteDirectoryPath)
+{
+    QDir dir(absoluteDirectoryPath);
+    return dir.exists();
+}
+
+bool FileUtils::isDirectoryReadable(const QString &absoluteDirectoryPath)
+{
+    QFileInfo dirInfo(absoluteDirectoryPath);
+    return dirInfo.isReadable() && dirInfo.isDir();
+}
+
+bool FileUtils::isDirectoryWritable(const QString &absoluteDirectoryPath)
+{
+    QFileInfo dirInfo(absoluteDirectoryPath);
+    return dirInfo.isWritable() && dirInfo.isDir();
+}
 
 QString FileUtils::generateHash(const QByteArray& bytes)
 {
@@ -225,18 +155,18 @@ QString FileUtils::generateHash(const QByteArray& bytes)
     return hash;
 }
 
-QString FileUtils::copyFile(const QString &src, const QString &dest)
-{
-    QFile file(src);
-    if (file.exists()) {
-        if (file.copy(dest)) {
-                qDebug() << "File copied successfully!";
-        } else {
-                qDebug() << "Failed to copy file. Error:" << file.errorString();
-        }
-    } else {
-        qDebug() << "File does not exist!";
+QString FileUtils::getHumanReadableFileSize(const QString& absoluteFilePath) {
+    QFileInfo fileInfo(absoluteFilePath);
+    if (!fileInfo.exists())
+        return "";
+
+    double size = fileInfo.size();
+    QStringList units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
+    int i;
+
+    for (i = 0; i < units.size() && size >= 1024; i++) {
+        size /= 1024.0;
     }
 
-    return QFileInfo(file).absoluteFilePath();
+    return QString::number(size, 'f', 2) + " " + units[i];
 }

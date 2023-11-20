@@ -1,3 +1,4 @@
+#include "server/Server.h"
 #include "cypress_application.h"
 
 #include <QDir>
@@ -9,11 +10,6 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include <QSettings>
-
-#include "auxiliary/Constants.h"
-#include "server/Server.h"
-
-#include "server/sessions/frax_session.h"
 
 Cypress* Cypress::app = nullptr;
 Cypress& Cypress::getInstance()
@@ -31,18 +27,10 @@ Cypress::Cypress(QObject *parent) :
     QObject(parent),
     httpServer(new Server)
 {
-    try {
-        connect(httpServer.get(), &Server::startSession, this,  &Cypress::requestSession);
-        //connect(httpServer.get(), &Server::startReport,  this,  &Cypress::startValidatedReportSession);
+    connect(httpServer.get(), &Server::startSession, this,  &Cypress::requestSession);
+    connect(httpServer.get(), &Server::endSession,   this,  &Cypress::forceSessionEnd);
 
-        connect(httpServer.get(), &Server::endSession,   this,  &Cypress::forceSessionEnd);
-
-        httpServer->start();
-    }
-    catch (QException& exception)
-    {
-        qCritical() << exception.what();
-    }
+    httpServer->start();
 }
 
 

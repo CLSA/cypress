@@ -23,11 +23,6 @@ ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSessio
     m_test.reset(new ChoiceReactionTest);
 }
 
-bool ChoiceReactionManager::isAvailable()
-{
-    return false;
-}
-
 bool ChoiceReactionManager::isInstalled()
 {
     return false;
@@ -173,7 +168,7 @@ void ChoiceReactionManager::measure()
 {
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
     {
         m_test->simulate();
         emit measured(m_test.get());
@@ -196,7 +191,7 @@ void ChoiceReactionManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("Measurements saved to Pine");
@@ -233,9 +228,4 @@ bool ChoiceReactionManager::cleanUp()
     m_outputFile.clear();
 
     return true;
-}
-
-void ChoiceReactionManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
 }

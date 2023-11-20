@@ -6,7 +6,19 @@ SerialPortWidget::SerialPortWidget(QWidget *parent) :
     ui(new Ui::SerialPortWidget)
 {
     ui->setupUi(this);
+
+    ui->deviceComboBox->setEnabled(false);
+    ui->connectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(false);
+
     connect(ui->deviceComboBox, &QComboBox::currentTextChanged, this, &SerialPortWidget::comboBoxChanged);
+    connect(ui->connectButton, &QPushButton::pressed, this, [this]() {
+        emit connectDevice();
+    });
+
+    connect(ui->disconnectButton, &QPushButton::pressed, this, [this]() {
+        emit disconnectDevice();
+    });
 }
 
 SerialPortWidget::~SerialPortWidget()
@@ -14,15 +26,71 @@ SerialPortWidget::~SerialPortWidget()
     delete ui;
 }
 
-void SerialPortWidget::devicesDiscovered(QMap<QString, QSerialPortInfo> devices)
+void SerialPortWidget::scanningForDevices()
 {
     clear();
+
+    ui->deviceComboBox->setEnabled(false);
+    ui->connectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(false);
+}
+
+void SerialPortWidget::devicesCanBeSelected()
+{
+    ui->deviceComboBox->setEnabled(true);
+    ui->connectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(false);
+}
+
+void SerialPortWidget::defaultDeviceSelected(const QSerialPortInfo &portInfo)
+{
+    comboBoxChanged(portInfo.portName());
+}
+
+void SerialPortWidget::deviceConnected()
+{
+    ui->connectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(true);
+    ui->deviceComboBox->setEnabled(false);
+}
+
+void SerialPortWidget::deviceDisconnected()
+{
+    ui->connectButton->setEnabled(true);
+    ui->disconnectButton->setEnabled(false);
+    ui->deviceComboBox->setEnabled(true);
+}
+
+void SerialPortWidget::devicesDiscovered(const QMap<QString, QSerialPortInfo> &devices)
+{
+    clear();
+    ui->deviceComboBox->blockSignals(true);
 
     for (const auto& device : devices)
     {
         QString label = device.portName();
         ui->deviceComboBox->addItem(label);
     }
+
+    ui->deviceComboBox->blockSignals(false);
+
+    ui->deviceComboBox->setEnabled(true);
+
+    m_serialPorts = devices;
+}
+
+void SerialPortWidget::canConnectDevice()
+{
+    ui->connectButton->setEnabled(true);
+    ui->disconnectButton->setEnabled(false);
+    ui->deviceComboBox->setEnabled(true);
+}
+
+void SerialPortWidget::canDisconnectDevice()
+{
+    ui->connectButton->setEnabled(false);
+    ui->disconnectButton->setEnabled(false);
+    ui->deviceComboBox->setEnabled(false);
 }
 
 void SerialPortWidget::clear()
@@ -30,7 +98,22 @@ void SerialPortWidget::clear()
     ui->deviceComboBox->clear();
 }
 
-void SerialPortWidget::comboBoxChanged(QString portNumber)
+void SerialPortWidget::comboBoxChanged(const QString& portName)
 {
-    emit deviceSelected(portNumber);
+    ui->deviceComboBox->blockSignals(true);
+    foreach (auto device, m_serialPorts)
+    {
+        if (device.portName() == portName)
+        {
+            ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(portName));
+
+            ui->connectButton->setEnabled(false);
+            ui->disconnectButton->setEnabled(false);
+
+            emit deviceSelected(device);
+
+            break;
+        }
+    }
+    ui->deviceComboBox->blockSignals(false);
 }

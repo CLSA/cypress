@@ -32,7 +32,6 @@ public:
     ~DxaHipManager();
 
     //DicomSCP* m_dicomSCP;
-    static bool isAvailable();
     static bool isInstalled();
 
     QJsonObject scanAnalysisJson;
@@ -71,9 +70,6 @@ private:
     QFileInfo m_refDbFileInfo;
 
     bool validateDicomFile(DcmFileFormat &loadedFileFormat);
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 
     // Reset the session
     bool clearData() override;

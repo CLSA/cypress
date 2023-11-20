@@ -51,11 +51,6 @@ bool GripStrengthManager::isInstalled()
     return false;
 }
 
-bool GripStrengthManager::isAvailable()
-{
-    return false;
-}
-
 void GripStrengthManager::start()
 {
     emit started(m_test.get());
@@ -66,11 +61,12 @@ void GripStrengthManager::measure()
 {
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
+    {
         m_test->simulate();
-
-    emit measured(m_test.get());
-    emit canFinish();
+        emit measured(m_test.get());
+        emit canFinish();
+    }
 }
 
 void GripStrengthManager::finish()
@@ -87,7 +83,7 @@ void GripStrengthManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("Measurements sent to Pine");
@@ -159,12 +155,6 @@ bool GripStrengthManager::cleanUp() {
     //}
 
     return true;
-}
-
-void GripStrengthManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData);
-   //m_inputData = inputData;
 }
 
 bool GripStrengthManager::clearData()

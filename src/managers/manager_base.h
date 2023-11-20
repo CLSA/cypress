@@ -72,6 +72,8 @@ signals:
     //
     void canMeasure();
 
+    void cannotMeasure();
+
     // measurements read, stored in the test
     void measured(TestBase *test);
 
@@ -89,8 +91,6 @@ signals:
 protected:
     QSharedPointer<CypressSession> m_session;
 
-    const CypressSettings &m_settings;
-
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
 
@@ -100,14 +100,6 @@ protected:
 
     QVariant getInputDataValue(const QString &);
     QVariantMap jsonObjectToVariantMap(const QJsonObject& jsonObject);
-
-    // Context dependent clear test data and possibly device data (eg., serial port info)
-    // SerialPortManager class clears device data during setDevice() while
-    // test data is cleared depending on derived class implementation requirements.
-    // Derived classes may also clear test data depending on the nature of the test,
-    // such as when multiple measurements are separately acquired.
-    //
-    virtual void setInputData(const QVariantMap&) = 0;
 
     // Set up device
     virtual bool setUp() = 0;

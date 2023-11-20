@@ -4,6 +4,7 @@
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
+#include "../../../auxiliary/file_utils.h"
 #include "../../../auxiliary/Utilities.h"
 
 #include <QJsonObject>
@@ -240,7 +241,7 @@ void HipMeasurement::addDicomFile(DicomFile file)
 
     m_hipDicomFile = file;
     m_hipDicomFile.name = "HIP_DICOM";
-    m_hipDicomFile.size = Utilities::bytesToSize(m_hipDicomFile.fileInfo.size());
+    m_hipDicomFile.size = FileUtils::getHumanReadableFileSize(m_hipDicomFile.fileInfo.absoluteFilePath());
 
     m_hasHipFile = true;
 }

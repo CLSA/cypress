@@ -22,29 +22,15 @@ CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData):
 void CypressSession::validate() const
 {
     if (m_inputData.isEmpty())
-    {
         throw ValidationError("empty");
-    }
-
     if (!isValidString("barcode"))
-    {
         throw ValidationError("barcode");
-    }
-
     if (!isValidInteger("answer_id"))
-    {
         throw ValidationError("answer_id");
-    }
-
     if (!isValidString("language"))
-    {
         throw ValidationError("language");
-    }
-
     if (!isValidString("interviewer"))
-    {
         throw ValidationError("interviewer");
-    }
 }
 
 void CypressSession::start()
@@ -58,7 +44,8 @@ void CypressSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
+    if (CypressSettings::isDebugMode())
+        qDebug() << "start session" << getSessionId() << m_startDateTime;
 }
 
 void CypressSession::end()
@@ -69,7 +56,8 @@ void CypressSession::end()
     m_status = SessionStatus::Ended;
     m_endDateTime = QDateTime::currentDateTimeUtc();
 
-    qDebug() << "end session" << getSessionId() << m_endDateTime;
+    if (CypressSettings::isDebugMode())
+        qDebug() << "end session" << getSessionId() << m_endDateTime;
 }
 
 

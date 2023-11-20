@@ -1,5 +1,5 @@
 #include "ap_spine_measurement.h"
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
@@ -294,7 +294,7 @@ void ApSpineMeasurement::addDicomFile(DicomFile file)
 {
     m_apSpineFile = file;
     m_apSpineFile.name = "SP_DICOM_1";
-    m_apSpineFile.size = Utilities::bytesToSize(m_apSpineFile.fileInfo.size());
+    m_apSpineFile.size = FileUtils::getHumanReadableFileSize(m_apSpineFile.fileInfo.absoluteFilePath());
 
     m_hasApSpineFile = true;
 }

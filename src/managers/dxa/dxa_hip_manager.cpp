@@ -1,7 +1,5 @@
-#include "cypress_application.h"
 #include "cypress_session.h"
 
-#include "../../auxiliary/Utilities.h"
 #include "../../auxiliary/file_utils.h"
 
 #include "data/dxa/tests/dxa_hip_test.h"
@@ -24,14 +22,14 @@ DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session) /* : m_dicom
     QDir workingDir = QDir::current();
     QString workingDirPath = workingDir.absolutePath() + "/";
 
-    const QString executablePath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/executable").toString();
-    const QString aeTitle = CypressSettings::getInstance().readSetting("dxa/dicom/aeTitle").toString();
-    const QString host = CypressSettings::getInstance().readSetting("dxa/dicom/host").toString();
-    const QString port = CypressSettings::getInstance().readSetting("dxa/dicom/port").toString();
+    const QString executablePath = workingDirPath + CypressSettings::readSetting("dxa/dicom/executable").toString();
+    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
 
-    const QString storageDirPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/storagePath").toString();
-    const QString logConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/log_config").toString();
-    const QString ascConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/asc_config").toString();
+    const QString storageDirPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    const QString logConfigPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    const QString ascConfigPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
     m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
     connect(m_dicomServer.get(), &DcmRecv::dicomFilesReceived, this, &DxaHipManager::dicomFilesReceived);
@@ -51,15 +49,6 @@ void DxaHipManager::databaseCopied(QFileInfo fileInfo)
     // Get name of files
     QString patscanDbFileName = "";
     QString refDbFileName = "";
-
-
-
-}
-
-
-bool DxaHipManager::isAvailable()
-{
-    return true;
 }
 
 bool DxaHipManager::isInstalled()
@@ -82,7 +71,7 @@ void DxaHipManager::measure()
 {
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
     {
         m_test->simulate();
 
@@ -93,8 +82,8 @@ void DxaHipManager::measure()
     }
 
     // copy over patscan and refscan db
-    m_networkFileCopier->copyFileFromSMB(QUrl(), "");
-    m_networkFileCopier->copyFileFromSMB(QUrl(), "");
+    // m_networkFileCopier->copyFileFromSMB(QUrl(), "");
+    // m_networkFileCopier->copyFileFromSMB(QUrl(), "");
 
     // pass dicom files to test class
     if (m_test->isValid())
@@ -117,15 +106,13 @@ void DxaHipManager::finish()
 
     // Hip
     QString hip_1_file_name = "HIP_DICOM.dcm";
-    QByteArray hip_1 = FileUtils::readFileIntoByteArray("C:/Users/Anthony/Downloads/DEXA_SIM/HIP/HIP_DICOM.dcm");
-    int hip_1_size = hip_1.size();
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
 
     QJsonObject files = {};
-    files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""), Utilities::bytesToSize(hip_1_size));
+    files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""), FileUtils::getHumanReadableFileSize("C:/Users/Anthony/Downloads/DEXA_SIM/HIP/HIP_DICOM.dcm"));
 
     testJson.insert("session", sessionObj);
     testJson.insert("files", files);
@@ -137,18 +124,19 @@ void DxaHipManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
 
     sendHTTPSRequest("PATCH",
                      host + endpoint + QString::number(answer_id),
                      "application/json",
                      serializedData);
 
+    QByteArray hipDicomFile = FileUtils::readFile("C:/Users/Anthony/Downloads/DEXA_SIM/HIP/HIP_DICOM.dcm");
     sendHTTPSRequest("PATCH",
                      host + endpoint + QString::number(answer_id) + "?filename=" + hip_1_file_name + ".dcm",
                      "application/octet-stream",
-                     hip_1);
+                     hipDicomFile);
 
     emit success("");
 }
@@ -267,9 +255,4 @@ bool DxaHipManager::cleanUp()
 bool DxaHipManager::clearData()
 {
     return true;
-}
-
-void DxaHipManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
 }

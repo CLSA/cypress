@@ -7,17 +7,7 @@
 SerialPortManager::SerialPortManager(QSharedPointer<CypressSession> session)
     : ManagerBase(session)
 {
-    connect(&m_port, &QSerialPort::readyRead,
-            this,    &SerialPortManager::readDevice);
 
-    connect(&m_port, &QSerialPort::errorOccurred,
-            this,    &SerialPortManager::handleSerialPortError);
-
-    connect(&m_port, &QSerialPort::dataTerminalReadyChanged,
-            this,    &SerialPortManager::handleDataTerminalReadyChanged);
-
-    connect(&m_port, &QSerialPort::requestToSendChanged,
-            this,    &SerialPortManager::handleRequestToSendChanged);
 }
 
 void SerialPortManager::start()
@@ -29,12 +19,12 @@ void SerialPortManager::start()
 
 void SerialPortManager::handleSerialPortError(QSerialPort::SerialPortError error)
 {
+    qCritical() << "ERROR: serial port " << m_port.errorString();
+
     if(error == QSerialPort::NoError)
     {
         return;
     }
-
-    qCritical() << "ERROR: serial port " << m_port.errorString();
 }
 
 void SerialPortManager::handleDataTerminalReadyChanged(bool set)
@@ -105,77 +95,60 @@ bool SerialPortManager::scanDevices()
 
     foreach(const auto info, QSerialPortInfo::availablePorts())
     {
-        const QJsonObject deviceData = getDeviceData(info);
-        if (!deviceData.contains("port_number"))
-            continue;
-
-        const QString portNumber = deviceData["port_number"].toString();
-        if (!m_deviceList.contains(portNumber))
-        {
-            m_deviceList.insert(portNumber, info);
-            //emit deviceDiscovered(portNumber);
-        }
+        m_deviceList.insert(info.portName(), info);
     }
 
-    qInfo() << "found" << QString::number(m_deviceList.count()) << " serial ports";
-
+    qDebug() << m_deviceList.keys();
     emit devicesDiscovered(m_deviceList);
 
     // if we have a port from the ini file, check if it is still available on the system
     //
-    //bool found = false;
-    //QSerialPortInfo info;
-    //QString label;
-    //if(!m_deviceName.isEmpty())
-    //{
-    //    QMap<QString,QSerialPortInfo>::const_iterator it = m_deviceList.constBegin();
-    //    while(it != m_deviceList.constEnd() && !found)
-    //    {
-    //      label = it.key();
-    //      found = label == m_deviceName;
-    //      if(found) info = it.value();
-    //      ++it;
-    //    }
-    //}
-    //if(found)
-    //{
-    //    qInfo() << "found port device" << m_deviceName;
+    bool found = false;
+    QSerialPortInfo info;
+    QString label;
 
-    //  qDebug() << "signal deviceSelected";
-    //  emit deviceSelected(label);
-    //  setDevice(info);
-    //}
-    //else
-    //{
-    //  // select a serial port from the list of scanned ports
-    //  //
-    //  qDebug() << "signal canSelectDevice";
-    //  emit canSelectDevice();
-    //}
+    if(!m_deviceName.isEmpty())
+    {
+        QMap<QString,QSerialPortInfo>::const_iterator it = m_deviceList.constBegin();
+        while(it != m_deviceList.constEnd() && !found)
+        {
+          label = it.key();
+          found = label == m_deviceName;
+          if(found) info = it.value();
+          ++it;
+        }
+    }
+    if(found)
+    {
+        qInfo() << "Found port device: " << m_deviceName;
+        emit deviceSelected(label);
+      //setDevice(info);
+    }
+    else
+    {
+      // select a serial port from the list of scanned ports
+      //
+      emit canSelectDevice();
+    }
 
     return true;
 }
 
-void SerialPortManager::selectDevice(const QString &label)
+void SerialPortManager::selectDevice(const QSerialPortInfo &port)
 {
-    qDebug() << "SerialPortManager::selectDevice - " << label;
-    if(m_deviceList.contains(label))
-    {
-      QSerialPortInfo info = m_deviceList.value(label);
-      setProperty("deviceName",info.portName());
-      setDevice(info);
-      qDebug() << "SerialPortManager:: port selected " <<  label;
-    }
+    qDebug() << "SerialPortManager::selectDevice: " << port.portName();
+
+    setProperty("deviceName", port.portName());
+    setDevice(port);
 }
 
 void SerialPortManager::setDevice(const QSerialPortInfo &info)
 {
-    qDebug() << "SerialPortManager::setDevice";
     m_port.setPort(info);
     if(m_port.open(QSerialPort::ReadWrite))
     {
-      emit canConnectDevice();
-      m_port.close();
+        emit canConnectDevice();
+        m_port.close();
     }
 }
 
@@ -183,18 +156,33 @@ void SerialPortManager::connectDevice()
 {
     qDebug() << "SerialPortManager::connectDevice";
     if(m_port.isOpen())
+    {
+        qDebug() << "closing port";
         m_port.close();
+    }
+
+    connect(&m_port, &QSerialPort::readyRead,
+            this,    &SerialPortManager::readDevice);
+
+    connect(&m_port, &QSerialPort::errorOccurred,
+            this,    &SerialPortManager::handleSerialPortError);
+
+    connect(&m_port, &QSerialPort::dataTerminalReadyChanged,
+            this,    &SerialPortManager::handleDataTerminalReadyChanged);
+
+    connect(&m_port, &QSerialPort::requestToSendChanged,
+            this,    &SerialPortManager::handleRequestToSendChanged);
 
     if(m_port.open(QSerialPort::ReadWrite))
     {
-      m_port.setDataBits(QSerialPort::Data8);
-      m_port.setParity(QSerialPort::NoParity);
-      m_port.setStopBits(QSerialPort::OneStop);
-      m_port.setBaudRate(QSerialPort::Baud9600);
+        m_port.setDataBits(QSerialPort::Data8);
+        m_port.setParity(QSerialPort::NoParity);
+        m_port.setStopBits(QSerialPort::OneStop);
+        m_port.setBaudRate(QSerialPort::Baud9600);
 
-      // signal the GUI that the measure button can be clicked
-      //
-      emit canMeasure();
+        // signal the GUI that the measure button can be clicked
+        //
+        emit canMeasure();
     }
 }
 
@@ -202,17 +190,26 @@ void SerialPortManager::disconnectDevice()
 {
     qDebug() << "SerialPortManager::disconnectDevice";
     if(m_port.isOpen())
+    {
+        qDebug() << "closing port";
         m_port.close();
+    }
 
+    disconnect(&m_port, &QSerialPort::readyRead,
+            this,    &SerialPortManager::readDevice);
+
+    disconnect(&m_port, &QSerialPort::errorOccurred,
+            this,    &SerialPortManager::handleSerialPortError);
+
+    disconnect(&m_port, &QSerialPort::dataTerminalReadyChanged,
+            this,    &SerialPortManager::handleDataTerminalReadyChanged);
+
+    disconnect(&m_port, &QSerialPort::requestToSendChanged,
+            this,    &SerialPortManager::handleRequestToSendChanged);
+
+    emit cannotMeasure();
     emit canConnectDevice();
 }
-
-// set input parameters for the test
-void SerialPortManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
-}
-
 
 bool SerialPortManager::setUp()
 {

@@ -32,7 +32,6 @@ class ECGManager : public ManagerBase
 public:
     explicit ECGManager(QSharedPointer<ECGSession> session);
 
-    static bool isAvailable();
     static bool isInstalled();
 
 public slots:
@@ -54,6 +53,31 @@ public slots:
     void readOutput();
 
 private:
+    bool isDefined(const QString&, const FileType& type = ECGApplication) const;
+
+    // full pathspec to Cardiosoft Cardio.exe
+    //
+    QString m_runnableName;
+
+    // path to backup db files
+    // C:/CARDIO
+    //
+    QString m_workingPath;
+
+    // C:/CARDIO/Export
+    //
+    QString m_exportPath;
+
+    // full pathspec to exported xml file
+    //
+    QString m_outputFile;
+
+    // path for Cardiosoft database backup to and restore from
+    //
+    const QString INIT_PATH = "initecg";
+    const QString DATABASE_PATH = "DATABASE";
+
+
     QProcess m_process;
 
     // Reset the session
@@ -64,9 +88,6 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 
     bool deleteDeviceData();
 

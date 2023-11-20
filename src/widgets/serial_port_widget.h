@@ -18,17 +18,35 @@ public:
     ~SerialPortWidget();
 
 signals:
-    void deviceSelected(const QString& portNumber);
+    void deviceSelected(const QSerialPortInfo& portInfo);
+
+    void connectDevice();
+    void disconnectDevice();
 
 public slots:
-    void devicesDiscovered(QMap<QString, QSerialPortInfo> devices);
+    void scanningForDevices();
+    void devicesDiscovered(const QMap<QString, QSerialPortInfo> &devices);
+
+    void devicesCanBeSelected();
+    void canConnectDevice();
+    void canDisconnectDevice();
+
+    void defaultDeviceSelected(const QSerialPortInfo& portInfo);
+
+    void deviceConnected();
+    void deviceDisconnected();
+
+
+
     void clear();
 
 private slots:
-    void comboBoxChanged(QString portNumber);
+    void comboBoxChanged(const QString& portName);
 
 private:
     Ui::SerialPortWidget *ui;
+
+    QMap<QString, QSerialPortInfo> m_serialPorts;
 };
 
 #endif // SERIAL_PORT_WIDGET_H

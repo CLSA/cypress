@@ -12,7 +12,7 @@
 #include "widgets/device_settings/frax_settings_widget.h"
 #include "widgets/device_settings/grip_strength_settings_widget.h"
 #include "widgets/device_settings/retinal_camera_settings_widget.h"
-#include "widgets/device_settings/signature_pad_settings_widget.h"
+//#include "widgets/device_settings/signature_pad_settings_widget.h"
 #include "widgets/device_settings/spirometer_settings_widget.h"
 #include "widgets/device_settings/tonometer_settings_widget.h"
 #include "widgets/device_settings/weight_scale_settings_widget.h"
@@ -76,10 +76,10 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         this->setCentralWidget(retinalCameraSettings);
     });
 
-    connect(ui->actionSignature, &QAction::triggered, this, [=] {
-        SignaturePadSettingsWidget*  signaturePadSettings = new SignaturePadSettingsWidget;
-        this->setCentralWidget(signaturePadSettings);
-    });
+    //connect(ui->actionSignature, &QAction::triggered, this, [=] {
+    //    SignaturePadSettingsWidget*  signaturePadSettings = new SignaturePadSettingsWidget;
+    //    this->setCentralWidget(signaturePadSettings);
+    //});
 
     connect(ui->actionSpirometer, &QAction::triggered, this, [=] {
         SpirometerSettingsWidget* spirometerSettings = new SpirometerSettingsWidget;

@@ -38,17 +38,7 @@ public:
     QString getSessionInfo();
     QJsonObject getStatus();
 
-
     bool endSession(const QString& uuid);
-
-    void enableSimMode() { m_simulate = true; };
-    void disableSimMode() { m_simulate = false; };
-    bool isSimulation() { return m_simulate; };
-
-    void enableVerbose() { m_verbose = true; };
-    void disableVerbose() { m_verbose = false; };
-    bool isVerbose() { return m_verbose; };
-
     void printActiveSessions() const;
 
 public slots:
@@ -62,9 +52,6 @@ private:
     static Cypress* app;
 
     void initialize();
-
-    bool m_simulate { true };
-    bool m_verbose { false };
 };
 
 

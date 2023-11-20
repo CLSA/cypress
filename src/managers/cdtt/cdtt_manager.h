@@ -31,7 +31,6 @@ public:
     explicit CDTTManager(QSharedPointer<CDTTSession> session);
     ~CDTTManager();
 
-    static bool isAvailable();
     static bool isInstalled();
 
 public slots:
@@ -57,9 +56,6 @@ private:
 
     // Reset the session
     bool clearData() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 
     // Set up device
     bool setUp() override;

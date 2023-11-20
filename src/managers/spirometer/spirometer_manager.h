@@ -20,7 +20,6 @@ public:
     ~SpirometerManager() = default;
 
     static bool isInstalled();
-    static bool isAvailable();
 
     bool isDefined(const QString&, const SpirometerManager::FileType&) const;
 
@@ -40,50 +39,16 @@ public slots:
     //
     void finish() override;
 
-    void select();
-
-    // set the executable full path and name
-    // calls isDefined to validate the passed arg
-    //
-    void selectRunnable(const QString&);
-
-    // set the emr transfer directory full path and name
-    // check if the passed in dir is a directory,
-    // but does not have any way of knowing if the directory is correct or not
-    //
-    void selectDataPath(const QString&);
 
     void readOutput();
 
-signals:
-
-    // a valid runnable was selected
-    // manager attempts to configure the process and may emit canMeasure on success
-    //
-    void runnableSelected();
-
-    // no runnable available or the selected runnable is invalid
-    // signal can be connected to a ui slot to launch a File select dialog
-    //
-    void canSelectRunnable();
-
-    // no valid EMR data transfer directory available
-    // signal can be connected to a ui slot to launch a directory select dialog
-    //
-    void canSelectDataPath();
-
-    // a valid data path was selected
-    // manager attempts to configure the process and may emit canMeasure on success
-    //
-    void dataPathSelected();
-
 private:
-    QString m_runnableName;// full pathspec to EasyWarePro.exe
+    QString m_runnableName; // full pathspec to EasyWarePro.exe
     QString m_runnablePath; // path to EasyWarePro.exe directory
-    QString m_dataPath; // Path to the EMR plugin data transfer directory
+    QString m_dataPath;     // Path to the EMR plugin data transfer directory
 
-    QString getEMRInXmlName() const { return QString("%1/%2").arg(m_dataPath,"CypressIn.xml"); }
-    QString getEMROutXmlName() const { return QString("%1/%2").arg(m_dataPath,"CypressOut.xml"); }
+    QString getEMRInXmlName() const { return QString("%1/%2").arg(m_dataPath,"OnyxIn.xml"); }
+    QString getEMROutXmlName() const { return QString("%1/%2").arg(m_dataPath,"OnyxOut.xml"); }
     QString getEWPDbName() const { return QString("%1/%2").arg(m_dataPath,"EasyWarePro.mdb"); }
     QString getEWPDbCopyName() const { return QString("%1/%2").arg(m_dataPath,"EasyWareProCopy.mdb"); }
     QString getEWPOptionsDbName() const { return QString("%1/%2").arg(m_dataPath,"EwpOptions.mdb"); }
@@ -115,11 +80,6 @@ private:
 
     QString getOutputPdfPath() const;
     bool outputPdfExists() const;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
-
-
 };
 
 #endif // SPIROMETER_MANAGER_H

@@ -15,12 +15,12 @@ CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations
 QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
-INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
-LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
+INCLUDEPATH += $$PWD/../dep/QtUsb-win32/include
+LIBS += -L$$PWD/../dep/QtUsb-win32/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
-LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/OpenSSL-Win32/include"
+LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
@@ -34,9 +34,9 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/include/
+INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32/lib/
+LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 # INCLUDEPATH += $$PWD/../dep/SigLib/Include/
@@ -91,6 +91,7 @@ FORMS += \
     widgets/settings_dialog.ui \
     widgets/submission_buttons.ui \
   widgets/test_info_widget.ui \
+    widgets/usb_port_picker.ui
 
 RESOURCES += \
     resources.qrc
@@ -112,6 +113,7 @@ HEADERS += \
     auxiliary/crc8.h \
     auxiliary/constants.h \
     auxiliary/file_utils.h \
+    auxiliary/network_utils.h \
     auxiliary/pdf_form_filler.h \
     auxiliary/utilities.h \
     auxiliary/command_line_parser.h \
@@ -194,6 +196,7 @@ HEADERS += \
     managers/blood_pressure/bpm_communication.h \
     managers/blood_pressure/bpm_message.h \
     #managers/bluetooth/bluetooth_le_manager.h \
+    managers/blood_pressure/bptru_200_driver.h \
     managers/body_composition/body_composition_manager.h \
     managers/cdtt/cdtt_manager.h \
     managers/choice_reaction/choice_reaction_manager.h \
@@ -211,8 +214,6 @@ HEADERS += \
     managers/participant_report/participant_report_manager.h \
     managers/retinal_camera/retinal_camera_manager.h \
     managers/serial_port/serial_port_manager.h \
-    managers/session_manager.h \
-    managers/settings_manager.h \
     #managers/signature_pad/signature_pad_communication.h \
     #managers/signature_pad/signature_pad_manager.h \
     managers/spirometer/spirometer_manager.h \
@@ -303,12 +304,14 @@ HEADERS += \
     widgets/serial_port_widget.h \
     widgets/settings_dialog.h \
     widgets/submission_buttons.h \
-    widgets/test_info_widget.h
+    widgets/test_info_widget.h \
+    widgets/usb_port_picker.h
 
 SOURCES += \
     #auxiliary/bluetooth_util.cpp \
     auxiliary/crc8.cpp \
     auxiliary/constants.cpp \
+    auxiliary/network_utils.cpp \
     auxiliary/pdf_form_filler.cpp \
     auxiliary/utilities.cpp \
     auxiliary/command_line_parser.cpp \
@@ -393,6 +396,7 @@ SOURCES += \
     managers/blood_pressure/bpm_communication.cpp \
     managers/blood_pressure/bpm_message.cpp \
     #managers/bluetooth/bluetooth_le_manager.cpp \
+    managers/blood_pressure/bptru_200_driver.cpp \
     managers/body_composition/body_composition_manager.cpp \
     managers/cdtt/cdtt_manager.cpp \
     managers/choice_reaction/choice_reaction_manager.cpp \
@@ -410,8 +414,6 @@ SOURCES += \
     managers/participant_report/participant_report_manager.cpp \
     managers/retinal_camera/retinal_camera_manager.cpp \
     managers/serial_port/serial_port_manager.cpp \
-    managers/session_manager.cpp \
-    managers/settings_manager.cpp \
     #managers/signature_pad/signature_pad_communication.cpp \
     #managers/signature_pad/signature_pad_manager.cpp \
     managers/spirometer/spirometer_manager.cpp \
@@ -502,4 +504,5 @@ SOURCES += \
     widgets/serial_port_widget.cpp \
     widgets/settings_dialog.cpp \
     widgets/submission_buttons.cpp \
-    widgets/test_info_widget.cpp
+    widgets/test_info_widget.cpp \
+    widgets/usb_port_picker.cpp

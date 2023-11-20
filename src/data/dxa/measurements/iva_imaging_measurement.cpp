@@ -1,6 +1,5 @@
-
 #include "iva_imaging_measurement.h"
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -62,7 +61,7 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding IVA measure";
         m_dicomMeasureFile = file;
         m_dicomMeasureFile.name = "SEL_DICOM_MEASURE";
-        m_dicomMeasureFile.size = Utilities::bytesToSize(m_dicomMeasureFile.fileInfo.size());
+        m_dicomMeasureFile.size = FileUtils::getHumanReadableFileSize(m_dicomMeasureFile.fileInfo.absoluteFilePath());
 
         hasMeasureFile = true;
     }
@@ -71,7 +70,7 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding IVA PR";
         m_dicomPrFile = file;
         m_dicomPrFile.name = "SEL_DICOM_PR";
-        m_dicomPrFile.size = Utilities::bytesToSize(m_dicomPrFile.fileInfo.size());
+        m_dicomPrFile.size = FileUtils::getHumanReadableFileSize(m_dicomPrFile.fileInfo.absoluteFilePath());
 
         hasPrFile = true;
     }
@@ -80,7 +79,7 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding IVA OT";
         m_dicomOtFile = file;
         m_dicomOtFile.name = "SEL_DICOM_OT";
-        m_dicomOtFile.size = Utilities::bytesToSize(m_dicomOtFile.fileInfo.size());
+        m_dicomOtFile.size = FileUtils::getHumanReadableFileSize(m_dicomOtFile.fileInfo.absoluteFilePath());
 
         hasOtFile = true;
     }

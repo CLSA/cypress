@@ -38,11 +38,6 @@ bool RetinalCameraManager::isInstalled()
     return false;
 }
 
-bool RetinalCameraManager::isAvailable()
-{
-    return false;
-}
-
 void RetinalCameraManager::addManualMeasurement()
 {
     QSharedPointer<RetinalCameraMeasurement> measurement(new RetinalCameraMeasurement);
@@ -62,18 +57,17 @@ void RetinalCameraManager::start()
     //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     //QStringList arguments;
 
-    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
-    //{
-    //    measure();
-    //    finish();
-    //});
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
+    {
+        measure();
+        finish();
+    });
 
-    //ok = startRetinalCamera();
-    //if (!ok)
-    //{
-    //    qCritical() << "RetinalCameraManager:start() - could not start exe";
-    //    return;
-    //}
+    if (!startRetinalCamera())
+    {
+        qCritical() << "RetinalCameraManager:start() - could not start exe";
+        return;
+    }
 }
 
 void RetinalCameraManager::measure()
@@ -82,13 +76,10 @@ void RetinalCameraManager::measure()
 
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
-        m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
-
-    emit measured(m_test);
-
-    if (m_test->isValid())
+    if (CypressSettings::isSimMode())
     {
+        m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
+        emit measured(m_test);
         emit canFinish();
     }
 }
@@ -105,19 +96,19 @@ void RetinalCameraManager::finish()
         Measurement& measure = m_test->get(i);
         const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").toString();
 
-        QString host = CypressSettings::getInstance().getPineHost();
-        QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+        QString host = CypressSettings::getPineHost();
+        QString endpoint = CypressSettings::getPineEndpoint();
 
-        QByteArray fileContents = FileUtils::readFileIntoByteArray(measure.getAttribute("EYE_PICT_VENDOR").toString());
+        QByteArray fileContents = FileUtils::readFile(measure.getAttribute("EYE_PICT_VENDOR").toString());
         QString fileName = "EYE_" + side;
 
-        testJson.insert("files", QJsonObject {{ fileName, Utilities::bytesToSize(fileContents.size())}});
+        testJson.insert("files", QJsonObject {{ fileName, FileUtils::getHumanReadableFileSize(measure.getAttribute("EYE_PICT_VENDOR").toString())}});
 
         sendHTTPSRequest("PATCH",
                          host + endpoint + QString::number(answer_id) + "?filename=EYE_" + side
                              + ".jpg",
                          "application/octet-stream",
-                         FileUtils::readFileIntoByteArray(
+                         FileUtils::readFile(
                              measure.getAttribute("EYE_PICT_VENDOR").toString()));
 
         measure.removeAttribute("EYE_PICT_VENDOR");
@@ -129,7 +120,7 @@ void RetinalCameraManager::finish()
     QJsonDocument jsonDoc(values);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH",
                      answerUrl,
                      "application/json",
@@ -263,12 +254,6 @@ bool RetinalCameraManager::clearData()
 void RetinalCameraManager::cancel()
 {
     qDebug() << "RetinalCameraManager::cancel";
-}
-
-// set input parameters for the test
-void RetinalCameraManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData);
 }
 
 bool RetinalCameraManager::setUp()

@@ -27,9 +27,6 @@ class ChoiceReactionManager: public ManagerBase
 public:
     explicit ChoiceReactionManager(QSharedPointer<ChoiceReactionSession> session);
 
-    static bool isAvailable();
-    static bool isInstalled();
-
     static QString CCB_PREFIX;
     static QString CCB_CLINIC;
 
@@ -37,6 +34,8 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&) const;
+
+    static bool isInstalled();
 
 public slots:
 
@@ -67,9 +66,6 @@ private:
 
     // Reset the session
     bool clearData() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 
     // Set up device
     bool setUp() override;

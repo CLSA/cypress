@@ -24,7 +24,10 @@
     <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
    </item>
    <item>
-    <widget class="QGroupBox" name="armBandGroupBox">
+    <widget class="UsbPortPicker" name="usbPortPicker" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="deviceOptions">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -32,73 +35,170 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string/>
+      <string>Device Options</string>
      </property>
-     <layout class="QHBoxLayout" name="armBandHorizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="armBandSizeLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <layout class="QHBoxLayout" name="armCuff">
+        <item>
+         <widget class="QLabel" name="armLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Arm:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="armBandSizeComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="armBandSizeLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Cuff:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="armComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addPushButton">
         <property name="text">
-         <string>Cuff size:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <string>Add</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="armBandSizeComboBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="startStop">
+        <item>
+         <widget class="QPushButton" name="startPushButton">
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="stopPushButton">
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="currentMeasurement">
+     <property name="title">
+      <string>Current Measurement</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="state">
+        <item>
+         <widget class="QLabel" name="stateLabel">
+          <property name="text">
+           <string>State</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="stateValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLabel" name="armLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Arm used:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="reading">
+        <item>
+         <widget class="QLabel" name="readingLabel">
+          <property name="text">
+           <string>Reading</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="readingValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QComboBox" name="armComboBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="cuffPressure">
+        <item>
+         <widget class="QLabel" name="cuffPressureLabel">
+          <property name="text">
+           <string>Cuff Pressure</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cuffPressureValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       <layout class="QHBoxLayout" name="cycle">
+        <item>
+         <widget class="QLabel" name="cycleLabel">
+          <property name="text">
+           <string>Cycle</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cycleValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -132,6 +232,12 @@
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>UsbPortPicker</class>
+   <extends>QWidget</extends>
+   <header>widgets/usb_port_picker.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

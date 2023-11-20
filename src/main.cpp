@@ -1,12 +1,6 @@
 #include "cypress_application.h"
-
-#include "managers/audiometer/audiometer_manager.h"
-#include "managers/blood_pressure/blood_pressure_manager.h"
-#include "managers/body_composition/body_composition_manager.h"
-#include "managers/cdtt/cdtt_manager.h"
-#include "managers/choice_reaction/choice_reaction_manager.h"
-
 #include "cypress_session.h"
+#include "cypress_settings.h"
 #include "cypress_main_window.h"
 #include "tray_application.h"
 
@@ -33,8 +27,6 @@ const QString orgName = "CLSA";
 const QString orgDomain = "clsa-elcv.ca";
 const QString appName = "Cypress";
 const QString appVersion = "v0.1.0";
-
-
 
 // Custom message handler to write to a log file and stdout
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -117,11 +109,10 @@ void logNetworkInfo()
 {
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for(const QNetworkInterface &interface : interfaces) {
-        qInfo() << interface.humanReadableName();
         QList<QNetworkAddressEntry> entries = interface.addressEntries();
         for(const QNetworkAddressEntry &entry : entries) {
             if(entry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                qInfo() << "\t" << entry.ip().toString();
+                qInfo() << entry.ip().toString();
             }
         }
     }
@@ -129,8 +120,7 @@ void logNetworkInfo()
 
 void logAppInfo()
 {
-    qInfo() << QCoreApplication::applicationName();
-    qInfo() << QCoreApplication::applicationVersion();
+    qInfo() << QCoreApplication::applicationName() << QCoreApplication::applicationVersion();
     qInfo() << QCoreApplication::applicationDirPath();
 }
 
@@ -143,7 +133,7 @@ bool checkAlive()
 {
     bool isAlive { true };
 
-    qInfo() << getStatusCheckString("pine available", isAlive);
+    qInfo() << getStatusCheckString("pine available: ", isAlive);
 
     return isAlive;
 }
@@ -152,34 +142,32 @@ bool updateAvailable()
 {
     bool isUpdateAvailable { false };
 
-    qInfo() << getStatusCheckString("update available", isUpdateAvailable);
+    qInfo() << getStatusCheckString("update available: ", isUpdateAvailable);
 
     return isUpdateAvailable;
 }
 
 bool downloadUpdate()
 {
-    qInfo() << "downloading update...";
     return false;
 }
 
 int main(int argc, char *argv[])
 {
+    //qInstallMessageHandler(messageHandler);
+    //cleanupLogs();
+
     // Setup Qt and defaults
     QGuiApplication::setOrganizationName(orgName);
     QGuiApplication::setOrganizationDomain(orgDomain);
 
     QGuiApplication::setApplicationName(appName);
     QGuiApplication::setApplicationVersion(appVersion);
-    QGuiApplication::setApplicationVersion("1.0");
+    QGuiApplication::setApplicationVersion("1.0.0");
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
     qRegisterMetaType<CypressSession*>("CypressSession*");
-
-    qInstallMessageHandler(messageHandler);
-
-    cleanupLogs();
 
     QApplication app(argc, argv);
     CypressMainWindow* mainWindow = new CypressMainWindow;
@@ -195,22 +183,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    //CypressSettings::getInstance().setDefaultSettings();
-
     logAppInfo();
     logSystemInfo();
     logNetworkInfo();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("CLSA DCS device integration and data collection suite.");
-    parser.addHelpOption();
-    parser.addVersionOption();
-
-    QCommandLineOption isDebug("d",
-        QCoreApplication::translate("main", "run app in debug mode")
-    );
-    parser.addOption(isDebug);
-    parser.process(app);
+    qInfo() << getStatusCheckString("debug mode", CypressSettings::isDebugMode());
+    qInfo() << getStatusCheckString("sim mode", CypressSettings::isSimMode());
 
     // Make sure the network is up and that the Pine server is alive
     if (!checkAlive())
@@ -226,7 +204,8 @@ int main(int argc, char *argv[])
         {
             restartApplication(QCoreApplication::arguments());
         }
-        else {
+        else
+        {
             qCritical() << "Could not download a new update";
         }
     }

@@ -18,10 +18,49 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
     ui->testInfoWidget->setSessionInformation(*session);
 
+    QStringList bandList = {"small", "medium", "large", "x-large"};
+    ui->armBandSizeComboBox->addItems(bandList);
+    connect(ui->armBandSizeComboBox, &QComboBox::currentTextChanged, manager, &BloodPressureManager::setCuffSize);
+
+    QStringList armList = { "left", "right" };
+    ui->armComboBox->addItems(armList);
+    connect(ui->armComboBox, &QComboBox::currentTextChanged, manager, &BloodPressureManager::setSide);
+
     QList<TableColumn> columns;
-    columns << TableColumn("diastolic", "Diastolic", new NumberDelegate(0, 1000, true, false, false, 2));
-    columns << TableColumn("pulse", "pulse", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("systolic", "Systolic", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("#", "reading_number", new NumberDelegate(0, 1000, true, false, false, 2));
+    columns << TableColumn("Start time", "start_time", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("End time", "end_time", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("Systolic (mmHg)", "systolic", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("Diastolic (mmHg)", "diastolic", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("Pulse (bpm)", "pulse", new TextDelegate("", QRegExp(), false));
+
+    // port picker setup
+    // ports have been scanned
+    connect(manager, &BloodPressureManager::scanningDevices, ui->usbPortPicker, &UsbPortPicker::scanningForDevices);
+
+    // ports have been scanned
+    connect(manager, &BloodPressureManager::devicesDiscovered, ui->usbPortPicker, &UsbPortPicker::devicesDiscovered);
+
+    // ui should now allow picking a device
+    connect(manager, &BloodPressureManager::canSelectDevice, ui->usbPortPicker, &UsbPortPicker::devicesCanBeSelected);
+
+    // the user selected a device from the dropdown
+    connect(ui->usbPortPicker, &UsbPortPicker::deviceSelected, manager, &BloodPressureManager::selectDevice);
+
+    // the selected device is valid for this test
+    connect(manager, &BloodPressureManager::canConnectDevice, ui->usbPortPicker, &UsbPortPicker::canConnectDevice);
+
+    // the user requested to connect to the device
+    connect(ui->usbPortPicker, &UsbPortPicker::connectDevice, manager, &BloodPressureManager::connectDevice);
+
+    // the user requested to disconnect from the device
+    connect(ui->usbPortPicker, &UsbPortPicker::disconnectDevice, manager, &BloodPressureManager::disconnectDevice);
+
+    // a connection was made, update ui
+    connect(manager, &BloodPressureManager::deviceConnected, ui->usbPortPicker, &UsbPortPicker::deviceConnected);
+
+    // device disconnected, update ui
+    connect(manager, &BloodPressureManager::deviceDisconnected, ui->usbPortPicker, &UsbPortPicker::deviceDisconnected);
 
     // device started
     connect(manager, &BloodPressureManager::started, ui->measurementTable, [=](TestBase* test) {
@@ -32,6 +71,11 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     // can auto measure
     connect(manager, &BloodPressureManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
+    });
+
+    // cannot auto measure
+    connect(manager, &BloodPressureManager::cannotMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->disableMeasureButton();
     });
 
     // auto measure

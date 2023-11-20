@@ -726,8 +726,3 @@ bool BodyCompositionManager::cleanUp()
 {
     return true;
 }
-
-void BodyCompositionManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
-}

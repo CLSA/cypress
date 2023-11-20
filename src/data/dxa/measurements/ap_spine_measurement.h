@@ -1,7 +1,7 @@
 #ifndef AP_SPINE_MEASUREMENT_H
 #define AP_SPINE_MEASUREMENT_H
 
-#include "dicom/dcm_recv.h"
+#include "../../../dicom/dcm_recv.h"
 
 #include "dxa_measurement.h"
 

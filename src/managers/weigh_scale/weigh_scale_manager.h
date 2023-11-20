@@ -1,7 +1,6 @@
 #ifndef WEIGH_SCALE_MANAGER_H
 #define WEIGH_SCALE_MANAGER_H
 
-#include "data/weigh_scale/tests/weigh_scale_test.h"
 #include "managers/serial_port/serial_port_manager.h"
 #include "server/sessions/weigh_scale_session.h"
 
@@ -25,7 +24,6 @@ class WeighScaleManager : public SerialPortManager
 public:
     explicit WeighScaleManager(QSharedPointer<WeighScaleSession> &session);
 
-    static bool isAvailable();
     static bool isInstalled();
 
 public slots:
@@ -70,9 +68,6 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 };
 
 #endif // WEIGH_SCALE_MANAGER_H

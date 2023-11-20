@@ -178,14 +178,4 @@ void Utilities::showMessageBox(const QString& title, const QString& text)
     messageBox.exec();
 }
 
-QString Utilities::bytesToSize(qint64 size) {
-    QStringList units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
-    int i;
-    double doubleSize = size;
 
-    for (i = 0; i < units.size() && doubleSize >= 1024; i++) {
-        doubleSize /= 1024.0;
-    }
-
-    return QString::number(doubleSize, 'f', 2) + " " + units[i];
-}

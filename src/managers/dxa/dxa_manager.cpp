@@ -25,16 +25,16 @@ DXAManager::DXAManager(QSharedPointer<DXASession> session) /* : m_dicomWatcher(Q
     QDir workingDir = QDir::current();
     QString workingDirPath = workingDir.absolutePath() + "/";
 
-    const QString executablePath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/executable").toString();
-    const QString aeTitle = CypressSettings::getInstance().readSetting("dxa/dicom/aeTitle").toString();
-    const QString host = CypressSettings::getInstance().readSetting("dxa/dicom/host").toString();
-    const QString port = CypressSettings::getInstance().readSetting("dxa/dicom/port").toString();
+    const QString executablePath = workingDirPath + CypressSettings::readSetting("dxa/dicom/executable").toString();
+    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
 
-    const QString storageDirPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/storagePath").toString();
-    const QString logConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("dxa/dicom/log_config").toString();
+    const QString storageDirPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    const QString logConfigPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/log_config").toString();
     const QString ascConfigPath
         = workingDirPath
-          + CypressSettings::getInstance().readSetting("dxa/dicom/asc_config").toString();
+          + CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
     m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
     connect(m_dicomServer.get(),
@@ -84,11 +84,6 @@ void DXAManager::dicomFilesReceived()
     emit updateDicomTable(files);
 }
 
-bool DXAManager::isAvailable()
-{
-    return true;
-}
-
 bool DXAManager::isInstalled()
 {
     return true;
@@ -106,7 +101,7 @@ void DXAManager::start()
 //
 void DXAManager::measure()
 {
-    if (Cypress::getInstance().isSimulation()) {
+    if (CypressSettings::isSimMode()) {
         m_test->reset();
         m_test->simulate();
 
@@ -140,25 +135,25 @@ void DXAManager::finish()
     DXATest *test = static_cast<DXATest *>(m_test.get());
 
     // Whole body
-    QByteArray wb_1 = FileUtils::readFileIntoByteArray(
+    QByteArray wb_1 = FileUtils::readFile(
         test->wholeBodyMeasurement->m_wholeBody1.fileInfo.absoluteFilePath());
-    QByteArray wb_2 = FileUtils::readFileIntoByteArray(
+    QByteArray wb_2 = FileUtils::readFile(
         test->wholeBodyMeasurement->m_wholeBody2.fileInfo.absoluteFilePath());
 
     QString wb_1_file_name = test->wholeBodyMeasurement->m_wholeBody1.name + ".dcm";
     QString wb_2_file_name = test->wholeBodyMeasurement->m_wholeBody2.name + ".dcm";
 
-    QByteArray sp_1 = FileUtils::readFileIntoByteArray(
+    QByteArray sp_1 = FileUtils::readFile(
         test->apSpineMeasurement->m_apSpineFile.fileInfo.absoluteFilePath());
 
     // AP Lumbar Spine
     QString sp_1_file_name = test->apSpineMeasurement->m_apSpineFile.name + ".dcm";
 
-    QByteArray iva_ot = FileUtils::readFileIntoByteArray(
+    QByteArray iva_ot = FileUtils::readFile(
         test->ivaImagingMeasurement->m_dicomOtFile.fileInfo.absoluteFilePath());
-    QByteArray iva_pr = FileUtils::readFileIntoByteArray(
+    QByteArray iva_pr = FileUtils::readFile(
         test->ivaImagingMeasurement->m_dicomPrFile.fileInfo.absoluteFilePath());
-    QByteArray iva_measure = FileUtils::readFileIntoByteArray(
+    QByteArray iva_measure = FileUtils::readFile(
         test->ivaImagingMeasurement->m_dicomMeasureFile.fileInfo.absoluteFilePath());
 
     // IVA
@@ -168,7 +163,7 @@ void DXAManager::finish()
 
     // Forearm
     QString fa_1_file_name = "FA_DICOM.dcm";
-    QByteArray fa_1 = FileUtils::readFileIntoByteArray(
+    QByteArray fa_1 = FileUtils::readFile(
         "C:/Users/Anthony/Downloads/DEXA_SIM/FA/FA_DICOM.dcm");
 
     QJsonObject testJson = m_test->toJsonObject();
@@ -203,8 +198,8 @@ void DXAManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
 
     sendHTTPSRequest("PATCH",
                      host + endpoint + QString::number(answer_id),
@@ -357,9 +352,3 @@ bool DXAManager::clearData()
 {
     return true;
 }
-
-void DXAManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
-}
-

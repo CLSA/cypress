@@ -1,6 +1,6 @@
 #include "whole_body_measurement.h"
 
-#include "auxiliary/Utilities.h"
+#include "../../../auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -343,7 +343,7 @@ void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding dicom 1";
         m_wholeBody1 = file;
         m_wholeBody1.name = "WB_DICOM_1";
-        m_wholeBody1.size = Utilities::bytesToSize(m_wholeBody1.fileInfo.size());
+        m_wholeBody1.size = FileUtils::getHumanReadableFileSize(m_wholeBody1.fileInfo.absoluteFilePath());
 
         hasWholeBody1File = true;
     }
@@ -352,7 +352,7 @@ void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding dicom 2";
         m_wholeBody2 = file;
         m_wholeBody2.name = "WB_DICOM_2";
-        m_wholeBody2.size = Utilities::bytesToSize(m_wholeBody2.fileInfo.size());
+        m_wholeBody2.size = FileUtils::getHumanReadableFileSize(m_wholeBody2.fileInfo.absoluteFilePath());
 
         hasWholeBody2File = true;
     }

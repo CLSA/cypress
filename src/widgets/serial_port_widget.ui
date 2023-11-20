@@ -51,22 +51,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="connectButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Connect</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="disconnectButton">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
            <string>Disconnect</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="connectButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Connect</string>
           </property>
          </widget>
         </item>

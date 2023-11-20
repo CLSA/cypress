@@ -1,6 +1,6 @@
 #include "vividi_manager.h"
-#include "cypress_application.h"
 
+#include "data/cimt_vivid_i_test.h"
 #include "auxiliary/file_utils.h"
 
 #include <QJsonDocument>
@@ -13,15 +13,14 @@ VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     QDir workingDir = QDir::current();
     QString workingDirPath = workingDir.absolutePath() + "/";
 
-    const QString executablePath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/executable").toString();
-    const QString aeTitle = CypressSettings::getInstance().readSetting("ultrasound/dicom/aeTitle").toString();
-    const QString host = CypressSettings::getInstance().readSetting("ultrasound/dicom/host").toString();
-    const QString port = CypressSettings::getInstance().readSetting("ultrasound/dicom/port").toString();
+    const QString executablePath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/executable").toString();
+    const QString aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
 
-    const QString storageDirPath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/storagePath").toString();
-    const QString logConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/log_config").toString();
-    const QString ascConfigPath = workingDirPath + CypressSettings::getInstance().readSetting("ultrasound/dicom/asc_config").toString();
-
+    const QString storageDirPath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
+    const QString logConfigPath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
+    const QString ascConfigPath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
 
     m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
     connect(m_dicomServer.get(), &DcmRecv::dicomFilesReceived, this, &VividiManager::dicomFilesReceived);
@@ -35,23 +34,14 @@ void VividiManager::dicomFilesReceived()
 
     foreach (DicomFile file, files)
     {
-        qDebug() << file.patientId << file.modality << file.studyDate << file.studyId << file.fileInfo.absoluteFilePath();
+        if (CypressSettings::isDebugMode())
+            qDebug() << file.patientId << file.modality << file.studyDate << file.studyId << file.fileInfo.absoluteFilePath();
     }
-}
-
-bool VividiManager::isAvailable()
-{
-    return false;
 }
 
 bool VividiManager::isInstalled()
 {
     return false;
-}
-
-void VividiManager::setInputData(const QVariantMap& inputData)
-{
-    m_inputData = inputData;
 }
 
 void VividiManager::start()
@@ -64,7 +54,7 @@ void VividiManager::measure()
 {
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
     {
         m_test->simulate();
         emit measured(m_test.get());
@@ -80,15 +70,15 @@ void VividiManager::finish()
 {
     QJsonObject responseJson{};
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
-    QString pine_path = CypressSettings::getInstance().getAnswerUrl(m_session->getAnswerId());
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
+    QString pine_path = CypressSettings::getAnswerUrl(m_session->getAnswerId());
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
     {
         Measurement& measure = m_test->get(i);
         const QString &side = measure.getAttribute("side").toString();
-        QByteArray data = FileUtils::readFileIntoByteArray(measure.getAttribute("path").toString());
+        QByteArray data = FileUtils::readFile(measure.getAttribute("path").toString());
 
         sendHTTPSRequest("PATCH",
                          pine_path + "?filename=" + measure.getAttribute("name").toString(),

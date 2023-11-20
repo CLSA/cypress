@@ -1,7 +1,7 @@
 #ifndef DXA_TEST_H
 #define DXA_TEST_H
 
-#include "dicom/dcm_recv.h"
+#include "../../../dicom/dcm_recv.h"
 #include "../../test_base.h"
 
 #include "../measurements/ap_spine_measurement.h"

@@ -1,5 +1,5 @@
 #include "dxa_test.h"
-#include "dicom/dcm_recv.h"
+#include "../../../dicom/dcm_recv.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 

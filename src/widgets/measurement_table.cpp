@@ -11,28 +11,30 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->measurementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->measurementTable->horizontalHeader()->setSectionsClickable(false);
+    // Disable measure and complete buttons by default
+    ui->measureButton->setEnabled(false);
+    ui->submitButton->setEnabled(false);
 
-    ui->measurementTable->setSelectionMode(QAbstractItemView::SingleSelection);
-
+    // Table setup
     ui->measurementTable->setShowGrid(true);
     ui->measurementTable->setGridStyle(Qt::SolidLine);
     ui->measurementTable->setAlternatingRowColors(true);
-
-    ui->addMeasureButton->setVisible(false);
-
-    ui->manualEntryToggle->setFocusPolicy(Qt::NoFocus);
-
+    ui->measurementTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->measurementTable->horizontalHeader()->setSectionsClickable(false);
+    ui->measurementTable->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->measurementTable->setStyleSheet(
         "alternate-background-color: #e5e5e5;"
         "background-color: #f5f5f5;"
         "gridline-color: #d3d3d3;"
     );
 
+    // Manual entry setup
+    ui->manualEntryToggle->setFocusPolicy(Qt::NoFocus);
+    ui->addMeasureButton->setVisible(false);
+
     // Request automatic measurement
     connect(ui->measureButton, &QPushButton::clicked, this, [=]() {
-        if (manualEditsMade || ui->measurementTable->rowCount() > 0)
+        if (manualEditsMade)
         {
             QMessageBox::StandardButton reply;
             reply = QMessageBox::question(nullptr, "Confirmation", "Are you sure you want to measure again? This will overrite the measurements collected.",
@@ -45,7 +47,6 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
             }
         }
 
-        qDebug() << "measure";
         emit measure();
     });
 
@@ -53,20 +54,20 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
     connect(ui->measurementTable, &QTableWidget::cellChanged, this, &MeasurementTable::handleChange);
 
     connect(ui->submitButton, &QPushButton::clicked, this, [=]() {
-        //if (m_test->isValid())
-        //{
-        emit finish();
-        //}
-        //else {
-         //   QMessageBox::warning(this, "Test Incomplete", "The test is incomplete, please enter all required fields before saving.");
-        //}
+        if (m_test->isValid())
+        {
+            emit finish();
+        }
+        else {
+            QMessageBox::warning(this, "Test Incomplete", "The test is incomplete or invalid.");
+        }
     });
 
+    // Manual entry
     connect(ui->manualEntryToggle, &QPushButton::clicked, this, [=]() {
         toggleManualEntry(true);
         emit enterManualEntry();
     });
-
     connect(ui->addMeasureButton, &QPushButton::clicked, this, &MeasurementTable::addManualMeasurement);
 
 }

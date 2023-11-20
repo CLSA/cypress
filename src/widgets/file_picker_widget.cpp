@@ -36,17 +36,17 @@ bool FilePickerWidget::validate(const QString& path)
 {
     if (m_isFile)
     {
-        return FileUtils::doesFileExist(path, true);
+        return FileUtils::doesFileExist(path);
     }
 
     else if (m_isExe)
     {
-        return FileUtils::doesExeExist(path);
+        return FileUtils::isFileExecutable(path);
     }
 
     else if (m_isDir)
     {
-        return FileUtils::doesDirExist(path, true);
+        return FileUtils::doesDirectoryExist(path);
     }
 
     return true;

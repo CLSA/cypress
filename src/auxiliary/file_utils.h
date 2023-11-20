@@ -8,28 +8,33 @@
 class FileUtils
 {
 public:
-    static QJsonObject readJsonFile(const QString &filePath);
-
-    static QByteArray readFileIntoByteArray(const QString& filePath);
-
-    static QByteArray readFileAsBase64(QFile& file);
+    static QJsonObject readJson(const QString &filePath);
     static QString generateHash(const QByteArray& bytes);
 
-    static QString copyFile(const QString& src, const QString& dest);
+    static bool createFile(const QString& destinationAbsolutePath, const QByteArray& bytes);
+    static QByteArray readFile(const QString& absolutefilePath);
+    static bool copyFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    static bool moveFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    static bool deleteFile(const QString& fileAbsolutePath);
 
-    static bool doesExeExist(const QString &absolutePath);
-    static bool doesFileExist(const QString &absolutePath, const bool isWritable);
-    static bool doesDirExist(const QString &absolutePath, const bool isWritable);
+    static bool doesFileExist(const QString &absoluteFilePath);
+    static bool isFileReadable(const QString &absoluteFilePath);
+    static bool isFileWritable(const QString &absoluteFilePath);
+    static bool isFileExecutable(const QString &absoluteFilePath);
 
-    static bool backupFile(const QString& fromPath, const QString& toPath);
-    static bool restoreBackup(const QString& fromPath, const QString& toPath);
+    static bool createDirectory(const QString& absoluteDirectoryPath);
+    static bool copyDirectory(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    static bool moveDirectory(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    static bool removeDirectory(const QString& absoluteDirectoryPath);
 
-    static bool createDirectory(const QString& dirPath);
-    static bool removeDirectory(const QString& dirPath);
+    static bool doesDirectoryExist(const QString &absoluteDirectoryPath);
+    static bool isDirectoryReadable(const QString &absoluteDirectoryPath);
+    static bool isDirectoryWritable(const QString &absoluteDirectoryPath);
 
-    static void sendHTTPSRequest(const QString &method, const QString &endpoint, const QString &contentType, const QByteArray &data);
+    static QString getHumanReadableFileSize(const QString& absoluteFilePath);
+
 private:
-    FileUtils() = default;
+    FileUtils() = delete;
 };
 
 #endif // FILEUTILS_H

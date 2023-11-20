@@ -21,7 +21,6 @@ public:
     ~GripStrengthManager();
 
     static bool isInstalled();
-    static bool isAvailable();
 
 public slots:
     void start() override;
@@ -40,9 +39,6 @@ private:
 
     QDir m_backupDir;
     QDir m_trackerDir;
-
-    // Set data from Pine request
-    void setInputData(const QVariantMap&) override;
 
     // Set up device
     bool setUp() override;

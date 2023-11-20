@@ -18,14 +18,9 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     m_test.reset(new FraxTest);
 }
 
-bool FraxManager::isAvailable()
-{
-    return false;
-}
-
 bool FraxManager::isInstalled()
 {
-    return false;
+    return true;
 }
 
 void FraxManager::start()
@@ -52,7 +47,7 @@ void FraxManager::measure()
 {
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
     {
         QVariantMap map;
         QJsonObject inputData = m_session->getInputData();
@@ -201,8 +196,8 @@ void FraxManager::configureProcess()
 
 bool FraxManager::clearData()
 {
-    //m_test.reset();
-    return false;
+    m_test->reset();
+    return true;
 }
 
 void FraxManager::finish()
@@ -219,7 +214,7 @@ void FraxManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("sent");
@@ -272,9 +267,4 @@ bool FraxManager::cleanUp()
     }
 
     return true;
-}
-
-void FraxManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
 }

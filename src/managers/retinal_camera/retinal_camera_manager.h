@@ -20,7 +20,6 @@ public:
     ~RetinalCameraManager();
 
     static bool isInstalled();
-    static bool isAvailable();
 
     QJsonDocument m_exam;
 
@@ -36,7 +35,6 @@ protected:
     bool setUp() override;
     bool clearData() override;
     bool cleanUp() override;
-    void setInputData(const QVariantMap &) override;
 
 private:
     RetinalCameraTest* m_test;

@@ -5,45 +5,35 @@
 #include <QString>
 #include <QSettings>
 
-
 // .ini file can be found at C:\Users\<User>\AppData\Roaming\CLSA\Cypress.ini
 
+// Static class
 class CypressSettings
 {
 public:
-    static CypressSettings& getInstance()
-    {
-        static CypressSettings instance;
-        return instance;
-    }
-
-    // Singleton, delete the copy constructor and assignment operator
+    CypressSettings() = delete;
     CypressSettings(const CypressSettings&) = delete;
     CypressSettings &operator=(const CypressSettings &) = delete;
 
-    QString getPineHost() const;
-    void setPineHost(const QString &host);
+    static bool isSimMode();
+    static bool isDebugMode();
 
-    QString getPineEndpoint() const;
-    void setPineEndpoint(const QString &newEndpoint);
+    static QString getPineHost();
+    static void setPineHost(const QString &host);
 
-    QString getDeviceEndpoint() const;
+    static QString getPineEndpoint();
+    static void setPineEndpoint(const QString &newEndpoint);
 
-    QString getPineCredentials() const;
-    QString getAnswerUrl(int answer_id) const;
+    static QString getDeviceEndpoint();
 
-    QVariant readSetting(const QString& key) const;
-    void writeSetting(const QString& key, const QVariant& value);
+    static QString getPineCredentials();
+    static QString getAnswerUrl(int answer_id);
 
-    void setDefaultSettings();
+    static QVariant readSetting(const QString& key);
+    static void writeSetting(const QString& key, const QVariant& value);
 
 private:
-    CypressSettings();
-
-    QSettings settings;
-
-    QSettings& getSettings() const;
-    void clearSettings();
+    static QSettings* m_settings;
 };
 
 #endif // CYPRESSSETTINGS_H

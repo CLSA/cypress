@@ -3,7 +3,7 @@
 
 #include "../../measurement.h"
 
-#include "dicom/dcm_recv.h"
+#include "../../../dicom/dcm_recv.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/ofstd/ofstdinc.h"

@@ -109,9 +109,6 @@ private:
 
     BodyCompositionTest m_test;
 
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
-
     // Reset the session
     bool clearData() override;
 

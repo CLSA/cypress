@@ -2,7 +2,7 @@
 #define IVA_IMAGING_MEASUREMENT_H
 
 #include "dxa_measurement.h"
-#include "dicom/dcm_recv.h"
+#include "../../../dicom/dcm_recv.h"
 
 class IVAImagingMeasurement : public DXAMeasurement
 {

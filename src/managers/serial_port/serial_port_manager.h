@@ -51,7 +51,7 @@ public slots:
     // checks of the named port is in the list of scanned devices
     // and calls setDevice
     //
-    void selectDevice(const QString&);
+    void selectDevice(const QSerialPortInfo& port);
 
 private slots:
 
@@ -103,6 +103,9 @@ signals:
 
     void deviceNameChanged(const QString&);
 
+    void deviceConnected();
+    void deviceDisconnected();
+
 
 protected:
     // scan for available devices (serial ports)
@@ -142,9 +145,6 @@ protected:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
 };
 
 #endif // SERIAL_PORT_MANAGER_H

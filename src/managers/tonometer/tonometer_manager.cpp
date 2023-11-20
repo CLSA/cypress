@@ -27,16 +27,6 @@ TonometerManager::~TonometerManager()
   QSqlDatabase::removeDatabase("mdb_connection");
 }
 
-bool TonometerManager::isAvailable()
-{
-  return false;
-}
-
-bool TonometerManager::isInstalled()
-{
-  return false;
-}
-
 void TonometerManager::start()
 {
     emit started(m_test.get());
@@ -44,29 +34,28 @@ void TonometerManager::start()
 
     // connect signals and slots to QProcess one time only
     //
-    //connect(&m_process, &QProcess::started,
-    //    this, [this]() {
-    //        qDebug() << "process started: " << m_process.arguments().join(" ");
-    //    });
+    connect(&m_process, &QProcess::started,
+        this, [this]() {
+            qDebug() << "process started: " << m_process.arguments().join(" ");
+        });
 
-    //connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-    //    this, &TonometerManager::readOutput);
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        this, &TonometerManager::readOutput);
 
-    //connect(&m_process, &QProcess::errorOccurred,
-    //    this, [](QProcess::ProcessError error)
-    //    {
-    //        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-    //        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
-    //    });
+    connect(&m_process, &QProcess::errorOccurred,
+        this, [](QProcess::ProcessError error)
+        {
+            QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+        });
 
-    //connect(&m_process, &QProcess::stateChanged,
-    //    this, [](QProcess::ProcessState state) {
-    //        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-    //        qDebug() << "process state: " << s.join(" ").toLower();
-    //    });
+    connect(&m_process, &QProcess::stateChanged,
+        this, [](QProcess::ProcessState state) {
+            QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+            qDebug() << "process state: " << s.join(" ").toLower();
+        });
 
-    //configureProcess();
-    //emit dataChanged();
+    configureProcess();
 }
 
 
@@ -103,11 +92,12 @@ void TonometerManager::measure()
 {
     m_test->reset();
 
-    if (Cypress::getInstance().isSimulation())
+    if (CypressSettings::isSimMode())
+    {
         m_test->simulate({});
-
-    emit measured(m_test.get());
-    emit canFinish();
+        emit measured(m_test.get());
+        emit canFinish();
+    }
 }
 
 void TonometerManager::readOutput()
@@ -140,19 +130,13 @@ void TonometerManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getInstance().getPineHost();
-    QString endpoint = CypressSettings::getInstance().getPineEndpoint();
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
 
-    QString answerUrl = CypressSettings::getInstance().getAnswerUrl(answer_id);
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
     emit success("sent");
-}
-
-// set input parameters for the test
-void TonometerManager::setInputData(const QVariantMap& inputData)
-{
-    Q_UNUSED(inputData)
 }
 
 bool TonometerManager::setUp()

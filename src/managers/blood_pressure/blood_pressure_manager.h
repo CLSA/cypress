@@ -7,7 +7,8 @@
 
 #include <QObject>
 #include <QThread>
-#include "QtUsb/QtUsb"
+
+#include "bptru_200_driver.h"
 
 /*!
  * \class BloodPressureManager
@@ -30,6 +31,7 @@
 
 QT_FORWARD_DECLARE_CLASS(BPMCommunication)
 
+
 class BloodPressureManager : public ManagerBase
 {
     Q_OBJECT
@@ -38,26 +40,32 @@ class BloodPressureManager : public ManagerBase
     Q_PROPERTY(QString cuffSize MEMBER m_cuffSize NOTIFY cuffSizeChanged)
     Q_PROPERTY(QString side MEMBER m_side NOTIFY sideChanged)
 
+    enum State {
+        CONNECTING,
+        READY,
+        MEASURING,
+    };
+
+signals:
+    void deviceConnected();
+    void deviceDisconnected();
+
 public:
     explicit BloodPressureManager(QSharedPointer<BPMSession> session);
     ~BloodPressureManager();
 
-    const quint16 BPTRU_VENDOR_ID { 4279 };
-
     static bool isDefined();
-
     static bool isInstalled();
-    static bool isAvailable();
 
-    //TODO: use cypress constant for all use of size and side
     void setCuffSize(const QString&);
-
-    //TODO: use cypress constant for all use of size and side
     void setSide(const QString&);
 
-    void setVendorIdFilter(const quint16& vid);
+signals:
+    void writeMessage(BPMMessage message);
 
 public slots:
+    void receiveMessages(QList<BPMMessage> messages);
+
     // what the manager does in response to the main application
     // window invoking its run method
     //
@@ -72,53 +80,15 @@ public slots:
     //
     void finish() override;
 
-    bool scanDevices();
-
-    // set the device by descritive label
-    //
-    void selectDevice(const QString&);
-    void connectDevice();
-    void disconnectDevice();
-
-private slots:
-    // slot for signals coming from BPMCommunication
-    //
-    void measurementAvailable(const int&, const int&, const int&, const int&,
-                              const QDateTime&, const QDateTime&);
-    void averageAvailable(const int&, const int&, const int&);
-    void finalReviewAvailable(const int&, const int&, const int&);
-    void connectionStatusChanged(const bool&);
-    void abortComplete(const bool&);
-    void deviceInfoAvailable();
-
-    // set the device
-    //
-    void setDevice(const QUsb::Id&);
-
-signals:
-    // signals to BPMCommunication
-    //
-    void attemptConnection(const QUsb::Id&);
-    void startMeasurement();
-    void abortMeasurement(QThread*);
-
-    void canConnectDevice();
-    void scanningDevices();
-    void deviceDiscovered(const QString&);
-    void canSelectDevice();
-    void deviceSelected(const QString&);
-
-    void deviceNameChanged(const QString&);
-    void sideChanged(const QString&);
-    void cuffSizeChanged(const QString&);
-
 private:
+    // communications handling
+    QScopedPointer<QThread> m_thread;
+    QScopedPointer<BpTru200Driver> m_driver;
+
+    State m_state { State::CONNECTING };
+
     // device data is separate from test data
     Measurement m_deviceData;
-
-    // communications handling
-    QThread m_thread;
-    BPMCommunication* m_comm { Q_NULLPTR };
 
     // Set up device
     bool setUp() override;
@@ -129,23 +99,12 @@ private:
     // Clean up the device for next time
     bool cleanUp() override;
 
-    // set input parameters for the test
-    void setInputData(const QVariantMap& inputData) override;
-
-    bool m_aborted { false };
-
-    // usb hid devices plugged in and openable
-    QMap<QString,QUsb::Id> m_deviceList;
-
-    // called when loading from settings
-    void selectDeviceById(const QUsb::Id&);
-
-    // the usb hid device
-    QString m_deviceName;
-    QUsb::Id m_device;
-    quint16 m_vendorIDFilter { 0 };
-    QString m_cuffSize { "" };
-    QString m_side { "" };
+    void handleAck(const BPMMessage& ackMessage);
+    void handleNack(const BPMMessage& nackMessage);
+    void handleButton(const BPMMessage& buttonMessage);
+    void handleData(const BPMMessage& dataMessage);
+    void handleNotification(const BPMMessage& notificationMessage);
+    void handleNoMessage(const BPMMessage& noMessage);
 };
 
 
