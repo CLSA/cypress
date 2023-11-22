@@ -15,6 +15,27 @@ HearingTest::HearingTest()
   m_outputKeyList << "test_id";
 }
 
+// Meta data
+
+// PatientID bytes 4-17
+// TestID bytes 18-34
+// TestDatetime 35-50
+// CalibrationDate
+const static int PATIENT_ID_INDEX_START = 4;
+const static int PATIENT_ID_INDEX_END = 17;
+
+const static int TEST_ID_INDEX_START = 18;
+const static int TEST_ID_INDEX_END = 34;
+
+const static int TEST_DATETIME_INDEX_START = 35;
+const static int TEST_DATETIME_INDEX_END = 50;
+
+const static int CALIBRATION_DATE_INDEX_START = 51;
+const static int CALIBRATION_DATE_INDEX_END = 58;
+
+const static int EXAMINER_ID_START = 59;
+const static int EXAMINER_ID_END = 74;
+
 bool HearingTest::isValid() const
 {
   bool okMeta = true;
@@ -112,54 +133,60 @@ QString HearingTest::readArray(const quint8 &begin, const quint8 &end) const
 //
 void HearingTest::fromArray(const QByteArray &arr)
 {
-    if(!arr.isEmpty())
-    {
-        reset();
-        m_array = arr;
+    // assumes all data before end code (5 bytes) is valid
+    if (arr.isEmpty()) {
+        qDebug() << "HearingTest::fromArray is empty.";
+        return;
+    }
 
-        addMetaData("patient_id",readPatientID());
-        addMetaData("test_id",readTestID());
-        addMetaData("test_datetime",readTestDateTime());
-        addMetaData("last_calibration_date",readCalibrationDate());
+    reset();
 
-        QStringList sides = {"left", "right"};
+    m_array = arr;
 
-        foreach (auto side, sides) {
+    addMetaData("patient_id", readPatientID());
+    addMetaData("test_id", readTestID());
+    addMetaData("test_datetime", readTestDateTime());
+    addMetaData("last_calibration_date", readCalibrationDate());
+
+    QStringList sides = {"left", "right"};
+
+    foreach (auto side, sides) {
         foreach (auto m, readHearingThresholdLevels(side)) {
-          QSharedPointer<HearingMeasurement> measure(new HearingMeasurement(m));
-          addMeasurement(measure);
-        }
+        QSharedPointer<HearingMeasurement> measure(new HearingMeasurement(m));
+        addMeasurement(measure);
         }
     }
 }
 
 QString HearingTest::readPatientID() const
 {
-    return readArray(4,17).trimmed();
+    return readArray(PATIENT_ID_INDEX_START, PATIENT_ID_INDEX_END).trimmed();
 }
 
 QString HearingTest::readTestID() const
 {
-    return readArray(18,34).trimmed();
+    return readArray(TEST_ID_INDEX_START, TEST_ID_INDEX_END).trimmed();
 }
 
 QDateTime HearingTest::readTestDateTime() const
 {
-    QString d_str = readArray(35,50).trimmed();
-    if(d_str.contains("A"))
-        d_str.replace("A","1");
-    return QDateTime::fromString(d_str,"MM/dd/yyHH:mm:ss").addYears(100);
+    QString d_str = readArray(TEST_DATETIME_INDEX_START, TEST_DATETIME_INDEX_END).trimmed();
+
+    if (d_str.contains("A"))
+        d_str.replace("A", "1");
+
+    return QDateTime::fromString(d_str, "MM/dd/yyHH:mm:ss").addYears(100);
 }
 
 QDate HearingTest::readCalibrationDate() const
 {
-    QString d_str = readArray(51,58).trimmed();
+    QString d_str = readArray(CALIBRATION_DATE_INDEX_START, CALIBRATION_DATE_INDEX_END).trimmed();
     return QDate::fromString(d_str,"MM/dd/yy").addYears(100);
 }
 
 QString HearingTest::readExaminerID() const
 {
-    return readArray(59,74).trimmed();
+    return readArray(EXAMINER_ID_START, EXAMINER_ID_END).trimmed();
 }
 
 QList<HearingMeasurement> HearingTest::readHearingThresholdLevels(const QString& side) const

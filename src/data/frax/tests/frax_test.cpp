@@ -188,30 +188,27 @@ void FraxTest::simulate(const QVariantMap& input)
 QString FraxTest::toString() const
 {
     QString str;
-    if(isValid())
-    {
-      QStringList list;
-      foreach(const auto measurement, m_measurementList)
-      {
-        list << measurement->toString();
-      }
-      str = list.join("\n");
+    QStringList list;
+
+    foreach (const auto measurement, m_measurementList) {
+      list << measurement->toString();
     }
+
+    str = list.join("\n");
+
     return str;
 }
 
 bool FraxTest::isValid() const
 {
-    //bool okMeta = true;
-    //foreach(const auto key, m_outputKeyList)
-    //{
-    //  if(!hasMetaData(key))
-    //  {
-    //     qDebug() << "ERROR: test missing meta data" << key;
-    //     okMeta = false;
-    //     break;
-    //   }
-    //}
+    bool okMeta = true;
+    foreach (const auto key, m_outputKeyList) {
+      if (!hasMetaData(key)) {
+        qDebug() << "ERROR: test missing meta data" << key;
+        okMeta = false;
+        break;
+      }
+    }
 
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
     if(okTest)
@@ -225,8 +222,7 @@ bool FraxTest::isValid() const
       }
     }
 
-    return okTest;
-    //return okMeta && okTest;
+    return okMeta && okTest;
 }
 
 QJsonObject FraxTest::toJsonObject() const

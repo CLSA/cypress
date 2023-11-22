@@ -28,16 +28,16 @@ QByteArray AudiometerManager::initEndCode()
 
 bool AudiometerManager::hasEndCode(const QByteArray &arr) const
 {
+    // If the
     bool ok = false;
+
+    // arr.size() = 10
+    // len = 9 (0-9)
     int len = arr.size() - 1;
-    if(5 < len)
-    {
-      ok = (
-        END_CODE.at(5) == arr.at(len) &&
-        END_CODE.at(2) == arr.at(len-3) &&
-        END_CODE.at(1) == arr.at(len-4) &&
-        END_CODE.at(0) == arr.at(len-5)
-        );
+
+    if (5 < len) {
+        ok = (END_CODE.at(5) == arr.at(len) && END_CODE.at(2) == arr.at(len - 3)
+              && END_CODE.at(1) == arr.at(len - 4) && END_CODE.at(0) == arr.at(len - 5));
     }
     return ok;
 }
