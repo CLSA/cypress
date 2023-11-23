@@ -2,7 +2,6 @@
 
 #include <QDebug>
 
-
 const int TIMER_WAIT = 2000; // ms
 
 DicomDirectoryWatcher::DicomDirectoryWatcher(const QString &directoryPath, QObject *parent)

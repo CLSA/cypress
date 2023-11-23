@@ -1,7 +1,7 @@
 #include "spirometer_manager.h"
-#include "cypress_application.h"
-
 #include "managers/emr/emr_plugin_writer.h"
+
+#include "cypress_settings.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -32,6 +32,11 @@ bool SpirometerManager::isInstalled()
 
 bool SpirometerManager::isDefined(const QString& value, const SpirometerManager::FileType &fileType) const
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::isDefined";
+    }
+
     if(value.isEmpty())
     {
         return false;
@@ -59,7 +64,13 @@ bool SpirometerManager::isDefined(const QString& value, const SpirometerManager:
 
 void SpirometerManager::start()
 {
-    if (CypressSettings::isSimMode()) {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::start";
+    }
+
+    if (m_sim) {
+
         emit started(m_test.get());
         emit canMeasure();
 
@@ -95,9 +106,14 @@ void SpirometerManager::start()
 
 void SpirometerManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::measure";
+    }
+
     m_test->reset();
 
-    if (CypressSettings::isSimMode())
+    if (m_sim)
     {
         m_test->simulate(QVariantMap({
             {"barcode", m_session->getBarcode()},
@@ -122,6 +138,11 @@ void SpirometerManager::measure()
 
 void SpirometerManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::finish";
+    }
+
     if(QProcess::NotRunning != m_process.state())
     {
        m_process.kill();
@@ -162,22 +183,28 @@ void SpirometerManager::finish()
 
 void SpirometerManager::readOutput()
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::readOutput";
+    }
+
     if(QProcess::NormalExit != m_process.exitStatus())
     {
-      qDebug() << "ERROR: process failed to finish correctly: cannot read output";
-      return;
+        qDebug() << "ERROR: process failed to finish correctly: cannot read output";
+        return;
     }
     else
-      qDebug() << "process finished successfully";
-
+    {
+        qDebug() << "process finished successfully";
+    }
 
     SpirometerTest* test = static_cast<SpirometerTest*>(m_test.get());
-    test->fromFile(getEMROutXmlName());
 
+    test->fromFile(getEMROutXmlName());
     if(test->isValid())
     {
-      emit measured(m_test.get());
-      emit canFinish();
+        emit measured(m_test.get());
+        emit canFinish();
     }
     else
     {
@@ -187,12 +214,23 @@ void SpirometerManager::readOutput()
 
 bool SpirometerManager::clearData()
 {
-    m_test.reset();
-    return false;
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::clearData";
+    }
+
+    m_test->reset();
+
+    return true;
 }
 
 void SpirometerManager::backupDatabases() const
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::backupDatabases";
+    }
+
     // Create database copy
     QString fromFile = getEWPDbName();
     QString toFile = getEWPDbCopyName();
@@ -216,6 +254,11 @@ void SpirometerManager::backupDatabases() const
 
 void SpirometerManager::restoreDatabases() const
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::restoreDatabases";
+    }
+
     // Reset copied database
     QString toFile = getEWPDbName();
     QString fromFile = getEWPDbCopyName();
@@ -249,6 +292,11 @@ void SpirometerManager::restoreDatabases() const
 
 void SpirometerManager::configureProcess()
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::configureProcess";
+    }
+
     QDir working(m_runnablePath);
     if(isDefined(m_runnableName, SpirometerManager::FileType::EasyWareExe) &&
        isDefined(m_dataPath, SpirometerManager::FileType::EMRDataPath) &&
@@ -282,6 +330,11 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::removeXmlFiles() const
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::removeXmlFiles";
+    }
+
     // delete CypressOut.xml if it exists
     //
     QString fileName = getEMROutXmlName();
@@ -303,10 +356,13 @@ void SpirometerManager::removeXmlFiles() const
 
 QString SpirometerManager::getOutputPdfPath() const
 {
-    SpirometerTest* test = static_cast<SpirometerTest*>(m_test.get());
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::getOutputPdfPath";
+    }
 
-    if(test->isValid() &&
-        test->hasMetaData("pdf_report_path"))
+    SpirometerTest* test = static_cast<SpirometerTest*>(m_test.get());
+    if(test->isValid() && test->hasMetaData("pdf_report_path"))
     {
         return test->getMetaDataAsString("pdf_report_path");
     }
@@ -316,6 +372,11 @@ QString SpirometerManager::getOutputPdfPath() const
 
 bool SpirometerManager::outputPdfExists() const
 {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::outputPdfExists";
+    }
+
     bool pdfExists = false;
     QString outPdfPath = getOutputPdfPath();
     if(!outPdfPath.isEmpty())
@@ -327,11 +388,22 @@ bool SpirometerManager::outputPdfExists() const
 
 
 // Set up device
-bool SpirometerManager::setUp() {
+bool SpirometerManager::setUp()
+{
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::setUp";
+    }
+
     return true;
 }
 
 // Clean up the device for next time
 bool SpirometerManager::cleanUp() {
+    if (m_debug)
+    {
+        qDebug() << "SpirometerManager::cleanUp";
+    }
+
     return true;
 }

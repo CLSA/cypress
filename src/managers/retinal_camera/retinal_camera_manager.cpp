@@ -1,7 +1,9 @@
 #include "retinal_camera_manager.h"
 #include "cypress_application.h"
 
+#include "data/retinal_camera/retinal_camera_test.h"
 #include "data/retinal_camera/retinal_camera_measurement.h"
+
 #include "data/retinal_camera/database_manager.h"
 
 #include "auxiliary/Utilities.h"
@@ -23,8 +25,8 @@
 
 RetinalCameraManager::RetinalCameraManager(QSharedPointer<RetinalCameraSession> session)
     : ManagerBase(session)
-    , m_test(new RetinalCameraTest)
 {
+    m_test.reset(new RetinalCameraTest);
 }
 
 
@@ -38,30 +40,19 @@ bool RetinalCameraManager::isInstalled()
     return false;
 }
 
-void RetinalCameraManager::addManualMeasurement()
-{
-    QSharedPointer<RetinalCameraMeasurement> measurement(new RetinalCameraMeasurement);
-
-    measurement->setAttribute("EYE_PICT_VENDOR", "");
-
-    m_test->addMeasurement(measurement);
-
-    emit dataChanged(m_test);
-}
-
 void RetinalCameraManager::start()
 {
-    emit started(m_test);
-    emit canMeasure();
-
-    //QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    //QStringList arguments;
-
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]
+    if (m_debug)
     {
-        measure();
-        finish();
-    });
+        qDebug() << "RetinalCameraManager::start";
+    }
+
+
+    configureProcess();
+
+    m_process.start();
+
+    emit started(m_test.get());
 
     if (!startRetinalCamera())
     {
@@ -72,20 +63,30 @@ void RetinalCameraManager::start()
 
 void RetinalCameraManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::measure";
+    }
+
     RetinalCameraSession& session = dynamic_cast<RetinalCameraSession&>(*m_session);
 
     m_test->reset();
 
-    if (CypressSettings::isSimMode())
+    if (m_sim)
     {
         m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
-        emit measured(m_test);
+        emit measured(m_test.get());
         emit canFinish();
     }
 }
 
 void RetinalCameraManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::finish";
+    }
+
     int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
@@ -129,16 +130,23 @@ void RetinalCameraManager::finish()
     emit success("sent");
 }
 
-// collate test results and device and other meta data
-// for the main application to write to .json
-//
 bool RetinalCameraManager::backupDatabase()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::backupDatabase";
+    }
+
     return false;
 }
 
 bool RetinalCameraManager::openDatabase()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::openDatabase";
+    }
+
     // Open DB connection and clean up database
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
     m_db = QSqlDatabase::addDatabase(settings.value("instruments/retinal_camera/database/driver").toString());
@@ -161,8 +169,13 @@ bool RetinalCameraManager::openDatabase()
 
 bool RetinalCameraManager::cleanupDatabase()
 {
-    qDebug() << "RetinalCameraManager:: cleaning data";
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::cleanupDatabase";
+    }
+
     QSqlQuery query(m_db);
+
     query.prepare("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.exec();
@@ -181,21 +194,26 @@ bool RetinalCameraManager::cleanupDatabase()
     query.prepare("DELETE FROM dbo.Exams WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.exec();
+
     qDebug() << query.lastError();
 
     query.prepare("DELETE FROM dbo.Media WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.exec();
+
     qDebug() << query.lastError();
 
     query.prepare("DELETE FROM dbo.Patients WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.exec();
+
     qDebug() << query.lastError();
 
     query.prepare("DELETE FROM dbo.Persons WHERE PersonUid = :personUUID");
     query.bindValue(":personUUID", defaultPatientUUID);
     query.exec();
+
+
     qDebug() << query.lastError();
 
     return true;
@@ -203,11 +221,21 @@ bool RetinalCameraManager::cleanupDatabase()
 
 bool RetinalCameraManager::restoreDatabase()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::restoreDatabase";
+    }
+
     return false;
 }
 
 bool RetinalCameraManager::initializeDatabase()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::initializeDatabase";
+    }
+
     QString participantId = "123456789";
 
     QSqlQuery query(m_db);
@@ -228,6 +256,11 @@ bool RetinalCameraManager::initializeDatabase()
 
 bool RetinalCameraManager::startRetinalCamera()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::startRetinalCamera";
+    }
+
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 
     m_process.setProgram(settings.value("retinal_camera/working_dir").toString() + settings.value("retinal_camera/executable").toString());
@@ -242,27 +275,52 @@ bool RetinalCameraManager::startRetinalCamera()
     return started;
 }
 
+void RetinalCameraManager::configureProcess()
+{
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::configureProcess";
+    }
+}
 
-
-// Context dependent clear test data and possibly device data (eg., serial port info)
 bool RetinalCameraManager::clearData()
 {
-    qDebug() << "RetinalCameraManager::clearData";
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::clearData";
+    }
+
+    m_test->reset();
+    emit dataChanged(m_test.get());
+
     return false;
 }
 
 void RetinalCameraManager::cancel()
 {
-    qDebug() << "RetinalCameraManager::cancel";
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::cancel";
+    }
 }
 
 bool RetinalCameraManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::setUp";
+    }
+
     return true;
 }
 
 bool RetinalCameraManager::cleanUp()
 {
-   return true;
+    if (m_debug)
+    {
+        qDebug() << "RetinalCameraManager::cleanUp";
+    }
+
+    return true;
 }
 

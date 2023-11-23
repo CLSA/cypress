@@ -1,8 +1,7 @@
 #include "audiometer_manager.h"
-
 #include "../../data/hearing/tests/hearing_test.h"
 
-#include "cypress_application.h"
+#include "cypress_settings.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -14,8 +13,6 @@
 #include <QStandardItemModel>
 #include <QtMath>
 #include <QMessageBox>
-
-
 
 QByteArray AudiometerManager::END_CODE = AudiometerManager::initEndCode();
 
@@ -51,16 +48,8 @@ AudiometerManager::AudiometerManager(QSharedPointer<AudiometerSession> session)
 
 bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
 {
-#ifdef Q_OS_WIN
     // Check if the system location starts with "COM"
     return portInfo.description().contains("communications port", Qt::CaseInsensitive);
-#elif defined(Q_OS_LINUX)
-    // Check if the system location matches the pattern "/dev/ttyS*"
-    return portInfo.systemLocation().startsWith("/dev/ttyS", Qt::CaseSensitive);
-#else
-    // Unsupported platform
-    return false;
-#endif
 }
 
 bool AudiometerManager::isInstalled()
@@ -71,12 +60,12 @@ bool AudiometerManager::isInstalled()
     }
 
     bool supportsBaudRates = false;
-    for (const QSerialPortInfo& portInfo : portList) {
+    foreach (const QSerialPortInfo& portInfo, portList) {
         if (!isRS232Port(portInfo))
             continue;
 
         QList<qint32> baudRates = portInfo.standardBaudRates();
-        for (qint32 baudRate : baudRates) {
+        foreach (qint32 baudRate, baudRates) {
             if (baudRate >= 600 && baudRate <= 19200) {
                 qInfo() << "port:"                 << portInfo.portName();
                 qInfo() << "supported baud rates:" << baudRates;
@@ -98,17 +87,32 @@ bool AudiometerManager::isInstalled()
 
 void AudiometerManager::start()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::start";
+    }
+
     emit started(m_test.get());
     emit canMeasure();
 }
 
 bool AudiometerManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::setUp";
+    }
+
     return true;
 }
 
 void AudiometerManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::measure";
+    }
+
     m_test.reset();
 
     if (CypressSettings::isSimMode())
@@ -126,6 +130,11 @@ void AudiometerManager::measure()
 
 void AudiometerManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::finish";
+    }
+
     int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
@@ -149,6 +158,11 @@ void AudiometerManager::finish()
 
 bool AudiometerManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::cleanUp";
+    }
+
     clearData();
 
     m_buffer.clear();
@@ -160,6 +174,11 @@ bool AudiometerManager::cleanUp()
 
 void AudiometerManager::readDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::readDevice";
+    }
+
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
 
@@ -182,6 +201,11 @@ void AudiometerManager::readDevice()
 
 void AudiometerManager::writeDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::writeDevice";
+    }
+
     // send a request to the audiometer to start data collection
     //
     m_buffer.clear();
@@ -193,6 +217,11 @@ void AudiometerManager::writeDevice()
 
 bool AudiometerManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "AudiometerManager::clearData";
+    }
+
     m_test.reset();
 
     return true;

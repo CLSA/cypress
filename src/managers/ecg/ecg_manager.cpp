@@ -9,17 +9,18 @@
 #include <QSettings>
 #include <QStandardItemModel>
 #include <QJsonDocument>
+#include <QMessageBox>
 
 ECGManager::ECGManager(QSharedPointer<ECGSession> session)
     : ManagerBase(session)
 {
-    m_test.reset(new ECGTest);
-    m_test->setExpectedMeasurementCount(1);
-
     m_runnableName = CypressSettings::readSetting("ecg/runnableName").toString();
     m_workingPath = CypressSettings::readSetting("ecg/workingPath").toString();
     m_exportPath = CypressSettings::readSetting("ecg/exportPath").toString();
     m_outputFile = m_exportPath + "/" + session->getBarcode() + ".xml";
+
+    m_test.reset(new ECGTest);
+    m_test->setExpectedMeasurementCount(1);
 }
 
 bool ECGManager::isInstalled()
@@ -29,7 +30,12 @@ bool ECGManager::isInstalled()
 
 bool ECGManager::isDefined(const QString &fileName, const FileType &type) const
 {
-    if(CypressSettings::isSimMode())
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::isDefined";
+    }
+
+    if(m_sim)
     {
         return true;
     }
@@ -50,7 +56,12 @@ bool ECGManager::isDefined(const QString &fileName, const FileType &type) const
 
 void ECGManager::start()
 {
-    if (CypressSettings::isSimMode())
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::start";
+    }
+
+    if (m_sim)
     {
         emit started(m_test.get());
         emit canMeasure();
@@ -87,8 +98,54 @@ void ECGManager::start()
     //emit dataChanged();
 }
 
+void ECGManager::configureProcess()
+{
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::configureProcess";
+    }
+
+    QDir workingDir(m_workingPath);
+    QDir exportDir(m_exportPath);
+
+    if(isDefined(m_runnableName) && workingDir.exists() && exportDir.exists())
+    {
+        m_process.setProgram(m_runnableName);
+
+        QString path = QDir::cleanPath(QString("%1%2%3").arg(m_workingPath, QDir::separator(), INIT_PATH));
+
+        QDir backupDir(path);
+
+        if(backupDir.exists())
+        {
+            if(!backupDir.removeRecursively())
+            {
+                qDebug() << "failed to configure and remove backup directory" << path;
+            }
+        }
+
+        if(deleteDeviceData())
+        {
+            emit canMeasure();
+        }
+        else
+        {
+            qDebug() << "couldn't delete device data";
+        }
+    }
+    else
+    {
+        qDebug() << "failed to configure process";
+    }
+}
+
 void ECGManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::measure";
+    }
+
     clearData();
 
     if (CypressSettings::isSimMode())
@@ -107,19 +164,18 @@ void ECGManager::measure()
 
 void ECGManager::readOutput()
 {
-    ECGTest* test = static_cast<ECGTest*>(m_test.get());
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::readOutput";
+    }
 
+    ECGTest* test = static_cast<ECGTest*>(m_test.get());
     if(QProcess::NormalExit != m_process.exitStatus())
     {
-        qDebug() << "ERROR: process failed to finish correctly: cannot read output";
-        return;
-    }
-    else
-    {
-        qDebug() << "process finished successfully, reading output";
-        return;
-    }
+        QMessageBox::critical(nullptr, "Error", "CardioSoft error, cannot read output");
 
+        return;
+    }
 
     if(QFileInfo::exists(m_outputFile))
     {
@@ -132,60 +188,35 @@ void ECGManager::readOutput()
         }
         else
         {
-            qDebug() << "ERROR: input from file produced invalid test results";
+            QMessageBox::critical(nullptr, "Error", "The measurements from CardioSoft were not valid");
         }
     }
     else
     {
-        qDebug() << "ERROR: no output xml file found";
+        QMessageBox::critical(nullptr, "Error", "Cannot find the measurements from CardioSoft");
     }
 }
 
-void ECGManager::configureProcess()
-{
-    QDir workingDir(m_workingPath);
-    QDir exportDir(m_exportPath);
-    if(isDefined(m_runnableName) &&
-        workingDir.exists() && exportDir.exists() &&
-        !m_inputData.isEmpty())
-    {
-        m_process.setProgram(m_runnableName);
-        // m_process.setWorkingDirectory(m_runnablePath); // just use the default
 
-        QString path = QDir::cleanPath(QString("%1%2%3").arg(m_workingPath,QDir::separator(),INIT_PATH));
-        QDir backupDir(path);
-        if(backupDir.exists())
-        {
-            if(!backupDir.removeRecursively())
-            {
-                qDebug() << "failed to configure and remove backup directory"<<path;
-            }
-        }
-
-        if(deleteDeviceData())
-        {
-            qDebug() << "can measure";
-            emit canMeasure();
-        }
-        else
-        {
-            qDebug() << "couldn't delete device data";
-        }
-    }
-    else
-    {
-        qDebug() << "failed to configure process";
-    }
-}
 
 bool ECGManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::clearData";
+    }
+
     m_test.reset();
     return true;
 }
 
 void ECGManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::finish";
+    }
+
     int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
@@ -218,6 +249,11 @@ void ECGManager::finish()
 
 bool ECGManager::deleteDeviceData()
 {
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::deleteDeviceData";
+    }
+
     QString path = QDir::cleanPath(QString("%1%2%3").arg(m_workingPath,QDir::separator(),INIT_PATH));
     QDir backupDir(path);
 
@@ -230,11 +266,11 @@ bool ECGManager::deleteDeviceData()
         }
     }
 
-
     // list of backed up database files
     //
-    backupDir.setNameFilters(QStringList()<<"*.BTR");
+    backupDir.setNameFilters(QStringList() << "*.BTR");
     backupDir.setFilter(QDir::Files);
+
     QFileInfoList list = backupDir.entryInfoList();
     if(!list.isEmpty())
     {
@@ -261,11 +297,20 @@ bool ECGManager::deleteDeviceData()
 // Set up device
 bool ECGManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::setUp";
+    }
+
     return true;
 }
 
 // Clean up the device for next time
 bool ECGManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "ECGManager::cleanUp";
+    }
     return true;
 }

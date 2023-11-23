@@ -1,10 +1,5 @@
 #include "blood_pressure_manager.h"
-#include "auxiliary/json_settings.h"
-
 #include "data/blood_pressure/tests/blood_pressure_test.h"
-
-#include "cypress_application.h"
-#include "bpm_communication.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -36,11 +31,19 @@ BloodPressureManager::~BloodPressureManager()
 
 void BloodPressureManager::start()
 {
-
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::start";
+    }
 }
 
 void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
 {
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::receiveMessages";
+    }
+
     while (!messages.empty())
     {
         BPMMessage message = messages.front();
@@ -65,8 +68,19 @@ void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
 
         // should not appear in read messages
         case BPMMessage::MessageType::CMD:
+            if (m_debug)
+            {
+                qDebug() << "invalid: receiveMessage received CMD message from device";
+            }
+
             break;
+
         case BPMMessage::MessageType::UNKNOWN:
+            if (m_debug)
+            {
+                qDebug() << "invalid: unknown message received from device";
+            }
+
             break;
         }
 
@@ -77,43 +91,60 @@ void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
 
 bool BloodPressureManager::isInstalled()
 {
-  return false;
+    return false;
 }
 
 
 void BloodPressureManager::setCuffSize(const QString &size)
 {
-    //if(size.isNull() || 0 == size.length()) return;
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::setCuffSize";
+    }
 
-    //BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
-    //if(size.toLower() != m_cuffSize)
-    //{
-    //    m_cuffSize = size.toLower();
-    //    test->setCuffSize(m_cuffSize);
+    if(size.isNull() || size.isEmpty())
+    {
+        if (m_debug)
+        {
+            qDebug() << "cuff size is not valid: " << size;
+        }
 
-    //    emit cuffSizeChanged(m_cuffSize);
-    //}
+        return;
+    }
+
+    BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+    test->setCuffSize(size);
 }
 
 void BloodPressureManager::setSide(const QString &side)
 {
-    //if(side.isNull() || 0 == side.length()) return;
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::setSide";
+    }
 
-    //BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
-    //if(side.toLower() != m_side)
-    //{
-    //    m_side = side.toLower();
-    //    test->setSide(m_side);
+    if (side.isNull() || side.isEmpty())
+    {
+        if (m_debug)
+        {
+            qDebug() << "side is not valid: " << side;
+        }
 
-    //    emit sideChanged(m_side);
-    //}
+        return;
+    }
+
+    BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+    test->setSide(side);
 }
 
 // slot for UI communication
 //
 void BloodPressureManager::measure()
 {
-
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::measure";
+    }
 }
 
 
@@ -121,55 +152,97 @@ void BloodPressureManager::measure()
 //
 void BloodPressureManager::finish()
 {
-
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::finish";
+    }
 }
 
 // Set up device
 bool BloodPressureManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::setUp";
+    }
+
     return true;
 }
 
 // Clean up the device for next time
 bool BloodPressureManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::cleanUp";
+    }
+
     return true;
 }
 
 void BloodPressureManager::handleAck(const BPMMessage& message)
 {
-    // get ack type
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::handleAck" << message.getMessageId();
+    }
 
-    quint8 ackType = message.
+    // get ack type
+    //quint8 ackType = message.
 }
 
 void BloodPressureManager::handleNack(const BPMMessage& message)
 {
     // get nack type
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::handleNack: " << message.getMessageId();
+    }
 }
 
 void BloodPressureManager::handleButton(const BPMMessage& message)
 {
     // get button type
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::handleButton: " << message.getMessageId();
+    }
 }
 
 void BloodPressureManager::handleData(const BPMMessage& message)
 {
     // get data type
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::handleData: " << message.getMessageId();
+    }
 }
 
 void BloodPressureManager::handleNotification(const BPMMessage& message)
 {
     // get notification type
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::handleNotification: " << message.getMessageId();
+    }
 }
 
 void BloodPressureManager::handleNoMessage(const BPMMessage& message)
 {
     // get no message type
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::handleNoMessage: " << message.getMessageId();
+    }
 }
 
 // Clean up the device for next time
 bool BloodPressureManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "BloodPressureManager::clearData";
+    }
+
     return true;
 }

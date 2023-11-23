@@ -30,15 +30,17 @@ public slots:
     void addManualMeasurement() override;
 
 private:
+    void configureProcess();
+
     QProcess m_process;
+
     QSqlDatabase m_database;
 
     QString m_workingDirPath;
     QString m_executablePath;
-    QString m_databaseName;
 
-    QDir m_backupDir;
-    QDir m_trackerDir;
+    QString m_databasePath;
+    QString m_backupPath;
 
     // Set up device
     bool setUp() override;

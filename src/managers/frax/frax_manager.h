@@ -27,56 +27,28 @@ class FraxManager : public ManagerBase
 public:
     explicit FraxManager(QSharedPointer<FraxSession> session);
 
-    // is the passed string an executable file
-    // with the correct path elements ?
-    //
-    bool isDefined(const QString&) const;
-
-    static bool isAvailable();
     static bool isInstalled();
 
 public slots:
-
-    // what the manager does in response to the main application
-    // window invoking its run method
-    //
     void start() override;
 
-    // retrieve a measurement from the device
-    //
     void measure() override;
 
-    // implementation of final clean up of device after disconnecting and all
-    // data has been retrieved and processed by any upstream classes
-    //
     void finish() override;
 
-    // set the executable full path and name
-    // calls isDefined to validate the passed arg
-    //
-    void selectRunnable(const QString&);
-
+private:
     void readOutput();
 
-signals:
+    QString m_country_code;
+    QString m_type_code;
 
-    // a valid runnable was selected
-    // manager attempts to configure the process and may emit canMeasure on success
-    //
-    void runnableSelected();
+    QString m_executablePath;		// full path to blackbox.exe
+    QString m_workingDirectoryPath; // path to blackbox.exe directory
 
-    // no runnable available or the selected runnable is invalid
-    // signal can be connected to a ui slot to launch a File select dialog
-    //
-    void canSelectRunnable();
+    QString m_outputFile;    		// full path to output.txt
+    QString m_inputFile;     		// full path to input.txt
+    QString m_temporaryFile; 		// store a copy of the default input.txt
 
-private:
-    QString m_runnableName;// full pathspec to blackbox.exe
-    QString m_runnablePath;// path to blackbox.exe
-
-    QString m_outputFile;    // full pathspec to working output.txt
-    QString m_inputFile;     // full pathspec to working input.txt
-    QString m_temporaryFile; // store a copy of the default input.txt
     QProcess m_process;
 
     // Reset the session

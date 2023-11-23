@@ -96,6 +96,9 @@ protected:
 
     QScopedPointer<TestBase> m_test;
 
+    bool m_debug { true };
+    bool m_sim { true };
+
     bool manualEntryMode { false };
 
     QVariant getInputDataValue(const QString &);

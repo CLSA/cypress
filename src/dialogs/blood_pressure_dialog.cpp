@@ -34,27 +34,6 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     columns << TableColumn("Diastolic (mmHg)", "diastolic", new TextDelegate("", QRegExp(), false));
     columns << TableColumn("Pulse (bpm)", "pulse", new TextDelegate("", QRegExp(), false));
 
-    // port picker setup
-    // ports have been scanned
-    connect(manager, &BloodPressureManager::scanningDevices, ui->usbPortPicker, &UsbPortPicker::scanningForDevices);
-
-    // ports have been scanned
-    connect(manager, &BloodPressureManager::devicesDiscovered, ui->usbPortPicker, &UsbPortPicker::devicesDiscovered);
-
-    // ui should now allow picking a device
-    connect(manager, &BloodPressureManager::canSelectDevice, ui->usbPortPicker, &UsbPortPicker::devicesCanBeSelected);
-
-    // the user selected a device from the dropdown
-    connect(ui->usbPortPicker, &UsbPortPicker::deviceSelected, manager, &BloodPressureManager::selectDevice);
-
-    // the selected device is valid for this test
-    connect(manager, &BloodPressureManager::canConnectDevice, ui->usbPortPicker, &UsbPortPicker::canConnectDevice);
-
-    // the user requested to connect to the device
-    connect(ui->usbPortPicker, &UsbPortPicker::connectDevice, manager, &BloodPressureManager::connectDevice);
-
-    // the user requested to disconnect from the device
-    connect(ui->usbPortPicker, &UsbPortPicker::disconnectDevice, manager, &BloodPressureManager::disconnectDevice);
 
     // a connection was made, update ui
     connect(manager, &BloodPressureManager::deviceConnected, ui->usbPortPicker, &UsbPortPicker::deviceConnected);

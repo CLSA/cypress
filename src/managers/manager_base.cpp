@@ -28,6 +28,8 @@ ManagerBase::ManagerBase(QSharedPointer<CypressSession> session)
     : m_session(session)
     , m_inputData(jsonObjectToVariantMap(m_session->getInputData()))
 {
+    m_debug = CypressSettings::isDebugMode();
+    m_sim = CypressSettings::isSimMode();
 }
 
 ManagerBase::~ManagerBase()

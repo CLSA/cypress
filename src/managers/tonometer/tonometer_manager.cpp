@@ -1,5 +1,5 @@
 //#include "data/AccessQueryHelper.h"
-#include "cypress_application.h"
+#include "cypress_settings.h"
 
 #include "tonometer_manager.h"
 #include "server/sessions/tonometer_session.h"
@@ -29,6 +29,10 @@ TonometerManager::~TonometerManager()
 
 void TonometerManager::start()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::start";
+    }
     emit started(m_test.get());
     emit canMeasure();
 
@@ -61,6 +65,11 @@ void TonometerManager::start()
 
 bool TonometerManager::isDefined(const QString& fileName, const TonometerManager::FileType& type) const
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::isDefined";
+    }
+
     bool ok = false;
     QFileInfo info(fileName);
     if(type == TonometerManager::FileType::ORAApplication)
@@ -74,25 +83,16 @@ bool TonometerManager::isDefined(const QString& fileName, const TonometerManager
     return ok;
 }
 
-void TonometerManager::select()
-{
-}
-
-void TonometerManager::selectRunnable(const QString &exeName)
-{
-    Q_UNUSED(exeName)
-}
-
-void TonometerManager::selectDatabase(const QString &dbName)
-{
-    Q_UNUSED(dbName)
-}
-
 void TonometerManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::measure";
+    }
+
     m_test->reset();
 
-    if (CypressSettings::isSimMode())
+    if (m_sim)
     {
         m_test->simulate({});
         emit measured(m_test.get());
@@ -102,22 +102,39 @@ void TonometerManager::measure()
 
 void TonometerManager::readOutput()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::readOutput";
+    }
 
 }
 
 void TonometerManager::configureProcess()
 {
-
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::configureProcess";
+    }
 }
 
 bool TonometerManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::clearData";
+    }
+
     m_test->reset();
     return false;
 }
 
 void TonometerManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::finish";
+    }
+
     QJsonObject responseJson{};
 
     int answer_id = m_session->getAnswerId();
@@ -130,9 +147,6 @@ void TonometerManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getPineEndpoint();
-
     QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
 
@@ -141,10 +155,20 @@ void TonometerManager::finish()
 
 bool TonometerManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::setUp";
+    }
+
     return true;
 }
 
 bool TonometerManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "TonometerManager::cleanUp";
+    }
+
     return true;
 }

@@ -32,6 +32,11 @@ bool CDTTManager::isInstalled()
 
 void CDTTManager::start()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTT::start";
+    }
+
     setUp();
     emit canMeasure();
 }
@@ -39,6 +44,11 @@ void CDTTManager::start()
 // Set up device
 bool CDTTManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTT::setUp";
+    }
+
     m_test->reset();
     configureProcess();
     return true;
@@ -46,6 +56,11 @@ bool CDTTManager::setUp()
 
 void CDTTManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTT::measure";
+    }
+
     m_test->reset();
     if (CypressSettings::isSimMode())
     {
@@ -62,12 +77,22 @@ void CDTTManager::measure()
 
 bool CDTTManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTTManager::clearData";
+    }
+
     m_test->reset();
     return true;
 }
 
 void CDTTManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTTManager::finish";
+    }
+
     QJsonObject responseJson {};
 
     int answer_id = m_session->getAnswerId();
@@ -90,6 +115,11 @@ void CDTTManager::finish()
 
 void CDTTManager::configureProcess()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTTManager::configureProcess";
+    }
+
     QDir workingDir("");
     QDir outputDir("");
 
@@ -133,6 +163,11 @@ void CDTTManager::configureProcess()
 
 void CDTTManager::readOutput()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTTManager::readOutput";
+    }
+
     if(QProcess::NormalExit != m_process.exitStatus())
     {
         QMessageBox::critical(nullptr, "Error", "CDTT failed to finish correctly, cannot read data. Please contact support");
@@ -195,6 +230,11 @@ void CDTTManager::readOutput()
 // Clean up the device for next time
 bool CDTTManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "CDTTManager::cleanUp";
+    }
+
     m_test.reset();
 
     if(QProcess::NotRunning != m_process.state())

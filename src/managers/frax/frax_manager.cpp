@@ -15,6 +15,15 @@
 FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     : ManagerBase(session)
 {
+    m_executablePath = CypressSettings::readSetting("frax/executablePath").toString();
+    m_workingDirectoryPath = CypressSettings::readSetting("frax/workingDirectoryPath").toString();
+    m_outputFile = CypressSettings::readSetting("frax/outputFilePath").toString();
+    m_inputFile = CypressSettings::readSetting("frax/inputFilePath").toString();
+    m_temporaryFile = CypressSettings::readSetting("frax/temporaryFilePath").toString();
+
+    m_country_code = CypressSettings::readSetting("frax/countryCode").toString();
+    m_type_code = CypressSettings::readSetting("frax/typeCode").toString();
+
     m_test.reset(new FraxTest);
 }
 
@@ -25,6 +34,11 @@ bool FraxManager::isInstalled()
 
 void FraxManager::start()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::start";
+    }
+
     configureProcess();
 
     emit started(m_test.get());
@@ -32,19 +46,13 @@ void FraxManager::start()
 }
 
 
-bool FraxManager::isDefined(const QString &exeName) const
-{
-    Q_UNUSED(exeName)
-    return true;
-}
-
-void FraxManager::selectRunnable(const QString &runnableName)
-{
-    Q_UNUSED(runnableName)
-}
-
 void FraxManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::measure";
+    }
+
     m_test->reset();
 
     if (CypressSettings::isSimMode())
@@ -52,8 +60,9 @@ void FraxManager::measure()
         QVariantMap map;
         QJsonObject inputData = m_session->getInputData();
 
-        map.insert("type", 						inputData.value("type"));
-        map.insert("country_code", 				inputData.value("country_code"));
+        map.insert("type", 						m_type_code);
+        map.insert("country_code", 				m_country_code);
+
         map.insert("age", 						inputData.value("age"));
         map.insert("sex", 						inputData.value("sex"));
         map.insert("bmi", 						inputData.value("bmi"));
@@ -84,19 +93,22 @@ void FraxManager::measure()
 
 void FraxManager::readOutput()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::readOutput";
+    }
+
     if (QProcess::NormalExit != m_process.exitStatus())
     {
-        qDebug() << "ERROR: process failed to finish correctly: cannot read output";
+
+        QMessageBox::critical(nullptr, "Error", "FRAX hasn't finished running");
+
         return;
     }
-    else
-        qDebug() << "process finished successfully";
 
     FraxTest* test = static_cast<FraxTest*>(m_test.get());
-
     if(QFileInfo::exists(m_outputFile))
     {
-        qDebug() << "found output txt file " << m_outputFile;
         test->fromFile(m_outputFile);
         if(test->isValid())
         {
@@ -105,47 +117,50 @@ void FraxManager::readOutput()
         }
         else
         {
-            qDebug() << "ERROR: input from file produced invalid test results";
+            QMessageBox::critical(nullptr, "Error", "FRAX results are invalid");
         }
     }
     else
     {
-        qDebug() << "ERROR: no output.txt file found";
+        QMessageBox::critical(nullptr, "Error", "FRAX results not found");
     }
 }
 
 void FraxManager::configureProcess()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::configureProcess";
+    }
+
     // blackbox.exe and input.txt file are present
     //
-    QDir working(m_runnablePath);
-    if(isDefined(m_runnableName) &&
-        working.exists() && QFileInfo::exists(m_inputFile) &&
-        !m_inputData.isEmpty())
+    QDir working(m_workingDirectoryPath);
+    if(working.exists() && QFileInfo::exists(m_inputFile) && QFileInfo::exists(m_executablePath))
     {
-        qDebug() << "OK: configuring command";
+        m_process.setProgram(m_executablePath);
+        m_process.setWorkingDirectory(m_workingDirectoryPath);
 
-        m_process.setProgram(m_runnableName);
-        m_process.setWorkingDirectory(m_runnablePath);
-
-        qDebug() << "process working dir: " << m_runnablePath;
-
-        // backup original intput.txt
+        // backup original input.txt
         //
         if(!QFileInfo::exists(m_temporaryFile))
         {
-            if(QFile::copy(m_inputFile, m_temporaryFile))
-                qDebug() << "wrote backup of"<< m_inputFile << "to" << m_temporaryFile;
-            else
-                qDebug() << "ERROR: failed to backup default " << m_inputFile;
+            if(!QFile::copy(m_inputFile, m_temporaryFile))
+            {
+                QMessageBox::critical(nullptr, "Error", "Failed to backup data. Please contact support");
+            }
         }
+
         // generate input.txt file content
         // exclude interview barcode and language
         //
         QStringList list;
         foreach(const auto key, m_inputKeyList)
         {
-            if("barcode" == key || "language" == key) continue;
+            if("barcode" == key || "language" == key)
+            {
+                continue;
+            }
 
             QVariant value = m_inputData[key];
             if("sex" == key)
@@ -174,18 +189,20 @@ void FraxManager::configureProcess()
         if(input_file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
             QTextStream stream(&input_file);
+
             stream << line << Qt::endl;
+
             input_file.close();
 
-            qDebug() << "populated input.txt file " << m_inputFile;
-            qDebug() << "content = " << line;
+            if (m_debug)
+            {
+                qDebug() << "populated input.txt file " << m_inputFile;
+                qDebug() << "content = " << line;
+            }
         }
         else
         {
-            qDebug() << "ERROR: failed writing to " << m_inputFile;
             QMessageBox::critical(nullptr, "Error", "Failed writing to input file");
-
-            return;
         }
     }
     else
@@ -196,12 +213,22 @@ void FraxManager::configureProcess()
 
 bool FraxManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::clearData";
+    }
+
     m_test->reset();
     return true;
 }
 
 void FraxManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::finish";
+    }
+
     QJsonObject responseJson{};
 
     int answer_id = m_session->getAnswerId();
@@ -225,6 +252,11 @@ void FraxManager::finish()
 // Set up device
 bool FraxManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::setUp";
+    }
+
     configureProcess();
 
     return true;
@@ -233,7 +265,13 @@ bool FraxManager::setUp()
 // Clean up the device for next time
 bool FraxManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "FraxManager::cleanUp";
+    }
+
     m_test.reset();
+
     if(QProcess::NotRunning != m_process.state())
     {
         m_process.close();
@@ -241,29 +279,51 @@ bool FraxManager::cleanUp()
 
     // remove blackbox.exe generated output.txt file
     //
-    if(!m_outputFile.isEmpty() && QFileInfo::exists(m_outputFile))
+    if(QFileInfo::exists(m_outputFile))
     {
-        qDebug() << "removing output file " << m_outputFile;
-        QFile ofile(m_outputFile);
-        ofile.remove();
-        m_outputFile.clear();
+        QFile outputFile(m_outputFile);
+        if (!outputFile.remove())
+        {
+            QMessageBox::critical(nullptr, "Error", "Could not remove the FRAX output file");
+        }
+    }
+    else
+    {
+        QMessageBox::warning(nullptr, "Warning", "Could not find the output file to be removed");
     }
 
     // remove the default input.txt file
     //
-    if(!m_temporaryFile.isEmpty() && QFileInfo::exists(m_temporaryFile))
+    if(!QFileInfo::exists(m_temporaryFile))
     {
-        // remove the inputfile first
-        QFile ifile(m_inputFile);
-        ifile.remove();
+        // remove the input file containing participant data
+        QFile inputFile(m_inputFile);
+        if (!inputFile.exists())
+        {
+            QMessageBox::critical(nullptr, "Error", "Could not find the input file");
+        }
 
-        QFile::copy(m_temporaryFile, m_inputFile);
-        qDebug() << "restored backup from " << m_temporaryFile;
+        if (!inputFile.remove())
+        {
+            QMessageBox::critical(nullptr, "Error", "Could not remove the input file");
+        }
 
+        // restore backup, default input.txt
+        if (!QFile::copy(m_temporaryFile, m_inputFile))
+        {
+            QMessageBox::critical(nullptr, "Error", "Could not restore backup");
+        }
+
+        // remove the temporary file
         QFile tempFile(m_temporaryFile);
-
-        tempFile.remove();
-        m_temporaryFile.clear();
+        if (!tempFile.remove())
+        {
+            QMessageBox::critical(nullptr, "Error", "Could not remove the temporary file");
+        }
+    }
+    else
+    {
+        QMessageBox::critical(nullptr, "Error", "Could not find the FRAX backup. Please contact support.");
     }
 
     return true;

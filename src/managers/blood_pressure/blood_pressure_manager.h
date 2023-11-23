@@ -36,10 +36,6 @@ class BloodPressureManager : public ManagerBase
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString deviceName MEMBER m_deviceName NOTIFY deviceNameChanged)
-    Q_PROPERTY(QString cuffSize MEMBER m_cuffSize NOTIFY cuffSizeChanged)
-    Q_PROPERTY(QString side MEMBER m_side NOTIFY sideChanged)
-
     enum State {
         CONNECTING,
         READY,

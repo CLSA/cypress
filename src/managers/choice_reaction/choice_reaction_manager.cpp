@@ -30,6 +30,11 @@ bool ChoiceReactionManager::isInstalled()
 
 void ChoiceReactionManager::start()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::start";
+    }
+
     setUp();
 
     emit started(m_test.get());
@@ -38,6 +43,10 @@ void ChoiceReactionManager::start()
 
 void ChoiceReactionManager::configureProcess()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::configureProcess";
+    }
 
     // connect signals and slots to QProcess one time only
     //
@@ -122,6 +131,11 @@ void ChoiceReactionManager::readOutput()
     // the output file.
     // user id and interviewer id are embedded in the csv file content.
     //
+    if (m_debug)
+    {
+        qDebug() << "ChoiceReactionManager::readOutput";
+    }
+
     QStringList pattern;
 
     pattern << CCB_PREFIX << CCB_CLINIC << QDate().currentDate().toString("yyyyMMdd");
@@ -166,6 +180,11 @@ void ChoiceReactionManager::readOutput()
 
 void ChoiceReactionManager::measure()
 {
+    if (m_debug)
+    {
+        qDebug() << "ChoiceReactionManager::measure";
+    }
+
     m_test->reset();
 
     if (CypressSettings::isSimMode())
@@ -180,6 +199,11 @@ void ChoiceReactionManager::measure()
 
 void ChoiceReactionManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "ChoiceReactionManager::finish";
+    }
+
     QJsonObject responseJson {};
 
     int answer_id = m_session->getAnswerId();
@@ -201,6 +225,11 @@ void ChoiceReactionManager::finish()
 
 bool ChoiceReactionManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "ChoiceReactionManager::clearData";
+    }
+
     return false;
 }
 
@@ -208,6 +237,11 @@ bool ChoiceReactionManager::clearData()
 // Set up device
 bool ChoiceReactionManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "ChoiceReactionManager::setUp";
+    }
+
     configureProcess();
     return true;
 }
@@ -215,6 +249,11 @@ bool ChoiceReactionManager::setUp()
 // Clean up the device for next time
 bool ChoiceReactionManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "ChoiceReactionManager::cleanUp";
+    }
+
     m_test.reset();
     if(QProcess::NotRunning != m_process.state())
     {

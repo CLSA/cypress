@@ -34,15 +34,25 @@ bool WeighScaleManager::isInstalled()
 
 void WeighScaleManager::start()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::measure";
+    }
+
     scanDevices();
 
     emit started(m_test.get());
-    //emit canMeasure();
+    emit canMeasure();
 }
 
 void WeighScaleManager::measure()
 {
-    if (CypressSettings::isSimMode())
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::measure";
+    }
+
+    if (m_sim)
     {
         m_test->simulate();
 
@@ -58,6 +68,11 @@ void WeighScaleManager::measure()
 
 void WeighScaleManager::finish()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::finish";
+    }
+
     int answer_id = m_session->getAnswerId();
 
     QJsonObject testJson = m_test->toJsonObject();
@@ -78,6 +93,11 @@ void WeighScaleManager::finish()
 
 void WeighScaleManager::connectDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::connectDevice";
+    }
+
     // Connect to the serial port and set up listeners
 
     if(m_port.isOpen())
@@ -110,12 +130,22 @@ void WeighScaleManager::connectDevice()
 
 void WeighScaleManager::zeroDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::zeroDevice";
+    }
+
     m_request = QByteArray("z");
     writeDevice();
 }
 
 void WeighScaleManager::readDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::readDevice";
+    }
+
     QByteArray data = m_port.readAll();
     m_buffer += data;
 
@@ -169,6 +199,11 @@ void WeighScaleManager::readDevice()
 
 void WeighScaleManager::writeDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::writeDevice";
+    }
+
     // prepare to receive data
     //
     m_buffer.clear();
@@ -177,16 +212,31 @@ void WeighScaleManager::writeDevice()
 
 bool WeighScaleManager::setUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::setUp";
+    }
+
     return true;
 }
 
 bool WeighScaleManager::cleanUp()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::cleanUp";
+    }
+
     return clearData();
 }
 
 bool WeighScaleManager::clearData()
 {
+    if (m_debug)
+    {
+        qDebug() << "WeighScaleManager::clearData";
+    }
+
     m_test->reset();
     return true;
 }
