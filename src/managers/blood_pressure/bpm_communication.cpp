@@ -1,7 +1,7 @@
 #include "bpm_communication.h"
-
 #include "bpm_message.h"
-#include "auxiliary/Utilities.h"
+
+#include "../../auxiliary/Utilities.h"
 
 #include <QCoreApplication>
 #include <QtUsb/QHidDevice>

@@ -4,8 +4,8 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
-#include "managers/manager_base.h"
-#include "auxiliary/Constants.h"
+#include "../managers/manager_base.h"
+#include "../auxiliary/Constants.h"
 
 class CypressSession;
 
@@ -28,6 +28,9 @@ public slots:
     void cancel(const QString& cancelMsg);
 
 protected:
+    bool m_debug;
+    bool m_sim;
+
     void closeEvent(QCloseEvent *event) override;
 
     QSharedPointer<CypressSession> m_session;

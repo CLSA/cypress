@@ -90,6 +90,11 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
 BloodPressureDialog::~BloodPressureDialog()
 {
+    if (CypressSettings::isDebugMode())
+    {
+        qDebug() << "destroy blood pressure dialog";
+    }
+
     delete ui;
 }
 

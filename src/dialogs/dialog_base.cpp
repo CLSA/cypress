@@ -1,10 +1,8 @@
-#include "cypress_application.h"
-#include "cypress_session.h"
-
 #include "dialog_base.h"
-#include "managers/manager_base.h"
 
-#include "auxiliary/json_settings.h"
+#include "../cypress_application.h"
+#include "../cypress_session.h"
+#include "../managers/manager_base.h"
 
 #include <QCoreApplication>
 #include <QCloseEvent>
@@ -27,12 +25,13 @@ DialogBase::DialogBase(QWidget *parent, QSharedPointer<CypressSession> session)
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     startTime = QDateTime::currentDateTimeUtc();
+
+    m_debug = CypressSettings::isDebugMode();
+    m_sim = CypressSettings::isSimMode();
 }
 
 void DialogBase::initialize()
 {
-    initializeModel();
-    initializeConnections();
 }
 
 DialogBase::~DialogBase()

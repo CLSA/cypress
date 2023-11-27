@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QCloseEvent>
 
+#include "dialogs/dialog_base.h"
+
 namespace Ui {
 class CypressMainWindow;
 }
@@ -23,6 +25,8 @@ protected:
 private:
     Ui::CypressMainWindow *ui;
     QPushButton *m_button;
+
+    QSharedPointer<DialogBase> m_device_dialog;
 };
 
 #endif // CYPRESS_MAIN_WINDOW_H

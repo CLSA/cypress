@@ -13,7 +13,99 @@
   <property name="windowTitle">
    <string>CLSA Cypress</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="launchBpm">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>40</y>
+      <width>101</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch BPM</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="launchDxa1">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>101</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch DXA 1</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="launchDxa2">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>40</y>
+      <width>181</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch DXA 2</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="launchUltrasound">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>100</y>
+      <width>161</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch Ultrasound</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="launchWeightScale">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>100</y>
+      <width>161</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch Weight Scale</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="launchSpirometer">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>150</y>
+      <width>161</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch Spirometer</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="launchEcg">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>150</y>
+      <width>191</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Launch ECG</string>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>

@@ -9,39 +9,39 @@
 class BPMMessage {
 public:
     enum MessageType {
-        CMD = 0x11,
-        RESET = 0x10,
-        ACK = 0x10,
-        NACK = 0x15,
-        BUTTON = 0x55,
-        NOTIFICATION = 0x21,
-        DATA,
-        UNKNOWN
+        Command = 0x11,
+        Reset = 0x10,
+        Ack = 0x10,
+        Nack = 0x15,
+        Button = 0x55,
+        Notification = 0x21,
+        Data,
+        Unknown
     };
 
     enum AckType {
-        HANDSHAKE = 0x00,
-        STOP = 0x01,
-        //REVIEW = 0x02,
-        CYCLE = 0x03,
-        START = 0x04,
-        CLEAR = 0x05,
+        AckHandshake = 0x00,
+        AckStop = 0x01,
+        AckReview = 0x02,
+        AckCycle = 0x03,
+        AckStart = 0x04,
+        AckClear = 0x05,
     };
 
     enum ButtonType {
-        STOPPED = 0x01,
-        //REVIEW = 0x02,
-        CYCLED = 0x03,
-        STARTED = 0x04,
-        CLEARED = 0x05,
+        StopButton = 0x01,
+        ReviewButton = 0x02,
+        CycleButton = 0x03,
+        StartButton = 0x04,
+        ClearButton = 0x05,
     };
 
     enum DataType {
-        INFL_CUFF_PRESSURE = 0x49,
-        DEFL_CUFF_PRESSURE = 0x44,
-        BP_RESULT = 0x42,
-        BP_AVG = 0x41,
-        REVIEW = 0x52,
+        BpInflCuffPressure = 0x49,
+        BpDeflCuffPressure = 0x44,
+        BpResult = 0x42,
+        BpAvg = 0x41,
+        BpReview = 0x52,
     };
 
     BPMMessage(
@@ -58,19 +58,19 @@ public:
     BPMMessage::MessageType getType() {
         switch (m_messageId)
         {
-        case MessageType::ACK:
-            return MessageType::ACK;
-        case MessageType::NACK:
-            return MessageType::NACK;
-        case MessageType::BUTTON:
-            return MessageType::BUTTON;
-        case MessageType::DATA:
-            return MessageType::DATA;
-        case MessageType::NOTIFICATION:
-            return MessageType::NOTIFICATION;
+        case MessageType::Ack:
+            return MessageType::Ack;
+        case MessageType::Nack:
+            return MessageType::Nack;
+        case MessageType::Button:
+            return MessageType::Button;
+        case MessageType::Data:
+            return MessageType::Data;
+        case MessageType::Notification:
+            return MessageType::Notification;
         }
 
-        return MessageType::UNKNOWN;
+        return MessageType::Unknown;
     };
 
     quint8 getMessageId() const { return m_messageId; } ;
@@ -115,9 +115,6 @@ private:
     quint8 m_crc{};
 };
 
-struct BPMError {
-
-};
 
 class BpTru200Driver : public QObject
 {
@@ -130,15 +127,20 @@ public:
 signals:
     void receiveMessages(QList<BPMMessage> messages);
 
+    void deviceDisconnected();
+    void deviceConnected();
+
+    void couldNotConnect();
+
 public slots:
     void writeMessage(BPMMessage message);
+
+    void connectToDevice();
+    void disconnectFromDevice();
 
 private:
     void read();
     void write(BPMMessage);
-
-    bool connect();
-    bool disconnect();
 
     QScopedPointer<QByteArray> m_read_buffer;
     QScopedPointer<QHidDevice> m_bpm200;

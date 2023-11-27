@@ -1,5 +1,5 @@
 #include "blood_pressure_manager.h"
-#include "data/blood_pressure/tests/blood_pressure_test.h"
+#include "../../data/blood_pressure/tests/blood_pressure_test.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -8,6 +8,8 @@
 #include <QSettings>
 #include <QStandardItemModel>
 #include <QtUsb/QtUsb>
+
+#include <QMessageBox>
 
 BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
     : ManagerBase(session)
@@ -20,13 +22,27 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
 
     m_driver->moveToThread(m_thread.get());
 
-
     connect(this, &BloodPressureManager::writeMessage, m_driver.get(), &BpTru200Driver::writeMessage);
+
     connect(m_driver.get(), &BpTru200Driver::receiveMessages, this, &BloodPressureManager::receiveMessages);
+    connect(m_driver.get(), &BpTru200Driver::couldNotConnect, this, [=]() {
+        qDebug() << "could not connect";
+        QMessageBox::warning(nullptr, "Could not connect to BPM", "");
+    });
+
+    connect(m_thread.get(), &QThread::started, m_driver.get(), &BpTru200Driver::connectToDevice);
+    connect(m_thread.get(), &QThread::finished, m_driver.get(), &BpTru200Driver::disconnectFromDevice);
+
 }
 
 BloodPressureManager::~BloodPressureManager()
 {
+    if (m_debug)
+    {
+        qDebug() << "destroy blood pressure manager";
+    }
+
+    m_thread->terminate();
 }
 
 void BloodPressureManager::start()
@@ -35,6 +51,8 @@ void BloodPressureManager::start()
     {
         qDebug() << "BloodPressureManager::start";
     }
+
+    m_thread->start();
 }
 
 void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
@@ -50,24 +68,28 @@ void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
 
         switch (message.getType())
         {
-        case BPMMessage::MessageType::ACK:
+        case BPMMessage::MessageType::Ack:
             handleAck(message);
             break;
-        case BPMMessage::MessageType::NACK:
+
+        case BPMMessage::MessageType::Nack:
             handleNack(message);
             break;
-        case BPMMessage::MessageType::BUTTON:
+
+        case BPMMessage::MessageType::Button:
             handleButton(message);
             break;
-        case BPMMessage::MessageType::DATA:
+
+        case BPMMessage::MessageType::Data:
             handleData(message);
             break;
-        case BPMMessage::MessageType::NOTIFICATION:
+
+        case BPMMessage::MessageType::Notification:
             handleNotification(message);
             break;
 
         // should not appear in read messages
-        case BPMMessage::MessageType::CMD:
+        case BPMMessage::MessageType::Command:
             if (m_debug)
             {
                 qDebug() << "invalid: receiveMessage received CMD message from device";
@@ -75,7 +97,7 @@ void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
 
             break;
 
-        case BPMMessage::MessageType::UNKNOWN:
+        case BPMMessage::MessageType::Unknown:
             if (m_debug)
             {
                 qDebug() << "invalid: unknown message received from device";
@@ -186,6 +208,8 @@ void BloodPressureManager::handleAck(const BPMMessage& message)
     {
         qDebug() << "BloodPressureManager::handleAck" << message.getMessageId();
     }
+
+
 
     // get ack type
     //quint8 ackType = message.

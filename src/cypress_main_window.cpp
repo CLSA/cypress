@@ -17,6 +17,10 @@
 #include "widgets/device_settings/tonometer_settings_widget.h"
 #include "widgets/device_settings/weight_scale_settings_widget.h"
 
+#include "server/sessions/bpm_session.h"
+#include "dialogs/blood_pressure_dialog.h"
+
+
 #include <QVBoxLayout>
 #include <QDebug>
 
@@ -25,6 +29,21 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     ui(new Ui::CypressMainWindow)
 {
     ui->setupUi(this);
+
+    connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData {
+            {"language", "en"},
+            {"barcode", "12345678"},
+            {"interviewer", "Test"},
+            };
+        ;
+
+        QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData));
+        m_device_dialog.reset(new BloodPressureDialog(nullptr, session));
+
+        m_device_dialog->run();
+        m_device_dialog->show();
+    });
 
     connect(ui->actionAudiometer_2, &QAction::triggered, this, [=]() {
         AudiometerSettingsWidget* audiometerSettings = new AudiometerSettingsWidget;

@@ -1,9 +1,9 @@
 #ifndef BLOOD_PRESSURE_MANAGER_H
 #define BLOOD_PRESSURE_MANAGER_H
 
-#include "data/blood_pressure/tests/blood_pressure_test.h"
-#include "managers/manager_base.h"
-#include "server/sessions/bpm_session.h"
+#include "../../data/blood_pressure/tests/blood_pressure_test.h"
+#include "../../managers/manager_base.h"
+#include "../../server/sessions/bpm_session.h"
 
 #include <QObject>
 #include <QThread>

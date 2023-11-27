@@ -10,15 +10,34 @@ BpTru200Driver::BpTru200Driver(QObject *parent)
 
 BpTru200Driver::~BpTru200Driver()
 {
-
+    qDebug() << "destory bptru driver";
 }
 
-bool BpTru200Driver::connect()
+void BpTru200Driver::connectToDevice()
 {
     if (m_bpm200->isOpen())
-        return true;
+    {
+        return;
+    }
 
-    return m_bpm200->open(vid, pid);
+    if (m_bpm200->open(vid, pid))
+    {
+        emit deviceConnected();
+    }
+    else
+    {
+        emit couldNotConnect();
+    }
+}
+
+void BpTru200Driver::disconnectFromDevice()
+{
+    if (m_bpm200->isOpen())
+    {
+        m_bpm200->close();
+    }
+
+    emit deviceDisconnected();
 }
 
 void BpTru200Driver::writeMessage(BPMMessage message)
@@ -138,13 +157,4 @@ void BpTru200Driver::parseData(const QByteArray& data, quint32 bytesRead)
     }
 }
 
-bool BpTru200Driver::disconnect()
-{
-    if (m_bpm200->isOpen())
-    {
-        m_bpm200->close();
-        return true;
-    }
 
-    return true;
-}
