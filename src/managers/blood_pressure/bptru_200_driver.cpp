@@ -1,11 +1,16 @@
 #include "bptru_200_driver.h"
 
+#include "cypress_settings.h"
+
 
 BpTru200Driver::BpTru200Driver(QObject *parent)
     : QObject{parent}
 {
     m_bpm200.reset(new QHidDevice(this));
     m_read_buffer.reset(new QByteArray(1024, 0));
+
+    m_debug = CypressSettings::isDebugMode();
+    m_sim = CypressSettings::isSimMode();
 }
 
 BpTru200Driver::~BpTru200Driver()
@@ -15,46 +20,73 @@ BpTru200Driver::~BpTru200Driver()
 
 void BpTru200Driver::connectToDevice()
 {
-    if (m_bpm200->isOpen())
+    if (m_debug)
     {
-        return;
+        qDebug() << "attempt to connect to device...";
     }
 
     if (m_bpm200->open(vid, pid))
     {
+        if (m_debug)
+        {
+            qDebug() << "connected to bpm";
+        }
+
         emit deviceConnected();
     }
     else
     {
+        if (m_debug)
+        {
+            qDebug() << "could not connect to bpm...";
+        }
+
         emit couldNotConnect();
     }
 }
 
 void BpTru200Driver::disconnectFromDevice()
 {
+    if (m_debug)
+    {
+        qDebug() << "attempt to disconnect from device";
+    }
+
     if (m_bpm200->isOpen())
     {
         m_bpm200->close();
+
+        if (m_debug)
+        {
+            qDebug() << "bpm disconnected";
+        }
     }
 
     emit deviceDisconnected();
 }
 
-void BpTru200Driver::writeMessage(BPMMessage message)
+
+void BpTru200Driver::write(BPMMessage message)
 {
     if (message.isValidCRC())
     {
-        qDebug() << "writing message";
+        if (m_debug)
+        {
+            qDebug() << "writing message";
+        }
+
         write(message);
     }
     else
     {
-        qDebug() << "error: bpm message does not have a valid CRC";
-    }
-}
+        if (m_debug)
+        {
+            qDebug() << "error: bpm message does not have a valid CRC";
+        }
 
-void BpTru200Driver::write(BPMMessage message)
-{
+        return;
+    }
+
     QByteArray packedMessage;
 
     packedMessage.append(reportNumber);
@@ -67,11 +99,20 @@ void BpTru200Driver::write(BPMMessage message)
     packedMessage.append(message.getCrc());
     packedMessage.append(ETX);
 
-    m_bpm200->write(&packedMessage, packedMessage.size());
+    qint32 bytesWritten = m_bpm200->write(&packedMessage, packedMessage.size());
+    if (m_debug)
+    {
+        qDebug() << "BpTru200Driver::write - wrote " << bytesWritten;
+    }
 }
 
 void BpTru200Driver::read()
 {
+    if (m_debug)
+    {
+        qDebug() << "BpTru200Driver - read";
+    }
+
     if (!m_bpm200->isOpen())
     {
         qDebug() << "Tried to read before device was connected..";
@@ -88,15 +129,25 @@ void BpTru200Driver::read()
     quint32 bytesRead = m_bpm200->read(m_read_buffer.get(), 1024);
     if (bytesRead <= 0)
     {
-        qDebug() << "bytes read <= 0, not parsing anything";
+        if (m_debug)
+        {
+            qDebug() << "bytes read <= 0, not parsing anything";
+        }
+
         return;
     }
     else {
-        qDebug() << "bytes read: " << bytesRead;
+        if (m_debug)
+        {
+            qDebug() << "bytes read: " << bytesRead;
+        }
     }
 
     // convert bytes into bytes
-    qDebug() << "convert bytes into bytes";
+    if (m_debug)
+    {
+        qDebug() << "convert bytes into bytes";
+    }
 
     QByteArray bytes = QByteArray::fromHex(m_read_buffer.get()[0].toHex());
     for (quint32 i = 1; i < bytesRead; i++)
@@ -105,12 +156,18 @@ void BpTru200Driver::read()
         bytes.append(tempBytes);
     }
 
-    qDebug() << "parse bytes into message";
+    if (m_debug)
+    {
+        qDebug() << "parse bytes into message";
+    }
 
     // parse bytes into bpm messages
     parseData(bytes, bytesRead);
 
-    qDebug() << "send to manager";
+    if (m_debug)
+    {
+        qDebug() << "send to manager";
+    }
 
     // pop from the read queue into a list and send to the manager
     QList<BPMMessage> messages;
@@ -142,15 +199,20 @@ void BpTru200Driver::parseData(const QByteArray& data, quint32 bytesRead)
                 quint8 crc   = data[++i];
 
                 BPMMessage message(messageId, data0, data1, data2, data3, crc);
-
                 if (message.isValidCRC())
                 {
-                    qDebug() << "parsed valid message";
+                    if (m_debug)
+                    {
+                        qDebug() << "parsed valid message";
+                    }
                     readQueue.push(message);
                 }
                 else
                 {
-                    qDebug() << "error: message is not valid";
+                    if (m_debug)
+                    {
+                        qDebug() << "error: message is not valid";
+                    }
                 }
             }
         }

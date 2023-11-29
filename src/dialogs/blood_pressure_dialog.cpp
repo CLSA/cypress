@@ -35,12 +35,6 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     columns << TableColumn("Pulse (bpm)", "pulse", new TextDelegate("", QRegExp(), false));
 
 
-    // a connection was made, update ui
-    connect(manager, &BloodPressureManager::deviceConnected, ui->usbPortPicker, &UsbPortPicker::deviceConnected);
-
-    // device disconnected, update ui
-    connect(manager, &BloodPressureManager::deviceDisconnected, ui->usbPortPicker, &UsbPortPicker::deviceDisconnected);
-
     // device started
     connect(manager, &BloodPressureManager::started, ui->measurementTable, [=](TestBase* test) {
         Q_UNUSED(test)

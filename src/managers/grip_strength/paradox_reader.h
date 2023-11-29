@@ -42,8 +42,8 @@ class DbHeaderField
         void setName(const QString& name) { m_name = name; }
     private:
         FieldType m_type;
-        int m_size;
         QString m_name;
+        int m_size;
 };
 
 class DbHeader
@@ -87,8 +87,15 @@ class DbHeader
 
 class ParadoxDbBlock {
     public:
-        ParadoxDbBlock(qint32 blockNumber, qint32 nextBlock, qint32 prevBlock,
-        int offsetToLastRecord, long fileOffset, qint32 addDataSize, DbHeader* header) :
+        ParadoxDbBlock(
+            qint32 blockNumber,
+            qint32 nextBlock,
+            qint32 prevBlock,
+            int offsetToLastRecord,
+            long fileOffset,
+            qint32 addDataSize,
+            DbHeader* header
+        ) :
         m_blockNumber(blockNumber),
         m_nextBlock(nextBlock),
         m_prevBlock(prevBlock),

@@ -58,6 +58,7 @@ public:
 
 signals:
     void writeMessage(BPMMessage message);
+    void readMessages();
 
 public slots:
     void receiveMessages(QList<BPMMessage> messages);

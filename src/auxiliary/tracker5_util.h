@@ -8,7 +8,6 @@ public:
     static double asNewtons(int thousanthsPounds);
     static double asKg(int thousanthsPounds);
 
-private:
     constexpr static double ONE_POUND_FORCE_IN_NEWTONS = 4.4482216152605;
     constexpr static double ONE_POUND_FORCE_IN_KILOGRAMS = 4.4482216152605 / 9.80665;
 };

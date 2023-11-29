@@ -24,9 +24,6 @@
     <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
    </item>
    <item>
-    <widget class="UsbPortPicker" name="usbPortPicker" native="true"/>
-   </item>
-   <item>
     <widget class="QGroupBox" name="deviceOptions">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -93,13 +90,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QPushButton" name="addPushButton">
-        <property name="text">
-         <string>Add</string>
-        </property>
-       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="startStop">
@@ -232,12 +222,6 @@
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>UsbPortPicker</class>
-   <extends>QWidget</extends>
-   <header>widgets/usb_port_picker.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

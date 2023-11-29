@@ -83,7 +83,10 @@ void ParadoxReader::openDatabase(const QString& filePath)
 {
     // Open data base
     m_dbFile.setFileName(filePath);
-    m_dbFile.open(QFile::ReadOnly);
+    if (!m_dbFile.open(QFile::ReadOnly))
+    {
+        qDebug() << "ParadoxReader::could not open paradox file";
+    }
 }
 
 /*
@@ -148,16 +151,17 @@ bool ParadoxReader::headerDataValid()
 
 QJsonObject ParadoxDbBlock::readRecord(QFile& dbFile)
 {
-        QJsonObject jsonRecord;
-        for (int i = 0; i < m_dbHeader->numFields; i++) {
-            DbHeaderField field = m_dbHeader->fields[i];
-            FieldType type = field.getType();
-            QByteArray bytes = dbFile.read(field.getSize());
-            QVariant value = getValue(bytes, type);
-            qDebug() << field.getName() << " " << value;
-            jsonRecord.insert(field.getName(), QJsonValue::fromVariant(value));
-        }
-        return jsonRecord;
+    QJsonObject jsonRecord;
+
+    for (int i = 0; i < m_dbHeader->numFields; i++) {
+        DbHeaderField field = m_dbHeader->fields[i];
+        FieldType type = field.getType();
+        QByteArray bytes = dbFile.read(field.getSize());
+        QVariant value = getValue(bytes, type);
+        qDebug() << field.getName() << " " << value;
+        jsonRecord.insert(field.getName(), QJsonValue::fromVariant(value));
+    }
+    return jsonRecord;
 }
 
 QList<QJsonObject> ParadoxDbBlock::readRecords(QFile& dbFile)
@@ -228,14 +232,17 @@ QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
     }
 
 
-QByteArray ParadoxDbBlock::fixSign(QByteArray bytes) {
-        if (bytes[0] & 0x80) {
-            //bytes[0] &= 0x7f; This is the java code. not too sure about &=
-            // Flip the most significant bit to 0 (remove sign bit)
-            bytes[0] = bytes[0] & 0x7f;
-        }
-        return bytes;
+QByteArray ParadoxDbBlock::fixSign(QByteArray bytes)
+{
+    if (bytes[0] & 0x80) {
+        //bytes[0] &= 0x7f; This is the java code. not too sure about &=
+        // Flip the most significant bit to 0 (remove sign bit)
+        bytes[0] = bytes[0] & 0x7f;
     }
+
+    return bytes;
+}
+
 /*
 * Seek to the start of the header field info stored in the paradox database
 * Expects that the dbFile will be set to the end of the refIntegrity

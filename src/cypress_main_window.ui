@@ -14,97 +14,178 @@
    <string>CLSA Cypress</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="launchBpm">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>40</y>
-      <width>101</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch BPM</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="launchDxa1">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>40</y>
-      <width>101</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch DXA 1</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="launchDxa2">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>40</y>
-      <width>181</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch DXA 2</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="launchUltrasound">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>100</y>
-      <width>161</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch Ultrasound</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="launchWeightScale">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>100</y>
-      <width>161</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch Weight Scale</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="launchSpirometer">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>150</y>
-      <width>161</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch Spirometer</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="launchEcg">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>150</y>
-      <width>191</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Launch ECG</string>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Room 1</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="launchBpm">
+         <property name="text">
+          <string>BPM</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchSpirometer">
+         <property name="text">
+          <string>Spirometer</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchWeightScale">
+         <property name="text">
+          <string>Weight</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchDxa1">
+         <property name="text">
+          <string>DXA (Hip)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchDxa2">
+         <property name="text">
+          <string>DXA 2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchUltrasound">
+         <property name="text">
+          <string>CIMT</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchEcg">
+         <property name="text">
+          <string>ECG</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchFrax">
+         <property name="text">
+          <string>FRAX</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Room 2</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="launchAudiometer">
+         <property name="text">
+          <string>Audiometer</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="title">
+       <string>Room 3</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="launchGripStrength">
+         <property name="text">
+          <string>Grip Strength</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchRetinalCamera">
+         <property name="text">
+          <string>Retinal Camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchChoiceReaction">
+         <property name="text">
+          <string>Choice Reaction</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="launchCDTT">
+         <property name="text">
+          <string>CDTT</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -134,6 +215,8 @@
     <addaction name="actionWeigh_Scale"/>
     <addaction name="actionSpirometer"/>
     <addaction name="actionBlood_Pressure"/>
+    <addaction name="separator"/>
+    <addaction name="actionTest_Locally"/>
    </widget>
    <addaction name="menuDevice_Settings"/>
   </widget>
@@ -236,6 +319,11 @@
   <action name="actionBlood_Pressure">
    <property name="text">
     <string>Blood Pressure</string>
+   </property>
+  </action>
+  <action name="actionTest_Locally">
+   <property name="text">
+    <string>Test Locally</string>
    </property>
   </action>
  </widget>

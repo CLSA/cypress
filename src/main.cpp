@@ -2,6 +2,9 @@
 #include "cypress_session.h"
 #include "cypress_settings.h"
 #include "cypress_main_window.h"
+
+#include "managers/blood_pressure/bptru_200_driver.h"
+
 #include "tray_application.h"
 
 #include "auxiliary/Constants.h"
@@ -168,6 +171,7 @@ int main(int argc, char *argv[])
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
     qRegisterMetaType<CypressSession*>("CypressSession*");
+    qRegisterMetaType<BPMMessage>("BPMMessage");
 
     QApplication app(argc, argv);
     CypressMainWindow* mainWindow = new CypressMainWindow;

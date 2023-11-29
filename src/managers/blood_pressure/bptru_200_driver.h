@@ -4,9 +4,12 @@
 #include <QObject>
 #include <QtUsb/QHidDevice>
 
+#include "auxiliary/CRC8.h"
+
 #include <queue>
 
-class BPMMessage {
+class BPMMessage: public QObject {
+    Q_OBJECT
 public:
     enum MessageType {
         Command = 0x11,
@@ -50,10 +53,44 @@ public:
         quint8 data1,
         quint8 data2,
         quint8 data3,
-        quint8 crc
+        quint8 crc = 0x00
         ): m_messageId(messageId), m_data0(data0), m_data1(data1), m_data2(data2), m_data3(data3), m_crc(crc) {
+            if (!crc)
+            {
+                calculateCrc();
+            }
+        };
 
-          };
+    BPMMessage(const BPMMessage& other)
+    {
+        m_messageId = other.getMessageId();
+        m_data0 = other.getData0();
+        m_data1 = other.getData1();
+        m_data2 = other.getData2();
+        m_data3 = other.getData3();
+        m_crc = other.getCrc();
+    }
+
+    BPMMessage(BPMMessage&& other)
+    {
+        m_messageId = other.getMessageId();
+        m_data0 = other.getData0();
+        m_data1 = other.getData1();
+        m_data2 = other.getData2();
+        m_data3 = other.getData3();
+        m_crc = other.getCrc();
+    }
+
+
+    BPMMessage()
+    {
+        m_messageId = 0x00;
+        m_data0 = 0x00;
+        m_data1 = 0x00;
+        m_data2 = 0x00;
+        m_data3 = 0x00;
+        m_crc = 0x00;
+    }
 
     BPMMessage::MessageType getType() {
         switch (m_messageId)
@@ -91,6 +128,10 @@ public:
     quint8 getCrc() const { return m_crc; };
     void setCrc(quint8 crc) { m_crc = crc; };
 
+    void calculateCrc() {
+        m_crc = CRC8::calculate(getBytes(), getBytes().length());
+    }
+
     bool isValidCRC() { return true; };
 
     QByteArray getBytes() const {
@@ -107,12 +148,12 @@ public:
     };
 
 private:
-    quint8 m_messageId{};
-    quint8 m_data0{};
-    quint8 m_data1{};
-    quint8 m_data2{};
-    quint8 m_data3{};
-    quint8 m_crc{};
+    quint8 m_messageId{ 0x00 };
+    quint8 m_data0{ 0x00 };
+    quint8 m_data1{ 0x00 };
+    quint8 m_data2{ 0x00 };
+    quint8 m_data3{ 0x00 };
+    quint8 m_crc{ 0x00 };
 };
 
 
@@ -133,14 +174,17 @@ signals:
     void couldNotConnect();
 
 public slots:
-    void writeMessage(BPMMessage message);
+    void read();
+    void write(BPMMessage message);
 
     void connectToDevice();
     void disconnectFromDevice();
 
 private:
-    void read();
-    void write(BPMMessage);
+    bool m_debug;
+    bool m_sim;
+
+
 
     QScopedPointer<QByteArray> m_read_buffer;
     QScopedPointer<QHidDevice> m_bpm200;

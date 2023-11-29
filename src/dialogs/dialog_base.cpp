@@ -20,9 +20,8 @@ DialogBase::DialogBase(QWidget *parent, QSharedPointer<CypressSession> session)
 {
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
-    connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
-
-    this->setAttribute(Qt::WA_DeleteOnClose);
+    //connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
+    //this->setAttribute(Qt::WA_DeleteOnClose);
 
     startTime = QDateTime::currentDateTimeUtc();
 
@@ -59,8 +58,19 @@ void DialogBase::run()
 
 void DialogBase::closeEvent(QCloseEvent* event)
 {
+
     if (m_session->getStatus() != SessionStatus::Ended) {
-        cancel("");
+        QMessageBox::StandardButton reply = QMessageBox::question(
+        this,
+        "Confirmation",
+        "Are you sure you want to close? Any unsaved measurements will be lost.",
+        QMessageBox::Yes|QMessageBox::No
+    );
+        if (reply != QMessageBox::Yes)
+        {
+            event->ignore();
+            return;
+        }
     }
 
     QDialog::closeEvent(event);
@@ -68,19 +78,15 @@ void DialogBase::closeEvent(QCloseEvent* event)
 
 void DialogBase::cancel(const QString& cancelMsg)
 {
-    QMessageBox::StandardButton reply = QMessageBox::question(
-        this,
-        "Confirmation",
-        !cancelMsg.isEmpty() ? cancelMsg : "Are you sure you want to close? Any unsaved measurements will be lost.",
-        QMessageBox::Yes|QMessageBox::No
-    );
-
-    if (reply != QMessageBox::Yes)
+    if (m_debug)
     {
-        return;
+        qDebug() << "DialogBase::cancel";
     }
 
-    m_manager->sendCancellation(m_session->getSessionId());
+    if (!m_debug)
+    {
+        m_manager->sendCancellation(m_session->getSessionId());
+    }
 
     Cypress::getInstance().endSession(m_session->getSessionId());
 
@@ -102,7 +108,10 @@ void DialogBase::success(const QString& successMsg)
 {
     QMessageBox::information(this, "Complete", !successMsg.isEmpty() ? successMsg : "The data has been saved to Pine");
 
-    m_manager->sendComplete(m_session->getSessionId());
+    if (!m_debug)
+    {
+        m_manager->sendComplete(m_session->getSessionId());
+    }
 
     Cypress::getInstance().endSession(m_session->getSessionId());
 

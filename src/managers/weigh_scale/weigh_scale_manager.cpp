@@ -30,8 +30,6 @@ bool WeighScaleManager::isInstalled()
     return false;
 }
 
-
-
 void WeighScaleManager::start()
 {
     if (m_debug)
