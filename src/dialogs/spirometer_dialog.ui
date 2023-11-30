@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>692</width>
+    <height>393</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Spirometer</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -24,15 +24,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TestInfoWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/test_info_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>MeasurementTable</class>
    <extends>QWidget</extends>
    <header>widgets/measurement_table.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TestInfoWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/test_info_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

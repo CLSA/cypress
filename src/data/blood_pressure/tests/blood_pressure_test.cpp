@@ -78,6 +78,7 @@ void BloodPressureTest::simulate()
 
 bool BloodPressureTest::isValid() const
 {
+    qDebug() << "is valid?";
     bool okMeta = true;
     foreach(const auto key, m_outputKeyList)
     {

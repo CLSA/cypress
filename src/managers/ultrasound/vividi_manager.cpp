@@ -47,6 +47,7 @@ bool VividiManager::isInstalled()
 void VividiManager::start()
 {
     emit started(m_test.get());
+    emit dataChanged(m_test.get());
     emit canMeasure();
 }
 

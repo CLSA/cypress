@@ -72,6 +72,7 @@ void SpirometerManager::start()
     if (m_sim) {
 
         emit started(m_test.get());
+        emit dataChanged(m_test.get());
         emit canMeasure();
 
         return;
@@ -101,7 +102,7 @@ void SpirometerManager::start()
         });
 
     configureProcess();
-    //emit dataChanged();
+    emit dataChanged(m_test.get());
 }
 
 void SpirometerManager::measure()
@@ -125,6 +126,7 @@ void SpirometerManager::measure()
         }));
 
         emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;

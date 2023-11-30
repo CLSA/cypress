@@ -18,6 +18,7 @@ SpirometerDialog::SpirometerDialog(QWidget *parent, QSharedPointer<SpirometerSes
     SpirometerManager* manager = static_cast<SpirometerManager*>(m_manager.get());
 
     ui->testInfoWidget->setSessionInformation(*session);
+    ui->measurementTable->disableMeasureButton();
 
     QList<TableColumn> columns;
 

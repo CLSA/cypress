@@ -38,6 +38,7 @@ void ChoiceReactionManager::start()
     setUp();
 
     emit started(m_test.get());
+    emit dataChanged(m_test.get());
     emit canMeasure();
 }
 

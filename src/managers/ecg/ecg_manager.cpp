@@ -95,7 +95,7 @@ void ECGManager::start()
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
     configureProcess();
-    //emit dataChanged();
+    emit dataChanged(m_test.get());
 }
 
 void ECGManager::configureProcess()

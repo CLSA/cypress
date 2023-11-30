@@ -40,6 +40,7 @@ void WeighScaleManager::start()
     scanDevices();
 
     emit started(m_test.get());
+    emit dataChanged(m_test.get());
     emit canMeasure();
 }
 

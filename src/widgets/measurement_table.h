@@ -245,6 +245,10 @@ public:
 
     void hideManualEntry();
     void showManualEntry();
+
+    void hideMeasureButton();
+    void showMeasureButton();
+
 signals:
     void measure();
     void finish();

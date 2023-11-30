@@ -11,8 +11,10 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
     , ui(new Ui::FraxDialog)
 {
     ui->setupUi(this);
+
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+    ui->measurementTable->hideManualEntry();
 
     this->setWindowTitle("FRAX");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -24,8 +26,8 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
     ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
-    columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("type", "Type", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("probability", "Probability", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager, &FraxManager::started, ui->measurementTable, [=](TestBase* test) {

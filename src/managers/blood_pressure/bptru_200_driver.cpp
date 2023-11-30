@@ -25,17 +25,19 @@ bool BpTru200Driver::connectToDevice()
         qDebug() << "attempt to connect to device...";
     }
 
-    if (m_bpm200->open(vid, pid))
-    {
+    if (m_bpm200->isOpen()) {
+        m_bpm200->close();
+    }
+
+    if (m_bpm200->open(vid, pid)) {
         if (m_debug)
         {
             qDebug() << "connected to bpm";
+            qDebug() << m_bpm200->manufacturer();
         }
 
         return true;
-    }
-    else
-    {
+    } else {
         if (m_debug)
         {
             qDebug() << "could not connect to bpm...";
@@ -66,13 +68,9 @@ void BpTru200Driver::disconnectFromDevice()
 
 qint32 BpTru200Driver::write(BPMMessage message)
 {
-    if (!message.isValidCRC())
-    {
-        if (m_debug)
-        {
-            qDebug() << "invalid crc, cannot write";
-        }
-    }
+    message.calculateCrc();
+
+    qDebug() << message.isValidCRC();
 
     QByteArray packedMessage;
     packedMessage.append(reportNumber);
@@ -84,6 +82,11 @@ qint32 BpTru200Driver::write(BPMMessage message)
     packedMessage.append(message.getData3());
     packedMessage.append(message.getCrc());
     packedMessage.append(ETX);
+
+    if (!m_bpm200->isOpen()) {
+        qDebug() << "connection not open";
+        return -1;
+    }
 
     qint32 bytesWritten = m_bpm200->write(&packedMessage, packedMessage.size());
     if (m_debug)
@@ -107,12 +110,9 @@ qint32 BpTru200Driver::read(int timeoutMs)
     //    return -1;
     //}
 
-    // reset buffer
-    QByteArray* buffer = m_read_buffer.get();
-    for (int i = 0; i < 1024; i++)
-    {
-        buffer[i] = 0;
-    }
+    qDebug() << "reset buffer";
+
+    m_read_buffer.get()->fill(0x00);
 
     qDebug() << "buffer reset, reading";
 
@@ -136,8 +136,7 @@ qint32 BpTru200Driver::read(int timeoutMs)
     qDebug() << "bytes: " << m_read_buffer->toHex();
 
     QByteArray bytes = QByteArray::fromHex(m_read_buffer.get()[0].toHex());
-    for (quint32 i = 1; i < bytesRead; i++)
-    {
+    for (quint32 i = 1; i < bytesRead; i++) {
         QByteArray tempBytes = QByteArray::fromHex(m_read_buffer.get()[i].toHex());
         bytes.append(tempBytes);
     }
@@ -148,26 +147,24 @@ qint32 BpTru200Driver::read(int timeoutMs)
     }
 
     // parse bytes into bpm messages
-    parseData(bytes, bytesRead);
+    parseData(bytesRead);
 
     return bytesRead;
 }
 
-void BpTru200Driver::parseData(const QByteArray& data, quint32 bytesRead)
+void BpTru200Driver::parseData(quint32 bytesRead)
 {
     for (quint32 i = 0; i < bytesRead; i++)
     {
-        if (data[i] == STX && (i + 7) < bytesRead)
-        {
-            if (data[i + 7] == ETX)
-            {
+        if (m_read_buffer->at(i) == STX && (i + 7) < bytesRead) {
+            if (m_read_buffer->at(i + 7) == ETX) {
                 qDebug() << "found message, parsing..";
-                quint8 messageId = data[++i];
-                quint8 data0 = data[++i];
-                quint8 data1 = data[++i];
-                quint8 data2 = data[++i];
-                quint8 data3 = data[++i];
-                quint8 crc   = data[++i];
+                quint8 messageId = m_read_buffer->at(++i);
+                quint8 data0 = m_read_buffer->at(++i);
+                quint8 data1 = m_read_buffer->at(++i);
+                quint8 data2 = m_read_buffer->at(++i);
+                quint8 data3 = m_read_buffer->at(++i);
+                quint8 crc = m_read_buffer->at(++i);
 
                 BPMMessage message(messageId, data0, data1, data2, data3, crc);
 

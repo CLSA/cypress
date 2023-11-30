@@ -98,8 +98,9 @@ void MeasurementTable::handleChange(int row, int col)
 
 void MeasurementTable::updateRowIds()
 {
-    for (int row = 0; row < ui->measurementTable->rowCount(); row++)
-    {
+    qDebug() << "update row ids";
+
+    for (int row = 0; row < ui->measurementTable->rowCount(); row++) {
         QWidget* widget = ui->measurementTable->cellWidget(row, ui->measurementTable->columnCount() - 1);
         if (widget)
         {
@@ -136,12 +137,14 @@ void MeasurementTable::saveManualChanges()
 {
     updateRowIds();
 
-    for (int row = 0; row < ui->measurementTable->rowCount(); row++)
-    {
-        Measurement& measure = m_test->get(row);
+    qDebug() << "update rows: " << ui->measurementTable->rowCount();
 
-        for (int col = 0; col < ui->measurementTable->columnCount() - 1; col++)
-        {
+    for (int row = 0; row < ui->measurementTable->rowCount(); row++) {
+        qDebug() << "get measure";
+
+        Measurement &measure = m_test->get(row);
+
+        for (int col = 0; col < ui->measurementTable->columnCount() - 1; col++) {
             TableColumn& column = m_columns[col];
 
             Measurement::Value attribute = measure.getAttribute(column.key);
@@ -160,8 +163,12 @@ void MeasurementTable::saveManualChanges()
         }
     }
 
-    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
+    qDebug() << "before set buttons";
+    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount()
+                                     < m_test->getExpectedMeasurementCount());
+    qDebug() << "2";
     ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
+    qDebug() << "set buttons";
 }
 
 void MeasurementTable::updateModel(TestBase* test)
@@ -257,6 +264,16 @@ void MeasurementTable::disableMeasureButton()
     ui->measureButton->setEnabled(false);
 }
 
+void MeasurementTable::hideMeasureButton()
+{
+    ui->measureButton->hide();
+}
+
+void MeasurementTable::showMeasureButton()
+{
+    ui->measureButton->show();
+}
+
 void MeasurementTable::enableFinishButton()
 {
     ui->submitButton->setEnabled(true);
@@ -307,6 +324,8 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
 {
     manualEntryMode = !manualEntryMode;
 
+    qDebug() << "enter manual entry mode" << manualEntryMode;
+
     if (manualEntryMode) {
         ui->measurementTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
 
@@ -331,12 +350,14 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
             connect(btn, &QPushButton::clicked, this, &MeasurementTable::removeManualMeasurement);
             ui->measurementTable->setCellWidget(row, newColumn, btn);
         }
-    }
-    else {
+    } else {
         if (saveChanges)
         {
+            qDebug() << "save manual changes";
             saveManualChanges();
         }
+
+        qDebug() << "here";
 
         ui->manualEntryToggle->setText("Manual Entry");
         ui->addMeasureButton->setVisible(false);

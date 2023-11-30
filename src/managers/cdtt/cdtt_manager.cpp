@@ -38,7 +38,9 @@ void CDTTManager::start()
     }
 
     setUp();
+
     emit canMeasure();
+    emit dataChanged(m_test.get());
 }
 
 // Set up device
@@ -73,6 +75,8 @@ void CDTTManager::measure()
     }
 
     m_process.start();
+
+    emit dataChanged(m_test.get());
 }
 
 bool CDTTManager::clearData()

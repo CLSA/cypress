@@ -18,6 +18,8 @@ EcgDialog::EcgDialog(QWidget *parent, QSharedPointer<ECGSession> session)
     ECGManager* manager = static_cast<ECGManager*>(m_manager.get());
 
     ui->testInfoWidget->setSessionInformation(*session);
+    ui->measurementTable->hideManualEntry();
+    ui->measurementTable->disableMeasureButton();
 
     QList<TableColumn> columns;
 

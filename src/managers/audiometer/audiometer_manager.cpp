@@ -93,6 +93,7 @@ void AudiometerManager::start()
     }
 
     emit started(m_test.get());
+    emit dataChanged(m_test.get());
     emit canMeasure();
 }
 
@@ -121,9 +122,12 @@ void AudiometerManager::measure()
 
         emit measured(m_test.get());
         emit canFinish();
+
+        return;
     }
 
     const char cmd[] = { 0x05, '4', 0x0d };
+
     m_request = QByteArray::fromRawData(cmd, 3);
     writeDevice();
 }

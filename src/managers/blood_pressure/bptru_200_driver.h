@@ -48,18 +48,13 @@ public:
     };
 
     BPMMessage(
-        quint8 messageId,
-        quint8 data0,
-        quint8 data1,
-        quint8 data2,
-        quint8 data3,
-        quint8 crc = 0x00
-        ): m_messageId(messageId), m_data0(data0), m_data1(data1), m_data2(data2), m_data3(data3), m_crc(crc) {
-            if (!crc)
-            {
-                calculateCrc();
-            }
-        };
+        quint8 messageId, quint8 data0, quint8 data1, quint8 data2, quint8 data3, quint8 crc = 0x00)
+        : m_messageId(messageId)
+        , m_data0(data0)
+        , m_data1(data1)
+        , m_data2(data2)
+        , m_data3(data3)
+        , m_crc(crc){};
 
     BPMMessage(const BPMMessage& other)
     {
@@ -128,11 +123,9 @@ public:
     quint8 getCrc() const { return m_crc; };
     void setCrc(quint8 crc) { m_crc = crc; };
 
-    void calculateCrc() {
-        m_crc = CRC8::calculate(getBytes(), getBytes().length());
-    }
+    void calculateCrc() { m_crc = CRC8::calculate(getBytes(), getBytes().length()); }
 
-    bool isValidCRC() { return true; };
+    bool isValidCRC() { return CRC8::isValid(getBytes(), getBytes().length(), m_crc); };
 
     QByteArray getBytes() const {
         QByteArray bytes;
@@ -142,7 +135,6 @@ public:
         bytes.append(m_data1);
         bytes.append(m_data2);
         bytes.append(m_data3);
-        bytes.append(m_crc);
 
         return bytes;
     };
@@ -199,9 +191,7 @@ private:
     quint8 ETX { 0x03 };
     quint8 reportNumber { 0x00 };
 
-    void parseData(const QByteArray& data, quint32 bytesRead);
-
-
+    void parseData(quint32 bytesRead);
 };
 
 #endif // BPTRU200DRIVER_H

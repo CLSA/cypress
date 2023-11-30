@@ -42,10 +42,6 @@ class BloodPressureManager : public ManagerBase
         MEASURING,
     };
 
-signals:
-    void deviceConnected();
-    void deviceDisconnected();
-
 public:
     explicit BloodPressureManager(QSharedPointer<BPMSession> session);
     ~BloodPressureManager();
@@ -57,8 +53,15 @@ public:
     void setSide(const QString&);
 
 signals:
-    void writeMessage(BPMMessage message);
-    void readMessages();
+    void deviceConnected();
+    void deviceDisconnected();
+
+    void deviceCycled();
+
+    void deviceCleared();
+
+    void measurementStarted();
+    void measurementStopped();
 
 public slots:
     void receiveMessages(QList<BPMMessage> messages);
@@ -68,6 +71,15 @@ public slots:
     //
     void start() override;
 
+    void connectToDevice();
+    void disconnectFromDevice();
+
+    void cycleDevice();
+    void clearDevice();
+
+    void startMeasurement();
+    void stopMeasurement();
+
     // retrieve a measurement from the device
     //
     void measure() override;
@@ -76,6 +88,8 @@ public slots:
     // data has been retrieved and processed by any upstream classes
     //
     void finish() override;
+
+    void addManualMeasurement() override;
 
 private:
     State m_state { State::CONNECTING };

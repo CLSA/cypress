@@ -33,8 +33,9 @@ void TonometerManager::start()
     {
         qDebug() << "TonometerManager::start";
     }
-    emit started(m_test.get());
-    emit canMeasure();
+
+    //emit started(m_test.get());
+    //emit canMeasure();
 
     // connect signals and slots to QProcess one time only
     //
@@ -60,6 +61,7 @@ void TonometerManager::start()
         });
 
     configureProcess();
+    emit dataChanged(m_test.get());
 }
 
 
