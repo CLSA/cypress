@@ -13,6 +13,8 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent,
     , ui(new Ui::ChoiceReactionDialog)
 {
     ui->setupUi(this);
+
+    ui->measurementTable->removeManualMeasurement();
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
 
@@ -27,8 +29,11 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent,
 
     QList<TableColumn> columns;
 
-    //columns << TableColumn("TYPE", "Type", new TextDelegate("", QRegExp(), true));
-    //columns << TableColumn("PROBABILITY", "Probability", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("screen_id", "Screen ID", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("response_correct", "Response Correct", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("elapsed_time", "Elapsed Time", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("correct_position", "Correct Position", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("response_stimulus_interval", "Response Stimulus Interval", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager, &ChoiceReactionManager::started, ui->measurementTable, [=](TestBase* test) {

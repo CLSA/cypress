@@ -19,8 +19,8 @@ INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
 LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
-LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += $$PWD/../dep/OpenSSL-Win32/include
+LIBS += -L$$PWD/../dep/OpenSSL-Win32/lib -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include

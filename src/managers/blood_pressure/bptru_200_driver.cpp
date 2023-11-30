@@ -104,11 +104,11 @@ qint32 BpTru200Driver::read(int timeoutMs)
         qDebug() << "BpTru200Driver - read";
     }
 
-    //if (!m_bpm200->isOpen())
-    //{
-    //    qDebug() << "Tried to read before device was connected..";
-    //    return -1;
-    //}
+    if (!m_bpm200->isOpen())
+    {
+        qDebug() << "Tried to read before device was connected..";
+        return -1;
+    }
 
     qDebug() << "reset buffer";
 

@@ -10,14 +10,14 @@ QSettings* CypressSettings::m_settings = new QSettings(QSettings::IniFormat, QSe
 
 bool CypressSettings::isDebugMode()
 {
-    bool isDebugMode = m_settings->value("general/debug_mode", true).toBool();
+    bool isDebugMode = m_settings->value("general/debug_mode", 1).toInt();
 
     return isDebugMode;
 }
 
 bool CypressSettings::isSimMode()
 {
-    bool isSimMode = m_settings->value("general/sim_mode", true).toBool();
+    bool isSimMode = m_settings->value("general/sim_mode", 0).toInt();
 
     return isSimMode;
 }
