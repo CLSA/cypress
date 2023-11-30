@@ -147,6 +147,18 @@ public:
         return bytes;
     };
 
+    QString toString() {
+        return QString("ID: %1 D0: %2 D1: %3 D2: %4 D3: %5 CRC: %6")
+            .arg(
+                QString::number(getMessageId(), 16),
+                QString::number(getData0(), 16),
+                QString::number(getData1(), 16),
+                QString::number(getData2(), 16),
+                QString::number(getData3(), 16),
+                QString::number(getCrc(), 16)
+                );
+    };
+
 private:
     quint8 m_messageId{ 0x00 };
     quint8 m_data0{ 0x00 };
@@ -165,26 +177,17 @@ public:
     explicit BpTru200Driver(QObject *parent = nullptr);
     ~BpTru200Driver();
 
-signals:
-    void receiveMessages(QList<BPMMessage> messages);
+    qint32 write(BPMMessage message);
+    qint32 read(int timeoutMs = -1); // default blocking read
 
-    void deviceDisconnected();
-    void deviceConnected();
-
-    void couldNotConnect();
-
-public slots:
-    void read();
-    void write(BPMMessage message);
-
-    void connectToDevice();
+    bool connectToDevice();
     void disconnectFromDevice();
+
+    std::queue<BPMMessage> readQueue;
 
 private:
     bool m_debug;
     bool m_sim;
-
-
 
     QScopedPointer<QByteArray> m_read_buffer;
     QScopedPointer<QHidDevice> m_bpm200;
@@ -198,8 +201,7 @@ private:
 
     void parseData(const QByteArray& data, quint32 bytesRead);
 
-    std::queue<BPMMessage> writeQueue;
-    std::queue<BPMMessage> readQueue;
+
 };
 
 #endif // BPTRU200DRIVER_H

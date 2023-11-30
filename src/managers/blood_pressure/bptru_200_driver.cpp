@@ -18,7 +18,7 @@ BpTru200Driver::~BpTru200Driver()
     qDebug() << "destory bptru driver";
 }
 
-void BpTru200Driver::connectToDevice()
+bool BpTru200Driver::connectToDevice()
 {
     if (m_debug)
     {
@@ -32,7 +32,7 @@ void BpTru200Driver::connectToDevice()
             qDebug() << "connected to bpm";
         }
 
-        emit deviceConnected();
+        return true;
     }
     else
     {
@@ -41,7 +41,7 @@ void BpTru200Driver::connectToDevice()
             qDebug() << "could not connect to bpm...";
         }
 
-        emit couldNotConnect();
+        return false;
     }
 }
 
@@ -61,34 +61,20 @@ void BpTru200Driver::disconnectFromDevice()
             qDebug() << "bpm disconnected";
         }
     }
-
-    emit deviceDisconnected();
 }
 
 
-void BpTru200Driver::write(BPMMessage message)
+qint32 BpTru200Driver::write(BPMMessage message)
 {
-    if (message.isValidCRC())
+    if (!message.isValidCRC())
     {
         if (m_debug)
         {
-            qDebug() << "writing message";
+            qDebug() << "invalid crc, cannot write";
         }
-
-        write(message);
-    }
-    else
-    {
-        if (m_debug)
-        {
-            qDebug() << "error: bpm message does not have a valid CRC";
-        }
-
-        return;
     }
 
     QByteArray packedMessage;
-
     packedMessage.append(reportNumber);
     packedMessage.append(STX);
     packedMessage.append(message.getMessageId());
@@ -102,31 +88,36 @@ void BpTru200Driver::write(BPMMessage message)
     qint32 bytesWritten = m_bpm200->write(&packedMessage, packedMessage.size());
     if (m_debug)
     {
-        qDebug() << "BpTru200Driver::write - wrote " << bytesWritten;
+        qDebug() << "BpTru200Driver::write -" << bytesWritten << "bytes";
     }
+
+    return bytesWritten;
 }
 
-void BpTru200Driver::read()
+qint32 BpTru200Driver::read(int timeoutMs)
 {
     if (m_debug)
     {
         qDebug() << "BpTru200Driver - read";
     }
 
-    if (!m_bpm200->isOpen())
-    {
-        qDebug() << "Tried to read before device was connected..";
-        return;
-    }
+    //if (!m_bpm200->isOpen())
+    //{
+    //    qDebug() << "Tried to read before device was connected..";
+    //    return -1;
+    //}
 
     // reset buffer
+    QByteArray* buffer = m_read_buffer.get();
     for (int i = 0; i < 1024; i++)
     {
-        m_read_buffer.get()[i] = 0;
+        buffer[i] = 0;
     }
 
+    qDebug() << "buffer reset, reading";
+
     // read into buffer
-    quint32 bytesRead = m_bpm200->read(m_read_buffer.get(), 1024);
+    quint32 bytesRead = m_bpm200->read(m_read_buffer.get(), 1024, timeoutMs);
     if (bytesRead <= 0)
     {
         if (m_debug)
@@ -134,20 +125,15 @@ void BpTru200Driver::read()
             qDebug() << "bytes read <= 0, not parsing anything";
         }
 
-        return;
-    }
-    else {
-        if (m_debug)
-        {
-            qDebug() << "bytes read: " << bytesRead;
-        }
+        return -1;
     }
 
-    // convert bytes into bytes
     if (m_debug)
     {
-        qDebug() << "convert bytes into bytes";
+        qDebug() << "bytes read: " << bytesRead;
     }
+
+    qDebug() << "bytes: " << m_read_buffer->toHex();
 
     QByteArray bytes = QByteArray::fromHex(m_read_buffer.get()[0].toHex());
     for (quint32 i = 1; i < bytesRead; i++)
@@ -164,22 +150,7 @@ void BpTru200Driver::read()
     // parse bytes into bpm messages
     parseData(bytes, bytesRead);
 
-    if (m_debug)
-    {
-        qDebug() << "send to manager";
-    }
-
-    // pop from the read queue into a list and send to the manager
-    QList<BPMMessage> messages;
-    while (!readQueue.empty())
-    {
-        BPMMessage message = readQueue.front();
-        readQueue.pop();
-
-        messages.append(message);
-    }
-
-    emit receiveMessages(messages);
+    return bytesRead;
 }
 
 void BpTru200Driver::parseData(const QByteArray& data, quint32 bytesRead)
@@ -199,6 +170,9 @@ void BpTru200Driver::parseData(const QByteArray& data, quint32 bytesRead)
                 quint8 crc   = data[++i];
 
                 BPMMessage message(messageId, data0, data1, data2, data3, crc);
+
+                qDebug() << message.toString();
+
                 if (message.isValidCRC())
                 {
                     if (m_debug)

@@ -78,11 +78,9 @@ public slots:
     void finish() override;
 
 private:
-    // communications handling
-    QScopedPointer<QThread> m_thread;
-    QScopedPointer<BpTru200Driver> m_driver;
-
     State m_state { State::CONNECTING };
+
+    QScopedPointer<BpTru200Driver> m_driver;
 
     // device data is separate from test data
     Measurement m_deviceData;

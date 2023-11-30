@@ -20,39 +20,6 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
     m_test->setExpectedMeasurementCount(6);
 
     m_driver.reset(new BpTru200Driver);
-    m_thread.reset(new QThread);
-
-    m_driver->moveToThread(m_thread.get());
-
-    connect(m_thread.get(), &QThread::started, m_driver.get(), &BpTru200Driver::connectToDevice);
-    connect(m_thread.get(), &QThread::finished, m_driver.get(), &BpTru200Driver::disconnectFromDevice);
-
-    connect(m_driver.get(), &BpTru200Driver::couldNotConnect, this, [=]() {
-        if (m_debug)
-        {
-            qDebug() << "BloodPressureManager::couldNotConnect slot: could not connect to device";
-        }
-
-        QMessageBox::warning(nullptr, "Could not connect to BPM", "");
-    });
-
-    connect(m_driver.get(), &BpTru200Driver::deviceConnected, this, [=]() {
-        BPMMessage handshake(0x11, 0x00, 0x00, 0x00, 0x00);
-
-        if (m_debug)
-        {
-            qDebug() << "BloodPressureManager::deviceConnected -- sending handshake message";
-        }
-
-        // Write handshake message
-        emit writeMessage(handshake);
-        emit readMessages();
-    });
-
-    connect(this, &BloodPressureManager::writeMessage, m_driver.get(), &BpTru200Driver::write);
-    connect(this, &BloodPressureManager::readMessages, m_driver.get(), &BpTru200Driver::read);
-
-    connect(m_driver.get(), &BpTru200Driver::receiveMessages, this, &BloodPressureManager::receiveMessages);
 }
 
 BloodPressureManager::~BloodPressureManager()
@@ -61,8 +28,6 @@ BloodPressureManager::~BloodPressureManager()
     {
         qDebug() << "destroy blood pressure manager";
     }
-
-    m_thread->terminate();
 }
 
 void BloodPressureManager::start()
@@ -72,7 +37,49 @@ void BloodPressureManager::start()
         qDebug() << "BloodPressureManager::start";
     }
 
-    m_thread->start();
+    if (!m_driver->connectToDevice())
+    {
+        qCritical() << "error couldn't connect to device";
+    }
+
+    // send handshake
+    BPMMessage handshake(0x11, 0x00, 0x00, 0x00, 0x00);
+    if (!m_driver->write(handshake))
+    {
+        qCritical() << "couldn't write handshake message";
+    }
+    if (!m_driver->read())
+    {
+        qCritical() << "couldn't read handshake ack";
+    }
+
+    // clear device
+    BPMMessage clear(0x11, 0x05, 0x00, 0x00, 0x00);
+    if (!m_driver->write(clear))
+    {
+        qCritical() << "couldn't write clear message";
+    }
+    if (!m_driver->read())
+    {
+        qCritical() << "couldn't read clear ack";
+    }
+
+    // set cycle to 1
+    BPMMessage cycle(0x11, 0x03, 0x00, 0x00, 0x00);
+    if (!m_driver->write(cycle))
+    {
+        qCritical() << "couldn't write cycle message";
+    }
+    if (!m_driver->read())
+    {
+        qCritical() << "couldn't read cycle ack";
+    }
+
+    for (int i = 0; i < m_driver->readQueue.size(); i++)
+    {
+        qDebug() << m_driver->readQueue.front().toString();
+        m_driver->readQueue.pop();
+    }
 }
 
 void BloodPressureManager::receiveMessages(QList<BPMMessage> messages)
@@ -230,9 +237,8 @@ void BloodPressureManager::handleAck(const BPMMessage& message)
     }
 
 
-
     // get ack type
-    //quint8 ackType = message.
+    quint8 ackType = message.getMessageId();
 }
 
 void BloodPressureManager::handleNack(const BPMMessage& message)
