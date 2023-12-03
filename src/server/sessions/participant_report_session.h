@@ -13,7 +13,6 @@ public:
     void validate() const override;
     void calculateInputs() override;
     void start() override;
-    void end() override;
 };
 
 #endif // PARTICIPANTREPORTSESSION_H

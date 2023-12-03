@@ -9,20 +9,7 @@ void RetinalCameraRightRequestHandler::handleRequest(Poco::Net::HTTPServerReques
 {
     try {
         QJsonObject requestData = getRequestData(request);
-
         QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Retinal_Camera_Right, requestData);
-
-        if (false)
-        {
-            response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
-            response.setContentType("application/json");
-
-            std::ostream& out = response.send();
-            out << "workstation is busy";
-            out.flush();
-
-            return;
-        }
 
         QJsonObject data = getResponseData(sessionId);
         QString responseData = JsonSettings::serializeJson(data);

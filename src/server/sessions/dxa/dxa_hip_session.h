@@ -10,10 +10,7 @@ public:
 
     // CypressSession interface
 public:
-    void validate() const;
-    void calculateInputs();
     void start();
-    void end();
 };
 
 #endif // DXAHIPSESSION_H

@@ -14,11 +14,6 @@ void RetinalCameraSession::validate() const
     CypressSession::validate();
 }
 
-void RetinalCameraSession::calculateInputs()
-{
-
-}
-
 Side RetinalCameraSession::getSide()
 {
     return m_side;
@@ -36,10 +31,6 @@ void RetinalCameraSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void RetinalCameraSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "RetinalCameraSession::start " << getSessionId() << m_startDateTime;
 }

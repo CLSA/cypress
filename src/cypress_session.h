@@ -25,6 +25,9 @@ public:
 
     virtual ~CypressSession() {};
 
+    virtual void isInstalled() const { };
+    virtual void isAvailable() const { };
+
     // Determines if the basic key/value pairs exist for a session or throws exception
     virtual void validate() const;
 
@@ -67,6 +70,9 @@ protected:
     QDateTime m_startDateTime {};
     QDateTime m_endDateTime {};
 
+    bool m_debug;
+    bool m_sim;
+
     bool isValidString(const QString& key) const;
     bool isValidDouble(const QString& key) const;
     bool isValidInteger(const QString& key) const;
@@ -93,6 +99,47 @@ public:
 
 private:
     std::string message;
+};
+
+
+class NotInstalledError: public QException {
+public:
+    NotInstalledError(std::string message) : message(message) {}
+
+    void raise() const override {
+        throw *this;
+    }
+
+    NotInstalledError* clone() const override {
+        return new NotInstalledError(*this);
+    }
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+private:
+    std::string message;
+
+};
+
+class NotAvailableError: public QException {
+public:
+    NotAvailableError(std::string message) : message(message) {}
+
+    void raise() const override {
+        throw *this;
+    }
+
+    NotAvailableError* clone() const override {
+        return new NotAvailableError(*this);
+    }
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+private:
+    std::string message;
+
 };
 
 #endif // CYPRESSSESSION_H

@@ -13,11 +13,6 @@ void GripStrengthSession::validate() const
     CypressSession::validate();
 }
 
-void GripStrengthSession::calculateInputs()
-{
-
-}
-
 void GripStrengthSession::start()
 {
     m_dialog = new GripStrengthDialog(nullptr, QSharedPointer<GripStrengthSession>(this));
@@ -30,10 +25,6 @@ void GripStrengthSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void GripStrengthSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "GripStrengthSession::start - " << getSessionId() << m_startDateTime;
 }

@@ -38,68 +38,74 @@ CDTTTest::CDTTTest()
 
 void CDTTTest::simulate(const QVariantMap &inputData)
 {
-  reset();
-  addMetaData("subject_id", inputData["barcode"].toInt());
-  addMetaData("datetime",QDateTime::currentDateTime());
-  addMetaData("language","EN_CA");
-  addMetaData("talker","Male");
-  addMetaData("mode","Adaptive");
-  addMetaData("digits","TRIPLET-80");
-  addMetaData("list_number",1);
-  addMetaData("msk_signal","SSNOISE");
-  addMetaData("test_ear","Binaural");
-  addMetaData("sp_level",65.0f,"dB");
-  addMetaData("msk_level",65.0f,"dB");
+    reset();
 
-  // typical double range from -14 to +2
-  //
-  double mu = QRandomGenerator::global()->generateDouble();
-  double srt = Utilities::interp(-14.0f,2.0f,mu);
-  addMetaData("speech_reception_threshold",srt,"dB");
+    addMetaData("subject_id", inputData["barcode"].toInt());
+    addMetaData("datetime",QDateTime::currentDateTime());
+    addMetaData("language","EN_CA");
+    addMetaData("talker","Male");
+    addMetaData("mode","Adaptive");
+    addMetaData("digits","TRIPLET-80");
+    addMetaData("list_number",1);
+    addMetaData("msk_signal","SSNOISE");
+    addMetaData("test_ear","Binaural");
+    addMetaData("sp_level",65.0f,"dB");
+    addMetaData("msk_level",65.0f,"dB");
 
-  //typical double range 1 - 5
-  //
-  double stddev = Utilities::interp(1.0f,5.0f,mu);
-  addMetaData("standard_deviation",stddev,"dB");
+    // typical double range from -14 to +2
+    //
+    double mu = QRandomGenerator::global()->generateDouble();
+    double srt = Utilities::interp(-14.0f,2.0f,mu);
+    addMetaData("speech_reception_threshold",srt,"dB");
 
-  // typical integer range 6 to 20
-  //
-  addMetaData("reversal_count",QRandomGenerator::global()->bounded(6, 20));
+    //typical double range 1 - 5
+    //
+    double stddev = Utilities::interp(1.0f,5.0f,mu);
+    addMetaData("standard_deviation",stddev,"dB");
 
-  int numTrial = 24;
-  this->setExpectedMeasurementCount(numTrial);
+    // typical integer range 6 to 20
+    //
+    addMetaData("reversal_count",QRandomGenerator::global()->bounded(6, 20));
 
-  addMetaData("trial_count", numTrial);
-  int trial = 1;
-  do {
-      QSharedPointer<CDTTMeasurement> measure(new CDTTMeasurement);
-      measure->simulate(trial);
-      addMeasurement(measure);
-  } while (trial++ != numTrial);
+    int numTrial = 24;
+    this->setExpectedMeasurementCount(numTrial);
+
+    addMetaData("trial_count", numTrial);
+    int trial = 1;
+    do {
+        QSharedPointer<CDTTMeasurement> measure(new CDTTMeasurement);
+        measure->simulate(trial);
+        addMeasurement(measure);
+    } while (trial++ != numTrial);
 }
 
 QStringList CDTTTest::toStringList() const
 {
     QStringList list;
+
     if(hasMetaData("speech_reception_threshold"))
     {
-      list << QString("SRT: %1").arg(getMetaDataAsString("speech_reception_threshold"));
+        list << QString("SRT: %1").arg(getMetaDataAsString("speech_reception_threshold"));
     }
+
     if(hasMetaData("standard_deviation"))
     {
-      list << QString("StdDev: %1").arg(getMetaDataAsString("standard_deviation"));
+        list << QString("StdDev: %1").arg(getMetaDataAsString("standard_deviation"));
     }
+
     if(hasMetaData("reversal_count"))
     {
-      list << QString("Reversals: %1").arg(getMetaDataAsString("reversal_count"));
+        list << QString("Reversals: %1").arg(getMetaDataAsString("reversal_count"));
     }
+
     if(hasMetaData("trial_count"))
     {
-      list << QString("Trials: %1").arg(getMetaDataAsString("trial_count"));
+        list << QString("Trials: %1").arg(getMetaDataAsString("trial_count"));
     }
+
     foreach(const auto measure, m_measurementList)
     {
-      list << measure->toString();
+        list << measure->toString();
     }
 
     return list;
@@ -107,23 +113,27 @@ QStringList CDTTTest::toStringList() const
 
 void CDTTTest::fromDatabase(const QSqlDatabase &db)
 {
-  if(db.isOpen())
-  {
-    reset();
-    bool ok = readBarcode(db);
-    if(ok)
+    if(db.isOpen())
     {
-      ok = readMetaData(db);
+        reset();
+
+        bool ok = readBarcode(db);
+
+        if(ok)
+        {
+            ok = readMetaData(db);
+        }
+
+        if(ok)
+        {
+            ok = readSummary(db);
+        }
+
+        if(ok)
+        {
+            readTrialData(db);
+        }
     }
-    if(ok)
-    {
-      ok = readSummary(db);
-    }
-    if(ok)
-    {
-      readTrialData(db);
-    }
-  }
 }
 
 bool CDTTTest::readBarcode(const QSqlDatabase &db)

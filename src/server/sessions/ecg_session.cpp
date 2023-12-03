@@ -8,16 +8,6 @@ ECGSession::ECGSession(QObject *parent, const QJsonObject& inputData)
 
 }
 
-void ECGSession::validate() const
-{
-    CypressSession::validate();
-}
-
-void ECGSession::calculateInputs()
-{
-
-}
-
 void ECGSession::start()
 {
     m_dialog = new EcgDialog(nullptr, QSharedPointer<ECGSession>(this));
@@ -30,10 +20,6 @@ void ECGSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void ECGSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "ECGSession::start " << getSessionId() << m_startDateTime;
 }

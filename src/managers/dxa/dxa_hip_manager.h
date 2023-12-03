@@ -1,16 +1,15 @@
 #ifndef DXAHIPMANAGER_H
 #define DXAHIPMANAGER_H
 
-#include "../manager_base.h"
-#include "./dicom/dicom_scp.h"
+#include "managers/manager_base.h"
 
-#include "server/sessions/dxa/dxa_hip_session.h"
-
-#include "dcmtk/dcmdata/dcfilefo.h"
+#include "dicom/dicom_scp.h"
 #include "dicom/dcm_recv.h"
 #include "dicom/dicom_directory_watcher.h"
 
-#include "../../data/dxa/smbfilecopier.h"
+#include "server/sessions/dxa/dxa_hip_session.h"
+#include "dcmtk/dcmdata/dcfilefo.h"
+#include "data/dxa/smbfilecopier.h"
 
 #include <QMap>
 #include <QObject>

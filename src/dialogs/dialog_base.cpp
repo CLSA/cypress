@@ -58,7 +58,6 @@ void DialogBase::run()
 
 void DialogBase::closeEvent(QCloseEvent* event)
 {
-
     if (m_session->getStatus() != SessionStatus::Ended) {
         QMessageBox::StandardButton reply = QMessageBox::question(
         this,
@@ -69,8 +68,12 @@ void DialogBase::closeEvent(QCloseEvent* event)
         if (reply != QMessageBox::Yes)
         {
             event->ignore();
-            return;
         }
+        else {
+            cancel("");
+        }
+
+        return;
     }
 
     QDialog::closeEvent(event);
@@ -90,7 +93,7 @@ void DialogBase::cancel(const QString& cancelMsg)
 
     Cypress::getInstance().endSession(m_session->getSessionId());
 
-    close();
+    //close();
 }
 
 void DialogBase::error(const QString& errorMsg)

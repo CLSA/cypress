@@ -119,10 +119,11 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
 
     if (!session)
     {
-            qDebug() << "weird exception";
         throw QException();
     }
 
+    session->isInstalled();
+    session->isAvailable();
     session->validate();
     session->calculateInputs();
     //QString sessionId = session->getSessionId();

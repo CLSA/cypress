@@ -57,7 +57,8 @@ int computeAge(const QString &birthdateStr) {
 
 void SpirometerSession::calculateInputs()
 {
-    // TODO calculate age from DOB
+    CypressSession::calculateInputs();
+
     m_inputData["age"] = computeAge(m_inputData["dob"].toString());
     m_inputData["ethnicity"] = "caucasian";
 }
@@ -74,10 +75,6 @@ void SpirometerSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void SpirometerSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "SpirometerSession::start " << getSessionId() << m_startDateTime;
 }

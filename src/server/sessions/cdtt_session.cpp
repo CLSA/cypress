@@ -7,16 +7,6 @@ CDTTSession::CDTTSession(QObject *parent, const QJsonObject& inputData)
 
 }
 
-void CDTTSession::validate() const
-{
-    CypressSession::validate();
-}
-
-void CDTTSession::calculateInputs()
-{
-
-}
-
 void CDTTSession::start()
 {
     m_dialog = new CDTTDialog(nullptr, QSharedPointer<CDTTSession>(this));
@@ -29,11 +19,6 @@ void CDTTSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-
-}
-
-void CDTTSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "CDTTSession::start " << getSessionId() << m_startDateTime;
 }

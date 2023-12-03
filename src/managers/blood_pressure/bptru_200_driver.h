@@ -1,7 +1,11 @@
 #ifndef BPTRU200DRIVER_H
 #define BPTRU200DRIVER_H
 
+#include <QThread>
 #include <QObject>
+#include <QQueue>
+#include <QMutex>
+
 #include <QtUsb/QHidDevice>
 
 #include "auxiliary/CRC8.h"
@@ -14,7 +18,7 @@ public:
     enum MessageType {
         Command = 0x11,
         Reset = 0x10,
-        Ack = 0x10,
+        Ack = 0x06,
         Nack = 0x15,
         Button = 0x55,
         Notification = 0x21,
@@ -161,37 +165,51 @@ private:
 };
 
 
-class BpTru200Driver : public QObject
+class BpTru200Driver : public QThread
 {
     Q_OBJECT
-
 public:
-    explicit BpTru200Driver(QObject *parent = nullptr);
+    explicit BpTru200Driver(QMutex& mutex, QSharedPointer<QHidDevice>, QObject *parent = nullptr);
     ~BpTru200Driver();
 
     qint32 write(BPMMessage message);
     qint32 read(int timeoutMs = -1); // default blocking read
 
-    bool connectToDevice();
-    void disconnectFromDevice();
+    QQueue<BPMMessage> writeQueue;
 
-    std::queue<BPMMessage> readQueue;
+    void run() override;
+
+signals:
+    void messagesReceived(QQueue<BPMMessage> messages);
 
 private:
-    bool m_debug;
-    bool m_sim;
 
     QScopedPointer<QByteArray> m_read_buffer;
-    QScopedPointer<QHidDevice> m_bpm200;
 
-    quint16 vid { 0x10b7 };
-    quint16 pid { 0x1234 };
+    // mutex is for the write queue
+    QMutex& m_mutex;
 
+    QQueue<BPMMessage> readQueue;
+
+    QSharedPointer<QHidDevice> m_bpm200;
+
+    void parseData(quint32 bytesRead);
+
+    bool m_debug;
     quint8 STX { 0x02 };
     quint8 ETX { 0x03 };
     quint8 reportNumber { 0x00 };
+};
 
-    void parseData(quint32 bytesRead);
+
+class BpTruMessageHandler: public QObject
+{
+    Q_OBJECT
+public slots:
+    void process() {};
+
+signals:
+    void messageReceived(BPMMessage message);
 };
 
 #endif // BPTRU200DRIVER_H

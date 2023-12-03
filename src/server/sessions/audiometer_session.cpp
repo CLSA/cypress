@@ -7,16 +7,6 @@ AudiometerSession::AudiometerSession(QObject *parent, const QJsonObject& inputDa
 
 }
 
-void AudiometerSession::validate() const
-{
-    CypressSession::validate();
-}
-
-void AudiometerSession::calculateInputs()
-{
-
-}
-
 void AudiometerSession::start()
 {
     m_dialog = new AudiometerDialog(nullptr, QSharedPointer<AudiometerSession>(this));
@@ -29,10 +19,6 @@ void AudiometerSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void AudiometerSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "AudiometerSession::start " << getSessionId() << m_startDateTime;
 }

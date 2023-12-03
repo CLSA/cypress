@@ -17,6 +17,8 @@ CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData):
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
     m_startDateTime = QDateTime::currentDateTimeUtc();
 
+    m_debug = CypressSettings::isDebugMode();
+    m_sim = CypressSettings::isSimMode();
 }
 
 void CypressSession::validate() const

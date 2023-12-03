@@ -183,10 +183,6 @@ void ParticipantReportSession::start()
     ParticipantReportManager manager(QSharedPointer<ParticipantReportSession>(this));
     manager.start();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void ParticipantReportSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "ParticipantReportSession::start " << getSessionId() << m_startDateTime;
 }

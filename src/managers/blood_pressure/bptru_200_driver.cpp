@@ -2,75 +2,56 @@
 
 #include "cypress_settings.h"
 
+#include <QThread>
 
-BpTru200Driver::BpTru200Driver(QObject *parent)
-    : QObject{parent}
+BpTru200Driver::BpTru200Driver(QMutex& mutex, QSharedPointer<QHidDevice> bpm200, QObject *parent)
+    : QThread{parent}, m_mutex(mutex), m_bpm200(bpm200)
 {
-    m_bpm200.reset(new QHidDevice(this));
     m_read_buffer.reset(new QByteArray(1024, 0));
 
     m_debug = CypressSettings::isDebugMode();
-    m_sim = CypressSettings::isSimMode();
 }
 
 BpTru200Driver::~BpTru200Driver()
 {
-    qDebug() << "destory bptru driver";
-}
-
-bool BpTru200Driver::connectToDevice()
-{
     if (m_debug)
     {
-        qDebug() << "attempt to connect to device...";
-    }
-
-    if (m_bpm200->isOpen()) {
-        m_bpm200->close();
-    }
-
-    if (m_bpm200->open(vid, pid)) {
-        if (m_debug)
-        {
-            qDebug() << "connected to bpm";
-            qDebug() << m_bpm200->manufacturer();
-        }
-
-        return true;
-    } else {
-        if (m_debug)
-        {
-            qDebug() << "could not connect to bpm...";
-        }
-
-        return false;
+        qDebug() << "destory bptru driver";
     }
 }
 
-void BpTru200Driver::disconnectFromDevice()
+
+void BpTru200Driver::run()
 {
-    if (m_debug)
+    while (!isInterruptionRequested() && !isFinished())
     {
-        qDebug() << "attempt to disconnect from device";
-    }
-
-    if (m_bpm200->isOpen())
-    {
-        m_bpm200->close();
-
-        if (m_debug)
+        m_mutex.lock();
+        if (!writeQueue.empty())
         {
-            qDebug() << "bpm disconnected";
+            // write message
+            BPMMessage message = writeQueue.dequeue();
+            write(message);
+        }
+        m_mutex.unlock();
+
+        read(300 /* ms */);
+
+        if (!readQueue.isEmpty())
+        {
+            emit messagesReceived(readQueue);
+            readQueue.clear();
         }
     }
 }
-
 
 qint32 BpTru200Driver::write(BPMMessage message)
 {
     message.calculateCrc();
 
-    qDebug() << message.isValidCRC();
+    if (m_debug)
+    {
+        qDebug() << "BpTru200Driver:: isValidCRC: " << message.isValidCRC();
+    }
 
     QByteArray packedMessage;
     packedMessage.append(reportNumber);
@@ -110,11 +91,11 @@ qint32 BpTru200Driver::read(int timeoutMs)
         return -1;
     }
 
-    qDebug() << "reset buffer";
-
     m_read_buffer.get()->fill(0x00);
-
-    qDebug() << "buffer reset, reading";
+    if (m_debug)
+    {
+        qDebug() << "reset buffer, reading...";
+    }
 
     // read into buffer
     quint32 bytesRead = m_bpm200->read(m_read_buffer.get(), 1024, timeoutMs);
@@ -131,18 +112,7 @@ qint32 BpTru200Driver::read(int timeoutMs)
     if (m_debug)
     {
         qDebug() << "bytes read: " << bytesRead;
-    }
-
-    qDebug() << "bytes: " << m_read_buffer->toHex();
-
-    QByteArray bytes = QByteArray::fromHex(m_read_buffer.get()[0].toHex());
-    for (quint32 i = 1; i < bytesRead; i++) {
-        QByteArray tempBytes = QByteArray::fromHex(m_read_buffer.get()[i].toHex());
-        bytes.append(tempBytes);
-    }
-
-    if (m_debug)
-    {
+        qDebug() << "bytes: " << m_read_buffer->toHex();
         qDebug() << "parse bytes into message";
     }
 
@@ -176,7 +146,7 @@ void BpTru200Driver::parseData(quint32 bytesRead)
                     {
                         qDebug() << "parsed valid message";
                     }
-                    readQueue.push(message);
+                    readQueue.enqueue(message);
                 }
                 else
                 {

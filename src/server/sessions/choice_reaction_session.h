@@ -10,10 +10,10 @@ public:
 
     // CypressSession interface
 public:
-    void validate() const override;
-    void calculateInputs() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
+
     void start() override;
-    void end() override;
 };
 
 #endif // CHOICEREACTIONSESSION_H

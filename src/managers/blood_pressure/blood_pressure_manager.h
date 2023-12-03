@@ -5,10 +5,12 @@
 #include "../../managers/manager_base.h"
 #include "../../server/sessions/bpm_session.h"
 
+#include "bptru_200_driver.h"
+
 #include <QObject>
 #include <QThread>
+#include <QMutex>
 
-#include "bptru_200_driver.h"
 
 /*!
  * \class BloodPressureManager
@@ -56,27 +58,37 @@ signals:
     void deviceConnected();
     void deviceDisconnected();
 
-    void deviceCycled();
-
+    void deviceHandshaked(const QString& firmware);
+    void deviceCycled(const QString& newCycle);
     void deviceCleared();
 
     void measurementStarted();
     void measurementStopped();
 
-public slots:
-    void receiveMessages(QList<BPMMessage> messages);
+    void handshaked(QString firmwareVersion);
 
+    void inflateCuffPressure();
+    void deflateCuffPressure();
+
+    void bpResult();
+    void bpAverage();
+    void review();
+
+public slots:
     // what the manager does in response to the main application
     // window invoking its run method
     //
-    void start() override;
-
     void connectToDevice();
     void disconnectFromDevice();
 
-    void cycleDevice();
-    void clearDevice();
+    void receiveMessages(QQueue<BPMMessage> messages);
 
+    void start() override;
+
+    // Commands from GUI
+    //
+    void cycle();
+    void clear();
     void startMeasurement();
     void stopMeasurement();
 
@@ -95,6 +107,9 @@ private:
     State m_state { State::CONNECTING };
 
     QScopedPointer<BpTru200Driver> m_driver;
+    QSharedPointer<QHidDevice> m_bpm200;
+
+    QMutex m_mutex;
 
     // device data is separate from test data
     Measurement m_deviceData;
@@ -108,12 +123,32 @@ private:
     // Clean up the device for next time
     bool cleanUp() override;
 
+    void handshake();
+
     void handleAck(const BPMMessage& ackMessage);
     void handleNack(const BPMMessage& nackMessage);
     void handleButton(const BPMMessage& buttonMessage);
     void handleData(const BPMMessage& dataMessage);
     void handleNotification(const BPMMessage& notificationMessage);
     void handleNoMessage(const BPMMessage& noMessage);
+
+    void onDeviceHandshaked(const BPMMessage& message);
+    void onDeviceCleared(const BPMMessage& message);
+    void onDeviceReset(const BPMMessage& message);
+    void onDeviceCycled(const BPMMessage& message);
+    void onDeviceStarted(const BPMMessage& message);
+    void onDeviceStopped(const BPMMessage& message);
+    void onDeviceData(const BPMMessage& message);
+
+
+    void onInflateCuffPressure(const BPMMessage& message);
+    void onDeflateCuffPressure(const BPMMessage& message);
+    void onBpResult(const BPMMessage& message);
+    void onBpAverage(const BPMMessage& message);
+    void onBpReview(const BPMMessage& message);
+
+    quint16 vid { 0x10b7 };
+    quint16 pid { 0x1234 };
 };
 
 

@@ -13,11 +13,6 @@ void GenProxySession::validate() const
     CypressSession::validate();
 }
 
-void GenProxySession::calculateInputs()
-{
-
-}
-
 void GenProxySession::start()
 {
     m_startDateTime = QDateTime::currentDateTimeUtc();
@@ -26,10 +21,6 @@ void GenProxySession::start()
     GeneralProxyManager manager(QSharedPointer<GenProxySession>(this));
     manager.start();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void GenProxySession::end()
-{
-
+    if (m_debug)
+        qDebug() << "GenProxySession::start " << getSessionId() << m_startDateTime;
 }

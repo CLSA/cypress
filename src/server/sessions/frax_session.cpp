@@ -9,7 +9,6 @@ FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData): Cypress
 
 void FraxSession::start()
 {
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
     m_dialog = new FraxDialog(nullptr, QSharedPointer<FraxSession>(this));
     if (m_dialog == nullptr)
         throw QException();
@@ -20,14 +19,16 @@ void FraxSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
+    if (m_debug)
+        qDebug() << "FraxSession::start " << getSessionId() << m_startDateTime;
 }
 
 void FraxSession::validate() const
 {
     CypressSession::validate();
 
-    qDebug() << m_inputData;
+    if (m_debug)
+        qDebug() << m_inputData;
 
     if (!isValidInteger("age"))
         throw ValidationError("age");
@@ -81,39 +82,28 @@ void FraxSession::calculateInputs()
 {
     validate();
 
-    qDebug() << m_inputData;
-
-    qDebug("calculate inputs");
-
     int age = m_inputData.value("age").toInt();
-    qDebug() << "calculate inputs";
     if (age <= 0)
         throw ValidationError("age must be greater than 0");
 
     bool glucocorticoid = calculateGlucocorticoid(age);
-    qDebug() << "glucco";
-
     bool father_hip_fracture = m_inputData.value("father_hip_fracture").toBool();
-    qDebug() << "father hip";
-
     bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toBool();
-    qDebug() << "mother hip";
-
     bool previous_fracture = father_hip_fracture || mother_hip_fracture;
-    qDebug() << "previous fracture";
-
     double t_score = calculateTScore(m_inputData.value("femoral_neck_bmd").toDouble());
-    qDebug() << "t score";
 
     m_inputData.insert("rheumatoid_arthritis", (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
     m_inputData.insert("previous_fracture", previous_fracture);
     m_inputData.insert("glucocorticoid", glucocorticoid);
     m_inputData.insert("t_score", t_score);
 
-    qDebug() << "glucocorticoid: " << glucocorticoid;
-    qDebug() << "father_hip_fracture: " << father_hip_fracture;
-    qDebug() << "mother_hip_fracture: " << mother_hip_fracture;
-    qDebug() << "previous_fracture: " << previous_fracture;
+    if (m_debug)
+    {
+        qDebug() << "glucocorticoid: " << glucocorticoid;
+        qDebug() << "father_hip_fracture: " << father_hip_fracture;
+        qDebug() << "mother_hip_fracture: " << mother_hip_fracture;
+        qDebug() << "previous_fracture: " << previous_fracture;
+    }
 }
 
 double FraxSession::calculateBMI(double weight_kg, double height_cm)

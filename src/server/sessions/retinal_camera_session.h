@@ -14,12 +14,11 @@ public:
 
 public:
     Side getSide();
+
     // CypressSession interface
 public:
     void validate() const override;
-    void calculateInputs() override;
     void start() override;
-    void end() override;
 
 private:
     Side m_side{Left};

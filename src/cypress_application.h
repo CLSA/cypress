@@ -39,6 +39,9 @@ public:
     QJsonObject getStatus();
 
     bool endSession(const QString& uuid);
+
+    QList<QSharedPointer<CypressSession>> getActiveSessions();
+
     void printActiveSessions() const;
 
 public slots:

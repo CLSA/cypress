@@ -7,16 +7,6 @@ DxaHipSession::DxaHipSession(QObject *parent, const QJsonObject& inputData)
 
 }
 
-void DxaHipSession::validate() const
-{
-    CypressSession::validate();
-}
-
-void DxaHipSession::calculateInputs()
-{
-    CypressSession::calculateInputs();
-}
-
 void DxaHipSession::start()
 {
     m_dialog = new DxaHipDialog(nullptr, QSharedPointer<DxaHipSession>(this));
@@ -29,10 +19,6 @@ void DxaHipSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void DxaHipSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "DxaHipSession::start " << getSessionId() << m_startDateTime;
 }

@@ -12,23 +12,6 @@ void FraxRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Po
         QJsonObject requestData = getRequestData(request);
         QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Frax, requestData);
 
-        qDebug() << sessionId;
-        //QSharedPointer<FraxSession> session(new FraxSession(requestData));
-        //session->validate();
-        //session->calculateInputs();
-
-        if (false)
-        {
-            response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
-            response.setContentType("application/json");
-
-            std::ostream& out = response.send();
-            out << "workstation is busy";
-            out.flush();
-
-            return;
-        }
-
         QJsonObject data = getResponseData(sessionId);
         QString responseData = JsonSettings::serializeJson(data);
 

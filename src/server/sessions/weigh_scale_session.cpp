@@ -13,11 +13,6 @@ void WeighScaleSession::validate() const
     CypressSession::validate();
 }
 
-void WeighScaleSession::calculateInputs()
-{
-
-}
-
 void WeighScaleSession::start()
 {
     m_dialog = new WeighScaleDialog(nullptr, QSharedPointer<WeighScaleSession>(this));
@@ -30,10 +25,6 @@ void WeighScaleSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void WeighScaleSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "WeighScaleSession::start " << getSessionId() << m_startDateTime;
 }

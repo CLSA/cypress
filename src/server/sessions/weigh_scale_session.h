@@ -13,9 +13,7 @@ public:
     // CypressSession interface
 public:
     void validate() const override;
-    void calculateInputs() override;
     void start() override;
-    void end() override;
 };
 
 #endif // WEIGHSCALESESSION_H

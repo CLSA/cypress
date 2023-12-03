@@ -57,6 +57,23 @@ bool Cypress::endSession(const QString& sessionId)
     return true;
 }
 
+QList<QSharedPointer<CypressSession>> Cypress::getActiveSessions()
+{
+    QList<QSharedPointer<CypressSession>> activeSessions;
+
+    QMapIterator<QString, QSharedPointer<CypressSession>> it(sessions);
+    while (it.hasNext())
+    {
+        it.next();
+
+        const QSharedPointer<CypressSession> session = it.value();
+        if (session->getStatus() == SessionStatus::Started)
+            activeSessions.push_back(session);
+    }
+
+    return activeSessions;
+}
+
 void Cypress::printActiveSessions() const
 {
     QMapIterator<QString, QSharedPointer<CypressSession>> it(sessions);

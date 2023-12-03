@@ -8,16 +8,6 @@ DXASession::DXASession(QObject *parent, const QJsonObject& inputData)
 
 }
 
-void DXASession::validate() const
-{
-    CypressSession::validate();
-}
-
-void DXASession::calculateInputs()
-{
-
-}
-
 void DXASession::start()
 {
     m_dialog = new DXADialog(nullptr, QSharedPointer<DXASession>(this));
@@ -30,10 +20,8 @@ void DXASession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-
+    if (m_debug)
+        qDebug() << "DXASession::start " << getSessionId() << m_startDateTime;
 }
 
-void DXASession::end()
-{
-}
+

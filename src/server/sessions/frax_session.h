@@ -14,8 +14,6 @@ public:
 
 // CypressSession interface
 protected:
-
-
     double calculateBMI(double weight_kg, double height_cm);
     double calculateTScore(double femoral_neck_bmd);
     bool calculateGlucocorticoid(int age);

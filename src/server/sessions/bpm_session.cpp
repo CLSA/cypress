@@ -7,16 +7,6 @@ BPMSession::BPMSession(QObject *parent, const QJsonObject& inputData)
 
 }
 
-void BPMSession::validate() const
-{
-    CypressSession::validate();
-}
-
-void BPMSession::calculateInputs()
-{
-
-}
-
 void BPMSession::start()
 {
     m_dialog = new BloodPressureDialog(nullptr, QSharedPointer<BPMSession>(this));
@@ -29,11 +19,6 @@ void BPMSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-
-}
-
-void BPMSession::end()
-{
-
+    if (m_debug)
+        qDebug() << "BPMSession::start" << getSessionId() << m_startDateTime;
 }

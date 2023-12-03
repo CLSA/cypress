@@ -19,15 +19,8 @@ void UltrasoundSession::validate() const
     qDebug() << "validate ultrsound session";
 }
 
-void UltrasoundSession::calculateInputs()
-{
-    CypressSession::calculateInputs();
-    qDebug() << "calculateInputs ultrsound session";
-}
-
 void UltrasoundSession::start()
 {
-    qDebug() << "ultrsound session start";
     m_dialog = new CimtVividiDialog(nullptr, QSharedPointer<UltrasoundSession>(this));
     if (m_dialog == nullptr)
         throw QException();
@@ -38,11 +31,6 @@ void UltrasoundSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void UltrasoundSession::end()
-{
-    qDebug() << "ultrsound session end";
-    CypressSession::end();
+    if (m_debug)
+        qDebug() << "UltrasoundSession::start " << getSessionId() << m_startDateTime;
 }

@@ -17,10 +17,6 @@ void TonometerSession::validate() const
         throw ValidationError("sex");
 }
 
-void TonometerSession::calculateInputs()
-{
-}
-
 void TonometerSession::start()
 {
     m_dialog = new TonometerDialog(nullptr, QSharedPointer<TonometerSession>(this));
@@ -33,10 +29,6 @@ void TonometerSession::start()
     m_dialog->run();
     m_dialog->show();
 
-    qDebug() << "start session" << getSessionId() << m_startDateTime;
-}
-
-void TonometerSession::end()
-{
-    m_status = SessionStatus::Ended;
+    if (m_debug)
+        qDebug() << "TonometerSession::start " << getSessionId() << m_startDateTime;
 }

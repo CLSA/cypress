@@ -1,6 +1,5 @@
 #include "blood_pressure_dialog.h"
 #include "managers/blood_pressure/blood_pressure_manager.h"
-#include "cypress_application.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -51,9 +50,9 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
             manager,
             &BloodPressureManager::disconnectFromDevice);
 
-    connect(ui->cyclePushButton, &QPushButton::clicked, manager, &BloodPressureManager::cycleDevice);
+    connect(ui->cyclePushButton, &QPushButton::clicked, manager, &BloodPressureManager::cycle);
 
-    connect(ui->clearPushButton, &QPushButton::clicked, manager, &BloodPressureManager::clearDevice);
+    connect(ui->clearPushButton, &QPushButton::clicked, manager, &BloodPressureManager::clear);
 
     connect(ui->startPushButton,
             &QPushButton::clicked,
@@ -65,14 +64,25 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
             manager,
             &BloodPressureManager::stopMeasurement);
 
-    connect(manager, &BloodPressureManager::deviceConnected, this, [=]() {
-        ui->disconnectPushButton->setEnabled(true);
+    connect(manager, &BloodPressureManager::deviceHandshaked, this, [=](QString firmware) {
         ui->connectPushButton->setEnabled(false);
+        ui->disconnectPushButton->setEnabled(true);
 
         ui->cyclePushButton->setEnabled(true);
         ui->clearPushButton->setEnabled(true);
 
         ui->startPushButton->setEnabled(true);
+
+        qDebug() << "BPMDialog::deviceHandshaked: " << firmware;
+    });
+
+    connect(manager, &BloodPressureManager::deviceCycled, this, [=](QString cycle) {
+        ui->cycleLabel->setText(cycle);
+    });
+
+    connect(manager, &BloodPressureManager::deviceCleared, this, [=]() {
+        ui->cycleLabel->setText("");
+        ui->readingLabel->setText("");
     });
 
     connect(manager, &BloodPressureManager::deviceDisconnected, this, [=]() {

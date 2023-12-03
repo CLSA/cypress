@@ -9,18 +9,6 @@ void ChoiceReactionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
         QJsonObject requestData = getRequestData(request);
         QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Choice_Reaction, requestData);
 
-        if (false)
-        {
-            response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
-            response.setContentType("application/json");
-
-            std::ostream& out = response.send();
-            out << "workstation is busy";
-            out.flush();
-
-            return;
-        }
-
         QJsonObject data = getResponseData(sessionId);
         QString responseData = JsonSettings::serializeJson(data);
 
@@ -29,6 +17,24 @@ void ChoiceReactionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
 
         std::ostream& out = response.send();
         out << responseData.toStdString();
+        out.flush();
+    }
+    catch (const NotInstalledError& exception)
+    {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_FAILED_DEPENDENCY);
+        response.setContentType("application/json");
+
+        std::ostream& out = response.send();
+        out << exception.what();
+        out.flush();
+    }
+    catch (const NotAvailableError& exception)
+    {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+        response.setContentType("application/json");
+
+        std::ostream& out = response.send();
+        out << exception.what();
         out.flush();
     }
     catch (const ValidationError& exception)
