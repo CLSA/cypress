@@ -38,8 +38,11 @@ private:
     QString m_runnablePath;
     QString m_runnableName;
 
-    QString m_databasePath;
+    QString m_gripTestDBPath;
+    QString m_gripTestDataDBPath;
+
     QString m_backupPath;
+    QString m_databasePath;
 
     // Set up device
     bool setUp() override;

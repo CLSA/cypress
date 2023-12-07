@@ -13,20 +13,48 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Grip Strength</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="FilePickerWidget" name="runnablePath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="runnableName" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="backupPath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="databasePath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="gripTestDB" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="gripTestDataDB" native="true"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>183</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FilePickerWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/file_picker_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

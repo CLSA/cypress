@@ -2,6 +2,7 @@
 
 #include "data/blood_pressure/tests/blood_pressure_test.h"
 
+#include <QMessageBox>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QtUsb/QHidDevice>
@@ -60,11 +61,7 @@ void BloodPressureManager::connectToDevice()
 
         emit deviceConnected();
     } else {
-        if (m_debug)
-        {
-            qDebug() << "could not connect to bpm...";
-            // emit error
-        }
+        QMessageBox::warning(nullptr, "Error", "Could not connect to the blood pressure device");
     }
 }
 

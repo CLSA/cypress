@@ -166,7 +166,7 @@ QJsonObject ParadoxDbBlock::readRecord(QFile& dbFile)
 
 QList<QJsonObject> ParadoxDbBlock::readRecords(QFile& dbFile)
 {
-        int numRecords = getNumRecords();
+        int numRecords = 1; //getNumRecords();
         qDebug() << numRecords;
         QList<QJsonObject> records;
         dbFile.seek(m_fileOffset);
