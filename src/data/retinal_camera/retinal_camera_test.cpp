@@ -32,6 +32,29 @@ void RetinalCameraTest::simulate(const QVariantMap& inputData)
 
 }
 
+bool RetinalCameraTest::fromDatabaseResults(const QJsonObject &results)
+{
+    QSharedPointer<RetinalCameraMeasurement> eyeMeasure(new RetinalCameraMeasurement);
+    if (results["side"] == "left") {
+        eyeMeasure->setAttribute("EYE_PICT_VENDOR",
+                                 results["filePath"].toString() + results["fileName"].toString()
+                                     + results["fileExt"].toString());
+        eyeMeasure->setAttribute("EYE_SIDE_VENDOR", "LEFT");
+    }
+
+    else if (results["side"] == "right") {
+        QSharedPointer<RetinalCameraMeasurement> rightEye(new RetinalCameraMeasurement);
+        eyeMeasure->setAttribute("EYE_PICT_VENDOR",
+                                 results["filePath"].toString() + results["fileName"].toString()
+                                     + results["fileExt"].toString());
+        eyeMeasure->setAttribute("EYE_SIDE_VENDOR", "RIGHT");
+    }
+
+    this->addMeasurement(eyeMeasure);
+
+    return true;
+}
+
 bool RetinalCameraTest::isValid() const
 {
     if (getMeasurementCount() != getExpectedMeasurementCount()) {

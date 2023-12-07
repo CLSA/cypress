@@ -19,7 +19,7 @@
 class WeightMeasurement : public Measurement
 {
 public:
-    WeightMeasurement() = default;
+    WeightMeasurement();
     ~WeightMeasurement() = default;
 
     void fromArray(const QByteArray &);

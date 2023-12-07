@@ -14,10 +14,31 @@
 ECGManager::ECGManager(QSharedPointer<ECGSession> session)
     : ManagerBase(session)
 {
+    // absolute path to exe
     m_runnableName = CypressSettings::readSetting("ecg/runnableName").toString();
+
+    // absolute path to working directory
     m_workingPath = CypressSettings::readSetting("ecg/workingPath").toString();
+
+    // absolute path to export directory
     m_exportPath = CypressSettings::readSetting("ecg/exportPath").toString();
+
+    // xml file output
     m_outputFile = m_exportPath + "/" + session->getBarcode() + ".xml";
+
+    if (m_debug) {
+        qDebug() << "ECGManager";
+
+        qDebug() << session->getSessionId();
+        qDebug() << session->getBarcode();
+        qDebug() << session->getInterviewer();
+        qDebug() << session->getInputData();
+
+        qDebug() << m_runnableName;
+        qDebug() << m_workingPath;
+        qDebug() << m_exportPath;
+        qDebug() << m_outputFile;
+    }
 
     m_test.reset(new ECGTest);
     m_test->setExpectedMeasurementCount(1);
@@ -25,33 +46,71 @@ ECGManager::ECGManager(QSharedPointer<ECGSession> session)
 
 bool ECGManager::isInstalled()
 {
-    return false;
-}
+    bool isDebugMode = CypressSettings::isDebugMode();
 
-bool ECGManager::isDefined(const QString &fileName, const FileType &type) const
-{
-    if (m_debug)
-    {
-        qDebug() << "ECGManager::isDefined";
+    QString runnableName = CypressSettings::readSetting("ecg/runnableName").toString();
+    QString workingPath = CypressSettings::readSetting("ecg/workingPath").toString();
+    QString exportPath = CypressSettings::readSetting("ecg/exportPath").toString();
+
+    if (runnableName.isNull() || runnableName.isEmpty()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: runnableName is not defined";
+        }
+
+        return false;
     }
 
-    if(m_sim)
-    {
-        return true;
+    if (workingPath.isNull() || workingPath.isEmpty()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: workingPath is not defined";
+        }
+
+        return false;
     }
 
-    bool ok = false;
-    if(type == FileType::ECGApplication)
-    {
-        QFileInfo info(fileName);
-        ok = info.exists() && info.isExecutable();
+    if (exportPath.isNull() || exportPath.isEmpty()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: exportPath is not defined";
+        }
+
+        return false;
     }
-    else
-    {
-        QDir info(fileName);
-        ok = info.exists() && info.isReadable() && info.exists("Export");
+
+    QFileInfo runnableInfo(runnableName);
+    if (!runnableInfo.exists()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: runnableName does not exist";
+        }
+
+        return false;
     }
-    return ok;
+
+    if (!runnableInfo.isExecutable()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: runnableName is not executable";
+        }
+
+        return false;
+    }
+
+    QDir workingInfo(workingPath);
+    if (!workingInfo.exists()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: working info does not exist";
+        }
+
+        return false;
+    }
+
+    QDir exportInfo(exportPath);
+    if (!exportInfo.exists()) {
+        if (isDebugMode) {
+            qDebug() << "ECGManager::isInstalled: export info does not exist";
+        }
+        return false;
+    }
+
+    return true;
 }
 
 void ECGManager::start()
@@ -64,6 +123,7 @@ void ECGManager::start()
     if (m_sim)
     {
         emit started(m_test.get());
+        emit dataChanged(m_test.get());
         emit canMeasure();
 
         return;
@@ -71,26 +131,27 @@ void ECGManager::start()
 
     // connect signals and slots to QProcess one time only
     //
-    connect(&m_process, &QProcess::started,
-        this, [this]() {
+    connect(&m_process, &QProcess::started, this, [this]() {
+        if (m_debug)
             qDebug() << "process started: " << m_process.arguments().join(" ");
-        });
+    });
 
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         this, &ECGManager::readOutput);
 
-    connect(&m_process, &QProcess::errorOccurred,
-        this, [](QProcess::ProcessError error)
-        {
-            QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    connect(&m_process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
+                                                                    Qt::SkipEmptyParts);
+        if (m_debug)
             qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
-        });
+    });
 
-    connect(&m_process, &QProcess::stateChanged,
-        this, [](QProcess::ProcessState state) {
-            QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
+    connect(&m_process, &QProcess::stateChanged, this, [this](QProcess::ProcessState state) {
+        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
+                                                                    Qt::SkipEmptyParts);
+        if (m_debug)
             qDebug() << "process state: " << s.join(" ").toLower();
-        });
+    });
 
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
@@ -106,36 +167,58 @@ void ECGManager::configureProcess()
     }
 
     QDir workingDir(m_workingPath);
+    if (!workingDir.exists()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::configureProcess -- "
+                     << "workingDir does not exist";
+        }
+
+        return;
+    }
+
     QDir exportDir(m_exportPath);
-
-    if(isDefined(m_runnableName) && workingDir.exists() && exportDir.exists())
-    {
-        m_process.setProgram(m_runnableName);
-
-        QString path = QDir::cleanPath(QString("%1%2%3").arg(m_workingPath, QDir::separator(), INIT_PATH));
-
-        QDir backupDir(path);
-
-        if(backupDir.exists())
-        {
-            if(!backupDir.removeRecursively())
-            {
-                qDebug() << "failed to configure and remove backup directory" << path;
-            }
+    if (!exportDir.exists()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::configureProcess -- "
+                     << "exportDir does not exist";
         }
 
-        if(deleteDeviceData())
-        {
-            emit canMeasure();
+        return;
+    }
+
+    QFileInfo exeInfo(m_runnableName);
+    if (!exeInfo.exists()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::configureProcess -- could not find exe at " << m_runnableName;
         }
-        else
-        {
-            qDebug() << "couldn't delete device data";
+
+        return;
+    }
+
+    if (!exeInfo.isExecutable()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::configureProcess -- exe is not executable at "
+                     << m_runnableName;
+        }
+
+        return;
+    }
+
+    QString backupPath = QDir::cleanPath(
+        QString("%1%2%3").arg(m_workingPath, QDir::separator(), INIT_PATH));
+    QDir backupDir(backupPath);
+    if (backupDir.exists()) { // remove old backup
+        if (!backupDir.removeRecursively()) {
+            qDebug() << "failed to configure and remove backup directory" << backupPath;
         }
     }
-    else
-    {
-        qDebug() << "failed to configure process";
+
+    m_process.setProgram(m_runnableName);
+
+    if (backupData()) {
+        emit canMeasure();
+    } else {
+        qDebug() << "couldn't delete device data";
     }
 }
 
@@ -152,70 +235,66 @@ void ECGManager::measure()
     {
         m_test->simulate();
 
-        emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
     }
 
-    qDebug() << "starting process";
-    m_process.start();
+    if (m_debug) {
+        qDebug() << "ECGManager::measure - starting process";
+    }
+
+    if (m_process.state() != QProcess::Running) {
+        m_process.start();
+    } else {
+        QMessageBox::critical(nullptr, "Error", "CardioSoft is already running");
+    }
 }
 
 void ECGManager::readOutput()
 {
     if (m_debug)
-    {
         qDebug() << "ECGManager::readOutput";
-    }
 
     ECGTest* test = static_cast<ECGTest*>(m_test.get());
-    if(QProcess::NormalExit != m_process.exitStatus())
-    {
-        QMessageBox::critical(nullptr, "Error", "CardioSoft error, cannot read output");
 
+    if (QProcess::NormalExit != m_process.exitStatus()) {
+        QMessageBox::critical(nullptr, "Error", "CardioSoft error, cannot read output");
         return;
     }
 
     if(QFileInfo::exists(m_outputFile))
     {
-        qDebug() << "found xml output file " << m_outputFile;
+        if (m_debug)
+            qDebug() << "found xml output file " << m_outputFile;
+
         test->fromFile(m_outputFile);
-        if(m_test->isValid())
-        {
-            emit measured(test);
+        if (m_test->isValid()) {
+            emit dataChanged(m_test.get());
             emit canFinish();
-        }
-        else
-        {
+        } else {
             QMessageBox::critical(nullptr, "Error", "The measurements from CardioSoft were not valid");
         }
-    }
-    else
-    {
+    } else {
         QMessageBox::critical(nullptr, "Error", "Cannot find the measurements from CardioSoft");
     }
 }
 
-
-
 bool ECGManager::clearData()
 {
     if (m_debug)
-    {
         qDebug() << "ECGManager::clearData";
-    }
 
     m_test.reset();
+
     return true;
 }
 
 void ECGManager::finish()
 {
     if (m_debug)
-    {
         qDebug() << "ECGManager::finish";
-    }
 
     int answer_id = m_session->getAnswerId();
 
@@ -237,57 +316,65 @@ void ECGManager::finish()
 
     m_test->reset();
 
+    cleanUp();
+
     emit success("Measurements saved to Pine");
 
     if(QProcess::NotRunning != m_process.state())
-    {
         m_process.kill();
-    }
-
-    deleteDeviceData();
 }
 
-bool ECGManager::deleteDeviceData()
+bool ECGManager::backupData()
 {
     if (m_debug)
     {
         qDebug() << "ECGManager::deleteDeviceData";
     }
 
-    QString path = QDir::cleanPath(QString("%1%2%3").arg(m_workingPath,QDir::separator(),INIT_PATH));
-    QDir backupDir(path);
+    // get or create backup path
+    QString backupPath = QDir::cleanPath(
+        QString("%1%2%3").arg(m_workingPath, QDir::separator(), INIT_PATH));
 
-    if(!backupDir.exists())
-    {
-        if(!backupDir.mkdir(path))
-        {
-            qCritical() << "unable to create backup directory" << path;
+    QDir backupDir(backupPath);
+
+    if (!backupDir.exists()) {
+        if (!backupDir.mkdir(backupPath)) {
+            if (m_debug)
+                qCritical() << "unable to create backup directory" << backupPath;
+
             return false;
         }
     }
 
-    // list of backed up database files
-    //
-    backupDir.setNameFilters(QStringList() << "*.BTR");
-    backupDir.setFilter(QDir::Files);
+    QString databasePath = QDir::cleanPath(
+        QString("%1%2%3").arg(m_workingPath, QDir::separator(), DATABASE_PATH));
+    QDir databaseDir(databasePath);
 
-    QFileInfoList list = backupDir.entryInfoList();
+    databaseDir.setNameFilters(QStringList() << "*.BTR");
+    databaseDir.setFilter(QDir::Files);
+
+    // copy each database file to the backup folder
+    QFileInfoList list = databaseDir.entryInfoList();
     if(!list.isEmpty())
     {
-        path = QDir::cleanPath(QString("%1%2%3").arg(m_workingPath, QDir::separator(), DATABASE_PATH));
-        foreach(const auto info, list)
-        {
-            QString toFile = QDir(path).filePath(info.fileName());
-            QFile::copy(info.absoluteFilePath(), toFile);
+        foreach (const auto databaseFile, list) {
+            QString toFile = QDir(backupPath).filePath(databaseFile.fileName());
+            QFile::copy(databaseFile.absoluteFilePath(), toFile);
         }
     }
 
-    // xml output from Cardiosoft export
+    // remove previous XML output from Cardiosoft export
     //
-    QFile file(m_outputFile);
-    if(file.exists() && !file.remove())
-    {
-        qDebug() << "could not delete Cardiosoft xml output file" << m_outputFile;
+    QString xmlFile = QString("%1.xml").arg(m_session->getBarcode());
+    QString outputFilePath = QDir(m_exportPath).filePath(xmlFile);
+
+    QFile outputXmlFile(outputFilePath);
+    if (outputXmlFile.exists() && !outputXmlFile.remove()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::cleanUp - could not delete Cardiosoft XML output file"
+                     << m_outputFile;
+        }
+
         return false;
     }
 
@@ -302,15 +389,88 @@ bool ECGManager::setUp()
         qDebug() << "ECGManager::setUp";
     }
 
-    return true;
+    return backupData();
 }
 
 // Clean up the device for next time
 bool ECGManager::cleanUp()
 {
-    if (m_debug)
-    {
+    return restoreBackup();
+}
+
+bool ECGManager::restoreBackup()
+{
+    if (m_debug) {
         qDebug() << "ECGManager::cleanUp";
     }
+
+    // get backup directory
+    QString backupPath = QDir::cleanPath(
+        QString("%1%2%3").arg(m_workingPath, QDir::separator(), INIT_PATH));
+    QDir backupDir(backupPath);
+
+    if (!backupDir.exists()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::cleanUp - could not find backup dir";
+        }
+
+        return false;
+    }
+
+    if (m_debug) {
+        qDebug() << "ECGManager::cleanUp - " << backupDir.absolutePath();
+    }
+
+    backupDir.setNameFilters(QStringList() << "*.BTR");
+    backupDir.setFilter(QDir::Files);
+
+    // get database directory
+    //
+    QString databasePath = QDir::cleanPath(
+        QString("%1%2%3").arg(m_workingPath, QDir::separator(), DATABASE_PATH));
+    QDir databaseDir(databasePath);
+
+    if (!databaseDir.exists()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::cleanUp - could not find database dir";
+        }
+
+        return false;
+    }
+
+    if (m_debug) {
+        qDebug() << "ECGManager::cleanUp - " << databasePath;
+    }
+
+    // for each backup file, restore to the database folder
+    //
+    QFileInfoList list = backupDir.entryInfoList();
+    if (!list.isEmpty()) {
+        foreach (const auto backupFile, list) {
+            QString toFile = QDir(databasePath).filePath(backupFile.fileName());
+            if (!QFile::copy(backupFile.absoluteFilePath(), toFile)) {
+                if (m_debug) {
+                    qDebug() << "ECGManager::cleanUp - could not restore backup file "
+                             << backupFile.absoluteFilePath();
+                }
+            }
+        }
+    }
+
+    // remove xml output from Cardiosoft export
+    //
+    QString xmlFile = QString("%1.xml").arg(m_session->getBarcode());
+    QString outputFilePath = QDir(m_exportPath).filePath(xmlFile);
+
+    QFile outputXmlFile(outputFilePath);
+    if (outputXmlFile.exists() && !outputXmlFile.remove()) {
+        if (m_debug) {
+            qDebug() << "ECGManager::cleanUp - could not delete Cardiosoft XML output file"
+                     << m_outputFile;
+        }
+
+        return false;
+    }
+
     return true;
 }

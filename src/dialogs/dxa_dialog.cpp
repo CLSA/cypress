@@ -17,6 +17,7 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideManualEntry();
+    ui->measurementTable->hideMeasureButton();
 
     this->setWindowTitle("DXA 2");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);

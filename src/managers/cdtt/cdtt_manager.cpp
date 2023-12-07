@@ -1,6 +1,6 @@
-#include "cypress_application.h"
-
 #include "cdtt_manager.h"
+
+#include "cypress_settings.h"
 
 #include <QDebug>
 #include <QDir>
@@ -16,6 +16,13 @@
 CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     : ManagerBase(session)
 {
+    m_runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
+    m_runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
+    m_outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
+
+    QDir outputDir(m_outputPath);
+    m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
+
     m_test.reset(new CDTTTest);
     m_test->setMinimumMeasurementCount(1);
 }
@@ -27,7 +34,35 @@ CDTTManager::~CDTTManager()
 
 bool CDTTManager::isInstalled()
 {
-    return false;
+    QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
+    QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
+    QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
+
+    if (runnableName.isNull() || runnableName.isEmpty())
+        return false;
+
+    if (runnablePath.isNull() || runnablePath.isEmpty())
+        return false;
+
+    if (outputPath.isNull() || outputPath.isEmpty())
+        return false;
+
+    QFileInfo runnableNameInfo(runnableName);
+    if (!runnableNameInfo.isFile()) {
+        return false;
+    }
+
+    QDir runnableDir(runnablePath);
+    if (!runnableDir.exists()) {
+        return false;
+    }
+
+    QDir outputDir(outputPath);
+    if (!outputDir.exists()) {
+        return false;
+    }
+
+    return true;
 }
 
 void CDTTManager::start()
@@ -52,7 +87,10 @@ bool CDTTManager::setUp()
     }
 
     m_test->reset();
+
+    cleanUp();
     configureProcess();
+
     return true;
 }
 
@@ -68,7 +106,7 @@ void CDTTManager::measure()
     {
         m_test->simulate({});
 
-        emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
@@ -124,14 +162,13 @@ void CDTTManager::configureProcess()
         qDebug() << "CDTTManager::configureProcess";
     }
 
-    QDir workingDir("");
-    QDir outputDir("");
-
-    QString runnablePath = "";
+    QDir workingDir(m_runnablePath);
+    QDir outputDir(m_outputPath);
 
     QString command = "java";
     QStringList arguments;
-    arguments << "-jar" << runnablePath << m_session->getBarcode();
+
+    arguments << "-jar" << m_runnableName << m_session->getBarcode();
 
     m_process.setProgram(command);
     m_process.setArguments(arguments);
@@ -186,8 +223,8 @@ void CDTTManager::readOutput()
 
     QDir dir(m_outputPath);
     QString fileName = dir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
-    if(QFileInfo::exists(fileName))
-    {
+
+    if (QFileInfo::exists(fileName)) {
         qDebug() << "found output xlsx file " << fileName;
 
         QSqlDatabase db;
@@ -212,19 +249,13 @@ void CDTTManager::readOutput()
             test->fromDatabase(db);
             if(test->isValid())
             {
-                emit measured(m_test.get());
+                emit dataChanged(m_test.get());
                 emit canFinish();
-            }
-            else
-            {
-                qDebug() << "";
             }
 
             db.close();
         }
-    }
-    else
-    {
+    } else {
         qDebug() << "ERROR: no output xlsx file found" << fileName;
     }
 }

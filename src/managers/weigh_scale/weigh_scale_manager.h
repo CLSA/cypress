@@ -49,6 +49,8 @@ public slots:
     //
     void finish() override;
 
+    void addManualMeasurement() override;
+
 private slots:
 
     // retrieve data from the scale over RS232

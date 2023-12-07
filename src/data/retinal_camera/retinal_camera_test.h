@@ -14,6 +14,8 @@ public:
     QJsonObject toJsonObject() const override;
     QString toString() const override;
 
+    bool fromDatabaseResults(const QJsonObject &results);
+
 private:
     QStringList m_outputKeyList;
     QMap<QString, QString> m_displayNames;

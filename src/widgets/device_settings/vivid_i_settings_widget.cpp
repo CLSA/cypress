@@ -1,7 +1,7 @@
 #include "vivid_i_settings_widget.h"
 #include "ui_vivid_i_settings_widget.h"
 
-#include <QSettings>
+#include "cypress_settings.h"
 
 VividISettingsWidget::VividISettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -9,41 +9,47 @@ VividISettingsWidget::VividISettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    QString runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
+    QString runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
 
-    QString aeTitle = settings.value("vividi/dicom/aeTitle", "").toString();
-    QString port = settings.value("vividi/dicom/port", "").toString();
-    QString exe = settings.value("vividi/dicom/executable", "").toString();
-    QString config = settings.value("vividi/dicom/asc_config", "").toString();
+    QString storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
+    QString logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
+    QString ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
 
-    ui->dicomWidget->setDicomLabels(aeTitle, "", port);
+    ui->runnableName->setTitle("DICOM Executable Path");
+    ui->runnableName->setIsExe(true);
+    ui->runnableName->setPath(runnableName);
 
-    ui->executable->setTitle("Executable");
-    ui->executable->setIsExe(true);
-    ui->executable->setPath(exe);
+    ui->runnablePath->setTitle("DICOM Working Directory Path");
+    ui->runnablePath->setIsDir(true);
+    ui->runnablePath->setPath(runnablePath);
 
-    ui->config->setTitle("Config");
-    ui->config->setIsFile(true);
-    ui->config->setPath(config);
+    ui->storagePath->setTitle("DICOM Storage Path");
+    ui->storagePath->setIsDir(true);
+    ui->storagePath->setPath(storageDirPath);
 
-    connect(ui->dicomWidget, &DicomWidget::aeTitleChanged, this, [=](QString aeTitle) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("vividi/dicom/aeTitle", aeTitle);
+    ui->logConfigPath->setTitle("DICOM Log Config File Path");
+    ui->logConfigPath->setIsFile(true);
+    ui->logConfigPath->setPath(logConfigPath);
+
+    ui->ascConfigPath->setTitle("DICOM Settings File Path");
+    ui->ascConfigPath->setIsFile(true);
+    ui->ascConfigPath->setPath(ascConfigPath);
+
+    connect(ui->runnableName, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("ultrasound/dicom/runnableName", value);
     });
-
-    connect(ui->dicomWidget, &DicomWidget::portChanged, this, [=](QString port) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("vividi/dicom/port", port);
+    connect(ui->runnablePath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("ultrasound/dicom/runnablePath", value);
     });
-
-    connect(ui->executable, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("vividi/dicom/executable", path);
+    connect(ui->storagePath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("ultrasound/dicom/storagePath", value);
     });
-
-    connect(ui->config, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("vividi/dicom/asc_config", path);
+    connect(ui->logConfigPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("ultrasound/dicom/log_config", value);
+    });
+    connect(ui->ascConfigPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("ultrasound/dicom/asc_config", value);
     });
 }
 

@@ -1,4 +1,6 @@
 #include "dexa_settings_widget.h"
+#include "cypress_settings.h"
+
 #include "ui_dexa_settings_widget.h"
 
 #include <QSettings>
@@ -9,41 +11,47 @@ DexaSettingsWidget::DexaSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
+    QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
 
-    QString aeTitle = settings.value("dxa/dicom/aeTitle", "").toString();
-    QString port = settings.value("dxa/dicom/port", "").toString();
-    QString exe = settings.value("dxa/dicom/executable", "").toString();
-    QString config = settings.value("dxa/dicom/asc_config", "").toString();
+    QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
-    ui->dicomWidget->setDicomLabels(aeTitle, "", port);
+    ui->runnableName->setTitle("DICOM Executable Path");
+    ui->runnableName->setIsExe(true);
+    ui->runnableName->setPath(runnableName);
 
-    ui->executable->setTitle("Executable");
-    ui->executable->setIsExe(true);
-    ui->executable->setPath(exe);
+    ui->runnablePath->setTitle("DICOM Working Directory Path");
+    ui->runnablePath->setIsDir(true);
+    ui->runnablePath->setPath(runnablePath);
 
-    ui->config->setTitle("Config");
-    ui->config->setIsFile(true);
-    ui->config->setPath(config);
+    ui->storagePath->setTitle("DICOM Storage Path");
+    ui->storagePath->setIsDir(true);
+    ui->storagePath->setPath(storageDirPath);
 
-    connect(ui->dicomWidget, &DicomWidget::aeTitleChanged, this, [=](QString aeTitle) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("dxa/dicom/aeTitle", aeTitle);
+    ui->logConfigPath->setTitle("DICOM Log Config File Path");
+    ui->logConfigPath->setIsFile(true);
+    ui->logConfigPath->setPath(logConfigPath);
+
+    ui->ascConfigPath->setTitle("DICOM Settings File Path");
+    ui->ascConfigPath->setIsFile(true);
+    ui->ascConfigPath->setPath(ascConfigPath);
+
+    connect(ui->runnableName, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/dicom/runnableName", value);
     });
-
-    connect(ui->dicomWidget, &DicomWidget::portChanged, this, [=](QString port) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("dxa/dicom/port", port);
+    connect(ui->runnablePath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/dicom/runnablePath", value);
     });
-
-    connect(ui->executable, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("dxa/dicom/executable", path);
+    connect(ui->storagePath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/dicom/storagePath", value);
     });
-
-    connect(ui->config, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("dxa/dicom/asc_config", path);
+    connect(ui->logConfigPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/dicom/log_config", value);
+    });
+    connect(ui->ascConfigPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/dicom/asc_config", value);
     });
 }
 

@@ -14,15 +14,14 @@ class VividiManager: public ManagerBase
 public:
     explicit VividiManager(QSharedPointer<UltrasoundSession> session);
 
+    ~VividiManager();
+
     static bool isInstalled();
 
 public slots:
     void start() override;
     void measure() override;
     void finish() override;
-    void cancel();
-
-    void addManualMeasurement() override {};
 
     void dicomFilesReceived();
 
@@ -32,6 +31,19 @@ protected:
     bool cleanUp() override;
 
 private:
+    QString m_runnablePath;
+    QString m_runnableName;
+    QString m_aeTitle;
+    QString m_host;
+    QString m_port;
+    QString m_storageDirPath;
+    QString m_logConfigPath;
+    QString m_ascConfigPath;
+
+    int m_stillImageIdCounter = 1;
+    int m_cineloopCounter = 1;
+    int m_srCounter = 1;
+
     QScopedPointer<DcmRecv> m_dicomServer;
 };
 

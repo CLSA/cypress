@@ -1,7 +1,7 @@
 #include "cimt_vivid_i_dialog.h"
 #include "ui_cimt_vivid_i_dialog.h"
+
 #include "managers/ultrasound/vividi_manager.h"
-#include "cypress_session.h"
 
 #include <QHostInfo>
 #include <QTableWidget>
@@ -15,6 +15,8 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
 
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+    ui->measurementTable->hideMeasureButton();
+    ui->measurementTable->hideManualEntry();
 
     this->setWindowTitle("Carotid Intima");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -26,7 +28,23 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
 
     QList<TableColumn> columns;
-    columns << TableColumn("SIDE", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
+
+    columns << TableColumn("NAME",
+                           "Name",
+                           new ComboBoxDelegate(QStringList() << "LEFT"
+                                                              << "RIGHT",
+                                                true,
+                                                false,
+                                                "Select a side"));
+
+    columns << TableColumn("SIDE",
+                           "Side",
+                           new ComboBoxDelegate(QStringList() << "LEFT"
+                                                              << "RIGHT",
+                                                true,
+                                                false,
+                                                "Select a side"));
+
     columns << TableColumn("FILE", "File", new TextDelegate("", QRegExp(), true, false));
     columns << TableColumn("SIZE", "Size", new TextDelegate("", QRegExp(), true, false));
 
@@ -43,9 +61,6 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
 
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager, &VividiManager::measure);
-
-    // measure complete
-    connect(manager, &VividiManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // measures valid, can finish test
     connect(manager, &VividiManager::canFinish, ui->measurementTable, [=]() {

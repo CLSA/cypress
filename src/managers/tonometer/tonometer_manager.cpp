@@ -97,7 +97,8 @@ void TonometerManager::measure()
     if (m_sim)
     {
         m_test->simulate({});
-        emit measured(m_test.get());
+
+        emit dataChanged(m_test.get());
         emit canFinish();
     }
 }
@@ -108,7 +109,6 @@ void TonometerManager::readOutput()
     {
         qDebug() << "TonometerManager::readOutput";
     }
-
 }
 
 void TonometerManager::configureProcess()

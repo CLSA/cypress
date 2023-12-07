@@ -129,14 +129,16 @@ void logAppInfo()
 
 QString getStatusCheckString(const QString& arg1, bool arg2)
 {
-    return QString("%1 %2").arg(arg1, -17).arg("[ " + (arg2 ? QString("true ") : QString("false")) + " ]");
+    return QString("%1 %2")
+        .arg(arg1, -20, ' ')
+        .arg("[ " + (arg2 ? QString("true ") : QString("false")) + " ]", 20, ' ');
 }
 
 bool checkAlive()
 {
     bool isAlive { true };
 
-    qInfo() << getStatusCheckString("pine available: ", isAlive);
+    qInfo() << getStatusCheckString("pine available", isAlive);
 
     return isAlive;
 }
@@ -145,7 +147,7 @@ bool updateAvailable()
 {
     bool isUpdateAvailable { false };
 
-    qInfo() << getStatusCheckString("update available: ", isUpdateAvailable);
+    qInfo() << getStatusCheckString("update available", isUpdateAvailable);
 
     return isUpdateAvailable;
 }
@@ -191,8 +193,8 @@ int main(int argc, char *argv[])
     logSystemInfo();
     logNetworkInfo();
 
-    qInfo() << getStatusCheckString("debug mode", CypressSettings::isDebugMode());
-    qInfo() << getStatusCheckString("sim mode", CypressSettings::isSimMode());
+    qInfo() << getStatusCheckString("debug", CypressSettings::isDebugMode());
+    qInfo() << getStatusCheckString("sim", CypressSettings::isSimMode());
 
     // Make sure the network is up and that the Pine server is alive
     if (!checkAlive())

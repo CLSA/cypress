@@ -14,9 +14,12 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
     , ui(new Ui::RetinalCameraDialog)
 {
     ui->setupUi(this);
+
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+
     ui->measurementTable->hideManualEntry();
+    ui->measurementTable->hideMeasureButton();
 
     this->setWindowTitle("Retinal Camera" + (session->getSide() == Side::Left ? QString("(Left)") : QString("(Right)")));
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -29,7 +32,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
 
     QList<TableColumn> columns;
     columns << TableColumn("EYE_PICT_VENDOR", "Picture", new TextDelegate("", QRegExp("^1234$"), true));
-    columns << TableColumn("EYE_SIDE_VENDOR", "Side", new ComboBoxDelegate(QStringList() << "LEFT" << "RIGHT", true, false, "Select a side"));
+    columns << TableColumn("EYE_SIDE_VENDOR", "Side", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager, &RetinalCameraManager::started, ui->measurementTable, [=](TestBase* test) {
@@ -41,9 +44,6 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
     connect(manager, &RetinalCameraManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
-
-    // auto measure
-    connect(manager, &RetinalCameraManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // can finish
     connect(manager, &RetinalCameraManager::canFinish, ui->measurementTable, [=]() {
@@ -66,7 +66,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
     connect(ui->measurementTable, &MeasurementTable::finish, manager, &RetinalCameraManager::finish);
 
     // request adding manual measurement
-    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &RetinalCameraManager::addManualMeasurement);
+    //connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &RetinalCameraManager::addManualMeasurement);
 
     // update measurement
 }

@@ -123,16 +123,14 @@ void ChoiceReactionManager::start()
 void ChoiceReactionManager::measure()
 {
     if (m_debug)
-    {
         qDebug() << "ChoiceReactionManager::measure";
-    }
 
     m_test->reset();
 
-    if (CypressSettings::isSimMode())
-    {
+    if (m_sim) {
         m_test->simulate();
-        emit measured(m_test.get());
+
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
@@ -144,9 +142,7 @@ void ChoiceReactionManager::measure()
 void ChoiceReactionManager::finish()
 {
     if (m_debug)
-    {
         qDebug() << "ChoiceReactionManager::finish";
-    }
 
     QJsonObject responseJson {};
 
@@ -177,9 +173,7 @@ void ChoiceReactionManager::readOutput()
     // user id and interviewer id are embedded in the csv file content.
     //
     if (m_debug)
-    {
         qDebug() << "ChoiceReactionManager::readOutput";
-    }
 
     QStringList pattern;
 
@@ -199,7 +193,6 @@ void ChoiceReactionManager::readOutput()
 
         if(test->isValid())
         {
-            emit measured(test);
             emit dataChanged(test);
             emit canFinish();
 

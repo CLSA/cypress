@@ -33,9 +33,6 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &AudiometerManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &AudiometerManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();

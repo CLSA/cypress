@@ -4,6 +4,13 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
+WeightMeasurement::WeightMeasurement()
+{
+    setAttribute("weight", 0.00f);
+    setAttribute("mode", "gross");
+    setAttribute("timestamp", QDateTime::currentDateTime());
+}
+
 void WeightMeasurement::fromArray(const QByteArray &arr)
 {
     if(!arr.isEmpty())
@@ -12,31 +19,30 @@ void WeightMeasurement::fromArray(const QByteArray &arr)
       QList<QByteArray> parts = bytes.split(' ');
       if(3 <= parts.size())
       {
-        setAttribute("WEIGHT", parts[0].toDouble(), QString(parts[1]), 1);
-        setAttribute("MODE", QString(parts[2]));
-        setAttribute("TIMESTAMP", QDateTime::currentDateTime());
+          setAttribute("weight", parts[0].toDouble(), QString(parts[1]), 1);
+          setAttribute("mode", QString(parts[2]));
+          setAttribute("timestamp", QDateTime::currentDateTime());
       }
     }
 }
 
 void WeightMeasurement::simulate()
 {
-    setAttribute("WEIGHT", QRandomGenerator::global()->generateDouble() * (100.0 - 50.0) + 50.0, "kg", 1);
-    setAttribute("MODE", "gross");
-    setAttribute("TIMESTAMP", QDateTime::currentDateTimeUtc());
+    setAttribute("weight",
+                 QRandomGenerator::global()->generateDouble() * (100.0 - 50.0) + 50.0,
+                 "kg",
+                 1);
+    setAttribute("mode", "gross");
+    setAttribute("timestamp", QDateTime::currentDateTimeUtc());
 }
 
 bool WeightMeasurement::isValid() const
 {
     bool ok = false;
-    if(hasAttribute("WEIGHT"))
-    {
-      float fval = getAttributeValue("WEIGHT").toDouble(&ok);
-      ok = ok
-        && getAttribute("WEIGHT").hasUnits()
-        && hasAttribute("MODE")
-        && hasAttribute("TIMESTAMP")
-        && 0.0f <= fval;
+    if (hasAttribute("weight")) {
+        float fval = getAttributeValue("weight").toDouble(&ok);
+        ok = ok && getAttribute("weight").hasUnits() && hasAttribute("mode")
+             && hasAttribute("timestamp") && 0.0f <= fval;
     }
     return ok;
 }

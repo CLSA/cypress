@@ -49,9 +49,6 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent, QSharedPointer<GripStren
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &GripStrengthManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &GripStrengthManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();

@@ -53,8 +53,6 @@ public slots:
     void readOutput();
 
 private:
-    bool isDefined(const QString&, const FileType& type = ECGApplication) const;
-
     // full pathspec to Cardiosoft Cardio.exe
     //
     QString m_runnableName;
@@ -89,7 +87,8 @@ private:
     // Clean up the device for next time
     bool cleanUp() override;
 
-    bool deleteDeviceData();
+    bool backupData();
+    bool restoreBackup();
 
     void configureProcess();
 };

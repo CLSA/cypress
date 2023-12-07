@@ -22,6 +22,15 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
 
     m_bpm200.reset(new QHidDevice(this));
     m_driver.reset(new BpTru200Driver(m_mutex, m_bpm200));
+
+    if (m_debug) {
+        qDebug() << "BloodPressure";
+
+        qDebug() << session->getSessionId();
+        qDebug() << session->getBarcode();
+        qDebug() << session->getInterviewer();
+        qDebug() << session->getInputData();
+    }
 }
 
 

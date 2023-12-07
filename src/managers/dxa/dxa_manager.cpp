@@ -1,10 +1,8 @@
-#include "cypress_application.h"
 #include "cypress_session.h"
 
 #include "dicom/dcm_recv.h"
 #include "data/dxa/tests/dxa_test.h"
 #include "managers/dxa/dxa_manager.h"
-#include "auxiliary/Utilities.h"
 
 #include "../../auxiliary/file_utils.h"
 
@@ -22,32 +20,24 @@ DXAManager::DXAManager(QSharedPointer<DXASession> session) /* : m_dicomWatcher(Q
 {
     m_test.reset(new DXATest);
 
-    QDir workingDir = QDir::current();
-    QString workingDirPath = workingDir.absolutePath() + "/";
+    m_runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
+    m_runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
 
-    const QString executablePath = workingDirPath + CypressSettings::readSetting("dxa/dicom/executable").toString();
-    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    m_aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    m_host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    m_port = CypressSettings::readSetting("dxa/dicom/port").toString();
 
-    const QString storageDirPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    const QString logConfigPath = workingDirPath + CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    const QString ascConfigPath
-        = workingDirPath
-          + CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    m_storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    m_logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    m_ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
-    m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
+    m_dicomServer.reset(
+        new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
+
     connect(m_dicomServer.get(),
             &DcmRecv::dicomFilesReceived,
             this,
             &DXAManager::dicomFilesReceived);
-
-    m_networkFileCopier.reset(new SMBFileCopier());
-    connect(m_networkFileCopier.get(),
-            &SMBFileCopier::fileCopied,
-            this,
-            &DXAManager::copiedDatabaseFile);
-    m_dicomServer->start();
 }
 
 DXAManager::~DXAManager()
@@ -94,7 +84,11 @@ bool DXAManager::isInstalled()
 //
 void DXAManager::start()
 {
+    m_dicomServer->start();
+
     emit started(m_test.get());
+    emit dataChanged(m_test.get());
+    emit canMeasure();
 }
 
 // retrieve a measurement from the device
@@ -102,10 +96,9 @@ void DXAManager::start()
 void DXAManager::measure()
 {
     if (CypressSettings::isSimMode()) {
-        m_test->reset();
         m_test->simulate();
 
-        emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
@@ -119,8 +112,8 @@ void DXAManager::measure()
     // check if valid
     DXATest *test = static_cast<DXATest *>(m_test.get());
     if (test->areDicomFilesValid()) {
-        emit measured(test);
-        emit canFinish();
+        emit dataChanged(m_test.get());
+        emit canMeasure();
     }
 }
 
@@ -164,7 +157,7 @@ void DXAManager::finish()
     // Forearm
     QString fa_1_file_name = "FA_DICOM.dcm";
     QByteArray fa_1 = FileUtils::readFile(
-        "C:/Users/Anthony/Downloads/DEXA_SIM/FA/FA_DICOM.dcm");
+        test->forearmMeasurement->m_forearmDicomFile.fileInfo.absoluteFilePath());
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
@@ -242,76 +235,6 @@ void DXAManager::finish()
                      fa_1);
 
     emit success("");
-}
-
-bool DXAManager::isCompleteDicom(DcmFileFormat &file)
-{
-    Q_UNUSED(file)
-    return false;
-}
-
-bool DXAManager::isCorrectDicom(DcmFileFormat &file)
-{
-    Q_UNUSED(file)
-    return true;
-}
-
-bool DXAManager::validateDicomFile(DcmFileFormat &loadedFileFormat)
-{
-    bool isComplete = isCorrectDicom(loadedFileFormat);
-    bool isCorrect = isCompleteDicom(loadedFileFormat);
-
-    return isComplete && isCorrect;
-}
-
-QList<DcmFileFormat> DXAManager::getValidatedFiles(QStringList filePaths)
-{
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-    QList<DcmFileFormat> validatedDicomFiles;
-
-    DcmFileFormat fileFormat;
-    QList<QString>::const_iterator i;
-
-    try {
-        for (i = filePaths.begin(); i != filePaths.end(); ++i)
-        {
-            const QString filePath = *i;
-            QString fileName = settings.value("dicom/out_dir", "").toString() + "/" + filePath.toStdString().c_str();
-            fileName = fileName.replace("/", "\\");
-
-            OFCondition status = fileFormat.loadFile(fileName.toStdString().c_str());
-            if (status.good())
-            {
-                bool isValid = validateDicomFile(fileFormat);
-                if (isValid)
-                {
-                    qInfo() << "DICOM File is valid: " << isValid;
-                    validatedDicomFiles.append(fileFormat);
-                }
-            }
-            else
-            {
-              qInfo() << "Error: cannot read DICOM file (" << status.text() << ")" << endl;
-            }
-        }
-    }
-
-    catch (QException &e)
-    {
-        qInfo() << e.what();
-    }
-
-    return validatedDicomFiles;
-}
-
-void DXAManager::dicomServerExitNormal()
-{
-
-}
-
-void DXAManager::dicomServerExitCrash()
-{
-
 }
 
 QMap<QString, QVariant> DXAManager::retrieveDeviceData()

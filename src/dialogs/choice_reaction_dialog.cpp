@@ -46,9 +46,6 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent,
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &ChoiceReactionManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &ChoiceReactionManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();

@@ -119,9 +119,6 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
         ui->measurementTable->disableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &BloodPressureManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &BloodPressureManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();

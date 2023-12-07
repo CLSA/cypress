@@ -15,40 +15,26 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="FilePickerWidget" name="cardioPath" native="true"/>
+    <widget class="FilePickerWidget" name="runnableName" native="true"/>
    </item>
    <item>
-    <widget class="FilePickerWidget" name="initPath" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="databasePath" native="true"/>
+    <widget class="FilePickerWidget" name="workingPath" native="true"/>
    </item>
    <item>
     <widget class="FilePickerWidget" name="exportPath" native="true"/>
    </item>
    <item>
-    <widget class="FilePickerWidget" name="settingsFileName" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="winSettingsFileName" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="btrRecordFileName" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="btrDatabaseFileName" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="xmlFileName" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="pdfFileNameRestingEcg" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="pdfFileNameFullEcg" native="true"/>
-   </item>
-   <item>
-    <widget class="FilePickerWidget" name="executableForParticipantInfo" native="true"/>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

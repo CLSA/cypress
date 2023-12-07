@@ -223,7 +223,6 @@ void GripStrengthManager::measure()
     {
         m_test->simulate();
 
-        emit measured(m_test.get());
         emit dataChanged(m_test.get());
         emit canFinish();
 

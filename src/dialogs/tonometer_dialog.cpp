@@ -42,9 +42,6 @@ TonometerDialog::TonometerDialog(QWidget *parent, QSharedPointer<TonometerSessio
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &TonometerManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &TonometerManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();

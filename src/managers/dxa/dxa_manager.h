@@ -34,19 +34,11 @@ public:
     QJsonObject scanAnalysisJson;
     QJsonObject scoresJson;
 
-    QList<DcmFileFormat> validatedDicomFiles;
-    QList<DcmFileFormat> getValidatedFiles(QStringList filePaths);
-
     QVariantMap getParticipantData();
 
     QMap<QString, QVariant> retrieveDeviceData();
     QMap<QString, QVariant> extractScanAnalysisData();
     QMap<QString, QVariant> computeTandZScores();
-
-    bool validateDicomFile(DcmFileFormat &loadedFileFormat);
-
-    bool isCorrectDicom(DcmFileFormat &file);
-    bool isCompleteDicom(DcmFileFormat &file);
 
 public slots:
     void start() override;
@@ -56,14 +48,19 @@ public slots:
     void dicomFilesReceived();
     void copiedDatabaseFile(QFileInfo file);
 
-protected slots:
-    void dicomServerExitNormal();
-    void dicomServerExitCrash();
-
 signals:
     void updateDicomTable(QList<DicomFile> files);
 
 private:
+    QString m_runnableName;
+    QString m_runnablePath;
+    QString m_aeTitle;
+    QString m_host;
+    QString m_port;
+    QString m_storageDirPath;
+    QString m_logConfigPath;
+    QString m_ascConfigPath;
+
     QFileInfo m_patscanDb{};
     QFileInfo m_referenceDb{};
 

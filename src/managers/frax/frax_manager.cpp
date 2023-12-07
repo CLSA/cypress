@@ -82,7 +82,7 @@ void FraxManager::measure()
 
         m_test->simulate(map);
 
-        emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
@@ -113,6 +113,7 @@ void FraxManager::readOutput()
         if(test->isValid())
         {
             emit measured(test);
+            emit dataChanged(test);
             emit canFinish();
         }
         else

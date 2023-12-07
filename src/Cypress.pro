@@ -29,14 +29,11 @@ INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
 INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
 
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/bin
-
 LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/include/
-INCLUDEPATH += $$PWD/../dep/dcmtk-3.6.7-win32-install/lib/
-LIBS += -L$$PWD/../dep/dcmtk-3.6.7-win32-install/lib/ -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
+LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 # INCLUDEPATH += $$PWD/../dep/SigLib/Include/
@@ -235,7 +232,6 @@ HEADERS += \
     server/sessions/dxa/dxa_hip_session.h \
     server/sessions/dxa/dxa_session.h \
     server/sessions/ecg_session.h \
-    server/sessions/frax_session.h \
     server/handlers/audiometer/audiometer_request_handler.h \
     server/handlers/audiometer/audiometer_status_request_handler.h \
     server/handlers/blood_pressure/blood_pressure_request_handler.h \

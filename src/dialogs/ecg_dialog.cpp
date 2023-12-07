@@ -18,8 +18,10 @@ EcgDialog::EcgDialog(QWidget *parent, QSharedPointer<ECGSession> session)
     ECGManager* manager = static_cast<ECGManager*>(m_manager.get());
 
     ui->testInfoWidget->setSessionInformation(*session);
-    ui->measurementTable->hideManualEntry();
+
     ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->hideMeasureButton();
+    ui->measurementTable->hideManualEntry();
 
     QList<TableColumn> columns;
 
@@ -52,9 +54,6 @@ EcgDialog::EcgDialog(QWidget *parent, QSharedPointer<ECGSession> session)
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &ECGManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &ECGManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
@@ -80,8 +79,7 @@ EcgDialog::EcgDialog(QWidget *parent, QSharedPointer<ECGSession> session)
     connect(ui->measurementTable, &MeasurementTable::finish, manager, &ECGManager::finish);
 
     // request adding manual measurement
-    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &ECGManager::addManualMeasurement);
-
+    //connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &ECGManager::addManualMeasurement);
 }
 
 EcgDialog::~EcgDialog()

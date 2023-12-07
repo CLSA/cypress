@@ -1,6 +1,8 @@
 #include "vividi_manager.h"
 
+#include "data/cimt_vivid_i_measurement.h"
 #include "data/cimt_vivid_i_test.h"
+
 #include "auxiliary/file_utils.h"
 
 #include <QJsonDocument>
@@ -9,23 +11,31 @@ VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new CimtVividiTest);
+    m_test->setExpectedMeasurementCount(10);
 
-    QDir workingDir = QDir::current();
-    QString workingDirPath = workingDir.absolutePath() + "/";
+    m_runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
+    m_runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
 
-    const QString executablePath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/executable").toString();
-    const QString aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
-    const QString host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
-    const QString port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
+    m_aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
+    m_host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
+    m_port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
 
-    const QString storageDirPath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
-    const QString logConfigPath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
-    const QString ascConfigPath = workingDirPath + CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
+    m_storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
+    m_logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
+    m_ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
 
-    m_dicomServer.reset(new DcmRecv(executablePath, ascConfigPath, storageDirPath, aeTitle, port));
-    connect(m_dicomServer.get(), &DcmRecv::dicomFilesReceived, this, &VividiManager::dicomFilesReceived);
+    m_dicomServer.reset(
+        new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
 
-    m_dicomServer->start();
+    connect(m_dicomServer.get(),
+            &DcmRecv::dicomFilesReceived,
+            this,
+            &VividiManager::dicomFilesReceived);
+}
+
+VividiManager::~VividiManager()
+{
+    m_dicomServer->stop();
 }
 
 void VividiManager::dicomFilesReceived()
@@ -34,18 +44,74 @@ void VividiManager::dicomFilesReceived()
 
     foreach (DicomFile file, files)
     {
-        if (CypressSettings::isDebugMode())
+        QSharedPointer<CimtVividIMeasurement> measure(new CimtVividIMeasurement);
+
+        if (m_debug)
             qDebug() << file.patientId << file.modality << file.studyDate << file.studyId << file.fileInfo.absoluteFilePath();
+
+        if (file.mediaStorageUID == UID_UltrasoundImageStorage) {
+            if (m_debug) {
+                qDebug() << "VividIManager::dicomFilesReceived: received still image "
+                         << m_stillImageIdCounter;
+            }
+
+            measure->setAttribute("name", "STILL_IMAGE_" + QString::number(m_stillImageIdCounter));
+            measure->setAttribute("path", file.fileInfo.absoluteFilePath());
+            measure->setAttribute("side", "");
+
+            ++m_stillImageIdCounter;
+
+        } else if (file.mediaStorageUID == UID_UltrasoundMultiframeImageStorage) {
+            if (m_debug) {
+                qDebug() << "VividIManager::dicomFilesReceived: received cineloop image"
+                         << m_cineloopCounter;
+            }
+
+            measure->setAttribute("name", "CINELOOP_" + QString::number(m_cineloopCounter));
+            measure->setAttribute("path", file.fileInfo.absoluteFilePath());
+            measure->setAttribute("side", "");
+
+            ++m_cineloopCounter;
+
+        } else if (file.modality == "SR") {
+            if (m_debug) {
+                qDebug() << "VividIManager::dicomFilesReceived: received SR file" << m_srCounter;
+            }
+
+            measure->setAttribute("name", "SR_" + QString::number(m_srCounter));
+            measure->setAttribute("path", file.fileInfo.absoluteFilePath());
+            measure->setAttribute("side", "");
+
+            ++m_srCounter;
+        } else {
+            qDebug() << "found unknown dicom file";
+            continue;
+        }
+
+        m_test->addMeasurement(measure);
     }
 }
 
 bool VividiManager::isInstalled()
 {
-    return false;
+    QString runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
+    QString runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
+
+    QString aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
+    QString host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
+    QString port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
+
+    QString storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
+    QString logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
+    QString ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
+
+    return true;
 }
 
 void VividiManager::start()
 {
+    m_dicomServer->start();
+
     emit started(m_test.get());
     emit dataChanged(m_test.get());
     emit canMeasure();
@@ -53,18 +119,13 @@ void VividiManager::start()
 
 void VividiManager::measure()
 {
-    m_test->reset();
-
     if (CypressSettings::isSimMode())
     {
         m_test->simulate();
-        emit measured(m_test.get());
+
+        emit dataChanged(m_test.get());
         emit canFinish();
     }
-}
-
-void VividiManager::cancel()
-{
 }
 
 void VividiManager::finish()
@@ -106,15 +167,33 @@ void VividiManager::finish()
 
 bool VividiManager::setUp()
 {
+    if (m_debug) {
+        qDebug() << "VividiManager::cleanUp";
+    }
+
     return true;
 }
 
 bool VividiManager::clearData()
 {
+    if (m_debug) {
+        qDebug() << "VividiManager::clearData";
+    }
+
+    m_test->reset();
+
+    m_stillImageIdCounter = 1;
+    m_cineloopCounter = 1;
+    m_srCounter = 1;
+
     return true;
 }
 
 bool VividiManager::cleanUp()
 {
-    return true;
+    if (m_debug) {
+        qDebug() << "VividiManager::cleanUp";
+    }
+
+    return clearData();
 }

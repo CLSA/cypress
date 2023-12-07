@@ -71,11 +71,7 @@ signals:
     // (update GUI enable measure button)
     //
     void canMeasure();
-
     void cannotMeasure();
-
-    // measurements read, stored in the test
-    void measured(TestBase *test);
 
     // valid test completed and ready to write to output
     // (update GUI enable write button and update the results display)

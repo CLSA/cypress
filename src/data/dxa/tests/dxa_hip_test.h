@@ -12,7 +12,6 @@ class DxaHipTest: public TestBase
 public:
     DxaHipTest();
 
-
     static const QMap<QString, QString> ranges;
 
     bool isValid() const override;

@@ -1,4 +1,3 @@
-#include "cypress_application.h"
 #include "cypress_session.h"
 
 #include "data/weigh_scale/tests/weigh_scale_test.h"
@@ -23,6 +22,15 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
 {
     m_test.reset(new WeighScaleTest);
     m_test->setExpectedMeasurementCount(2);
+
+    if (m_debug) {
+        qDebug() << "WeighScaleManager";
+
+        qDebug() << session->getSessionId();
+        qDebug() << session->getBarcode();
+        qDebug() << session->getInterviewer();
+        qDebug() << session->getInputData();
+    }
 }
 
 bool WeighScaleManager::isInstalled()
@@ -51,11 +59,10 @@ void WeighScaleManager::measure()
         qDebug() << "WeighScaleManager::measure";
     }
 
-    if (m_sim)
-    {
+    if (m_sim) {
         m_test->simulate();
 
-        emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
@@ -68,9 +75,7 @@ void WeighScaleManager::measure()
 void WeighScaleManager::finish()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::finish";
-    }
 
     int answer_id = m_session->getAnswerId();
 
@@ -90,27 +95,30 @@ void WeighScaleManager::finish()
     emit success("");
 }
 
+void WeighScaleManager::addManualMeasurement()
+{
+    QSharedPointer<WeightMeasurement> measure(new WeightMeasurement);
+    m_test->addMeasurement(measure);
+
+    emit dataChanged(m_test.get());
+}
+
 void WeighScaleManager::connectDevice()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::connectDevice";
-    }
 
     // Connect to the serial port and set up listeners
 
-    if(m_port.isOpen())
-    {
+    if (m_port.isOpen())
         m_port.close();
-    }
 
     m_port.setDataBits(QSerialPort::Data8);
     m_port.setParity(QSerialPort::NoParity);
     m_port.setStopBits(QSerialPort::OneStop);
     m_port.setBaudRate(QSerialPort::Baud9600);
 
-    if (m_port.open(QSerialPort::ReadWrite))
-    {
+    if (m_port.open(QSerialPort::ReadWrite)) {
         qDebug() << "connected";
         emit deviceConnected();
 
@@ -120,19 +128,14 @@ void WeighScaleManager::connectDevice()
         //
         m_request = QByteArray("i");
         writeDevice();
-    }
-    else
-    {
+    } else
         qDebug() << "could not open port";
-    }
 }
 
 void WeighScaleManager::zeroDevice()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::zeroDevice";
-    }
 
     m_request = QByteArray("z");
     writeDevice();
@@ -141,9 +144,7 @@ void WeighScaleManager::zeroDevice()
 void WeighScaleManager::readDevice()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::readDevice";
-    }
 
     QByteArray data = m_port.readAll();
     m_buffer += data;
@@ -155,40 +156,32 @@ void WeighScaleManager::readDevice()
         return;
     }
 
-    if("i" == QString(m_request))
-    {
+    if ("i" == QString(m_request)) {
         //m_deviceData.setAttribute("software_id", QString(m_buffer.simplified()));
         // signal the GUI that the measure button can be clicked
         //
         emit canMeasure();
-    }
-    else if("p" == QString(m_request))
-    {
+    } else if ("p" == QString(m_request)) {
         WeighScaleTest* test = static_cast<WeighScaleTest*>(m_test.get());
         test->fromArray(m_buffer);
 
-        qDebug() << "received p request, read buffer" << m_buffer;
+        if (m_debug)
+            qDebug() << "received p request, read buffer" << m_buffer;
 
-        if(m_test->isValid())
-        {
-            qDebug() << "test is valid, can save results";
-            // emit the can write signal
-            emit measured(m_test.get());
+        if (m_test->isValid()) {
+            if (m_debug)
+                qDebug() << "test is valid, can save results";
+
+            emit dataChanged(m_test.get());
             emit canFinish();
-        }
-        else
-        {
+        } else {
             QMessageBox::critical(nullptr, "Received invalid data", "Data received was invalid");
-
             emit canMeasure();
         }
-    }
-    else if("z" == QString(m_request))
-    {
+    } else if ("z" == QString(m_request)) {
         WeightMeasurement m;
         m.fromArray(m_buffer);
-        if(m.isZero())
-        {
+        if (m.isZero()) {
             // signal the GUI that the measure button can be clicked
             //
             emit canMeasure();
@@ -212,9 +205,7 @@ void WeighScaleManager::writeDevice()
 bool WeighScaleManager::setUp()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::setUp";
-    }
 
     return true;
 }
@@ -222,9 +213,7 @@ bool WeighScaleManager::setUp()
 bool WeighScaleManager::cleanUp()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::cleanUp";
-    }
 
     return clearData();
 }
@@ -232,11 +221,10 @@ bool WeighScaleManager::cleanUp()
 bool WeighScaleManager::clearData()
 {
     if (m_debug)
-    {
         qDebug() << "WeighScaleManager::clearData";
-    }
 
     m_test->reset();
+
     return true;
 }
 

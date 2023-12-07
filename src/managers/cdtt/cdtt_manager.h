@@ -51,8 +51,12 @@ public slots:
 
 private:
     QProcess m_process;
-    QString m_outputFile;
+
+    QString m_runnableName;
+    QString m_runnablePath;
+
     QString m_outputPath;
+    QString m_outputFile;
 
     // Reset the session
     bool clearData() override;

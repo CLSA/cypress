@@ -24,7 +24,12 @@ DcmRecv::DcmRecv(
     m_port(port)
 {
     // Reset the output directory
-    FileUtils::removeDirectory(m_outputDir);
+    QDir outputDirInfo(m_outputDir);
+
+    if (outputDirInfo.exists()) {
+        FileUtils::removeDirectory(m_outputDir);
+    }
+
     FileUtils::createDirectory(m_outputDir);
 
     connect(&m_process, &QProcess::readyReadStandardOutput, this, &DcmRecv::onReadyReadStandardOutput);
@@ -63,6 +68,7 @@ void DcmRecv::onFilesReceived()
             if (loadResult.good())
             {
                 DcmDataset* dataset = fileFormat.getDataset();
+                OFString mediaStorageUID;
                 OFString studyInstanceUID;
                 OFString patientId;
                 OFString fileName;
@@ -73,6 +79,10 @@ void DcmRecv::onFilesReceived()
 
                 DicomFile dicomFile;
                 dicomFile.fileInfo = fileInfo;
+
+                if (dataset->findAndGetOFString(DCM_MediaStorageSOPClassUID, mediaStorageUID).good()) {
+                    dicomFile.mediaStorageUID = mediaStorageUID.c_str();
+                }
 
                 if (dataset->findAndGetOFString(DCM_StudyInstanceUID, studyInstanceUID).good()) {
                     dicomFile.studyId = studyInstanceUID.c_str();
@@ -119,6 +129,9 @@ bool DcmRecv::start()
     m_process.start(m_executablePath, arguments);
 
     bool started = m_process.waitForStarted();
+
+    qDebug() << "started dicom server" << arguments;
+
     if (!started)
     {
         qDebug() << "error: could not start DICOM server";

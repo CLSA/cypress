@@ -14,6 +14,7 @@ struct DicomFile {
     QString patientId;
     QString bodyPartExamined;
     QString modality;
+    QString mediaStorageUID;
     QString studyDate;
     QString seriesNumber;
     QString size;

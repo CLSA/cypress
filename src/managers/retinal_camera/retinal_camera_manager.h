@@ -26,32 +26,36 @@ public slots:
 
     void finish() override;
 
-    void cancel();
-
 private:
-    QProcess m_process;
-    QString m_uuid;
-
-    QSqlDatabase m_db;
-
     QString defaultPersonUUID = "11111111-2222-3333-4444-555555555555";
     QString defaultPatientUUID = "11111111-2222-3333-4444-555555555555";
 
+    QString m_runnableName = "";
+    QString m_runnablePath = "";
+
+    QString m_databaseName = "";
+    int m_databasePort = -1;
+    QString m_databaseUser = "";
+    QString m_databasePassword = "";
+
+    QProcess m_process;
+    QString m_uuid;
+    QSqlDatabase m_db;
+
     bool setUp() override;
 
-    bool backupDatabase();
+    bool openDatabase();
     bool initializeDatabase();
     void configureProcess();
-    bool startRetinalCamera();
 
-    bool openDatabase();
+    void readOutput();
 
     bool clearData() override;
-
     bool cleanUp() override;
-    bool restoreDatabase();
     bool cleanupDatabase();
 
+    QJsonObject getLeftEye();
+    QJsonObject getRightEye();
 };
 
 #endif // RETINAL_CAMERA_MANAGER_H

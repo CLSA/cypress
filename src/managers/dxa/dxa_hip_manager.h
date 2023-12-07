@@ -30,23 +30,16 @@ public:
     explicit DxaHipManager(QSharedPointer<DxaHipSession> session);
     ~DxaHipManager();
 
-    //DicomSCP* m_dicomSCP;
     static bool isInstalled();
 
     QJsonObject scanAnalysisJson;
     QJsonObject scoresJson;
-
-    QList<DcmFileFormat> validatedDicomFiles;
-    QList<DcmFileFormat> getValidatedFiles(QStringList filePaths);
 
     QVariantMap getParticipantData();
 
     QMap<QString, QVariant> retrieveDeviceData();
     QMap<QString, QVariant> extractScanAnalysisData();
     QMap<QString, QVariant> computeTandZScores();
-
-    bool isCorrectDicom(DcmFileFormat &file);
-    bool isCompleteDicom(DcmFileFormat &file);
 
 public slots:
     void start() override;
@@ -56,19 +49,23 @@ public slots:
     void dicomFilesReceived();
 
 protected slots:
-    void dicomServerExitNormal();
-    void dicomServerExitCrash();
-
     void databaseCopied(QFileInfo fileInfo);
 
 private:
+    QString m_runnableName;
+    QString m_runnablePath;
+    QString m_aeTitle;
+    QString m_host;
+    QString m_port;
+    QString m_storageDirPath;
+    QString m_logConfigPath;
+    QString m_ascConfigPath;
+
     QScopedPointer<DcmRecv> m_dicomServer;
     QScopedPointer<SMBFileCopier> m_networkFileCopier;
 
     QFileInfo m_patscanDbFileInfo;
     QFileInfo m_refDbFileInfo;
-
-    bool validateDicomFile(DcmFileFormat &loadedFileFormat);
 
     // Reset the session
     bool clearData() override;

@@ -14,7 +14,9 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
 
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+
     ui->measurementTable->hideManualEntry();
+    ui->measurementTable->hideMeasureButton();
 
     this->setWindowTitle("FRAX");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -39,9 +41,6 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
     connect(manager, &FraxManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
-
-    // auto measure
-    connect(manager, &FraxManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // can finish
     connect(manager, &FraxManager::canFinish, ui->measurementTable, [=]() {

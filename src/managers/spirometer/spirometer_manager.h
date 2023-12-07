@@ -46,9 +46,11 @@ private:
     QString m_runnableName; // full pathspec to EasyWarePro.exe
     QString m_runnablePath; // path to EasyWarePro.exe directory
     QString m_dataPath;     // Path to the EMR plugin data transfer directory
+    QString m_inFileName;   // OnyxIn.xml
+    QString m_outFileName;  // OnyxOut.xml
 
-    QString getEMRInXmlName() const { return QString("%1/%2").arg(m_dataPath,"OnyxIn.xml"); }
-    QString getEMROutXmlName() const { return QString("%1/%2").arg(m_dataPath,"OnyxOut.xml"); }
+    QString getEMRInXmlName() const { return QString("%1/%2").arg(m_dataPath, m_inFileName); }
+    QString getEMROutXmlName() const { return QString("%1/%2").arg(m_dataPath, m_outFileName); }
     QString getEWPDbName() const { return QString("%1/%2").arg(m_dataPath,"EasyWarePro.mdb"); }
     QString getEWPDbCopyName() const { return QString("%1/%2").arg(m_dataPath,"EasyWareProCopy.mdb"); }
     QString getEWPOptionsDbName() const { return QString("%1/%2").arg(m_dataPath,"EwpOptions.mdb"); }

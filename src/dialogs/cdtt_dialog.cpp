@@ -13,6 +13,8 @@ CDTTDialog::CDTTDialog(QWidget *parent, QSharedPointer<CDTTSession> session)
     ui->setupUi(this);
     ui->measurementTable->disableMeasureButton();
     ui->measurementTable->disableFinishButton();
+    ui->measurementTable->hideMeasureButton();
+    ui->measurementTable->hideManualEntry();
 
     this->setWindowTitle("FRAX");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -38,9 +40,6 @@ CDTTDialog::CDTTDialog(QWidget *parent, QSharedPointer<CDTTSession> session)
     connect(manager, &CDTTManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
-
-    // auto measure
-    connect(manager, &CDTTManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // can finish
     connect(manager, &CDTTManager::canFinish, ui->measurementTable, [=]() {

@@ -120,7 +120,7 @@ void AudiometerManager::measure()
     {
         m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
 
-        emit measured(m_test.get());
+        emit dataChanged(m_test.get());
         emit canFinish();
 
         return;
@@ -197,7 +197,7 @@ void AudiometerManager::readDevice()
         hearingTest->fromArray(m_buffer);
         if(hearingTest->isValid())
         {
-            emit measured(m_test.get());
+            emit dataChanged(m_test.get());
             emit canFinish();
         }
     }

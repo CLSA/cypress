@@ -41,9 +41,6 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
         ui->measurementTable->enableMeasureButton();
     });
 
-    // auto measure
-    connect(manager, &DxaHipManager::measured, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
     // can finish
     connect(manager, &DxaHipManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
