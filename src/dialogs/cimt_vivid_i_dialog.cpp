@@ -14,42 +14,34 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     ui->setupUi(this);
 
     ui->measurementTable->disableMeasureButton();
-    ui->measurementTable->disableFinishButton();
+    //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideMeasureButton();
     ui->measurementTable->hideManualEntry();
+    ui->measurementTable->setTitle("Files Received");
 
-    this->setWindowTitle("Carotid Intima");
+    this->setWindowTitle("CIMT");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new VividiManager(session));
     VividiManager* manager = static_cast<VividiManager*>(m_manager.get());
 
     ui->testInfoWidget->setSessionInformation(*session);
-    ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
 
     QList<TableColumn> columns;
 
-    columns << TableColumn("NAME",
-                           "Name",
-                           new ComboBoxDelegate(QStringList() << "LEFT"
-                                                              << "RIGHT",
-                                                true,
-                                                false,
-                                                "Select a side"));
-
-    columns << TableColumn("SIDE",
+    columns << TableColumn("patient_id", "Patient ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("study_id", "Study ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("name", "Name", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("side",
                            "Side",
-                           new ComboBoxDelegate(QStringList() << "LEFT"
-                                                              << "RIGHT",
+                           new ComboBoxDelegate(QStringList() << "Left"
+                                                              << "Right",
                                                 true,
                                                 false,
                                                 "Select a side"));
-
-    columns << TableColumn("FILE", "File", new TextDelegate("", QRegExp(), true, false));
-    columns << TableColumn("SIZE", "Size", new TextDelegate("", QRegExp(), true, false));
 
     // device/server started
-    connect(manager, &VividiManager::started, ui->measurementTable, [=](TestBase* test) {
+    connect(manager, &VividiManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });

@@ -10,8 +10,12 @@ public:
 
     // CypressSession interface
 public:
+    void isInstalled() const override;
+    void isAvailable() const override;
     void validate() const override;
-    void start() override;
+
+    void initializeDialog() override;
+
 };
 
 #endif // TONOMETERSESSION_H

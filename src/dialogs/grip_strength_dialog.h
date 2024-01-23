@@ -16,12 +16,6 @@ public:
 
 private:
     Ui::GripStrengthDialog *ui;
-
-    void initializeConnections() override;
-    void initializeModel() override;
-
-    void enableMeasure();
-    bool handleClose();
 };
 
 #endif // GRIP_STRENGTH_DIALOG_H

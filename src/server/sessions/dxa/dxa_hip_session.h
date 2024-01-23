@@ -10,7 +10,12 @@ public:
 
     // CypressSession interface
 public:
-    void start();
+    QString getWebpageContents() override;
+
+    void initializeDialog() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
+
 };
 
 #endif // DXAHIPSESSION_H

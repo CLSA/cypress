@@ -4,9 +4,7 @@
 
 bool FraxMeasurement::isValid() const
 {
-    bool ok =
-      hasAttribute("TYPE") &&
-      hasAttribute("PROBABILITY");
+    bool ok = hasAttribute("type") && hasAttribute("probability");
     return ok;
 }
 
@@ -15,9 +13,9 @@ QString FraxMeasurement::toString() const
     QString s;
     if(isValid())
     {
-      QString type = getAttribute("TYPE").toString().replace("_"," ");
-      QString p = QString::number(getAttributeValue("PROBABILITY").toDouble(),'f',1);
-      s = QString("%1 risk: %2 (%3)").arg(type,p,getAttribute("PROBABILITY").units());
+      QString type = getAttribute("type").toString().replace("_"," ");
+      QString p = QString::number(getAttributeValue("probability").toDouble(),'f',1);
+      s = QString("%1 risk: %2 (%3)").arg(type,p,getAttribute("probability").units());
     }
     return s;
 }

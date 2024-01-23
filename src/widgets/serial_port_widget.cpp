@@ -1,6 +1,8 @@
 #include "serial_port_widget.h"
 #include "ui_serial_port_widget.h"
 
+#include <QDebug>
+
 SerialPortWidget::SerialPortWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SerialPortWidget)
@@ -106,9 +108,14 @@ void SerialPortWidget::comboBoxChanged(const QString& portName)
         if (device.portName() == portName)
         {
             ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(portName));
-
             ui->connectButton->setEnabled(false);
             ui->disconnectButton->setEnabled(false);
+
+            m_portInfo = device;
+
+            qDebug() << device.manufacturer();
+            qDebug() << device.productIdentifier();
+            qDebug() << device.description();
 
             emit deviceSelected(device);
 

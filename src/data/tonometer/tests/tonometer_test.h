@@ -12,7 +12,7 @@ public:
     TonometerTest();
     ~TonometerTest() = default;
 
-    void fromVariant(const QVariant&);
+    void fromVariantMapList(const QList<QVariantMap> &);
 
     void simulate(const QVariantMap &) override;
 

@@ -1,8 +1,8 @@
 #include "dialog_base.h"
 
-#include "../cypress_application.h"
-#include "../cypress_session.h"
-#include "../managers/manager_base.h"
+#include "cypress_application.h"
+#include "cypress_session.h"
+#include "managers/manager_base.h"
 
 #include <QCoreApplication>
 #include <QCloseEvent>
@@ -18,47 +18,34 @@ DialogBase::DialogBase(QWidget *parent, QSharedPointer<CypressSession> session)
     : QDialog(parent)
     , m_session(session)
 {
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
-
-    //connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
-    //this->setAttribute(Qt::WA_DeleteOnClose);
-
-    startTime = QDateTime::currentDateTimeUtc();
+    setWindowFlags(Qt::WindowFullscreenButtonHint | Qt::WindowStaysOnTopHint);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     m_debug = CypressSettings::isDebugMode();
     m_sim = CypressSettings::isSimMode();
 }
 
-void DialogBase::initialize()
+DialogBase::~DialogBase() {}
+
+bool DialogBase::run()
 {
-}
-
-DialogBase::~DialogBase()
-{
-    qDebug() << "destroy dialog";
-}
-
-void DialogBase::initializeModel()
-{
-
-}
-
-void DialogBase::initializeConnections()
-{
-
-}
-
-void DialogBase::run()
-{
-    initialize();
-    m_manager->start();
-    show();
+    return m_manager->start();
 }
 
 
 void DialogBase::closeEvent(QCloseEvent* event)
 {
-    if (m_session->getStatus() != SessionStatus::Ended) {
+    if (m_session->getStatus() == CypressSession::SessionStatus::CriticalError) {
+        QDialog::closeEvent(event);
+        return;
+    }
+
+    if (m_session->getStatus() == CypressSession::SessionStatus::Cancelled) {
+        QDialog::closeEvent(event);
+        return;
+    }
+
+    if (m_session->getStatus() == CypressSession::SessionStatus::Started) {
         QMessageBox::StandardButton reply = QMessageBox::question(
         this,
         "Confirmation",
@@ -66,57 +53,41 @@ void DialogBase::closeEvent(QCloseEvent* event)
         QMessageBox::Yes|QMessageBox::No
     );
         if (reply != QMessageBox::Yes)
-        {
             event->ignore();
-        }
-        else {
+        else
             cancel("");
-        }
-
-        return;
+    } else {
+        QDialog::closeEvent(event);
     }
-
-    QDialog::closeEvent(event);
 }
 
 void DialogBase::cancel(const QString& cancelMsg)
 {
     if (m_debug)
-    {
         qDebug() << "DialogBase::cancel";
-    }
 
-    if (!m_debug)
-    {
+    if (!m_sim)
         m_manager->sendCancellation(m_session->getSessionId());
-    }
 
-    Cypress::getInstance().endSession(m_session->getSessionId());
-
-    //close();
+    Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::Cancelled);
 }
 
 void DialogBase::error(const QString& errorMsg)
 {
-    QMessageBox::critical(this, "Error", !errorMsg.isEmpty() ? errorMsg : "Unknown error");
+    QMessageBox::critical(nullptr, "Error", errorMsg);
 
-    m_manager->sendCancellation(m_session->getSessionId());
+    if (!m_sim)
+        m_manager->sendCancellation(m_session->getSessionId());
 
-    Cypress::getInstance().endSession(m_session->getSessionId());
-
-    close();
+    Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::CriticalError);
 }
 
 void DialogBase::success(const QString& successMsg)
 {
-    QMessageBox::information(this, "Complete", !successMsg.isEmpty() ? successMsg : "The data has been saved to Pine");
+    QMessageBox::information(nullptr, "Success", successMsg);
 
-    if (!m_debug)
-    {
+    if (!m_sim)
         m_manager->sendComplete(m_session->getSessionId());
-    }
 
-    Cypress::getInstance().endSession(m_session->getSessionId());
-
-    close();
+    Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::Success);
 }

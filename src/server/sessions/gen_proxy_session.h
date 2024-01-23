@@ -12,6 +12,7 @@ public:
 public:
     void validate() const override;
     void start() override;
+    void initializeDialog() override;
 };
 
 #endif // GENPROXYSESSION_H

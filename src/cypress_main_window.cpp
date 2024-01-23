@@ -1,4 +1,5 @@
 #include "cypress_main_window.h"
+#include "cypress_application.h"
 #include "ui_cypress_main_window.h"
 
 #include "widgets/device_settings/vivid_i_settings_widget.h"
@@ -16,6 +17,9 @@
 #include "widgets/device_settings/tonometer_settings_widget.h"
 #include "widgets/device_settings/weight_scale_settings_widget.h"
 
+#include "server/sessions/audiometer_session.h"
+#include "server/sessions/grip_strength_session.h"
+#include "server/sessions/retinal_camera_session.h"
 #include "server/sessions/bpm_session.h"
 #include "server/sessions/weigh_scale_session.h"
 #include "server/sessions/ecg_session.h"
@@ -26,23 +30,6 @@
 #include "server/sessions/frax_session.h"
 #include "server/sessions/cdtt_session.h"
 #include "server/sessions/choice_reaction_session.h"
-
-#include "dialogs/blood_pressure_dialog.h"
-#include "dialogs/ecg_dialog.h"
-#include "dialogs/cimt_vivid_i_dialog.h"
-#include "dialogs/spirometer_dialog.h"
-#include "dialogs/weigh_scale_dialog.h"
-#include "dialogs/dxa_dialog.h"
-#include "dialogs/dxa_hip_dialog.h"
-
-#include "dialogs/audiometer_dialog.h"
-#include "dialogs/frax_dialog.h"
-#include "dialogs/retinal_camera_dialog.h"
-#include "dialogs/grip_strength_dialog.h"
-
-#include "dialogs/cdtt_dialog.h"
-#include "dialogs/choice_reaction_dialog.h"
-#include "dialogs/frax_dialog.h"
 
 
 #include <QVBoxLayout>
@@ -68,11 +55,9 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData));
-
-        m_device_dialog.reset(new BloodPressureDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchWeightScale, &QPushButton::clicked, this, [=]() {
        QJsonObject inputData {
             {"language", "en"},
@@ -81,37 +66,36 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<WeighScaleSession> session(new WeighScaleSession(nullptr, inputData));
-
-        m_device_dialog.reset(new WeighScaleDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchSpirometer, &QPushButton::clicked, this, [=]() {
-       QJsonObject inputData {
+        QJsonObject inputData{
             {"language", "en"},
             {"barcode", "12345678"},
             {"interviewer", "Test"},
+            {"smoker", true},
+            {"gender", "male"},
+            {"height", 150},
+            {"weight", 100},
+            {"date_of_birth", "1995-12-06"},
         };
 
         QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData));
-
-        m_device_dialog.reset(new SpirometerDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchDxa1, &QPushButton::clicked, this, [=]() {
-        QJsonObject inputData {
+        QJsonObject inputData{
             {"language", "en"},
-            {"barcode", "12345678"},
+            {"barcode", "40001964"},
             {"interviewer", "Test"},
         };
 
         QSharedPointer<DxaHipSession> session(new DxaHipSession(nullptr, inputData));
-
-        m_device_dialog.reset(new DxaHipDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchDxa2, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData {
             {"language", "en"},
@@ -120,36 +104,31 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<DXASession> session(new DXASession(nullptr, inputData));
-
-        m_device_dialog.reset(new DXADialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchUltrasound, &QPushButton::clicked, this, [=]() {
-        QJsonObject inputData {
+        QJsonObject inputData{
             {"language", "en"},
-            {"barcode", "12345678"},
+            {"barcode", "40008471"},
             {"interviewer", "Test"},
         };
 
         QSharedPointer<UltrasoundSession> session(new UltrasoundSession(nullptr, inputData));
-
-        m_device_dialog.reset(new CimtVividiDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchEcg, &QPushButton::clicked, this, [=]() {
-        QJsonObject inputData {
+        QJsonObject inputData{
             {"language", "en"},
-            {"barcode", "12345678"},
+            {"barcode", "40012245"},
             {"interviewer", "Test"},
         };
 
         QSharedPointer<ECGSession> session(new ECGSession(nullptr, inputData));
-        m_device_dialog.reset(new EcgDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchFrax, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData {
             {"language", "en"},
@@ -158,9 +137,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<FraxSession> session(new FraxSession(nullptr, inputData));
-        m_device_dialog.reset(new FraxDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
 
     // DCS Room 2
@@ -172,9 +149,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<AudiometerSession> session(new AudiometerSession(nullptr, inputData));
-        m_device_dialog.reset(new AudiometerDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
 
     // DCS Room 3
@@ -186,10 +161,9 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<GripStrengthSession> session(new GripStrengthSession(nullptr, inputData));
-        m_device_dialog.reset(new GripStrengthDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchRetinalCamera, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData {
             {"language", "en"},
@@ -198,10 +172,9 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<RetinalCameraSession> session(new RetinalCameraSession(nullptr, inputData));
-        m_device_dialog.reset(new RetinalCameraDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchChoiceReaction, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData {
             {"language", "en"},
@@ -210,10 +183,9 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<ChoiceReactionSession> session(new ChoiceReactionSession(nullptr, inputData));
-        m_device_dialog.reset(new ChoiceReactionDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
+
     connect(ui->launchCDTT, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData {
             {"language", "en"},
@@ -222,10 +194,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         };
 
         QSharedPointer<CDTTSession> session(new CDTTSession(nullptr, inputData));
-
-        m_device_dialog.reset(new CDTTDialog(nullptr, session));
-        m_device_dialog->run();
-        m_device_dialog->show();
+        Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->actionAudiometer_2, &QAction::triggered, this, [=]() {

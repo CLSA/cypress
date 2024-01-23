@@ -1,4 +1,5 @@
 #include "retinal_camera_session.h"
+#include "managers/retinal_camera/retinal_camera_manager.h"
 
 #include "dialogs/retinal_camera_dialog.h"
 
@@ -6,31 +7,29 @@ RetinalCameraSession::RetinalCameraSession(QObject *parent, const QJsonObject &i
     : CypressSession{parent, inputData}
     , m_side(side)
 {
-    qDebug() << side;
+
+    if (m_debug)
+        qDebug() << side;
 }
 
-void RetinalCameraSession::validate() const
+void RetinalCameraSession::initializeDialog()
 {
-    CypressSession::validate();
+    m_dialog = new RetinalCameraDialog(nullptr, QSharedPointer<RetinalCameraSession>(this));
 }
+
 
 Side RetinalCameraSession::getSide()
 {
     return m_side;
 }
 
-void RetinalCameraSession::start()
+void RetinalCameraSession::isInstalled() const
 {
-    m_dialog = new RetinalCameraDialog(nullptr, QSharedPointer<RetinalCameraSession>(this));
-    if (m_dialog == nullptr)
-        throw QException();
+    if (!RetinalCameraManager::isInstalled())
+        throw NotInstalledError("Retinal Camera is not installed on this workstation");
+}
 
-    m_startDateTime = QDateTime::currentDateTimeUtc();
-    m_status = SessionStatus::Started;
+void RetinalCameraSession::isAvailable() const
+{
 
-    m_dialog->run();
-    m_dialog->show();
-
-    if (m_debug)
-        qDebug() << "RetinalCameraSession::start " << getSessionId() << m_startDateTime;
 }

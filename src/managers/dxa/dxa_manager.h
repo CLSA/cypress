@@ -1,14 +1,10 @@
 #ifndef DXA_MANAGER_H
 #define DXA_MANAGER_H
 
-#include "../../data/dxa/smbfilecopier.h"
-#include "../manager_base.h"
-#include "./dicom/dicom_scp.h"
+#include "managers/manager_base.h"
 #include "server/sessions/dxa/dxa_session.h"
 
-#include "dcmtk/dcmdata/dcfilefo.h"
 #include "dicom/dcm_recv.h"
-#include "dicom/dicom_directory_watcher.h"
 
 #include <QMap>
 #include <QObject>
@@ -30,42 +26,31 @@ public:
     ~DXAManager();
 
     static bool isInstalled();
-
-    QJsonObject scanAnalysisJson;
-    QJsonObject scoresJson;
-
-    QVariantMap getParticipantData();
-
-    QMap<QString, QVariant> retrieveDeviceData();
-    QMap<QString, QVariant> extractScanAnalysisData();
-    QMap<QString, QVariant> computeTandZScores();
+    static QString getWebpageContents(const DXASession &session);
 
 public slots:
-    void start() override;
+    bool start() override;
     void measure() override;
     void finish() override;
 
-    void dicomFilesReceived();
-    void copiedDatabaseFile(QFileInfo file);
-
-signals:
-    void updateDicomTable(QList<DicomFile> files);
+private slots:
+    void dicomFilesReceived(QList<DicomFile> files);
 
 private:
+    QScopedPointer<DcmRecv> m_dicomServer;
+
     QString m_runnableName;
     QString m_runnablePath;
+
+    QString m_patscanDbPath;
+    QString m_refscanDbPath;
+
+    QString m_storageDirPath;
     QString m_aeTitle;
     QString m_host;
     QString m_port;
-    QString m_storageDirPath;
     QString m_logConfigPath;
     QString m_ascConfigPath;
-
-    QFileInfo m_patscanDb{};
-    QFileInfo m_referenceDb{};
-
-    QScopedPointer<DcmRecv> m_dicomServer;
-    QScopedPointer<SMBFileCopier> m_networkFileCopier;
 
     // Reset the session
     bool clearData() override;

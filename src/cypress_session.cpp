@@ -43,20 +43,25 @@ void CypressSession::start()
     m_startDateTime = QDateTime::currentDateTimeUtc();
     m_status = SessionStatus::Started;
 
-    m_dialog->run();
-    m_dialog->show();
-
-    if (CypressSettings::isDebugMode())
-        qDebug() << "start session" << getSessionId() << m_startDateTime;
+    if (m_dialog->run()) {
+        m_dialog->show();
+        if (CypressSettings::isDebugMode())
+            qDebug() << "start session" << getSessionId() << m_startDateTime;
+    }
+    else {
+        end(SessionStatus::CriticalError);
+    }
 }
 
-void CypressSession::end()
+void CypressSession::end(const CypressSession::SessionStatus& status)
 {
     if (m_dialog == nullptr)
-        throw QException();
+        return;
 
-    m_status = SessionStatus::Ended;
+    m_status = status;
     m_endDateTime = QDateTime::currentDateTimeUtc();
+
+    //m_dialog->close();
 
     if (CypressSettings::isDebugMode())
         qDebug() << "end session" << getSessionId() << m_endDateTime;
@@ -114,7 +119,7 @@ QJsonObject CypressSession::getJsonObject() const
 }
 
 
-SessionStatus CypressSession::getStatus() const
+CypressSession::SessionStatus CypressSession::getStatus() const
 {
     return m_status;
 }

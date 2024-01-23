@@ -326,7 +326,7 @@ bool WholeBodyScanMeasurement::isValid() const
 bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file) const
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
     return isWholeBody1(loadedFileFormat) || isWholeBody2(loadedFileFormat);
@@ -335,15 +335,21 @@ bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file) const
 void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good()) {
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good()) {
         return;
     }
 
+    setAttribute("patientId", file.patientId);
+    setAttribute("filePath", file.absFilePath);
+    setAttribute("studyId", file.studyId);
+    setAttribute("mediaStorageUid", file.mediaStorageUID);
+
     if (isWholeBody1(loadedFileFormat)) {
         qDebug() << "adding dicom 1";
+
         m_wholeBody1 = file;
         m_wholeBody1.name = "WB_DICOM_1";
-        m_wholeBody1.size = FileUtils::getHumanReadableFileSize(m_wholeBody1.fileInfo.absoluteFilePath());
+        m_wholeBody1.size = FileUtils::getHumanReadableFileSize(m_wholeBody1.absFilePath);
 
         hasWholeBody1File = true;
     }
@@ -352,7 +358,7 @@ void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding dicom 2";
         m_wholeBody2 = file;
         m_wholeBody2.name = "WB_DICOM_2";
-        m_wholeBody2.size = FileUtils::getHumanReadableFileSize(m_wholeBody2.fileInfo.absoluteFilePath());
+        m_wholeBody2.size = FileUtils::getHumanReadableFileSize(m_wholeBody2.absFilePath);
 
         hasWholeBody2File = true;
     }

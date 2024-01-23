@@ -1,4 +1,5 @@
 #include "spirometer_status_request_handler.h"
+#include "managers/spirometer/spirometer_manager.h"
 
 #include "auxiliary/json_settings.h"
 
@@ -7,7 +8,7 @@ void SpirometerStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest 
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", "Available"}
+            {"status", SpirometerManager::isInstalled() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

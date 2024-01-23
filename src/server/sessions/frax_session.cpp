@@ -1,5 +1,6 @@
 #include "frax_session.h"
 #include "dialogs/frax_dialog.h"
+#include "managers/frax/frax_manager.h"
 
 #include <stdexcept>
 
@@ -7,20 +8,9 @@ FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData): Cypress
 {
 }
 
-void FraxSession::start()
+void FraxSession::initializeDialog()
 {
     m_dialog = new FraxDialog(nullptr, QSharedPointer<FraxSession>(this));
-    if (m_dialog == nullptr)
-        throw QException();
-
-    m_startDateTime = QDateTime::currentDateTimeUtc();
-    m_status = SessionStatus::Started;
-
-    m_dialog->run();
-    m_dialog->show();
-
-    if (m_debug)
-        qDebug() << "FraxSession::start " << getSessionId() << m_startDateTime;
 }
 
 void FraxSession::validate() const
@@ -38,9 +28,6 @@ void FraxSession::validate() const
 
     if (!isValidBool("alcohol"))
         throw ValidationError("alcohol");
-
-    if (!isValidInteger("country_code"))
-        throw ValidationError("country_code");
 
     if (!isValidBool("current_smoker"))
         throw ValidationError("current_smoker");
@@ -71,11 +58,6 @@ void FraxSession::validate() const
 
     if (!isValidString("sex"))
         throw ValidationError("sex");
-
-    if (!isValidString("type"))
-        throw ValidationError("type");
-
-    qDebug("validated");
 }
 
 void FraxSession::calculateInputs()
@@ -95,7 +77,10 @@ void FraxSession::calculateInputs()
     m_inputData.insert("rheumatoid_arthritis", (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
     m_inputData.insert("previous_fracture", previous_fracture);
     m_inputData.insert("glucocorticoid", glucocorticoid);
+    m_inputData.insert("parent_hip_fracture", father_hip_fracture || mother_hip_fracture);
     m_inputData.insert("t_score", t_score);
+    m_inputData.insert("type", "t");
+    m_inputData.insert("country_code", "19");
 
     if (m_debug)
     {
@@ -104,6 +89,17 @@ void FraxSession::calculateInputs()
         qDebug() << "mother_hip_fracture: " << mother_hip_fracture;
         qDebug() << "previous_fracture: " << previous_fracture;
     }
+}
+
+void FraxSession::isInstalled() const
+{
+    if (!FraxManager::isInstalled())
+        throw NotInstalledError("FRAX is not installed on this workstation");
+}
+
+void FraxSession::isAvailable() const
+{
+
 }
 
 double FraxSession::calculateBMI(double weight_kg, double height_cm)

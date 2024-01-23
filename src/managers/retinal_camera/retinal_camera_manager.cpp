@@ -1,4 +1,5 @@
 #include "retinal_camera_manager.h"
+#include "auxiliary/network_utils.h"
 
 #include "cypress_session.h"
 #include "cypress_settings.h"
@@ -51,31 +52,31 @@ bool RetinalCameraManager::isInstalled()
 
     if (runnableName.isEmpty() || runnablePath.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - runnableName is not defined";
+            qDebug() << "RetinalCameraManager::isInstalled - runnable name is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - runnablePath is not defined";
+            qDebug() << "RetinalCameraManager::isInstalled - runnable path is not defined";
         return false;
     }
 
     if (databaseName.isEmpty() || databaseName.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - databaseName is not defined";
+            qDebug() << "RetinalCameraManager::isInstalled - database name is not defined";
         return false;
     }
 
     if (databasePort.isEmpty() || databasePort.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - databasePort is not defined";
+            qDebug() << "RetinalCameraManager::isInstalled - database port is not defined";
         return false;
     }
 
     if (databaseUser.isEmpty() || databaseUser.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - databaes user is not defined";
+            qDebug() << "RetinalCameraManager::isInstalled - database user is not defined";
         return false;
     }
 
@@ -97,36 +98,32 @@ bool RetinalCameraManager::isInstalled()
     return true;
 }
 
-void RetinalCameraManager::start()
+bool RetinalCameraManager::start()
 {
     if (m_debug)
         qDebug() << "RetinalCameraManager::start";
 
     if (m_sim) {
-        emit started(m_test.get());
+        emit started(m_test);
         emit canMeasure();
-        emit dataChanged(m_test.get());
+        emit dataChanged(m_test);
 
-        return;
+        return true;
     }
 
     if (!openDatabase()) {
-        QMessageBox::critical(nullptr, "Error", "Failed to connect to the IMAGEnet_R4 database");
-        return;
+        emit error("Could not open IMAGENet database");
+        return false;
     }
 
     if (!setUp()) {
-        QMessageBox::critical(nullptr, "Error", "Failed to setup the application");
-        return;
+        emit error("Could not setup database");
+        return false;
     }
 
-    m_process.start();
-    if (!m_process.waitForStarted()) {
-        qDebug() << "RetinalCameraManager::startRetinalCamera: IMAGEnet_R4 did not start";
-    }
+    measure();
 
-    emit started(m_test.get());
-    emit dataChanged(m_test.get());
+    return true;
 }
 
 bool RetinalCameraManager::openDatabase()
@@ -157,13 +154,17 @@ bool RetinalCameraManager::setUp()
     if (m_debug)
         qDebug() << "RetinalCameraManager::setUp";
 
-    if (!m_db.isOpen())
+    if (!m_db.isOpen()) {
         return false;
+    }
 
     if (!cleanUp()) {
         if (m_debug)
             qDebug() << "RetinalCameraManager::setUp cleanup did not return true";
+        return false;
     }
+
+    cleanUp();
 
     return initializeDatabase();
 }
@@ -224,15 +225,27 @@ void RetinalCameraManager::measure()
     if (m_debug)
         qDebug() << "RetinalCameraManager::measure";
 
-    m_test->reset();
-
-    RetinalCameraSession &session = static_cast<RetinalCameraSession &>(*m_session);
-
     if (m_sim) {
+        RetinalCameraSession &session = static_cast<RetinalCameraSession &>(*m_session);
         m_test->simulate({{"side", session.getSide() == Side::Left ? "left" : "right"}});
 
-        emit dataChanged(m_test.get());
+        emit dataChanged(m_test);
         emit canFinish();
+
+        return;
+    }
+
+    if (m_process.state() != QProcess::NotRunning) {
+        QMessageBox::critical(nullptr, "Error", "Program is already running");
+        return;
+    }
+
+    clearData();
+
+    m_process.start();
+    if (!m_process.waitForStarted()) {
+        QMessageBox::critical(nullptr, "Error", "Could not launch program");
+        return;
     }
 }
 
@@ -257,12 +270,14 @@ void RetinalCameraManager::finish()
 
         testJson.insert("files", QJsonObject {{ fileName, FileUtils::getHumanReadableFileSize(measure.getAttribute("EYE_PICT_VENDOR").toString())}});
 
-        sendHTTPSRequest("PATCH",
-                         host + endpoint + QString::number(answer_id) + "?filename=EYE_" + side
-                             + ".jpg",
-                         "application/octet-stream",
-                         FileUtils::readFile(
-                             measure.getAttribute("EYE_PICT_VENDOR").toString()));
+        bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
+                                   (host + endpoint + QString::number(answer_id) + "?filename=EYE_"
+                                                  + side + ".jpg").toStdString(),
+                                   "application/octet-stream",
+                                   FileUtils::readFile(
+                                       measure.getAttribute("EYE_PICT_VENDOR").toString()));
+        if (!ok) {
+        }
 
         measure.removeAttribute("EYE_PICT_VENDOR");
     }
@@ -274,12 +289,14 @@ void RetinalCameraManager::finish()
     QByteArray serializedData = jsonDoc.toJson();
 
     QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
-    sendHTTPSRequest("PATCH",
-                     answerUrl,
-                     "application/json",
-                     serializedData);
+    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
+    if (ok) {
+        emit success("");
+    }
+    else {
+        emit error("");
+    }
 
-    emit success("sent");
 }
 
 bool RetinalCameraManager::cleanupDatabase()
@@ -364,19 +381,22 @@ bool RetinalCameraManager::initializeDatabase()
     query.bindValue(":personUUID", defaultPersonUUID);
     query.bindValue(":lastName", "Study");
     query.bindValue(":firstName", "Participant");
-    query.exec();
 
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
 
     query.prepare("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUUID, :participantId, :personUUID)");
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.bindValue(":participantId", participantId);
     query.bindValue(":personUUID", defaultPatientUUID);
-    query.exec();
 
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+
 
     return true;
 }
@@ -387,31 +407,33 @@ bool RetinalCameraManager::clearData()
         qDebug() << "RetinalCameraManager::clearData";
 
     m_test->reset();
-    emit dataChanged(m_test.get());
+    emit dataChanged(m_test);
 
     return false;
 }
 
 void RetinalCameraManager::readOutput()
 {
-    openDatabase();
+    if (QProcess::NormalExit != m_process.exitStatus()) {
+        emit error("Process failed to finish correctly, cannot read output");
+        return;
+    }
 
-    RetinalCameraSession &session = static_cast<RetinalCameraSession &>(*m_session);
-    RetinalCameraTest *test = static_cast<RetinalCameraTest *>(m_test.get());
+    QSharedPointer<RetinalCameraSession> session = qSharedPointerCast<RetinalCameraSession>(m_session);
+    QSharedPointer<RetinalCameraTest> test = qSharedPointerCast<RetinalCameraTest>(m_test);
 
     QJsonObject results;
-    switch (session.getSide()) {
-    case Side::Left:
-        results = getLeftEye();
-        break;
-    case Side::Right:
-        results = getRightEye();
-        break;
+    switch (session->getSide()) {
+        case Side::Left:
+            results = getLeftEye();
+            break;
+        case Side::Right:
+            results = getRightEye();
+            break;
     }
 
     test->fromDatabaseResults(results);
 
-    emit measured(test);
     emit canFinish();
 }
 
@@ -422,10 +444,10 @@ QJsonObject RetinalCameraManager::getLeftEye()
         "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM dbo.Media WHERE PatientUid = "
         ":patientUid AND EyeType = 1 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
-    query.exec();
 
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+    }
 
     QJsonObject results;
     results["fileName"] = query.value(0).toString();
@@ -436,10 +458,10 @@ QJsonObject RetinalCameraManager::getLeftEye()
 
     query.prepare("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = :storagePathUid");
     query.bindValue(":storagePathUid", results["storagePathUid"].toString());
-    query.exec();
 
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+    }
 
     results["filePath"] = query.value(0).toString();
 
@@ -453,10 +475,10 @@ QJsonObject RetinalCameraManager::getRightEye()
         "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM dbo.Media WHERE PatientUid = "
         ":patientUid AND EyeType = 2 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
-    query.exec();
 
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+    }
 
     QJsonObject results;
     results["fileName"] = query.value(0).toString();
@@ -467,10 +489,10 @@ QJsonObject RetinalCameraManager::getRightEye()
 
     query.prepare("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = :storagePathUid");
     query.bindValue(":storagePathUid", results["storagePathUid"].toString());
-    query.exec();
 
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+    }
 
     results["filePath"] = query.value(0).toString();
 

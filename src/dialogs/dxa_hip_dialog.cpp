@@ -15,7 +15,7 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
     ui->setupUi(this);
 
     ui->measurementTable->disableMeasureButton();
-    ui->measurementTable->disableFinishButton();
+    //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideManualEntry();
 
     this->setWindowTitle("DXA 1");
@@ -25,13 +25,14 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
     DxaHipManager* manager = static_cast<DxaHipManager*>(m_manager.get());
 
     ui->testInfoWidget->setSessionInformation(*session);
-    ui->dicomWidget->setDicomLabels("CLSADICOM", QHostInfo::localHostName(), "9001");
-    ui->dicomWidget->setReadOnly(true);
 
     QList<TableColumn> columns;
+    columns << TableColumn("patient_id", "Patient ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("study_id", "Study ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("media_storage_uid", "Media UID", new TextDelegate("", QRegExp(), true));
 
     // device started
-    connect(manager, &DxaHipManager::started, ui->measurementTable, [=](TestBase* test) {
+    connect(manager, &DxaHipManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
@@ -68,44 +69,4 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
 DxaHipDialog::~DxaHipDialog()
 {
     delete ui;
-}
-
-void DxaHipDialog::dicomServerStarted()
-{
-    qInfo() << "DxaHipDialog::dicomServerStarted";
-}
-
-void DxaHipDialog::dicomServerEnded()
-{
-    qInfo() << "DxaHipDialog::dicomServerEnded";
-}
-
-void DxaHipDialog::dicomLogUpdate(QString line)
-{
-    //ui->logBrowser->append(line);
-}
-
-void DxaHipDialog::dicomFilesReceived(const QStringList& dicomFilePaths)
-{
-    Q_UNUSED(dicomFilePaths)
-    //ui->filesList->clear();
-    //QStringList::ConstIterator iterator;
-    //for (iterator = dicomFilePaths.begin(); iterator != dicomFilePaths.end(); ++iterator)
-    //{
-    //   ui->filesList->append((*iterator).toLocal8Bit().constData());
-    //}
-
-    //qDebug() << dicomFilePaths;
-    //m_manager->dicomFilesReceived(dicomFilePaths);
-}
-
-void DxaHipDialog::on_openFileExplorer_released()
-{
-    QDesktopServices::openUrl(QUrl(QDir::currentPath() + "/dcmtk-3.6.7/storage"));
-}
-
-
-void DxaHipDialog::on_submitButton_clicked()
-{
-    //m_manager->measure();
 }

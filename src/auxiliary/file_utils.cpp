@@ -131,6 +131,34 @@ bool FileUtils::removeDirectory(const QString &absoluteDirectoryPath)
     return dir.removeRecursively();
 }
 
+bool FileUtils::clearDirectory(const QString &absoluteDirectoryPath)
+{
+    QDir dir(absoluteDirectoryPath);
+    if (!dir.exists())
+        return false;
+    ;
+
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    QFileInfoList files = dir.entryInfoList();
+
+    for (const QFileInfo &info : files) {
+        if (info.isDir()) {
+            QDir subDir(info.absoluteFilePath());
+            if (!subDir.removeRecursively()) {
+                qDebug() << "File Utils - could not remove dir: " << info.absoluteFilePath();
+                return false;
+            }
+        } else {
+            if (!QFile::remove(info.absoluteFilePath())) {
+                qDebug() << "File Utils - could not remove: " << info.absoluteFilePath();
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool FileUtils::doesDirectoryExist(const QString &absoluteDirectoryPath)
 {
     QDir dir(absoluteDirectoryPath);
@@ -149,7 +177,7 @@ bool FileUtils::isDirectoryWritable(const QString &absoluteDirectoryPath)
     return dirInfo.isWritable() && dirInfo.isDir();
 }
 
-QString FileUtils::generateHash(const QByteArray& bytes)
+QString FileUtils::getSha256Hash(const QByteArray &bytes)
 {
     QByteArray hash = QCryptographicHash::hash(bytes, QCryptographicHash::Sha256);
     return hash;

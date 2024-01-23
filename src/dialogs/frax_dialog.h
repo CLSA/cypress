@@ -15,8 +15,6 @@ public:
     ~FraxDialog();
 
 private:
-    void initializeConnections() override;
-
     Ui::FraxDialog *ui { Q_NULLPTR };
 };
 

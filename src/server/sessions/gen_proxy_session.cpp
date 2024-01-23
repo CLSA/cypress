@@ -8,6 +8,10 @@ GenProxySession::GenProxySession(QObject *parent, const QJsonObject& inputData)
 
 }
 
+void GenProxySession::initializeDialog() {
+
+}
+
 void GenProxySession::validate() const
 {
     CypressSession::validate();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>448</width>
-    <height>363</height>
+    <height>50</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,15 +40,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MeasurementTable</class>
-   <extends>QWidget</extends>
-   <header>widgets/measurement_table.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MeasurementTable</class>
+   <extends>QWidget</extends>
+   <header>widgets/measurement_table.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

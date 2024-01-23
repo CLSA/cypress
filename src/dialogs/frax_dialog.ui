@@ -18,9 +18,6 @@
     <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
    </item>
    <item>
-    <widget class="MeasurementTable" name="measurementTable" native="true"/>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -36,12 +33,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>MeasurementTable</class>
-   <extends>QWidget</extends>
-   <header>widgets/measurement_table.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>

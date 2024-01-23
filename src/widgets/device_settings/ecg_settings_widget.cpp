@@ -29,17 +29,17 @@ ECGSettingsWidget::ECGSettingsWidget(QWidget *parent) :
 
     connect(ui->runnableName, &FilePickerWidget::pathChanged, this, [=](QString cardioPath) {
         QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("ecg/mac1600/cardioPath", cardioPath);
+        settings.setValue("ecg/runnableName", cardioPath);
     });
 
     connect(ui->workingPath, &FilePickerWidget::pathChanged, this, [=](QString initPath) {
         QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("ecg/mac1600/initPath", initPath);
+        settings.setValue("ecg/workingPath", initPath);
     });
 
     connect(ui->exportPath, &FilePickerWidget::pathChanged, this, [=](QString databasePath) {
         QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-        settings.setValue("ecg/mac1600/databasePath", databasePath);
+        settings.setValue("ecg/exportPath", databasePath);
     });
 }
 

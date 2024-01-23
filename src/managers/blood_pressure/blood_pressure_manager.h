@@ -1,9 +1,8 @@
 #ifndef BLOOD_PRESSURE_MANAGER_H
 #define BLOOD_PRESSURE_MANAGER_H
 
-#include "../../data/blood_pressure/tests/blood_pressure_test.h"
-#include "../../managers/manager_base.h"
-#include "../../server/sessions/bpm_session.h"
+#include "managers/manager_base.h"
+#include "server/sessions/bpm_session.h"
 
 #include "bptru_200_driver.h"
 
@@ -54,7 +53,12 @@ public:
     void setCuffSize(const QString&);
     void setSide(const QString&);
 
+    static const quint16 vid;
+    static const quint16 pid;
+
 signals:
+    void canConnect();
+
     void deviceConnected();
     void deviceDisconnected();
 
@@ -67,8 +71,10 @@ signals:
 
     void handshaked(QString firmwareVersion);
 
-    void inflateCuffPressure();
-    void deflateCuffPressure();
+    void inflateCuffPressure(int cuffPressure);
+    void deflateCuffPressure(int cuffPressure);
+
+    void deviceStateChanged(QString state);
 
     void bpResult();
     void bpAverage();
@@ -83,7 +89,7 @@ public slots:
 
     void receiveMessages(QQueue<BPMMessage> messages);
 
-    void start() override;
+    bool start() override;
 
     // Commands from GUI
     //
@@ -95,11 +101,6 @@ public slots:
     // retrieve a measurement from the device
     //
     void measure() override;
-
-    // implementation of final clean up of device after disconnecting and all
-    // data has been retrieved and processed by any upstream classes
-    //
-    void finish() override;
 
     void addManualMeasurement() override;
 
@@ -138,19 +139,12 @@ private:
     void onDeviceCycled(const BPMMessage& message);
     void onDeviceStarted(const BPMMessage& message);
     void onDeviceStopped(const BPMMessage& message);
-    void onDeviceData(const BPMMessage& message);
-
 
     void onInflateCuffPressure(const BPMMessage& message);
     void onDeflateCuffPressure(const BPMMessage& message);
     void onBpResult(const BPMMessage& message);
     void onBpAverage(const BPMMessage& message);
     void onBpReview(const BPMMessage& message);
-
-    quint16 vid { 0x10b7 };
-    quint16 pid { 0x1234 };
 };
-
-
 
 #endif // BLOOD_PRESSURE_MANAGER_H

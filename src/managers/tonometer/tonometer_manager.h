@@ -6,6 +6,7 @@
 #include "server/sessions/tonometer_session.h"
 
 #include <QProcess>
+#include <QSqlDatabase>
 
 /*!
  * \class TonometerManager
@@ -38,31 +39,28 @@ public:
     // with the correct path elements ?
     //
     bool isDefined(const QString&, const TonometerManager::FileType& type = ORAApplication) const;
+    static bool isInstalled();
 
 public slots:
 
     // what the manager does in response to the main application
     // window invoking its run method
     //
-    void start() override;
+    bool start() override;
 
     // retrieve a measurement from the device
     //
     void measure() override;
 
-    // implementation of final clean up of device after disconnecting and all
-    // data has been retrieved and processed by any upstream classes
-    //
-    void finish() override;
-
     void readOutput();
 
 private:
+    QSqlDatabase m_db;
     QProcess m_process;
 
-    QString m_runnableName;// full pathspec to ora.exe
-    QString m_runnablePath;// path to ora.exe
-    QString m_databaseName;// full pathspec to ora.mdb
+    QString m_runnableName;  // full pathspec to ora.exe
+    QString m_runnablePath;	 // path to ora.exe
+    QString m_databaseName;	 // full pathspec to ora.mdb
     QString m_temporaryFile; // store a copy of ora.mdb
 
     // Reset the session
@@ -75,6 +73,10 @@ private:
     bool cleanUp() override;
 
     void configureProcess();
+
+    bool insertPatient(const QString& name, const QString& birthDate, const QString& sex, const int id);
+    QVariantMap extractMeasures(const int patientId, const QString& eye);
+    bool restoreDatabase();
 };
 
 #endif // TONOMETER_MANAGER_H

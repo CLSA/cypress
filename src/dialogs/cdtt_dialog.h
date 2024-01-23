@@ -15,8 +15,6 @@ public:
     ~CDTTDialog();
 
 private:
-    void initializeConnections() override;
-
     Ui::CDTTDialog *ui { Q_NULLPTR };
 };
 

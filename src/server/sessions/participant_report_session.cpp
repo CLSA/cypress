@@ -7,6 +7,10 @@ ParticipantReportSession::ParticipantReportSession(QObject *parent, const QJsonO
 
 }
 
+void ParticipantReportSession::initializeDialog() {
+
+}
+
 void ParticipantReportSession::validate() const
 {
     CypressSession::validate();

@@ -16,9 +16,6 @@ public:
 
 
 private:
-    void initializeModel() override;
-    void initializeConnections() override;
-
     Ui::WeighScaleDialog *ui { Q_NULLPTR };
 };
 

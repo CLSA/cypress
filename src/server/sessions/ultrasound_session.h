@@ -9,12 +9,13 @@ class UltrasoundSession : public CypressSession
 {
 public:
     explicit UltrasoundSession(QObject *parent, const QJsonObject& inputData);
-    ~UltrasoundSession();
 
     // CypressSession interface
 public:
-    void validate() const override;
-    void start() override;
+    void initializeDialog() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
+
 };
 
 #endif // ULTRASOUNDSESSION_H

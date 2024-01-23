@@ -10,15 +10,19 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent, QSharedPointer<GripStren
     , ui(new Ui::GripStrengthDialog)
 {
     ui->setupUi(this);
+
     ui->measurementTable->disableMeasureButton();
-    ui->measurementTable->disableFinishButton();
+    //ui->measurementTable->disableFinishButton();
+
+    if (!m_sim)
+        ui->measurementTable->hideMeasureButton();
 
     this->setWindowTitle("Grip Strength");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new GripStrengthManager(session));
 
-    GripStrengthManager* manager = static_cast<GripStrengthManager*>(m_manager.get());
+    QSharedPointer<GripStrengthManager> manager = qSharedPointerCast<GripStrengthManager>(m_manager);
     ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
@@ -39,59 +43,42 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent, QSharedPointer<GripStren
     columns << TableColumn("REP_3_Exclude", "Rep 3 Exclude", new ComboBoxDelegate(QStringList({"No", "Yes"}), true, true, false));
 
     // device started
-    connect(manager, &GripStrengthManager::started, ui->measurementTable, [=](TestBase* test) {
+    connect(manager.get(), &GripStrengthManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 
     // can auto measure
-    connect(manager, &GripStrengthManager::canMeasure, ui->measurementTable, [=]() {
+    connect(manager.get(), &GripStrengthManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
 
     // can finish
-    connect(manager, &GripStrengthManager::canFinish, ui->measurementTable, [=]() {
+    connect(manager.get(), &GripStrengthManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
     });
 
     // finished
-    connect(manager, &GripStrengthManager::success, this, &GripStrengthDialog::success);
+    connect(manager.get(), &GripStrengthManager::success, this, &GripStrengthDialog::success);
 
     // critical error
-    connect(manager, &GripStrengthManager::error, this, &GripStrengthDialog::error);
+    connect(manager.get(), &GripStrengthManager::error, this, &GripStrengthDialog::error);
 
     // data changed
-    connect(manager, &GripStrengthManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+    connect(manager.get(), &GripStrengthManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // request auto measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager, &GripStrengthManager::measure);
+    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &GripStrengthManager::measure);
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager, &GripStrengthManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &GripStrengthManager::finish);
 
     // request adding manual measurement
-    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &GripStrengthManager::addManualMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &GripStrengthManager::addManualMeasurement);
 
 }
 
 GripStrengthDialog::~GripStrengthDialog()
 {
     delete ui;
-}
-
-void GripStrengthDialog::initializeConnections()
-{
-    //m_manager.start();
-}
-
-bool GripStrengthDialog::handleClose() {
-    return this -> close();
-}
-
-void GripStrengthDialog::enableMeasure() {
-    //ui->measureWidget->enableMeasure();
-}
-
-void GripStrengthDialog::initializeModel()
-{
 }

@@ -88,8 +88,10 @@ bool TonometerMeasurement::isValid() const
 void TonometerMeasurement::fromVariant(const QVariantMap& obj)
 {
     reset();
-    QString side = "L" == obj["Eye"].toString() ? "left" : "right";
-    setAttribute("side",side);
+
+    QString side = obj["Eye"].toString().startsWith("l", Qt::CaseSensitivity::CaseInsensitive) ? "left" : "right";
+    setAttribute("side", side);
+
     q_stringMap::const_iterator it = TonometerMeasurement::variableLUT.constBegin();
     while(it != TonometerMeasurement::variableLUT.constEnd())
     {
@@ -101,6 +103,7 @@ void TonometerMeasurement::fromVariant(const QVariantMap& obj)
 
          setAttribute(key, obj[it.value()], units);
        }
+
        it++;
     }
 }

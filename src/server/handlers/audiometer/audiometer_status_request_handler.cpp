@@ -1,5 +1,5 @@
 #include "audiometer_status_request_handler.h"
-
+#include "managers/audiometer/audiometer_manager.h"
 #include "auxiliary/json_settings.h"
 
 
@@ -8,7 +8,7 @@ void AudiometerStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest 
     Q_UNUSED(request)
     try {
         QString responseData = JsonSettings::serializeJson(QJsonObject {{
-            "status", "available"
+            "status", AudiometerManager::isInstalled() ? "available" : "unavailable"
         }});
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

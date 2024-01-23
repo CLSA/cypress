@@ -3,11 +3,12 @@
 #include "cypress_settings.h"
 #include "cypress_main_window.h"
 
-#include "managers/blood_pressure/bptru_200_driver.h"
-
 #include "tray_application.h"
 
+#include "managers/blood_pressure/bptru_200_driver.h"
+
 #include "auxiliary/Constants.h"
+#include "auxiliary/Utilities.h"
 
 #include <QApplication>
 #include <QStyle>
@@ -100,6 +101,7 @@ void restartApplication(const QStringList& arguments) {
 
 void logSystemInfo()
 {
+    qInfo() << "\nHost Information";
     qInfo() << QHostInfo::localHostName();
     qInfo() << QSysInfo::productType() + " "
                + QSysInfo::productVersion() + " ("
@@ -111,6 +113,7 @@ void logSystemInfo()
 void logNetworkInfo()
 {
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    qInfo() << "\nNetwork Interfaces";
     for(const QNetworkInterface &interface : interfaces) {
         QList<QNetworkAddressEntry> entries = interface.addressEntries();
         for(const QNetworkAddressEntry &entry : entries) {
@@ -123,8 +126,15 @@ void logNetworkInfo()
 
 void logAppInfo()
 {
-    qInfo() << QCoreApplication::applicationName() << QCoreApplication::applicationVersion();
-    qInfo() << QCoreApplication::applicationDirPath();
+    qInfo() << "\nCypress Information";
+    qInfo() << "Name:" << QCoreApplication::applicationName();
+    qInfo() << "Version: " << QCoreApplication::applicationVersion();
+    qInfo() << "Working Directory: " << QCoreApplication::applicationDirPath();
+    qInfo() << "Debug Mode: " << CypressSettings::isDebugMode();
+    qInfo() << "Sim Mode: " << CypressSettings::isSimMode();
+
+    qInfo() << "Server: " << CypressSettings::readSetting("address").toString() << ":"
+            << CypressSettings::readSetting("port").toString();
 }
 
 QString getStatusCheckString(const QString& arg1, bool arg2)
@@ -172,8 +182,11 @@ int main(int argc, char *argv[])
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
+    qRegisterMetaType<QSharedPointer<CypressSession>>("QSharedPointer<CypressSession>");
+    qRegisterMetaType<QSharedPointer<CypressSession>>("QSharedPointer<TestBase>");
     qRegisterMetaType<CypressSession*>("CypressSession*");
     qRegisterMetaType<BPMMessage>("BPMMessage");
+    qRegisterMetaType<QQueue<BPMMessage>>("QQueue<BPMMessage>");
 
     QApplication app(argc, argv);
     CypressMainWindow* mainWindow = new CypressMainWindow;
@@ -190,30 +203,34 @@ int main(int argc, char *argv[])
     }
 
     logAppInfo();
+
     logSystemInfo();
+
     logNetworkInfo();
 
-    qInfo() << getStatusCheckString("debug", CypressSettings::isDebugMode());
-    qInfo() << getStatusCheckString("sim", CypressSettings::isSimMode());
-
     // Make sure the network is up and that the Pine server is alive
-    if (!checkAlive())
-    {
+    if (!checkAlive()) {
         qCritical() << "Could not connect to the Pine server";
         return -1;
     }
 
     // Check for and install any updates
-    if (updateAvailable())
-    {
-        if (downloadUpdate())
-        {
+    if (updateAvailable()) {
+        if (downloadUpdate()) {
             restartApplication(QCoreApplication::arguments());
-        }
-        else
-        {
+        } else {
             qCritical() << "Could not download a new update";
         }
+    }
+
+    qInfo() << "\nDevices Installed";
+    QJsonObject status = Cypress::getInstance().getStatus();
+    QJsonObject deviceStatus = status["availableInstruments"].toObject();
+    for (auto it = deviceStatus.constBegin(); it != deviceStatus.constEnd(); ++it) {
+        QString deviceName = it.key();
+        bool available = it.value().toBool();
+
+        qInfo() << getStatusCheckString(deviceName, available);
     }
 
     Cypress::getInstance();

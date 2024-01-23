@@ -1,13 +1,15 @@
 #include "Utilities.h"
 
-#include <QDir>
 #include <QDateTime>
+#include <QDesktopServices>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QLoggingCategory>
+#include <QMessageBox>
 #include <QStandardPaths>
 #include <QTextStream>
-#include <QLoggingCategory>
-#include <QDesktopServices>
 #include <QUrl>
-#include <QMessageBox>
 
 /*CRC-8 Lookup table based on:
     poly = x^8 + x^2 + x^1 + x^0 (100000111)
@@ -176,6 +178,13 @@ void Utilities::showMessageBox(const QString& title, const QString& text)
     messageBox.setText(text);
     messageBox.setWindowTitle(title);
     messageBox.exec();
+}
+
+void Utilities::prettyPrint(const QJsonObject &jsonObj)
+{
+    QJsonDocument doc(jsonObj);
+    QString jsonStr(doc.toJson(QJsonDocument::Indented));
+    qInfo() << jsonStr;
 }
 
 

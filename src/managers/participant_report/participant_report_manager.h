@@ -11,7 +11,7 @@ public:
 
     // ManagerBase interface
 public slots:
-    void start();
+    bool start();
     void measure();
     void finish();
 

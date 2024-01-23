@@ -38,7 +38,7 @@
       <item>
        <layout class="QHBoxLayout" name="armCuff">
         <item>
-         <widget class="QLabel" name="armLabel">
+         <widget class="QLabel" name="armBandSizeLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -46,7 +46,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Arm:</string>
+           <string>Arm</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -54,7 +54,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="armBandSizeComboBox">
+         <widget class="QComboBox" name="armComboBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -64,7 +64,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="armBandSizeLabel">
+         <widget class="QLabel" name="armLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -72,7 +72,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Cuff:</string>
+           <string>Cuff Size</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -80,7 +80,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="armComboBox">
+         <widget class="QComboBox" name="armBandSizeComboBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>

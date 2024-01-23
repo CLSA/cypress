@@ -7,80 +7,6 @@
 #include <QJsonObject>
 #include <QException>
 
-enum SessionStatus {
-    Unknown,
-    Started,
-    Ended,
-};
-
-class CypressSession : public QObject
-{
-    Q_OBJECT
-public:
-    CypressSession(QObject* parent, const QJsonObject& inputData);
-
-    // Delete copy constructor and copy assignment operator.
-    CypressSession(const CypressSession&) = delete;
-    CypressSession& operator=(const CypressSession&) = delete;
-
-    virtual ~CypressSession() {};
-
-    virtual void isInstalled() const { };
-    virtual void isAvailable() const { };
-
-    // Determines if the basic key/value pairs exist for a session or throws exception
-    virtual void validate() const;
-
-    // Calculates any needed implicit variables from data sent from pine
-    virtual void calculateInputs() {};
-
-    virtual void start();
-    virtual void end();
-
-    SessionStatus getStatus() const;
-    QJsonObject getInputData() const;
-
-    int getAnswerId() const;
-    QString getSessionId() const;
-    QString getBarcode() const;
-    QString getLanguage() const;
-    QString getInterviewer() const;
-    QDateTime getStartTime() const;
-    QDateTime getEndTime() const;
-
-    QJsonObject getJsonObject() const;
-
-protected:
-    SessionStatus m_status { SessionStatus::Unknown };
-
-    // the device UI
-    //
-    DialogBase* m_dialog;
-
-    // request body sent from Pine
-    //
-    QJsonObject m_inputData;
-
-    QString m_interviewer {};
-    int m_answerId {};
-    QString m_sessionId {};
-    QString m_barcode {};
-    QString m_language {};
-
-    QDateTime m_startDateTime {};
-    QDateTime m_endDateTime {};
-
-    bool m_debug;
-    bool m_sim;
-
-    bool isValidString(const QString& key) const;
-    bool isValidDouble(const QString& key) const;
-    bool isValidInteger(const QString& key) const;
-    bool isValidBool(const QString& key) const;
-    bool isValidDate(const QString &key, const QString &dateFormat) const;
-    bool isValidDateTime(const QString &key, const QString &dateFormat) const;
-};
-
 class ValidationError: public QException {
 public:
     ValidationError(std::string message) : message(message) {}
@@ -141,5 +67,99 @@ private:
     std::string message;
 
 };
+
+
+class CypressSession : public QObject
+{
+    Q_OBJECT
+public:
+    enum SessionStatus {
+        Unknown,
+        Started,
+        CriticalError,
+        Success,
+        Cancelled,
+    };
+    CypressSession(QObject* parent, const QJsonObject& inputData);
+
+    // Delete copy constructor and copy assignment operator.
+    CypressSession(const CypressSession&) = delete;
+    CypressSession& operator=(const CypressSession&) = delete;
+
+    virtual ~CypressSession() {};
+
+    virtual void initializeDialog() = 0;
+
+    virtual void isInstalled() const { throw NotInstalledError("device is not installed"); };
+    virtual void isAvailable() const { throw NotAvailableError("device is not available"); };
+
+    // Determines if the basic key/value pairs exist for a session or throws exception
+    virtual void validate() const;
+
+    // Calculates any needed implicit variables from data sent from pine
+    virtual void calculateInputs() {};
+
+    virtual void start();
+    virtual void end(const CypressSession::SessionStatus& status = CypressSession::SessionStatus::Success);
+
+    virtual QString getWebpageContents()
+    {
+        return "<!DOCTYPE html>"
+               "<html lang=\"en\">"
+               "<head>"
+               "<meta charset=\"UTF-8\">"
+               "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+               "<title>Pine</title>"
+               "</head>"
+               "<body>"
+               "</body>"
+               "</html>";
+    }
+
+    SessionStatus getStatus() const;
+    QJsonObject getInputData() const;
+
+    int getAnswerId() const;
+    QString getSessionId() const;
+    QString getBarcode() const;
+    QString getLanguage() const;
+    QString getInterviewer() const;
+    QDateTime getStartTime() const;
+    QDateTime getEndTime() const;
+
+    QJsonObject getJsonObject() const;
+
+protected:
+    SessionStatus m_status { SessionStatus::Unknown };
+
+    // the device UI
+    //
+    DialogBase* m_dialog;
+
+    // request body sent from Pine
+    //
+    QJsonObject m_inputData;
+
+    QString m_interviewer {};
+    int m_answerId {};
+    QString m_sessionId {};
+    QString m_barcode {};
+    QString m_language {};
+
+    QDateTime m_startDateTime {};
+    QDateTime m_endDateTime {};
+
+    bool m_debug;
+    bool m_sim;
+
+    bool isValidString(const QString& key) const;
+    bool isValidDouble(const QString& key) const;
+    bool isValidInteger(const QString& key) const;
+    bool isValidBool(const QString& key) const;
+    bool isValidDate(const QString &key, const QString &dateFormat) const;
+    bool isValidDateTime(const QString &key, const QString &dateFormat) const;
+};
+
+
 
 #endif // CYPRESSSESSION_H

@@ -1,4 +1,7 @@
 #include "frax_test.h"
+#include "data/frax/measurements/frax_measurement.h"
+
+#include "auxiliary/Utilities.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -6,8 +9,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QRandomGenerator>
-#include "../../../auxiliary/Utilities.h"
-#include "../measurements/frax_measurement.h"
+
 
 /**
  * sample contents of output.txt from blackbox.exe

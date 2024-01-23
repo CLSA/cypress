@@ -1,4 +1,5 @@
 #include "tonometer_status_request_handler.h"
+#include "managers/tonometer/tonometer_manager.h"
 
 #include "auxiliary/json_settings.h"
 
@@ -7,7 +8,7 @@ void TonometerStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", "available"}
+            {"status", TonometerManager::isInstalled() ? "available" : "unavailable" }
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

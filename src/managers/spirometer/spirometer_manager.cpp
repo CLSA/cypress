@@ -49,12 +49,16 @@ SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
 bool SpirometerManager::isInstalled()
 {
     bool isDebugMode = CypressSettings::isDebugMode();
+    bool isSimMode = CypressSettings::isSimMode();
 
+    if (isSimMode)
+        return false;
+
+    // path to EasyWarePro.exe
     QString runnableName = CypressSettings::readSetting("spirometer/runnableName").toString();
 
-    // full pathspec to runnable directory
-    QString runnablePath = CypressSettings::readSetting("spirometer/runnablePath")
-                               .toString(); // path to EasyWarePro.exe directory
+    // full path to runnable directory
+    QString runnablePath = CypressSettings::readSetting("spirometer/runnablePath").toString();
 
     // Path to the EMR plugin data transfer directory
     QString dataPath = CypressSettings::readSetting("spirometer/exchangePath").toString();
@@ -100,64 +104,67 @@ bool SpirometerManager::isInstalled()
         return false;
     }
 
+    QFileInfo runnableInfo(runnableName);
+    if (!runnableInfo.exists()) {
+        if (isDebugMode)
+            qDebug() << "SpirometerManager::isInstalled - EasyWarePro.exe does not exist at"
+                     << runnableName;
+
+        return false;
+    }
+
+    if (!runnableInfo.isExecutable()) {
+        if (isDebugMode)
+            qDebug() << "SpirometerManager::isInstalled - EasyWarePro.exe is not executable at"
+                     << runnableName;
+        return false;
+    }
+
+    QFileInfo runnableDir(runnablePath);
+    if (!runnableDir.isDir()) {
+        if (isDebugMode)
+            qDebug() << "SpirometerManager::isInstalled - Runnable dir is not executable at"
+                     << runnablePath;
+        return false;
+    }
+
+    if (!runnableDir.isReadable()) {
+        if (isDebugMode)
+            qDebug() << "SpirometerManager::isInstalled - directory does not exist at"
+                     << runnableDir;
+        return false;
+    }
+
     return true;
 }
 
-bool SpirometerManager::isDefined(const QString &value,
-                                  const SpirometerManager::FileType &fileType) const
-{
-    if (m_debug)
-        qDebug() << "SpirometerManager::isDefined";
-
-    if(value.isEmpty())
-        return false;
-
-    bool ok = false;
-    if(fileType == SpirometerManager::FileType::EasyWareExe)
-    {
-        QFileInfo info(value);
-        if(info.exists() /* && "exe" == info.completeSuffix()*/)
-            ok = true;
-    }
-    else if(fileType == SpirometerManager::FileType::EMRDataPath)
-    {
-        if(QDir(value).exists())
-            ok = true;
-    }
-
-    return ok;
-}
-
-void SpirometerManager::start()
+bool SpirometerManager::start()
 {
     if (m_debug)
         qDebug() << "SpirometerManager::start";
 
     if (m_sim) {
-        emit started(m_test.get());
-        emit dataChanged(m_test.get());
+        emit started(m_test);
+        emit dataChanged(m_test);
         emit canMeasure();
 
-        return;
+        return false;
     }
 
-    configureProcess();
-
-    m_process.start();
-    if (!m_process.waitForStarted()) {
-        QMessageBox::critical(nullptr, "Error", "Could not launch EasyOnPC");
-        return;
+    if (!setUp()) {
+        emit error("Something went wrong during setup");
+        return false;
     }
 
-    emit dataChanged(m_test.get());
+    measure();
+
+    return true;
 }
 
 void SpirometerManager::measure()
 {
     if (m_debug)
         qDebug() << "SpirometerManager::measure";
-
-    m_test->reset();
 
     if (m_sim) {
         m_test->simulate(QVariantMap({
@@ -169,53 +176,25 @@ void SpirometerManager::measure()
             {"date_of_birth", m_session->getInputData()["date_of_birth"].toString()},
         }));
 
-        emit dataChanged(m_test.get());
+        emit dataChanged(m_test);
         emit canFinish();
 
         return;
     }
 
-    if (m_debug)
-        qDebug() << "Starting process from measure";
+    if (m_process.state() != QProcess::NotRunning) {
+        emit error("CardioSoft is already running");
+        return;
+    }
 
     clearData();
+    m_process.start();
+
+    if (!m_process.waitForStarted()) {
+        emit error("Could not launch the spirometer application (EasyOnPC)");
+        return;
+    }
 }
-
-void SpirometerManager::finish()
-{
-    if (m_debug)
-        qDebug() << "SpirometerManager::finish";
-
-    if(QProcess::NotRunning != m_process.state())
-       m_process.kill();
-
-    restoreDatabases();
-    removeXmlFiles();
-
-    //// delete pdf output file
-    ////
-    QString pdfFilePath = getOutputPdfPath();
-    if(QFile::exists(pdfFilePath))
-        QFile::remove(pdfFilePath);
-
-    int answer_id = m_session->getAnswerId();
-
-    QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session->getJsonObject();
-    testJson.insert("session", sessionObj);
-
-    QJsonObject responseJson;
-    responseJson.insert("value", testJson);
-
-    QJsonDocument jsonDoc(responseJson);
-    QByteArray serializedData = jsonDoc.toJson();
-
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
-    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
-
-    emit success("Measurements have been sent to Pine");
-}
-
 
 void SpirometerManager::readOutput()
 {
@@ -223,25 +202,14 @@ void SpirometerManager::readOutput()
         qDebug() << "SpirometerManager::readOutput";
 
     if (QProcess::NormalExit != m_process.exitStatus()) {
-        QMessageBox::critical(nullptr,
-                              "Error",
-                              "Process failed to finish correctly, cannot read output");
+        emit error("Process failed to finish correctly, cannot read output");
         return;
     }
 
     SpirometerTest *test = static_cast<SpirometerTest *>(m_test.get());
     test->fromFile(getEMROutXmlName());
 
-    if (test->isValid()) {
-        emit dataChanged(m_test.get());
-        emit canFinish();
-
-    } else {
-        if (m_debug)
-            qDebug() << test->toJsonObject();
-
-        QMessageBox::critical(nullptr, "Error", "EMR plugin produced invalid XML test results");
-    }
+    finish();
 }
 
 bool SpirometerManager::clearData()
@@ -250,6 +218,8 @@ bool SpirometerManager::clearData()
         qDebug() << "SpirometerManager::clearData";
 
     m_test->reset();
+
+    emit dataChanged(m_test);
 
     return true;
 }
@@ -335,37 +305,11 @@ void SpirometerManager::configureProcess()
             qDebug() << "SpiromterManager::process state: " << s.join(" ").toLower();
     });
 
-    QDir working(m_runnablePath);
-    if (!working.exists()) {
-        QMessageBox::critical(nullptr, "Error", "EasyWare working directory does not exist");
-        return;
-    }
-
-    QFileInfo runnableFile(m_runnableName);
-    if (!runnableFile.exists()) {
-        QMessageBox::critical(nullptr, "Error", "Spirometry program could not be found");
-        return;
-    }
-
-    if (!runnableFile.isExecutable()) {
-        QMessageBox::critical(nullptr, "Error", "Spirometry program could not be run");
-        return;
-    }
-
-    QDir dataDirectory(m_dataPath);
-    if (!dataDirectory.exists()) {
-        QMessageBox::critical(nullptr, "Error", "Data directory could not be found");
-        return;
-    }
-
     if (m_debug)
         qDebug() << "OK: configuring command";
 
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
-
-    removeXmlFiles();
-    backupDatabases();
 
     if (m_debug)
         qDebug() << "SpirometerManager::configureProcess - creating plugin xml";
@@ -431,6 +375,11 @@ bool SpirometerManager::setUp()
     if (m_debug)
         qDebug() << "SpirometerManager::setUp";
 
+    removeXmlFiles();
+    backupDatabases();
+
+    configureProcess();
+
     return true;
 }
 
@@ -438,6 +387,11 @@ bool SpirometerManager::setUp()
 bool SpirometerManager::cleanUp() {
     if (m_debug)
         qDebug() << "SpirometerManager::cleanUp";
+
+    removeXmlFiles();
+    restoreDatabases();
+
+    clearData();
 
     return true;
 }

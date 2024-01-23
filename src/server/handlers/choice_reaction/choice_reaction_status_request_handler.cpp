@@ -1,4 +1,5 @@
 #include "choice_reaction_status_request_handler.h"
+#include "managers/choice_reaction/choice_reaction_manager.h"
 
 #include "auxiliary/json_settings.h"
 
@@ -6,7 +7,7 @@ void ChoiceReactionStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequ
 {
     Q_UNUSED(request)
     try {
-        QJsonObject responseJson = {{"available", true}};
+        QJsonObject responseJson = {{"status", ChoiceReactionManager::isInstalled() ? "available" : "unavailable"}};
         QString responseData = JsonSettings::serializeJson(responseJson);
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

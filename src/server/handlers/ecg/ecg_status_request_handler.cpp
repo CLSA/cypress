@@ -1,12 +1,13 @@
 #include "ecg_status_request_handler.h"
 #include "auxiliary/json_settings.h"
+#include "managers/ecg/ecg_manager.h"
 
 void ECGStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", "available"}
+            {"status", ECGManager::isInstalled() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

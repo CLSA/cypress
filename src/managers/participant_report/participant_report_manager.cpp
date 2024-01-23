@@ -1,4 +1,5 @@
 #include "participant_report_manager.h"
+#include "auxiliary/network_utils.h"
 #include "auxiliary/pdf_form_filler.h"
 #include "auxiliary/file_utils.h"
 
@@ -10,9 +11,10 @@ ParticipantReportManager::ParticipantReportManager(QSharedPointer<ParticipantRep
 
 }
 
-void ParticipantReportManager::start()
+bool ParticipantReportManager::start()
 {
     finish();
+    return true;
 }
 
 void ParticipantReportManager::measure()
@@ -50,16 +52,22 @@ void ParticipantReportManager::finish()
 
     QJsonDocument jsonDoc(responseJson);
 
-    sendHTTPSRequest("PATCH", answerUrl, "application/json", jsonDoc.toJson());
+    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", jsonDoc.toJson());
+    if (!ok) {
+    }
 
-    sendHTTPSRequest("PATCH",
-                                host + endpoint + m_session->getAnswerId()
-                                    + "?filename=participant_report.pdf",
-                                "application/octet-stream",
-                                responseData);
-
-    sendComplete(m_session->getSessionId());
-    emit success("");
+    ok = NetworkUtils::sendHTTPSRequest("PATCH",
+                          (host + endpoint + m_session->getAnswerId()
+                                         + "?filename=participant_report.pdf").toStdString(),
+                          "application/octet-stream",
+                          responseData);
+    if (ok) {
+        emit success("");
+    }
+    else {
+        emit error("");
+    }
+    //sendComplete(m_session->getSessionId());
 }
 
 void ParticipantReportManager::setInputData(const QVariantMap &)

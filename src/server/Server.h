@@ -49,7 +49,7 @@ public:
 signals:
     // signals the main thread to start a new device session
     //
-    void startSession(CypressSession* session);
+    void startSession(QSharedPointer<CypressSession> session);
 
     //// signals the main thread to start a new report session
     ////

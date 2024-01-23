@@ -1,10 +1,24 @@
 #include "spirometer_session.h"
+#include "managers/spirometer/spirometer_manager.h"
 
 #include "dialogs/spirometer_dialog.h"
 
 SpirometerSession::SpirometerSession(QObject *parent, const QJsonObject& inputData)
     : CypressSession{parent, inputData}
 {
+}
+
+void SpirometerSession::initializeDialog()
+{
+    m_dialog = new SpirometerDialog(nullptr, QSharedPointer<SpirometerSession>(this));
+}
+
+void SpirometerSession::isInstalled() const {
+    if (!SpirometerManager::isInstalled())
+        throw NotInstalledError("Spirometer is not installed on this workstation");
+}
+
+void SpirometerSession::isAvailable() const {
 
 }
 
@@ -12,7 +26,6 @@ void SpirometerSession::validate() const
 {
     CypressSession::validate();
 
-    qDebug() << m_inputData;
     //if (!isValidString("age"))
     //    throw ValidationError("age");
     //if (!isValidString("ethnicity"))
@@ -39,7 +52,15 @@ void SpirometerSession::validate() const
         throw ValidationError("weight");
 }
 
-int computeAge(const QString &birthdateStr) {
+void SpirometerSession::calculateInputs()
+{
+    CypressSession::calculateInputs();
+
+    m_inputData["age"] = computeAge(m_inputData["dob"].toString());
+    m_inputData["ethnicity"] = "caucasian";
+}
+
+int SpirometerSession::computeAge(const QString &birthdateStr) {
     QDate birthdate = QDate::fromString(birthdateStr, "yyyy-MM-dd");
     QDate currentDate = QDate::currentDate();
 
@@ -55,26 +76,4 @@ int computeAge(const QString &birthdateStr) {
     return years;
 }
 
-void SpirometerSession::calculateInputs()
-{
-    CypressSession::calculateInputs();
 
-    m_inputData["age"] = computeAge(m_inputData["dob"].toString());
-    m_inputData["ethnicity"] = "caucasian";
-}
-
-void SpirometerSession::start()
-{
-    m_dialog = new SpirometerDialog(nullptr, QSharedPointer<SpirometerSession>(this));
-    if (m_dialog == nullptr)
-        throw QException();
-
-    m_startDateTime = QDateTime::currentDateTimeUtc();
-    m_status = SessionStatus::Started;
-
-    m_dialog->run();
-    m_dialog->show();
-
-    if (m_debug)
-        qDebug() << "SpirometerSession::start " << getSessionId() << m_startDateTime;
-}

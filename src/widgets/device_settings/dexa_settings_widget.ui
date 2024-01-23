@@ -30,6 +30,12 @@
     <widget class="FilePickerWidget" name="storagePath" native="true"/>
    </item>
    <item>
+    <widget class="FilePickerWidget" name="patscanDbPath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="refscanDbPath" native="true"/>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

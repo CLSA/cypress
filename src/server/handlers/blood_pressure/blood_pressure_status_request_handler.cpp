@@ -1,4 +1,6 @@
 #include "blood_pressure_status_request_handler.h"
+#include "managers/blood_pressure/blood_pressure_manager.h"
+
 #include "auxiliary/json_settings.h"
 
 void BloodPressureStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
@@ -6,7 +8,7 @@ void BloodPressureStatusRequestHandler::handleRequest(Poco::Net::HTTPServerReque
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", "Available"}
+            {"status", BloodPressureManager::isInstalled() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

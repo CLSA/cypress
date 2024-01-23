@@ -1,4 +1,5 @@
 #include "grip_strength_test.h"
+#include "auxiliary/tracker5_util.h"
 
 #include <QDebug>
 #include <QJsonObject>
@@ -10,7 +11,6 @@
 #include <QException>
 #include <QRandomGenerator>
 
-#include "../../../auxiliary/tracker5_util.h"
 
 
 const q_stringMap GripStrengthTest::testMetaMap = {

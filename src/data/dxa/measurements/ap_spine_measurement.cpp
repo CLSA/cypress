@@ -196,7 +196,7 @@ bool ApSpineMeasurement::isValid() const
 bool ApSpineMeasurement::isValidDicomFile(DicomFile file) const
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
     OFString value = "";
@@ -294,7 +294,13 @@ void ApSpineMeasurement::addDicomFile(DicomFile file)
 {
     m_apSpineFile = file;
     m_apSpineFile.name = "SP_DICOM_1";
-    m_apSpineFile.size = FileUtils::getHumanReadableFileSize(m_apSpineFile.fileInfo.absoluteFilePath());
-
+    m_apSpineFile.size = FileUtils::getHumanReadableFileSize(m_apSpineFile.absFilePath);
     m_hasApSpineFile = true;
+
+    setAttribute("patientId", file.patientId);
+    setAttribute("filePath", file.absFilePath);
+    setAttribute("studyId", file.studyId);
+    setAttribute("mediaStorageUid", file.mediaStorageUID);
+    setAttribute("name", m_apSpineFile.name);
+    setAttribute("size", m_apSpineFile.size);
 }

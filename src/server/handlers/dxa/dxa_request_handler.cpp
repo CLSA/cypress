@@ -21,13 +21,11 @@ void DxaRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
         std::ostream& out = response.send();
         out << responseData.toStdString();
         out.flush();
-    }
-    catch (const ValidationError& exception)
-    {
+    } catch (const ValidationError &exception) {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         response.setContentType("application/json");
 
-        std::ostream& out = response.send();
+        std::ostream &out = response.send();
         out << exception.what();
         out.flush();
     }

@@ -28,17 +28,14 @@ ChoiceReactionSettingsWidget::ChoiceReactionSettingsWidget(QWidget *parent) :
     ui->outputPath->setPath(outputPath);
 
     connect(ui->runnableName, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        qDebug() << "changing runnable name" << path;
         CypressSettings::writeSetting("choice_reaction/runnableName", path);
     });
 
     connect(ui->runnablePath, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        qDebug() << "changing runnable path" << path;
         CypressSettings::writeSetting("choice_reaction/runnablePath", path);
     });
 
     connect(ui->outputPath, &FilePickerWidget::pathChanged, this, [=](QString path) {
-        qDebug() << "changing output path" << path;
         CypressSettings::writeSetting("choice_reaction/outputPath", path);
     });
 }

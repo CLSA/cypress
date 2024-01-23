@@ -19,9 +19,6 @@ public:
     ~RetinalCameraDialog();
 
 private:
-    void initializeModel() override;
-    void initializeConnections() override;
-
     Ui::RetinalCameraDialog *ui;
 };
 

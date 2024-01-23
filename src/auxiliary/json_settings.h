@@ -3,21 +3,19 @@
 
 #include <QtCore>
 
-class JsonSettings {
+namespace JsonSettings {
+    QJsonObject readJsonFromFile(const QString &path);
+    QJsonObject deserializeJson(const QString &jsonString);
+    QString serializeJson(const QJsonObject &jsonObject);
 
-public:
+    bool readSettingsJson(QIODevice &device, QVariantMap &map);
+    bool writeSettingsJson(QIODevice &device, const QVariantMap &map);
 
-    static QJsonObject readJsonFromFile(const QString &path);
-    static QJsonObject deserializeJson(const QString &jsonString);
-    static QString serializeJson(const QJsonObject &jsonObject);
 
-    static bool readSettingsJson(QIODevice &device, QVariantMap &map);
-    static bool writeSettingsJson(QIODevice &device, const QVariantMap &map);
-    static QSettings::Format JsonFormat;
+    QVariantMap jsonObjectToVariantMap(const QJsonObject& jsonObject);
 
-private:
-    static void parseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map);
-    static QJsonObject restoreJsonObject(QVariantMap &map);
-};
+    void parseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map);
+    QJsonObject restoreJsonObject(QVariantMap &map);
+}
 
 #endif // JSON_SETTINGS_H

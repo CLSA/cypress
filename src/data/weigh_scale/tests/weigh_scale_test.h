@@ -44,6 +44,11 @@ public:
     // UI measure button click events
     //
     static const qint64 DELAY { 5 };
+
+private:
+    QList<QString> m_outputKeyList;
+
+    double calculateAverage();
 };
 
 Q_DECLARE_METATYPE(WeighScaleTest);

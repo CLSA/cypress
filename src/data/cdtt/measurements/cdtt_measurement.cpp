@@ -7,6 +7,8 @@
 
 bool CDTTMeasurement::isValid() const
 {
+    qDebug() << "is valid";
+
     bool ok =
       hasAttribute("trial") &&
       hasAttribute("stimulus") &&

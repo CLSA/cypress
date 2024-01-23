@@ -15,8 +15,6 @@ public:
     ~SpirometerDialog();
 
 private:
-    void initializeConnections() override;
-
     Ui::SpirometerDialog *ui { Q_NULLPTR };
 };
 

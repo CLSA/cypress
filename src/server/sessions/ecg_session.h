@@ -10,7 +10,9 @@ public:
 
     // CypressSession interface
 public:
-    void start() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
+    void initializeDialog() override;
 };
 
 #endif // ECGSESSION_H

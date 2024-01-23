@@ -1,9 +1,5 @@
 #include "json_settings.h"
 
-QSettings::Format JsonSettings::JsonFormat =
-        QSettings::registerFormat("JsonFormat", &JsonSettings::readSettingsJson, &JsonSettings::writeSettingsJson);
-
-
 QJsonObject JsonSettings::readJsonFromFile(const QString &path)
 {
     QFile file(path);
@@ -22,6 +18,23 @@ QString JsonSettings::serializeJson(const QJsonObject& jsonObject)
    QJsonDocument jsonDoc(jsonObject);
    QString jsonString = jsonDoc.toJson();
    return jsonString;
+}
+
+QVariantMap JsonSettings::jsonObjectToVariantMap(const QJsonObject& jsonObject)
+{
+    // Convert QJsonObject to QJsonDocument
+    QJsonDocument jsonDoc(jsonObject);
+
+    // Convert QJsonDocument to QByteArray
+    QByteArray byteArray = jsonDoc.toJson(QJsonDocument::Compact);
+
+    // Convert QByteArray to QJsonDocument
+    QJsonDocument convertedJsonDoc = QJsonDocument::fromJson(byteArray);
+
+    // Convert QJsonDocument to QVariantMap
+    QVariantMap variantMap = convertedJsonDoc.toVariant().toMap();
+
+    return variantMap;
 }
 
 QJsonObject JsonSettings::deserializeJson(const QString& jsonString)

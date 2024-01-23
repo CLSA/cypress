@@ -19,11 +19,25 @@ void DxaHipRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, 
         std::ostream& out = response.send();
         out << responseData.toStdString();
         out.flush();
+    } catch (const NotInstalledError &exception) {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_FAILED_DEPENDENCY);
+        response.setContentType("application/json");
+
+        std::ostream &out = response.send();
+        out << exception.what();
+        out.flush();
+    } catch (const NotAvailableError &exception) {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+        response.setContentType("application/json");
+
+        std::ostream &out = response.send();
+        out << exception.what();
+        out.flush();
     } catch (const ValidationError &exception) {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
         response.setContentType("application/json");
 
-        std::ostream& out = response.send();
+        std::ostream &out = response.send();
         out << exception.what();
         out.flush();
     }

@@ -44,7 +44,7 @@ public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)
     //
-    virtual void start() = 0;
+    virtual bool start() = 0;
 
     // actual measure will only execute if the barcode has been
     // verified.  Subclasses must reimplement accordingly.
@@ -53,19 +53,44 @@ public slots:
 
     // subclasses call methods just prior to main close event
     //
-    virtual void finish() = 0;
+    virtual void finish();
 
     // Request from the view to add a manual measurement
     virtual void addManualMeasurement();
+
+protected:
+
+    // Set up device
+    virtual bool setUp() = 0;
+
+    // Reset the session
+    virtual bool clearData() = 0;
+
+    // Clean up the device for next time
+    virtual bool cleanUp() = 0;
+
+    QSharedPointer<CypressSession> m_session;
+    QSharedPointer<TestBase> m_test;
+
+    QVariantMap m_inputData;
+    QList<QString> m_inputKeyList;
+
+    bool m_debug { true };
+    bool m_sim { true };
+
+    bool manualEntryMode { false };
+
+    QVariant getInputDataValue(const QString &);
+
 
 signals:
 
     // the underlying test data has changed
     //
-    void dataChanged(TestBase *test);
+    void dataChanged(QSharedPointer<TestBase> test);
 
     // initialize UI with basic test info
-    void started(TestBase *test);
+    void started(QSharedPointer<TestBase> test);
 
     // ready to measure and receive data
     // (update GUI enable measure button)
@@ -84,33 +109,12 @@ signals:
     // Something went wrong, critical error, couldn't save data
     void error(const QString& errorMsg);
 
-protected:
-    QSharedPointer<CypressSession> m_session;
+private:
+    // backupData
+    // restoreData
+    // restoreDirectoriesAndFiles
+    // restor
 
-    QVariantMap m_inputData;
-    QList<QString> m_inputKeyList;
-
-    QScopedPointer<TestBase> m_test;
-
-    bool m_debug { true };
-    bool m_sim { true };
-
-    bool manualEntryMode { false };
-
-    QVariant getInputDataValue(const QString &);
-    QVariantMap jsonObjectToVariantMap(const QJsonObject& jsonObject);
-
-    // Set up device
-    virtual bool setUp() = 0;
-
-    // Reset the session
-    virtual bool clearData() = 0;
-
-    // Clean up the device for next time
-    virtual bool cleanUp() = 0;
-
-    virtual void sendHTTPRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
-    virtual void sendHTTPSRequest(const QString& method, const QString& endpoint, const QString& contentType, const QByteArray& data);
 };
 
 #endif // MANAGER_BASE_H

@@ -80,9 +80,8 @@ public:
 
     static HTTPRequestHandler* createParticipantReportRequestHandler();
     static HTTPRequestHandler* createGeneralProxyConsentRequestHandler();
+    static HTTPRequestHandler *createDxaHipSessionRequestHandler();
+    static HTTPRequestHandler *createDxaSessionRequestHandler();
 };
-
-
-
 
 #endif // INSTRUMENT_REQUEST_HANDLER_FACTORY_H

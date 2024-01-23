@@ -10,11 +10,10 @@ SerialPortManager::SerialPortManager(QSharedPointer<CypressSession> session)
 
 }
 
-void SerialPortManager::start()
+bool SerialPortManager::start()
 {
     scanDevices();
-    //qDebug() << "signal dataChanged";
-    //emit dataChanged();
+    return true;
 }
 
 void SerialPortManager::handleSerialPortError(QSerialPort::SerialPortError error)
@@ -22,9 +21,7 @@ void SerialPortManager::handleSerialPortError(QSerialPort::SerialPortError error
     qCritical() << "ERROR: serial port " << m_port.errorString();
 
     if(error == QSerialPort::NoError)
-    {
         return;
-    }
 }
 
 void SerialPortManager::handleDataTerminalReadyChanged(bool set)

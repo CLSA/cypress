@@ -1,8 +1,8 @@
 #ifndef DCM_RECV_H
 #define DCM_RECV_H
 
-#include "dicom_directory_watcher.h"
 #include "dcmtk/dcmdata/dctk.h"
+#include "dicom_directory_watcher.h"
 
 #include <QObject>
 #include <QProcess>
@@ -19,8 +19,8 @@ struct DicomFile {
     QString seriesNumber;
     QString size;
     QString name;
-
-    QFileInfo fileInfo;
+    QString absFilePath;
+    QString laterality;
 };
 
 class DcmRecv : public QObject
@@ -41,13 +41,9 @@ public:
     bool start();
     bool stop();
 
-    QList<DicomFile> receivedFiles;
-
     QString receivedFilesDir() const;
-
 signals:
-    void dicomFilesReceived();
-
+    void dicomFilesReceived(QList<DicomFile> dicomFilesReceived);
     void logUpdate(const QString& line);
 
     void notRunning();
@@ -67,9 +63,14 @@ private slots:
     void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
+    bool m_debug;
+
+    bool clearOutputDirectory();
+    bool configureProcess();
+    bool initializeOutputWatcher();
+
     QScopedPointer<DicomDirectoryWatcher> m_watcher;
     QProcess m_process;
-
 
     QString m_executablePath;
     QString m_configPath;
@@ -77,6 +78,5 @@ private:
     QString m_aeTitle;
     QString m_port;
 };
-
 
 #endif // DCM_RECV_H

@@ -1,30 +1,24 @@
 #include "weigh_scale_session.h"
-
+#include "managers/weigh_scale/weigh_scale_manager.h"
 #include "dialogs/weigh_scale_dialog.h"
 
 WeighScaleSession::WeighScaleSession(QObject *parent, const QJsonObject& inputData)
     : CypressSession{parent, inputData}
 {
-
 }
 
-void WeighScaleSession::validate() const
-{
-    CypressSession::validate();
-}
-
-void WeighScaleSession::start()
+void WeighScaleSession::initializeDialog()
 {
     m_dialog = new WeighScaleDialog(nullptr, QSharedPointer<WeighScaleSession>(this));
-    if (m_dialog == nullptr)
-        throw QException();
+}
 
-    m_startDateTime = QDateTime::currentDateTimeUtc();
-    m_status = SessionStatus::Started;
+void WeighScaleSession::isInstalled() const
+{
+    if (!WeighScaleManager::isInstalled())
+        throw NotInstalledError("Weight Scale is not installed on this workstation.");
+}
 
-    m_dialog->run();
-    m_dialog->show();
+void WeighScaleSession::isAvailable() const
+{
 
-    if (m_debug)
-        qDebug() << "WeighScaleSession::start " << getSessionId() << m_startDateTime;
 }

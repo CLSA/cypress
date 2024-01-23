@@ -1,6 +1,7 @@
 #include "general_proxy_manager.h"
 #include "auxiliary/pdf_form_filler.h"
 #include "auxiliary/file_utils.h"
+#include "auxiliary/network_utils.h"
 #include "cypress_settings.h"
 
 #include <QDir>
@@ -11,9 +12,10 @@ GeneralProxyManager::GeneralProxyManager(QSharedPointer<GenProxySession> session
 
 }
 
-void GeneralProxyManager::start()
+bool GeneralProxyManager::start()
 {
     finish();
+    return true;
 }
 
 void GeneralProxyManager::measure()
@@ -79,19 +81,26 @@ void GeneralProxyManager::finish()
     QByteArray serializedData = jsonDoc.toJson();
 
     QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
-    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
+    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
+    if (!ok) {
+    }
 
     ////QDesktopServices::openUrl(outputPath);
     QByteArray responseData = FileUtils::readFile(outputPath);
-    sendHTTPSRequest("PATCH", answerUrl, "application/octet-stream", responseData);
+    ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/octet-stream", responseData);
+    if (!ok) {
+    }
 
     QString host = CypressSettings::getPineHost();
     QString endpoint = CypressSettings::getPineEndpoint();
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=general_proxy_consent.pdf",
-                     "application/octet-stream",
-                     responseData);
+    ok = NetworkUtils::sendHTTPSRequest("PATCH",
+                          (host + endpoint + QString::number(answer_id)
+                                         + "?filename=general_proxy_consent.pdf").toStdString(),
+                          "application/octet-stream",
+                          responseData);
+    if (!ok) {
+    }
 
     sendComplete(m_session->getSessionId());
 

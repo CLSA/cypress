@@ -1,13 +1,14 @@
 #ifndef DXA_TEST_H
 #define DXA_TEST_H
 
-#include "../../../dicom/dcm_recv.h"
-#include "../../test_base.h"
+#include "data/dxa/measurements/ap_spine_measurement.h"
+#include "data/dxa/measurements/forearm_measurement.h"
+#include "data/dxa/measurements/iva_imaging_measurement.h"
+#include "data/dxa/measurements/whole_body_measurement.h"
+#include "data/test_base.h"
 
-#include "../measurements/ap_spine_measurement.h"
-#include "../measurements/forearm_measurement.h"
-#include "../measurements/iva_imaging_measurement.h"
-#include "../measurements/whole_body_measurement.h"
+#include "dicom/dcm_recv.h"
+#include "server/sessions/dxa/dxa_session.h"
 
 #include "dcmtk/ofstd/ofstdinc.h"
 
@@ -22,9 +23,9 @@ public:
     bool isValid() const override;
     void reset() override;
 
-    bool areDicomFilesValid() const;
+    bool hasAllNeededFiles() const;
 
-    void fromDicomFiles(QList<DicomFile> files);
+    void fromDicomFiles(QList<DicomFile> files, const DXASession &session);
 
     void simulate() override;
 

@@ -1,11 +1,11 @@
 #ifndef DIALOG_BASE_H
 #define DIALOG_BASE_H
 
+#include "managers/manager_base.h"
+
 #include <QDialog>
 #include <QStandardItemModel>
 
-#include "../managers/manager_base.h"
-#include "../auxiliary/Constants.h"
 
 class CypressSession;
 
@@ -17,10 +17,7 @@ public:
     DialogBase(QWidget *parent, QSharedPointer<CypressSession> session);
     virtual ~DialogBase();
 
-    void initialize();
-    void run();
-
-    QSharedPointer<ManagerBase> m_manager;
+    bool run();
 
 public slots:
     void error(const QString& errorMsg);
@@ -28,21 +25,18 @@ public slots:
     void cancel(const QString& cancelMsg);
 
 protected:
+    bool isManualEntryMode{false};
+
     bool m_debug;
     bool m_sim;
 
-    void closeEvent(QCloseEvent *event) override;
-
     QSharedPointer<CypressSession> m_session;
-
-    bool isManualEntryMode { false };
+    QSharedPointer<ManagerBase> m_manager;
 
     QVariantMap m_inputData;
-
     QDateTime startTime;
 
-    virtual void initializeConnections();
-    virtual void initializeModel();
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // DIALOG_BASE_H

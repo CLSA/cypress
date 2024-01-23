@@ -19,17 +19,12 @@ INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
 LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += $$PWD/../dep/OpenSSL-Win32/include
-LIBS += -L$$PWD/../dep/OpenSSL-Win32/lib -llibssl -llibcrypto
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib/VC/x86/MD" -llibssl -llibcrypto
 
 # POCO
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += $$PWD/../dep/poco-1.12.4-all/NetSSL_OpenSSL/include
-
-LIBS += -L$$PWD/../dep/poco-1.12.4-all/lib -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+INCLUDEPATH += "C:/Program Files (x86)/Poco/include"
+LIBS += -L"C:/Program Files (x86)/Poco/lib" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
 INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
@@ -117,6 +112,7 @@ HEADERS += \
     auxiliary/file_compressor.h \
     auxiliary/json_settings.h \
     auxiliary/tracker5_util.h \
+    auxiliary/windows_util.h \
     cypress_application.h \
     cypress_main_window.h \
     cypress_session.h \
@@ -222,7 +218,9 @@ HEADERS += \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
     server/handlers/dxa/dxa_hip_request_handler.h \
+    server/handlers/dxa/dxa_hip_session_request_handler.h \
     server/handlers/dxa/dxa_hip_status_request_handler.h \
+    server/handlers/dxa/dxa_session_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/sessions/audiometer_session.h \
@@ -315,6 +313,7 @@ SOURCES += \
     auxiliary/file_utils.cpp \
     auxiliary/json_settings.cpp \
     auxiliary/tracker5_util.cpp \
+    auxiliary/windows_util.cpp \
     cypress_application.cpp \
     cypress_main_window.cpp \
     cypress_session.cpp \
@@ -420,7 +419,9 @@ SOURCES += \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
     server/handlers/dxa/dxa_hip_request_handler.cpp \
+    server/handlers/dxa/dxa_hip_session_request_handler.cpp \
     server/handlers/dxa/dxa_hip_status_request_handler.cpp \
+    server/handlers/dxa/dxa_session_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/sessions/audiometer_session.cpp \

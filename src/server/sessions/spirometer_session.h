@@ -10,9 +10,15 @@ public:
 
     // CypressSession interface
 public:
+    void isInstalled() const override;
+    void isAvailable() const override;
     void validate() const override;
+
     void calculateInputs() override;
-    void start() override;
+
+    void initializeDialog() override;
+private:
+    int computeAge(const QString &birthdateStr);
 };
 
 #endif // SPIROMETERSESSION_H

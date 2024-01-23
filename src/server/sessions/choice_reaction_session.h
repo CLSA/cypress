@@ -12,8 +12,7 @@ public:
 public:
     void isInstalled() const override;
     void isAvailable() const override;
-
-    void start() override;
+    void initializeDialog() override;
 };
 
 #endif // CHOICEREACTIONSESSION_H

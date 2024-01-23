@@ -18,9 +18,6 @@
     <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
    </item>
    <item>
-    <widget class="DicomWidget" name="dicomWidget" native="true"/>
-   </item>
-   <item>
     <widget class="MeasurementTable" name="measurementTable" native="true"/>
    </item>
    <item>
@@ -49,12 +46,6 @@
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>DicomWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/dicom_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

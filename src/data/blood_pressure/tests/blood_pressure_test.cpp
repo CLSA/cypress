@@ -36,14 +36,11 @@ BloodPressureTest::BloodPressureTest()
 QString BloodPressureTest::toString() const
 {
     QString str;
-    if(isValid())
-    {
-        QStringList list;
-        foreach (const auto m, m_measurementList) {
-            list << m->toString();
-        }
-        str = list.join("\n");
+    QStringList list;
+    foreach (const auto m, m_measurementList) {
+        list << m->toString();
     }
+    str = list.join("\n");
     return str;
 }
 
@@ -78,7 +75,6 @@ void BloodPressureTest::simulate()
 
 bool BloodPressureTest::isValid() const
 {
-    qDebug() << "is valid?";
     bool okMeta = true;
     foreach(const auto key, m_outputKeyList)
     {
@@ -97,6 +93,9 @@ bool BloodPressureTest::isValid() const
          }
        }
     }
+
+    qDebug() << "valid: " << (okMeta && okTest);
+
     return okMeta && okTest;
 }
 
@@ -178,11 +177,6 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
           sbpTotal += measurement->getSbp();
           dbpTotal += measurement->getDbp();
           pulseTotal += measurement->getPulse();
-
-          qDebug() << QString("sbpTotal = %1 dbpTotal = %2 pulseTotal = %3")
-                          .arg(sbpTotal)
-                          .arg(dbpTotal)
-                          .arg(pulseTotal);
       }
     }
 
@@ -197,8 +191,6 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
     double avgPulseCalc = pulseTotal * 1.0f / count;
 
     addMetaData("avg_count", QVariant(count));
-
-    qDebug() << QString("Averages: sbp(%1:%2) dbp(%3:%4) pulse(%5:%6)").arg(sbpAvg).arg(avgSbpCalc).arg(dbpAvg).arg(avgDbpCalc).arg(pulseAvg).arg(avgPulseCalc);
 
     bool ok = true;
 

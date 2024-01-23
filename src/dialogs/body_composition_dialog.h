@@ -13,8 +13,6 @@ public:
     ~BodyCompositionDialog();
 
 private:
-    void initializeConnections() override;
-
     Ui::BodyCompositionDialog *ui { Q_NULLPTR };
 };
 

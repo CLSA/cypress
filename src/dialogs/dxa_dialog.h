@@ -16,12 +16,6 @@ public:
     explicit DXADialog(QWidget *parent, QSharedPointer<DXASession> session);
     ~DXADialog();
 
-public slots:
-    void dicomFilesReceived(const QStringList& dicomFilePaths);
-    void dicomServerStarted();
-    void dicomServerEnded();
-    void dicomLogUpdate(QString line);
-
 private:
     Ui::DXADialog *ui { Q_NULLPTR };
 };

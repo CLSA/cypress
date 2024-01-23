@@ -6,8 +6,10 @@
 #include <iostream>
 
 #include "Poco/Net/HTTPServer.h"
-#include "server/instrument_request_handler_factory.h"
+#include "cypress_settings.h"
+#include "cypress_application.h"
 #include "server/Server.h"
+#include "server/instrument_request_handler_factory.h"
 
 #include "sessions/frax_session.h"
 #include "sessions/audiometer_session.h"
@@ -32,16 +34,26 @@ using namespace Poco::Net;
 
 Server::Server()
 {
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
+    try {
+        mainThread = QThread::currentThread();
+        //moveToThread(&serverThread);
 
-    HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
-    HTTPServerParams::Ptr pParams = new HTTPServerParams;
-    Poco::UInt16 portNumber = settings.value("server/port", 9000).toInt();
+        HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
+        HTTPServerParams::Ptr pParams = new HTTPServerParams;
 
-    mainThread = QThread::currentThread();
+        QString addr = CypressSettings::readSetting("address").toString();
+        int port = CypressSettings::readSetting("port").toUInt();
 
-    server.reset(new HTTPServer(pFactory, portNumber, pParams));
-    moveToThread(&serverThread);
+        Poco::Net::ServerSocket socket(Poco::Net::SocketAddress(addr.toStdString(), port));
+        socket.setReuseAddress(true);
+        socket.setReusePort(true);
+
+        server.reset(new HTTPServer(pFactory, socket, pParams));
+    } catch (const Poco::Exception& e) {
+        qDebug() << e.what();
+    } catch (...) {
+        qDebug() << "random exception";
+    }
 }
 
 Server::~Server()
@@ -51,84 +63,80 @@ Server::~Server()
 
 QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObject& inputData)
 {
-    CypressSession* session = nullptr;
+    QSharedPointer<CypressSession> session;
 
     switch (type)
     {
         case Constants::MeasureType::Audiometer:
-            session = new AudiometerSession(nullptr, inputData);
+            session = QSharedPointer<AudiometerSession>(new AudiometerSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Blood_Pressure:
-            session = new BPMSession(nullptr, inputData);
+            session = QSharedPointer<BPMSession>(new BPMSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Body_Composition:
             break;
         case Constants::MeasureType::CDTT:
-            session = new CDTTSession(nullptr, inputData);
+            session = QSharedPointer<CDTTSession>(new CDTTSession(nullptr, inputData));
             break;
         case Constants::MeasureType::CarotidIntima:
-            session = new UltrasoundSession(nullptr, inputData);
+            session = QSharedPointer<UltrasoundSession>(new UltrasoundSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Choice_Reaction:
-            session = new ChoiceReactionSession(nullptr, inputData);
+            session = QSharedPointer<ChoiceReactionSession>(new ChoiceReactionSession(nullptr, inputData));
             break;
         case Constants::MeasureType::DxaDualHip:
-            session = new DxaHipSession(nullptr, inputData);
+            session = QSharedPointer<DxaHipSession>(new DxaHipSession(nullptr, inputData));
             break;
         case Constants::MeasureType::DxaWholeBody:
-            session = new DXASession(nullptr, inputData);
+            session = QSharedPointer<DXASession>(new DXASession(nullptr, inputData));
             break;
         case Constants::MeasureType::ECG:
-            session = new ECGSession(nullptr, inputData);
+            session = QSharedPointer<ECGSession>(new ECGSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Frax:
-            session = new FraxSession(nullptr, inputData);
+            session = QSharedPointer<FraxSession>(new FraxSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Grip_Strength:
-            session = new GripStrengthSession(nullptr, inputData);
+            session = QSharedPointer<GripStrengthSession>(new GripStrengthSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Retinal_Camera_Left:
-            session = new RetinalCameraSession(nullptr, inputData, Side::Left);
+            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, Side::Left));
             break;
         case Constants::MeasureType::Retinal_Camera_Right:
-            session = new RetinalCameraSession(nullptr, inputData, Side::Right);
+            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, Side::Right));
             break;
         case Constants::MeasureType::Spirometer:
-            session = new SpirometerSession(nullptr, inputData);
+            session = QSharedPointer<SpirometerSession>(new SpirometerSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Tonometer:
-            session = new TonometerSession(nullptr, inputData);
+            session = QSharedPointer<TonometerSession>(new TonometerSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Thermometer:
             session = nullptr;
             break;
         case Constants::MeasureType::Weigh_Scale:
-            session = new WeighScaleSession(nullptr, inputData);
+            session = QSharedPointer<WeighScaleSession>(new WeighScaleSession(nullptr, inputData));
             break;
         case Constants::MeasureType::Gen_Proxy_Consent:
-            session = new GenProxySession(nullptr, inputData);
+            session = QSharedPointer<GenProxySession>(new GenProxySession(nullptr, inputData));
             break;
         case Constants::MeasureType::Participant_Report:
-            session = new ParticipantReportSession(nullptr, inputData);
+            session = QSharedPointer<ParticipantReportSession>(new ParticipantReportSession(nullptr, inputData));
             break;
         default:
             throw QException();
     }
 
-        qDebug() << session;
-
     if (!session)
-    {
         throw QException();
-    }
 
+    session->moveToThread(mainThread);
     session->isInstalled();
     session->isAvailable();
     session->validate();
     session->calculateInputs();
-    //QString sessionId = session->getSessionId();
+    qDebug() << "session thread" << session->thread()->currentThreadId();
 
-    session->moveToThread(mainThread);
     emit startSession(session);
 
     //sessions.insert(session->getSessionId(), session);
@@ -154,14 +162,16 @@ void Server::forceSessionEnd(QString sessionId)
 
 void Server::start()
 {
-    serverThread.start();
+    //serverThread.start();
     server->start();
     qInfo() << "listening at " + QString::fromStdString(server->socket().address().toString());
 }
 
 void Server::stop()
 {
-    server->stop();
+    server->stopAll(true);
+    qDebug() << "stop all";
+
     serverThread.quit();
     serverThread.wait();
 }

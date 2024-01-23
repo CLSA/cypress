@@ -1,9 +1,23 @@
-#include "tonometer_session.h"
+#include "server/sessions/tonometer_session.h"
+#include "managers/tonometer/tonometer_manager.h"
 #include "dialogs/tonometer_dialog.h"
 
 TonometerSession::TonometerSession(QObject *parent, const QJsonObject& inputData)
     : CypressSession{parent, inputData}
 {
+}
+
+void TonometerSession::initializeDialog()
+{
+    m_dialog = new TonometerDialog(nullptr, QSharedPointer<TonometerSession>(this));
+}
+
+void TonometerSession::isInstalled() const {
+    if (!TonometerManager::isInstalled())
+        throw NotInstalledError("Tonometer is not installed on this workstation");
+}
+
+void TonometerSession::isAvailable() const {
 
 }
 
@@ -15,20 +29,4 @@ void TonometerSession::validate() const
 
     if (!isValidString("sex"))
         throw ValidationError("sex");
-}
-
-void TonometerSession::start()
-{
-    m_dialog = new TonometerDialog(nullptr, QSharedPointer<TonometerSession>(this));
-    if (m_dialog == nullptr)
-        throw QException();
-
-    m_startDateTime = QDateTime::currentDateTimeUtc();
-    m_status = SessionStatus::Started;
-
-    m_dialog->run();
-    m_dialog->show();
-
-    if (m_debug)
-        qDebug() << "TonometerSession::start " << getSessionId() << m_startDateTime;
 }

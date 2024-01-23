@@ -13,7 +13,7 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
 
     // Disable measure and complete buttons by default
     ui->measureButton->setEnabled(false);
-    ui->submitButton->setEnabled(false);
+    //ui->submitButton->setEnabled(false);
 
     // Table setup
     ui->measurementTable->setShowGrid(true);
@@ -59,7 +59,14 @@ MeasurementTable::MeasurementTable(QWidget *parent) :
             emit finish();
         }
         else {
-            QMessageBox::warning(this, "Test Incomplete", "The test is incomplete or invalid.");
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(nullptr, "Test Incomplete", "The test is incomplete, are you sure you want to submit?");
+            if (reply == QMessageBox::Yes) {
+                emit finish();
+            }
+            else {
+                return;
+            }
         }
     });
 
@@ -92,6 +99,22 @@ void MeasurementTable::handleChange(int row, int col)
     Q_UNUSED(row)
     Q_UNUSED(col)
 
+    qDebug() << "cell changed row:" << row << "col:" << col;
+
+    Measurement &measure = m_test->get(row);
+    TableColumn& column = m_columns[col];
+    Measurement::Value attribute = measure.getAttribute(column.key);
+
+    bool hasUnits = measure.getAttribute(column.key).hasUnits();
+
+    if (hasUnits)
+    {
+        QString unit = attribute.units();
+        measure.setAttribute(column.key, ui->measurementTable->item(row, col)->data(Qt::EditRole), unit);
+    }
+    else {
+        measure.setAttribute(column.key, ui->measurementTable->item(row, col)->data(Qt::EditRole));
+    }
     //ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount() < m_test->getExpectedMeasurementCount());
     //ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
 }
@@ -137,16 +160,13 @@ void MeasurementTable::saveManualChanges()
 {
     updateRowIds();
 
-    qDebug() << "update rows: " << ui->measurementTable->rowCount();
+    //qDebug() << "update rows: " << ui->measurementTable->rowCount();
 
     for (int row = 0; row < ui->measurementTable->rowCount(); row++) {
-        qDebug() << "get measure";
-
+        //qDebug() << "get measure";
         Measurement &measure = m_test->get(row);
-
         for (int col = 0; col < ui->measurementTable->columnCount() - 1; col++) {
             TableColumn& column = m_columns[col];
-
             Measurement::Value attribute = measure.getAttribute(column.key);
 
             bool hasUnits = measure.getAttribute(column.key).hasUnits();
@@ -163,21 +183,16 @@ void MeasurementTable::saveManualChanges()
         }
     }
 
-    qDebug() << "before set buttons";
-    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount()
-                                     < m_test->getExpectedMeasurementCount());
-    qDebug() << "2";
-    ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
-    qDebug() << "set buttons";
+    //    ui->addMeasureButton->setEnabled(ui->measurementTable->rowCount()
+                                     //< m_test->getExpectedMeasurementCount());
+    //ui->submitButton->setEnabled((ui->measurementTable->rowCount() == m_test->getExpectedMeasurementCount()) && m_test->isValid());
 }
 
-void MeasurementTable::updateModel(TestBase* test)
+void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
 {
     m_test = test;
-    if (!m_test)
-    {
+    if (m_test.isNull())
         return;
-    }
 
     qDebug() << m_test->toJsonObject();
 
@@ -196,7 +211,9 @@ void MeasurementTable::updateModel(TestBase* test)
 
             foreach (auto column, m_columns)
             {
-                QTableWidgetItem* item = new QTableWidgetItem();
+                qDebug() << column.key;
+                qDebug() << measurement->getAttribute(column.key).value();
+                QTableWidgetItem *item = new QTableWidgetItem();
                 item->setData(Qt::EditRole, measurement->getAttributeValue(column.key));
                 ui->measurementTable->setItem(row, col++, item);
             }
@@ -218,40 +235,15 @@ void MeasurementTable::updateModel(TestBase* test)
     }
 }
 
-void MeasurementTable::handleTestUpdate(TestBase* test)
+void MeasurementTable::handleTestUpdate(QSharedPointer<TestBase> test)
 {
-    updateModel(test);
-}
-
-void MeasurementTable::handleDicomFiles(QList<DicomFile> files)
-{
-    int row = 0;
-
-    ui->measurementTable->clear();
-    ui->measurementTable->setRowCount(0);
-    ui->measurementTable->setColumnCount(4);
-
-    QStringList headerNames = {"StudyID", "Name", "Type", "Size"};
-
-    ui->measurementTable->setHorizontalHeaderLabels(headerNames);
-
-    foreach (auto file, files) {
-        ui->measurementTable->insertRow(row);
-
-        QTableWidgetItem *study = new QTableWidgetItem(file.studyId);
-        ui->measurementTable->setItem(row, 0, study);
-
-        QTableWidgetItem *name = new QTableWidgetItem(file.name);
-        ui->measurementTable->setItem(row, 1, name);
-
-        QTableWidgetItem *type = new QTableWidgetItem(file.bodyPartExamined);
-        ui->measurementTable->setItem(row, 2, type);
-
-        QTableWidgetItem *size = new QTableWidgetItem(file.size);
-        ui->measurementTable->setItem(row, 3, size);
-
-        row++;
+    if (test.isNull()) {
+        qDebug() << "MeasurementTable::handleTestUpdate: test pointer is not valid";
+        return;
     }
+
+    updateModel(test);
+    //ui->submitButton->setEnabled(test->isValid());
 }
 
 void MeasurementTable::enableMeasureButton()
@@ -272,6 +264,11 @@ void MeasurementTable::hideMeasureButton()
 void MeasurementTable::showMeasureButton()
 {
     ui->measureButton->show();
+}
+
+void MeasurementTable::setTitle(const QString &title)
+{
+    ui->measurementsInfo->setTitle(title);
 }
 
 void MeasurementTable::enableFinishButton()
@@ -324,8 +321,6 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
 {
     manualEntryMode = !manualEntryMode;
 
-    qDebug() << "enter manual entry mode" << manualEntryMode;
-
     if (manualEntryMode) {
         ui->measurementTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
 
@@ -353,11 +348,8 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
     } else {
         if (saveChanges)
         {
-            qDebug() << "save manual changes";
             saveManualChanges();
         }
-
-        qDebug() << "here";
 
         ui->manualEntryToggle->setText("Manual Entry");
         ui->addMeasureButton->setVisible(false);

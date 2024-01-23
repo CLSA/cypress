@@ -1,4 +1,5 @@
 #include "choice_reaction_request_handler.h"
+
 #include "cypress_application.h"
 
 #include "auxiliary/json_settings.h"

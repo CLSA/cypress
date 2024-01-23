@@ -16,9 +16,6 @@ public:
     ~BloodPressureDialog();
 
 private:
-    void initializeModel() override;
-    void initializeConnections() override;
-
     Ui::BloodPressureDialog *ui { Q_NULLPTR };
 };
 

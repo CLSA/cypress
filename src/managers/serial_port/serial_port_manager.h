@@ -34,7 +34,7 @@ public slots:
     // what the manager does in response to the main application
     // window invoking its run method
     //
-    void start() override;
+    bool start() override;
 
     // connect to the serial port
     // opens the serial port with required parametere (baud rate etc.)
@@ -53,7 +53,7 @@ public slots:
     //
     void selectDevice(const QSerialPortInfo& port);
 
-private slots:
+protected slots:
 
     // send write request over RS232 to retrieve data from the audiometer
     //

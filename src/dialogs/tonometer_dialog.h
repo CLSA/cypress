@@ -14,9 +14,6 @@ public:
     ~TonometerDialog();
 
 private:
-    void initializeModel() override;
-    void initializeConnections() override;
-
     Ui::TonometerDialog *ui { Q_NULLPTR };
 };
 

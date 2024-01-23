@@ -56,7 +56,7 @@ bool DXAMeasurement::isValid() const
 bool DXAMeasurement::isValidDicomFile(DicomFile file) const
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
     DcmMetaInfo *metaInfo = loadedFileFormat.getMetaInfo();

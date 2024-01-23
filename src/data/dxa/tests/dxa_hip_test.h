@@ -1,11 +1,14 @@
 #ifndef DXAHIPTEST_H
 #define DXAHIPTEST_H
 
-#include "../../test_base.h"
+#include "server/sessions/dxa/dxa_hip_session.h"
 
-#include "../measurements/hip_measurement.h"
+#include "data/dxa/measurements/hip_measurement.h"
+#include "data/test_base.h"
 
 #include "dcmtk/ofstd/ofstdinc.h"
+
+#include <QSqlDatabase>
 
 class DxaHipTest: public TestBase
 {
@@ -22,9 +25,22 @@ public:
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
 
-    void fromDicomFiles(QList<DicomFile> files);
+    void fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session);
 
-    QScopedPointer<HipMeasurement> hipMeasurement;
+    bool hasAllNeededFiles() const;
+
+    QJsonObject extractScanAnalysis(const QSqlDatabase &db,
+                                    const QString &barcode,
+                                    const QString &scanType);
+
+    QJsonObject extractScanData(const QSqlDatabase &db,
+                                const QString &barcode,
+                                const QString &scanType);
+
+    QSharedPointer<HipMeasurement> leftHipMeasurement;
+    QSharedPointer<HipMeasurement> rightHipMeasurement;
+
+    void retrieveResults(const QSqlDatabase &db, const QString &barcode);
 };
 
 #endif // DXAHIPTEST_H

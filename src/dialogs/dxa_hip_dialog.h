@@ -19,16 +19,6 @@ public:
     explicit DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> session);
     ~DxaHipDialog();
 
-public slots:
-    void dicomFilesReceived(const QStringList& dicomFilePaths);
-    void dicomServerStarted();
-    void dicomServerEnded();
-    void dicomLogUpdate(QString line);
-
-private slots:
-    void on_openFileExplorer_released();
-    void on_submitButton_clicked();
-
 private:
     Ui::DxaHipDialog *ui { Q_NULLPTR };
 };

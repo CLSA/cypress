@@ -43,7 +43,7 @@ bool IVAImagingMeasurement::isValid() const
 bool IVAImagingMeasurement::isValidDicomFile(DicomFile file) const
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
     return isDicomMeasureFile(loadedFileFormat) || isDicomOTFile(loadedFileFormat)
@@ -53,15 +53,21 @@ bool IVAImagingMeasurement::isValidDicomFile(DicomFile file) const
 void IVAImagingMeasurement::addDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good()) {
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good()) {
         return;
     }
+
+    setAttribute("patientId", file.patientId);
+    setAttribute("studyId", file.studyId);
+    setAttribute("mediaStorageUid", file.mediaStorageUID);
+    setAttribute("filePath", file.absFilePath);
 
     if (isDicomMeasureFile(loadedFileFormat)) {
         qDebug() << "adding IVA measure";
         m_dicomMeasureFile = file;
         m_dicomMeasureFile.name = "SEL_DICOM_MEASURE";
-        m_dicomMeasureFile.size = FileUtils::getHumanReadableFileSize(m_dicomMeasureFile.fileInfo.absoluteFilePath());
+        m_dicomMeasureFile.size = FileUtils::getHumanReadableFileSize(
+            m_dicomMeasureFile.absFilePath);
 
         hasMeasureFile = true;
     }
@@ -70,7 +76,7 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding IVA PR";
         m_dicomPrFile = file;
         m_dicomPrFile.name = "SEL_DICOM_PR";
-        m_dicomPrFile.size = FileUtils::getHumanReadableFileSize(m_dicomPrFile.fileInfo.absoluteFilePath());
+        m_dicomPrFile.size = FileUtils::getHumanReadableFileSize(m_dicomPrFile.absFilePath);
 
         hasPrFile = true;
     }
@@ -79,7 +85,7 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
         qDebug() << "adding IVA OT";
         m_dicomOtFile = file;
         m_dicomOtFile.name = "SEL_DICOM_OT";
-        m_dicomOtFile.size = FileUtils::getHumanReadableFileSize(m_dicomOtFile.fileInfo.absoluteFilePath());
+        m_dicomOtFile.size = FileUtils::getHumanReadableFileSize(m_dicomOtFile.absFilePath);
 
         hasOtFile = true;
     }

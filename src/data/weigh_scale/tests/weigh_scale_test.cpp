@@ -1,5 +1,6 @@
 #include "weigh_scale_test.h"
-#include "../measurements/weight_measurement.h"
+#include "data/weigh_scale/measurements/weight_measurement.h"
+#include "auxiliary/Utilities.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -8,6 +9,7 @@
 
 WeighScaleTest::WeighScaleTest()
 {
+    m_outputKeyList << "average_weight";
     setExpectedMeasurementCount(2);
 }
 
@@ -28,6 +30,27 @@ bool WeighScaleTest::isValid() const
         }
     }
     return okTest;
+}
+
+double WeighScaleTest::calculateAverage()
+{
+    auto &measurements = getMeasurements();
+    double average = 0;
+    double totalWeight = 0;
+    int numberOfMeasures = measurements.length();
+
+    if (numberOfMeasures <= 0) {
+        return 0.00;
+    }
+
+    for (auto &measure : measurements) {
+        if (measure->hasAttribute("weight") && measure->getAttributeValue("weight").isValid()) {
+            totalWeight += measure->getAttributeValue("weight").toDouble();
+        }
+    }
+
+    average = totalWeight / numberOfMeasures;
+    return average;
 }
 
 QString WeighScaleTest::toString() const
@@ -54,6 +77,12 @@ void WeighScaleTest::simulate()
 
     addMeasurement(weight1);
     addMeasurement(weight2);
+
+    double average = calculateAverage();
+    if (m_debug)
+        qDebug() << "WeighScaleTest::simulate - new average" << average << "kg";
+
+    addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
 }
 
 void WeighScaleTest::fromArray(const QByteArray &arr)
@@ -68,14 +97,20 @@ void WeighScaleTest::fromArray(const QByteArray &arr)
           bool ok = true;
           if (0 < getMeasurementCount()) {
               Measurement &last = lastMeasurement();
-              QDateTime prev = last.getAttributeValue("TIMESTAMP").toDateTime();
-              QDateTime curr = m->getAttributeValue("TIMESTAMP").toDateTime();
+              QDateTime prev = last.getAttributeValue("timestamp").toDateTime();
+              QDateTime curr = m->getAttributeValue("timestamp").toDateTime();
               ok = DELAY < prev.secsTo(curr);
           }
           if (ok) {
               addMeasurement(m);
           }
       }
+
+      double average = calculateAverage();
+      if (m_debug)
+          qDebug() << "WeighScaleTest::fromArray - new average" << average << "kg";
+
+      addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
     }
 }
 
@@ -88,15 +123,9 @@ QJsonObject WeighScaleTest::toJsonObject() const
       measurementArray << measurement->toJsonObject();
     }
 
-    testJson.insert("results", measurementArray);
-
-    double weight1 = testJson["results"].toArray()[0].toObject().value("weight").toObject().value("value").toDouble();
-    double weight2 = testJson["results"].toArray()[1].toObject().value("weight").toObject().value("value").toDouble();
-    double avg_weight { (weight1 + weight2) / 2 };
-
     QJsonObject metadata = getMetaData().toJsonObject();
 
-    metadata.insert("average_weight", avg_weight);
+    testJson.insert("results", measurementArray);
     testJson.insert("manual_entry", getManualEntryMode());
     testJson.insert("metadata", metadata);
 

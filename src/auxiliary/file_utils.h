@@ -9,7 +9,7 @@ class FileUtils
 {
 public:
     static QJsonObject readJson(const QString &filePath);
-    static QString generateHash(const QByteArray& bytes);
+    static QString getSha256Hash(const QByteArray &bytes);
 
     static bool createFile(const QString& destinationAbsolutePath, const QByteArray& bytes);
     static QByteArray readFile(const QString& absolutefilePath);
@@ -32,6 +32,7 @@ public:
     static bool isDirectoryWritable(const QString &absoluteDirectoryPath);
 
     static QString getHumanReadableFileSize(const QString& absoluteFilePath);
+    static bool clearDirectory(const QString &absoluteDirectoryPath);
 
 private:
     FileUtils() = delete;

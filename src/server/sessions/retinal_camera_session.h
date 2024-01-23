@@ -17,8 +17,9 @@ public:
 
     // CypressSession interface
 public:
-    void validate() const override;
-    void start() override;
+    void initializeDialog() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
 
 private:
     Side m_side{Left};

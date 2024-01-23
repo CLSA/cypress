@@ -8,9 +8,10 @@ class AudiometerSession : public CypressSession
 public:
     explicit AudiometerSession(QObject *parent, const QJsonObject& inputData);
 
-    // CypressSession interface
 public:
-    void start() override;
+    void initializeDialog() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
 };
 
 #endif // AUDIOMETERSESSION_H

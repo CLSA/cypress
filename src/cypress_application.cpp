@@ -1,23 +1,35 @@
 #include "server/Server.h"
 #include "cypress_application.h"
 
-#include <QDir>
-#include <QFileInfo>
-#include <QMessageBox>
-#include <QException>
-#include <QDebug>
-#include <QNetworkInterface>
-#include <QJsonArray>
+#include "managers/audiometer/audiometer_manager.h"
+#include "managers/blood_pressure/blood_pressure_manager.h"
+#include "managers/cdtt/cdtt_manager.h"
+#include "managers/choice_reaction/choice_reaction_manager.h"
+#include "managers/dxa/dxa_hip_manager.h"
+#include "managers/ecg/ecg_manager.h"
+#include "managers/frax/frax_manager.h"
+#include "managers/grip_strength/grip_strength_manager.h"
+#include "managers/retinal_camera/retinal_camera_manager.h"
+#include "managers/spirometer/spirometer_manager.h"
+#include "managers/tonometer/tonometer_manager.h"
+#include "managers/ultrasound/vividi_manager.h"
+#include "managers/weigh_scale/weigh_scale_manager.h"
+
 #include <QDateTime>
+#include <QDebug>
+#include <QDir>
+#include <QException>
+#include <QFileInfo>
+#include <QJsonArray>
+#include <QMessageBox>
+#include <QNetworkInterface>
 #include <QSettings>
 
 Cypress* Cypress::app = nullptr;
 Cypress& Cypress::getInstance()
 {
     if (app == nullptr)
-    {
         app = new Cypress();
-    }
 
     return *app;
 }
@@ -44,15 +56,13 @@ void Cypress::forceSessionEnd(QString sessionId)
     endSession(sessionId);
 }
 
-bool Cypress::endSession(const QString& sessionId)
+bool Cypress::endSession(const QString& sessionId, const CypressSession::SessionStatus& status)
 {
     if (!sessions.contains(sessionId))
-    {
         return true;
-    }
 
     CypressSession& session = *sessions.value(sessionId);
-    session.end();
+    session.end(status);
 
     return true;
 }
@@ -67,7 +77,7 @@ QList<QSharedPointer<CypressSession>> Cypress::getActiveSessions()
         it.next();
 
         const QSharedPointer<CypressSession> session = it.value();
-        if (session->getStatus() == SessionStatus::Started)
+        if (session->getStatus() == CypressSession::SessionStatus::Started)
             activeSessions.push_back(session);
     }
 
@@ -81,11 +91,8 @@ void Cypress::printActiveSessions() const
     {
         it.next();
         const CypressSession& session = *it.value();
-
-        if (session.getStatus() == SessionStatus::Started)
-        {
+        if (session.getStatus() == CypressSession::SessionStatus::Started)
             qDebug() << " " << session.getAnswerId() << " " << session.getBarcode();
-        }
     }
 }
 
@@ -103,9 +110,7 @@ QJsonObject Cypress::getStatus()
     QStringList addresses;
     for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
-        {
             addresses << address.toString();
-        }
     }
 
     statusJson["addresses"] = QJsonArray::fromStringList(addresses);
@@ -113,44 +118,35 @@ QJsonObject Cypress::getStatus()
 
     QJsonObject availableInstruments {{}};
 
-    statusJson["availableInstruments"] = QJsonObject {
-        { "audiometer",        false },
-        { "blood_pressure",    false },
-        { "temperature",       false },
-        { "body_composition",  false },
-        { "cdtt",              false },
-        { "choice_reaction",   false },
-        { "dxa", QJsonObject
-            {
-                { "forearm",    false },
-                { "spine",      false },
-                { "hip",        false },
-                { "whole_body", false },
-                { "iva",        false },
-            }
-        },
-
-        {"ecg",                false },
-        {"frax", 		       false },
-        {"dynamometer",        false },
-        {"retinal_camera",     false },
-        {"spirometer",         false },
-        {"tonometer",          false },
-        {"ultrasound",         false },
-        {"weigh_scale",        false },
-        {"signature_pad", 	   false },
+    statusJson["availableInstruments"] = QJsonObject{
+        {"audiometer", AudiometerManager::isInstalled()},
+        {"blood_pressure", BloodPressureManager::isInstalled()},
+        {"temperature", false},
+        {"body_composition", false},
+        {"cdtt", CDTTManager::isInstalled()},
+        {"choice_reaction", ChoiceReactionManager::isInstalled()},
+        {"dxa", DxaHipManager::isInstalled()},
+        {"ecg", ECGManager::isInstalled()},
+        {"frax", FraxManager::isInstalled()},
+        {"grip_strength", GripStrengthManager::isInstalled()},
+        {"retinal_camera", RetinalCameraManager::isInstalled()},
+        {"spirometer", SpirometerManager::isInstalled()},
+        {"tonometer", TonometerManager::isInstalled()},
+        {"ultrasound", VividiManager::isInstalled()},
+        {"weigh_scale", WeighScaleManager::isInstalled()},
+        {"signature_pad", false},
     };
 
     return statusJson;
 }
 
-void Cypress::requestSession(CypressSession* session)
+void Cypress::requestSession(QSharedPointer<CypressSession> session)
 {
     if (!session)
-    {
         return;
-    }
 
-    sessions.insert(session->getSessionId(), QSharedPointer<CypressSession>(session));
+    sessions.insert(session->getSessionId(), session);
+
+    session->initializeDialog();
     session->start();
 }

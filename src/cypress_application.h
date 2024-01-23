@@ -38,14 +38,14 @@ public:
     QString getSessionInfo();
     QJsonObject getStatus();
 
-    bool endSession(const QString& uuid);
+    bool endSession(const QString& uuid, const CypressSession::SessionStatus& status = CypressSession::Unknown);
 
     QList<QSharedPointer<CypressSession>> getActiveSessions();
 
     void printActiveSessions() const;
 
 public slots:
-    void requestSession(CypressSession* session);
+    void requestSession(QSharedPointer<CypressSession> session);
     void forceSessionEnd(QString sessionId);
 
 private:

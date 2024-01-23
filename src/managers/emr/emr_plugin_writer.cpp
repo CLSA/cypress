@@ -65,7 +65,7 @@ void EMRPluginWriter::addPatients(QXmlStreamWriter& stream) const
     stream.writeStartElement("Patients");
 
     stream.writeStartElement("Patient");
-    stream.writeAttribute("ID", m_input["barcode"].toString());
+    stream.writeAttribute("ID", "ONYX");
     stream.writeEmptyElement("LastName");
     stream.writeEmptyElement("FirstName");
     stream.writeTextElement("IsBioCal", "false");
@@ -91,18 +91,13 @@ void EMRPluginWriter::addPatientDataAtPresent(QXmlStreamWriter& stream) const
 
     // TODO: check that the units are decimal m ?
     //
-    stream.writeTextElement("Height", QString::number(m_input["height"].toDouble()));
+    stream.writeTextElement("Height", QString::number(m_input["height"].toDouble() / 100.0));
     stream.writeTextElement("Weight", QString::number(m_input["weight"].toDouble()));
 
     //stream.writeTextElement("Ethnicity", m_ethnicity);
-
     stream.writeTextElement("Smoker", (m_input["smoker"].toBool() ? "Yes" : "No"));
-
-    //stream.writeTextElement("Asthma", QString(m_asthma));
-    stream.writeTextElement("Asthma", "No");
-
-    //stream.writeTextElement("COPD", QString(m_copd));
-    stream.writeTextElement("COPD", "No");
+    stream.writeTextElement("Asthma", (m_input["asthma"].toBool() ? "Yes" : "No"));
+    stream.writeTextElement("COPD", (m_input["copd"].toBool() ? "Yes" : "No"));
 
     stream.writeEndElement();
 }

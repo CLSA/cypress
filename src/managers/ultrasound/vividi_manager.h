@@ -19,11 +19,12 @@ public:
     static bool isInstalled();
 
 public slots:
-    void start() override;
+    bool start() override;
     void measure() override;
     void finish() override;
 
-    void dicomFilesReceived();
+private slots:
+    void dicomFilesReceived(QList<DicomFile> dicomFiles);
 
 protected:
     bool setUp() override;

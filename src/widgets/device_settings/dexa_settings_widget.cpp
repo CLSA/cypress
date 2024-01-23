@@ -18,6 +18,9 @@ DexaSettingsWidget::DexaSettingsWidget(QWidget *parent) :
     QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
     QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
+    QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
+    QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
+
     ui->runnableName->setTitle("DICOM Executable Path");
     ui->runnableName->setIsExe(true);
     ui->runnableName->setPath(runnableName);
@@ -38,6 +41,14 @@ DexaSettingsWidget::DexaSettingsWidget(QWidget *parent) :
     ui->ascConfigPath->setIsFile(true);
     ui->ascConfigPath->setPath(ascConfigPath);
 
+    ui->patscanDbPath->setTitle("Patient Scan Database Path (Apex)");
+    ui->patscanDbPath->setIsFile(true);
+    ui->patscanDbPath->setPath(patscanDbPath);
+
+    ui->refscanDbPath->setTitle("Reference Database Path (Apex)");
+    ui->refscanDbPath->setIsFile(true);
+    ui->refscanDbPath->setPath(refscanDbPath);
+
     connect(ui->runnableName, &FilePickerWidget::pathChanged, this, [=](QString value) {
         CypressSettings::writeSetting("dxa/dicom/runnableName", value);
     });
@@ -52,6 +63,13 @@ DexaSettingsWidget::DexaSettingsWidget(QWidget *parent) :
     });
     connect(ui->ascConfigPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
         CypressSettings::writeSetting("dxa/dicom/asc_config", value);
+    });
+
+    connect(ui->patscanDbPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/patscanDbPath", value);
+    });
+    connect(ui->refscanDbPath, &FilePickerWidget::pathChanged, this, [=](QString value) {
+        CypressSettings::writeSetting("dxa/refscanDbPath", value);
     });
 }
 

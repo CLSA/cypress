@@ -130,7 +130,7 @@ bool ForearmMeasurement::isValid() const
 bool ForearmMeasurement::isValidDicomFile(DicomFile file) const
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
     OFString value = "";
@@ -197,7 +197,13 @@ void ForearmMeasurement::addDicomFile(DicomFile file)
 {
     m_forearmDicomFile = file;
     m_forearmDicomFile.name = "FA_DICOM";
-    m_forearmDicomFile.size = FileUtils::getHumanReadableFileSize(file.fileInfo.absoluteFilePath());
-
+    m_forearmDicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
     hasForearmFile = true;
+
+    setAttribute("patientId", file.patientId);
+    setAttribute("filePath", file.absFilePath);
+    setAttribute("studyId", file.studyId);
+    setAttribute("mediaStorageUid", file.mediaStorageUID);
+    setAttribute("name", m_forearmDicomFile.name);
+    setAttribute("size", m_forearmDicomFile.size);
 }

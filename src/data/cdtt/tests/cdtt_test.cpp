@@ -347,6 +347,8 @@ QString CDTTTest::toString() const
 
 bool CDTTTest::isValid() const
 {
+    qDebug() << "test is valid";
+
     bool okMeta = true;
     foreach(const auto key, m_outputKeyList)
     {

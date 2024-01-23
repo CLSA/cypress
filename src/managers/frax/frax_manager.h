@@ -4,7 +4,6 @@
 #include "managers/manager_base.h"
 #include "server/sessions/frax_session.h"
 
-#include "data/frax/tests/frax_test.h"
 #include <QProcess>
 
 /*!
@@ -30,24 +29,22 @@ public:
     static bool isInstalled();
 
 public slots:
-    void start() override;
+    bool start() override;
 
     void measure() override;
-
-    void finish() override;
 
 private:
     void readOutput();
 
     QString m_country_code;
     QString m_type_code;
-
-    QString m_executablePath;		// full path to blackbox.exe
-    QString m_workingDirectoryPath; // path to blackbox.exe directory
-
-    QString m_outputFile;    		// full path to output.txt
-    QString m_inputFile;     		// full path to input.txt
-    QString m_temporaryFile; 		// store a copy of the default input.txt
+    
+    QString m_runnableName;		// full path to blackbox.exe
+    QString m_runnablePath; // path to blackbox.exe directory
+    
+    QString m_outputFilePath;    		// full path to output.txt
+    QString m_inputFilePath;     		// full path to input.txt
+    QString m_temporaryFilePath; 		// store a copy of the default input.txt
 
     QProcess m_process;
 

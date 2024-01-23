@@ -99,6 +99,9 @@ protected:
     QVector<QSharedPointer<Measurement>> m_measurementList;
     MetaData m_metaData;
 
+    bool m_debug;
+    bool m_sim;
+
     bool isManualEntryMode{false};
 
     int m_expectedMeasurementCount { 1 };

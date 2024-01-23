@@ -1,11 +1,11 @@
 #include "hip_measurement.h"
 
+#include "auxiliary/Utilities.h"
+#include "auxiliary/file_utils.h"
+
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
-
-#include "../../../auxiliary/file_utils.h"
-#include "../../../auxiliary/Utilities.h"
 
 #include <QJsonObject>
 #include <QRandomGenerator>
@@ -114,7 +114,7 @@ bool HipMeasurement::isValid() const
 bool HipMeasurement::isValidDicomFile(DicomFile file) const
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.fileInfo.absoluteFilePath().toStdString().c_str()).good())
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
     bool valid = true;
@@ -135,102 +135,72 @@ bool HipMeasurement::isValidDicomFile(DicomFile file) const
     // Modality == "OT"
     valid = dataset->tagExistsWithValue(DCM_Modality);
     if (!valid)
-    {
         return false;
-    }
 
     dataset->findAndGetOFString(DCM_Modality, value);
     if (value != modality)
-    {
         return false;
-    }
 
     // BodyPartExamined == ""
     valid = dataset->tagExistsWithValue(DCM_BodyPartExamined);
     if (!valid)
-    {
         return false;
-    }
 
     dataset->findAndGetOFString(DCM_BodyPartExamined, value);
     if (value != bodyPartExamined)
-    {
         return false;
-    }
 
     valid = dataset->tagExists(DCM_ImageAndFluoroscopyAreaDoseProduct);
     if (!valid)
-    {
         return false;
-    }
 
     valid = dataset->tagExists(DCM_PatientOrientation);
     if (!valid)
-    {
         return false;
-    }
 
     valid = dataset->tagExistsWithValue(DCM_BitsAllocated);
     if (!valid)
-    {
         return false;
-    }
+
     dataset->findAndGetOFString(DCM_BitsAllocated, value);
     if (value != bitsAllocated)
-    {
         return false;
-    }
 
     valid = dataset->tagExistsWithValue(DCM_PhotometricInterpretation);
     if (!valid)
-    {
         return false;
-    }
+
     dataset->findAndGetOFString(DCM_PhotometricInterpretation, value);
     if (value != photometricInterpretation)
-    {
         return false;
-    }
 
     valid = dataset->tagExistsWithValue(DCM_Laterality);
     if (!valid)
-    {
         return false;
-    }
+
     dataset->findAndGetOFString(DCM_Laterality, value);
     if (value != laterality)
-    {
         return false;
-    }
 
     valid = dataset->tagExists(DCM_PixelSpacing);
     if (!valid)
-    {
         return false;
-    }
 
     valid = dataset->tagExistsWithValue(DCM_SamplesPerPixel);
     if (!valid)
-    {
         return false;
-    }
+
     dataset->findAndGetOFString(DCM_SamplesPerPixel, value);
     if (value != samplesPerPixel)
-    {
         return false;
-    }
 
     loadedFileFormat.getMetaInfo()->tagExists(DCM_MediaStorageSOPClassUID);
     if (!valid)
-    {
         return false;
-    }
 
     loadedFileFormat.getMetaInfo()->findAndGetOFString(DCM_MediaStorageSOPClassUID, value);
     if (value != mediaStorageSOPClassUID)
-    {
         return false;
-    }
 
     return valid;
 }
@@ -241,9 +211,16 @@ void HipMeasurement::addDicomFile(DicomFile file)
 
     m_hipDicomFile = file;
     m_hipDicomFile.name = "HIP_DICOM";
-    m_hipDicomFile.size = FileUtils::getHumanReadableFileSize(m_hipDicomFile.fileInfo.absoluteFilePath());
-
+    m_hipDicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
     m_hasHipFile = true;
+
+    setAttribute("patient_id", file.patientId);
+    setAttribute("file_path", file.absFilePath);
+    setAttribute("study_id", file.studyId);
+    setAttribute("side", file.laterality);
+    setAttribute("media_storage_uid", file.mediaStorageUID);
+    setAttribute("name", "HIP_DICOM");
+    setAttribute("size", m_hipDicomFile.size);
 }
 
 Side HipMeasurement::getSide() {

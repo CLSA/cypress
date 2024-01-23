@@ -1,12 +1,10 @@
 #include "dxa_test.h"
-#include "../../../dicom/dcm_recv.h"
+#include "dicom/dcm_recv.h"
 
-#include "dcmtk/dcmdata/dcfilefo.h"
-
-#include "../measurements/ap_spine_measurement.h"
-#include "../measurements/forearm_measurement.h"
-#include "../measurements/whole_body_measurement.h"
-#include "../measurements/iva_imaging_measurement.h"
+#include "data/dxa/measurements/ap_spine_measurement.h"
+#include "data/dxa/measurements/forearm_measurement.h"
+#include "data/dxa/measurements/iva_imaging_measurement.h"
+#include "data/dxa/measurements/whole_body_measurement.h"
 
 #include <QDir>
 #include <QJsonObject>
@@ -82,21 +80,29 @@ void DXATest::reset()
     ivaImagingMeasurement->reset();
 }
 
-bool DXATest::areDicomFilesValid() const
+bool DXATest::hasAllNeededFiles() const
 {
     return wholeBodyMeasurement->hasAllNeededFiles() && apSpineMeasurement->hasAllNeededFiles()
            && forearmMeasurement->hasAllNeededFiles();
 }
 
-void DXATest::fromDicomFiles(QList<DicomFile> files)
+void DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
 {
     foreach (const DicomFile &file, files) {
+        if (file.patientId != session.getBarcode()) {
+            qDebug() << "file patient id " << file.patientId << "does not equal session barcode"
+                     << session.getBarcode();
+            // continue
+        }
+
         QString bodyPartExamined = file.bodyPartExamined;
+        QString patientId = file.patientId;
 
         if (bodyPartExamined == "HIP") // hip done in different stage
             continue;
 
-        qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
+        if (m_debug)
+            qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
 
         if (ivaImagingMeasurement->isValidDicomFile(file)) {
             qDebug("Found IVA");
@@ -111,7 +117,8 @@ void DXATest::fromDicomFiles(QList<DicomFile> files)
             qDebug("Found Spine");
             apSpineMeasurement->addDicomFile(file);
         } else {
-            qDebug() << "Unknown file";
+            if (m_debug)
+                qDebug() << "Unknown file";
         }
     }
 }
@@ -126,43 +133,35 @@ void DXATest::simulate()
 
 QJsonObject DXATest::toJsonObject() const
 {
-    QJsonObject wholeBody {};
+    QJsonObject wholeBody{};
+    QJsonObject apSpine{};
+    QJsonObject forearm{};
+    QJsonObject iva{};
+
+    QJsonObject json{};
+    QJsonObject results{};
+
     if (wholeBodyMeasurement)
-    {
         wholeBody = wholeBodyMeasurement->toJsonObject();
-    }
 
-    QJsonObject apSpine {};
     if (apSpineMeasurement)
-    {
         apSpine = apSpineMeasurement->toJsonObject();
-    }
 
-    QJsonObject forearm {};
     if (forearmMeasurement)
-    {
         forearm = apSpineMeasurement->toJsonObject();
-    }
 
-    QJsonObject iva {};
     if (ivaImagingMeasurement)
-    {
         iva = ivaImagingMeasurement->toJsonObject();
-    }
-
-    QJsonObject value {};
-    QJsonObject results {};
 
     results.insert("ap_spine", apSpine);
     results.insert("whole_body", wholeBody);
     results.insert("forearm", forearm);
     results.insert("iva", iva);
 
-    value.insert("results", results);
-    value.insert("manual_entry", getManualEntryMode());
+    json.insert("results", results);
+    json.insert("manual_entry", getManualEntryMode());
 
-    QJsonObject json;
-    return value;
+    return json;
 }
 
 

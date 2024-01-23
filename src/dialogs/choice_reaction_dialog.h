@@ -15,8 +15,6 @@ public:
     ~ChoiceReactionDialog();
 
 private:
-    void initializeConnections() override;
-
     Ui::ChoiceReactionDialog *ui { Q_NULLPTR };
 };
 

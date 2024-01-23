@@ -1,20 +1,30 @@
 #include "cypress_session.h"
 
-#include "../../auxiliary/file_utils.h"
+#include "auxiliary/file_utils.h"
+#include "auxiliary/windows_util.h"
+#include "auxiliary/network_utils.h"
 
 #include "data/dxa/tests/dxa_hip_test.h"
 #include "managers/dxa/dxa_hip_manager.h"
 
 #include <QException>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QMap>
+#include <QMessageBox>
 #include <QProcess>
 #include <QSettings>
 #include <QSql>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QString>
 #include <QVariant>
 
-DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session) /* : m_dicomWatcher(QDir::currentPath())*/
+
+
+DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new DxaHipTest);
@@ -30,17 +40,20 @@ DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session) /* : m_dicom
     m_logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
     m_ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
-    m_dicomServer.reset(
-        new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
+    m_patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
+    m_refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
-    connect(m_dicomServer.get(), &DcmRecv::running, this, [=]() {
-        qDebug() << "DxaHipManager::running - DICOM server is running...";
-    });
+    WindowsUtil::killProcessByName(L"storescp.exe");
 
-    connect(m_dicomServer.get(),
-            &DcmRecv::dicomFilesReceived,
-            this,
-            &DxaHipManager::dicomFilesReceived);
+    if (m_debug) {
+        qDebug() << "DXAHipManager";
+
+        qDebug() << session->getSessionId();
+        qDebug() << session->getBarcode();
+        qDebug() << session->getInterviewer();
+
+        qDebug() << session->getInputData();
+    }
 }
 
 DxaHipManager::~DxaHipManager()
@@ -48,53 +61,319 @@ DxaHipManager::~DxaHipManager()
     m_dicomServer->stop();
 }
 
-void DxaHipManager::databaseCopied(QFileInfo fileInfo)
-{
-    // Get name of files
-    QString patscanDbFileName = "";
-    QString refDbFileName = "";
-}
-
 bool DxaHipManager::isInstalled()
 {
+    bool isDebugMode = CypressSettings::isDebugMode();
+    bool isSimMode = CypressSettings::isSimMode();
+
+    if (isSimMode)
+        return true;
+
+    QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
+    QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
+    QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
+
+    QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+
+    QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
+    QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
+
+    if (runnableName.isNull() || runnableName.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - runnableName is not defined";
+        return false;
+    }
+
+    if (runnablePath.isNull() || runnablePath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - runnablePath is not defined";
+        return false;
+    }
+
+    if (aeTitle.isNull() || aeTitle.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - aeTitle is not defined";
+        return false;
+    }
+
+    if (host.isNull() || host.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - host is not defined";
+        return false;
+    }
+
+    if (port.isNull() || port.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - port is not defined";
+        return false;
+    }
+
+    if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - storageDirPath is not defined";
+        return false;
+    }
+
+    if (logConfigPath.isNull() || logConfigPath.isNull()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - logConfigPath is not defined";
+        return false;
+    }
+
+    if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - ascConfigPath is not defined";
+        return false;
+    }
+
+    if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - patscanDbPath is not defined";
+
+        return false;
+    }
+
+    QFileInfo patscanFile(patscanDbPath);
+    if (!patscanFile.exists()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - patscan file does not exist: "
+                     << patscanDbPath;
+        return false;
+    }
+
+    if (!patscanFile.isFile()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - patscan file is not a file at"
+                     << patscanDbPath;
+        return false;
+    }
+
+    if (!patscanFile.isReadable()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - patscan file is not readable at "
+                     << patscanDbPath;
+        return false;
+    }
+
+    if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not defined at "
+                     << refscanDbPath;
+        return false;
+    }
+
+    QFileInfo refscanFile(refscanDbPath);
+    if (!refscanFile.exists()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not defined at "
+                     << refscanDbPath;
+        return false;
+    }
+
+    if (!refscanFile.isFile()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not a file at "
+                     << refscanDbPath;
+        return false;
+    }
+
+    if (!refscanFile.isReadable()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not readable at "
+                     << refscanDbPath;
+        return false;
+    }
+
+    QFileInfo exeInfo(runnableName);
+    if (!exeInfo.exists()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - runnableName does not exist at"
+                     << runnableName;
+        return false;
+    }
+    if (!exeInfo.isExecutable()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - runnableName is not executable at"
+                     << runnableName;
+        return false;
+    }
+
+    QFileInfo workingDir(runnablePath);
+    if (!workingDir.exists()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - working directory does not exist at"
+                     << workingDir;
+        return false;
+    }
+
+    if (!workingDir.isDir()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - working directory is not writable at"
+                     << workingDir;
+        return false;
+    }
+
+    if (!workingDir.isWritable()) {
+        if (isDebugMode)
+            qDebug() << "DxaHipManager::isInstalled - working directory is not writable at"
+                     << workingDir;
+        return false;
+    }
+
     return true;
 }
 
 // what the manager does in response to the main application
 // window invoking its run method
 //
-void DxaHipManager::start()
+bool DxaHipManager::start()
 {
+    setUp();
+
     m_dicomServer->start();
 
-    emit started(m_test.get());
-    emit dataChanged(m_test.get());
+    emit started(m_test);
+    emit dataChanged(m_test);
     emit canMeasure();
+
+    return true;
+}
+
+// Set up device
+bool DxaHipManager::setUp()
+{
+    m_dicomServer.reset(
+        new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
+
+    connect(m_dicomServer.get(), &DcmRecv::running, this, [=]() {
+        if (m_debug)
+            qDebug() << "DxaHipManager::running - DICOM server is running...";
+    });
+
+    connect(m_dicomServer.get(),
+            &DcmRecv::dicomFilesReceived,
+            this,
+            &DxaHipManager::dicomFilesReceived);
+
+    return true;
+}
+
+void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
+{
+    // pass received dicom files to test class
+    DxaHipTest *test = static_cast<DxaHipTest *>(m_test.get());
+    DxaHipSession *session = static_cast<DxaHipSession *>(m_session.get());
+
+    if (!session) {
+        qDebug() << "DxaHipManager::dicomFilesReceived - session does not exist...";
+        return;
+    }
+    if (!test) {
+        qDebug() << "DxaHipManager::dicomFilesReceived - test does not exist...";
+        return;
+    }
+
+    test->fromDicomFiles(dicomFiles, *session);
+    emit dataChanged(m_test);
+
+    if (m_debug)
+        qDebug() << "Have received all files, can now measure...";
 }
 
 // retrieve a measurement from the device
 //
 void DxaHipManager::measure()
 {
-    m_test->reset();
-
-    if (CypressSettings::isSimMode()) {
+    if (m_sim) {
+        m_test->reset();
         m_test->simulate();
 
-        emit dataChanged(m_test.get());
+        emit dataChanged(m_test);
         emit canFinish();
 
         return;
     }
 
-    // copy over patscan and refscan db
-    // m_networkFileCopier->copyFileFromSMB(QUrl(), "");
-    // m_networkFileCopier->copyFileFromSMB(QUrl(), "");
+    QSharedPointer<DxaHipTest> test = qSharedPointerCast<DxaHipTest>(m_test);
+    if (!test->hasAllNeededFiles()) {
+        QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");
+        return;
+    }
 
-    // pass dicom files to test class
-    if (m_test->isValid()) {
-        emit dataChanged(m_test.get());
+    QFileInfo patscanFileInfo(m_patscanDbPath);
+    QString localPath = QDir::currentPath() + "/" + patscanFileInfo.fileName();
+    qDebug() << m_patscanDbPath << localPath;
+
+    if (patscanFileInfo.exists() && patscanFileInfo.isReadable()) {
+        if (QFileInfo(localPath).exists()) {
+            QFile::remove(localPath);
+        }
+
+        if (!QFile::copy(m_patscanDbPath, localPath)) {
+            if (m_debug)
+                qDebug() << "error copying patscan db from " << m_patscanDbPath << "to"
+                         << localPath;
+            return;
+        }
+    } else {
+        qDebug() << "could not access patscanDb at" << m_patscanDbPath;
+        QMessageBox::critical(nullptr, "Error", "Could not access Apex workstation");
+        return;
+    }
+
+    // get refscan db variables for measurements
+    //QFileInfo refscanFileInfo(m_refscanDbPath);
+    //if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
+    //    QString localPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
+    //    if (QFileInfo(localPath).exists()) {
+    //        QFile::remove(localPath);
+    //    }
+
+    //    if (!QFile::copy(m_refscanDbPath, localPath)) {
+    //        if (m_debug)
+    //            qDebug() << "error copying refscan db from " << m_refscanDbPath << "to"
+    //                     << localPath;
+    //        return;
+    //    }
+    //} else {
+    //    qDebug() << "could not access refscanDb at" << m_refscanDbPath;
+    //    QMessageBox::critical(nullptr, "Error", "Could not access Apex workstation");
+    //    return;
+    //}
+
+    // calculate totals and averages
+    m_patscanDb = QSqlDatabase::addDatabase("QODBC");
+    m_patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};FIL={MS "
+                                "Access};DBQ="
+                                + localPath.replace("/", "\\"));
+
+    if (!m_patscanDb.open()) {
+        qDebug() << "Error: " << m_patscanDb.lastError().text();
+        return;
+        // Handle error
+    } else {
+        // Connection is successful, you can query the database
+        qDebug() << "connected to the patscanDb at " << localPath;
+
+        if (!m_patscanDb.open()) {
+            qDebug() << "could not open patscanDB";
+            return;
+        }
+
+        test->retrieveResults(m_patscanDb, m_session->getBarcode());
+
+        m_patscanDb.close();
+    }
+
+    emit dataChanged(m_test);
+    if (test->isValid()) {
         emit canFinish();
+    } else {
+        QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");
     }
 }
 
@@ -103,22 +382,32 @@ void DxaHipManager::measure()
 //
 void DxaHipManager::finish()
 {
-    DxaHipTest *test = static_cast<DxaHipTest *>(m_test.get());
+    QSharedPointer<DxaHipTest> test = qSharedPointerCast<DxaHipTest>(m_test);
 
     int answer_id = m_session->getAnswerId();
     QString barcode = m_session->getBarcode();
 
     // Hip
-    QString hip_1_file_name = "HIP_DICOM.dcm";
+    QString hip_1_file_name = "L_HIP_DICOM.dcm";
+    QString hip_2_file_name = "R_HIP_DICOM.dcm";
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
 
     QJsonObject files = {};
-    files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""),
-                 FileUtils::getHumanReadableFileSize(
-                     test->hipMeasurement->m_hipDicomFile.fileInfo.absoluteFilePath()));
+
+    if (!testJson["l_hip"].toObject().isEmpty()) {
+        files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""),
+                     FileUtils::getHumanReadableFileSize(
+                         test->leftHipMeasurement->m_hipDicomFile.absFilePath));
+    }
+
+    if (!testJson["r_hip"].toObject().isEmpty()) {
+        files.insert(hip_2_file_name.replace(QRegExp(".dcm"), ""),
+                     FileUtils::getHumanReadableFileSize(
+                         test->rightHipMeasurement->m_hipDicomFile.absFilePath));
+    }
 
     testJson.insert("session", sessionObj);
     testJson.insert("files", files);
@@ -132,65 +421,67 @@ void DxaHipManager::finish()
     QString host = CypressSettings::getPineHost();
     QString endpoint = CypressSettings::getPineEndpoint();
 
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id),
-                     "application/json",
-                     serializedData);
+    bool ok = false;
+    ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString(),
+        "application/json",
+        serializedData
+    );
 
-    QByteArray hipDicomFile = FileUtils::readFile(
-        test->hipMeasurement->m_hipDicomFile.fileInfo.absoluteFilePath());
-    sendHTTPSRequest("PATCH",
-                     host + endpoint + QString::number(answer_id) + "?filename=" + hip_1_file_name + ".dcm",
-                     "application/octet-stream",
-                     hipDicomFile);
+    if (!ok) {
+        emit error("Something went wrong, please contact support.");
+        return;
+    }
 
-    emit success("");
-}
+    if (!testJson["l_hip"].toObject().isEmpty()) {
 
-void DxaHipManager::dicomFilesReceived()
-{
-    // pass received dicom files to test class
-    DxaHipTest* test = static_cast<DxaHipTest*>(m_test.get());
-    test->fromDicomFiles(m_dicomServer->receivedFiles);
+        QByteArray leftHipDicomFile = FileUtils::readFile(
+            test->leftHipMeasurement->m_hipDicomFile.absFilePath);
 
-    emit dataChanged(m_test.get());
-}
+        ok = NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString() + "?filename=" + hip_1_file_name.toStdString() + ".dcm",
+            "application/octet-stream",
+            leftHipDicomFile
+        );
 
-QMap<QString, QVariant> DxaHipManager::retrieveDeviceData()
-{
-    return QVariantMap();
-}
+        if (!ok) {
+            qDebug() << "PATCH dicom failed";
+            return;
+        }
+    }
 
+    if (!testJson["r_hip"].toObject().isEmpty()) {
+        QByteArray rightHipDicomFile = FileUtils::readFile(
+            test->rightHipMeasurement->m_hipDicomFile.absFilePath);
 
-QMap<QString, QVariant> DxaHipManager::extractScanAnalysisData()
-{
-    return QVariantMap();
-}
+        ok = NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString()
+            + "?filename=" + hip_1_file_name.toStdString() + ".dcm",
+            "application/octet-stream",
+            rightHipDicomFile
+        );
 
+        if (!ok) {
+            qDebug() << "PATCH dicom failed";
+            return;
+        }
+    }
 
-QMap<QString, QVariant> DxaHipManager::computeTandZScores()
-{
-    return QVariantMap();
-}
+    emit success("Saved images to Pine, you may now close this window");
 
-
-QVariantMap DxaHipManager::getParticipantData()
-{
-    return QVariantMap();
-}
-
-// Set up device
-bool DxaHipManager::setUp()
-{
-    return true;
+    cleanUp();
 }
 
 bool DxaHipManager::cleanUp()
 {
-    return true;
+    return clearData();
 }
 
 bool DxaHipManager::clearData()
 {
+    m_test->reset();
     return true;
 }

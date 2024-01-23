@@ -8,9 +8,11 @@ class BPMSession : public CypressSession
 public:
     explicit BPMSession(QObject *parent, const QJsonObject& inputData);
 
-    // CypressSession interface
 public:
-    void start() override;
+    void isInstalled() const override;
+    void isAvailable() const override;
+
+    void initializeDialog() override;
 };
 
 #endif // BPMSESSION_H

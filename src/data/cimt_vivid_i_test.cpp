@@ -127,12 +127,10 @@ QJsonObject CimtVividiTest::toJsonObject() const
         measure.remove("side");
         measure.remove("path");
 
-        if (side == "left")
+        if (side == "Left")
             leftFiles.append(measure);
-        else if (side == "right")
+        else if (side == "Right")
             rightFiles.append(measure);
-        else
-            qDebug() << "invalid measure, " << measure;
     }
 
     leftResults["files"] = leftFiles;

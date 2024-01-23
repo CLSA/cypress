@@ -20,11 +20,11 @@ signals:
     void dicomDirectoryChanged();
 
 private slots:
-    void onDirectoryChanged(const QString &path);
+    void onDirectoryChanged();
 
 private:
     QFileSystemWatcher m_watcher;
-    QTimer m_timer;
+    QTimer* m_timer;
 };
 
 

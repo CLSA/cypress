@@ -17,6 +17,7 @@ public:
 
     static bool isSimMode();
     static bool isDebugMode();
+    static QString getFilePath();
 
     static QString getPineHost();
     static void setPineHost(const QString &host);

@@ -58,6 +58,7 @@ public:
         QString value = index.model()->data(index, Qt::EditRole).toString();
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         int itemIndex = comboBox->findText(value);
+        qDebug() << "setEditorData: " << value;
         if (itemIndex >= 0) {
             comboBox->setCurrentIndex(itemIndex);
         } else if (isEditable) {
@@ -232,7 +233,7 @@ public:
     ~MeasurementTable();
 
     void initializeModel(QList<TableColumn> columns);
-    void updateModel(TestBase *test);
+    void updateModel(QSharedPointer<TestBase> test);
 
     void enableMeasureButton();
     void disableMeasureButton();
@@ -248,7 +249,8 @@ public:
 
     void hideMeasureButton();
     void showMeasureButton();
-
+    
+    void setTitle(const QString& title);
 signals:
     void measure();
     void finish();
@@ -256,12 +258,10 @@ signals:
     void enterManualEntry();
 
 public slots:
-    void handleTestUpdate(TestBase *test);
+    void handleTestUpdate(QSharedPointer<TestBase> test);
 
     void addManualMeasurement();
     void removeManualMeasurement();
-
-    void handleDicomFiles(QList<DicomFile> files);
 
 private slots:
     void handleChange(int row, int col);
@@ -275,7 +275,7 @@ private:
     bool manualEntryMode { false };
 
     Ui::MeasurementTable *ui;
-    TestBase *m_test;
+    QSharedPointer<TestBase> m_test;
     QList<TableColumn> m_columns;
 };
 

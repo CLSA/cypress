@@ -14,8 +14,6 @@ public:
     ~AudiometerDialog();
 
 private:
-    void initializeConnections() override;
-
     Ui::AudiometerDialog *ui { Q_NULLPTR };
 };
 

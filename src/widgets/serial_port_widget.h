@@ -45,6 +45,7 @@ private slots:
 
 private:
     Ui::SerialPortWidget *ui;
+    QSerialPortInfo m_portInfo;
 
     QMap<QString, QSerialPortInfo> m_serialPorts;
 };

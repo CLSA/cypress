@@ -1,7 +1,4 @@
 #include "audiometer_manager.h"
-#include "../../data/hearing/tests/hearing_test.h"
-
-#include "cypress_settings.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -13,6 +10,10 @@
 #include <QStandardItemModel>
 #include <QtMath>
 #include <QMessageBox>
+
+#include "data/hearing/tests/hearing_test.h"
+#include "cypress_settings.h"
+#include "auxiliary/network_utils.h"
 
 QByteArray AudiometerManager::END_CODE = AudiometerManager::initEndCode();
 
@@ -85,24 +86,25 @@ bool AudiometerManager::isInstalled()
     return supportsBaudRates;
 }
 
-void AudiometerManager::start()
+bool AudiometerManager::start()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::start";
+
+    if (!setUp()) {
+        return false;
     }
 
-    emit started(m_test.get());
-    emit dataChanged(m_test.get());
+    emit dataChanged(m_test);
     emit canMeasure();
+
+    return true;
 }
 
 bool AudiometerManager::setUp()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::setUp";
-    }
 
     return true;
 }
@@ -110,9 +112,7 @@ bool AudiometerManager::setUp()
 void AudiometerManager::measure()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::measure";
-    }
 
     m_test.reset();
 
@@ -120,7 +120,7 @@ void AudiometerManager::measure()
     {
         m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
 
-        emit dataChanged(m_test.get());
+        emit dataChanged(m_test);
         emit canFinish();
 
         return;
@@ -132,46 +132,15 @@ void AudiometerManager::measure()
     writeDevice();
 }
 
-void AudiometerManager::finish()
-{
-    if (m_debug)
-    {
-        qDebug() << "AudiometerManager::finish";
-    }
-
-    int answer_id = m_session->getAnswerId();
-
-    QJsonObject testJson = m_test->toJsonObject();
-    QJsonObject sessionObj = m_session->getJsonObject();
-
-    testJson.insert("session", sessionObj);
-
-    QJsonObject responseJson {};
-    responseJson.insert("value", testJson);
-
-    QJsonDocument jsonDoc(responseJson);
-    QByteArray serializedData = jsonDoc.toJson();
-
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
-    sendHTTPSRequest("PATCH", answerUrl, "application/json", serializedData);
-
-    emit success("");
-
-    cleanUp();
-}
-
 bool AudiometerManager::cleanUp()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::cleanUp";
-    }
 
     clearData();
 
     m_buffer.clear();
     m_deviceList.clear();
-    //m_deviceData.reset();
 
     return true;
 }
@@ -179,25 +148,21 @@ bool AudiometerManager::cleanUp()
 void AudiometerManager::readDevice()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::readDevice";
-    }
 
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
-
+    //
     QByteArray data = m_port.readAll();
-
     m_buffer += data;
 
-    HearingTest* hearingTest = static_cast<HearingTest*>(m_test.get());
-
+    QSharedPointer<HearingTest> hearingTest = qSharedPointerCast<HearingTest>(m_test);
     if(hasEndCode(m_buffer))
     {
         hearingTest->fromArray(m_buffer);
         if(hearingTest->isValid())
         {
-            emit dataChanged(m_test.get());
+            emit dataChanged(m_test);
             emit canFinish();
         }
     }
@@ -206,9 +171,7 @@ void AudiometerManager::readDevice()
 void AudiometerManager::writeDevice()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::writeDevice";
-    }
 
     // send a request to the audiometer to start data collection
     //
@@ -222,11 +185,10 @@ void AudiometerManager::writeDevice()
 bool AudiometerManager::clearData()
 {
     if (m_debug)
-    {
         qDebug() << "AudiometerManager::clearData";
-    }
 
-    m_test.reset();
+    m_test->reset();
+    emit dataChanged(m_test);
 
     return true;
 }

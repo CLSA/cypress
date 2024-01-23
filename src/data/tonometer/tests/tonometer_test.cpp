@@ -46,71 +46,20 @@ TonometerTest::TonometerTest()
     m_outputKeyList = TonometerTest::metaLUT.keys();
 }
 
-void TonometerTest::fromVariant(const QVariant& var)
+void TonometerTest::fromVariantMapList(const QList<QVariantMap>& variantMapList)
 {
-    // expecting an array of QVariantMap objects,
-    // one for each row of the ORA mdb Measures table
-    //
-    if(!var.canConvert<QList<QVariant>>())
-        return;
+    QVariantMap first = variantMapList.first();
 
-    QList<QVariant> list = var.toList();
-    if(list.isEmpty())
-        return;
-
-    // check if there are multiple session dates and retain
-    // data from the most recent
-    //
-    QList<QDateTime> dateList;
-    foreach(const auto x, list)
-    {
-        QVariantMap obj = x.toMap();
-        if(obj.contains("SessionDate"))
-        {
-          QDateTime t = obj["SessionDate"].toDateTime();
-          if(!dateList.contains(t))
-            dateList.push_back(t);
-        }
+    for (auto it = metaLUT.cbegin(); it != metaLUT.cend(); ++it) {
+        addMetaData(it.key(), first[it.value()]);
     }
 
-    std::sort(dateList.begin(),dateList.end());
-    foreach(const auto x, dateList)
-    {
-      qDebug() << "sorted session" << x.toString();
-    }
-    QDateTime lastSession = dateList.last();
 
-    bool meta = false;
-    foreach(const auto x, list)
-    {
-        QVariantMap obj = x.toMap();
-        if(obj.contains("SessionDate") && obj.contains("Eye"))
-        {
-          QDateTime t = obj["SessionDate"].toDateTime();
-          if(lastSession == t)
-          {
-            // all sessions on one date share the same meta data
-            //
-            if(!meta)
-            {
-               q_stringMap::const_iterator it = TonometerTest::metaLUT.constBegin();
-               while(it != TonometerTest::metaLUT.constEnd())
-               {
-                  if(obj.contains(it.value()))
-                  {
-                    addMetaData(it.key(),obj[it.value()]);
-                  }
-                  it++;
-               }
-               meta = true;
-            }
-
-            QSharedPointer<TonometerMeasurement> m(new TonometerMeasurement);
-            m->fromVariant(obj);
-            if (m->isValid()) {
-               addMeasurement(m);
-            }
-          }
+    foreach (auto variantMap, variantMapList) {
+        QSharedPointer<TonometerMeasurement> m(new TonometerMeasurement);
+        m->fromVariant(variantMap);
+        if (m->isValid()) {
+           addMeasurement(m);
         }
     }
 }
@@ -205,20 +154,23 @@ bool TonometerTest::isValid() const
     bool okMeta = true;
     foreach(const auto key, m_outputKeyList)
     {
-      if(!hasMetaData(key))
-      {
-         okMeta = false;
-         break;
-       }
+        if(!hasMetaData(key))
+        {
+            qDebug() << "meta data is not valid" << key;
+            okMeta = false;
+            break;
+        }
     }
+
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
     if (okTest) {
-       foreach (const auto m, m_measurementList) {
-         if (!m->isValid()) {
-            okTest = false;
-            break;
-         }
-       }
+        foreach (const auto m, m_measurementList) {
+            if (!m->isValid()) {
+                qDebug() << "measurement is not valid";
+                okTest = false;
+                break;
+            }
+        }
     }
     return okMeta && okTest;
 }
