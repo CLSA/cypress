@@ -16,6 +16,7 @@
 CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     : ManagerBase(session)
 {
+    m_jre = CypressSettings::readSetting("cdtt/jre").toString();
     m_runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     m_outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
@@ -25,6 +26,11 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
 
     if (m_debug) {
         qDebug() << "CDTTManager";
+
+        qDebug() << m_jre;
+        qDebug() << m_runnableName;
+        qDebug() << m_runnablePath;
+        qDebug() << m_outputPath;
 
         qDebug() << session->getSessionId();
         qDebug() << session->getBarcode();
@@ -44,30 +50,59 @@ CDTTManager::~CDTTManager()
 
 bool CDTTManager::isInstalled()
 {
+    QString jre = CypressSettings::readSetting("cdtt/jre").toString();
     QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
 
-    if (runnableName.isNull() || runnableName.isEmpty())
+    if (jre.isNull() || jre.isEmpty()) {
+        qDebug() << "CDTTManager: jre is undefined";
         return false;
+    }
 
-    if (runnablePath.isNull() || runnablePath.isEmpty())
+    if (runnableName.isNull() || runnableName.isEmpty()) {
+        qDebug() << "CDTTManager: runnableName is undefined";
         return false;
+    }
 
-    if (outputPath.isNull() || outputPath.isEmpty())
+    if (runnablePath.isNull() || runnablePath.isEmpty()) {
+        qDebug() << "CDTTManager: runnablePath is undefined";
         return false;
+    }
+
+    if (outputPath.isNull() || outputPath.isEmpty()) {
+        qDebug() << "CDTTManager: outputPath is undefined";
+        return false;
+    }
+
+    QFileInfo jreInfo(jre);
+    if (!jreInfo.exists()) {
+        qDebug() << "CDTTManager: JRE does not exist at " << jre;
+        return false;
+    }
+
+    if (!jreInfo.isExecutable()) {
+        qDebug() << "CDTTManager: JRE is not executable at " << jre;
+        return false;
+    }
 
     QFileInfo runnableNameInfo(runnableName);
-    if (!runnableNameInfo.isFile())
+    if (!runnableNameInfo.isFile()) {
+        qDebug() << "CDTTManager: runnableName does not exist";
         return false;
+    }
 
     QDir runnableDir(runnablePath);
-    if (!runnableDir.exists())
+    if (!runnableDir.exists()) {
+        qDebug() << "CDTTManager: runnablePath does not exist";
         return false;
+    }
 
     QDir outputDir(outputPath);
-    if (!outputDir.exists())
+    if (!outputDir.exists()) {
+        qDebug() << "CDTTManager: output dir does not exist";
         return false;
+    }
 
     return true;
 }
@@ -91,8 +126,14 @@ bool CDTTManager::setUp()
     if (m_debug)
         qDebug() << "CDTT::setUp";
 
-    clearData();
-    cleanUp();
+    if (!clearData()) {
+        return false;
+    }
+
+    if (!cleanUp()) {
+        return false;
+    }
+
     configureProcess();
 
     return true;
@@ -111,6 +152,7 @@ void CDTTManager::measure()
     }
 
     m_process.start();
+
     if (!m_process.waitForStarted()) {
         emit error("Could not start CDTT application");
     }
@@ -131,7 +173,7 @@ void CDTTManager::configureProcess()
     if (m_debug)
         qDebug() << "CDTTManager::configureProcess";
 
-    QString command = "java";
+    QString command = m_jre; // C:/Program Files (x86)/Java/jre1.8.0_51/bin/javaw.exe
     QStringList arguments;
 
     arguments << "-jar" << m_runnableName << m_session->getBarcode();
@@ -181,49 +223,41 @@ void CDTTManager::readOutput()
     if (m_debug)
         qDebug() << "CDTTManager::readOutput";
 
-    if(QProcess::NormalExit != m_process.exitStatus())
-    {
-        QMessageBox::critical(nullptr, "Error", "CDTT failed to finish correctly, cannot read data. Please contact support");
+    if(QProcess::NormalExit != m_process.exitStatus()) {
+        emit error("CDTT failed to finish correctly, cannot read data.");
         return;
     }
-    else
-        qDebug() << "CDTTManager::readOutput - process finished successfully";
-
-    CDTTTest* test = static_cast<CDTTTest*>(m_test.get());
 
     QDir dir(m_outputPath);
     QString fileName = dir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
+
     fileName = dir.toNativeSeparators(fileName);
-
-    if (QFileInfo::exists(fileName)) {
-        if (m_debug)
-            qDebug() << "found output xlsx file " << fileName;
-
-        QSqlDatabase db = QSqlDatabase::addDatabase("QODBC", "xlsx_connection");
-        db.setDatabaseName(
-            "DRIVER={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" + fileName);
-
-        if(db.isValid())
-            db.open();
-        else {
-            emit error("ERROR: invalid database");
-            return;
-        }
-
-        if(db.isOpen())
-        {
-            test->fromDatabase(db);
-            finish();
-            db.close();
-        }
-        else {
-            qDebug() << "cannot find valid file";
-            emit error("Something went wrong. Please contact support");
-        }
-    } else {
-        qDebug() << "ERROR: no output xlsx file found" << fileName;
-        emit error("Something went wrong. Please contact support");
+    if (!QFileInfo::exists(fileName)) {
+        emit error("Error: cannot find the output .xlsx file");
     }
+
+    if (m_debug)
+        qDebug() << "found output xlsx file " << fileName;
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName(
+        "DRIVER=Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" + fileName);
+
+    if (!db.isValid()) {
+        emit error("ERROR: invalid database");
+        return;
+    }
+
+    if (!db.open()) {
+        qDebug() << "cannot find valid file";
+        emit error("Error: cannot find valid file");
+        return;
+    }
+
+    QSharedPointer<CDTTTest> test = qSharedPointerCast<CDTTTest>(m_test);
+    test->fromDatabase(db);
+    db.close();
+    finish();
 }
 
 

@@ -1,8 +1,7 @@
 #ifndef BLOOD_PRESSURE_TEST_H
 #define BLOOD_PRESSURE_TEST_H
 
-#include "../../blood_pressure/measurements/blood_pressure_measurement.h"
-#include "../../test_base.h"
+#include "data/test_base.h"
 
 class BloodPressureTest : public TestBase
 {

@@ -59,87 +59,91 @@ FraxTest::FraxTest()
 void FraxTest::fromFile(const QString& fileName)
 {
     QFile ifile(fileName);
-    if(ifile.open(QIODevice::ReadOnly))
-    {
-        qDebug() << "OK, reading input file " << fileName;
 
-        QTextStream instream(&ifile);
-        QString line = instream.readLine();
-        if(false == instream.atEnd())
-        {
-          qDebug() << "Frax: More lines of content than expected";
-        }
-        ifile.close();
-        reset();
+    if (!ifile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Could not read frax output";
+        return;
+    }
 
-        QStringList list = line.split(",");
-        if (17 == list.size()) {
-          QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
-          measure1->setAttribute("type", "osteoporotic_fracture");
-          measure1->setAttribute("probability", list.at(13).toDouble(), "%");
-          addMeasurement(measure1);
+    qDebug() << "OK, reading input file " << fileName;
 
-          QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
-          measure2->setAttribute("type", "hip_fracture");
-          measure2->setAttribute("probability", list.at(14).toDouble(), "%");
-          addMeasurement(measure2);
+    QTextStream instream(&ifile);
+    QString line = instream.readLine();
 
-          QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
-          measure3->setAttribute("type", "osteoporotic_fracture_bmd");
-          measure3->setAttribute("probability", list.at(15).toDouble(), "%");
-          addMeasurement(measure3);
+    if(!instream.atEnd()) {
+        qDebug() << "Frax: More lines of content than expected";
+    }
 
-          QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
-          measure4->setAttribute("type", "hip_fracture_bmd");
-          measure4->setAttribute("probability", list.at(16).toDouble(), "%");
-          addMeasurement(measure4);
+    ifile.close();
+    reset();
 
-          addMetaData("type", list.at(0).toLower());
-          addMetaData("country_code", list.at(1).toUInt());
-          addMetaData("age", list.at(2).toDouble(), "yr");
-          addMetaData("sex", list.at(3).toUInt());
-          addMetaData("body_mass_index", list.at(4).toDouble(), "kg/m2");
-          addMetaData("previous_fracture", list.at(5).toUInt());
-          addMetaData("parent_hip_fracture", list.at(6).toUInt());
-          addMetaData("current_smoker", list.at(7).toUInt());
-          addMetaData("gluccocorticoid", list.at(8).toUInt());
-          addMetaData("rheumatoid_arthritis", list.at(9).toUInt());
-          addMetaData("secondary_osteoporosis", list.at(10).toUInt());
-          addMetaData("alcohol", list.at(11).toUInt());
-          addMetaData("femoral_neck_tscore", list.at(12).toDouble());
-        }
+    QStringList list = line.split(",");
+    if (17 == list.size()) {
+        QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
+        measure1->setAttribute("type", "osteoporotic_fracture");
+        measure1->setAttribute("probability", list.at(13).toDouble(), "%");
+        addMeasurement(measure1);
+
+        QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
+        measure2->setAttribute("type", "hip_fracture");
+        measure2->setAttribute("probability", list.at(14).toDouble(), "%");
+        addMeasurement(measure2);
+
+        QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
+        measure3->setAttribute("type", "osteoporotic_fracture_bmd");
+        measure3->setAttribute("probability", list.at(15).toDouble(), "%");
+        addMeasurement(measure3);
+
+        QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
+        measure4->setAttribute("type", "hip_fracture_bmd");
+        measure4->setAttribute("probability", list.at(16).toDouble(), "%");
+        addMeasurement(measure4);
+
+        addMetaData("type", list.at(0).toLower());
+        addMetaData("country_code", list.at(1).toUInt());
+        addMetaData("age", list.at(2).toDouble(), "yr");
+        addMetaData("sex", list.at(3).toUInt());
+        addMetaData("body_mass_index", list.at(4).toDouble(), "kg/m2");
+        addMetaData("previous_fracture", list.at(5).toUInt());
+        addMetaData("parent_hip_fracture", list.at(6).toUInt());
+        addMetaData("current_smoker", list.at(7).toUInt());
+        addMetaData("gluccocorticoid", list.at(8).toUInt());
+        addMetaData("rheumatoid_arthritis", list.at(9).toUInt());
+        addMetaData("secondary_osteoporosis", list.at(10).toUInt());
+        addMetaData("alcohol", list.at(11).toUInt());
+        addMetaData("femoral_neck_tscore", list.at(12).toDouble());
     }
 }
 
 void FraxTest::simulate(const QVariantMap& input)
 {
-    foreach(auto key, input.keys())
-    {
-      if("barcode" == key || "language" == key) continue;
+    for (auto it = input.cbegin(); it != input.cend(); ++it) {
+        if("barcode" == it.key() || "language" == it.key())
+            continue;
 
-      QVariant value = input[key];
-      if("SEX" == key)
-      {
-        value = "male" == value.toString() ? 0 : 1;
-      }
-      else if("femoral_neck_bmd" == key)
-      {
-        value = Utilities::tscore(value.toDouble());
-        key = "femoral_neck_tscore";
-      }
-      else
-      {
-        if(QVariant::Bool == value.type())
-        {
-          value = value.toUInt();
+        QVariant value = it.value();
+
+        if("sex" == it.key()) {
+            value = "male" == value.toString() ? 0 : 1;
         }
-      }
-      if("age" == key)
-        addMetaData(key,value,"yr");
-      else if("body_mass_index" == key)
-        addMetaData(key,value,"kg/m2");
-      else
-        addMetaData(key,value);
+        else if("femoral_neck_bmd" == it.key()) {
+            value = Utilities::tscore(value.toDouble());
+            QString key = "femoral_neck_tscore";
+            addMetaData(key, value);
+        }
+        else if(QVariant::Bool == value.type()) {
+            value = value.toUInt();
+        }
+
+        if("age" == it.key()) {
+            addMetaData(it.key(), value, "yr");
+        }
+        else if("body_mass_index" == it.key()) {
+            addMetaData(it.key(), value, "kg/m2");
+        }
+        else {
+            addMetaData(it.key(), value);
+        }
     }
 
     QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
@@ -165,14 +169,14 @@ void FraxTest::simulate(const QVariantMap& input)
     QString interp = "N/A";
     if (p > 20)
     {
-      interp = "High";
+        interp = "High";
     }
     else if (p >= 10 && p <= 20)
     {
-      interp = "Moderate";
+        interp = "Moderate";
     }
     else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5) {
-      interp = "Low";
+        interp = "Low";
     }
 
     addMetaData("osteoporotic_fracture_bmd_interp", interp);

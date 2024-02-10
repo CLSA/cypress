@@ -1,7 +1,7 @@
 #include <QtTest>
 #include <QDebug>
 
-#include "managers/blood_pressure/bpm_messages.h"
+#include "data/blood_pressure/tests/blood_pressure_test.h"
 
 class BpmTests : public QObject
 {
@@ -39,9 +39,13 @@ void BpmTests::cleanupTestCase()
     qDebug() << "cleanup test case";
 }
 
-void BpmTests::test_case1()
+void BpmTests::test_bpm()
 {
-    qDebug() << "test case 1";
+    BloodPressureTest test;
+
+    test.simulate();
+
+    qDebug() << test.toJsonObject();
 }
 
 QTEST_APPLESS_MAIN(BpmTests)

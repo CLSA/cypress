@@ -45,12 +45,14 @@ private:
 
     // Set up device
     bool setUp() override;
-
-    // Reset the session
-    bool clearData() override;
+    bool backupData();
 
     // Clean up the device for next time
     bool cleanUp() override;
+    bool restoreData();
+
+    // Reset the session
+    bool clearData() override;
 };
 
 #endif // GRIP_STRENGTH_MANAGER_H

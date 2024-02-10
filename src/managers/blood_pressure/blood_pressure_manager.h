@@ -110,6 +110,8 @@ private:
     QScopedPointer<BpTru200Driver> m_driver;
     QSharedPointer<QHidDevice> m_bpm200;
 
+    QDateTime m_measurementStartTime;
+
     QMutex m_mutex;
 
     // device data is separate from test data

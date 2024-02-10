@@ -32,6 +32,8 @@ public slots:
     //
     void measure() override;
 
+    void finish() override;
+
 
     void readOutput();
 

@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item>
-    <widget class="SerialPortWidget" name="serialPortWidget" native="true"/>
+    <widget class="SerialPortWidget" name="serialPortPickerWidget" native="true"/>
    </item>
    <item>
     <widget class="MeasurementTable" name="measurementTable" native="true"/>

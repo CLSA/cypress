@@ -38,6 +38,7 @@ public:
     QJsonObject toJsonObject() const override;
 
     void simulate() override;
+    double calculateAverage();
 
     // ms of delay between performing a measurement to allow for
     // step on/off without implementing a delay timer between
@@ -48,7 +49,6 @@ public:
 private:
     QList<QString> m_outputKeyList;
 
-    double calculateAverage();
 };
 
 Q_DECLARE_METATYPE(WeighScaleTest);

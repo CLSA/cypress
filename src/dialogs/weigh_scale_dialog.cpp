@@ -52,8 +52,8 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
     });
 
     // a connection was made, update ui
-    connect(manager.get(), &WeighScaleManager::deviceConnected, ui->serialPortPickerWidget, [=]() {
-        ui->serialPortPickerWidget->deviceConnected();
+    connect(manager.get(), &WeighScaleManager::deviceConnected, ui->serialPortPickerWidget, [=](const QSerialPortInfo& portInfo) {
+        ui->serialPortPickerWidget->deviceConnected(portInfo);
         ui->zeroDevicePushButton->setEnabled(true);
         ui->measurementTable->enableMeasureButton();
     });

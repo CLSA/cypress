@@ -70,6 +70,8 @@ void DialogBase::cancel(const QString& cancelMsg)
         m_manager->sendCancellation(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::Cancelled);
+
+    close();
 }
 
 void DialogBase::error(const QString& errorMsg)
@@ -80,14 +82,18 @@ void DialogBase::error(const QString& errorMsg)
         m_manager->sendCancellation(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::CriticalError);
+
+    close();
 }
 
 void DialogBase::success(const QString& successMsg)
 {
-    QMessageBox::information(nullptr, "Success", successMsg);
+    QMessageBox::information(nullptr, "Measurement complete", successMsg);
 
     if (!m_sim)
         m_manager->sendComplete(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::Success);
+
+    close();
 }

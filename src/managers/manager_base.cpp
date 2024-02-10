@@ -32,6 +32,7 @@ ManagerBase::~ManagerBase()
 }
 
 void ManagerBase::finish() {
+
     if (m_debug)
         qDebug() << "ManagerBase::finish";
 

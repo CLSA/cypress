@@ -131,14 +131,14 @@ void ChoiceReactionManager::measure()
     clearData();
 
     if (m_process.state() != QProcess::NotRunning) {
-        error("Application is already running");
+        emit error("Application is already running");
         return;
     }
 
     m_process.start();
 
     if (!m_process.waitForStarted()) {
-        error("Could not start application");
+        emit error("Could not start application");
         return;
     }
 }
@@ -174,34 +174,12 @@ void ChoiceReactionManager::readOutput()
         outputFile.prepend(m_outputPath);
 
         test->fromFile(outputFile);
-
-        if(test->isValid())
-        {
-            if (m_debug)
-            {
-                qDebug() << "test is valid";
-            }
-            finish();
-        }
-        else
-        {
-            QFile::remove(outputFile);
-
-            if (m_debug)
-            {
-                qDebug() << "ERROR: input from file produced invalid test results";
-                qDebug() << "Removed" << outputFile;
-            }
-
-            emit error("Something went wrong. Please contact support");
-        }
+        finish();
     }
     else
     {
         emit error("Something went wrong. Please contact support");
-
         m_test->reset();
-        emit dataChanged(test);
     }
 }
 
@@ -213,7 +191,10 @@ bool ChoiceReactionManager::setUp()
     if (m_debug)
         qDebug() << "ChoiceReactionManager::setUp";
 
-    cleanUp();
+    if (!cleanUp()) {
+        return false;
+    }
+
     configureProcess();
 
     return true;
@@ -240,10 +221,11 @@ bool ChoiceReactionManager::cleanUp()
 
     foreach (const QString& file, fileList)
     {
-        QFile::remove(outputDir.absoluteFilePath(file));
+        QString filePath = outputDir.absoluteFilePath(file);
+        if (!QFile::remove(filePath)) {
+            qDebug() << "could not remove " << filePath;
+        }
     }
-
-    emit dataChanged(m_test);
 
     return true;
 }
@@ -280,71 +262,41 @@ void ChoiceReactionManager::configureProcess()
             qDebug() << "process state: " << s.join(" ").toLower();
     });
 
-    // CCB.exe is present
+    if (m_debug)
+        qDebug() << "ChoiceReactionManager::configureProcess - ok, configuring command";
+
+    // the inputs for command line args are present
+    QStringList command;
+    command << m_runnableName;
+
+    if(!m_session->getInterviewer().isNull() && !m_session->getInterviewer().isEmpty())
+        command << "/i" + m_session->getInterviewer();
+    else
+        command << "/iNone";
+
+    // minimum required input to identify the file belonging to the participant
     //
-    QFileInfo info(m_runnableName);
-    if (!info.exists()) {
-        qDebug() << "ChoiceReactionManager::configureProcess - CCB.exe does not exist at " << m_runnableName;
-        return;
+    command << "/u" + m_session->getBarcode();
+
+    // TODO: consider using upstream host "clinic" identifier
+    //
+    command << "/c" + CCB_CLINIC;
+
+    // required language "en" or "fr" converted to E or F
+    //
+    QString s = m_session->getLanguage().toUpper();
+    if (!s.isEmpty()) {
+        command << "/l" + QString(s.at(0));
     }
 
-    if (!info.isExecutable())
-        qDebug() << "ChoiceReactionManager::configureProcess - file is not executable at " << m_runnableName;
+    m_process.setProgram(m_runnableName);
+    m_process.setArguments(command);
+    m_process.setWorkingDirectory(m_runnablePath);
+    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    QDir working(m_runnablePath);
-    if (!working.exists())
-        qDebug() << "ChoiceReactionManager::configureProcess - working does not exist";
-
-    QDir out(m_outputPath);
-    if (!out.exists())
-        qDebug() << "ChoiceReactionManager::configureProcess - out does not exist";
-
-    if(info.exists() && info.isExecutable() &&
-        working.exists() && out.exists())
-    {
-        if (m_debug)
-            qDebug() << "ChoiceReactionManager::configureProcess - ok, configuring command";
-
-        // the inputs for command line args are present
-        QStringList command;
-        command << m_runnableName;
-
-        if(!m_session->getInterviewer().isNull() && !m_session->getInterviewer().isEmpty())
-            command << "/i" + m_session->getInterviewer();
-        else
-            command << "/iNone";
-
-        // minimum required input to identify the file belonging to the participant
-        //
-        command << "/u" + m_session->getBarcode();
-
-        // TODO: consider using upstream host "clinic" identifier
-        //
-        command << "/c" + CCB_CLINIC;
-
-        // required language "en" or "fr" converted to E or F
-        //
-        QString s = m_session->getLanguage().toUpper();
-        if (!s.isEmpty()) {
-            command << "/l" + QString(s.at(0));
-        }
-
-        m_process.setProgram(m_runnableName);
-        m_process.setArguments(command);
-        m_process.setWorkingDirectory(m_runnablePath);
-        m_process.setProcessChannelMode(QProcess::ForwardedChannels);
-
-        if (m_debug) {
-            qDebug() << "ChoiceReactionManager - process config args: " << m_process.arguments().join(" ");
-            qDebug() << "ChoiceReactionManager - process working dir: " << m_runnablePath;
-        }
-
-        emit canMeasure();
-    } else {
-        if (m_debug)
-            qDebug() << "failed to configure process";
-
-        QMessageBox::critical(nullptr, "Error", "The choice reaction test could not be configured. Please contact support");
+    if (m_debug) {
+        qDebug() << "ChoiceReactionManager - process config args: " << m_process.arguments().join(" ");
+        qDebug() << "ChoiceReactionManager - process working dir: " << m_runnablePath;
     }
 }
 

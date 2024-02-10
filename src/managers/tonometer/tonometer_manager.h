@@ -35,10 +35,6 @@ public:
     explicit TonometerManager(QSharedPointer<TonometerSession> session);
     ~TonometerManager();
 
-    // is the passed string an executable file
-    // with the correct path elements ?
-    //
-    bool isDefined(const QString&, const TonometerManager::FileType& type = ORAApplication) const;
     static bool isInstalled();
 
 public slots:
@@ -55,13 +51,17 @@ public slots:
     void readOutput();
 
 private:
+
     QSqlDatabase m_db;
     QProcess m_process;
 
     QString m_runnableName;  // full pathspec to ora.exe
     QString m_runnablePath;	 // path to ora.exe
-    QString m_databaseName;	 // full pathspec to ora.mdb
-    QString m_temporaryFile; // store a copy of ora.mdb
+    QString m_databasePath;	 // full pathspec to ora.mdb
+    QString m_temporaryPath; // store a copy of ora.mdb
+
+    bool backupData();
+    bool restoreData();
 
     // Reset the session
     bool clearData() override;
@@ -76,6 +76,7 @@ private:
 
     bool insertPatient(const QString& name, const QString& birthDate, const QString& sex, const int id);
     QVariantMap extractMeasures(const int patientId, const QString& eye);
+
     bool restoreDatabase();
 };
 

@@ -1,4 +1,5 @@
 #include "audiometer_manager.h"
+#include "data/hearing/tests/hearing_test.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -11,9 +12,6 @@
 #include <QtMath>
 #include <QMessageBox>
 
-#include "data/hearing/tests/hearing_test.h"
-#include "cypress_settings.h"
-#include "auxiliary/network_utils.h"
 
 QByteArray AudiometerManager::END_CODE = AudiometerManager::initEndCode();
 
@@ -45,6 +43,8 @@ AudiometerManager::AudiometerManager(QSharedPointer<AudiometerSession> session)
 {
     m_test.reset(new HearingTest);
     m_test->setExpectedMeasurementCount(16);
+
+    m_deviceName = CypressSettings::readSetting("audiometer/portName").toString();
 }
 
 bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
@@ -68,15 +68,15 @@ bool AudiometerManager::isInstalled()
         QList<qint32> baudRates = portInfo.standardBaudRates();
         foreach (qint32 baudRate, baudRates) {
             if (baudRate >= 600 && baudRate <= 19200) {
-                qInfo() << "port:"                 << portInfo.portName();
-                qInfo() << "supported baud rates:" << baudRates;
-                qInfo() << "description:"          << portInfo.description();
-                qInfo() << "manufacturer:"         << portInfo.manufacturer();
-                qInfo() << "serial number:"        << portInfo.serialNumber();
-                qInfo() << "system location:"      << portInfo.systemLocation();
-                qInfo() << "vendor identifier:"    << portInfo.vendorIdentifier();
-                qInfo() << "product identifier:"   << portInfo.productIdentifier();
-                qInfo() << "-------------------------------------";
+                //qInfo() << "port:"                 << portInfo.portName();
+                //qInfo() << "supported baud rates:" << baudRates;
+                //qInfo() << "description:"          << portInfo.description();
+                //qInfo() << "manufacturer:"         << portInfo.manufacturer();
+                //qInfo() << "serial number:"        << portInfo.serialNumber();
+                //qInfo() << "system location:"      << portInfo.systemLocation();
+                //qInfo() << "vendor identifier:"    << portInfo.vendorIdentifier();
+                //qInfo() << "product identifier:"   << portInfo.productIdentifier();
+                //qInfo() << "-------------------------------------";
 
                 supportsBaudRates = true;
             }
@@ -95,6 +95,9 @@ bool AudiometerManager::start()
         return false;
     }
 
+    scanDevices();
+
+    emit started(m_test);
     emit dataChanged(m_test);
     emit canMeasure();
 
@@ -109,14 +112,54 @@ bool AudiometerManager::setUp()
     return true;
 }
 
+void AudiometerManager::connectDevice()
+{
+    if (m_debug)
+        qDebug() << "WeighScaleManager::connectDevice";
+
+    // Connect to the serial port and set up listeners
+
+    if (m_port.isOpen())
+        m_port.close();
+
+    m_port.setDataBits(QSerialPort::Data8);
+    m_port.setParity(QSerialPort::NoParity);
+    m_port.setStopBits(QSerialPort::OneStop);
+    m_port.setBaudRate(QSerialPort::Baud9600);
+
+    connect(&m_port, &QSerialPort::readyRead, this, &AudiometerManager::readDevice);
+
+    connect(&m_port, &QSerialPort::errorOccurred, this, &AudiometerManager::handleSerialPortError);
+
+    connect(&m_port,
+            &QSerialPort::dataTerminalReadyChanged,
+            this,
+            &AudiometerManager::handleDataTerminalReadyChanged);
+
+    connect(&m_port,
+            &QSerialPort::requestToSendChanged,
+            this,
+            &AudiometerManager::handleRequestToSendChanged);
+
+    if (m_port.open(QSerialPort::ReadWrite)) {
+        emit deviceConnected(QSerialPortInfo(m_port));
+    }
+}
+
+void AudiometerManager::selectDevice(const QSerialPortInfo &port)
+{
+    SerialPortManager::selectDevice(port);
+
+    CypressSettings::writeSetting("audiometer/portName", port.portName());
+    m_deviceName = port.portName();
+}
+
 void AudiometerManager::measure()
 {
     if (m_debug)
         qDebug() << "AudiometerManager::measure";
 
-    m_test.reset();
-
-    if (CypressSettings::isSimMode())
+    if (m_sim)
     {
         m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
 

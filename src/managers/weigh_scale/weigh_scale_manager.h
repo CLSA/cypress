@@ -34,6 +34,8 @@ public slots:
     //
     void connectDevice() override;
 
+    void selectDevice(const QSerialPortInfo &port) override;
+
     // zero the weigh scale
     //
     void zeroDevice();

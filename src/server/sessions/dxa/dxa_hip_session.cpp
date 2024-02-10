@@ -14,12 +14,6 @@ void DxaHipSession::initializeDialog()
 
 QString DxaHipSession::getWebpageContents()
 {
-    QString id = getBarcode();
-    QString scansRequired = "";
-    QString weight = "";
-    QString height = "";
-    QString sex = "";
-
     QString webpageContents
         = "<!DOCTYPE html>"
           "<html lang=\"en\">"
@@ -29,11 +23,18 @@ QString DxaHipSession::getWebpageContents()
           "<title>Pine</title>"
           "</head>"
           "<body>"
-          "<h1>ID</h1>"
-          + id + "<h1>Scan(s)</h1>" + scansRequired + "<h1>Weight</h1>" + weight + "<h1>Height</h1>"
-          + height + "<h1>Sex</h1>" + sex
-          + "</body>"
-            "</html>";
+          "<h1>Participant ID</h1>"
+          "<p>" + getBarcode() + "</p>"
+          "<h1>Scans required</h1>"
+          "<p>" + m_inputData.value("scans").toString() + "</p>"
+          "<h1>Weight</h1>"
+          "<p>" + m_inputData.value("weight").toString() + "</p>"
+          "<h1>Height</h1>"
+          "<p>" + m_inputData.value("height").toString() + "</p>"
+          "<h1>Sex</h1>"
+          "<p>" + m_inputData.value("sex").toString() + "</p>"
+          "</body>"
+          "</html>";
 
     return webpageContents;
 }

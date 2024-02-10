@@ -35,15 +35,25 @@ public:
     static QByteArray END_CODE;
 
     static bool isRS232Port(const QSerialPortInfo& portInfo);
-
     static bool isInstalled();
 
+
 public slots:
+
     bool start() override;
 
     // retrieve a measurement from the device
     //
     void measure() override;
+
+    // connect to the serial port
+    // opens the serial port with required parametere (baud rate etc.)
+    // connects the port readyRead signal to the readDevice slot
+    // emits canMeasure signal if the port is open
+    //
+    void connectDevice() override;
+
+    void selectDevice(const QSerialPortInfo &port) override;
 
 private slots:
     // retrieve data from the audiometer over RS232

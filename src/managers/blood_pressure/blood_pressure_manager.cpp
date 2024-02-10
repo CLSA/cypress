@@ -1,5 +1,6 @@
-#include "blood_pressure_manager.h"
+#include "managers/blood_pressure/blood_pressure_manager.h"
 #include "data/blood_pressure/tests/blood_pressure_test.h"
+#include "data/blood_pressure/measurements/blood_pressure_measurement.h"
 
 #include <QtUsb/QtUsb>
 
@@ -33,10 +34,7 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
         qDebug() << session->getInputData();
     }
 
-    connect(m_driver.get(),
-            &BpTru200Driver::messagesReceived,
-            this,
-            &BloodPressureManager::receiveMessages);
+    connect(m_driver.get(), &BpTru200Driver::messagesReceived, this, &BloodPressureManager::receiveMessages);
 }
 
 
@@ -44,6 +42,72 @@ BloodPressureManager::~BloodPressureManager()
 {
     if (m_debug)
         qDebug() << "destroy blood pressure manager";
+}
+
+bool BloodPressureManager::isInstalled()
+{
+    bool isDebugMode{CypressSettings::isDebugMode()};
+    bool isSimMode{CypressSettings::isSimMode()};
+
+    if (isSimMode) {
+        return true;
+    }
+
+    QHidDevice device;
+    if (device.open(BloodPressureManager::vid, BloodPressureManager::pid)) {
+        device.close();
+        return true;
+    } else {
+        if (isDebugMode)
+            qDebug() << "BloodPressureManager::isInstalled - could not open bpm device";
+    }
+
+    return false;
+}
+
+
+void BloodPressureManager::receiveMessages(QQueue<BPMMessage> messages)
+{
+    if (m_sim) {
+        return;
+    }
+
+    if (m_debug)
+        qDebug() << "BloodPressureManager::received " << messages.length() << " messages";
+
+    while (!messages.empty())
+    {
+        BPMMessage message = messages.dequeue();
+
+        switch (message.getType())
+        {
+        case BPMMessage::MessageType::Ack:
+            handleAck(message);
+            break;
+
+        case BPMMessage::MessageType::Nack:
+            handleNack(message);
+            break;
+
+        case BPMMessage::MessageType::Button:
+            handleButton(message);
+            break;
+
+        case BPMMessage::MessageType::Data:
+            handleData(message);
+            break;
+
+        case BPMMessage::MessageType::Notification:
+            handleNotification(message);
+            break;
+
+        case BPMMessage::MessageType::Command:
+        case BPMMessage::Reset:
+        case BPMMessage::MessageType::Unknown:
+            handleData(message);
+            break;
+        }
+    }
 }
 
 void BloodPressureManager::connectToDevice()
@@ -98,6 +162,7 @@ bool BloodPressureManager::start()
     }
 
     emit started(m_test);
+    emit canConnect();
     emit dataChanged(m_test);
 
     return true;
@@ -210,70 +275,8 @@ void BloodPressureManager::stopMeasurement()
     m_mutex.unlock();
 }
 
-void BloodPressureManager::receiveMessages(QQueue<BPMMessage> messages)
-{
-    if (m_sim) {
-        return;
-    }
 
-    if (m_debug)
-        qDebug() << "BloodPressureManager::received " << messages.length() << " messages";
 
-    while (!messages.empty())
-    {
-        BPMMessage message = messages.dequeue();
-
-        switch (message.getType())
-        {
-        case BPMMessage::MessageType::Ack:
-            handleAck(message);
-            break;
-
-        case BPMMessage::MessageType::Nack:
-            handleNack(message);
-            break;
-
-        case BPMMessage::MessageType::Button:
-            handleButton(message);
-            break;
-
-        case BPMMessage::MessageType::Data:
-            handleData(message);
-            break;
-
-        case BPMMessage::MessageType::Notification:
-            handleNotification(message);
-            break;
-
-        case BPMMessage::MessageType::Command:
-        case BPMMessage::Reset:
-        case BPMMessage::MessageType::Unknown:
-            handleData(message);
-            break;
-        }
-    }
-}
-
-bool BloodPressureManager::isInstalled()
-{
-    bool isDebugMode{CypressSettings::isDebugMode()};
-    bool isSimMode{CypressSettings::isSimMode()};
-
-    if (isSimMode) {
-        return true;
-    }
-
-    QHidDevice device;
-    if (device.open(BloodPressureManager::vid, BloodPressureManager::pid)) {
-        device.close();
-        return true;
-    } else {
-        if (isDebugMode)
-            qDebug() << "BloodPressureManager::isInstalled - could not open bpm device";
-    }
-
-    return false;
-}
 
 void BloodPressureManager::onDeviceHandshaked(const BPMMessage &message)
 {
@@ -297,6 +300,8 @@ void BloodPressureManager::onDeviceHandshaked(const BPMMessage &message)
 
 void BloodPressureManager::onDeviceCleared(const BPMMessage &message)
 {
+    Q_UNUSED(message);
+
     if (m_debug)
         qDebug() << "BPMManager::deviceCleared";
 
@@ -316,6 +321,8 @@ void BloodPressureManager::onDeviceCleared(const BPMMessage &message)
 
 void BloodPressureManager::onDeviceReset(const BPMMessage &message)
 {
+    Q_UNUSED(message);
+
     if (m_debug)
         qDebug() << "BPMManager::deviceReset";
 }
@@ -352,6 +359,8 @@ void BloodPressureManager::onDeviceCycled(const BPMMessage &message)
 
 void BloodPressureManager::onDeviceStarted(const BPMMessage &message)
 {
+    Q_UNUSED(message);
+
     if (m_debug)
         qDebug() << "BPMManager::deviceStarted";
 
@@ -414,6 +423,8 @@ void BloodPressureManager::onDeviceStarted(const BPMMessage &message)
 
 void BloodPressureManager::onDeviceStopped(const BPMMessage &message)
 {
+    Q_UNUSED(message)
+
     if (m_debug)
         qDebug() << "BPMManager::deviceStopped";
 
@@ -433,6 +444,8 @@ void BloodPressureManager::onInflateCuffPressure(const BPMMessage &message)
     int ls = message.getData0() & 0x000000FF;
     int ms = (message.getData1() << 8) & 0x0000FF00;
     int pressure = ls + ms;
+
+    m_measurementStartTime = QDateTime::currentDateTime();
 
     emit inflateCuffPressure(pressure);
 }
@@ -459,12 +472,16 @@ void BloodPressureManager::onBpResult(const BPMMessage &message)
     int pulse = message.getData3();
 
     QSharedPointer<BloodPressureMeasurement> measure(new BloodPressureMeasurement);
+    measure->setAttribute("reading_number", m_test->getMeasurementCount() + 1);
     measure->setAttribute("systolic", BloodPressureMeasurement::Value(sbp, "mmHg"));
     measure->setAttribute("diastolic", BloodPressureMeasurement::Value(dbp, "mmHg"));
     measure->setAttribute("pulse", BloodPressureMeasurement::Value(pulse, "bpm"));
+    measure->setAttribute("start_time", m_measurementStartTime.toString(Qt::DateFormat::TextDate));
+    measure->setAttribute("end_time", QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate));
 
     BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
     test->addMeasurement(measure);
+
 
     emit dataChanged(m_test);
 }
@@ -492,6 +509,22 @@ void BloodPressureManager::onBpReview(const BPMMessage &message)
 {
     if (m_debug)
         qDebug() << "bp review";
+
+    if (message.getData0() == 0) {
+        qDebug() << "computing average";
+        int sbp = message.getData1();
+        int dbp = message.getData2();
+        int pulse = message.getData3();
+
+        BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+        test->addDeviceAverage(sbp, dbp, pulse);
+
+        emit dataChanged(m_test);
+
+        if (test->isValid()) {
+            emit canFinish();
+        }
+    }
 }
 
 
@@ -577,23 +610,23 @@ void BloodPressureManager::handleAck(const BPMMessage& message)
 
     switch (ackType)
     {
-    case BPMMessage::AckType::AckHandshake:
-        onDeviceHandshaked(message);
-        break;
-    case BPMMessage::AckType::AckClear:
-        onDeviceCleared(message);
-        break;
-    case BPMMessage::AckType::AckCycle:
-        onDeviceCycled(message);
-        break;
-    case BPMMessage::AckType::AckStart:
-        onDeviceStarted(message);
-        break;
-    case BPMMessage::AckType::AckStop:
-        onDeviceStopped(message);
-        break;
-    case BPMMessage::AckType::AckReview:
-        break;
+        case BPMMessage::AckType::AckHandshake:
+            onDeviceHandshaked(message);
+            break;
+        case BPMMessage::AckType::AckClear:
+            onDeviceCleared(message);
+            break;
+        case BPMMessage::AckType::AckCycle:
+            onDeviceCycled(message);
+            break;
+        case BPMMessage::AckType::AckStart:
+            onDeviceStarted(message);
+            break;
+        case BPMMessage::AckType::AckStop:
+            onDeviceStopped(message);
+            break;
+        case BPMMessage::AckType::AckReview:
+            break;
     }
 }
 
@@ -640,21 +673,21 @@ void BloodPressureManager::handleData(const BPMMessage& message)
 
     switch (messageId)
     {
-    case BPMMessage::DataType::BpDeflCuffPressure:
-        onDeflateCuffPressure(message);
-        break;
-    case BPMMessage::DataType::BpInflCuffPressure:
-        onInflateCuffPressure(message);
-        break;
-    case BPMMessage::DataType::BpAvg:
-        onBpAverage(message);
-        break;
-    case BPMMessage::DataType::BpResult:
-        onBpResult(message);
-        break;
-    case BPMMessage::DataType::BpReview:
-        onBpReview(message);
-        break;
+        case BPMMessage::DataType::BpDeflCuffPressure:
+            onDeflateCuffPressure(message);
+            break;
+        case BPMMessage::DataType::BpInflCuffPressure:
+            onInflateCuffPressure(message);
+            break;
+        case BPMMessage::DataType::BpAvg:
+            onBpAverage(message);
+            break;
+        case BPMMessage::DataType::BpResult:
+            onBpResult(message);
+            break;
+        case BPMMessage::DataType::BpReview:
+            onBpReview(message);
+            break;
     }
 }
 

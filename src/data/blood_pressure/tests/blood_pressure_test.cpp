@@ -1,4 +1,5 @@
 #include "blood_pressure_test.h"
+#include "data/blood_pressure/measurements/blood_pressure_measurement.h"
 
 #include <QDateTime>
 #include <QJsonArray>
@@ -28,7 +29,7 @@ BloodPressureTest::BloodPressureTest()
     m_outputKeyList << "total_avg_pulse";
     m_outputKeyList << "total_avg_count";
 
-    setExpectedMeasurementCount(2);
+    //setExpectedMeasurementCount(2);
 }
 
 // String representation for debug and GUI display purposes
@@ -111,14 +112,11 @@ QJsonObject BloodPressureTest::toJsonObject() const
     }
 
     QJsonObject valuesObject {};
-
     valuesObject.insert("results", measurementArray);
     valuesObject.insert("metadata", m_metaData.toJsonObject());
     valuesObject.insert("manual_entry", getManualEntryMode());
 
-    testJson.insert("value", valuesObject);
-
-    return testJson;
+    return valuesObject;
 }
 
 bool BloodPressureTest::verifyDeviceAverage(const int& sbp, const int& dbp, const int& pulse) const
@@ -186,15 +184,15 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
         return;
     }
 
-    double avgSbpCalc = sbpTotal * 1.0f / count;
-    double avgDbpCalc = dbpTotal * 1.0f / count;
-    double avgPulseCalc = pulseTotal * 1.0f / count;
+    double avgSbpCalc = qRound(sbpTotal * 1.0f / count);
+    double avgDbpCalc = qRound(dbpTotal * 1.0f / count);
+    double avgPulseCalc = qRound(pulseTotal * 1.0f / count);
 
     addMetaData("avg_count", QVariant(count));
 
     bool ok = true;
 
-    if(qRound(avgSbpCalc) == sbpAvg)
+    if(avgSbpCalc == sbpAvg)
     {
       addMetaData("avg_systolic",sbpAvg,"mmHg");
     }

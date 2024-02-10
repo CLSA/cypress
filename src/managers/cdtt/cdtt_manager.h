@@ -47,6 +47,7 @@ public slots:
 private:
     QProcess m_process;
 
+    QString m_jre;
     QString m_runnableName;
     QString m_runnablePath;
 

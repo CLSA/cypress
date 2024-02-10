@@ -20,7 +20,7 @@ void DxaHipRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, 
         out << responseData.toStdString();
         out.flush();
     } catch (const NotInstalledError &exception) {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_FAILED_DEPENDENCY);
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         response.setContentType("application/json");
 
         std::ostream &out = response.send();

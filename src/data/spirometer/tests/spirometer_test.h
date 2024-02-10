@@ -34,6 +34,8 @@ public:
     static const q_stringMap testMetaMap;
     static const q_stringMap patientMetaMap;
 
+    std::unique_ptr<QJsonObject> toJsonObjectHeap();
+
 private:
     QStringList m_outputKeyList;
 

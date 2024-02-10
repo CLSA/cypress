@@ -166,27 +166,27 @@ bool DxaHipManager::isInstalled()
         return false;
     }
 
-    QFileInfo refscanFile(refscanDbPath);
-    if (!refscanFile.exists()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not defined at "
-                     << refscanDbPath;
-        return false;
-    }
+    //QFileInfo refscanFile(refscanDbPath);
+    //if (!refscanFile.exists()) {
+    //    if (isDebugMode)
+    //        qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not defined at "
+    //                 << refscanDbPath;
+    //    return false;
+    //}
 
-    if (!refscanFile.isFile()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not a file at "
-                     << refscanDbPath;
-        return false;
-    }
+    //if (!refscanFile.isFile()) {
+    //    if (isDebugMode)
+    //        qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not a file at "
+    //                 << refscanDbPath;
+    //    return false;
+    //}
 
-    if (!refscanFile.isReadable()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not readable at "
-                     << refscanDbPath;
-        return false;
-    }
+    //if (!refscanFile.isReadable()) {
+    //    if (isDebugMode)
+    //        qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not readable at "
+    //                 << refscanDbPath;
+    //    return false;
+    //}
 
     QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
@@ -265,23 +265,11 @@ bool DxaHipManager::setUp()
 void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
     // pass received dicom files to test class
-    DxaHipTest *test = static_cast<DxaHipTest *>(m_test.get());
-    DxaHipSession *session = static_cast<DxaHipSession *>(m_session.get());
-
-    if (!session) {
-        qDebug() << "DxaHipManager::dicomFilesReceived - session does not exist...";
-        return;
-    }
-    if (!test) {
-        qDebug() << "DxaHipManager::dicomFilesReceived - test does not exist...";
-        return;
-    }
+    QSharedPointer<DxaHipTest> test = qSharedPointerCast<DxaHipTest>(m_test);
+    QSharedPointer<DxaHipSession> session = qSharedPointerCast<DxaHipSession>(m_session);
 
     test->fromDicomFiles(dicomFiles, *session);
     emit dataChanged(m_test);
-
-    if (m_debug)
-        qDebug() << "Have received all files, can now measure...";
 }
 
 // retrieve a measurement from the device
@@ -321,11 +309,11 @@ void DxaHipManager::measure()
         }
     } else {
         qDebug() << "could not access patscanDb at" << m_patscanDbPath;
-        QMessageBox::critical(nullptr, "Error", "Could not access Apex workstation");
+        emit error("Could not access PatScanDB on Apex workstation");
         return;
     }
 
-    // get refscan db variables for measurements
+    //// get refscan db variables for measurements
     //QFileInfo refscanFileInfo(m_refscanDbPath);
     //if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
     //    QString localPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
@@ -340,8 +328,7 @@ void DxaHipManager::measure()
     //        return;
     //    }
     //} else {
-    //    qDebug() << "could not access refscanDb at" << m_refscanDbPath;
-    //    QMessageBox::critical(nullptr, "Error", "Could not access Apex workstation");
+    //    emit error("Could not access ReferenceDB on Apex workstation");
     //    return;
     //}
 
@@ -369,12 +356,7 @@ void DxaHipManager::measure()
         m_patscanDb.close();
     }
 
-    emit dataChanged(m_test);
-    if (test->isValid()) {
-        emit canFinish();
-    } else {
-        QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");
-    }
+    emit canFinish();
 }
 
 // implementation of final clean up of device after disconnecting and all

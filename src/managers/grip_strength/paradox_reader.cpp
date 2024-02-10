@@ -199,23 +199,39 @@ QVariant ParadoxDbBlock::getValue(QByteArray bytes, FieldType type) {
         }
         case FieldType::LongInteger:
         {
-            qint32 value = NULL;
-            unsigned char sign = (bytes[0] & 0x80) ? (bytes[0] & 0x7f) : (bytes[0] | 0x80);
+            //qint32 value = (bytes[3] << 24) | (bytes[2] << 16) | (bytes[1] << 8) << bytes[0];
+            //qint32 value = bytes.toInt();
+            //qint32 value = NULL;
+            //unsigned char sign = (bytes[0] & 0x80) == 0x80 ? (bytes[0] & 0x7f) : (bytes[0] | 0x80);
 
-            if (bytes[0] & 0x80) { // positive
-                value  = (qint32) ((unsigned char) sign << 24);
-                value |= (qint32) ((unsigned char) bytes[1] << 16);
-                value |= (qint32) ((unsigned char) bytes[2] << 8);
-                value |= (qint32) ((unsigned char) bytes[3]);
-            }
-            else if (bytes[0] & 0x7F) { // negative
-                value  = (qint32) ((unsigned char) sign << 24);
-                value |= (qint32) ((unsigned char) bytes[1] << 16);
-                value |= (qint32) ((unsigned char) bytes[2] << 8);
-                value |= (qint32) ((unsigned char) bytes[3]);
+            bool positive = false;
+            if ((quint8) bytes[0] == (quint8) 0x80u) {
+                bytes[0] =  ((quint8) bytes[0] & 0x7fu);
+                positive = true;
             }
 
-            output = value;
+            quint32 value = 0;
+
+            value = value | ((quint8) bytes[0] << 24);
+            value = value | ((quint8) bytes[1] << 16);
+            value = value | ((quint8) bytes[2] << 8);
+            value = value |  (quint8) bytes[3];
+
+            output = positive ? (qint32) value : -((qint32) value);
+            //if (bytes[0] & 0x80) { // positive
+            //    value  = (qint32) ((unsigned char) sign << 24);
+            //    value |= (qint32) ((unsigned char) bytes[1] << 16);
+            //    value |= (qint32) ((unsigned char) bytes[2] << 8);
+            //    value |= (qint32) ((unsigned char) bytes[3]);
+            //}
+            //else if (bytes[0] & 0x7F) { // negative
+            //    value  = (qint32) ((unsigned char) sign << 24);
+            //    value |= (qint32) ((unsigned char) bytes[1] << 16);
+            //    value |= (qint32) ((unsigned char) bytes[2] << 8);
+            //    value |= (qint32) ((unsigned char) bytes[3]);
+            //}
+
+            //output = value;
             break;
         }
         // These two are in the data set, but ONYX has them return null

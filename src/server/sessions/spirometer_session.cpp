@@ -33,14 +33,14 @@ void SpirometerSession::validate() const
     if (!isValidDate("dob", "yyyy-MM-dd"))
         throw ValidationError("dob");
 
-    if (!isValidBool("asthma"))
-        throw ValidationError("asthma");
+    //if (!isValidBool("asthma"))
+    //    throw ValidationError("asthma");
+
+    //if (!isValidBool("copd"))
+    //    throw ValidationError("copd");
 
     if (!isValidBool("smoker"))
         throw ValidationError("smoker");
-
-    if (!isValidBool("copd"))
-        throw ValidationError("copd");
 
     if (!isValidString("sex"))
         throw ValidationError("sex");

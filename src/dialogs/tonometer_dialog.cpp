@@ -14,7 +14,7 @@ TonometerDialog::TonometerDialog(QWidget *parent, QSharedPointer<TonometerSessio
     ui->setupUi(this);
 
     ui->measurementTable->disableMeasureButton();
-    ui->measurementTable->disableFinishButton();
+    //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideManualEntry();
 
     if (!m_sim)

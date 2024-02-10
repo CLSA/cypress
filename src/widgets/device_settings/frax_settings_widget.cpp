@@ -23,15 +23,15 @@ FraxSettingsWidget::FraxSettingsWidget(QWidget *parent) :
     ui->runnablePath->setIsDir(true);
     ui->runnablePath->setPath(runnablePath);
 
-    ui->inputFilePath->setTitle("Input File Path");
-    ui->inputFilePath->setIsDir(true);
+    ui->inputFilePath->setTitle("Input File");
+    ui->inputFilePath->setIsFile(true);
     ui->inputFilePath->setPath(inputFilePath);
 
-    ui->outputFilePath->setTitle("Output File Path");
-    ui->outputFilePath->setIsDir(true);
+    ui->outputFilePath->setTitle("Output File");
+    ui->outputFilePath->setIsFile(true);
     ui->outputFilePath->setPath(outputFilePath);
 
-    ui->temporaryFilePath->setTitle("Temporary File Path");
+    ui->temporaryFilePath->setTitle("Temporary Path");
     ui->temporaryFilePath->setIsDir(true);
     ui->temporaryFilePath->setPath(temporaryFilePath);
 

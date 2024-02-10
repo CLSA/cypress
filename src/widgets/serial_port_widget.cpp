@@ -37,6 +37,14 @@ void SerialPortWidget::scanningForDevices()
     ui->disconnectButton->setEnabled(false);
 }
 
+void SerialPortWidget::deviceFound(const QSerialPortInfo& portInfo) {
+    ui->deviceComboBox->blockSignals(true);
+    ui->deviceComboBox->setCurrentIndex(ui->deviceComboBox->findText(portInfo.portName()));
+    ui->deviceComboBox->blockSignals(false);
+
+    m_portInfo = portInfo;
+}
+
 void SerialPortWidget::devicesCanBeSelected()
 {
     ui->deviceComboBox->setEnabled(true);
@@ -49,7 +57,7 @@ void SerialPortWidget::defaultDeviceSelected(const QSerialPortInfo &portInfo)
     comboBoxChanged(portInfo.portName());
 }
 
-void SerialPortWidget::deviceConnected()
+void SerialPortWidget::deviceConnected(const QSerialPortInfo &portInfo)
 {
     ui->connectButton->setEnabled(false);
     ui->disconnectButton->setEnabled(true);

@@ -4,25 +4,25 @@
 #include "cypress_session.h"
 
 #include "dialog_factory.h"
-#include "audiometer_dialog.h"
-#include "blood_pressure_dialog.h"
+//#include "blood_pressure_dialog.h"
 //#include "temperature_dialog.h"
-#include "body_composition_dialog.h"
-#include "cdtt_dialog.h"
-#include "choice_reaction_dialog.h"
-#include "ecg_dialog.h"
-#include "frax_dialog.h"
-#include "spirometer_dialog.h"
-#include "tonometer_dialog.h"
-#include "weigh_scale_dialog.h"
-#include "grip_strength_dialog.h"
-#include "retinal_camera_dialog.h"
-#include "signature_pad_dialog.h"
-#include "dxa_dialog.h"
-#include "cimt_vivid_i_dialog.h"
+//#include "body_composition_dialog.h"
+//#include "cdtt_dialog.h"
+//#include "choice_reaction_dialog.h"
+//#include "ecg_dialog.h"
+//#include "frax_dialog.h"
+//#include "spirometer_dialog.h"
+//#include "tonometer_dialog.h"
+//#include "weigh_scale_dialog.h"
+//#include "grip_strength_dialog.h"
+//#include "retinal_camera_dialog.h"
+//#include "signature_pad_dialog.h"
+//#include "dxa_dialog.h"
+//#include "cimt_vivid_i_dialog.h"
 
 DialogBase* DialogFactory::instantiate(const CypressSession& session)
 {
+    Q_UNUSED(session)
     //switch(session.getDeviceType())
     //{
     //  case Constants::MeasureType::Audiometer:

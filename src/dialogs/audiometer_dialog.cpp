@@ -21,7 +21,43 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     columns << TableColumn("side", "Side", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("test", "Test", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("level", "Level", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("outcome", "Outcome", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("error", "Error", new TextDelegate("", QRegExp(), true));
 
+
+    connect(manager.get(), &AudiometerManager::scanningDevices, ui->serialPortPickerWidget, &SerialPortWidget::scanningForDevices);
+
+    // ports have been scanned
+    connect(manager.get(), &AudiometerManager::devicesDiscovered, ui->serialPortPickerWidget, &SerialPortWidget::devicesDiscovered);
+
+    // ui should now allow picking a device
+    connect(manager.get(), &AudiometerManager::canSelectDevice, ui->serialPortPickerWidget, &SerialPortWidget::devicesCanBeSelected);
+
+    // the user selected a device from the dropdown
+    connect(ui->serialPortPickerWidget, &SerialPortWidget::deviceSelected, manager.get(), &AudiometerManager::selectDevice);
+
+    // the selected device is valid for this test
+    connect(manager.get(), &AudiometerManager::canConnectDevice, ui->serialPortPickerWidget, &SerialPortWidget::canConnectDevice);
+
+    // the user requested to connect to the device
+    connect(ui->serialPortPickerWidget, &SerialPortWidget::connectDevice, manager.get(), &AudiometerManager::connectDevice);
+
+    // the user requested to disconnect from the device
+    connect(ui->serialPortPickerWidget, &SerialPortWidget::disconnectDevice, manager.get(), [=]() {
+        ui->serialPortPickerWidget->deviceDisconnected();
+    });
+
+    // a connection was made, update ui
+    connect(manager.get(), &AudiometerManager::deviceConnected, ui->serialPortPickerWidget, [=](const QSerialPortInfo& portInfo) {
+        ui->serialPortPickerWidget->deviceConnected(portInfo);
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    // device disconnected, update ui
+    connect(manager.get(), &AudiometerManager::deviceDisconnected, ui->serialPortPickerWidget, [=]() {
+        ui->serialPortPickerWidget->disconnectDevice();
+        ui->measurementTable->disableMeasureButton();
+    });
     // device started
     connect(manager.get(), &AudiometerManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)

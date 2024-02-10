@@ -86,33 +86,30 @@ bool FileUtils::createDirectory(const QString &absoluteDirectoryPath)
     return dir.mkpath(absoluteDirectoryPath);
 }
 
-bool FileUtils::copyDirectory(const QString &sourceAbsolutePath, const QString &destinationAbsolutePath)
-{
-    QDir sourceDir(sourceAbsolutePath);
-    if (!sourceDir.exists()) {
-        return false;
-    }
+bool FileUtils::copyDirectory(QDir source, QDir destination, bool overwrite, bool includeDirs) {
+    destination.mkpath(".");
 
-    QDir destinationDir;
-    if (!destinationDir.mkpath(destinationAbsolutePath)) {
-        return false;
-    }
+    foreach (QString file, source.entryList(QDir::Files))
+    {
+        QFile sourceFile(source.absoluteFilePath(file));
+        QFile destinationFile(destination.absoluteFilePath(file));
 
-    QStringList files = sourceDir.entryList(QDir::Files);
-    foreach (const QString &file, files) {
-        const QString srcName = sourceAbsolutePath + QDir::separator() + file;
-        const QString destName = destinationAbsolutePath + QDir::separator() + file;
-        if (!QFile::copy(srcName, destName)) {
+        if (overwrite || !destinationFile.exists())
+        {
+            destinationFile.remove();
+            if (!sourceFile.copy(destination.absoluteFilePath(file))) {
                 return false;
+            }
         }
     }
 
-    QStringList directories = sourceDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    foreach (const QString &dir, directories) {
-        const QString srcName = sourceAbsolutePath + QDir::separator() + dir;
-        const QString destName = destinationAbsolutePath + QDir::separator() + dir;
-        if (!copyDirectory(srcName, destName)) {
-                return false;
+    if (!includeDirs)
+        return true;
+
+    foreach (QString directory, source.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+    {
+        if (!FileUtils::copyDirectory(QDir(source.absoluteFilePath(directory)), QDir(destination.absoluteFilePath(directory)), overwrite)) {
+            return false;
         }
     }
 

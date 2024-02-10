@@ -97,6 +97,9 @@ public:
 
 protected:
     QVector<QSharedPointer<Measurement>> m_measurementList;
+
+    QList<QVariant> m_files;
+
     MetaData m_metaData;
 
     bool m_debug;

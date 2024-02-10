@@ -193,6 +193,7 @@ HEADERS += \
     managers/body_composition/body_composition_manager.h \
     managers/cdtt/cdtt_manager.h \
     managers/choice_reaction/choice_reaction_manager.h \
+    managers/dxa/apex_database_helper.h \
     managers/dxa/dicom/LogWorker.h \
     managers/dxa/dicom/dicom_scp.h \
     managers/dxa/dxa_hip_manager.h \
@@ -395,6 +396,7 @@ SOURCES += \
     managers/body_composition/body_composition_manager.cpp \
     managers/cdtt/cdtt_manager.cpp \
     managers/choice_reaction/choice_reaction_manager.cpp \
+    managers/dxa/apex_database_helper.cpp \
     managers/dxa/dicom/LogWorker.cpp \
     managers/dxa/dicom/dicom_scp.cpp \
     managers/dxa/dxa_hip_manager.cpp \

@@ -95,12 +95,12 @@ bool SerialPortManager::scanDevices()
         m_deviceList.insert(info.portName(), info);
     }
 
-    qDebug() << m_deviceList.keys();
     emit devicesDiscovered(m_deviceList);
 
     // if we have a port from the ini file, check if it is still available on the system
     //
     bool found = false;
+
     QSerialPortInfo info;
     QString label;
 
@@ -115,17 +115,18 @@ bool SerialPortManager::scanDevices()
           ++it;
         }
     }
+
     if(found)
     {
         qInfo() << "Found port device: " << m_deviceName;
+        selectDevice(info);
         emit deviceSelected(label);
-      //setDevice(info);
     }
     else
     {
-      // select a serial port from the list of scanned ports
-      //
-      emit canSelectDevice();
+        // select a serial port from the list of scanned ports
+        //
+        emit canSelectDevice();
     }
 
     return true;
@@ -142,7 +143,7 @@ void SerialPortManager::selectDevice(const QSerialPortInfo &port)
 void SerialPortManager::setDevice(const QSerialPortInfo &info)
 {
     m_port.setPort(info);
-    if(m_port.open(QSerialPort::ReadWrite))
+    if (m_port.open(QSerialPort::ReadWrite))
     {
         emit canConnectDevice();
         m_port.close();
@@ -156,6 +157,19 @@ void SerialPortManager::connectDevice()
     {
         qDebug() << "closing port";
         m_port.close();
+
+        disconnect(&m_port, &QSerialPort::readyRead,
+            this,    &SerialPortManager::readDevice);
+
+        disconnect(&m_port, &QSerialPort::errorOccurred,
+            this,    &SerialPortManager::handleSerialPortError);
+
+        disconnect(&m_port, &QSerialPort::dataTerminalReadyChanged,
+            this,    &SerialPortManager::handleDataTerminalReadyChanged);
+
+        disconnect(&m_port, &QSerialPort::requestToSendChanged,
+            this,    &SerialPortManager::handleRequestToSendChanged);
+
     }
 
     connect(&m_port, &QSerialPort::readyRead,
@@ -170,7 +184,7 @@ void SerialPortManager::connectDevice()
     connect(&m_port, &QSerialPort::requestToSendChanged,
             this,    &SerialPortManager::handleRequestToSendChanged);
 
-    if(m_port.open(QSerialPort::ReadWrite))
+    if (m_port.open(QSerialPort::ReadWrite))
     {
         m_port.setDataBits(QSerialPort::Data8);
         m_port.setParity(QSerialPort::NoParity);
@@ -185,12 +199,8 @@ void SerialPortManager::connectDevice()
 
 void SerialPortManager::disconnectDevice()
 {
-    qDebug() << "SerialPortManager::disconnectDevice";
-    if(m_port.isOpen())
-    {
-        qDebug() << "closing port";
+    if (m_port.isOpen())
         m_port.close();
-    }
 
     disconnect(&m_port, &QSerialPort::readyRead,
             this,    &SerialPortManager::readDevice);

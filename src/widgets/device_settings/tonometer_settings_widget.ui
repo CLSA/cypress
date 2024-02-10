@@ -15,13 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="FilePickerWidget" name="runnableName" native="true"/>
-   </item>
-   <item>
     <widget class="FilePickerWidget" name="runnablePath" native="true"/>
    </item>
    <item>
-    <widget class="FilePickerWidget" name="outputPath" native="true"/>
+    <widget class="FilePickerWidget" name="databasePath" native="true"/>
+   </item>
+   <item>
+    <widget class="FilePickerWidget" name="temporaryPath" native="true"/>
    </item>
    <item>
     <spacer name="verticalSpacer">

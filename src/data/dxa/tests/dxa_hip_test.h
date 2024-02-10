@@ -41,6 +41,8 @@ public:
     QSharedPointer<HipMeasurement> rightHipMeasurement;
 
     void retrieveResults(const QSqlDatabase &db, const QString &barcode);
+
+    void computeTandZScores();
 };
 
 #endif // DXAHIPTEST_H

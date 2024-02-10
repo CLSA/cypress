@@ -147,6 +147,8 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
 
 QString Server::requestReport(const Constants::ReportType& report, const QJsonObject& inputData)
 {
+    Q_UNUSED(inputData);
+    Q_UNUSED(report);
     //CypressSession session(report, inputData);
 
     //emit startReport(session);

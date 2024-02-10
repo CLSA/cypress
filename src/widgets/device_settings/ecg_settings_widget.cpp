@@ -15,11 +15,11 @@ ECGSettingsWidget::ECGSettingsWidget(QWidget *parent) :
     QString workingPath = settings.value("ecg/workingPath", "C:/CARDIO/").toString();
     QString exportPath = settings.value("ecg/exportPath", "C:/CARDIO/Export/").toString();
 
-    ui->runnableName->setTitle("CardioSoft exe");
+    ui->runnableName->setTitle("Program (.exe)");
     ui->runnableName->setIsFile(true);
     ui->runnableName->setPath(runnableName);
 
-    ui->workingPath->setTitle("Working Path");
+    ui->workingPath->setTitle("Working directory");
     ui->workingPath->setIsDir(true);
     ui->workingPath->setPath(workingPath);
 

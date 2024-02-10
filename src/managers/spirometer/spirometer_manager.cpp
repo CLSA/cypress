@@ -2,6 +2,7 @@
 #include "managers/emr/emr_plugin_writer.h"
 
 #include "cypress_settings.h"
+#include "auxiliary/network_utils.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -206,10 +207,44 @@ void SpirometerManager::readOutput()
         return;
     }
 
-    SpirometerTest *test = static_cast<SpirometerTest *>(m_test.get());
+    if (!QFileInfo::exists(getEMROutXmlName())) {
+        emit error("Cannot find the output file");
+        return;
+    }
+
+    QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
     test->fromFile(getEMROutXmlName());
 
     finish();
+}
+
+void SpirometerManager::finish()
+{
+    QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
+    std::unique_ptr<QJsonObject> testJson = test->toJsonObjectHeap();
+    testJson->insert("session", m_session->getJsonObject());
+
+    std::unique_ptr<QJsonObject> responseJson = std::make_unique<QJsonObject>();
+    responseJson->insert("value", *testJson);
+
+    QJsonDocument jsonDoc(*responseJson);
+    std::unique_ptr<QByteArray> serializedData = std::make_unique<QByteArray>(jsonDoc.toJson());
+
+    int answerId = m_session->getAnswerId();
+    QString answerUrl = CypressSettings::getAnswerUrl(answerId);
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        answerUrl.toStdString(),
+        "application/json",
+        *serializedData
+    );
+
+    cleanUp();
+
+    if (ok)
+        emit success("Save successful. You may close this window.");
+    else
+        emit error("Something went wrong");
 }
 
 bool SpirometerManager::clearData()

@@ -25,6 +25,7 @@ signals:
 
 public slots:
     void scanningForDevices();
+    void deviceFound(const QSerialPortInfo &portInfo);
     void devicesDiscovered(const QMap<QString, QSerialPortInfo> &devices);
 
     void devicesCanBeSelected();
@@ -33,10 +34,8 @@ public slots:
 
     void defaultDeviceSelected(const QSerialPortInfo& portInfo);
 
-    void deviceConnected();
+    void deviceConnected(const QSerialPortInfo& portInfo);
     void deviceDisconnected();
-
-
 
     void clear();
 

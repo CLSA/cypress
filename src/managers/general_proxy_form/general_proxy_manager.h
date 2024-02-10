@@ -9,7 +9,8 @@ class GeneralProxyManager : public ManagerBase
 public:
     GeneralProxyManager(QSharedPointer<GenProxySession> session);
 
-    // ManagerBase interface
+    static bool isInstalled();
+
 public slots:
     bool start();
     void measure();
@@ -20,6 +21,10 @@ protected:
     bool setUp();
     bool clearData();
     bool cleanUp();
+
+private:
+    QString m_inputFilePath;
+    QString m_outputFilePath;
 };
 
 #endif // GENERALPROXYMANAGER_H

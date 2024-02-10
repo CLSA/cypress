@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFile>
+#include <QDir>
 
 class FileUtils
 {
@@ -23,7 +24,7 @@ public:
     static bool isFileExecutable(const QString &absoluteFilePath);
 
     static bool createDirectory(const QString& absoluteDirectoryPath);
-    static bool copyDirectory(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    static bool copyDirectory(QDir source, QDir destination, bool overwrite = true, bool includeDirs = true);
     static bool moveDirectory(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
     static bool removeDirectory(const QString& absoluteDirectoryPath);
 

@@ -254,6 +254,7 @@ void ECGManager::readOutput()
         return;
     }
 
+
     if(!QFileInfo::exists(m_outputFile))
     {
         emit error("Cannot find the measurement file");

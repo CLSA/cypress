@@ -41,7 +41,7 @@ void ChoiceReactionSession::isAvailable() const
         catch (const std::bad_cast& e)
         {
             if (CypressSettings::isDebugMode())
-                qDebug() << "session downcast failed: " << activeSession->getSessionId();
+                qDebug() << "session downcast failed: " << activeSession->getSessionId() << e.what();
 
             continue;
         }

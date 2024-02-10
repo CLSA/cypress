@@ -14,7 +14,7 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
 {
     ui->setupUi(this);
 
-    ui->measurementTable->disableMeasureButton();
+    //ui->measurementTable->disableMeasureButton();
     //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideManualEntry();
 
@@ -38,14 +38,14 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
     });
 
     // can auto measure
-    connect(manager, &DxaHipManager::canMeasure, ui->measurementTable, [=]() {
-        ui->measurementTable->enableMeasureButton();
-    });
+    //connect(manager, &DxaHipManager::canMeasure, ui->measurementTable, [=]() {
+    //    ui->measurementTable->enableMeasureButton();
+    //});
 
     // can finish
-    connect(manager, &DxaHipManager::canFinish, ui->measurementTable, [=]() {
-        ui->measurementTable->enableFinishButton();
-    });
+    //connect(manager, &DxaHipManager::canFinish, ui->measurementTable, [=]() {
+    //    ui->measurementTable->enableFinishButton();
+    //});
 
     // finished
     connect(manager, &DxaHipManager::success, this, &DxaHipDialog::success);

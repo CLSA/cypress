@@ -5,6 +5,7 @@
 void DxaSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
                                              Poco::Net::HTTPServerResponse &response)
 {
+    Q_UNUSED(request)
     try {
         QString responseData = "";
         QList<QSharedPointer<CypressSession>> activeSessions = Cypress::getInstance()

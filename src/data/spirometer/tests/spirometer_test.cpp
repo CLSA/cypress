@@ -220,10 +220,10 @@ const q_stringMap SpirometerTest::patientMetaMap = {
   {"Weight","weight"},
   {"Ethnicity","ethnicity"},
   {"Smoker","smoker"},
-  {"Asthma","asthma"},
   {"Gender","gender"},
   {"DateOfBirth","date_of_birth"},
-  {"COPD","copd"}
+  //{"Asthma","asthma"},
+  //{"COPD","copd"}
 };
 
 // the minimum output data keys required from a successful a test
@@ -264,8 +264,8 @@ void SpirometerTest::simulate(const QVariantMap& inputData)
     addMetaData("device_serial_number", "200000");
     addMetaData("device_software_version", "1.4.1.2");
 
-    addMetaData("asthma", inputData["asthma"].toBool());
-    addMetaData("copd", inputData["copd"].toBool());
+    //addMetaData("asthma", inputData["asthma"].toBool());
+    //addMetaData("copd", inputData["copd"].toBool());
 
     addMetaData("lung_age", 54, "yr");
 
@@ -678,15 +678,15 @@ QList<QStringList> SpirometerTest::toStringListList()
 bool SpirometerTest::isValid() const
 {
     bool okMeta = true;
-    foreach(const auto key, m_outputKeyList)
-    {
-      if(!hasMetaData(key))
-      {
-         okMeta = false;
-         qDebug() << "test invalid missing metadata" << key;
-         break;
-       }
-    }
+    //foreach(const auto key, m_outputKeyList)
+    //{
+    //  if(!hasMetaData(key))
+    //  {
+    //     okMeta = false;
+    //     qDebug() << "test invalid missing metadata" << key;
+    //     break;
+    //   }
+    //}
 
     qDebug() << "validating number of measurements (4)" << getMeasurementCount();
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
@@ -722,7 +722,6 @@ QJsonObject SpirometerTest::toJsonObject() const
     }
 
     QJsonObject json;
-
     QJsonObject deviceJson {};
     QJsonObject metaJson = m_metaData.toJsonObject();
 
@@ -736,6 +735,41 @@ QJsonObject SpirometerTest::toJsonObject() const
     value.insert("manual_entry", getManualEntryMode());
     value.insert("results", trialJson);
     value.insert("best_values", bestJson);
+
+    return value;
+}
+
+
+std::unique_ptr<QJsonObject> SpirometerTest::toJsonObjectHeap() {
+    std::unique_ptr<QJsonObject> value = std::make_unique<QJsonObject>();
+
+    QJsonArray trialJson {};
+    QJsonObject bestJson{};
+
+    for (int i = 0; i < m_measurementList.size(); i++) {
+       SpirometerMeasurement *m = static_cast<SpirometerMeasurement *>(
+           m_measurementList.at(i).get());
+       if (SpirometerMeasurement::ResultType::typeBestValues == m->getResultType()) {
+         bestJson = m->toJsonObject();
+       } else {
+         trialJson.append(m->toJsonObject());
+       }
+    }
+
+    QJsonObject json;
+    QJsonObject deviceJson {};
+    QJsonObject metaJson = m_metaData.toJsonObject();
+
+    deviceJson.insert("device_type", metaJson.take("device_type"));
+    deviceJson.insert("device_serial_number", metaJson.take("device_serial_number"));
+    deviceJson.insert("device_software_version", metaJson.take("device_software_version"));
+
+    value->insert("device_data", deviceJson);
+    value->insert("metadata", metaJson);
+
+    value->insert("manual_entry", getManualEntryMode());
+    value->insert("results", trialJson);
+    value->insert("best_values", bestJson);
 
     return value;
 }
@@ -836,7 +870,7 @@ void SpirometerTest::readTrials(const QDomNode& node)
       QDomNode trialNode = trialNodeList.at(i);
 
       if ("Trial" != trialNode.toElement().tagName()) {
-       continue;
+        continue;
       }
 
       QDomNodeList nodeList = trialNode.childNodes();

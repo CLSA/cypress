@@ -25,8 +25,13 @@ TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
     m_test->setExpectedMeasurementCount(2);
 
     m_db = QSqlDatabase::addDatabase("QODBC");
-    QString mdbFilePath = "C:\\Users\\antho\\Documents\\Database11.mdb";
-    m_db.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + mdbFilePath);
+
+    m_runnableName = CypressSettings::readSetting("tonometer/runnableName").toString();
+    m_runnablePath = CypressSettings::readSetting("tonometer/runnablePath").toString();
+    m_databasePath = CypressSettings::readSetting("tonometer/databasePath").toString();
+    m_temporaryPath = CypressSettings::readSetting("tonometer/temporaryPath").toString();
+
+    m_db.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + QDir::toNativeSeparators(m_databasePath));
 
     if (!m_db.open()) {
         qWarning() << "Error: Unable to connect to database.";
@@ -36,7 +41,7 @@ TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
 
 TonometerManager::~TonometerManager()
 {
-    QSqlDatabase::removeDatabase("mdb_connection");
+    m_db.close();
 }
 
 bool TonometerManager::start()
@@ -46,6 +51,7 @@ bool TonometerManager::start()
 
     if (!setUp()) {
         emit error("Something went wrong. Please contact support");
+        return false;
     }
 
     measure();
@@ -54,23 +60,85 @@ bool TonometerManager::start()
 }
 
 
-bool TonometerManager::isDefined(const QString& fileName, const TonometerManager::FileType& type) const
-{
-    if (m_debug)
-        qDebug() << "TonometerManager::isDefined";
-
-    bool ok = false;
-    QFileInfo info(fileName);
-    if(type == TonometerManager::FileType::ORAApplication)
-      ok = info.isExecutable() && info.exists();
-    else
-      ok = info.isFile() && info.exists();
-    return ok;
-}
-
 bool TonometerManager::isInstalled()
 {
-    return false;
+    bool isDebugMode = CypressSettings::isDebugMode();
+
+    QString runnableName = CypressSettings::readSetting("tonometer/runnableName").toString();
+    QString runnablePath = CypressSettings::readSetting("tonometer/runnablePath").toString();
+    QString databasePath = CypressSettings::readSetting("tonometer/databasePath").toString();
+    QString temporaryPath = CypressSettings::readSetting("tonometer/temporaryPath").toString();
+
+    if (runnablePath.isNull() || runnablePath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "TonometerManager: runnablePath is not defined";
+        return false;
+    }
+
+    if (runnableName.isNull() || runnableName.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "TonometerManager: runnableName is not defined";
+        return false;
+    }
+
+    if (databasePath.isNull() || databasePath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "TonometerManager: databasePath is not defined";
+        return false;
+    }
+
+    if (temporaryPath.isNull() || temporaryPath.isEmpty()) {
+        if (isDebugMode)
+            qDebug() << "TonometerManager: temporaryPath is not defined";
+        return false;
+    }
+
+    QDir runnablePathInfo(runnablePath);
+    if (!runnablePathInfo.exists()) {
+        if (isDebugMode) {
+            qDebug() << "TonometerManager: runnable does not exist";
+        }
+        return false;
+    }
+
+
+    QFileInfo runnableNameInfo(runnableName);
+    if (!runnableNameInfo.exists()) {
+        if (isDebugMode) {
+            qDebug() << "TonometerManager: runnable does not exist";
+        }
+        return false;
+    }
+    if (!runnableNameInfo.isExecutable()) {
+        if (isDebugMode) {
+            qDebug() << "TonometerManager: runnable is not executable";
+        }
+        return false;
+    }
+
+    QFileInfo databaseFileInfo(databasePath);
+    if (!databaseFileInfo.isFile()) {
+        if (isDebugMode) {
+            qDebug() << "TonometerManager: database is not a file";
+        }
+        return false;
+    }
+    if (!databaseFileInfo.isReadable()) {
+        if (isDebugMode) {
+            qDebug() << "TonometerManager: database is not readable";
+        }
+        return false;
+    }
+
+    QDir backupDir(temporaryPath);
+    if (!backupDir.exists()) {
+        if (isDebugMode) {
+            qDebug() << "TonometerManager: backup dir does not exist";
+        }
+        return false;
+    }
+
+    return true;
 }
 
 void TonometerManager::measure()
@@ -87,14 +155,14 @@ void TonometerManager::measure()
     }
 
     if (m_process.state() != QProcess::NotRunning) {
-        emit error("Tonometer is already running");
+        emit error("ORA is already running");
         return;
     }
 
     m_process.start();
 
     if (!m_process.waitForStarted()) {
-        emit error("Could not start Tonometer application");
+        emit error("Could not start the ORA application");
         return;
     }
 }
@@ -157,23 +225,72 @@ bool TonometerManager::clearData()
     return false;
 }
 
+bool TonometerManager::backupData() {
+    QFileInfo databasePath(m_databasePath);
+    QDir backupPath(m_temporaryPath);
+
+    if (!QFile::exists(databasePath.absoluteFilePath()) ) {
+        qDebug() << "tonometer database file does not exist at path" << databasePath.absoluteFilePath();
+        return false;
+    }
+
+    QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
+    if (QFileInfo::exists(backupDatabasePath)) {
+        if (!QFile::remove(backupDatabasePath)) {
+            qDebug() << "tonometer backup exists but cannot be removed..";
+            return false;
+        }
+    }
+
+    if (!QFile::copy(databasePath.absoluteFilePath(), backupDatabasePath)) {
+        qDebug() << "could not copy database file at " << databasePath.absoluteFilePath() << "to" << backupDatabasePath;
+        return false;
+    }
+
+    return true;
+}
+
+bool TonometerManager::restoreData() {
+    QDir backupPath(m_temporaryPath);
+    QFileInfo databasePath(m_databasePath);
+
+    QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
+    if (!backupPath.exists() ) {
+        return false;
+    }
+
+    if (!QFile::remove(m_databasePath)) {
+        return false;
+    }
+
+    if(!QFile::copy(backupDatabasePath, databasePath.absoluteFilePath())) {
+        return false;
+    }
+
+    return true;
+}
+
 bool TonometerManager::setUp()
 {
     if (m_debug)
         qDebug() << "TonometerManager::setUp";
 
-    bool ok = restoreDatabase();
-    if (!ok) {
+    if (!backupData()) {
+        qDebug() << "could not backup data";
         return false;
     }
 
-    ok = insertPatient(
+    configureProcess();
+
+    bool ok = insertPatient(
         m_session->getBarcode(),
         m_session->getInputData()["date_of_birth"].toString(),
         m_session->getInputData()["sex"].toString(),
         m_session->getBarcode().toInt()
     );
+
     if (!ok) {
+        qDebug() << "could not insert patient";
         return false;
     }
 
@@ -185,8 +302,16 @@ bool TonometerManager::cleanUp()
     if (m_debug)
         qDebug() << "TonometerManager::cleanUp";
 
-    bool ok = restoreDatabase();
-    return ok;
+    //if (!restoreDatabase()) {
+    //    return false;
+    //}
+
+    if (!restoreData()) {
+        qDebug() << "could not restore database";
+        return false;
+    }
+
+    return true;
 }
 
 bool TonometerManager::insertPatient(
@@ -226,6 +351,7 @@ QVariantMap TonometerManager::extractMeasures(const int patientId, const QString
 
     if (!query.exec()) {
         qWarning() << "Database error:" << m_db.lastError().text();
+        return resultMap;
     }
 
     while (query.next()) {

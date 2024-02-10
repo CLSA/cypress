@@ -301,7 +301,6 @@ QJsonObject ECGTest::toJsonObject() const
     valueObject.insert("metadata", m_metaData.toJsonObject());
     valueObject.insert("results", measurementArray);
     valueObject.insert("manual_entry", getManualEntryMode());
-    json.insert("value", valueObject);
 
-    return json;
+    return valueObject;
 }

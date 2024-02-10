@@ -52,31 +52,25 @@ bool RetinalCameraManager::isInstalled()
 
     if (runnableName.isEmpty() || runnablePath.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - runnable name is not defined";
+            qDebug() << "RetinalCamera: runnable name is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - runnable path is not defined";
+            qDebug() << "RetinalCamera: runnable path is not defined";
         return false;
     }
 
     if (databaseName.isEmpty() || databaseName.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - database name is not defined";
+            qDebug() << "RetinalCamera: database name is not defined";
         return false;
     }
 
     if (databasePort.isEmpty() || databasePort.isNull()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - database port is not defined";
-        return false;
-    }
-
-    if (databaseUser.isEmpty() || databaseUser.isNull()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - database user is not defined";
+            qDebug() << "RetinalCamera: database port is not defined";
         return false;
     }
 
@@ -85,13 +79,13 @@ bool RetinalCameraManager::isInstalled()
 
     if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - ImageNet exe is not defined";
+            qDebug() << "RetinalCamera: ImageNet exe is not defined";
         return false;
     }
 
     if (!runnablePathInfo.exists()) {
         if (isDebugMode)
-            qDebug() << "RetinalCameraManager::isInstalled - working directory does not exist";
+            qDebug() << "RetinalCamera: working directory does not exist";
         return false;
     }
 
@@ -117,7 +111,7 @@ bool RetinalCameraManager::start()
     }
 
     if (!setUp()) {
-        emit error("Could not setup database");
+        emit error("Could not setup IMAGENet database");
         return false;
     }
 
@@ -155,6 +149,7 @@ bool RetinalCameraManager::setUp()
         qDebug() << "RetinalCameraManager::setUp";
 
     if (!m_db.isOpen()) {
+        qDebug() << "IMAGENet database is not open";
         return false;
     }
 
@@ -163,8 +158,6 @@ bool RetinalCameraManager::setUp()
             qDebug() << "RetinalCameraManager::setUp cleanup did not return true";
         return false;
     }
-
-    cleanUp();
 
     return initializeDatabase();
 }
@@ -290,11 +283,12 @@ void RetinalCameraManager::finish()
 
     QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
+
     if (ok) {
-        emit success("");
+        emit success("Save successful. You may close this window.");
     }
     else {
-        emit error("");
+        emit error("Could not save results, please contact support.");
     }
 
 }
@@ -313,13 +307,12 @@ bool RetinalCameraManager::cleanupDatabase()
     }
 
     QSqlQuery query(m_db);
-
     query.prepare("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
-    query.exec();
-
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
 
     while (query.next())
     {
@@ -339,31 +332,32 @@ bool RetinalCameraManager::cleanupDatabase()
 
     query.prepare("DELETE FROM dbo.Exams WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
-    query.exec();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
 
-    if (m_debug)
-        qDebug() << query.lastError();
 
     query.prepare("DELETE FROM dbo.Media WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
-    query.exec();
-
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
 
     query.prepare("DELETE FROM dbo.Patients WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
-    query.exec();
-
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
 
     query.prepare("DELETE FROM dbo.Persons WHERE PersonUid = :personUUID");
     query.bindValue(":personUUID", defaultPatientUUID);
-    query.exec();
-
-    if (m_debug)
-        qDebug() << query.lastError();
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
 
     return true;
 }
@@ -379,9 +373,8 @@ bool RetinalCameraManager::initializeDatabase()
     query.prepare("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) VALUES (:personUUID, "
                   ":lastName, :firstName)");
     query.bindValue(":personUUID", defaultPersonUUID);
-    query.bindValue(":lastName", "Study");
-    query.bindValue(":firstName", "Participant");
-
+    query.bindValue(":lastName", "Participant");
+    query.bindValue(":firstName", "CLSA");
     if (!query.exec()) {
         qDebug() << query.lastError().text();
         return false;
@@ -391,12 +384,10 @@ bool RetinalCameraManager::initializeDatabase()
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.bindValue(":participantId", participantId);
     query.bindValue(":personUUID", defaultPatientUUID);
-
     if (!query.exec()) {
         qDebug() << query.lastError().text();
         return false;
     }
-
 
     return true;
 }
@@ -434,7 +425,7 @@ void RetinalCameraManager::readOutput()
 
     test->fromDatabaseResults(results);
 
-    emit canFinish();
+    finish();
 }
 
 QJsonObject RetinalCameraManager::getLeftEye()
@@ -444,7 +435,6 @@ QJsonObject RetinalCameraManager::getLeftEye()
         "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM dbo.Media WHERE PatientUid = "
         ":patientUid AND EyeType = 1 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
-
     if (!query.exec()) {
         qDebug() << query.lastError().text();
     }

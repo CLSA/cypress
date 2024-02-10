@@ -50,6 +50,12 @@ double WeighScaleTest::calculateAverage()
     }
 
     average = totalWeight / numberOfMeasures;
+
+    addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
+
+    if (m_debug)
+          qDebug() << "WeighScaleTest: new average" << average << "kg";
+
     return average;
 }
 
@@ -87,31 +93,18 @@ void WeighScaleTest::simulate()
 
 void WeighScaleTest::fromArray(const QByteArray &arr)
 {
-    if (!arr.isEmpty()) {
-      // only add to the end and keep the last two tests
-      //
-      QSharedPointer<WeightMeasurement> m(new WeightMeasurement);
-      m->fromArray(arr);
-
-      if (m->isValid()) {
-          bool ok = true;
-          if (0 < getMeasurementCount()) {
-              Measurement &last = lastMeasurement();
-              QDateTime prev = last.getAttributeValue("timestamp").toDateTime();
-              QDateTime curr = m->getAttributeValue("timestamp").toDateTime();
-              ok = DELAY < prev.secsTo(curr);
-          }
-          if (ok) {
-              addMeasurement(m);
-          }
-      }
-
-      double average = calculateAverage();
-      if (m_debug)
-          qDebug() << "WeighScaleTest::fromArray - new average" << average << "kg";
-
-      addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
+    if (arr.isEmpty()) {
+        return;
     }
+
+    QSharedPointer<WeightMeasurement> m(new WeightMeasurement);
+    m->fromArray(arr);
+
+    if (m->isValid()) {
+        addMeasurement(m);
+    }
+
+    calculateAverage();
 }
 
 QJsonObject WeighScaleTest::toJsonObject() const

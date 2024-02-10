@@ -1,33 +1,30 @@
 QT += testlib gui widgets sql xml network serialport
 CONFIG += qt warn_on depend_includepath testcase
 
+INCLUDEPATH += C:/work/clsa/cypress/src
+
 # QtUsb
-INCLUDEPATH += C:/dev/cypress/dep/QtUsb-win32/include
-LIBS += -L"C:/dev/cypress/dep/QtUsb-win32/lib" -lQt5Usb
+INCLUDEPATH += C:/work/clsa/cypress/dep/QtUsb_x86/include
+LIBS += -L"C:/work/clsa/cypress/dep/QtUsb_x86/lib" -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += C:/OpenSSL-Win32/include
-LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += C:/work/clsa/cypress/dep/OpenSSL-Win32/include
+LIBS += -L"C:/work/clsa/cypress/dep/OpenSSL-Win32/lib -llibssl -llibcrypto
 
 # POCO
-INCLUDEPATH += C:/dev/cypress/dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += C:/dev/cypress/dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += C:/dev/cypress/dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += C:/dev/cypress/dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += C:/dev/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
-INCLUDEPATH += C:/dev/cypress/dep/poco-1.12.4-all/bin
-
-LIBS += -L"C:/dev/cypress/dep/poco-1.12.4-all/lib/" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Foundation/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Util/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Net/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Crypto/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/bin
+LIBS += -L"C:/work/clsa/cypress/dep/poco-1.12.4-all/lib/" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += C:/dev/cypress/dep/dcmtk-3.6.7-win32/include
-INCLUDEPATH += C:/dev/cypress/dep/dcmtk-3.6.7-win32/lib/
-
-LIBS += -L"C:/dev/cypress/dep/dcmtk-3.6.7-win32/lib/" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
+LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 TEMPLATE = app
-
-INCLUDEPATH += C:/dev/cypress/src
 
 SOURCES +=  tst_bpmtests.cpp \
     ../../auxiliary/CRC8.cpp \

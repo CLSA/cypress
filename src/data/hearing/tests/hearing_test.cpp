@@ -133,6 +133,7 @@ QString HearingTest::readArray(const quint8 &begin, const quint8 &end) const
 //
 void HearingTest::fromArray(const QByteArray &arr)
 {
+    qDebug() << "From Array: " << arr;
     // assumes all data before end code (5 bytes) is valid
     if (arr.isEmpty()) {
         qDebug() << "HearingTest::fromArray is empty.";
@@ -239,9 +240,6 @@ QJsonObject HearingTest::toJsonObject() const
     }
     else if (side == "right") {
         rightResults.append(measureJson);
-    }
-    else {
-        throw std::exception("Invalid side");
     }
   }
 

@@ -51,7 +51,7 @@ public slots:
     // checks of the named port is in the list of scanned devices
     // and calls setDevice
     //
-    void selectDevice(const QSerialPortInfo& port);
+    virtual void selectDevice(const QSerialPortInfo& port);
 
 protected slots:
 
@@ -103,7 +103,7 @@ signals:
 
     void deviceNameChanged(const QString&);
 
-    void deviceConnected();
+    void deviceConnected(const QSerialPortInfo& info);
     void deviceDisconnected();
 
 

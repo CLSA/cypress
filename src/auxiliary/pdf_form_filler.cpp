@@ -37,15 +37,19 @@ QString PDFFormFiller::fillPDF(const QString& pdfTemplatePath, const QString& fd
 
     QProcess pdftkProcess;
     QStringList arguments;
-
     arguments << pdfTemplatePath << "fill_form" << tempFile.fileName() << "output" << outputPath;
-
     pdftkProcess.start("C:/Program Files (x86)/PDFtk Server/bin/pdftk.exe", arguments);
     pdftkProcess.waitForFinished();
+    arguments.clear();
+
+    QProcess signingProcess;
+    arguments << outputPath;
+    signingProcess.start("C:/Program Files/Adobe/Acrobat DC/Acrobat.exe", arguments);
+    signingProcess.waitForFinished();
 
     // Read the standard output if needed
-    QByteArray stdoutData = pdftkProcess.readAllStandardOutput();
-    QByteArray stderrData = pdftkProcess.readAllStandardError();
+    // QByteArray stdoutData = pdftkProcess.readAllStandardOutput();
+    // QByteArray stderrData = pdftkProcess.readAllStandardError();
 
     tempFile.close();
     tempFile.remove();

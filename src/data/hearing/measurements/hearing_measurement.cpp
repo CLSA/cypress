@@ -108,7 +108,7 @@ q_stringMap HearingMeasurement::initOutcomeLookup()
 QMap<int,QString> HearingMeasurement::initFrequencyLookup()
 {
     QMap<int,QString> map;
-    map[0] = "1 kHz Test";
+    map[0] = "1 kHz";
     map[1] = "500 Hz";
     map[2] = "1 kHz";
     map[3] = "2 kHz";

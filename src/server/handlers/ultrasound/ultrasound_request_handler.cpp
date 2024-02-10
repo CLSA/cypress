@@ -21,7 +21,7 @@ void UltrasoundRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
         out << responseData.toStdString();
         out.flush();
     } catch (const NotInstalledError &exception) {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_FAILED_DEPENDENCY);
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         response.setContentType("application/json");
 
         std::ostream &out = response.send();

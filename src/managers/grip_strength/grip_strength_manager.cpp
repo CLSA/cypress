@@ -1,6 +1,8 @@
 #include "grip_strength_manager.h"
 #include "data/grip_strength/tests/grip_strength_test.h"
+#include "auxiliary/file_utils.h"
 #include "paradox_reader.h"
+#include "auxiliary/tracker5_util.h"
 
 #include "cypress_settings.h"
 
@@ -44,7 +46,7 @@ bool GripStrengthManager::isInstalled()
     if (runnableName.isEmpty() || runnableName.isNull())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled: runnableName is not defined";
+            qDebug() << "GripStrength: runnableName is not defined";
 
         return false;
     }
@@ -52,7 +54,7 @@ bool GripStrengthManager::isInstalled()
     if (runnablePath.isEmpty() || runnablePath.isNull())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled: runnablePath is not defined";
+            qDebug() << "GripStrength: runnablePath is not defined";
 
         return false;
     }
@@ -60,7 +62,7 @@ bool GripStrengthManager::isInstalled()
     if (databasePath.isEmpty() || databasePath.isNull())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled: databasePath is not defined";
+            qDebug() << "GripStrength: databasePath is not defined";
 
         return false;
     }
@@ -68,7 +70,7 @@ bool GripStrengthManager::isInstalled()
     if (gripTestDBPath.isEmpty() || gripTestDBPath.isNull())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled: gripTestDBPath is not defined";
+            qDebug() << "GripStrengt: gripTestDBPath is not defined";
 
         return false;
     }
@@ -76,7 +78,7 @@ bool GripStrengthManager::isInstalled()
     if (gripTestDataDBPath.isEmpty() || gripTestDataDBPath.isNull())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled: gripTestDataDBPath is not defined";
+            qDebug() << "GripStrength: gripTestDataDBPath is not defined";
 
         return false;
     }
@@ -84,7 +86,7 @@ bool GripStrengthManager::isInstalled()
     if (backupPath.isEmpty() || backupPath.isNull())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled: backupPath is not defined";
+            qDebug() << "GripStrength: backupPath is not defined";
 
         return false;
     }
@@ -95,14 +97,14 @@ bool GripStrengthManager::isInstalled()
     if (!executable.exists())
     {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled - file does not exist at " << runnableName;
+            qDebug() << "GripStrength: file does not exist at " << runnableName;
 
         return false;
     }
 
     if (!executable.isExecutable()) {
         if (isDebugMode)
-            qDebug() << "GripStrengthManager::isInstalled - file is not executable at " << runnableName;
+            qDebug() << "GripStrength: file is not executable at " << runnableName;
 
         return false;
     }
@@ -129,6 +131,11 @@ bool GripStrengthManager::start()
         return false;
     }
 
+    emit started(m_test);
+    emit dataChanged(m_test);
+
+    measure();
+
     return true;
 }
 
@@ -146,19 +153,19 @@ void GripStrengthManager::readOutput()
 
     for (int i = 0; i < results2.length(); i++)
     {
-        test->addMetaData("ExamID", results2[i]["ExamID"].toInt());
-        test->addMetaData("TestID", results2[i]["TestID"].toInt());
-        test->addMetaData("Test", results2[i]["Test"].toString());
-        test->addMetaData("Rung", results2[i]["Rung"].toInt());
-        test->addMetaData("Units", results2[i]["Units"].toString());
-        test->addMetaData("MaxReps", results2[i]["MaxReps"].toInt());
-        test->addMetaData("Sequence", results2[i]["Sequence"].toString());
-        test->addMetaData("RestTime", results2[i]["RestTime"].toInt());
-        test->addMetaData("Rate", results2[i]["Rate"].toInt());
-        test->addMetaData("Threshold", results2[i]["Threshold"].toInt());
-        test->addMetaData("PrimaryStat", results2[i]["PrimaryStat"].toString());
-        test->addMetaData("NormType", results2[i]["NormType"].toInt());
-        test->addMetaData("Comparison", results2[i]["Comparison"].toInt());
+        test->addMetaData("exam_id", results2[i]["ExamID"].toInt());
+        test->addMetaData("test_id", results2[i]["TestID"].toInt());
+        test->addMetaData("test", results2[i]["Test"].toString());
+        test->addMetaData("rung", results2[i]["Rung"].toInt());
+        test->addMetaData("units", results2[i]["Units"].toString());
+        test->addMetaData("max_reps", results2[i]["MaxReps"].toInt());
+        test->addMetaData("sequence", results2[i]["Sequence"].toString());
+        test->addMetaData("rest", results2[i]["RestTime"].toInt());
+        test->addMetaData("rate", results2[i]["Rate"].toInt());
+        test->addMetaData("threshold", Tracker5Util::asKg(results2[i]["Threshold"].toInt()));
+        test->addMetaData("primary_stat", results2[i]["PrimaryStat"].toString());
+        test->addMetaData("norm_type", results2[i]["NormType"].toInt());
+        test->addMetaData("comparison", results2[i]["Comparison"].toInt());
     }
 
     ParadoxReader readerTest(m_gripTestDataDBPath);
@@ -168,41 +175,43 @@ void GripStrengthManager::readOutput()
     {
         QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
 
-        measurement->setAttribute("ExamID", results[i]["ExamID"].toInt());
-        measurement->setAttribute("TestID", results[i]["TestID"].toInt());
-        measurement->setAttribute("Position", results[i]["Position"].toInt());
-        measurement->setAttribute("Side", results[i]["Side"].toInt());
-        measurement->setAttribute("Rep1", results[i]["Rep1"].toInt());
-        measurement->setAttribute("Rep2", results[i]["Rep2"].toInt());
-        measurement->setAttribute("Rep3", results[i]["Rep3"].toInt());
-        measurement->setAttribute("Rep4", results[i]["Rep4"].toInt());
-        measurement->setAttribute("Rep5", results[i]["Rep5"].toInt());
-        measurement->setAttribute("Rep6", results[i]["Rep6"].toInt());
-        measurement->setAttribute("Rep7", results[i]["Rep7"].toInt());
-        measurement->setAttribute("Rep8", results[i]["Rep8"].toInt());
-        measurement->setAttribute("Rep9", results[i]["Rep9"].toInt());
-        measurement->setAttribute("Rep10", results[i]["Rep10"].toInt());
+        measurement->setAttribute("exam_id", results[i]["ExamID"].toInt());
+        measurement->setAttribute("test_id", results[i]["TestID"].toInt());
+        measurement->setAttribute("position", results[i]["Position"].toInt());
+        measurement->setAttribute("side", results[i]["Side"].toInt());
+        measurement->setAttribute("rep1", Tracker5Util::asKg(results[i]["Rep1"].toInt()), "kg", 2);
+        measurement->setAttribute("rep2", Tracker5Util::asKg(results[i]["Rep2"].toInt()), "kg", 2);
+        measurement->setAttribute("rep3", Tracker5Util::asKg(results[i]["Rep3"].toInt()), "kg", 2);
+        measurement->setAttribute("rep4", Tracker5Util::asKg(results[i]["Rep4"].toInt()), "kg", 2);
+        measurement->setAttribute("rep5", Tracker5Util::asKg(results[i]["Rep5"].toInt()), "kg", 2);
+        measurement->setAttribute("rep6", Tracker5Util::asKg(results[i]["Rep6"].toInt()), "kg", 2);
+        measurement->setAttribute("rep7", Tracker5Util::asKg(results[i]["Rep7"].toInt()), "kg", 2);
+        measurement->setAttribute("rep8", Tracker5Util::asKg(results[i]["Rep8"].toInt()), "kg", 2);
+        measurement->setAttribute("rep9", Tracker5Util::asKg(results[i]["Rep9"].toInt()), "kg", 2);
+        measurement->setAttribute("rep10", Tracker5Util::asKg(results[i]["Rep10"].toInt()), "kg", 2);
 
-        measurement->setAttribute("Rep1Exclude", results[i]["Rep1Exclude"].toBool());
-        measurement->setAttribute("Rep2Exclude", results[i]["Rep2Exclude"].toBool());
-        measurement->setAttribute("Rep3Exclude", results[i]["Rep3Exclude"].toBool());
-        measurement->setAttribute("Rep4Exclude", results[i]["Rep4Exclude"].toBool());
-        measurement->setAttribute("Rep5Exclude", results[i]["Rep5Exclude"].toBool());
-        measurement->setAttribute("Rep6Exclude", results[i]["Rep6Exclude"].toBool());
-        measurement->setAttribute("Rep7Exclude", results[i]["Rep7Exclude"].toBool());
-        measurement->setAttribute("Rep8Exclude", results[i]["Rep8Exclude"].toBool());
-        measurement->setAttribute("Rep9Exclude", results[i]["Rep9Exclude"].toBool());
-        measurement->setAttribute("Rep10Exclude", results[i]["Rep10Exclude"].toBool());
+        measurement->setAttribute("rep1_exclude", results[i]["Rep1Exclude"].toBool());
+        measurement->setAttribute("rep2_exclude", results[i]["Rep2Exclude"].toBool());
+        measurement->setAttribute("rep3_exclude", results[i]["Rep3Exclude"].toBool());
+        measurement->setAttribute("rep4_exclude", results[i]["Rep4Exclude"].toBool());
+        measurement->setAttribute("rep5_exclude", results[i]["Rep5Exclude"].toBool());
+        measurement->setAttribute("rep6_exclude", results[i]["Rep6Exclude"].toBool());
+        measurement->setAttribute("rep7_exclude", results[i]["Rep7Exclude"].toBool());
+        measurement->setAttribute("rep8_exclude", results[i]["Rep8Exclude"].toBool());
+        measurement->setAttribute("rep9_exclude", results[i]["Rep9Exclude"].toBool());
+        measurement->setAttribute("rep10_exclude", results[i]["Rep10Exclude"].toBool());
 
-        measurement->setAttribute("Average", results[i]["Average"].toInt());
-        measurement->setAttribute("Maximum", results[i]["Maximum"].toInt());
-        measurement->setAttribute("CV", results[i]["CV"].toInt());
+        measurement->setAttribute("average", Tracker5Util::asKg(results[i]["Average"].toInt()), "kg", 2);
+        measurement->setAttribute("maximum", Tracker5Util::asKg(results[i]["Maximum"].toInt()), "kg", 2);
+        measurement->setAttribute("cv", results[i]["CV"].toInt());
 
         m_test->addMeasurement(measurement);
     }
 
     if (m_debug)
         qDebug() << "GripStrengthManager::readOutput: " << m_test->toJsonObject();
+
+    finish();
 }
 
 
@@ -222,13 +231,14 @@ void GripStrengthManager::measure()
     }
 
     if (m_process.state() != QProcess::NotRunning) {
-        QMessageBox::critical(nullptr, "Error", "Program is already running");
+        emit error("Program is already running");
         return;
     }
 
     m_process.start();
+
     if (!m_process.waitForStarted()) {
-        QMessageBox::critical(nullptr, "Error", "Could not start application");
+        emit error("Could not start application");
         return;
     }
 }
@@ -248,68 +258,45 @@ bool GripStrengthManager::setUp() {
     if (m_debug)
         qDebug() << "GripStrengthManager::setUp";
 
-    cleanUp();
+    if (!backupData()) {
+        return false;
+    }
+
     configureProcess();
 
     return true;
 }
 
+bool GripStrengthManager::backupData() {
+    if (m_debug)
+        qDebug() << "GripStrengthManager::backupData";
+
+    if (!FileUtils::copyDirectory(QDir(m_databasePath), QDir(m_backupPath), true, false)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool GripStrengthManager::restoreData() {
+    if (m_debug)
+        qDebug() << "GripStrengthManager::restoreData";
+
+    if (!FileUtils::copyDirectory(QDir(m_backupPath), QDir(m_databasePath), true, false)) {
+        return false;
+    }
+
+    return true;
+}
+
+
 bool GripStrengthManager::cleanUp() {
     if (m_debug)
         qDebug() << "GripStrengthManager::cleanUp";
 
-    m_test->reset();
-
-    // close process
-    if (m_process.state() != QProcess::NotRunning) {
-        m_process.close();
-        m_process.waitForFinished();
-    }
-
-    // close database
-    if (m_database.isOpen())
-        m_database.close();
-
-    // check if backup folder exists, if not then return since we are finished
-    QDir backupFolder(m_backupPath);
-    if (!backupFolder.exists()) {
-        if (m_debug)
-            qDebug() << "GripStrengthManager::cleanUp - backup folder doesn't exist";
-
-        return true;
-    }
-
-    // remove database folder, will be restored from backup
-    QDir databaseFolder(m_databasePath);
-    if (!databaseFolder.removeRecursively()) {
-        if (m_debug)
-            qDebug() << "GripStrengthManager::cleanUp - could not remove database folder";
-
+    if (!restoreData()) {
         return false;
     }
-
-    if (m_debug)
-        qDebug() << "GripStrengthManager::cleanUp - database folder removed, restoring backup";
-
-    // copy backup to database folder
-    foreach (const QString &fileName, backupFolder.entryList(QDir::Files)) {
-        QFile::copy(backupFolder.filePath(fileName), databaseFolder.filePath(fileName));
-    }
-
-    if (m_debug)
-        qDebug() << "GripStrengthManager::cleanUp - database folder restored from backup";
-
-    // remove backup folder
-    if (!backupFolder.removeRecursively())
-    {
-        if (m_debug)
-            qDebug() << "GripStrengthManager::cleanUp - could not remove backup folder";
-
-        return false;
-    }
-
-    if (m_debug)
-        qDebug() << "GripStrengthManager::cleanUp - backup folder removed";
 
     return true;
 }
@@ -317,7 +304,11 @@ bool GripStrengthManager::cleanUp() {
 void GripStrengthManager::configureProcess()
 {
     if (m_debug)
-        qDebug() << "GripStrengthManager::configureProcess";
+        qDebug() << "GripStrengthManager::configureProcess" << m_runnableName << m_runnablePath;
+
+    m_process.setProgram(m_runnableName);
+    m_process.setWorkingDirectory(m_runnablePath);
+    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
     // connect signals and slots to QProcess one time only
     //
@@ -338,7 +329,6 @@ void GripStrengthManager::configureProcess()
                 qDebug() << "GripStrengthManager::process error: process error occured: " << s.join(" ").toLower();
 
             cleanUp();
-            setUp();
         });
 
     connect(&m_process, &QProcess::stateChanged,
@@ -352,13 +342,6 @@ void GripStrengthManager::configureProcess()
     // read output after grip strength process ends
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
         this, &GripStrengthManager::readOutput);
-
-    m_process.setProgram(m_runnableName);
-    m_process.setWorkingDirectory(m_runnablePath);
-    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
-
-    if (m_debug)
-        qDebug() << "GripStrengthManager::configureProcess - process configured";
 }
 
 bool GripStrengthManager::clearData()
@@ -367,8 +350,6 @@ bool GripStrengthManager::clearData()
         qDebug() << "GripStrengthManager::clearData";
 
     m_test->reset();
-
-    emit dataChanged(m_test);
 
     return true;
 }

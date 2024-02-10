@@ -19,8 +19,9 @@ void EMRPluginWriter::setInputData(const QVariantMap& input)
 void EMRPluginWriter::write(const QString& fileName) const
 {
     QFile file(fileName);
-    if(!file.open(QIODevice::WriteOnly|QIODevice::Text))
+    if(!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
         return;
+    }
 
     QXmlStreamWriter stream(&file);
     stream.setAutoFormatting(true);
@@ -82,22 +83,23 @@ void EMRPluginWriter::addPatientDataAtPresent(QXmlStreamWriter& stream) const
 
     // enforce capitalized gender: eg., male => Male
     //
-    QString gender = m_input["gender"].toString().toLower();
+    QString gender = m_input["sex"].toString().toLower();
     gender = gender.at(0).toUpper() + gender.mid(1);
     stream.writeTextElement("Gender", gender);
 
-    stream.writeTextElement("DateOfBirth", m_input["date_of_birth"].toDate().toString("yyyy-MM-dd"));
+    stream.writeTextElement("DateOfBirth", m_input["dob"].toDate().toString("yyyy-MM-dd"));
     stream.writeTextElement("ComputedDateOfBirth", "false");
 
     // TODO: check that the units are decimal m ?
     //
     stream.writeTextElement("Height", QString::number(m_input["height"].toDouble() / 100.0));
     stream.writeTextElement("Weight", QString::number(m_input["weight"].toDouble()));
+    stream.writeTextElement("Ethnicity", m_input["ethnicity"].toString());
 
     //stream.writeTextElement("Ethnicity", m_ethnicity);
     stream.writeTextElement("Smoker", (m_input["smoker"].toBool() ? "Yes" : "No"));
-    stream.writeTextElement("Asthma", (m_input["asthma"].toBool() ? "Yes" : "No"));
-    stream.writeTextElement("COPD", (m_input["copd"].toBool() ? "Yes" : "No"));
+    stream.writeTextElement("Asthma", "No");
+    stream.writeTextElement("COPD", "No");
 
     stream.writeEndElement();
 }

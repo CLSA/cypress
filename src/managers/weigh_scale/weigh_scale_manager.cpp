@@ -19,7 +19,9 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     : SerialPortManager(session)
 {
     m_test.reset(new WeighScaleTest);
-    m_test->setExpectedMeasurementCount(2);
+    //m_test->setExpectedMeasurementCount(2);
+
+    m_deviceName = CypressSettings::readSetting("weight_scale/portName").toString();
 
     if (m_debug) {
         qDebug() << "WeighScaleManager";
@@ -70,8 +72,15 @@ void WeighScaleManager::measure()
 
 void WeighScaleManager::addManualMeasurement()
 {
+    QSharedPointer<WeighScaleTest> test = qSharedPointerCast<WeighScaleTest>(m_test);
     QSharedPointer<WeightMeasurement> measure(new WeightMeasurement);
-    m_test->addMeasurement(measure);
+
+    test->addMeasurement(measure);
+
+    double average = test->calculateAverage();
+    if (m_debug)
+      qDebug() << "WeighScaleTest::fromArray - new average" << average << "kg";
+
 
     emit dataChanged(m_test);
 }
@@ -106,7 +115,7 @@ void WeighScaleManager::connectDevice()
             &WeighScaleManager::handleRequestToSendChanged);
 
     if (m_port.open(QSerialPort::ReadWrite)) {
-        emit deviceConnected();
+        emit deviceConnected(QSerialPortInfo(m_port));
 
         // try and read the scale ID, if we can do that then emit the
         // canMeasure signal
@@ -116,6 +125,14 @@ void WeighScaleManager::connectDevice()
         writeDevice();
     } else
         qDebug() << "could not open port";
+}
+
+void WeighScaleManager::selectDevice(const QSerialPortInfo &port)
+{
+    SerialPortManager::selectDevice(port);
+
+    CypressSettings::writeSetting("weight_scale/portName", port.portName());
+    m_deviceName = port.portName();
 }
 
 void WeighScaleManager::zeroDevice()

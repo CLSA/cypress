@@ -120,32 +120,32 @@ bool GripStrengthTest::readMeasurements()
         {
             QJsonObject record;
 
-            record.insert("ExamId",   QJsonValue::fromVariant(query.value(0)));
-            record.insert("TestId",   QJsonValue::fromVariant(query.value(1)));
-            record.insert("Position", QJsonValue::fromVariant(query.value(2)));
-            record.insert("Side", 	  QJsonValue::fromVariant(query.value(3)));
+            record.insert("exam_id",   QJsonValue::fromVariant(query.value(0)));
+            record.insert("test_id",   QJsonValue::fromVariant(query.value(1)));
+            record.insert("position", QJsonValue::fromVariant(query.value(2)));
+            record.insert("side", 	  QJsonValue::fromVariant(query.value(3)));
 
-            record.insert("Rep1",  QJsonValue::fromVariant(query.value(4)));
-            record.insert("Rep2",  QJsonValue::fromVariant(query.value(5)));
-            record.insert("Rep3",  QJsonValue::fromVariant(query.value(6)));
+            record.insert("rep1",  QJsonValue::fromVariant(query.value(4)));
+            record.insert("rep2",  QJsonValue::fromVariant(query.value(5)));
+            record.insert("rep3",  QJsonValue::fromVariant(query.value(6)));
 
-            record.insert("Average", QJsonValue::fromVariant(query.value(7)));
-            record.insert("Maximum", QJsonValue::fromVariant(query.value(8)));
-            record.insert("CV",      QJsonValue::fromVariant(query.value(9)));
+            record.insert("average", QJsonValue::fromVariant(query.value(7)));
+            record.insert("maximum", QJsonValue::fromVariant(query.value(8)));
+            record.insert("cv",      QJsonValue::fromVariant(query.value(9)));
 
             qDebug() << record;
             testRecords.append(record);
         }
 
         foreach(QJsonObject record, testRecords) {
-            if (record.contains("Rep1")) {
-                record["Rep1"] = Tracker5Util::asKg(record["Rep1"].toDouble());
+            if (record.contains("rep1")) {
+                record["rep1"] = Tracker5Util::asKg(record["rep1"].toDouble());
             }
-            if (record.contains("Rep2")) {
-                record["Rep2"] = Tracker5Util::asKg(record["Rep2"].toDouble());
+            if (record.contains("rep2")) {
+                record["rep2"] = Tracker5Util::asKg(record["rep2"].toDouble());
             }
-            if (record.contains("Rep3")) {
-                record["Rep3"] = Tracker5Util::asKg(record["Rep3"].toDouble());
+            if (record.contains("rep3")) {
+                record["rep3"] = Tracker5Util::asKg(record["rep3"].toDouble());
             }
 
             QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
