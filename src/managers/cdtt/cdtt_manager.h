@@ -44,6 +44,8 @@ public slots:
     //
     void measure() override;
 
+    void finish() override;
+
 private:
     QProcess m_process;
 

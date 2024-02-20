@@ -10,17 +10,17 @@
 #include <QDir>
 
 struct DicomFile {
-    QString studyId;
-    QString patientId;
-    QString bodyPartExamined;
-    QString modality;
-    QString mediaStorageUID;
-    QString studyDate;
-    QString seriesNumber;
-    QString size;
-    QString name;
-    QString absFilePath;
-    QString laterality;
+    QString studyId {};
+    QString patientId {};
+    QString bodyPartExamined {};
+    QString modality {};
+    QString mediaStorageUID {};
+    QString studyDate {};
+    QString seriesNumber {};
+    QString size {};
+    QString name {};
+    QString absFilePath {};
+    QString laterality {};
 };
 
 class DcmRecv : public QObject
@@ -42,6 +42,7 @@ public:
     bool stop();
 
     QString receivedFilesDir() const;
+
 signals:
     void dicomFilesReceived(QList<DicomFile> dicomFilesReceived);
     void logUpdate(const QString& line);

@@ -1,5 +1,6 @@
 #include "ecg_manager.h"
 #include "auxiliary/network_utils.h"
+#include "auxiliary/file_utils.h"
 
 #include <QDebug>
 #include <QDir>
@@ -254,7 +255,6 @@ void ECGManager::readOutput()
         return;
     }
 
-
     if(!QFileInfo::exists(m_outputFile))
     {
         emit error("Cannot find the measurement file");
@@ -265,8 +265,64 @@ void ECGManager::readOutput()
         qDebug() << "found ecg output file" << m_outputFile;
 
     test->fromFile(m_outputFile);
+
     finish();
 }
+
+
+void ECGManager::finish() {
+    const int answer_id = m_session->getAnswerId();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
+
+    // Save the xml and pdf files
+    const QFileInfo xmlFile(m_outputFile);
+    if (!xmlFile.exists()) {
+        if (m_debug)
+            qDebug() << "xml file does not exist at: " << m_outputFile;
+
+        emit error("Ecg.xml file does not exist");
+    }
+
+    QJsonObject filesJson {};
+    filesJson.insert("Ecg_xml", FileUtils::getHumanReadableFileSize(xmlFile.absoluteFilePath()));
+
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        (host + endpoint + QString::number(answer_id) + "?filename=" + "Ecg.xml").toStdString(),
+        "application/octet-stream",
+        FileUtils::readFile(xmlFile.absoluteFilePath())
+    );
+
+    if (!ok) {
+        qDebug() << "could not send xmlFile" << xmlFile.absoluteFilePath();
+        emit error("Could not submit results");
+    }
+
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session->getJsonObject());
+    testJson.insert("files", filesJson);
+
+    QJsonObject responseJson {};
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+    ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        answerUrl.toStdString(),
+        "application/json",
+        serializedData
+    );
+
+    if (!ok) {
+        qDebug() << "could not send data";
+        emit error("Could not submit results");
+    }
+}
+
 
 bool ECGManager::clearData()
 {

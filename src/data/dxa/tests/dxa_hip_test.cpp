@@ -20,8 +20,8 @@ const QMap<QString, QString> DxaHipTest::ranges = {
 
 DxaHipTest::DxaHipTest()
 {
-    leftHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement);
-    rightHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement);
+    leftHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement(Side::LEFT));
+    rightHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement(Side::RIGHT));
 }
 
 void DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session)
@@ -34,18 +34,19 @@ void DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &ses
         }
 
         if (file.bodyPartExamined == "HIP") {
-            QSharedPointer<HipMeasurement> measure(new HipMeasurement);
-            if (file.laterality == "L" && measure->isValidDicomFile(file)) {
+            if (file.laterality == "L") {
                 if (m_debug)
                     qDebug() << "DxaHipTest::fromDicomFiles - found left hip";
+                QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::LEFT));
+                if (measure->isValidDicomFile(file))
                 measure->addDicomFile(file);
                 addMeasurement(measure);
-
                 leftHipMeasurement = measure;
             } else {
                 if (m_debug)
                     qDebug() << "DxaHipTest::fromDicomFiles - found right hip";
-
+                QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::RIGHT));
+                if (measure->isValidDicomFile(file))
                 measure->addDicomFile(file);
                 addMeasurement(measure);
 
@@ -55,135 +56,34 @@ void DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &ses
     }
 }
 
-void DxaHipTest::retrieveResults(const QSqlDatabase &db, const QString &barcode)
-{
-    if (!db.isOpen()) {
-        qDebug() << "DxaHipTest::db is not open";
-        return;
-    }
 
-    QJsonObject leftScanResults = extractScanAnalysis(db, barcode, "21");
-    QJsonObject rightScanResults = extractScanAnalysis(db, barcode, "31");
-
-    if (!leftScanResults.isEmpty() && leftHipMeasurement) {
-        QString scanId = leftScanResults["SCANID"].toString();
-        QString scanMode = leftScanResults["SCAN_MODE"].toString();
-        QString scanDate = leftScanResults["SCAN_DATE"].toString();
-
-        leftHipMeasurement->setAttribute("SCANID", scanId);
-        leftHipMeasurement->setAttribute("SCAN_MODE", scanMode);
-        leftHipMeasurement->setAttribute("SCAN_DATE", scanDate);
-
-        QJsonObject leftHipMeasurementData = extractScanData(db, barcode, scanId);
-        for (auto key : leftHipMeasurementData.keys()) {
-            QJsonValue value = leftHipMeasurementData.value(key);
-            leftHipMeasurement->setAttribute(key, value);
-        }
-    }
-
-    if (!rightScanResults.isEmpty() && rightHipMeasurement) {
-        QString scanId = rightScanResults["SCANID"].toString();
-        QString scanMode = rightScanResults["SCAN_MODE"].toString();
-        QString scanDate = rightScanResults["SCAN_DATE"].toString();
-
-        rightHipMeasurement->setAttribute("SCANID", scanId);
-        rightHipMeasurement->setAttribute("SCAN_MODE", scanMode);
-        rightHipMeasurement->setAttribute("SCAN_DATE", scanDate);
-
-        QJsonObject rightHipMeasurementData = extractScanData(db, barcode, scanId);
-        for (auto key : rightHipMeasurementData.keys()) {
-            QJsonValue value = rightHipMeasurementData.value(key);
-            rightHipMeasurement->setAttribute(key, value);
-        }
-    }
-}
 
 bool DxaHipTest::hasAllNeededFiles() const
 {
     return leftHipMeasurement->hasAllNeededFiles();
 }
 
-QJsonObject DxaHipTest::extractScanAnalysis(const QSqlDatabase &db,
-                                            const QString &barcode,
-                                            const QString &scanType)
-{
-    QJsonObject scanJson{};
+void DxaHipTest::getPatientScan(const QSqlDatabase &db, const QString &participantId) {
+    QSqlQuery query(db);
 
-    QSqlQuery query;
-
-    query.prepare("SELECT SCANID, SCAN_MODE, SCAN_DATE FROM ScanAnalysis WHERE PATIENT_KEY = "
-                  ":patient_key AND SCAN_TYPE = :scan_type");
-    query.bindValue(":patient_key", barcode);
-    query.bindValue(":scan_type", scanType);
+    query.prepare("SELECT PATIENT_KEY, BIRTHDATE, SEX, ETHNICITY, WEIGHT, HEIGHT FROM PATIENT WHERE IDENTIFIER1 = :participantId");
+    query.bindValue(":participantId", participantId);
 
     if (!query.exec()) {
         qDebug() << query.lastError().text();
-        return scanJson;
+        throw QException();
     }
 
-    QString scanId{};
-    QString scanMode{};
-    QString scanDate{};
-
-    // only get last result
-    while (query.next()) {
-        scanId = query.value(0).toString();
-        scanMode = query.value(1).toString();
-        scanDate = query.value(2).toString();
+    if (!query.first()) {
+        return;
     }
 
-    scanJson["SCANID"] = scanId;
-    scanJson["SCAN_MODE"] = scanMode;
-    scanJson["SCAN_DATE"] = scanDate;
-
-    return scanJson;
-}
-
-QJsonObject DxaHipTest::extractScanData(const QSqlDatabase &db,
-                                        const QString &barcode,
-                                        const QString &scanId)
-{
-    QJsonObject recordJson;
-
-    QSqlQuery query;
-    query.prepare("SELECT * from Hip where PATIENT_KEY = :patient_key AND SCANID = :scan_id");
-    query.bindValue(":patient_key", barcode);
-    query.bindValue(":scan_id", scanId);
-
-    if (!query.exec()) {
-        qDebug() << query.lastError().text();
-        return recordJson;
-    }
-
-    while (query.next()) {
-        QSqlRecord record = query.record();
-        for (int i = 0; i < record.count(); ++i) {
-            QVariant value = record.value(i);
-            recordJson[record.fieldName(i)] = value.toJsonValue();
-        }
-    }
-
-    query.prepare("SELECT * from HipHSA where PATIENT_KEY = :patient_key AND SCANID = :scan_id");
-    query.bindValue(":patient_key", barcode);
-    query.bindValue(":scan_id", scanId);
-
-    if (!query.exec()) {
-        qDebug() << query.lastError().text();
-    }
-
-    while (query.next()) {
-        QSqlRecord record = query.record();
-        for (int i = 0; i < record.count(); ++i) {
-            QVariant value = record.value(i);
-            recordJson[record.fieldName(i)] = value.toJsonValue();
-        }
-    }
-
-    return recordJson;
-}
-
-void DxaHipTest::computeTandZScores() {
-
+    addMetaData("PATIENT_KEY",  query.value("PATIENT_KEY").toString());
+    addMetaData("BIRTHDATE",    query.value("BIRTHDATE").toString());
+    addMetaData("SEX",          query.value("SEX").toString());
+    addMetaData("ETHNICITY",    query.value("ETHNICITY").toString());
+    addMetaData("WEIGHT", 	    query.value("WEIGHT").toDouble());
+    addMetaData("HEIGHT",       query.value("HEIGHT").toDouble());
 }
 
 bool DxaHipTest::isValid() const

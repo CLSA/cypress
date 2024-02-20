@@ -255,18 +255,29 @@ void VividiManager::finish()
     QString endpoint = CypressSettings::getPineEndpoint();
     QString pine_path = CypressSettings::getAnswerUrl(m_session->getAnswerId());
 
+    QJsonObject filesJson {};
+
+
+
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
     {
         Measurement& measure = m_test->get(i);
-        const QString &side = measure.getAttribute("side").toString();
         QByteArray data = FileUtils::readFile(measure.getAttribute("path").toString());
+
+        filesJson.insert(
+            measure.getAttribute("name").toString() + "_dcm",
+            FileUtils::getHumanReadableFileSize(measure.getAttribute("path").toString())
+        );
 
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
                                    (pine_path
-                                                  + "?filename=" + measure.getAttribute("name").toString()).toStdString(),
+                                                  + "?filename=" + measure.getAttribute("name").toString() + ".dcm").toStdString(),
                                    "application/octet-stream",
                                    data);
         if (!ok) {
+            qDebug() << "could not send file: " << measure.getAttribute("name").toString();
+            emit error("Could not send file");
+            return;
         }
 
         measure.removeAttribute("PATH");
@@ -276,6 +287,7 @@ void VividiManager::finish()
     QJsonObject sessionObj = m_session->getJsonObject();
 
     testJson.insert("session", sessionObj);
+    testJson.insert("files", filesJson);
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
@@ -283,10 +295,10 @@ void VividiManager::finish()
 
     bool ok = NetworkUtils::sendHTTPSRequest("PATCH", pine_path.toStdString(), "application/json", serializedData);
     if (!ok) {
+        emit error("Could not send results");
         return;
     }
-
-    emit success("Sent measurements to Pine, you can now close this window");
+    emit success("Sent measurements to Pine, you may now close this window");
 }
 
 

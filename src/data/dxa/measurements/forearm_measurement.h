@@ -3,23 +3,24 @@
 
 #include "dxa_measurement.h"
 
-#include "../../../dicom/dcm_recv.h"
+#include "dicom/dcm_recv.h"
 
 class ForearmMeasurement : public DXAMeasurement
 {
 public:
-    ForearmMeasurement();
+    ForearmMeasurement(Side side);
 
     QString toString() const override;
     QStringList toStringList(const bool& no_keys = false) const override;
 
     bool isValid() const override;
 
-public:
-    bool isValidDicomFile(DicomFile file) const override;
     void addDicomFile(DicomFile);
+    void simulate() override;
 
+    bool isValidDicomFile(DicomFile file) const override;
     DicomFile m_forearmDicomFile{};
+    void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;
 
     Side getSide() override;
     quint8 getScanType() override;
@@ -28,10 +29,9 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-    void simulate() override;
-
 private:
-    bool hasForearmFile{false};
+    bool hasForearmFile { false };
+    Side m_side;
 
     // DXAMeasurement interface
 public:

@@ -1,12 +1,13 @@
 #ifndef DXA_MEASUREMENT_H
 #define DXA_MEASUREMENT_H
 
-#include "../../measurement.h"
-
-#include "../../../dicom/dcm_recv.h"
+#include "data/measurement.h"
+#include "dicom/dcm_recv.h"
 
 #include "dcmtk/dcmdata/dcfilefo.h"
 #include "dcmtk/ofstd/ofstdinc.h"
+
+#include <QSqlDatabase>
 
 struct ValidDCMTag {
     ValidDCMTag(DcmTagKey _key, OFString _value) {
@@ -29,7 +30,6 @@ public:
     DXAMeasurement();
 
     QStringList m_mdb_keys {};
-
     QJsonObject readJsonFile(const QString &filePath);
 
     QList<ValidDCMTag> m_metaInfoTagExistsWithValue {};
@@ -53,6 +53,13 @@ public:
     virtual bool isValid() const override;
     virtual QString toString() const override;
     virtual QStringList toStringList(const bool& no_keys = false) const override;
+
+    void getPatientScan(const QSqlDatabase& db, const QString& participantId);
+    void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
+    void computeTZScore(const QSqlDatabase& referenceDb, const QJsonObject& patientData);
+
+    virtual void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) = 0;
+    double computeYearsDifference(const QDate& first, const QDate& second);
 };
 
 #endif // DXA_MEASUREMENT_H

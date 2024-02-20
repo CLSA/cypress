@@ -778,13 +778,18 @@ void SpirometerTest::readPDFReportPath(const QDomNode& node)
 {
     QDomElement child = node.firstChildElement("Parameter");
     if (child.isNull()) {
-       return;
+        qDebug() << "readPDFReportPath: child parameter is null";
+        return;
     }
 
-    qDebug() << child.hasAttribute("Name") << child.tagName() << child.text() << child.attribute("Name");
+    if (m_debug)
+        qDebug() << child.hasAttribute("Name") << child.tagName() << child.text() << child.attribute("Name");
 
     if (child.hasAttribute("Name") && "Attachment" == child.attribute("Name")) {
-       addMetaData("pdf_report_path", child.text());
+        if (m_debug)
+            qDebug() << "reading report path";
+
+        addMetaData("pdf_report_path", child.text());
     }
 }
 

@@ -50,7 +50,7 @@ bool RetinalCameraManager::isInstalled()
     QString databasePort = CypressSettings::readSetting("retinal_camera/database/port").toString();
     QString databaseUser = CypressSettings::readSetting("retinal_camera/database/user").toString();
 
-    if (runnableName.isEmpty() || runnablePath.isNull()) {
+    if (runnableName.isEmpty() || runnableName.isNull()) {
         if (isDebugMode)
             qDebug() << "RetinalCamera: runnable name is not defined";
         return false;
@@ -127,11 +127,7 @@ bool RetinalCameraManager::openDatabase()
     }
 
     m_db = QSqlDatabase::addDatabase("QODBC");
-    m_db.setHostName("localhost");
-    m_db.setPort(m_databasePort);
-    m_db.setDatabaseName(m_databaseName);
-    m_db.setUserName(m_databaseUser);
-    m_db.setPassword(m_databasePassword);
+    m_db.setDatabaseName("IMAGENet");
 
     if (!m_db.open()) {
         qDebug() << "RetinalCameraManager::openDatabase - could not open database: "
@@ -149,8 +145,9 @@ bool RetinalCameraManager::setUp()
         qDebug() << "RetinalCameraManager::setUp";
 
     if (!m_db.isOpen()) {
-        qDebug() << "IMAGENet database is not open";
-        return false;
+        if (!m_db.open()) {
+            return false;
+        }
     }
 
     if (!cleanUp()) {
@@ -159,7 +156,14 @@ bool RetinalCameraManager::setUp()
         return false;
     }
 
-    return initializeDatabase();
+    configureProcess();
+
+    bool ok = initializeDatabase();
+    if (!ok) {
+        return false;
+    }
+
+    return true;
 }
 
 bool RetinalCameraManager::cleanUp()
@@ -209,8 +213,7 @@ void RetinalCameraManager::configureProcess()
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
 
-    m_process.setProgram(settings.value("retinal_camera/working_dir").toString()
-                         + settings.value("retinal_camera/executable").toString());
+    m_process.setProgram(m_runnableName);
 }
 
 void RetinalCameraManager::measure()
@@ -252,27 +255,41 @@ void RetinalCameraManager::finish()
     QJsonObject testJson = m_test->toJsonObject();
     testJson.insert("session", m_session->getJsonObject());
 
+    if (m_debug)
+        qDebug() << "finish: measurement count = " << m_test->getMeasurementCount();
+
     for (int i = 0; i < m_test->getMeasurementCount(); i++) {
-        Measurement& measure = m_test->get(i);
-        const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").toString();
+        const Measurement& measure = m_test->get(i);
+        const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").value().toString();
+        QString path = measure.getAttribute("EYE_PICT_VENDOR").value().toString().trimmed();
+
+        path.replace("\\", "//");
+
+        const QString &fileSize = FileUtils::getHumanReadableFileSize(path);
+
+        if (m_debug) {
+            qDebug() << "side" << side << " path: " << path << " size: " << fileSize;
+            qDebug() << measure.toJsonObject();
+        }
+
 
         QString host = CypressSettings::getPineHost();
         QString endpoint = CypressSettings::getPineEndpoint();
 
-        QString fileName = "EYE_" + side;
+        QString fileName = "EYE_" + side + ".jpg";
 
-        testJson.insert("files", QJsonObject {{ fileName, FileUtils::getHumanReadableFileSize(measure.getAttribute("EYE_PICT_VENDOR").toString())}});
+        testJson.insert("files", QJsonObject {{ fileName, fileSize }});
 
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
                                    (host + endpoint + QString::number(answer_id) + "?filename=EYE_"
-                                                  + side + ".jpg").toStdString(),
+                                                  + side).toStdString(),
                                    "application/octet-stream",
                                    FileUtils::readFile(
-                                       measure.getAttribute("EYE_PICT_VENDOR").toString()));
+                                   measure.getAttribute("EYE_PICT_VENDOR").toString()));
         if (!ok) {
+            if (m_debug)
+                qDebug() << "failed to send eye";
         }
-
-        measure.removeAttribute("EYE_PICT_VENDOR");
     }
 
     QJsonObject values;
@@ -291,6 +308,7 @@ void RetinalCameraManager::finish()
         emit error("Could not save results, please contact support.");
     }
 
+    m_db.close();
 }
 
 bool RetinalCameraManager::cleanupDatabase()
@@ -307,7 +325,7 @@ bool RetinalCameraManager::cleanupDatabase()
     }
 
     QSqlQuery query(m_db);
-    query.prepare("SELECT FileName, FileExt, StoragePathUid FROM dbo.Media WHERE PatientUid = :patientUUID");
+    query.prepare("SELECT FileName, FileExt, StoragePathUid FROM Media WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     if (!query.exec()) {
         qDebug() << query.lastError().text();
@@ -330,7 +348,7 @@ bool RetinalCameraManager::cleanupDatabase()
         file.remove();
     }
 
-    query.prepare("DELETE FROM dbo.Exams WHERE PatientUid = :patientUUID");
+    query.prepare("DELETE FROM Exams WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     if (!query.exec()) {
         qDebug() << query.lastError().text();
@@ -338,26 +356,28 @@ bool RetinalCameraManager::cleanupDatabase()
     }
 
 
-    query.prepare("DELETE FROM dbo.Media WHERE PatientUid = :patientUUID");
+    query.prepare("DELETE FROM Media WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     if (!query.exec()) {
         qDebug() << query.lastError().text();
         return false;
     }
 
-    query.prepare("DELETE FROM dbo.Patients WHERE PatientUid = :patientUUID");
+    query.prepare("DELETE FROM Patients WHERE PatientUid = :patientUUID");
     query.bindValue(":patientUUID", defaultPatientUUID);
     if (!query.exec()) {
         qDebug() << query.lastError().text();
         return false;
     }
 
-    query.prepare("DELETE FROM dbo.Persons WHERE PersonUid = :personUUID");
+    query.prepare("DELETE FROM Persons WHERE PersonUid = :personUUID");
     query.bindValue(":personUUID", defaultPatientUUID);
     if (!query.exec()) {
         qDebug() << query.lastError().text();
         return false;
     }
+
+    m_db.close();
 
     return true;
 }
@@ -367,20 +387,22 @@ bool RetinalCameraManager::initializeDatabase()
     if (m_debug)
         qDebug() << "RetinalCameraManager::initializeDatabase";
 
+    m_db.open();
+
     QString participantId = m_session->getBarcode();
     QSqlQuery query(m_db);
 
-    query.prepare("INSERT INTO dbo.Persons (PersonUid, SurName, ForeName) VALUES (:personUUID, "
+    query.prepare("INSERT INTO Persons (PersonUid, SurName, ForeName) VALUES (:personUUID, "
                   ":lastName, :firstName)");
     query.bindValue(":personUUID", defaultPersonUUID);
-    query.bindValue(":lastName", "Participant");
     query.bindValue(":firstName", "CLSA");
+    query.bindValue(":lastName", "Participant");
     if (!query.exec()) {
         qDebug() << query.lastError().text();
         return false;
     }
 
-    query.prepare("INSERT INTO dbo.Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUUID, :participantId, :personUUID)");
+    query.prepare("INSERT INTO Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUUID, :participantId, :personUUID)");
     query.bindValue(":patientUUID", defaultPatientUUID);
     query.bindValue(":participantId", participantId);
     query.bindValue(":personUUID", defaultPatientUUID);
@@ -432,7 +454,7 @@ QJsonObject RetinalCameraManager::getLeftEye()
 {
     QSqlQuery query(m_db);
     query.prepare(
-        "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM dbo.Media WHERE PatientUid = "
+        "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM Media WHERE PatientUid = "
         ":patientUid AND EyeType = 1 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
     if (!query.exec()) {
@@ -440,20 +462,25 @@ QJsonObject RetinalCameraManager::getLeftEye()
     }
 
     QJsonObject results;
-    results["fileName"] = query.value(0).toString();
-    results["fileExt"] = query.value(1).toString();
-    results["side"] = "left";
-    results["storagePathUid"] = query.value(2).toString();
-    results["createDate"] = query.value(3).toString();
 
-    query.prepare("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = :storagePathUid");
+    while (query.next()) {
+        results["fileName"] = query.value(0).toString().trimmed();
+        results["fileExt"] = query.value(1).toString().trimmed();
+        results["side"] = "left";
+        results["storagePathUid"] = query.value(2).toString().trimmed();
+        results["createDate"] = query.value(3).toString().trimmed();
+    }
+
+    query.prepare("SELECT Location FROM StoragePaths WHERE StoragePathUid = :storagePathUid");
     query.bindValue(":storagePathUid", results["storagePathUid"].toString());
 
     if (!query.exec()) {
         qDebug() << query.lastError().text();
     }
 
-    results["filePath"] = query.value(0).toString();
+    while (query.next()) {
+        results["filePath"] = query.value(0).toString();
+    }
 
     return results;
 }
@@ -462,7 +489,7 @@ QJsonObject RetinalCameraManager::getRightEye()
 {
     QSqlQuery query(m_db);
     query.prepare(
-        "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM dbo.Media WHERE PatientUid = "
+        "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM Media WHERE PatientUid = "
         ":patientUid AND EyeType = 2 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
 
@@ -471,20 +498,23 @@ QJsonObject RetinalCameraManager::getRightEye()
     }
 
     QJsonObject results;
-    results["fileName"] = query.value(0).toString();
-    results["fileExt"] = query.value(1).toString();
-    results["side"] = "right";
-    results["storagePathUid"] = query.value(2).toString();
-    results["createDate"] = query.value(3).toString();
+    while (query.next()) {
+        results["fileName"] = query.value(0).toString().trimmed();
+        results["fileExt"] = query.value(1).toString().trimmed();
+        results["side"] = "right";
+        results["storagePathUid"] = query.value(2).toString().trimmed();
+        results["createDate"] = query.value(3).toString().trimmed();
+    }
 
-    query.prepare("SELECT Location FROM dbo.StoragePaths WHERE StoragePathUid = :storagePathUid");
+    query.prepare("SELECT Location FROM StoragePaths WHERE StoragePathUid = :storagePathUid");
     query.bindValue(":storagePathUid", results["storagePathUid"].toString());
-
     if (!query.exec()) {
         qDebug() << query.lastError().text();
     }
 
-    results["filePath"] = query.value(0).toString();
+    while (query.next()) {
+        results["filePath"] = query.value(0).toString();
+    }
 
     return results;
 }

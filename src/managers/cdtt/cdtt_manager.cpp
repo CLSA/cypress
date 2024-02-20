@@ -1,4 +1,7 @@
 #include "cdtt_manager.h"
+#include "auxiliary/network_utils.h"
+#include "auxiliary/file_utils.h"
+
 #include "cypress_settings.h"
 
 #include <QDebug>
@@ -258,6 +261,60 @@ void CDTTManager::readOutput()
     test->fromDatabase(db);
     db.close();
     finish();
+}
+
+
+void CDTTManager::finish() {
+    if (m_debug)
+        qDebug() << "ManagerBase::finish";
+
+    int answer_id = m_session->getAnswerId();
+
+    QDir dir(m_outputPath);
+    if (!dir.exists()) {
+        if (m_debug)
+            qDebug() << "directory does not exist: " << m_outputPath;
+        emit error("Output directory does not exist. Could not save measurements.");
+    }
+
+    QString outputFilePath = dir.absoluteFilePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
+    QFileInfo excelFile(outputFilePath);
+    if (!excelFile.exists()) {
+        if (m_debug)
+            qDebug() << "file does not exist: " << excelFile.absoluteFilePath();
+        emit error("Output excel file does not exist. Could not save measurements.");
+        return;
+    }
+
+    QJsonObject filesJson {};
+    filesJson.insert("cdtt_xlsx", FileUtils::getHumanReadableFileSize(excelFile.absoluteFilePath()));
+
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionJson = m_session->getJsonObject();
+    testJson.insert("session", sessionJson);
+    testJson.insert("files", filesJson);
+
+    QJsonObject responseJson {};
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        answerUrl.toStdString(),
+        "application/json",
+        serializedData
+    );
+
+    cleanUp();
+
+    if (ok)
+        emit success("Save successful. You may close this window.");
+    else
+        emit error("Something went wrong");
 }
 
 

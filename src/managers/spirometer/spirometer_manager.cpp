@@ -3,6 +3,7 @@
 
 #include "cypress_settings.h"
 #include "auxiliary/network_utils.h"
+#include "auxiliary/file_utils.h"
 
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -212,8 +213,7 @@ void SpirometerManager::readOutput()
         return;
     }
 
-    QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
-    test->fromFile(getEMROutXmlName());
+
 
     finish();
 }
@@ -221,16 +221,47 @@ void SpirometerManager::readOutput()
 void SpirometerManager::finish()
 {
     QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
-    std::unique_ptr<QJsonObject> testJson = test->toJsonObjectHeap();
-    testJson->insert("session", m_session->getJsonObject());
 
     std::unique_ptr<QJsonObject> responseJson = std::make_unique<QJsonObject>();
-    responseJson->insert("value", *testJson);
+    std::unique_ptr<QJsonObject> testJson = test->toJsonObjectHeap();
 
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
+
+    QJsonObject fileJson {};
+    test->fromFile(getEMROutXmlName());
+
+    int answerId = m_session->getAnswerId();
+
+    if (outputPdfExists()) {
+        const QString pdfOutputFilePath = getOutputPdfPath();
+        const QFileInfo pdfOutputInfo(pdfOutputFilePath);
+
+        QString fileName = pdfOutputInfo.fileName();
+        fileName.replace(".", "_");
+
+        if (m_debug)
+            qDebug() << "sending pdf output file: " << pdfOutputInfo.absoluteFilePath();
+
+        const QString fileSize = FileUtils::getHumanReadableFileSize(pdfOutputFilePath);
+
+        fileJson.insert(fileName, fileSize);
+
+        NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            (host + endpoint + QString::number(answerId) + "?filename=" + fileName.replace("_pdf", ".pdf")).toStdString(),
+            "application/octet-stream",
+            FileUtils::readFile(pdfOutputInfo.absoluteFilePath())
+        );
+    }
+
+    testJson->insert("session", m_session->getJsonObject());
+    testJson->insert("files", fileJson);
+
+    responseJson->insert("value", *testJson);
     QJsonDocument jsonDoc(*responseJson);
     std::unique_ptr<QByteArray> serializedData = std::make_unique<QByteArray>(jsonDoc.toJson());
 
-    int answerId = m_session->getAnswerId();
     QString answerUrl = CypressSettings::getAnswerUrl(answerId);
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
@@ -239,12 +270,15 @@ void SpirometerManager::finish()
         *serializedData
     );
 
+
     cleanUp();
 
-    if (ok)
+    if (ok) {
         emit success("Save successful. You may close this window.");
-    else
+    }
+    else {
         emit error("Something went wrong");
+    }
 }
 
 bool SpirometerManager::clearData()
@@ -385,8 +419,8 @@ QString SpirometerManager::getOutputPdfPath() const
     if (m_debug)
         qDebug() << "SpirometerManager::getOutputPdfPath";
 
-    SpirometerTest* test = static_cast<SpirometerTest*>(m_test.get());
-    if (test->isValid() && test->hasMetaData("pdf_report_path"))
+    QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
+    if (test->hasMetaData("pdf_report_path"))
         return test->getMetaDataAsString("pdf_report_path");
 
     return QString();

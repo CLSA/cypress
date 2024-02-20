@@ -78,6 +78,9 @@ void FraxTest::fromFile(const QString& fileName)
     reset();
 
     QStringList list = line.split(",");
+
+    qDebug() << list << list.size();
+
     if (17 == list.size()) {
         QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
         measure1->setAttribute("type", "osteoporotic_fracture");

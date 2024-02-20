@@ -7,7 +7,7 @@
 class HipMeasurement : public DXAMeasurement
 {
 public:
-    HipMeasurement();
+    HipMeasurement(Side side);
 
     QString toString() const override;
 
@@ -31,7 +31,11 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
+    void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) override;
+
 private:
+    Side m_side;
+
     bool m_hasHipFile{false};
 
     // DXAMeasurement interface

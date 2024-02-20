@@ -32,6 +32,8 @@ public:
     DicomFile m_wholeBody1{};
     DicomFile m_wholeBody2{};
 
+    void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;
+
 private:
     bool isWholeBody1(DcmFileFormat &file) const;
     bool isWholeBody2(DcmFileFormat &file) const;

@@ -20,6 +20,9 @@
  */
 
 
+
+
+
 class DxaHipManager: public ManagerBase
 {
     Q_OBJECT

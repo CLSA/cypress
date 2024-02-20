@@ -29,20 +29,10 @@ public:
 
     bool hasAllNeededFiles() const;
 
-    QJsonObject extractScanAnalysis(const QSqlDatabase &db,
-                                    const QString &barcode,
-                                    const QString &scanType);
-
-    QJsonObject extractScanData(const QSqlDatabase &db,
-                                const QString &barcode,
-                                const QString &scanType);
-
     QSharedPointer<HipMeasurement> leftHipMeasurement;
     QSharedPointer<HipMeasurement> rightHipMeasurement;
 
-    void retrieveResults(const QSqlDatabase &db, const QString &barcode);
-
-    void computeTandZScores();
+    void getPatientScan(const QSqlDatabase &db, const QString &participantId);
 };
 
 #endif // DXAHIPTEST_H

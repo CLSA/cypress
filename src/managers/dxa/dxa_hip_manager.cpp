@@ -23,7 +23,6 @@
 #include <QVariant>
 
 
-
 DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session)
     : ManagerBase(session)
 {
@@ -84,55 +83,55 @@ bool DxaHipManager::isInstalled()
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnableName is not defined";
+            qDebug() << "runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnablePath is not defined";
+            qDebug() << "runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - aeTitle is not defined";
+            qDebug() << "aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - host is not defined";
+            qDebug() << "host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - port is not defined";
+            qDebug() << "port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - storageDirPath is not defined";
+            qDebug() << "storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - logConfigPath is not defined";
+            qDebug() << "logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - ascConfigPath is not defined";
+            qDebug() << "ascConfigPath is not defined";
         return false;
     }
 
     if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - patscanDbPath is not defined";
+            qDebug() << "patscanDbPath is not defined";
 
         return false;
     }
@@ -140,64 +139,64 @@ bool DxaHipManager::isInstalled()
     QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - patscan file does not exist: "
+            qDebug() << "patscan file does not exist: "
                      << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isFile()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - patscan file is not a file at"
+            qDebug() << "patscan file is not a file at"
                      << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isReadable()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - patscan file is not readable at "
+            qDebug() << "patscan file is not readable at "
                      << patscanDbPath;
         return false;
     }
 
     if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not defined at "
+            qDebug() << "refscanDbPath is not defined at "
                      << refscanDbPath;
         return false;
     }
 
-    //QFileInfo refscanFile(refscanDbPath);
-    //if (!refscanFile.exists()) {
-    //    if (isDebugMode)
-    //        qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not defined at "
-    //                 << refscanDbPath;
-    //    return false;
-    //}
+    QFileInfo refscanFile(refscanDbPath);
+    if (!refscanFile.exists()) {
+        if (isDebugMode)
+            qDebug() << "refscanDbPath is not defined at "
+                     << refscanDbPath;
+        return false;
+    }
 
-    //if (!refscanFile.isFile()) {
-    //    if (isDebugMode)
-    //        qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not a file at "
-    //                 << refscanDbPath;
-    //    return false;
-    //}
+    if (!refscanFile.isFile()) {
+        if (isDebugMode)
+            qDebug() << "refscanDbPath is not a file at "
+                     << refscanDbPath;
+        return false;
+    }
 
-    //if (!refscanFile.isReadable()) {
-    //    if (isDebugMode)
-    //        qDebug() << "DxaHipManager::isInstalled - refscanDbPath is not readable at "
-    //                 << refscanDbPath;
-    //    return false;
-    //}
+    if (!refscanFile.isReadable()) {
+        if (isDebugMode)
+            qDebug() << "refscanDbPath is not readable at "
+                     << refscanDbPath;
+        return false;
+    }
 
     QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnableName does not exist at"
+            qDebug() << "runnableName does not exist at"
                      << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnableName is not executable at"
+            qDebug() << "runnableName is not executable at"
                      << runnableName;
         return false;
     }
@@ -205,21 +204,21 @@ bool DxaHipManager::isInstalled()
     QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - working directory does not exist at"
+            qDebug() << "working directory does not exist at"
                      << workingDir;
         return false;
     }
 
     if (!workingDir.isDir()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - working directory is not writable at"
+            qDebug() << "working directory is not writable at"
                      << workingDir;
         return false;
     }
 
     if (!workingDir.isWritable()) {
         if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - working directory is not writable at"
+            qDebug() << "working directory is not writable at"
                      << workingDir;
         return false;
     }
@@ -237,6 +236,7 @@ bool DxaHipManager::start()
     m_dicomServer->start();
 
     emit started(m_test);
+
     emit dataChanged(m_test);
     emit canMeasure();
 
@@ -269,7 +269,9 @@ void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     QSharedPointer<DxaHipSession> session = qSharedPointerCast<DxaHipSession>(m_session);
 
     test->fromDicomFiles(dicomFiles, *session);
+
     emit dataChanged(m_test);
+    emit canMeasure();
 }
 
 // retrieve a measurement from the device
@@ -292,71 +294,87 @@ void DxaHipManager::measure()
         return;
     }
 
+    // get patscan db variables for measurements
     QFileInfo patscanFileInfo(m_patscanDbPath);
-    QString localPath = QDir::currentPath() + "/" + patscanFileInfo.fileName();
-    qDebug() << m_patscanDbPath << localPath;
-
+    QString localPatscanPath= QDir::currentPath() + "/" + patscanFileInfo.fileName();
     if (patscanFileInfo.exists() && patscanFileInfo.isReadable()) {
-        if (QFileInfo(localPath).exists()) {
-            QFile::remove(localPath);
+        if (QFileInfo(localPatscanPath).exists()) {
+            QFile::remove(localPatscanPath);
         }
+        if (m_debug)
+            qDebug() << localPatscanPath;
 
-        if (!QFile::copy(m_patscanDbPath, localPath)) {
+        if (!QFile::copy(m_patscanDbPath, localPatscanPath)) {
             if (m_debug)
                 qDebug() << "error copying patscan db from " << m_patscanDbPath << "to"
-                         << localPath;
-            return;
+                         << localPatscanPath;
         }
     } else {
         qDebug() << "could not access patscanDb at" << m_patscanDbPath;
-        emit error("Could not access PatScanDB on Apex workstation");
+        emit error("Could not access Apex workstation");
         return;
     }
 
-    //// get refscan db variables for measurements
-    //QFileInfo refscanFileInfo(m_refscanDbPath);
-    //if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
-    //    QString localPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
-    //    if (QFileInfo(localPath).exists()) {
-    //        QFile::remove(localPath);
-    //    }
+    // get refscan db variables for measurements
+    QFileInfo refscanFileInfo(m_refscanDbPath);
+    QString localRefScanPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
 
-    //    if (!QFile::copy(m_refscanDbPath, localPath)) {
-    //        if (m_debug)
-    //            qDebug() << "error copying refscan db from " << m_refscanDbPath << "to"
-    //                     << localPath;
-    //        return;
-    //    }
-    //} else {
-    //    emit error("Could not access ReferenceDB on Apex workstation");
-    //    return;
-    //}
+    if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
+        if (QFileInfo(localRefScanPath).exists()) {
+            QFile::remove(localRefScanPath);
+        }
+        if (m_debug)
+            qDebug() << localRefScanPath;
+
+        if (!QFile::copy(m_refscanDbPath, localRefScanPath)) {
+            if (m_debug)
+                qDebug() << "error copying refscan db from " << m_refscanDbPath << "to"
+                         << localRefScanPath;
+        }
+    } else {
+        emit error("Could not access Apex workstation");
+        return;
+    }
 
     // calculate totals and averages
-    m_patscanDb = QSqlDatabase::addDatabase("QODBC");
-    m_patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};FIL={MS "
-                                "Access};DBQ="
-                                + localPath.replace("/", "\\"));
-
-    if (!m_patscanDb.open()) {
-        qDebug() << "Error: " << m_patscanDb.lastError().text();
-        return;
-        // Handle error
+    QSqlDatabase patscanDb = QSqlDatabase::addDatabase("QODBC", "patscan");
+    patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
+                              + QDir::toNativeSeparators(localPatscanPath));
+    if (!patscanDb.open()) {
+        qDebug() << "Error: " << patscanDb.lastError().text();
+        emit error("Could not open PatScan.mdb");
     } else {
-        // Connection is successful, you can query the database
-        qDebug() << "connected to the patscanDb at " << localPath;
-
-        if (!m_patscanDb.open()) {
-            qDebug() << "could not open patscanDB";
-            return;
-        }
-
-        test->retrieveResults(m_patscanDb, m_session->getBarcode());
-
-        m_patscanDb.close();
+        qDebug() << "connected to the patscanDb at " << localPatscanPath;
     }
 
+
+    QSqlDatabase referenceDb = QSqlDatabase::addDatabase("QODBC", "reference");
+    referenceDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
+                                + QDir::toNativeSeparators(localRefScanPath));
+    if (!referenceDb.open()) {
+        qDebug() << "Error: " << patscanDb.lastError().text();
+        emit error("Could not open reference.mdb");
+    } else {
+        qDebug() << "connected to the reference.mdb at " << localRefScanPath;
+    }
+
+    test->getPatientScan(patscanDb, m_session->getBarcode());
+
+    QString patientKey = test->getMetaData("PATIENT_KEY").toString();
+    QJsonObject patientData {
+        { "PATIENT_KEY", patientKey },
+        { "BIRTHDATE", test->getMetaData("BIRTHDATE").toString() },
+        { "SEX", test->getMetaData("SEX").toString() },
+        { "ETHNICITY", test->getMetaData("ETHNICITY").toString() }
+    };
+
+    test->leftHipMeasurement->getScanAnalysisData(patscanDb, referenceDb, patientData);
+    test->rightHipMeasurement->getScanAnalysisData(patscanDb, referenceDb, patientData);
+
     emit canFinish();
+
+    patscanDb.close();
+    referenceDb.close();
 }
 
 // implementation of final clean up of device after disconnecting and all
@@ -365,9 +383,13 @@ void DxaHipManager::measure()
 void DxaHipManager::finish()
 {
     QSharedPointer<DxaHipTest> test = qSharedPointerCast<DxaHipTest>(m_test);
+    bool ok = false;
 
     int answer_id = m_session->getAnswerId();
     QString barcode = m_session->getBarcode();
+
+    QString host = CypressSettings::getPineHost();
+    QString endpoint = CypressSettings::getPineEndpoint();
 
     // Hip
     QString hip_1_file_name = "L_HIP_DICOM.dcm";
@@ -376,23 +398,63 @@ void DxaHipManager::finish()
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
-
     QJsonObject files = {};
 
-    if (!testJson["l_hip"].toObject().isEmpty()) {
-        files.insert(hip_1_file_name.replace(QRegExp(".dcm"), ""),
+    if (!testJson.value("results").toObject().value("hip_l").toObject().isEmpty()) {
+        files.insert(hip_1_file_name.replace(".", "_"),
                      FileUtils::getHumanReadableFileSize(
                          test->leftHipMeasurement->m_hipDicomFile.absFilePath));
     }
 
-    if (!testJson["r_hip"].toObject().isEmpty()) {
-        files.insert(hip_2_file_name.replace(QRegExp(".dcm"), ""),
+    if (!testJson.value("results").toObject().value("hip_r").toObject().isEmpty()) {
+        files.insert(hip_2_file_name.replace(".", "_"),
                      FileUtils::getHumanReadableFileSize(
                          test->rightHipMeasurement->m_hipDicomFile.absFilePath));
     }
 
+    if (!testJson.value("results").toObject().value("hip_l").toObject().isEmpty()) {
+
+        QByteArray leftHipDicomFile = FileUtils::readFile(
+            test->leftHipMeasurement->m_hipDicomFile.absFilePath);
+
+        ok = NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString() + "?filename=" + hip_1_file_name.replace("_dcm", ".dcm").toStdString(),
+            "application/octet-stream",
+            leftHipDicomFile
+        );
+
+        metadata.insert("femoral_neck_bmd", testJson.value("results").toObject().value("hip_l").toObject().value("neck_bmd").toDouble());
+
+        if (!ok) {
+            qDebug() << "PATCH dicom failed";
+            return;
+        }
+    }
+
+    if (!testJson.value("results").toObject().value("hip_r").toObject().isEmpty()) {
+        QByteArray rightHipDicomFile = FileUtils::readFile(
+            test->rightHipMeasurement->m_hipDicomFile.absFilePath);
+
+        ok = NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString()
+                + "?filename=" + hip_2_file_name.replace("_dcm", ".dcm").toStdString(),
+            "application/octet-stream",
+            rightHipDicomFile
+        );
+
+        metadata.insert("femoral_neck_bmd", testJson.value("results").toObject().value("hip_r").toObject().value("neck_bmd").toDouble());
+
+        if (!ok) {
+            qDebug() << "PATCH dicom failed";
+            return;
+        }
+    }
+
     testJson.insert("session", sessionObj);
     testJson.insert("files", files);
+    testJson.insert("metadata", metadata);
 
     QJsonObject responseJson = {};
     responseJson.insert("value", testJson);
@@ -400,10 +462,6 @@ void DxaHipManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getPineEndpoint();
-
-    bool ok = false;
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString(),
@@ -412,47 +470,11 @@ void DxaHipManager::finish()
     );
 
     if (!ok) {
-        emit error("Something went wrong, please contact support.");
-        return;
+        emit error("Could not send results to Pine");
     }
-
-    if (!testJson["l_hip"].toObject().isEmpty()) {
-
-        QByteArray leftHipDicomFile = FileUtils::readFile(
-            test->leftHipMeasurement->m_hipDicomFile.absFilePath);
-
-        ok = NetworkUtils::sendHTTPSRequest(
-            Poco::Net::HTTPRequest::HTTP_PATCH,
-            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString() + "?filename=" + hip_1_file_name.toStdString() + ".dcm",
-            "application/octet-stream",
-            leftHipDicomFile
-        );
-
-        if (!ok) {
-            qDebug() << "PATCH dicom failed";
-            return;
-        }
+    else {
+        emit success("Saved images to Pine, you may now close this window");
     }
-
-    if (!testJson["r_hip"].toObject().isEmpty()) {
-        QByteArray rightHipDicomFile = FileUtils::readFile(
-            test->rightHipMeasurement->m_hipDicomFile.absFilePath);
-
-        ok = NetworkUtils::sendHTTPSRequest(
-            Poco::Net::HTTPRequest::HTTP_PATCH,
-            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString()
-            + "?filename=" + hip_1_file_name.toStdString() + ".dcm",
-            "application/octet-stream",
-            rightHipDicomFile
-        );
-
-        if (!ok) {
-            qDebug() << "PATCH dicom failed";
-            return;
-        }
-    }
-
-    emit success("Saved images to Pine, you may now close this window");
 
     cleanUp();
 }

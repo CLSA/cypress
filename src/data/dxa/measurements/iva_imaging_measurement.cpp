@@ -96,23 +96,23 @@ Side IVAImagingMeasurement::getSide() {
 }
 
 quint8 IVAImagingMeasurement::getScanType() {
-    return 0;
+    return 29;
 }
 
 QString IVAImagingMeasurement::getName() {
-    return "ForearmTest";
+    return "DEL";
 }
 
 QString IVAImagingMeasurement::getBodyPartName() {
-    return "Forearm";
+    return "LSPINE";
 }
 
 QString IVAImagingMeasurement::getRefType() {
-    return 0;
+    return "L";
 }
 
 QString IVAImagingMeasurement::getRefSource() {
-    return "ref";
+    return "NHANES";
 }
 
 bool IVAImagingMeasurement::isDicomMeasureFile(DcmFileFormat &file) const
@@ -249,4 +249,12 @@ bool IVAImagingMeasurement::isDicomOTFile(DcmFileFormat &file) const
 bool IVAImagingMeasurement::hasAllNeededFiles() const
 {
     return hasMeasureFile && hasOtFile && hasPrFile;
+}
+
+void IVAImagingMeasurement::getScanData(const QSqlDatabase &db,
+                                 const QString &patientKey,
+                                     const QString &scanId) {
+    Q_UNUSED(db)
+    Q_UNUSED(patientKey)
+    Q_UNUSED(scanId)
 }

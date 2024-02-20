@@ -1,7 +1,6 @@
 #include "frax_manager.h"
 #include "data/frax/tests/frax_test.h"
 #include "auxiliary/Utilities.h"
-#include "auxiliary/network_utils.h"
 
 #include <QDebug>
 #include <QDir>
@@ -17,12 +16,9 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
 {
     m_runnableName = CypressSettings::readSetting("frax/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("frax/runnablePath").toString();
-    m_outputFilePath = QDir(CypressSettings::readSetting("frax/outputFilePath").toString())
-                           .filePath("output.txt");
-    m_inputFilePath = QDir(CypressSettings::readSetting("frax/inputFilePath").toString())
-                          .filePath("input.txt");
-    m_temporaryFilePath = QDir(CypressSettings::readSetting("frax/temporaryFilePath").toString())
-                              .filePath("input_backup.txt");
+    m_outputFilePath = CypressSettings::readSetting("frax/outputFilePath").toString();
+    m_inputFilePath = CypressSettings::readSetting("frax/inputFilePath").toString();
+    m_temporaryFilePath = CypressSettings::readSetting("frax/temporaryFilePath").toString();
 
     m_country_code = CypressSettings::readSetting("frax/countryCode").toString();
     m_type_code = CypressSettings::readSetting("frax/typeCode").toString();
@@ -165,7 +161,6 @@ void FraxManager::measure()
     clearData();
 
     if (m_sim) {
-        clearData();
         QVariantMap map;
         QJsonObject inputData = m_session->getInputData();
 
@@ -222,6 +217,9 @@ void FraxManager::readOutput()
     }
 
     test->fromFile(m_outputFilePath);
+
+    qDebug() << test->toJsonObject();
+
     finish();
 }
 
@@ -259,60 +257,81 @@ void FraxManager::configureProcess()
 
     // blackbox.exe and input.txt file are present
     //
-    QDir working(m_runnablePath);
-    if (working.exists() && QFileInfo::exists(m_inputFilePath)
-        && QFileInfo::exists(m_runnableName)) {
-        m_process.setProgram(m_runnableName);
-        m_process.setWorkingDirectory(m_runnablePath);
+    QDir workingDirectory(m_runnablePath);
+    QFileInfo inputFileInfo(m_inputFilePath);
+    QFileInfo fraxExecutableInfo(m_runnableName);
+    QFileInfo temporaryFileInfo(m_temporaryFilePath);
 
-        // backup original input.txt
-        //
-        if (!QFileInfo::exists(m_temporaryFilePath)) {
-            if (!QFile::copy(m_inputFilePath, m_temporaryFilePath))
-                QMessageBox::critical(nullptr, "Error", "Failed to backup data. Please contact support");
+    if (!workingDirectory.exists()) {
+        emit error("working directory does not exist");
+        return;
+    }
+
+    if (!fraxExecutableInfo.exists()) {
+        emit error("frax exe does not exist");
+        return;
+    }
+
+    m_process.setProgram(m_runnableName);
+    m_process.setWorkingDirectory(m_runnablePath);
+
+    // backup original input.txt
+    //
+    //if (!QFileInfo::exists(m_temporaryFilePath)) {
+    //    if (!QFile::copy(m_inputFilePath, m_temporaryFilePath))
+    //        emit error("Could not configure FRAX");
+    //}
+
+    // generate input.txt file content
+    // exclude interview barcode and language
+    //
+    QStringList list;
+    QJsonObject sessionInputData = m_session->getInputData();
+    qDebug() << sessionInputData;
+
+    foreach (const auto key, m_inputKeyList) {
+        QVariant value = sessionInputData[key].toVariant();
+
+        qDebug() << key << value;
+
+        if ("sex" == key) {
+            value = value.toString()[0].toLower() == 'm' ? 0 : 1;
         }
 
-        // generate input.txt file content
-        // exclude interview barcode and language
-        //
-        QStringList list;
-        QJsonObject sessionInputData = m_session->getInputData();
-
-        foreach (const auto key, m_inputKeyList) {
-            QVariant value = sessionInputData[key].toVariant();
-
-            if ("sex" == key) {
-                value = value.toString()[0].toLower() == 'm' ? 0 : 1;
-            }
-
-            else {
-                if(QVariant::Bool == value.type())
-                    value = value.toUInt();
-            }
-
-            list << value.toString();
+        else {
+            if(QVariant::Bool == value.type())
+                value = value.toUInt();
         }
 
-        // Write input.txt file
-        QString line = list.join(",");
-        QFile input_file(m_inputFilePath);
+        list << value.toString();
+    }
 
-        if(input_file.open(QIODevice::WriteOnly | QIODevice::Text))
+    // Write input.txt file
+    QString line = list.join(",");
+    QFile input_file(m_inputFilePath);
+
+    qDebug() << m_inputFilePath << line;
+
+    if (input_file.exists()) {
+        if (!input_file.remove()) {
+            qDebug() << "could not remove file";
+        }
+    }
+
+    if(input_file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream stream(&input_file);
+        stream << line << Qt::endl;
+        input_file.close();
+
+        if (m_debug)
         {
-            QTextStream stream(&input_file);
-            stream << line << Qt::endl;
-            input_file.close();
-
-            if (m_debug)
-            {
-                qDebug() << "populated input.txt file " << m_inputFilePath;
-                qDebug() << "content = " << line;
-            }
+            qDebug() << "populated input.txt file " << m_inputFilePath;
+            qDebug() << "content = " << line;
         }
-        else
-            emit error("Failed writing to input file");
-    } else
-        emit error("Failed to configure FRAX process");
+    }
+    else
+        emit error("Failed writing to input file");
 }
 
 bool FraxManager::clearData()
@@ -354,45 +373,45 @@ bool FraxManager::cleanUp()
 
     // remove blackbox.exe generated output.txt file
     //
-    if (QFileInfo::exists(m_outputFilePath)) {
-        QFile outputFile(m_outputFilePath);
-        if (!outputFile.remove()) {
-            emit error("Could not remove the FRAX output file. Please contact support.");
-            return false;
-        }
-    }
+    //if (QFileInfo::exists(m_outputFilePath)) {
+    //    QFile outputFile(m_outputFilePath);
+    //    if (!outputFile.remove()) {
+    //        emit error("Could not remove the FRAX output file. Please contact support.");
+    //        return false;
+    //    }
+    //}
 
     // remove the default input.txt file
     //
-    if (QFileInfo::exists(m_temporaryFilePath)) {
-        // remove the input file containing participant data
-        QFile inputFile(m_inputFilePath);
-        if (!inputFile.exists()) {
-            qDebug() << "Could not find the input file";
-            return false;
-        }
+    //if (QFileInfo::exists(m_temporaryFilePath)) {
+    //    // remove the input file containing participant data
+    //    QFile inputFile(m_inputFilePath);
+    //    //if (!inputFile.exists()) {
+    //    //    qDebug() << "Could not find the input file";
+    //    //    return false;
+    //    //}
 
-        if (!inputFile.remove()) {
-            qDebug() << "Could not remove the input file";
-            return false;
-        }
+    //    //if (!inputFile.remove()) {
+    //    //    qDebug() << "Could not remove the input file";
+    //    //    return false;
+    //    //}
 
-        // restore backup, default input.txt
-        if (!QFile::copy(m_temporaryFilePath, m_inputFilePath)) {
-            qDebug() << "Could not restore the backup";
-            return false;
-        }
+    //    // restore backup, default input.txt
+    //    //if (!QFile::copy(m_temporaryFilePath, m_inputFilePath)) {
+    //    //    qDebug() << "Could not restore the backup";
+    //    //    return false;
+    //    //}
 
-        // remove the temporary file
-        QFile tempFile(m_temporaryFilePath);
-        if (!tempFile.remove()) {
-            qDebug() << "Could not remove the temporary file";
-            return false;
-        }
-    } else {
-        qDebug() << "Could not find the FRAX backup";
-        return false;
-    }
+    //    // remove the temporary file
+    //    //QFile tempFile(m_temporaryFilePath);
+    //    //if (!tempFile.remove()) {
+    //    //    qDebug() << "Could not remove the temporary file";
+    //    //    return false;
+    //    //}
+    //} else {
+    //    qDebug() << "Could not find the FRAX backup";
+    //    return false;
+    //}
 
     return true;
 }

@@ -28,14 +28,19 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
-    columns << TableColumn("patient_id", "Patient ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("study_id", "Study ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("media_storage_uid", "Media UID", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("PATIENT_ID", "Patient ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("STUDY_ID", "Study ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("MEDIA_STORAGE_UID", "Media UID", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager.get(), &DXAManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
+    });
+
+    // can auto measure
+    connect(manager.get(), &DXAManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
     });
 
     // data changed

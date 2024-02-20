@@ -13,9 +13,7 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
     , ui(new Ui::RetinalCameraDialog)
 {
     ui->setupUi(this);
-
     this->setWindowTitle("Retinal Camera" + (session->getSide() == Side::Left ? QString("(Left)") : QString("(Right)")));
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new RetinalCameraManager(session));
 

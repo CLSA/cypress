@@ -68,7 +68,7 @@ void FraxSession::calculateInputs()
     if (age <= 0)
         throw ValidationError("age must be greater than 0");
 
-    bool glucocorticoid = calculateGlucocorticoid(age);
+    bool gluccocorticoid = calculateGlucocorticoid(age);
     bool father_hip_fracture = m_inputData.value("father_hip_fracture").toBool();
     bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toBool();
     bool previous_fracture = father_hip_fracture || mother_hip_fracture;
@@ -76,15 +76,17 @@ void FraxSession::calculateInputs()
 
     m_inputData.insert("rheumatoid_arthritis", (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
     m_inputData.insert("previous_fracture", previous_fracture);
-    m_inputData.insert("glucocorticoid", glucocorticoid);
+    m_inputData.insert("secondary_osteoporosis", false);
+    m_inputData.insert("gluccocorticoid", gluccocorticoid);
     m_inputData.insert("parent_hip_fracture", father_hip_fracture || mother_hip_fracture);
     m_inputData.insert("t_score", t_score);
     m_inputData.insert("type", "t");
     m_inputData.insert("country_code", "19");
+    m_inputData.insert("body_mass_index", 0);
 
     if (m_debug)
     {
-        qDebug() << "glucocorticoid: " << glucocorticoid;
+        qDebug() << "glucocorticoid: " << gluccocorticoid;
         qDebug() << "father_hip_fracture: " << father_hip_fracture;
         qDebug() << "mother_hip_fracture: " << mother_hip_fracture;
         qDebug() << "previous_fracture: " << previous_fracture;

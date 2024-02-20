@@ -23,7 +23,7 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new VividiManager(session));
-    VividiManager* manager = static_cast<VividiManager*>(m_manager.get());
+    QSharedPointer<VividiManager> manager = qSharedPointerCast<VividiManager>(m_manager);
 
     ui->testInfoWidget->setSessionInformation(*session);
 
@@ -41,38 +41,38 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
                                                 "Select a side"));
 
     // device/server started
-    connect(manager, &VividiManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
+    connect(manager.get(), &VividiManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 
     // setup complete, can now measure
-    connect(manager, &VividiManager::canMeasure, ui->measurementTable, [=]() {
+    connect(manager.get(), &VividiManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
 
     // request auto measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager, &VividiManager::measure);
+    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &VividiManager::measure);
 
     // measures valid, can finish test
-    connect(manager, &VividiManager::canFinish, ui->measurementTable, [=]() {
+    connect(manager.get(), &VividiManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
     });
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager, &VividiManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &VividiManager::finish);
 
     // successful test
-    connect(manager, &VividiManager::success, this, &CimtVividiDialog::success);
+    connect(manager.get(), &VividiManager::success, this, &CimtVividiDialog::success);
 
     // critical error
-    connect(manager, &VividiManager::error, this, &CimtVividiDialog::error);
+    connect(manager.get(), &VividiManager::error, this, &CimtVividiDialog::error);
 
     // data changed
-    connect(manager, &VividiManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+    connect(manager.get(), &VividiManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // request adding manual measurement
-    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager, &VividiManager::addManualMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &VividiManager::addManualMeasurement);
 }
 
 CimtVividiDialog::~CimtVividiDialog()

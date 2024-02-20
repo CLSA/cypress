@@ -1,11 +1,15 @@
 #include "forearm_measurement.h"
-#include "../../../auxiliary/file_utils.h"
+#include "auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
 #include "dcmtk/dcmdata/dcmetinf.h"
 
 #include <QJsonObject>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QException>
 
 // { "RU13TOT_BMD",    "1.." },
 // { "RUMIDTOT_BMD",   ".2." },
@@ -20,7 +24,7 @@
 // { "U_UD_BMD",       "..U" },
 // { "UTOT_BMD",       "UUU" },
 
-ForearmMeasurement::ForearmMeasurement()
+ForearmMeasurement::ForearmMeasurement(Side side): m_side { side }
 {
     m_mdb_keys = QStringList(
     {
@@ -82,27 +86,32 @@ ForearmMeasurement::ForearmMeasurement()
 }
 
 Side ForearmMeasurement::getSide() {
-    return Side::BOTH;
+    return m_side;
 }
 
 quint8 ForearmMeasurement::getScanType() {
-    return 0;
+    return 6;
 }
 
 QString ForearmMeasurement::getName() {
-    return "ForearmTest";
+    if (m_side == Side::LEFT) {
+        return "L_FA";
+    }
+    else if (m_side == Side::RIGHT) {
+        return "R_FA";
+    }
 }
 
 QString ForearmMeasurement::getBodyPartName() {
-    return "Forearm";
+    return "ARM";
 }
 
 QString ForearmMeasurement::getRefType() {
-    return 0;
+    return "R";
 }
 
 QString ForearmMeasurement::getRefSource() {
-    return "ref";
+    return "Hologic";
 }
 
 void ForearmMeasurement::simulate()
@@ -200,10 +209,85 @@ void ForearmMeasurement::addDicomFile(DicomFile file)
     m_forearmDicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
     hasForearmFile = true;
 
-    setAttribute("patientId", file.patientId);
-    setAttribute("filePath", file.absFilePath);
-    setAttribute("studyId", file.studyId);
-    setAttribute("mediaStorageUid", file.mediaStorageUID);
-    setAttribute("name", m_forearmDicomFile.name);
-    setAttribute("size", m_forearmDicomFile.size);
+    setAttribute("PATIENT_ID", file.patientId);
+    setAttribute("FILE_PATH", file.absFilePath);
+    setAttribute("STUDY_ID", file.studyId);
+    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
+    setAttribute("NAME", m_forearmDicomFile.name);
+    setAttribute("SIZE", m_forearmDicomFile.size);
+}
+
+void ForearmMeasurement::getScanData(const QSqlDatabase &db,
+                                 const QString &patientKey,
+                                     const QString &scanId) {
+    QSqlQuery query(db);
+
+    query.prepare("SELECT * FROM Forearm WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");
+    query.bindValue(":patientKey", patientKey);
+    query.bindValue(":scanId", scanId);
+
+    if (!query.exec()) {
+        qDebug() << "forearmQuery: " << patientKey << scanId;
+        throw QException();
+    }
+
+    if (!query.first()) {
+        return;
+    }
+
+    setAttribute("PHYSICIAN_COMMENT", query.value("PHYSICIAN_COMMENT").toString());
+
+    setAttribute("R_13_AREA",     query.value("R_13_AREA").toDouble());
+    setAttribute("R_13_BMC",      query.value("R_13_BMC").toDouble());
+    setAttribute("R_13_BMD",      query.value("R_13_BMD").toDouble());
+
+    setAttribute("R_MID_AREA",    query.value("R_MID_AREA").toDouble());
+    setAttribute("R_MID_BMC",     query.value("R_MID_BMC").toDouble());
+    setAttribute("R_MID_BMD",     query.value("R_MID_BMD").toDouble());
+
+    setAttribute("R_UD_AREA",     query.value("R_UD_AREA").toDouble());
+    setAttribute("R_UD_BMC",      query.value("R_UD_BMC").toDouble());
+    setAttribute("R_UD_BMD",      query.value("R_UD_BMD").toDouble());
+
+    setAttribute("U_13_AREA",     query.value("U_13_AREA").toDouble());
+    setAttribute("U_13_BMC",      query.value("U_13_BMC").toDouble());
+    setAttribute("U_13_BMD",      query.value("U_13_BMD").toDouble());
+
+    setAttribute("U_MID_AREA",    query.value("U_MID_AREA").toDouble());
+    setAttribute("U_MID_BMC",     query.value("U_MID_BMC").toDouble());
+    setAttribute("U_MID_BMD",     query.value("U_MID_BMD").toDouble());
+
+    setAttribute("U_UD_AREA",     query.value("U_UD_AREA").toDouble());
+    setAttribute("U_UD_BMC",      query.value("U_UD_BMC").toDouble());
+    setAttribute("U_UD_BMD",      query.value("U_UD_BMD").toDouble());
+
+    setAttribute("RTOT_AREA",     query.value("RTOT_AREA").toDouble());
+    setAttribute("RTOT_BMC",      query.value("RTOT_BMC").toDouble());
+    setAttribute("RTOT_BMD",      query.value("RTOT_BMD").toDouble());
+
+    setAttribute("UTOT_AREA",     query.value("UTOT_AREA").toDouble());
+    setAttribute("UTOT_BMC",      query.value("UTOT_BMC").toDouble());
+    setAttribute("UTOT_BMD",      query.value("UTOT_BMD").toDouble());
+
+    setAttribute("RU13TOT_AREA",  query.value("RU13TOT_AREA").toDouble());
+    setAttribute("RU13TOT_BMC",   query.value("RU13TOT_BMC").toDouble());
+    setAttribute("RU13TOT_BMD",   query.value("RU13TOT_BMD").toDouble());
+
+    setAttribute("RUMIDTOT_AREA", query.value("RUMIDTOT_AREA").toDouble());
+    setAttribute("RUMIDTOT_BMC",  query.value("RUMIDTOT_BMC").toDouble());
+    setAttribute("RUMIDTOT_BMD",  query.value("RUMIDTOT_BMD").toDouble());
+
+    setAttribute("RUUDTOT_AREA",  query.value("RUUDTOT_AREA").toDouble());
+    setAttribute("RUUDTOT_BMC",   query.value("RUUDTOT_BMC").toDouble());
+    setAttribute("RUUDTOT_BMD",   query.value("RUUDTOT_BMD").toDouble());
+
+    setAttribute("RUUDTOT_BMD",   query.value("RUUDTOT_BMD").toDouble());
+    setAttribute("RUTOT_BMC",     query.value("RUTOT_BMC").toDouble());
+    setAttribute("RUTOT_BMD",     query.value("RUTOT_BMD").toDouble());
+
+    setAttribute("ROI_TYPE",      query.value("ROI_TYPE").toDouble());
+    setAttribute("ROI_WIDTH",     query.value("ROI_WIDTH").toDouble());
+    setAttribute("ROI_HEIGHT",    query.value("ROI_HEIGHT").toDouble());
+
+    setAttribute("ARM_LENGTH",    query.value("ARM_LENGTH").toDouble());
 }

@@ -75,7 +75,7 @@ private:
     void configureProcess();
 
     bool insertPatient(const QString& name, const QString& birthDate, const QString& sex, const int id);
-    QVariantMap extractMeasures(const int patientId, const QString& eye);
+    QVariantMap extractMeasures(const QString& eye);
 
     bool restoreDatabase();
 };

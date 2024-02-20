@@ -33,9 +33,12 @@ public:
     virtual QString toString() const override;
 
     QScopedPointer<WholeBodyScanMeasurement> wholeBodyMeasurement;
-    QScopedPointer<ForearmMeasurement> forearmMeasurement;
+    QScopedPointer<ForearmMeasurement> leftForearmMeasurement;
+    QScopedPointer<ForearmMeasurement> rightForearmMeasurement;
     QScopedPointer<ApSpineMeasurement> apSpineMeasurement;
     QScopedPointer<IVAImagingMeasurement> ivaImagingMeasurement;
+
+    void getPatientScan(const QSqlDatabase &db, const QString &participantId);
 };
 
 #endif // DXA_TEST_H

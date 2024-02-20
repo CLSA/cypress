@@ -34,6 +34,7 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+    void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) override;
 
     // DXAMeasurement interface
 public:

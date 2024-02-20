@@ -42,6 +42,7 @@ public:
     bool hasPrFile{false};
 
     bool hasAllNeededFiles() const override;
+    void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;
 };
 
 #endif // IVA_IMAGING_MEASUREMENT_H

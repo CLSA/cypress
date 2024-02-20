@@ -24,19 +24,18 @@ TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
     m_test.reset(new TonometerTest);
     m_test->setExpectedMeasurementCount(2);
 
-    m_db = QSqlDatabase::addDatabase("QODBC");
 
     m_runnableName = CypressSettings::readSetting("tonometer/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("tonometer/runnablePath").toString();
     m_databasePath = CypressSettings::readSetting("tonometer/databasePath").toString();
     m_temporaryPath = CypressSettings::readSetting("tonometer/temporaryPath").toString();
 
+    m_db = QSqlDatabase::addDatabase("QODBC");
     m_db.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + QDir::toNativeSeparators(m_databasePath));
-
-    if (!m_db.open()) {
-        qWarning() << "Error: Unable to connect to database.";
-        qWarning() << "Database error:" << m_db.lastError().text();
-    }
+    //if (!m_db.open()) {
+    //    qWarning() << "Error: Unable to connect to database.";
+    //    qWarning() << "Database error:" << m_db.lastError().text();
+    //}
 }
 
 TonometerManager::~TonometerManager()
@@ -49,8 +48,18 @@ bool TonometerManager::start()
     if (m_debug)
         qDebug() << "TonometerManager::start";
 
+    if (!backupData()) {
+        qDebug() << "could not backup data";
+        return false;
+    }
+
+    if (!clearData()) {
+        emit error("Something went wrong");
+        return false;
+    }
+
     if (!setUp()) {
-        emit error("Something went wrong. Please contact support");
+        emit error("Something went wrong");
         return false;
     }
 
@@ -146,14 +155,6 @@ void TonometerManager::measure()
     if (m_debug)
         qDebug() << "TonometerManager::measure";
 
-    clearData();
-
-    if (m_sim)
-    {
-        m_test->simulate({});
-        return;
-    }
-
     if (m_process.state() != QProcess::NotRunning) {
         emit error("ORA is already running");
         return;
@@ -172,8 +173,8 @@ void TonometerManager::readOutput()
     if (m_debug)
         qDebug() << "TonometerManager::readOutput";
 
-    QVariantMap leftResults = extractMeasures(m_session->getBarcode().toInt(), "Left");
-    QVariantMap rightResults = extractMeasures(m_session->getBarcode().toInt(), "Right");
+    QVariantMap leftResults = extractMeasures("L");
+    QVariantMap rightResults = extractMeasures("R");
 
     QList<QVariantMap> results { leftResults, rightResults };
 
@@ -187,6 +188,10 @@ void TonometerManager::configureProcess()
 {
     if (m_debug)
         qDebug() << "TonometerManager::configureProcess";
+
+    m_process.setProgram(m_runnableName);
+    m_process.setWorkingDirectory(m_runnablePath);
+    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
     // connect signals and slots to QProcess one time only
     //
@@ -213,7 +218,6 @@ void TonometerManager::configureProcess()
 }
 
 
-
 bool TonometerManager::clearData()
 {
     if (m_debug)
@@ -222,7 +226,7 @@ bool TonometerManager::clearData()
     m_test->reset();
     restoreDatabase();
 
-    return false;
+    return true;
 }
 
 bool TonometerManager::backupData() {
@@ -251,21 +255,21 @@ bool TonometerManager::backupData() {
 }
 
 bool TonometerManager::restoreData() {
-    QDir backupPath(m_temporaryPath);
-    QFileInfo databasePath(m_databasePath);
+    //QDir backupPath(m_temporaryPath);
+    //QFileInfo databasePath(m_databasePath);
 
-    QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
-    if (!backupPath.exists() ) {
-        return false;
-    }
+    //QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
+    //if (!backupPath.exists() ) {
+    //    return false;
+    //}
 
-    if (!QFile::remove(m_databasePath)) {
-        return false;
-    }
+    //if (!QFile::remove(m_databasePath)) {
+    //    return false;
+    //}
 
-    if(!QFile::copy(backupDatabasePath, databasePath.absoluteFilePath())) {
-        return false;
-    }
+    //if(!QFile::copy(backupDatabasePath, databasePath.absoluteFilePath())) {
+    //    return false;
+    //}
 
     return true;
 }
@@ -275,19 +279,20 @@ bool TonometerManager::setUp()
     if (m_debug)
         qDebug() << "TonometerManager::setUp";
 
-    if (!backupData()) {
-        qDebug() << "could not backup data";
+    configureProcess();
+
+    if (!m_db.open()) {
         return false;
     }
 
-    configureProcess();
-
     bool ok = insertPatient(
-        m_session->getBarcode(),
+        m_session->getBarcode() + "," + "CLSA",
         m_session->getInputData()["date_of_birth"].toString(),
         m_session->getInputData()["sex"].toString(),
         m_session->getBarcode().toInt()
     );
+
+    m_db.close();
 
     if (!ok) {
         qDebug() << "could not insert patient";
@@ -302,9 +307,9 @@ bool TonometerManager::cleanUp()
     if (m_debug)
         qDebug() << "TonometerManager::cleanUp";
 
-    //if (!restoreDatabase()) {
-    //    return false;
-    //}
+    if (!restoreDatabase()) {
+        return false;
+    }
 
     if (!restoreData()) {
         qDebug() << "could not restore database";
@@ -321,14 +326,14 @@ bool TonometerManager::insertPatient(
                                      const int id)
 {
     QSqlQuery query(m_db);
-    query.prepare("INSERT INTO Patients (PatientID, Name, BirthDate, Sex, GroupID, ID, RaceID) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    query.addBindValue(id);
-    query.addBindValue(name);
-    query.addBindValue(QDate::fromString(birthDate));
-    query.addBindValue(sex.startsWith("m", Qt::CaseSensitivity::CaseInsensitive));
-    query.addBindValue(2);
-    query.addBindValue(id);
-    query.addBindValue(1);
+
+    query.prepare("INSERT INTO Patients ( Name, BirthDate, Sex, GroupID, ID, RaceID ) VALUES ( :name, :birthDate, :sex, :groupId, :id, :raceId )");
+    query.bindValue(":name", name);
+    query.bindValue(":birthDate", "12/06/2000");
+    query.bindValue(":sex", sex.startsWith("m", Qt::CaseSensitivity::CaseInsensitive));
+    query.bindValue(":groupId", 2);
+    query.bindValue(":id", 1234);
+    query.bindValue(":raceId", 1);
 
     if (!query.exec()) {
         qWarning() << "Database error:" << m_db.lastError().text();
@@ -336,19 +341,35 @@ bool TonometerManager::insertPatient(
     }
 
     return true;
-
 }
 
-QVariantMap TonometerManager::extractMeasures(const int patientId, const QString &eye)
+QVariantMap TonometerManager::extractMeasures(const QString &eye)
 {
+    if (!m_db.isOpen()) {
+        if (!m_db.open()) {
+            throw QException();
+        }
+    }
+
     QSqlQuery query(m_db);
+
+    query.prepare("SELECT PatientID from Patients where ID = :id");
+    query.bindValue(":id", 1234);
+
+    if (!query.exec()) {
+        qWarning() << "Database error:" << m_db.lastError().text();
+    }
+
+    query.first();
+
+    int patientId = query.value("PatientID").toInt();
+
+    query.prepare("SELECT * from Measures where PatientID = :patientId and Eye = :eye ORDER BY MeasureDate desc");
+
+    query.bindValue(":patientId", patientId);
+    query.bindValue(":eye", QString(eye));
+
     QVariantMap resultMap;
-
-    query.prepare("SELECT * from Measures where PatientID = ? and Eye = ? ORDER BY MeasureDate desc");
-
-    query.addBindValue(patientId);
-    query.addBindValue(eye);
-
     if (!query.exec()) {
         qWarning() << "Database error:" << m_db.lastError().text();
         return resultMap;
@@ -365,23 +386,43 @@ QVariantMap TonometerManager::extractMeasures(const int patientId, const QString
 
 bool TonometerManager::restoreDatabase()
 {
+    if (!m_db.isOpen()) {
+        if (!m_db.open()) {
+            throw QException();
+        }
+    }
+
     QSqlQuery query(m_db);
+    query.prepare("SELECT PatientID from Patients where ID = :id");
+    query.bindValue(":id", 1234);
 
-    query.prepare("DELETE FROM Patients WHERE PatientID = ?");
-    query.addBindValue(m_session->getBarcode().toInt());
+    if (!query.exec()) {
+        qWarning() << "Database error:" << m_db.lastError().text();
+    }
+
+    query.first();
+
+    int patientId = query.value("PatientID").toInt();
+
+    query.prepare("DELETE FROM Patients WHERE PatientID = :patientId");
+    query.bindValue(":patientId", patientId);
 
     if (!query.exec()) {
         qWarning() << "Error deleting data from table:" << query.lastError().text();
+        m_db.close();
         return false;
     }
 
-    query.prepare("DELETE FROM Measures WHERE PatientID = ?");
-    query.addBindValue(m_session->getBarcode().toInt());
+    query.prepare("DELETE FROM Measures WHERE PatientID = :patientId");
+    query.bindValue(":patientId", patientId);
 
     if (!query.exec()) {
         qWarning() << "Error deleting data from table:" << query.lastError().text();
+        m_db.close();
         return false;
     }
+
+    m_db.close();
 
     return true;
 }
