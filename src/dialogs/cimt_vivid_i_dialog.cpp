@@ -14,13 +14,11 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     ui->setupUi(this);
 
     ui->measurementTable->disableMeasureButton();
-    //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideMeasureButton();
     ui->measurementTable->hideManualEntry();
     ui->measurementTable->setTitle("Files Received");
 
-    this->setWindowTitle("CIMT");
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+    setWindowTitle("CIMT");
 
     m_manager.reset(new VividiManager(session));
     QSharedPointer<VividiManager> manager = qSharedPointerCast<VividiManager>(m_manager);

@@ -305,8 +305,6 @@ void BloodPressureManager::onDeviceCleared(const BPMMessage &message)
     if (m_debug)
         qDebug() << "BPMManager::deviceCleared";
 
-    clearData();
-
     if (m_state == State::CONNECTING) {
         cycle();
     } else if (m_state == State::READY) {
@@ -367,12 +365,14 @@ void BloodPressureManager::onDeviceStarted(const BPMMessage &message)
     if (m_state == State::READY) {
         m_state = State::MEASURING;
 
+        auto test = qSharedPointerCast<BloodPressureTest>(m_test);
+
         emit deviceStateChanged("Measuring");
         emit measurementStarted();
 
         if (m_sim) {
+
             QRandomGenerator *generator = QRandomGenerator::global();
-            QSharedPointer<BloodPressureTest> test = qSharedPointerCast<BloodPressureTest>(m_test);
 
             int sbpTotal = 0;
             int dbpTotal = 0;
@@ -531,34 +531,24 @@ void BloodPressureManager::onBpReview(const BPMMessage &message)
 void BloodPressureManager::setCuffSize(const QString &size)
 {
     if (m_debug)
-        qDebug() << "BloodPressureManager::setCuffSize";
+        qDebug() << "BloodPressureManager::setCuffSize" << size;
 
     if(size.isNull() || size.isEmpty())
-    {
-        if (m_debug)
-            qDebug() << "BloodPressureManager::setCuffSize - " << size << "is not valid";
-
         return;
-    }
 
-    BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
     test->setCuffSize(size);
 }
 
 void BloodPressureManager::setSide(const QString &side)
 {
     if (m_debug)
-        qDebug() << "BloodPressureManager::setSide";
+        qDebug() << "BloodPressureManager::setSide" << side;
 
     if (side.isNull() || side.isEmpty())
-    {
-        if (m_debug)
-            qDebug() << "BloodPressureManager::setSide: " << side;
-
         return;
-    }
 
-    BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
     test->setSide(side);
 }
 

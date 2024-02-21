@@ -14,8 +14,7 @@ ChoiceReactionDialog::ChoiceReactionDialog(QWidget *parent,
 {
     ui->setupUi(this);
 
-    this->setWindowTitle("Choice Reaction Test");
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+    setWindowTitle("Choice Reaction Test");
 
     QSharedPointer<ChoiceReactionManager> manager(new ChoiceReactionManager(session));
     m_manager = manager;

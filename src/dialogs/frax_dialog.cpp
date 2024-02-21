@@ -12,8 +12,8 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
 {
     ui->setupUi(this);
 
-    this->setWindowTitle("FRAX");
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+    setWindowTitle("FRAX");
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new FraxManager(session));
 

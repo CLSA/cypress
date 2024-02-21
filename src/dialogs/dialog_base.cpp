@@ -18,7 +18,7 @@ DialogBase::DialogBase(QWidget *parent, QSharedPointer<CypressSession> session)
     : QDialog(parent)
     , m_session(session)
 {
-    setWindowFlags(Qt::WindowFullscreenButtonHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
     setAttribute(Qt::WA_DeleteOnClose);
 
     m_debug = CypressSettings::isDebugMode();

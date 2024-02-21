@@ -14,19 +14,19 @@
 SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
     : ManagerBase(session)
 {
-    // full path to EasyWarePro.exe
+    // Full path to EasyWarePro.exe
     m_runnableName = CypressSettings::readSetting("spirometer/runnableName").toString();
 
-    // full path to working directory
+    // Full path to working directory
     m_runnablePath = CypressSettings::readSetting("spirometer/runnablePath").toString(); // path to EasyWarePro.exe directory
 
     // Path to the EMR plugin data transfer directory
     m_dataPath = CypressSettings::readSetting("spirometer/exchangePath").toString();
 
-    // OnyxIn.xml
+    // EMR Input File (OnyxIn.xml)
     m_inFileName = CypressSettings::readSetting("spirometer/inFileName").toString();
 
-    // OnyxOut.xml
+    // EMR Output File OnyxOut.xml
     m_outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
 
     if (m_debug) {
@@ -50,26 +50,26 @@ SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
 
 bool SpirometerManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
-    bool isSimMode = CypressSettings::isSimMode();
+    const bool isDebugMode = CypressSettings::isDebugMode();
+    const bool isSimMode = CypressSettings::isSimMode();
 
     if (isSimMode)
         return false;
 
     // path to EasyWarePro.exe
-    QString runnableName = CypressSettings::readSetting("spirometer/runnableName").toString();
+    const QString runnableName = CypressSettings::readSetting("spirometer/runnableName").toString();
 
     // full path to runnable directory
-    QString runnablePath = CypressSettings::readSetting("spirometer/runnablePath").toString();
+    const QString runnablePath = CypressSettings::readSetting("spirometer/runnablePath").toString();
 
     // Path to the EMR plugin data transfer directory
-    QString dataPath = CypressSettings::readSetting("spirometer/exchangePath").toString();
+    const QString dataPath = CypressSettings::readSetting("spirometer/exchangePath").toString();
 
     // OnyxIn.xml
-    QString inFileName = CypressSettings::readSetting("spirometer/inFileName").toString();
+    const QString inFileName = CypressSettings::readSetting("spirometer/inFileName").toString();
 
     // OnyxOut.xml
-    QString outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
+    const QString outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
         if (isDebugMode)
@@ -106,7 +106,7 @@ bool SpirometerManager::isInstalled()
         return false;
     }
 
-    QFileInfo runnableInfo(runnableName);
+    const QFileInfo runnableInfo(runnableName);
     if (!runnableInfo.exists()) {
         if (isDebugMode)
             qDebug() << "SpirometerManager::isInstalled - EasyWarePro.exe does not exist at"
@@ -122,7 +122,7 @@ bool SpirometerManager::isInstalled()
         return false;
     }
 
-    QFileInfo runnableDir(runnablePath);
+    const QFileInfo runnableDir(runnablePath);
     if (!runnableDir.isDir()) {
         if (isDebugMode)
             qDebug() << "SpirometerManager::isInstalled - Runnable dir is not executable at"
@@ -213,63 +213,78 @@ void SpirometerManager::readOutput()
         return;
     }
 
-
+    auto test = qSharedPointerCast<SpirometerTest>(m_test);
+    test->fromFile(getEMROutXmlName());
 
     finish();
 }
 
 void SpirometerManager::finish()
 {
-    QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
+    auto test = qSharedPointerCast<SpirometerTest>(m_test);
 
-    std::unique_ptr<QJsonObject> responseJson = std::make_unique<QJsonObject>();
-    std::unique_ptr<QJsonObject> testJson = test->toJsonObjectHeap();
+    const int answerId = m_session->getAnswerId();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
 
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getPineEndpoint();
-
+    QJsonObject responseJson {};
+    QJsonObject testJson = test->toJsonObject();
     QJsonObject fileJson {};
-    test->fromFile(getEMROutXmlName());
 
-    int answerId = m_session->getAnswerId();
+    const QFileInfo emrOutputXMLFile(getEMROutXmlName());
+    if (emrOutputXMLFile.exists()) {
+        const QString filePath = emrOutputXMLFile.absoluteFilePath();
+        const QString fileSize = FileUtils::getHumanReadableFileSize(filePath);
+
+        fileJson.insert("data_xml", fileSize);
+
+        NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            (host + endpoint + QString::number(answerId) + "?filename=data.xml").toStdString(),
+            "application/octet-stream",
+            FileUtils::readFile(filePath)
+        );
+    }
+    else {
+        qDebug() << "could not find emrOutputXMLFile" << getEMROutXmlName();
+    }
 
     if (outputPdfExists()) {
         const QString pdfOutputFilePath = getOutputPdfPath();
         const QFileInfo pdfOutputInfo(pdfOutputFilePath);
-
-        QString fileName = pdfOutputInfo.fileName();
-        fileName.replace(".", "_");
 
         if (m_debug)
             qDebug() << "sending pdf output file: " << pdfOutputInfo.absoluteFilePath();
 
         const QString fileSize = FileUtils::getHumanReadableFileSize(pdfOutputFilePath);
 
-        fileJson.insert(fileName, fileSize);
+        fileJson.insert("report_pdf", fileSize);
 
         NetworkUtils::sendHTTPSRequest(
             Poco::Net::HTTPRequest::HTTP_PATCH,
-            (host + endpoint + QString::number(answerId) + "?filename=" + fileName.replace("_pdf", ".pdf")).toStdString(),
+            (host + endpoint + QString::number(answerId) + "?filename=report.pdf").toStdString(),
             "application/octet-stream",
             FileUtils::readFile(pdfOutputInfo.absoluteFilePath())
         );
     }
+    else {
+        qDebug() << "could not find outputPDF: " << getOutputPdfPath();
+    }
 
-    testJson->insert("session", m_session->getJsonObject());
-    testJson->insert("files", fileJson);
+    testJson.insert("session", m_session->getJsonObject());
+    testJson.insert("files", fileJson);
+    responseJson.insert("value", testJson);
 
-    responseJson->insert("value", *testJson);
-    QJsonDocument jsonDoc(*responseJson);
-    std::unique_ptr<QByteArray> serializedData = std::make_unique<QByteArray>(jsonDoc.toJson());
+    const QJsonDocument jsonDoc(responseJson);
+    const QByteArray serializedData = jsonDoc.toJson();
 
     QString answerUrl = CypressSettings::getAnswerUrl(answerId);
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),
         "application/json",
-        *serializedData
+        serializedData
     );
-
 
     cleanUp();
 
@@ -386,7 +401,7 @@ void SpirometerManager::configureProcess()
     // write the inputs to EMR xml
     //
     EMRPluginWriter writer;
-    QDir xmlPath(m_dataPath);
+    const QDir xmlPath(m_dataPath);
 
     writer.setInputData(m_session->getInputData().toVariantMap());
     writer.write(xmlPath.filePath(m_inFileName));
@@ -419,11 +434,11 @@ QString SpirometerManager::getOutputPdfPath() const
     if (m_debug)
         qDebug() << "SpirometerManager::getOutputPdfPath";
 
-    QSharedPointer<SpirometerTest> test = qSharedPointerCast<SpirometerTest>(m_test);
+    auto test = qSharedPointerCast<SpirometerTest>(m_test);
     if (test->hasMetaData("pdf_report_path"))
         return test->getMetaDataAsString("pdf_report_path");
 
-    return QString();
+    return "";
 }
 
 bool SpirometerManager::outputPdfExists() const
@@ -431,7 +446,7 @@ bool SpirometerManager::outputPdfExists() const
     if (m_debug)
         qDebug() << "SpirometerManager::outputPdfExists";
 
-    QString outPdfPath = getOutputPdfPath();
+    const QString outPdfPath = getOutputPdfPath();
     if (outPdfPath.isEmpty() || outPdfPath.isNull())
         return false;
 

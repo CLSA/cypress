@@ -275,6 +275,7 @@ void HipMeasurement::getScanData(const QSqlDatabase &db,
     }
 
     if (!query.first()) {
+        qDebug() << "Hip: could not find a result for" << patientKey << scanId;
         return;
     }
 
@@ -315,6 +316,7 @@ void HipMeasurement::getScanData(const QSqlDatabase &db,
     }
 
     if (!query.first()) {
+        qDebug() << "HipHSA: could not find a result for" << patientKey << scanId;
         return;
     }
 

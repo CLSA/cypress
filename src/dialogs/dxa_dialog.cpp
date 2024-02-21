@@ -13,14 +13,10 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     , ui(new Ui::DXADialog)
 {
     ui->setupUi(this);
-
-    //ui->measurementTable->disableMeasureButton();
-    //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideManualEntry();
-    //ui->measurementTable->hideMeasureButton();
 
-    this->setWindowTitle("DXA 2");
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+    setWindowTitle("DXA 2");
+    setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new DXAManager(session));
     QSharedPointer<DXAManager> manager = qSharedPointerCast<DXAManager>(m_manager);

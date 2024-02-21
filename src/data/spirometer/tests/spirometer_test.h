@@ -1,8 +1,8 @@
 #ifndef SPIROMETER_TEST_H
 #define SPIROMETER_TEST_H
 
-#include "../../test_base.h"
-#include "../measurements/spirometer_measurement.h"
+#include "data/test_base.h"
+#include "data/spirometer/measurements/spirometer_measurement.h"
 
 #include <QJsonObject>
 

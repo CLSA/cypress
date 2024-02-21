@@ -1,7 +1,7 @@
 #ifndef RETINALCAMERAMEASUREMENT_H
 #define RETINALCAMERAMEASUREMENT_H
 
-#include "../measurement.h"
+#include "data/measurement.h"
 
 class RetinalCameraMeasurement : public Measurement
 {

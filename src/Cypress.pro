@@ -122,7 +122,6 @@ HEADERS += \
     data/access_query_helper.h \
     data/blood_pressure/measurements/blood_pressure_measurement.h \
     data/blood_pressure/tests/blood_pressure_test.h \
-    data/body_composition/commands.h \
     data/body_composition/measurements/body_composition_measurement.h \
     data/body_composition/tests/body_composition_test.h \
     data/cdtt/measurements/cdtt_measurement.h \
@@ -324,7 +323,6 @@ SOURCES += \
     data/access_query_helper.cpp \
     data/blood_pressure/measurements/blood_pressure_measurement.cpp \
     data/blood_pressure/tests/blood_pressure_test.cpp \
-    data/body_composition/commands.cpp \
     data/body_composition/measurements/body_composition_measurement.cpp \
     data/body_composition/tests/body_composition_test.cpp \
     data/cdtt/measurements/cdtt_measurement.cpp \

@@ -53,10 +53,10 @@ CDTTManager::~CDTTManager()
 
 bool CDTTManager::isInstalled()
 {
-    QString jre = CypressSettings::readSetting("cdtt/jre").toString();
-    QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
-    QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
+    const QString jre = CypressSettings::readSetting("cdtt/jre").toString();
+    const QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
+    const QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
 
     if (jre.isNull() || jre.isEmpty()) {
         qDebug() << "CDTTManager: jre is undefined";
@@ -78,7 +78,7 @@ bool CDTTManager::isInstalled()
         return false;
     }
 
-    QFileInfo jreInfo(jre);
+    const QFileInfo jreInfo(jre);
     if (!jreInfo.exists()) {
         qDebug() << "CDTTManager: JRE does not exist at " << jre;
         return false;
@@ -89,19 +89,19 @@ bool CDTTManager::isInstalled()
         return false;
     }
 
-    QFileInfo runnableNameInfo(runnableName);
+    const QFileInfo runnableNameInfo(runnableName);
     if (!runnableNameInfo.isFile()) {
         qDebug() << "CDTTManager: runnableName does not exist";
         return false;
     }
 
-    QDir runnableDir(runnablePath);
+    const QDir runnableDir(runnablePath);
     if (!runnableDir.exists()) {
         qDebug() << "CDTTManager: runnablePath does not exist";
         return false;
     }
 
-    QDir outputDir(outputPath);
+    const QDir outputDir(outputPath);
     if (!outputDir.exists()) {
         qDebug() << "CDTTManager: output dir does not exist";
         return false;
@@ -244,12 +244,13 @@ void CDTTManager::readOutput()
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName(
-        "DRIVER=Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" + fileName);
+        "DRIVER={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" + fileName);
 
     if (!db.isValid()) {
         emit error("ERROR: invalid database");
         return;
     }
+
 
     if (!db.open()) {
         qDebug() << "cannot find valid file";
@@ -268,7 +269,9 @@ void CDTTManager::finish() {
     if (m_debug)
         qDebug() << "ManagerBase::finish";
 
-    int answer_id = m_session->getAnswerId();
+    const int answer_id = m_session->getAnswerId();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
 
     QDir dir(m_outputPath);
     if (!dir.exists()) {
@@ -300,9 +303,19 @@ void CDTTManager::finish() {
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        (host + endpoint + QString::number(answer_id) + "?filename=" + "cdtt.xlsx").toStdString(),
+        "application/octet-stream",
+        FileUtils::readFile(excelFile.absoluteFilePath())
+    );
+
+    if (!ok) {
+        emit error("Could not transfer Ecg.xml to Pine.");
+    }
 
     QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
-    bool ok = NetworkUtils::sendHTTPSRequest(
+    ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),
         "application/json",

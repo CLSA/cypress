@@ -944,73 +944,78 @@ void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement*
     </ResultParameter>
      */
 
-    int precision = measure->getPrecision();
+    const int precision = measure->getPrecision();
+    const QDomNodeList list = node.childNodes();
 
-    QDomNodeList list = node.childNodes();
     if (list.isEmpty()) {
-      qDebug() << "no parameter child nodes";
-      return;
+        qDebug() << "no parameter child nodes";
+        return;
     }
+
     for (int i = 0; i < list.count(); i++) {
-      QDomNode child = list.item(i);
-      QDomElement elem = child.toElement();
-      if (elem.hasAttribute("ID")) {
-       QString tag = elem.attribute("ID");
-       if (SpirometerMeasurement::resultMap.contains(tag)) {
+        QDomNode child = list.item(i);
+        QDomElement elem = child.toElement();
+
+    if (elem.hasAttribute("ID")) {
+        QString tag = elem.attribute("ID");
+
+        if (SpirometerMeasurement::resultMap.contains(tag)) {
+
           QString key = SpirometerMeasurement::resultMap[tag];
           QDomNodeList clist = child.childNodes();
+
           QJsonObject arr;
           QJsonObject pred;
           QJsonObject norm;
+
           for (int j = 0; j < clist.size(); j++) {
             QDomElement celem = clist.item(j).toElement();
             QString ctag = celem.tagName();
             QString s = celem.text();
             if (SpirometerMeasurement::parameterList.contains(ctag) && !s.isEmpty() && "NaN" != s) {
-              if ("DataValue" == ctag) {
-                arr.insert("value", QJsonValue::fromVariant(s.toDouble()));
-              } else if ("Unit" == ctag) {
-                arr.insert("units", s);
-                pred.insert("units", s);
-                norm.insert("units", s);
-              } else if ("PredictedValue" == ctag) {
-                pred.insert("value", QJsonValue::fromVariant(s.toDouble()));
-              } else if ("LLNormalValue" == ctag) {
-                norm.insert("value", QJsonValue::fromVariant(s.toDouble()));
-              }
+                if ("DataValue" == ctag) {
+                    arr.insert("value", QJsonValue::fromVariant(s.toDouble()));
+                }
+                else if ("Unit" == ctag) {
+                    arr.insert("units", s);
+                    pred.insert("units", s);
+                    norm.insert("units", s);
+                }
+                else if ("PredictedValue" == ctag) {
+                    pred.insert("value", QJsonValue::fromVariant(s.toDouble()));
+                }
+                else if ("LLNormalValue" == ctag) {
+                    norm.insert("value", QJsonValue::fromVariant(s.toDouble()));
+                }
             }
           }
           if (arr.contains("value")) {
             if (arr.contains("units"))
-              measure->setAttribute(key,
-                                    arr["value"].toDouble(),
-                                    arr["units"].toString(),
-                                    precision);
+              measure->setAttribute(key, arr["value"].toDouble(),
+                        arr["units"].toString(), precision);
             else
               measure->setAttribute(key, arr["value"].toDouble(), precision);
           }
           if (pred.contains("value")) {
             QString predName = QString("%1_predicted").arg(key);
             if (pred.contains("units"))
-              measure->setAttribute(predName,
-                                    pred["value"].toDouble(),
-                                    pred["units"].toString(),
-                                    precision);
+              measure->setAttribute(predName, pred["value"].toDouble(),
+                        pred["units"].toString(), precision);
             else
-              measure->setAttribute(predName, pred["value"].toDouble(), precision);
+              measure->setAttribute(predName, pred["value"].toDouble(),
+                        precision);
           }
           if (norm.contains("value")) {
             QString normName = QString("%1_ll_normal").arg(key);
             if (norm.contains("units"))
-              measure->setAttribute(normName,
-                                    norm["value"].toDouble(),
-                                    norm["units"].toString(),
-                                    precision);
+              measure->setAttribute(normName, norm["value"].toDouble(),
+                        norm["units"].toString(), precision);
             else
-              measure->setAttribute(normName, norm["value"].toDouble(), precision);
+              measure->setAttribute(normName, norm["value"].toDouble(),
+                        precision);
           }
-       }
-      }
+        }
+        }
     }
 }
 
@@ -1018,30 +1023,34 @@ void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement*
 //
 void SpirometerTest::readChannel(const QDomNode& node, SpirometerMeasurement* measure)
 {
-    QDomElement elem = node.toElement();
-    QString prefix = elem.tagName().mid(7).toLower();
+    const QDomElement elem = node.toElement();
+    const QString prefix = elem.tagName().mid(7).toLower();
+
     qDebug() << "reading" << prefix << "channel";
+
     int precision = measure->getPrecision();
 
     foreach (const auto tag, SpirometerMeasurement::channelMap.toStdMap()) {
       QDomNodeList list = elem.elementsByTagName(tag.first);
       if (!list.isEmpty()) {
-       QDomElement elem = list.item(0).toElement();
-       QString key = QString("%1_%2").arg(prefix, tag.second);
+        const QDomElement elem = list.item(0).toElement();
+        const QString key = QString("%1_%2").arg(prefix, tag.second);
 
-       // only insert the sampling values if the xml element has the correct attribute
-       if ("SamplingValues" == tag.first) {
-          if (elem.hasAttribute("TypeOfData")) {
-            QStringList values = elem.text().split(" ");
-            measure->setAttribute(key, values.join(","));
-            QString numKey = QString("%1_value_count").arg(prefix);
-            measure->setAttribute(numKey, values.count());
-          }
-       } else if ("SamplingInterval" == tag.first || "TimeZeroOffset" == tag.first) {
+        // only insert the sampling values if the xml element has the correct
+        // attribute
+        if ("SamplingValues" == tag.first) {
+          //if (elem.hasAttribute("TypeOfData")) {
+          //  QStringList values = elem.text().split(" ");
+          //  measure->setAttribute(key, values.join(","));
+          //  QString numKey = QString("%1_value_count").arg(prefix);
+          //  measure->setAttribute(numKey, values.count());
+          //}
+        } else if ("SamplingInterval" == tag.first ||
+                   "TimeZeroOffset" == tag.first) {
           measure->setAttribute(key, elem.text().toDouble(), precision);
-       } else {
+        } else {
           measure->setAttribute(key, elem.text().toInt());
-       }
+        }
       }
     }
 }

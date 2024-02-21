@@ -1,6 +1,9 @@
 #include "choice_reaction_manager.h"
 #include "cypress_session.h"
 
+#include "auxiliary/file_utils.h"
+#include "auxiliary/network_utils.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -44,9 +47,9 @@ bool ChoiceReactionManager::isInstalled()
 {
     bool isDebugMode = CypressSettings::isDebugMode();
 
-    QString runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
-    QString outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
+    const QString runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
+    const QString outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty())
     {
@@ -72,7 +75,7 @@ bool ChoiceReactionManager::isInstalled()
         return false;
     }
 
-    QFileInfo info(runnableName);
+    const QFileInfo info(runnableName);
     if (!info.exists())
     {
         if (isDebugMode)
@@ -89,7 +92,7 @@ bool ChoiceReactionManager::isInstalled()
         return false;
     }
 
-    QDir working(runnablePath);
+    const QDir working(runnablePath);
     if (!working.exists())
     {
         if (isDebugMode)
@@ -98,7 +101,7 @@ bool ChoiceReactionManager::isInstalled()
         return false;
     }
 
-    QDir out(outputPath);
+    const QDir out(outputPath);
     if (!out.exists())
     {
         if (isDebugMode)
@@ -139,7 +142,6 @@ void ChoiceReactionManager::measure()
 
     if (!m_process.waitForStarted()) {
         emit error("Could not start application");
-        return;
     }
 }
 
@@ -165,9 +167,10 @@ void ChoiceReactionManager::readOutput()
     pattern << CCB_PREFIX << CCB_CLINIC << QDate().currentDate().toString("yyyyMMdd");
 
     QString outputFile = pattern.join("_") + ".csv";
-    QDir dir(m_outputPath);
+    const QDir dir(m_outputPath);
 
-    QSharedPointer<ChoiceReactionTest> test = qSharedPointerCast<ChoiceReactionTest>(m_test);
+    auto test = qSharedPointerCast<ChoiceReactionTest>(m_test);
+
     if(dir.exists(outputFile))
     {
         outputFile.prepend(QDir::separator());
@@ -177,13 +180,74 @@ void ChoiceReactionManager::readOutput()
         finish();
     }
     else
-    {
         emit error("Something went wrong. Please contact support");
-        m_test->reset();
-    }
 }
 
+void ChoiceReactionManager::finish() {
+    const int answer_id = m_session->getAnswerId();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
 
+    QDir dir(m_outputPath);
+    if (!dir.exists()) {
+        if (m_debug)
+            qDebug() << "directory does not exist: " << m_outputPath;
+        emit error("Output directory does not exist. Could not save measurements.");
+    }
+
+    QStringList pattern;
+    pattern << CCB_PREFIX << CCB_CLINIC << QDate().currentDate().toString("yyyyMMdd");
+    QString outputFile = pattern.join("_") + ".csv";
+
+    QFileInfo csvFile(dir.absoluteFilePath(outputFile));
+    if (!csvFile.exists()) {
+        if (m_debug)
+            qDebug() << "file does not exist: " << csvFile.absoluteFilePath();
+        emit error("Output excel file does not exist. Could not save measurements.");
+        return;
+    }
+
+    QJsonObject filesJson {};
+    filesJson.insert("data_csv", FileUtils::getHumanReadableFileSize(csvFile.absoluteFilePath()));
+
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionJson = m_session->getJsonObject();
+    testJson.insert("session", sessionJson);
+    testJson.insert("files", filesJson);
+
+    QJsonObject responseJson {};
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        (host + endpoint + QString::number(answer_id) + "?filename=" + "data.csv").toStdString(),
+        "application/octet-stream",
+        FileUtils::readFile(csvFile.absoluteFilePath())
+    );
+
+    if (!ok) {
+        emit error("Could not transfer CSV file to Pine.");
+    }
+
+    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+    ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        answerUrl.toStdString(),
+        "application/json",
+        serializedData
+    );
+
+    cleanUp();
+
+    if (ok)
+        emit success("Save successful. You may close this window.");
+    else
+        emit error("Something went wrong");
+
+}
 
 // Set up device
 bool ChoiceReactionManager::setUp()
@@ -191,9 +255,8 @@ bool ChoiceReactionManager::setUp()
     if (m_debug)
         qDebug() << "ChoiceReactionManager::setUp";
 
-    if (!cleanUp()) {
+    if (!cleanUp())
         return false;
-    }
 
     configureProcess();
 
@@ -208,8 +271,7 @@ bool ChoiceReactionManager::cleanUp()
 
     m_test->reset();
 
-    if(QProcess::NotRunning != m_process.state())
-    {
+    if(QProcess::NotRunning != m_process.state()) {
         m_process.close();
         m_process.waitForFinished();
     }
@@ -217,11 +279,11 @@ bool ChoiceReactionManager::cleanUp()
     // Clear all files
     QDir outputDir(m_outputPath);
     outputDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-    QStringList fileList = outputDir.entryList();
 
+    const QStringList fileList = outputDir.entryList();
     foreach (const QString& file, fileList)
     {
-        QString filePath = outputDir.absoluteFilePath(file);
+        const QString filePath = outputDir.absoluteFilePath(file);
         if (!QFile::remove(filePath)) {
             qDebug() << "could not remove " << filePath;
         }
@@ -284,7 +346,7 @@ void ChoiceReactionManager::configureProcess()
 
     // required language "en" or "fr" converted to E or F
     //
-    QString s = m_session->getLanguage().toUpper();
+    const QString s = m_session->getLanguage().toUpper();
     if (!s.isEmpty()) {
         command << "/l" + QString(s.at(0));
     }

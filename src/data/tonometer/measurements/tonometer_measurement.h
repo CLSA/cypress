@@ -1,7 +1,7 @@
 #ifndef TONOMETER_MEASUREMENT_H
 #define TONOMETER_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
 * \class TonometerMeasurement

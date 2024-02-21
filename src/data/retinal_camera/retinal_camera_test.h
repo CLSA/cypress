@@ -1,7 +1,7 @@
 #ifndef RETINALCAMERATEST_H
 #define RETINALCAMERATEST_H
 
-#include "../test_base.h"
+#include "data/test_base.h"
 
 class RetinalCameraTest : public TestBase
 {

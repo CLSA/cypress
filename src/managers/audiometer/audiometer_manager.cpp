@@ -60,30 +60,19 @@ bool AudiometerManager::isInstalled()
         return false;
     }
 
-    bool supportsBaudRates = false;
     foreach (const QSerialPortInfo& portInfo, portList) {
         if (!isRS232Port(portInfo))
             continue;
 
-        QList<qint32> baudRates = portInfo.standardBaudRates();
-        foreach (qint32 baudRate, baudRates) {
+        const QList<qint32> baudRates = portInfo.standardBaudRates();
+        foreach (const qint32 baudRate, baudRates) {
             if (baudRate >= 600 && baudRate <= 19200) {
-                //qInfo() << "port:"                 << portInfo.portName();
-                //qInfo() << "supported baud rates:" << baudRates;
-                //qInfo() << "description:"          << portInfo.description();
-                //qInfo() << "manufacturer:"         << portInfo.manufacturer();
-                //qInfo() << "serial number:"        << portInfo.serialNumber();
-                //qInfo() << "system location:"      << portInfo.systemLocation();
-                //qInfo() << "vendor identifier:"    << portInfo.vendorIdentifier();
-                //qInfo() << "product identifier:"   << portInfo.productIdentifier();
-                //qInfo() << "-------------------------------------";
-
-                supportsBaudRates = true;
+                return true;
             }
         }
     }
 
-    return supportsBaudRates;
+    return false;
 }
 
 bool AudiometerManager::start()
@@ -91,9 +80,8 @@ bool AudiometerManager::start()
     if (m_debug)
         qDebug() << "AudiometerManager::start";
 
-    if (!setUp()) {
+    if (!setUp())
         return false;
-    }
 
     scanDevices();
 

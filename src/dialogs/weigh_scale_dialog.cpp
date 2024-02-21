@@ -17,9 +17,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
     QSharedPointer<WeighScaleManager> manager = qSharedPointerCast<WeighScaleManager>(m_manager);
 
     ui->testInfoWidget->setSessionInformation(*session);
-
     ui->measurementTable->disableMeasureButton();
-    //ui->measurementTable->disableFinishButton();
 
     QList<TableColumn> columns;
     columns << TableColumn("weight", "Weight", new NumberDelegate(0, 1000, true, false, false, 2));

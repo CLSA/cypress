@@ -1,7 +1,7 @@
 #ifndef ECG_TEST_H
 #define ECG_TEST_H
 
-#include "../../test_base.h"
+#include "data/test_base.h"
 
 QT_FORWARD_DECLARE_CLASS(QDomNode)
 

@@ -9,7 +9,7 @@ const QStringList SpirometerMeasurement::parameterList = {"DataValue","Unit","Pr
 
 const q_stringMap SpirometerMeasurement::channelMap = {
     {"SamplingInterval","sampling_interval"},
-    {"SamplingValues","values"},
+    //{"SamplingValues","values"},
     {"TimeZeroOffset","time_zero_offset"},
     {"DefaultVTPlotDrawEndIdx","default_vt_plot_draw_end_index"}
 };
@@ -133,11 +133,13 @@ bool SpirometerMeasurement::isValid() const
       foreach(const auto key, list)
       {
         if("default_vt_plot_draw_end_index" == key)
-          channelKeys << QString("volume_%1").arg(key);
+        {
+          //channelKeys << QString("volume_%1").arg(key);
+        }
         else
         {
-          channelKeys << QString("flow_%1").arg(key);
-          channelKeys << QString("volume_%1").arg(key);
+          //channelKeys << QString("flow_%1").arg(key);
+          //channelKeys << QString("volume_%1").arg(key);
         }
       }
 
@@ -225,19 +227,19 @@ void SpirometerMeasurement::simulate()
      setAttribute("flow_time_zero_offset",Utilities::interp(-10.0,-5.0,mu),m_precision);
 
      // random array of 1000 flow values 18 digits precision
-     QStringList flowValues;
-     QStringList volumeValues;
-     for(int i=0;i<1000;i++)
-     {
-        double phi = QRandomGenerator::global()->generateDouble();
-        double flow = Utilities::interp(0.0000000000000000001,2.0000000000000000001,phi);
-        double volume = Utilities::interp(1.0000000000000000001,4.0000000000000000001,phi);
+     //QStringList flowValues;
+     //QStringList volumeValues;
+     //for(int i=0;i<1000;i++)
+     //{
+     //   double phi = QRandomGenerator::global()->generateDouble();
+     //   double flow = Utilities::interp(0.0000000000000000001,2.0000000000000000001,phi);
+     //   double volume = Utilities::interp(1.0000000000000000001,4.0000000000000000001,phi);
 
-        flowValues << QString::number(flow,'g',18);
-        volumeValues << QString::number(volume,'g',18);
-     }
-     setAttribute("flow_values",flowValues.join(","));
-     setAttribute("volume_values",volumeValues.join(","));
+     //   flowValues << QString::number(flow,'g',18);
+     //   volumeValues << QString::number(volume,'g',18);
+     //}
+     //setAttribute("flow_values",flowValues.join(","));
+     //setAttribute("volume_values",volumeValues.join(","));
 
      setAttribute("volume_sampling_interval",0.01);
      setAttribute("volume_time_zero_offset",Utilities::interp(-10.0,-5.0,mu),m_precision);

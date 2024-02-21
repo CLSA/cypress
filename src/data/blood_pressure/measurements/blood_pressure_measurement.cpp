@@ -29,9 +29,9 @@ bool BloodPressureMeasurement::isValid() const
         && hasAttribute("start_time")
         && hasAttribute("end_time")
         && hasAttribute("reading_number");
-    if(!hasAllRequiredAttributes)
-    {
-      return false;
+
+    if (!hasAllRequiredAttributes) {
+        return false;
     }
 
     // TODO: There should be some low and high values which
@@ -41,9 +41,10 @@ bool BloodPressureMeasurement::isValid() const
     //       normal diastolic pressure: 60 - 80 mmHg
     //       normal pulse rate: 60 - 100 bpm
     //
-    bool sbpValid = 0 < getSbp();
-    bool dbpValid = 0 < getDbp();
-    bool pulseValid = 0 < getPulse();
+    const bool sbpValid = 0 < getSbp();
+    const bool dbpValid = 0 < getDbp();
+    const bool pulseValid = 0 < getPulse();
+
     return (sbpValid && dbpValid && pulseValid);
 }
 
@@ -62,14 +63,14 @@ void BloodPressureMeasurement::simulate(const int &reading)
 {
     static QDateTime previous = QDateTime::currentDateTime();
 
-    int systolic = QRandomGenerator::global()->bounded(90,120);
-    int diastolic = QRandomGenerator::global()->bounded(60,80);
-    int pulse = QRandomGenerator::global()->bounded(60,100);
-    int timeoffset = QRandomGenerator::global()->bounded(26000,99000);
+    const int systolic = QRandomGenerator::global()->bounded(90,120);
+    const int diastolic = QRandomGenerator::global()->bounded(60,80);
+    const int pulse = QRandomGenerator::global()->bounded(60,100);
+    const int timeoffset = QRandomGenerator::global()->bounded(26000,99000);
 
     QDateTime start = QDateTime::currentDateTime();
 
-    if(start<previous) start = previous;
+    if (start < previous) start = previous;
 
     QDateTime end = start.addMSecs(timeoffset);
 
@@ -90,5 +91,6 @@ QDebug operator<<(QDebug dbg, const BloodPressureMeasurement& item)
         dbg.nospace() << "Blood Pressure Measurement()";
     else
         dbg.nospace() << "Blood Pressure Measurement(" << measurementStr << " ...)";
+
     return dbg.maybeSpace();
 }

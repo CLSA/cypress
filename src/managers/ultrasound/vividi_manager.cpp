@@ -124,17 +124,17 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
 bool VividiManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
+    const bool isDebugMode = CypressSettings::isDebugMode();
 
-    QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
-    QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
+    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
 
-    QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    const QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    const QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    const QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         if (isDebugMode)
@@ -184,7 +184,7 @@ bool VividiManager::isInstalled()
         return false;
     }
 
-    QFileInfo exeInfo(runnableName);
+    const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
         if (isDebugMode)
             qDebug() << "DxaHipManager::isInstalled - runnableName does not exist at"
@@ -198,7 +198,7 @@ bool VividiManager::isInstalled()
         return false;
     }
 
-    QFileInfo workingDir(runnablePath);
+    const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
         if (isDebugMode)
             qDebug() << "DxaHipManager::isInstalled - working directory does not exist at"
@@ -249,15 +249,13 @@ void VividiManager::measure()
 
 void VividiManager::finish()
 {
+
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pine_path = CypressSettings::getAnswerUrl(m_session->getAnswerId());
+
     QJsonObject responseJson{};
-
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getPineEndpoint();
-    QString pine_path = CypressSettings::getAnswerUrl(m_session->getAnswerId());
-
     QJsonObject filesJson {};
-
-
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++)
     {

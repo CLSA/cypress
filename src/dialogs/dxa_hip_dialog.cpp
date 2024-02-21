@@ -18,8 +18,7 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
     //ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideManualEntry();
 
-    this->setWindowTitle("DXA 1");
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+    setWindowTitle("DXA 1");
 
     m_manager.reset(new DxaHipManager(session));
     QSharedPointer<DxaHipManager> manager = qSharedPointerCast<DxaHipManager>(m_manager);

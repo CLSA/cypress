@@ -150,7 +150,8 @@ void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QS
         setAttribute("SCAN_DATE", scanDate);
     }
 
-    qDebug() << "PATIENT DATA: " << patientData;
+    qDebug() << "Found Scan for : " << patientData << "SCANID: " << scanId << "SCAN_DATE: " << scanDate;
+
     getScanData(patscanDb, patientData.value("PATIENT_KEY").toString(), scanId);
     computeTZScore(referenceDb, patientData);
 }

@@ -19,8 +19,6 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     : SerialPortManager(session)
 {
     m_test.reset(new WeighScaleTest);
-    //m_test->setExpectedMeasurementCount(2);
-
     m_deviceName = CypressSettings::readSetting("weight_scale/portName").toString();
 
     if (m_debug) {
@@ -77,10 +75,9 @@ void WeighScaleManager::addManualMeasurement()
 
     test->addMeasurement(measure);
 
-    double average = test->calculateAverage();
+    const double average = test->calculateAverage();
     if (m_debug)
       qDebug() << "WeighScaleTest::fromArray - new average" << average << "kg";
-
 
     emit dataChanged(m_test);
 }

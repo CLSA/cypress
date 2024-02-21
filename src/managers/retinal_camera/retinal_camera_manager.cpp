@@ -42,13 +42,13 @@ RetinalCameraManager::~RetinalCameraManager()
 
 bool RetinalCameraManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
-    QString runnableName = CypressSettings::readSetting("retinal_camera/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("retinal_camera/runnablePath").toString();
+    const bool isDebugMode = CypressSettings::isDebugMode();
+    const QString runnableName = CypressSettings::readSetting("retinal_camera/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("retinal_camera/runnablePath").toString();
 
-    QString databaseName = CypressSettings::readSetting("retinal_camera/database/name").toString();
-    QString databasePort = CypressSettings::readSetting("retinal_camera/database/port").toString();
-    QString databaseUser = CypressSettings::readSetting("retinal_camera/database/user").toString();
+    const QString databaseName = CypressSettings::readSetting("retinal_camera/database/name").toString();
+    const QString databasePort = CypressSettings::readSetting("retinal_camera/database/port").toString();
+    const QString databaseUser = CypressSettings::readSetting("retinal_camera/database/user").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
         if (isDebugMode)
@@ -74,8 +74,8 @@ bool RetinalCameraManager::isInstalled()
         return false;
     }
 
-    QFileInfo runnableNameInfo(runnableName);
-    QDir runnablePathInfo(runnablePath);
+    const QFileInfo runnableNameInfo(runnableName);
+    const QDir runnablePathInfo(runnablePath);
 
     if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
         if (isDebugMode)
@@ -211,8 +211,6 @@ void RetinalCameraManager::configureProcess()
             qDebug() << "process state: " << s.join(" ").toLower();
     });
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");
-
     m_process.setProgram(m_runnableName);
 }
 
@@ -250,7 +248,9 @@ void RetinalCameraManager::finish()
     if (m_debug)
         qDebug() << "RetinalCameraManager::finish";
 
-    int answer_id = m_session->getAnswerId();
+    const int answer_id = m_session->getAnswerId();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
 
     QJsonObject testJson = m_test->toJsonObject();
     testJson.insert("session", m_session->getJsonObject());
@@ -261,8 +261,8 @@ void RetinalCameraManager::finish()
     for (int i = 0; i < m_test->getMeasurementCount(); i++) {
         const Measurement& measure = m_test->get(i);
         const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").value().toString();
-        QString path = measure.getAttribute("EYE_PICT_VENDOR").value().toString().trimmed();
 
+        QString path = measure.getAttribute("EYE_PICT_VENDOR").value().toString().trimmed();
         path.replace("\\", "//");
 
         const QString &fileSize = FileUtils::getHumanReadableFileSize(path);
@@ -272,12 +272,7 @@ void RetinalCameraManager::finish()
             qDebug() << measure.toJsonObject();
         }
 
-
-        QString host = CypressSettings::getPineHost();
-        QString endpoint = CypressSettings::getPineEndpoint();
-
-        QString fileName = "EYE_" + side + ".jpg";
-
+        const QString fileName = "EYE_" + side + ".jpg";
         testJson.insert("files", QJsonObject {{ fileName, fileSize }});
 
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
@@ -295,10 +290,10 @@ void RetinalCameraManager::finish()
     QJsonObject values;
     values.insert("value", testJson);
 
-    QJsonDocument jsonDoc(values);
-    QByteArray serializedData = jsonDoc.toJson();
+    const QJsonDocument jsonDoc(values);
+    const QByteArray serializedData = jsonDoc.toJson();
+    const QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
 
     if (ok) {
@@ -334,10 +329,10 @@ bool RetinalCameraManager::cleanupDatabase()
 
     while (query.next())
     {
-        QString storagePathUid = query.value("StoragePathUid").toString();
-        QString fileName = query.value("FileName").toString().trimmed();
-        QString extension = query.value("FileExt").toString().trimmed();
-        QString location = EyeExtractorQueryUtil::getLocation(m_db, storagePathUid);
+        const QString storagePathUid = query.value("StoragePathUid").toString();
+        const QString fileName = query.value("FileName").toString().trimmed();
+        const QString extension = query.value("FileExt").toString().trimmed();
+        const QString location = EyeExtractorQueryUtil::getLocation(m_db, storagePathUid);
 
         if (m_debug) {
             qDebug() << "RetinalCameraManager::cleanupDatabase - deleting:"
@@ -432,8 +427,8 @@ void RetinalCameraManager::readOutput()
         return;
     }
 
-    QSharedPointer<RetinalCameraSession> session = qSharedPointerCast<RetinalCameraSession>(m_session);
-    QSharedPointer<RetinalCameraTest> test = qSharedPointerCast<RetinalCameraTest>(m_test);
+    auto session = qSharedPointerCast<RetinalCameraSession>(m_session);
+    auto test = qSharedPointerCast<RetinalCameraTest>(m_test);
 
     QJsonObject results;
     switch (session->getSide()) {

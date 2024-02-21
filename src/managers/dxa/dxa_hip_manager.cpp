@@ -68,18 +68,18 @@ bool DxaHipManager::isInstalled()
     if (isSimMode)
         return true;
 
-    QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
-    QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
+    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
 
-    QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    const QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    const QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    const QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
-    QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
-    QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
+    const QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
+    const QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         if (isDebugMode)

@@ -82,9 +82,6 @@ void GeneralProxyManager::measure()
     //inputData["InformantPostalCode"] = "123 456";
     //inputData["InformantTelephone"] = "(222) 222-2222";
     //inputData["informantIsProxy"] = "Yes";
-
-
-
 }
 
 void GeneralProxyManager::finish()
@@ -101,9 +98,9 @@ void GeneralProxyManager::finish()
     responseJson.insert("value", testJson);
 
     QJsonDocument jsonDoc(responseJson);
-    QByteArray serializedData = jsonDoc.toJson();
+    const QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+    const QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
     if (!ok) {
         emit error("Something went wrong");

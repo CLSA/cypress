@@ -295,6 +295,7 @@ void ApSpineMeasurement::getScanData(const QSqlDatabase& db, const QString& pati
     }
 
     if (!query.first()) {
+        qDebug() << "Spine: could not find a result for" << patientKey << scanId;
         return;
     }
 

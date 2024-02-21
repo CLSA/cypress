@@ -67,18 +67,18 @@ bool DXAManager::isInstalled()
     if (isSimMode)
         return true;
 
-    QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
-    QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
+    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
 
-    QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    const QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
+    const QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
+    const QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
-    QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
-    QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
+    const QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
+    const QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         if (isDebugMode)
@@ -135,7 +135,7 @@ bool DXAManager::isInstalled()
         return false;
     }
 
-    QFileInfo patscanFile(patscanDbPath);
+    const QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
         if (isDebugMode)
             qDebug() << "DXAManager::isInstalled - patscan file does not exist: " << patscanDbPath;
@@ -162,7 +162,7 @@ bool DXAManager::isInstalled()
         return false;
     }
 
-    QFileInfo refscanFile(refscanDbPath);
+    const QFileInfo refscanFile(refscanDbPath);
     if (!refscanFile.exists()) {
         if (isDebugMode)
             qDebug() << "DXAManager::isInstalled - refscanDbPath is not defined at "
@@ -182,7 +182,7 @@ bool DXAManager::isInstalled()
         return false;
     }
 
-    QFileInfo exeInfo(runnableName);
+    const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
         if (isDebugMode)
             qDebug() << "DXAManager::isInstalled - runnableName does not exist at" << runnableName;
@@ -195,7 +195,7 @@ bool DXAManager::isInstalled()
         return false;
     }
 
-    QFileInfo workingDir(runnablePath);
+    const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
         if (isDebugMode)
             qDebug() << "DXAManager::isInstalled - working directory does not exist at"
@@ -280,15 +280,16 @@ void DXAManager::measure()
         return;
     }
 
-    QSharedPointer<DXATest> test = qSharedPointerCast<DXATest>(m_test);
+    auto test = qSharedPointerCast<DXATest>(m_test);
     if (!test->hasAllNeededFiles()) {
         QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");
         return;
     }
 
     // get patscan db variables for measurements
-    QFileInfo patscanFileInfo(m_patscanDbPath);
-    QString localPatscanPath= QDir::currentPath() + "/" + patscanFileInfo.fileName();
+    const QFileInfo patscanFileInfo(m_patscanDbPath);
+    const QString localPatscanPath= QDir::currentPath() + "/" + patscanFileInfo.fileName();
+
     if (patscanFileInfo.exists() && patscanFileInfo.isReadable()) {
         if (QFileInfo(localPatscanPath).exists()) {
             QFile::remove(localPatscanPath);
@@ -308,8 +309,8 @@ void DXAManager::measure()
     }
 
     // get refscan db variables for measurements
-    QFileInfo refscanFileInfo(m_refscanDbPath);
-    QString localRefScanPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
+    const QFileInfo refscanFileInfo(m_refscanDbPath);
+    const QString localRefScanPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
 
     if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
         if (QFileInfo(localRefScanPath).exists()) {

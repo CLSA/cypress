@@ -1,5 +1,5 @@
 #include "ecg_test.h"
-#include "../measurements/ecg_measurement.h"
+#include "data/ecg/measurements/ecg_measurement.h"
 
 #include <QDateTime>
 #include <QDebug>

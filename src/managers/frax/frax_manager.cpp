@@ -61,16 +61,16 @@ bool FraxManager::isInstalled()
         return true;
     }
 
-    QString runnableName = CypressSettings::readSetting("frax/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("frax/runnablePath").toString();
+    const QString runnableName = CypressSettings::readSetting("frax/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("frax/runnablePath").toString();
 
-    QString outputFilePath = CypressSettings::readSetting("frax/outputFilePath").toString();
-    QString inputFilePath = CypressSettings::readSetting("frax/inputFilePath").toString();
+    const QString outputFilePath = CypressSettings::readSetting("frax/outputFilePath").toString();
+    const QString inputFilePath = CypressSettings::readSetting("frax/inputFilePath").toString();
 
-    QString temporaryFilePath = CypressSettings::readSetting("frax/temporaryFilePath").toString();
+    const QString temporaryFilePath = CypressSettings::readSetting("frax/temporaryFilePath").toString();
 
-    QString country_code = CypressSettings::readSetting("frax/countryCode").toString();
-    QString type_code = CypressSettings::readSetting("frax/typeCode").toString();
+    const QString country_code = CypressSettings::readSetting("frax/countryCode").toString();
+    const QString type_code = CypressSettings::readSetting("frax/typeCode").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         if (isDebugMode)
@@ -109,8 +109,8 @@ bool FraxManager::isInstalled()
         return false;
     }
 
-    QFileInfo info(runnableName);
-    QDir workingDirectory(runnablePath);
+    const QFileInfo info(runnableName);
+    const QDir workingDirectory(runnablePath);
 
     if (!info.exists()) {
         if (isDebugMode) {
@@ -210,7 +210,7 @@ void FraxManager::readOutput()
     if (m_debug)
         qDebug() << "FraxManager::readOutput";
 
-    QSharedPointer<FraxTest> test = qSharedPointerCast<FraxTest>(m_test);
+    auto test = qSharedPointerCast<FraxTest>(m_test);
     if (!QFileInfo::exists(m_outputFilePath)) {
         emit error("FRAX results not found");
         return;

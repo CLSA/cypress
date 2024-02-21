@@ -10,7 +10,6 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     , ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
     m_manager.reset(new AudiometerManager(session));
 
     QSharedPointer<AudiometerManager> manager = qSharedPointerCast<AudiometerManager>(m_manager);
@@ -23,7 +22,6 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     columns << TableColumn("level", "Level", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("outcome", "Outcome", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("error", "Error", new TextDelegate("", QRegExp(), true));
-
 
     connect(manager.get(), &AudiometerManager::scanningDevices, ui->serialPortPickerWidget, &SerialPortWidget::scanningForDevices);
 

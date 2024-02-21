@@ -232,6 +232,7 @@ void ForearmMeasurement::getScanData(const QSqlDatabase &db,
     }
 
     if (!query.first()) {
+        qDebug() << "Forearm: could not find a result for" << patientKey << scanId;
         return;
     }
 

@@ -11,7 +11,6 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 {
     ui->setupUi(this);
 
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
     m_manager.reset(new BloodPressureManager(session));
     QSharedPointer<BloodPressureManager> manager = qSharedPointerCast<BloodPressureManager>(m_manager);
 
@@ -32,10 +31,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
     QStringList bandList = {"---", "Small", "Medium", "Large", "X-Large"};
     ui->armBandSizeComboBox->addItems(bandList);
-    connect(ui->armBandSizeComboBox,
-            &QComboBox::currentTextChanged,
-            manager.get(),
-            &BloodPressureManager::setCuffSize);
+    connect(ui->armBandSizeComboBox, &QComboBox::currentTextChanged, manager.get(), &BloodPressureManager::setCuffSize);
 
     QStringList armList = {"---", "Left", "Right"};
     ui->armComboBox->addItems(armList);
@@ -49,22 +45,22 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
         ui->stateValue->setText(state);
     });
 
-    connect(ui->connectPushButton,
-            &QPushButton::clicked,
-            manager.get(),
-            [=]() {
-                if (ui->armComboBox->currentText() == "---") {
-                    QMessageBox::warning(this, "Select Arm", "Please select the arm used from the dropdown");
-                    return;
-                }
+    connect(ui->connectPushButton, &QPushButton::clicked, manager.get(), [=]() {
+      if (ui->armComboBox->currentText() == "---") {
+        QMessageBox::warning(this, "Select Arm",
+                             "Please select the arm used from the dropdown");
+        return;
+      }
 
-                if (ui->armBandSizeComboBox->currentText() == "---") {
-                    QMessageBox::warning(this, "Select Cuff Size", "Please select the cuff size used from the dropdown");
-                    return;
-                }
+      if (ui->armBandSizeComboBox->currentText() == "---") {
+        QMessageBox::warning(
+            this, "Select Cuff Size",
+            "Please select the cuff size used from the dropdown");
+        return;
+      }
 
-                manager->connectToDevice();
-            });
+      manager->connectToDevice();
+    });
 
     connect(ui->disconnectPushButton,
             &QPushButton::clicked,

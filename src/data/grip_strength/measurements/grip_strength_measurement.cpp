@@ -1,5 +1,5 @@
 #include "grip_strength_measurement.h"
-#include "../../../auxiliary/Utilities.h"
+#include "auxiliary/Utilities.h"
 
 #include <QDebug>
 #include <QJsonObject>

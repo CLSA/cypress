@@ -1,7 +1,7 @@
 #include "choice_reaction_test.h"
-#include "../measurements/choice_reaction_measurement.h"
+#include "data/choice_reaction/measurements/choice_reaction_measurement.h"
 
-#include "../../../cypress_settings.h"
+#include "cypress_settings.h"
 
 #include <QDateTime>
 #include <QDebug>

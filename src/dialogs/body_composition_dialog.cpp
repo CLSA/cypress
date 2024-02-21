@@ -11,8 +11,6 @@ BodyCompositionDialog::BodyCompositionDialog(QWidget *parent, QSharedPointer<Cyp
     , ui(new Ui::BodyCompositionDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
-
     m_manager.reset(new BodyCompositionManager(session));
 }
 

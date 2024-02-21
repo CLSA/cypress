@@ -1,7 +1,7 @@
 #ifndef CHOICE_REACTION_TEST_H
 #define CHOICE_REACTION_TEST_H
 
-#include "../../test_base.h"
+#include "data/test_base.h"
 
 class ChoiceReactionTest : public TestBase
 {

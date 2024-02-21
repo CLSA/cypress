@@ -13,15 +13,7 @@ TonometerDialog::TonometerDialog(QWidget *parent, QSharedPointer<TonometerSessio
 {
     ui->setupUi(this);
 
-    //ui->measurementTable->disableMeasureButton();
-    //ui->measurementTable->disableFinishButton();
-    //ui->measurementTable->hideManualEntry();
-
-    //if (!m_sim)
-    //    ui->measurementTable->hideMeasureButton();
-
-    this->setWindowTitle("Tonometer");
-    this->setWindowFlags(Qt::WindowFullscreenButtonHint);
+    setWindowTitle("Tonometer");
 
     m_manager.reset(new TonometerManager(session));
 

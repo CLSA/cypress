@@ -1,12 +1,11 @@
 #include "tonometer_test.h"
-#include "../../../auxiliary/Utilities.h"
+#include "auxiliary/Utilities.h"
 
 #include <QDateTime>
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QRandomGenerator>
-#include <algorithm>
 
 const q_stringMap TonometerTest::metaLUT = TonometerTest::initMetaLUT();
 

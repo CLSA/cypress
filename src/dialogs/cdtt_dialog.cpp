@@ -13,7 +13,6 @@ CDTTDialog::CDTTDialog(QWidget *parent, QSharedPointer<CDTTSession> session)
     ui->setupUi(this);
 
     setWindowTitle("CDTT");
-    setWindowFlags(Qt::WindowFullscreenButtonHint);
 
     m_manager.reset(new CDTTManager(session));
 
