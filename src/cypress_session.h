@@ -102,7 +102,7 @@ public:
     virtual void start();
     virtual void end(const CypressSession::SessionStatus& status = CypressSession::SessionStatus::Success);
 
-    virtual QString getWebpageContents()
+    virtual QString getWebpageContents() const
     {
         return "<!DOCTYPE html>"
                "<html lang=\"en\">"
@@ -114,7 +114,7 @@ public:
                "<body>"
                "</body>"
                "</html>";
-    }
+    };
 
     SessionStatus getStatus() const;
     QJsonObject getInputData() const;

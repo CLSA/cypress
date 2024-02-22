@@ -121,15 +121,12 @@ void MeasurementTable::handleChange(int row, int col)
 
 void MeasurementTable::updateRowIds()
 {
-    qDebug() << "update row ids";
-
     for (int row = 0; row < ui->measurementTable->rowCount(); row++) {
         QWidget* widget = ui->measurementTable->cellWidget(row, ui->measurementTable->columnCount() - 1);
         if (widget)
         {
             QPushButton* button = qobject_cast<QPushButton*>(widget);
-            if (button)
-            {
+            if (button) {
                 button->setProperty("row_id", row);
             }
         }
@@ -194,7 +191,7 @@ void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
     if (m_test.isNull())
         return;
 
-    qDebug() << m_test->toJsonObject();
+    //qDebug() << m_test->toJsonObject();
 
     const QVector<QSharedPointer<Measurement>> measurements = m_test->getMeasurements();
 

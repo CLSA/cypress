@@ -21,11 +21,11 @@
 // { "WARDS_BMD",      "...4" },
 // { "HTOT_BMD",       "123." },
 
-const QList<QString> m_inputKeyList = {
+static const QList<QString> m_inputKeyList = {
 
 };
 
-const QList<QString> m_outputKeyList = {
+static const QList<QString> m_outputKeyList = {
     "TROCH_AREA",  		 // double
     "TROCH_BMC",   		 // double
     "TROCH_BMD",   		 // double
@@ -218,13 +218,13 @@ void HipMeasurement::addDicomFile(DicomFile file)
     m_hipDicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
     m_hasHipFile = true;
 
-    setAttribute("PATIENT_ID", file.patientId);
-    setAttribute("FILE_PATH", file.absFilePath);
-    setAttribute("STUDY_ID", file.studyId);
-    setAttribute("SIDE", file.laterality);
+    setAttribute("PATIENT_ID",        file.patientId);
+    setAttribute("FILE_PATH",         file.absFilePath);
+    setAttribute("STUDY_ID",          file.studyId);
+    setAttribute("SIDE",              file.laterality);
     setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
-    setAttribute("NAME", "HIP_DICOM");
-    setAttribute("SIZE", m_hipDicomFile.size);
+    setAttribute("NAME",              "HIP_DICOM");
+    setAttribute("SIZE",              m_hipDicomFile.size);
 }
 
 Side HipMeasurement::getSide() {

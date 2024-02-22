@@ -61,8 +61,8 @@ DXAManager::~DXAManager()
 
 bool DXAManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
-    bool isSimMode = CypressSettings::isSimMode();
+    const bool isDebugMode = CypressSettings::isDebugMode();
+    const bool isSimMode = CypressSettings::isSimMode();
 
     if (isSimMode)
         return true;
@@ -382,7 +382,6 @@ void DXAManager::finish()
     int answer_id = m_session->getAnswerId();
     QString barcode = m_session->getBarcode();
 
-
     // Whole body
     QByteArray wb_1 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody1.absFilePath);
     QByteArray wb_2 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody2.absFilePath);
@@ -460,7 +459,7 @@ void DXAManager::finish()
     if (!test->wholeBodyMeasurement->m_wholeBody1.absFilePath.isEmpty()) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
                   (host + endpoint + QString::number(answer_id)
-                                             + "?filename=" + wb_1_file_name.replace("_", ".")).toStdString(),
+                                             + "?filename=" + wb_1_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   wb_1);
         if (!ok) {
@@ -472,7 +471,7 @@ void DXAManager::finish()
     if (!test->wholeBodyMeasurement->m_wholeBody2.absFilePath.isEmpty()) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
                   (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + wb_2_file_name.replace("_", ".")).toStdString(),
+                         + "?filename=" + wb_2_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   wb_2);
         if (!ok) {
@@ -484,7 +483,7 @@ void DXAManager::finish()
     if (test->apSpineMeasurement->m_hasApSpineFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
                   (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + sp_1_file_name.replace("_", ".")).toStdString(),
+                         + "?filename=" + sp_1_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   sp_1);
         if (!ok) {
@@ -496,7 +495,7 @@ void DXAManager::finish()
     if (test->ivaImagingMeasurement->hasOtFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
                   (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + iva_ot_file_name.replace("_", ".")).toStdString(),
+                         + "?filename=" + iva_ot_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   iva_ot);
         if (!ok) {
@@ -508,7 +507,7 @@ void DXAManager::finish()
     if (test->ivaImagingMeasurement->hasPrFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
                   (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + iva_pr_file_name.replace("_", ".")).toStdString(),
+                         + "?filename=" + iva_pr_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   iva_pr);
         if (!ok) {

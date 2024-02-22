@@ -7,37 +7,34 @@ DXASession::DXASession(QObject *parent, const QJsonObject& inputData)
 {
 }
 
-void DXASession::initializeDialog()
-{
+void DXASession::initializeDialog() {
     m_dialog = new DXADialog(nullptr, QSharedPointer<DXASession>(this));
 }
 
-QString DXASession::getWebpageContents()
-{
-    QString webpageContents
+QString DXASession::getWebpageContents() const {
+    const QString webpageContents
         = "<!DOCTYPE html>"
           "<html lang=\"en\">"
           "<head>"
           "<meta charset=\"UTF-8\">"
           "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-          "<title>Pine</title>"
+          "<title>DXA 2 (" + m_inputData.value("barcode").toString() + ")</title>"
           "</head>"
           "<body>"
-          "<h1>Participant ID</h1>"
-          "<p>" + getBarcode() + "</p>"
-          "<h1>Scans required</h1>"
+          "<h5>Participant ID</h5>"
+          "<p>" + m_inputData.value("barcode").toString() + "</p>"
+          "<h5>Scans required</h5>"
           "<p>" + m_inputData.value("scans").toString() + "</p>"
-          "<h1>Weight</h1>"
+          "<h5>Weight</h5>"
           "<p>" + m_inputData.value("weight").toString() + "</p>"
-          "<h1>Height</h1>"
+          "<h5>Height</h5>"
           "<p>" + m_inputData.value("height").toString() + "</p>"
-          "<h1>Sex</h1>"
+          "<h5>Sex</h5>"
           "<p>" + m_inputData.value("sex").toString() + "</p>"
           "</body>"
           "</html>";
 
     return webpageContents;
-
 }
 
 void DXASession::isInstalled() const {

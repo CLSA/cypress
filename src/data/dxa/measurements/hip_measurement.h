@@ -35,8 +35,7 @@ public:
 
 private:
     Side m_side;
-
-    bool m_hasHipFile{false};
+    bool m_hasHipFile { false };
 
     // DXAMeasurement interface
 public:

@@ -12,7 +12,24 @@ void DxaHipSession::initializeDialog()
     m_dialog = new DxaHipDialog(nullptr, QSharedPointer<DxaHipSession>(this));
 }
 
-QString DxaHipSession::getWebpageContents()
+void DxaHipSession::validate() const {
+    if (m_debug)
+        qDebug() << m_inputData;
+
+    if (!isValidString("sex"))
+        throw ValidationError("Sex input variable is invalid");
+
+    if (!isValidString("scans"))
+        throw ValidationError("Scans input variable is invalid");
+
+    if (!isValidDouble("weight"))
+        throw ValidationError("Weight input variable is invalid");
+
+    if (!isValidDouble("height"))
+        throw ValidationError("Height input variable is invalid");
+}
+
+QString DxaHipSession::getWebpageContents() const
 {
     QString webpageContents
         = "<!DOCTYPE html>"
@@ -20,18 +37,18 @@ QString DxaHipSession::getWebpageContents()
           "<head>"
           "<meta charset=\"UTF-8\">"
           "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-          "<title>Pine</title>"
+          "<title>DXA 1 (" + m_inputData.value("barcode").toString() + ")</title>"
           "</head>"
           "<body>"
-          "<h1>Participant ID</h1>"
-          "<p>" + getBarcode() + "</p>"
-          "<h1>Scans required</h1>"
+          "<h5>Participant ID</h5>"
+          "<p>" + m_inputData.value("barcode").toString() + "</p>"
+          "<h5>Scans required</h5>"
           "<p>" + m_inputData.value("scans").toString() + "</p>"
-          "<h1>Weight</h1>"
+          "<h5>Weight</h5>"
           "<p>" + m_inputData.value("weight").toString() + "</p>"
-          "<h1>Height</h1>"
+          "<h5>Height</h5>"
           "<p>" + m_inputData.value("height").toString() + "</p>"
-          "<h1>Sex</h1>"
+          "<h5>Sex</h5>"
           "<p>" + m_inputData.value("sex").toString() + "</p>"
           "</body>"
           "</html>";

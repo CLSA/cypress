@@ -10,7 +10,7 @@ public:
 
     // CypressSession interface
 public:
-    QString getWebpageContents() override;
+    QString getWebpageContents() const override;
     void initializeDialog() override;
     void isInstalled() const override;
     void isAvailable() const override;

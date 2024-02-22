@@ -196,7 +196,9 @@ void BloodPressureManager::disconnectFromDevice()
         QThread::sleep(300);
     }
 
-    m_bpm200->disconnect();
+    if (m_bpm200->isOpen()) {
+        m_bpm200->disconnect();
+    }
 
     emit deviceDisconnected();
 }

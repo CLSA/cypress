@@ -12,14 +12,14 @@ void DxaSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
                                                                    .getActiveSessions();
 
         for (const QSharedPointer<CypressSession> &session : activeSessions) {
-            DXASession *dxaSession = static_cast<DXASession *>(session.get());
+            auto dxaSession = qSharedPointerCast<DXASession>(session);
             if (dxaSession) {
                 responseData = dxaSession->getWebpageContents();
             }
         }
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-        response.setContentType("application/json");
+        response.setContentType("text/html");
 
         std::ostream &out = response.send();
         out << responseData.toStdString();

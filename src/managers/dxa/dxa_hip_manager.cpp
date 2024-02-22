@@ -136,7 +136,7 @@ bool DxaHipManager::isInstalled()
         return false;
     }
 
-    QFileInfo patscanFile(patscanDbPath);
+    const QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
         if (isDebugMode)
             qDebug() << "patscan file does not exist: "
@@ -165,7 +165,7 @@ bool DxaHipManager::isInstalled()
         return false;
     }
 
-    QFileInfo refscanFile(refscanDbPath);
+    const QFileInfo refscanFile(refscanDbPath);
     if (!refscanFile.exists()) {
         if (isDebugMode)
             qDebug() << "refscanDbPath is not defined at "
@@ -187,7 +187,7 @@ bool DxaHipManager::isInstalled()
         return false;
     }
 
-    QFileInfo exeInfo(runnableName);
+    const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
         if (isDebugMode)
             qDebug() << "runnableName does not exist at"
@@ -201,7 +201,7 @@ bool DxaHipManager::isInstalled()
         return false;
     }
 
-    QFileInfo workingDir(runnablePath);
+    const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
         if (isDebugMode)
             qDebug() << "working directory does not exist at"
@@ -288,77 +288,86 @@ void DxaHipManager::measure()
         return;
     }
 
-    QSharedPointer<DxaHipTest> test = qSharedPointerCast<DxaHipTest>(m_test);
+    auto test = qSharedPointerCast<DxaHipTest>(m_test);
     if (!test->hasAllNeededFiles()) {
         QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");
-        return;
     }
 
     // get patscan db variables for measurements
-    QFileInfo patscanFileInfo(m_patscanDbPath);
-    QString localPatscanPath= QDir::currentPath() + "/" + patscanFileInfo.fileName();
-    if (patscanFileInfo.exists() && patscanFileInfo.isReadable()) {
-        if (QFileInfo(localPatscanPath).exists()) {
-            QFile::remove(localPatscanPath);
-        }
-        if (m_debug)
-            qDebug() << localPatscanPath;
+    //QFileInfo patscanFileInfo(m_patscanDbPath);
+    //QString localPatscanPath= QDir::currentPath() + "/" + patscanFileInfo.fileName();
+    //if (patscanFileInfo.exists() && patscanFileInfo.isReadable()) {
+    //    if (QFileInfo(localPatscanPath).exists()) {
+    //        QFile::remove(localPatscanPath);
+    //    }
+    //    if (m_debug)
+    //        qDebug() << localPatscanPath;
 
-        if (!QFile::copy(m_patscanDbPath, localPatscanPath)) {
-            if (m_debug)
-                qDebug() << "error copying patscan db from " << m_patscanDbPath << "to"
-                         << localPatscanPath;
-        }
-    } else {
-        qDebug() << "could not access patscanDb at" << m_patscanDbPath;
-        emit error("Could not access Apex workstation");
+    //    if (!QFile::copy(m_patscanDbPath, localPatscanPath)) {
+    //        if (m_debug)
+    //            qDebug() << "error copying patscan db from " << m_patscanDbPath << "to"
+    //                     << localPatscanPath;
+    //    }
+    //} else {
+    //    qDebug() << "could not access patscanDb at" << m_patscanDbPath;
+    //    emit error("Could not access Apex workstation");
+    //    return;
+    //}
+
+    //// get refscan db variables for measurements
+    //QFileInfo refscanFileInfo(m_refscanDbPath);
+    //QString localRefScanPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
+
+    //if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
+    //    if (QFileInfo(localRefScanPath).exists()) {
+    //        QFile::remove(localRefScanPath);
+    //    }
+    //    if (m_debug)
+    //        qDebug() << localRefScanPath;
+
+    //    if (!QFile::copy(m_refscanDbPath, localRefScanPath)) {
+    //        if (m_debug)
+    //            qDebug() << "error copying refscan db from " << m_refscanDbPath << "to"
+    //                     << localRefScanPath;
+    //    }
+    //} else {
+    //    emit error("Could not access Apex workstation");
+    //    return;
+    //}
+
+    //// calculate totals and averages
+    //QSqlDatabase patscanDb = QSqlDatabase::addDatabase("QODBC", "patscan");
+    //patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
+    //                          + QDir::toNativeSeparators(localPatscanPath));
+    //if (!patscanDb.open()) {
+    //    qDebug() << "Error: " << patscanDb.lastError().text();
+    //    emit error("Could not open PatScan.mdb");
+    //} else {
+    //    qDebug() << "connected to the patscanDb at " << localPatscanPath;
+    //}
+
+
+    //QSqlDatabase referenceDb = QSqlDatabase::addDatabase("QODBC", "reference");
+    //referenceDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
+    //                            + QDir::toNativeSeparators(localRefScanPath));
+    //if (!referenceDb.open()) {
+    //    qDebug() << "Error: " << patscanDb.lastError().text();
+    //    emit error("Could not open reference.mdb");
+    //} else {
+    //    qDebug() << "connected to the reference.mdb at " << localRefScanPath;
+    //}
+
+    if (!initPatScanDb()) {
+        emit error("Failed to copy the PatScan.mdb file from the Apex workstation");
         return;
     }
 
-    // get refscan db variables for measurements
-    QFileInfo refscanFileInfo(m_refscanDbPath);
-    QString localRefScanPath = QDir::currentPath() + "/" + refscanFileInfo.fileName();
-
-    if (refscanFileInfo.exists() && refscanFileInfo.isReadable()) {
-        if (QFileInfo(localRefScanPath).exists()) {
-            QFile::remove(localRefScanPath);
-        }
-        if (m_debug)
-            qDebug() << localRefScanPath;
-
-        if (!QFile::copy(m_refscanDbPath, localRefScanPath)) {
-            if (m_debug)
-                qDebug() << "error copying refscan db from " << m_refscanDbPath << "to"
-                         << localRefScanPath;
-        }
-    } else {
-        emit error("Could not access Apex workstation");
+    if (!initReferenceDb()) {
+        emit error("Failed to copy the reference.mdb file from the Apex workstation");
         return;
     }
 
-    // calculate totals and averages
-    QSqlDatabase patscanDb = QSqlDatabase::addDatabase("QODBC", "patscan");
-    patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
-                              + QDir::toNativeSeparators(localPatscanPath));
-    if (!patscanDb.open()) {
-        qDebug() << "Error: " << patscanDb.lastError().text();
-        emit error("Could not open PatScan.mdb");
-    } else {
-        qDebug() << "connected to the patscanDb at " << localPatscanPath;
-    }
-
-
-    QSqlDatabase referenceDb = QSqlDatabase::addDatabase("QODBC", "reference");
-    referenceDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
-                                + QDir::toNativeSeparators(localRefScanPath));
-    if (!referenceDb.open()) {
-        qDebug() << "Error: " << patscanDb.lastError().text();
-        emit error("Could not open reference.mdb");
-    } else {
-        qDebug() << "connected to the reference.mdb at " << localRefScanPath;
-    }
-
-    test->getPatientScan(patscanDb, m_session->getBarcode());
+    test->getPatientScan(m_patscanDb, m_session->getBarcode());
 
     QString patientKey = test->getMetaData("PATIENT_KEY").toString();
     QJsonObject patientData {
@@ -368,13 +377,11 @@ void DxaHipManager::measure()
         { "ETHNICITY", test->getMetaData("ETHNICITY").toString() }
     };
 
-    test->leftHipMeasurement->getScanAnalysisData(patscanDb, referenceDb, patientData);
-    test->rightHipMeasurement->getScanAnalysisData(patscanDb, referenceDb, patientData);
+    test->leftHipMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
+    test->rightHipMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
 
-    emit canFinish();
-
-    patscanDb.close();
-    referenceDb.close();
+    m_patscanDb.close();
+    m_referenceDb.close();
 }
 
 // implementation of final clean up of device after disconnecting and all
@@ -385,11 +392,10 @@ void DxaHipManager::finish()
     QSharedPointer<DxaHipTest> test = qSharedPointerCast<DxaHipTest>(m_test);
     bool ok = false;
 
-    int answer_id = m_session->getAnswerId();
-    QString barcode = m_session->getBarcode();
-
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getPineEndpoint();
+    const int answer_id = m_session->getAnswerId();
+    const QString barcode = m_session->getBarcode();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
 
     // Hip
     QString hip_1_file_name = "L_HIP_DICOM.dcm";
@@ -479,13 +485,109 @@ void DxaHipManager::finish()
     cleanUp();
 }
 
-bool DxaHipManager::cleanUp()
-{
+bool DxaHipManager::cleanUp() {
     return clearData();
 }
 
-bool DxaHipManager::clearData()
-{
+
+bool DxaHipManager::initPatScanDb() {
+    if (!copyPatScanDb()) {
+        return false;
+    }
+
+    // calculate totals and averages
+    m_patscanDb = QSqlDatabase::addDatabase("QODBC", "patscan");
+    m_patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
+                              + QDir::toNativeSeparators(m_patscanDbFileInfo.absoluteFilePath()));
+    if (!m_patscanDb.open()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool DxaHipManager::initReferenceDb() {
+    if (!copyReferenceDb()) {
+        return false;
+    }
+
+    m_referenceDb = QSqlDatabase::addDatabase("QODBC", "reference");
+    m_referenceDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
+                                + QDir::toNativeSeparators(m_referenceDbFileInfo.absoluteFilePath()));
+    if (!m_referenceDb.open()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool DxaHipManager::copyPatScanDb() {
+    // Copies the PatScan.mdb file from the DEXA/APEX workstation and sets up a reference to the file.
+    // Assumes that the Apex workstation is sharing the file
+
+    // Returns true if successful, otherwise false
+
+    const QFileInfo patscanFileInfo(m_patscanDbPath);
+    if (!patscanFileInfo.exists()) {
+        return false;
+    }
+    if (!patscanFileInfo.isReadable()) {
+        return false;
+    }
+
+    const QFileInfo localPatScanFileInfo(QDir::current().absoluteFilePath(patscanFileInfo.fileName()));
+    if (localPatScanFileInfo.exists()) {
+        if (!QFile::remove(localPatScanFileInfo.absoluteFilePath())) {
+            return false;
+        }
+    }
+
+    if (!QFile::copy(m_patscanDbPath, localPatScanFileInfo.absoluteFilePath())) {
+        if (m_debug)
+            qDebug() << "error copying patscan db from " << m_refscanDbPath << "to" << localPatScanFileInfo.absoluteFilePath();
+        return false;
+    }
+
+    m_patscanDbFileInfo = localPatScanFileInfo;
+
+    return true;
+}
+
+
+bool DxaHipManager::copyReferenceDb() {
+    // Copies the reference.mdb file from the DEXA computer, assumes that the Apex workstation is sharing the file
+    //
+
+    const QFileInfo apexReferenceFileInfo(m_refscanDbPath);
+    if (!apexReferenceFileInfo.exists()) {
+        return false;
+    }
+    if (!apexReferenceFileInfo.isReadable()) {
+        return false;
+    }
+
+    const QFileInfo localReferenceFileInfo(QDir::current().absoluteFilePath(apexReferenceFileInfo.fileName()));
+    if (localReferenceFileInfo.exists()) {
+        if (!QFile::remove(localReferenceFileInfo.absoluteFilePath())) {
+            if (m_debug)
+                qDebug() << "could not remove existing local reference db at: " << m_refscanDbPath;
+            return false;
+        }
+    }
+
+    if (!QFile::copy(m_refscanDbPath, localReferenceFileInfo.absoluteFilePath())) {
+        if (m_debug)
+            qDebug() << "error copying refscan db from " << m_refscanDbPath << "to" << localReferenceFileInfo.absoluteFilePath();
+
+        return false;
+    }
+
+    m_referenceDbFileInfo = localReferenceFileInfo;
+
+    return true;
+}
+
+bool DxaHipManager::clearData() {
     m_test->reset();
     return true;
 }

@@ -118,6 +118,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
      {QString(R"(^/dxa1/status/?$)"),
       &InstrumentRequestHandlerFactory::createDxaHipStatusRequestHandler},
 
+     {QString(R"(^/dxa1/session/?$)"),
+      &InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler},
+
      {QString(R"(^/dxa1/delete/?$)"),
       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
@@ -125,6 +128,9 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
 
      {QString(R"(^/dxa2/status/?$)"),
       &InstrumentRequestHandlerFactory::createDxaStatusRequestHandler},
+
+     {QString(R"(^/dxa2/session/?$)"),
+      &InstrumentRequestHandlerFactory::createDxaSessionRequestHandler},
 
      {QString(R"(^/dxa2/delete/?$)"),
       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},

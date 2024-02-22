@@ -57,7 +57,11 @@ private:
     QString m_logConfigPath;
     QString m_ascConfigPath;
 
+    QFileInfo m_patscanDbFileInfo;
     QSqlDatabase m_patscanDb;
+
+    QFileInfo m_referenceDbFileInfo;
+    QSqlDatabase m_referenceDb;
 
     // Reset the session
     bool clearData() override;
@@ -67,6 +71,12 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
+
+    bool initReferenceDb();
+    bool initPatScanDb();
+
+    bool copyReferenceDb();
+    bool copyPatScanDb();
 };
 
 #endif // DXAHIPMANAGER_H

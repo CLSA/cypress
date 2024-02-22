@@ -1,5 +1,5 @@
 #include "iva_imaging_measurement.h"
-#include "../../../auxiliary/file_utils.h"
+#include "auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
 #include "dcmtk/dcmdata/dcdeftag.h"
@@ -57,10 +57,10 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
         return;
     }
 
-    setAttribute("patientId", file.patientId);
-    setAttribute("studyId", file.studyId);
-    setAttribute("mediaStorageUid", file.mediaStorageUID);
-    setAttribute("filePath", file.absFilePath);
+    setAttribute("PATIENT_ID", file.patientId);
+    setAttribute("STUDY_ID", file.studyId);
+    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
+    setAttribute("FILEPATH", file.absFilePath);
 
     if (isDicomMeasureFile(loadedFileFormat)) {
         qDebug() << "adding IVA measure";

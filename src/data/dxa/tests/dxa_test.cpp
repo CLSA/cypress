@@ -201,10 +201,10 @@ QJsonObject DXATest::toJsonObject() const
         *apSpine = apSpineMeasurement->toJsonObject();
 
     if (leftForearmMeasurement)
-        *leftForearm = apSpineMeasurement->toJsonObject();
+        *leftForearm = leftForearmMeasurement->toJsonObject();
 
     if (rightForearmMeasurement)
-        *rightForearm = apSpineMeasurement->toJsonObject();
+        *rightForearm = rightForearmMeasurement->toJsonObject();
 
     if (ivaImagingMeasurement)
         *ivaSpine = ivaImagingMeasurement->toJsonObject();

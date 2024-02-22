@@ -100,6 +100,8 @@ QString ForearmMeasurement::getName() {
     else if (m_side == Side::RIGHT) {
         return "R_FA";
     }
+
+    return "L_FA";
 }
 
 QString ForearmMeasurement::getBodyPartName() {
@@ -118,10 +120,10 @@ void ForearmMeasurement::simulate()
 {
     QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/forearm.json");
 
-    QStringList keys = json.keys();
+    const QStringList keys = json.keys();
     for (const QString &key : keys)
     {
-        QJsonValue value = json.value(key);
+        const QJsonValue value = json.value(key);
         setAttribute(key, value);
     }
 }

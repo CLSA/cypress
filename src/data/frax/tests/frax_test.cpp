@@ -25,7 +25,7 @@
  * 5 : Previous fracture (0 : no, 1 : yes)
  * 6 : Parental history of hip fracture (0 : no, 1 : yes)
  * 7 : Current smoker (0 : no, 1 : yes)
- * 8 : Gluccocorticoid (0 : no, 1 : yes)
+ * 8 : Glucocorticoid (0 : no, 1 : yes)
  * 9 : Rheumatoid Arthritis (0 : no, 1 : yes)
  * 10: Secondary osteoporosis (0 : no, 1 : yes)
  * 11: Alcohol more than two drinks a day (0 : no, 1 : yes)
@@ -171,16 +171,11 @@ void FraxTest::simulate(const QVariantMap& input)
 
     QString interp = "N/A";
     if (p > 20)
-    {
         interp = "High";
-    }
     else if (p >= 10 && p <= 20)
-    {
         interp = "Moderate";
-    }
-    else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5) {
+    else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
         interp = "Low";
-    }
 
     addMetaData("osteoporotic_fracture_bmd_interp", interp);
 
