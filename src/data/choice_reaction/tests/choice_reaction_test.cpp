@@ -242,14 +242,10 @@ QString ChoiceReactionTest::toString() const
 bool ChoiceReactionTest::isValid() const
 {
     bool okMeta = true;
-    foreach(const auto key, m_outputKeyList)
-    {
-        if(!hasMetaData(key))
-        {
+    foreach(const auto key, m_outputKeyList) {
+        if(!hasMetaData(key)) {
             if (m_debug)
-            {
                 qDebug() << "test does not have metadata key: " << key;
-            }
 
             okMeta = false;
             break;
@@ -261,9 +257,7 @@ bool ChoiceReactionTest::isValid() const
         foreach (const auto m, m_measurementList) {
             if (!m->isValid()) {
                 if (m_debug)
-                {
                     qDebug() << "measurement is invalid: " << m->toStringList();
-                }
 
                 okTest = false;
                 break;

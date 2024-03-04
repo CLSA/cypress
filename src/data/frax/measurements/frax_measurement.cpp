@@ -11,12 +11,13 @@ bool FraxMeasurement::isValid() const
 QString FraxMeasurement::toString() const
 {
     QString s;
-    if(isValid())
-    {
-      QString type = getAttribute("type").toString().replace("_"," ");
-      QString p = QString::number(getAttributeValue("probability").toDouble(),'f',1);
-      s = QString("%1 risk: %2 (%3)").arg(type,p,getAttribute("probability").units());
+
+    if (isValid()) {
+        QString type = getAttribute("type").toString().replace("_"," ");
+        QString p = QString::number(getAttributeValue("probability").toDouble(),'f',1);
+        s = QString("%1 risk: %2 (%3)").arg(type,p,getAttribute("probability").units());
     }
+
     return s;
 }
 

@@ -14,15 +14,13 @@ RetinalCameraTest::RetinalCameraTest()
 
 void RetinalCameraTest::simulate(const QVariantMap& inputData)
 {
-    if (inputData["side"] == "left")
-    {
+    if (inputData["side"] == "left") {
         QSharedPointer<RetinalCameraMeasurement> leftEye(new RetinalCameraMeasurement);
         leftEye->setAttribute("EYE_PICT_VENDOR", "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/LEFT.jpg");
         leftEye->setAttribute("EYE_SIDE_VENDOR", "LEFT");
         this->addMeasurement(leftEye);
     }
-    else if (inputData["side"] == "right")
-    {
+    else if (inputData["side"] == "right") {
         QSharedPointer<RetinalCameraMeasurement> rightEye(new RetinalCameraMeasurement);
         rightEye->setAttribute("EYE_PICT_VENDOR",
                            "C:/Users/Anthony/Downloads/RETINAL_CAM_SIM/RIGHT.jpg");
@@ -49,7 +47,7 @@ bool RetinalCameraTest::fromDatabaseResults(const QJsonObject &results)
         eyeMeasure->setAttribute("EYE_SIDE_VENDOR", "RIGHT");
     }
 
-    this->addMeasurement(eyeMeasure);
+    addMeasurement(eyeMeasure);
 
     return true;
 }
@@ -60,12 +58,10 @@ bool RetinalCameraTest::isValid() const
         return false;
     }
 
-    auto measurements = getMeasurements();
-    foreach (auto measurement, measurements)
-    {
-        if (!measurement->isValid()) {
+    const auto measurements = getMeasurements();
+    foreach (auto measurement, measurements) {
+        if (!measurement->isValid())
             return false;
-        }
     }
 
     return true;

@@ -17,7 +17,7 @@ FraxDialog::FraxDialog(QWidget *parent, QSharedPointer<FraxSession> session)
 
     m_manager.reset(new FraxManager(session));
 
-    QSharedPointer<FraxManager> manager = qSharedPointerCast<FraxManager>(m_manager);
+    auto manager = qSharedPointerCast<FraxManager>(m_manager);
 
     // finished
     connect(manager.get(), &FraxManager::success, this, &FraxDialog::success);

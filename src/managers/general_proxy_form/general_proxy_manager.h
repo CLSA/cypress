@@ -1,8 +1,10 @@
 #ifndef GENERALPROXYMANAGER_H
 #define GENERALPROXYMANAGER_H
 
-#include "../manager_base.h"
+#include "managers/manager_base.h"
 #include "server/sessions/gen_proxy_session.h"
+
+#include <QProcess>
 
 class GeneralProxyManager : public ManagerBase
 {
@@ -22,9 +24,15 @@ protected:
     bool clearData();
     bool cleanUp();
 
+    void readOutput();
+
 private:
+    QProcess m_process;
     QString m_inputFilePath;
     QString m_outputFilePath;
+
+    QString m_runnableName;
+    QString m_runnablePath;
 };
 
 #endif // GENERALPROXYMANAGER_H

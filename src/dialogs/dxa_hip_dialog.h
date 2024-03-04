@@ -21,6 +21,10 @@ public:
 
 private:
     Ui::DxaHipDialog *ui { Q_NULLPTR };
+
+    void initMeasurementTable();
+    void initManager();
+
 };
 
 #endif // DXA_HIP_DIALOG_H

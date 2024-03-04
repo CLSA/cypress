@@ -1,8 +1,10 @@
 #include "choice_reaction_manager.h"
-#include "cypress_session.h"
+#include "data/choice_reaction/tests/choice_reaction_test.h"
 
 #include "auxiliary/file_utils.h"
 #include "auxiliary/network_utils.h"
+
+#include "cypress_session.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -45,7 +47,7 @@ ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSessio
 
 bool ChoiceReactionManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
+    const bool isDebugMode = CypressSettings::isDebugMode();
 
     const QString runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
@@ -273,7 +275,7 @@ bool ChoiceReactionManager::cleanUp()
 
     if(QProcess::NotRunning != m_process.state()) {
         m_process.close();
-        m_process.waitForFinished();
+        //m_process.waitForFinished();
     }
 
     // Clear all files

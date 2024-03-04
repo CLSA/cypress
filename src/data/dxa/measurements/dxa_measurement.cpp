@@ -150,13 +150,13 @@ void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QS
         setAttribute("SCAN_DATE", scanDate);
     }
 
-    qDebug() << "Found Scan for : " << patientData << "SCANID: " << scanId << "SCAN_DATE: " << scanDate;
+    qDebug() << "Found" << scanMode << "scan for : " << patientData << "SCANID: " << scanId << "SCAN_DATE: " << scanDate;
 
     getScanData(patscanDb, patientData.value("PATIENT_KEY").toString(), scanId);
-    computeTZScore(referenceDb, patientData);
+    computeTZScore(referenceDb, patientData, scanDate);
 }
 
-void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJsonObject& patientData)
+void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJsonObject& patientData, const QString& scanDate)
 {
     /*
      * INPUT
@@ -179,6 +179,8 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
     // - sum the area and sum the bmc of the included vertebral levels
     // - compute the revised total bmd from summed bmc / summed area
     // - provide the proper bone range code for total bmd
+
+    qDebug() << "t and z score patient data: " << patientData;
 
     QMap<QString, double> bmdData;
     QString prefix = getName() + "_";
@@ -318,12 +320,14 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
     qDebug() << prefix + " data contains: " << QString::number(m_attributes.size()) + " possible entries to get bmd values from";
     qDebug() << prefix + " bmddata contains: " << QString::number(bmdData.size()) + " entries to get tz";
 
+    qDebug() << "bmdData: " << bmdData;
+
     AgeBracket bracket;
     double age {};
 
     age = computeYearsDifference(
-        QDate::fromString(patientData.value("SCAN_DATE").toString()),
-        QDate::fromString(patientData.value("BIRTHDATE").toString()));
+        scanDate,
+        patientData.value("BIRTHDATE").toString());
 
     qDebug() << "computed age from scandate and dob: " + QString::number(age);
 
@@ -356,24 +360,32 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
         query.prepare(sql);
         query.exec();
 
-        query.first();
+        if (!query.first()) {
+            qDebug() << "first query (t score) failed to find results";
+        }
 
         QString curveId = query.value("UNIQUE_ID").toString();
         double ageYoung = query.value("AGE_YOUNG").toDouble();
 
+        qDebug() << "first query unique_id: " << curveId << "age young:" << ageYoung;
 
-        qDebug() << "second query (T score): " + sql;
 
         sql = "SELECT Y_VALUE, L_VALUE, STD FROM Points WHERE UNIQUE_ID = " + curveId;
         sql += " AND X_VALUE = " + QString::number(ageYoung);
 
+        qDebug() << "second query (T score): " + sql;
+
         query.prepare(sql);
         if (!query.exec()) {
             qDebug() << query.lastError().text();
-            throw QException();
+            //throw QException();
+            continue;
         }
 
-        query.first();
+        if (!query.first()) {
+            qDebug() << "second query t score no results";
+            continue;
+        }
 
         QList<double> bmdValues;
         bmdValues.append(query.value("Y_VALUE").toDouble());
@@ -386,31 +398,41 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
         double sigma = bmdValues.at(2);
 
         double T_score = M_value * (pow(X_value / M_value, L_value) - 1.0) / (L_value * sigma);
-        T_score = qRound(T_score);
 
-        if (0.0 == abs(T_score)) T_score = 0.;
+        qDebug() << "M_value: " << M_value << "X_value: " << X_value << "L_value: " << "L_value" << "sigma: " << sigma;
+        qDebug() << "T SCORE: " << T_score;
 
-        QString varName = getName() + "_";
+        // TODO
+        //T_score = static_cast<double>(static_cast<int>(T_score * 10.0)) / 10.0;
+        //if (0.0 == abs(T_score)) T_score = 0.;
+
+        QString varName = "";
         if (getRefType() == "S" && bmdBoneRangeKey.startsWith("TOT_"))
             varName += "TOT_T";
         else
             varName += QString(bmdBoneRangeKey).replace("_BMD", "_T");
 
-        if (m_attributes.contains(varName))
-            throw QException();
+        if (m_attributes.contains(varName)) {
+            qDebug() << "exception 416";
+            //throw QException();
+            continue;
+        }
 
         setAttribute(varName, T_score);
 
         double Z_score {};
-        varName = getName() + "_";
 
+        varName = "";
         if (getRefType() == "S" && bmdBoneRangeKey.startsWith("TOT_"))
             varName += "TOT_Z";
         else
             varName += QString(bmdBoneRangeKey).replace("_BMD", "_Z");
 
-        if (m_attributes.contains(varName))
-            throw QException();
+        if (m_attributes.contains(varName)) {
+            qDebug() << "exception 432";
+            continue;
+        }
+            //throw QException();
 
         QString sex = patientData.value("SEX").toString();
         sex = sex.toUpper();
@@ -451,9 +473,14 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
         query.prepare(sql);
         if (!query.exec()) {
             qDebug() << query.lastError().text();
-            throw QException();
+            continue;
         }
-        query.first();
+
+        if (!query.first()) {
+            qWarning() << "no results for first z score query..";
+            continue;
+        }
+
         curveId = query.value("UNIQUE_ID").toString();
 
         // Determine the age values (X axis variable) of the curve
@@ -463,7 +490,8 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
         query.prepare(sql);
         if (!query.exec()) {
             qDebug() << query.lastError().text();
-            throw QException();
+            continue;
+            //throw QException();
         }
 
         QList<double> ageTable;
@@ -486,12 +514,15 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
                 qDebug() << "third query (z score) iter: " + QString::number(i) + " : " + sql + QString::number(x_value_array[i]);;
 
                 query.prepare(sql + QString::number(x_value_array[i]));
-                if (query.exec()) {
+                if (!query.exec()) {
                     qDebug() << query.lastError().text();
-                    throw QException();
+                    continue;
                 }
 
-                query.first();
+                if (!query.first()) {
+                    qDebug() << "no results for third query (z score)..";
+                    continue;
+                }
 
                 bmdValues.append(query.value("Y_VALUE").toDouble());
                 bmdValues.append(query.value("L_VALUE").toDouble());
@@ -499,17 +530,31 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
             }
 
             double u = (age - bracket.ageMin) / bracket.ageSpan;
+
+            qDebug() << "age bracket: " << bracket.ageMin << bracket.ageMax << bracket.ageSpan;
+            qDebug() << "u: " << u << "bmdValues size: " << bmdValues.size() / 2;
+
             QList<double> interpValues;
-            for (int i = 0; i < bmdValues.size() / 2; i++)
+
+            if (bmdValues.size() < 4) {
+                qDebug() << "not enough bmd values for interpretation";
+                continue;
+            }
+
+            for (int i = 0; i < bmdValues.size() / 2; i++) {
                 interpValues.append((1.0 - u) * bmdValues.at(i) + u * bmdValues.at(i + 3));
+            }
 
             M_value = interpValues.at(0);
             L_value = interpValues.at(1);
             sigma = interpValues.at(2);
 
             Z_score = M_value * (pow(X_value / M_value, L_value) - 1.0) / (L_value * sigma);
-            Z_score = qRound(Z_score);
-            if (0.0 == abs(Z_score)) Z_score = 0.0;
+            qDebug() << "z score: " << Z_score;
+
+            // TODO ?
+            //Z_score = static_cast<double>(static_cast<int>(Z_score * 10.0)) / 10.0;;
+            //if (0.0 == abs(Z_score)) Z_score = 0.0;
         }
 
         setAttribute(varName, Z_score);
@@ -576,15 +621,23 @@ bool DXAMeasurement::isValidDicomFile(DicomFile file) const
     return true;
 };
 
-double DXAMeasurement::computeYearsDifference(const QDate& first, const QDate& second)
+double DXAMeasurement::computeYearsDifference(const QString& first, const QString& second)
 {
-    //double diff = first.time().msec() - second;
-    if (!first.isValid() || !second.isValid()) {
+    QDateTime firstDt = QDateTime::fromString(first, Qt::ISODateWithMs);
+    QDateTime secondDt = QDateTime::fromString(second, Qt::ISODateWithMs);
+
+    if (!firstDt.isValid()) {
+        qWarning() << "first datetime is not valid" << first;
         return 0.0;
     }
 
-    int daysDiff = first.daysTo(second);
-    double yearsDiff = qAbs(daysDiff) / 365.25;
+    if (!secondDt.isValid()) {
+        qWarning() << "second datetime is not valid" << second;
+        return 9.9;
+    }
+
+    const qint64 diff = firstDt.toSecsSinceEpoch() - secondDt.toSecsSinceEpoch();
+    const double yearsDiff = diff / (60.0 * 60.0 * 24.0 * 365.25);
 
     return yearsDiff;
 }

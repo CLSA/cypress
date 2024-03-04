@@ -14,6 +14,8 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
 {
     ui->setupUi(this);
     ui->measurementTable->hideManualEntry();
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
 
     setWindowTitle("DXA 2");
     setWindowFlags(Qt::WindowFullscreenButtonHint);
@@ -39,6 +41,13 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
         ui->measurementTable->enableMeasureButton();
     });
 
+    connect(manager.get(), &DXAManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->disableMeasureButton();
+        ui->measurementTable->enableFinishButton();
+    });
+
+    connect(manager.get(), &DXAManager::status, ui->testInfoWidget, &TestInfoWidget::setStatus);
+
     // data changed
     connect(manager.get(), &DXAManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
@@ -49,7 +58,11 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     connect(manager.get(), &DXAManager::error, this, &DXADialog::error);
 
     // request auto measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &DXAManager::measure);
+    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), [=]() {
+        ui->measurementTable->disableMeasureButton();
+        manager->measure();
+        ui->measurementTable->enableMeasureButton();
+    });
 
     // request finish
     connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &DXAManager::finish);

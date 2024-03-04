@@ -49,7 +49,7 @@ public:
 private:
     QList<QString> m_outputKeyList;
     QByteArray m_array;
-    QString readArray(const quint8 &, const quint8 &) const;
+    QString    readArray(const quint8 &, const quint8 &) const;
 
     QString   readPatientID() const;
     QString   readTestID() const;

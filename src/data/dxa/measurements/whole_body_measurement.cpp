@@ -529,6 +529,8 @@ void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString
     // Whole body
     QSqlQuery query(db);
 
+    qDebug() << "getting scan data for whole body";
+
     query.prepare("SELECT * FROM Wbody WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");
     query.bindValue(":patientKey", patientKey);
     query.bindValue(":scanId", scanId);
@@ -539,6 +541,7 @@ void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString
     }
 
     if (!query.first()) {
+        qDebug() << "Wbody did not return results...";
         return;
     }
 
@@ -601,6 +604,7 @@ void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString
     }
 
     if (!query.first()) {
+        qDebug() << "WbodyComposition did not return results...";
         return;
     }
 
@@ -661,6 +665,7 @@ void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString
     }
 
     if (!query.first()) {
+        qDebug() << "SubRegionBone did not return results...";
         return;
     }
 
@@ -760,6 +765,7 @@ void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString
     }
 
     if (!query.first()) {
+        qDebug() << "SubRegionComposition did not return results...";
         return;
     }
 

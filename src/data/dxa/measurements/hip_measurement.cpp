@@ -263,6 +263,7 @@ void HipMeasurement::getScanData(const QSqlDatabase &db,
                                  const QString &patientKey,
                                  const QString &scanId)
 {
+    qDebug() << "getting scan data for hip";
     QSqlQuery query(db);
 
     query.prepare("SELECT * FROM Hip WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");

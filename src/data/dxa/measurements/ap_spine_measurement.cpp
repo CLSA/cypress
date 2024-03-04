@@ -141,27 +141,27 @@ Side ApSpineMeasurement::getSide()
 
 quint8 ApSpineMeasurement::getScanType()
 {
-   return 0;
+   return 1;
 }
 
 QString ApSpineMeasurement::getName()
 {
-   return "AP Spine";
+   return "SP";
 }
 
 QString ApSpineMeasurement::getBodyPartName()
 {
-   return "Spine";
+   return "SPINE";
 }
 
 QString ApSpineMeasurement::getRefType()
 {
-   return "Ref Type";
+   return "S";
 }
 
 QString ApSpineMeasurement::getRefSource()
 {
-   return "Ref Source";
+   return "Hologic";
 }
 
 bool ApSpineMeasurement::hasAllNeededFiles() const
@@ -268,6 +268,8 @@ bool ApSpineMeasurement::isValidDicomFile(DicomFile file) const
 
 void ApSpineMeasurement::addDicomFile(DicomFile file)
 {
+    qDebug() << "adding spine 1";
+
     m_apSpineFile = file;
     m_apSpineFile.name = "SP_DICOM_1";
     m_apSpineFile.size = FileUtils::getHumanReadableFileSize(m_apSpineFile.absFilePath);
@@ -282,6 +284,8 @@ void ApSpineMeasurement::addDicomFile(DicomFile file)
 }
 
 void ApSpineMeasurement::getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) {
+    qDebug() << "getting scan data for spine";
+
     QSqlQuery query(db);
 
     // Spine

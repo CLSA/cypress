@@ -23,7 +23,7 @@ class SerialPortManager : public ManagerBase
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString deviceName MEMBER m_deviceName NOTIFY deviceNameChanged)
+    Q_PROPERTY(QString portName MEMBER m_portName NOTIFY deviceNameChanged)
 
 public:
     explicit SerialPortManager(QSharedPointer<CypressSession> session);
@@ -94,7 +94,7 @@ signals:
 
     // a port was selected from the list of discovered ports
     //
-    void deviceSelected(const QString&);
+    void deviceSelected(const QSerialPortInfo& info);
 
     // port ready to connect
     // (update GUI enable connect button, disable disconnect button)
@@ -126,7 +126,7 @@ protected:
 
     // the currently selected serial port
     QSerialPort m_port;
-    QString m_deviceName;
+    QString m_portName;
 
     // serial port output receive buffer
     QByteArray m_buffer;

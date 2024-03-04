@@ -31,6 +31,9 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     // ui should now allow picking a device
     connect(manager.get(), &AudiometerManager::canSelectDevice, ui->serialPortPickerWidget, &SerialPortWidget::devicesCanBeSelected);
 
+    // the default port in the .ini file was found, update the UI
+    connect(manager.get(), &AudiometerManager::deviceSelected, ui->serialPortPickerWidget, &SerialPortWidget::deviceFound);
+
     // the user selected a device from the dropdown
     connect(ui->serialPortPickerWidget, &SerialPortWidget::deviceSelected, manager.get(), &AudiometerManager::selectDevice);
 

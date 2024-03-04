@@ -127,8 +127,10 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
             throw QException();
     }
 
-    if (!session)
+    if (!session) {
+        qDebug() << "no session";
         throw QException();
+    }
 
     session->moveToThread(mainThread);
     session->isInstalled();

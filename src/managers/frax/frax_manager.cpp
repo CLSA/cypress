@@ -35,7 +35,7 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     m_inputKeyList << "previous_fracture";
     m_inputKeyList << "parent_hip_fracture";
     m_inputKeyList << "current_smoker";
-    m_inputKeyList << "gluccocorticoid";
+    m_inputKeyList << "glucocorticoid";
     m_inputKeyList << "rheumatoid_arthritis";
     m_inputKeyList << "secondary_osteoporosis";
     m_inputKeyList << "alcohol";
@@ -54,8 +54,8 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
 
 bool FraxManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
-    bool isSimMode = CypressSettings::isSimMode();
+    const bool isDebugMode = CypressSettings::isDebugMode();
+    const bool isSimMode = CypressSettings::isSimMode();
 
     if (isSimMode) {
         return true;
@@ -173,7 +173,7 @@ void FraxManager::measure()
         map.insert("previous_fracture", 		inputData.value("previous_fracture"));
         map.insert("parent_hip_fracture", 		inputData.value("parent_hip_fracture"));
         map.insert("current_smoker", 			inputData.value("current_smoker"));
-        map.insert("gluccocorticoid", 			inputData.value("gluccocorticoid"));
+        map.insert("glucocorticoid", 			inputData.value("glucocorticoid"));
         map.insert("rheumatoid_arthritis", 		inputData.value("rheumatoid_arthritis"));
         map.insert("secondary_osteoporosis", 	inputData.value("secondary_osteoporosis"));
         map.insert("t_score", 					inputData.value("t_score"));
@@ -211,6 +211,7 @@ void FraxManager::readOutput()
         qDebug() << "FraxManager::readOutput";
 
     auto test = qSharedPointerCast<FraxTest>(m_test);
+
     if (!QFileInfo::exists(m_outputFilePath)) {
         emit error("FRAX results not found");
         return;
@@ -287,16 +288,12 @@ void FraxManager::configureProcess()
     //
     QStringList list;
     QJsonObject sessionInputData = m_session->getInputData();
-    qDebug() << sessionInputData;
 
     foreach (const auto key, m_inputKeyList) {
         QVariant value = sessionInputData[key].toVariant();
 
-        qDebug() << key << value;
-
-        if ("sex" == key) {
+        if ("sex" == key)
             value = value.toString()[0].toLower() == 'm' ? 0 : 1;
-        }
 
         else {
             if(QVariant::Bool == value.type())
@@ -308,9 +305,9 @@ void FraxManager::configureProcess()
 
     // Write input.txt file
     QString line = list.join(",");
-    QFile input_file(m_inputFilePath);
+    qDebug() << line;
 
-    qDebug() << m_inputFilePath << line;
+    QFile input_file(m_inputFilePath);
 
     if (input_file.exists()) {
         if (!input_file.remove()) {
@@ -344,7 +341,6 @@ bool FraxManager::clearData()
 }
 
 
-
 // Set up device
 bool FraxManager::setUp()
 {
@@ -365,53 +361,24 @@ bool FraxManager::setUp()
 // Clean up the device for next time
 bool FraxManager::cleanUp()
 {
+    // remove blackbox.exe generated output.txt file
+    //
     if (m_debug)
         qDebug() << "FraxManager::cleanUp";
 
     if(QProcess::NotRunning != m_process.state())
         m_process.close();
 
-    // remove blackbox.exe generated output.txt file
-    //
-    //if (QFileInfo::exists(m_outputFilePath)) {
-    //    QFile outputFile(m_outputFilePath);
-    //    if (!outputFile.remove()) {
-    //        emit error("Could not remove the FRAX output file. Please contact support.");
-    //        return false;
-    //    }
-    //}
 
-    // remove the default input.txt file
-    //
-    //if (QFileInfo::exists(m_temporaryFilePath)) {
-    //    // remove the input file containing participant data
-    //    QFile inputFile(m_inputFilePath);
-    //    //if (!inputFile.exists()) {
-    //    //    qDebug() << "Could not find the input file";
-    //    //    return false;
-    //    //}
-
-    //    //if (!inputFile.remove()) {
-    //    //    qDebug() << "Could not remove the input file";
-    //    //    return false;
-    //    //}
-
-    //    // restore backup, default input.txt
-    //    //if (!QFile::copy(m_temporaryFilePath, m_inputFilePath)) {
-    //    //    qDebug() << "Could not restore the backup";
-    //    //    return false;
-    //    //}
-
-    //    // remove the temporary file
-    //    //QFile tempFile(m_temporaryFilePath);
-    //    //if (!tempFile.remove()) {
-    //    //    qDebug() << "Could not remove the temporary file";
-    //    //    return false;
-    //    //}
-    //} else {
-    //    qDebug() << "Could not find the FRAX backup";
-    //    return false;
-    //}
+    if (QFileInfo::exists(m_outputFilePath)) {
+        QFile outputFile(m_outputFilePath);
+        if (!outputFile.remove()) {
+            qDebug() << "could not remove output file";
+        }
+        else {
+            qDebug() << "removed output file";
+        }
+    }
 
     return true;
 }

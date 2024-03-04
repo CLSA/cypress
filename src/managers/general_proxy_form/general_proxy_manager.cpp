@@ -6,144 +6,159 @@
 
 #include <QDir>
 #include <QJsonDocument>
+#include <QJsonArray>
 
-GeneralProxyManager::GeneralProxyManager(QSharedPointer<GenProxySession> session): ManagerBase(session)
-{
-    m_inputFilePath = CypressSettings::readSetting("general_proxy_form_path").toString();
+GeneralProxyManager::GeneralProxyManager(QSharedPointer<GenProxySession> session): ManagerBase(session) {
     m_outputFilePath = QDir::currentPath() + "/" + m_session->getBarcode() + ".pdf";
+
+    m_runnableName = CypressSettings::readSetting("general_proxy/runnableName").toString();
+    m_runnablePath = CypressSettings::readSetting("general_proxy/runnablePath").toString();
 }
 
-bool GeneralProxyManager::start()
-{
+bool GeneralProxyManager::start() {
     measure();
     return true;
 }
 
 
-bool GeneralProxyManager::isInstalled()
-{
-    QString proxyPath = CypressSettings::readSetting("general_proxy_form_path").toString();
-    if (proxyPath.isNull() || proxyPath.isEmpty()) {
+bool GeneralProxyManager::isInstalled() {
+    const QString runnableName = CypressSettings::readSetting("general_proxy/runnableName").toString();
+    if (runnableName.isNull() || runnableName.isEmpty())
         return false;
-    }
+
+    const QString runnablePath = CypressSettings::readSetting("general_proxy/runnablePath").toString();
+    if (runnablePath.isNull() || runnableName.isEmpty())
+        return false;
 
     return true;
 }
 
 void GeneralProxyManager::measure()
 {
-    // copy general proxy consent
-    if (!QFile::copy(m_inputFilePath, m_outputFilePath)) {
-        emit error("Something went wrong");
-    }
-
-    // input any needed variables with pdftk
-    // open adobe with the copied file
-    // signing the page will autosave
-    // once adobe closes, send the file
-    // remove the file
-    // close
-
     PDFFormFiller filler;
     QJsonObject inputData;
 
-    inputData["Participant.enrollmentId"] = m_session->getBarcode();
-    inputData["Participant.fullName"] = "John Smith";
+    inputData["enrollmentId"] = m_session->getBarcode();
 
-    QString currentDir = QDir::currentPath();
+    QString language = m_session->getInputData().value("language").toString();
+
+    qDebug() << language;
+
+    QDir currentDir = QDir::currentPath();
     QString outputPath = filler.fillPDF(
-        "C:/Users/Anthony/Documents/GitHub/cypress/src/tests/Tests/gen_proxy_v1-1.pdf",
-        "C:/Users/Anthony/Documents/GitHub/cypress/src/tests/Tests/gen_proxy_v1_1.fdf",
+        currentDir.filePath(QString("general_proxy/gen_proxy_v1_1_%1.pdf").arg(language)),
+        currentDir.filePath(QString("general_proxy/gen_proxy_v1_1.fdf").arg(language)),
         inputData,
-        "C:/Users/Anthony/Documents/GitHub/cypress/src/tests/Tests/gen_proxy_v1_1-output.pdf"
+        m_outputFilePath
     );
 
-    //inputData["IPinformation_mandatoryField"] = "Yes";
-    //inputData["AgreeGiveNumber_mandatoryField"] = "Yes";
-    //inputData["DCScontinue_mandatoryField"] = "Yes";
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this,
+            &GeneralProxyManager::readOutput);
 
-    //inputData["ProxyFirstName"] = "John";
-    //inputData["ProxyLastName"] = "Smith";
-    //inputData["ProxyAddress"] = "123 Lane St.";
-    //inputData["ProxyAddress2"] = "Apt 2";
-    //inputData["ProxyCity"] = "Hamilton";
-    //inputData["ProxyProvince"] = "ON";
-    //inputData["ProxyPostalCode"] = "123 456";
-    //inputData["ProxyTelephone"] = "(111) 111-1111";
+    // error occured,
+    connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
+        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
+                                                                    Qt::SkipEmptyParts);
+        if (m_debug)
+            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+    });
 
-    //inputData["DMalready_mandatoryField"] = "Yes";
+    connect(&m_process, &QProcess::stateChanged, this, [=](QProcess::ProcessState state) {
+        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
+                                                                    Qt::SkipEmptyParts);
+        if (m_debug)
+            qDebug() << "process state: " << s.join(" ").toLower();
+    });
 
-    //inputData["InformantFirstName"] = "Jane";
-    //inputData["InformantLastName"] = "Smith";
-    //inputData["InformantAddress"] = "123 Lane St.";
-    //inputData["InformantAddress2"] = "1";
-    //inputData["InformantCity"] = "Hamilton";
-    //inputData["InformantProvince"] = "ON";
-    //inputData["InformantPostalCode"] = "123 456";
-    //inputData["InformantTelephone"] = "(222) 222-2222";
-    //inputData["informantIsProxy"] = "Yes";
+    QStringList arguments { QDir::toNativeSeparators(outputPath) };
+
+    m_process.setProgram(m_runnableName);
+    m_process.setArguments(arguments);
+    m_process.setWorkingDirectory(m_runnablePath);
+    m_process.start();
 }
 
-void GeneralProxyManager::finish()
-{
-    int answer_id = m_session->getAnswerId();
 
-    QJsonObject responseJson;
-    QJsonObject testJson = {};
-
-    testJson.insert("session", m_session->getJsonObject());
-    //testJson.insert("results", inputData);
-    testJson.insert("manual_entry", false);
-
-    responseJson.insert("value", testJson);
-
-    QJsonDocument jsonDoc(responseJson);
-    const QByteArray serializedData = jsonDoc.toJson();
-
-    const QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
-    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
-    if (!ok) {
-        emit error("Something went wrong");
+void GeneralProxyManager::readOutput() {
+    const QFileInfo outputFile(m_outputFilePath);
+    if (!outputFile.exists()) {
+        emit error("Output file does not exist");
+        return;
+    }
+    else if (!outputFile.isFile()) {
+        emit error("Output file is invalid");
+        return;
+    }
+    else if (!outputFile.isReadable()) {
+        emit error("Output file is not readable");
+        return;
     }
 
-    ////QDesktopServices::openUrl(outputPath);
-    //QByteArray responseData = FileUtils::readFile(outputPath);
-    //ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/octet-stream", responseData);
-    //if (!ok) {
-    //}
-
-    //QString host = CypressSettings::getPineHost();
-    //QString endpoint = CypressSettings::getPineEndpoint();
-
-    //ok = NetworkUtils::sendHTTPSRequest("PATCH",
-    //                      (host + endpoint + QString::number(answer_id)
-    //                                     + "?filename=general_proxy_consent.pdf").toStdString(),
-    //                      "application/octet-stream",
-    //                      responseData);
-    //if (!ok) {
-    //}
-
-    sendComplete(m_session->getSessionId());
-
-    emit success("");
+    finish();
 }
 
-void GeneralProxyManager::setInputData(const QVariantMap &)
-{
+void GeneralProxyManager::finish() {
+    const int answer_id = m_session->getAnswerId();
+    const QString host = CypressSettings::getPineHost();
+    const QString endpoint = CypressSettings::getPineEndpoint();
+
+    QJsonObject testJson {};
+    QJsonObject filesJson {
+        { "gen_proxy_consent_" + m_session->getSessionId() + "_pdf", FileUtils::getHumanReadableFileSize(m_outputFilePath) }
+    };
+
+    testJson.insert("files", filesJson);
+    testJson.insert("metadata", {});
+    testJson.insert("results", QJsonArray {});
+    testJson.insert("session", m_session->getJsonObject());
+
+    const QJsonObject responseJson { { "value", testJson } };
+    const QJsonDocument jsonDoc(responseJson);
+
+    const QByteArray serializedData = jsonDoc.toJson();
+    const QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        answerUrl.toStdString(),
+        "application/json",
+        serializedData
+    );
+    if (!ok)
+        emit error("Something went wrong");
+
+    ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        (host + endpoint + QString::number(answer_id) + "?filename=" + "gen_proxy_consent_" + m_session->getSessionId() + ".pdf").toStdString(),
+        "application/octet-stream",
+        FileUtils::readFile(m_outputFilePath)
+    );
+
+    cleanUp();
+
+    if (ok)
+        emit success("Save successful. You may now close this window");
+    else
+        emit error("Something went wrong.");
+}
+
+void GeneralProxyManager::setInputData(const QVariantMap &) {
 
 }
 
-bool GeneralProxyManager::setUp()
-{
+bool GeneralProxyManager::setUp() {
     return true;
 }
 
-bool GeneralProxyManager::clearData()
-{
+bool GeneralProxyManager::clearData() {
     return true;
 }
 
-bool GeneralProxyManager::cleanUp()
-{
+bool GeneralProxyManager::cleanUp() {
+    if (QFileInfo::exists(m_outputFilePath) && !QFile::remove(m_outputFilePath)) {
+        qDebug() << "could not remove output file";
+        return false;
+    }
     return true;
 }

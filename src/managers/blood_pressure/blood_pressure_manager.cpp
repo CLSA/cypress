@@ -13,8 +13,8 @@
 #include <QStandardItemModel>
 #include <QtUsb/QHidDevice>
 
-const quint16 BloodPressureManager::vid{0x10b7};
-const quint16 BloodPressureManager::pid{0x1234};
+const quint16 BloodPressureManager::vid{ 0x10b7 };
+const quint16 BloodPressureManager::pid{ 0x1234 };
 
 BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
     : ManagerBase(session)
@@ -46,23 +46,7 @@ BloodPressureManager::~BloodPressureManager()
 
 bool BloodPressureManager::isInstalled()
 {
-    bool isDebugMode{CypressSettings::isDebugMode()};
-    bool isSimMode{CypressSettings::isSimMode()};
-
-    if (isSimMode) {
-        return true;
-    }
-
-    QHidDevice device;
-    if (device.open(BloodPressureManager::vid, BloodPressureManager::pid)) {
-        device.close();
-        return true;
-    } else {
-        if (isDebugMode)
-            qDebug() << "BloodPressureManager::isInstalled - could not open bpm device";
-    }
-
-    return false;
+    return true;
 }
 
 
@@ -191,14 +175,6 @@ void BloodPressureManager::disconnectFromDevice()
     }
 
     m_driver->requestInterruption();
-    while (!m_driver->isFinished())
-    {
-        QThread::sleep(300);
-    }
-
-    if (m_bpm200->isOpen()) {
-        m_bpm200->disconnect();
-    }
 
     emit deviceDisconnected();
 }
@@ -276,8 +252,6 @@ void BloodPressureManager::stopMeasurement()
     m_driver->writeQueue.enqueue(stop);
     m_mutex.unlock();
 }
-
-
 
 
 void BloodPressureManager::onDeviceHandshaked(const BPMMessage &message)
@@ -469,22 +443,21 @@ void BloodPressureManager::onBpResult(const BPMMessage &message)
     if (m_debug)
         qDebug() << "BloodPressureManager::onBpResult";
 
-    int sbp = message.getData1();
-    int dbp = message.getData2();
-    int pulse = message.getData3();
+    const int sbp = message.getData1();
+    const int dbp = message.getData2();
+    const int pulse = message.getData3();
 
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
     QSharedPointer<BloodPressureMeasurement> measure(new BloodPressureMeasurement);
+
     measure->setAttribute("reading_number", m_test->getMeasurementCount() + 1);
-    measure->setAttribute("systolic", BloodPressureMeasurement::Value(sbp, "mmHg"));
-    measure->setAttribute("diastolic", BloodPressureMeasurement::Value(dbp, "mmHg"));
-    measure->setAttribute("pulse", BloodPressureMeasurement::Value(pulse, "bpm"));
-    measure->setAttribute("start_time", m_measurementStartTime.toString(Qt::DateFormat::TextDate));
-    measure->setAttribute("end_time", QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate));
+    measure->setAttribute("systolic",       BloodPressureMeasurement::Value(sbp, "mmHg"));
+    measure->setAttribute("diastolic",      BloodPressureMeasurement::Value(dbp, "mmHg"));
+    measure->setAttribute("pulse",          BloodPressureMeasurement::Value(pulse, "bpm"));
+    measure->setAttribute("start_time",     m_measurementStartTime.toString(Qt::DateFormat::TextDate));
+    measure->setAttribute("end_time",       QDateTime::currentDateTime().toString(Qt::DateFormat::TextDate));
 
-    BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
     test->addMeasurement(measure);
-
-
     emit dataChanged(m_test);
 }
 
@@ -497,7 +470,7 @@ void BloodPressureManager::onBpAverage(const BPMMessage &message)
     int dbp = message.getData2();
     int pulse = message.getData3();
 
-    BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
     test->addDeviceAverage(sbp, dbp, pulse);
 
     emit dataChanged(m_test);
@@ -518,7 +491,7 @@ void BloodPressureManager::onBpReview(const BPMMessage &message)
         int dbp = message.getData2();
         int pulse = message.getData3();
 
-        BloodPressureTest* test = static_cast<BloodPressureTest*>(m_test.get());
+        auto test = qSharedPointerCast<BloodPressureTest>(m_test);
         test->addDeviceAverage(sbp, dbp, pulse);
 
         emit dataChanged(m_test);
@@ -570,6 +543,9 @@ void BloodPressureManager::addManualMeasurement()
                                      QDateTime::currentDateTimeUtc(),
                                      QDateTime::currentDateTimeUtc()));
     m_test->addMeasurement(bpm);
+
+
+
 
     emit dataChanged(m_test);
 }

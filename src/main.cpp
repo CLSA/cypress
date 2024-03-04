@@ -9,6 +9,7 @@
 
 #include "auxiliary/Constants.h"
 #include "auxiliary/Utilities.h"
+#include "auxiliary/network_utils.h"
 
 #include <QApplication>
 #include <QStyle>

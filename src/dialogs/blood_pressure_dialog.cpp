@@ -12,7 +12,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     ui->setupUi(this);
 
     m_manager.reset(new BloodPressureManager(session));
-    QSharedPointer<BloodPressureManager> manager = qSharedPointerCast<BloodPressureManager>(m_manager);
+    auto manager = qSharedPointerCast<BloodPressureManager>(m_manager);
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->hideMeasureButton();
@@ -81,6 +81,8 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
             &BloodPressureManager::stopMeasurement);
 
     connect(manager.get(), &BloodPressureManager::deviceHandshaked, this, [=](QString firmware) {
+        qDebug() << "handshaked, setting controls";
+
         ui->connectPushButton->setEnabled(false);
         ui->disconnectPushButton->setEnabled(true);
 

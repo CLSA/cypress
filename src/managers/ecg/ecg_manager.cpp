@@ -212,8 +212,7 @@ void ECGManager::readOutput()
     if (m_debug)
         qDebug() << "ECGManager::readOutput";
 
-    QSharedPointer<ECGTest> test = qSharedPointerCast<ECGTest>(m_test);
-
+    auto test = qSharedPointerCast<ECGTest>(m_test);
     if (QProcess::NormalExit != m_process.exitStatus()) {
         emit error("CardioSoft error, cannot read output");
         return;
@@ -280,6 +279,8 @@ void ECGManager::finish() {
         "application/json",
         serializedData
     );
+
+    cleanUp();
 
     if (!ok) {
         qDebug() << "could not send data";
@@ -371,7 +372,7 @@ bool ECGManager::setUp()
 bool ECGManager::cleanUp()
 {
     if(QProcess::NotRunning != m_process.state())
-        m_process.kill();
+        m_process.close();
 
     m_test->reset();
 

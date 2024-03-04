@@ -19,8 +19,8 @@ void DxaHipSession::validate() const {
     if (!isValidString("sex"))
         throw ValidationError("Sex input variable is invalid");
 
-    if (!isValidString("scans"))
-        throw ValidationError("Scans input variable is invalid");
+    //if (!isValidString("scans"))
+    //    throw ValidationError("Scans input variable is invalid");
 
     if (!isValidDouble("weight"))
         throw ValidationError("Weight input variable is invalid");

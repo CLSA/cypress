@@ -238,7 +238,7 @@ bool TonometerManager::backupData() {
         return false;
     }
 
-    QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
+    const QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
     if (QFileInfo::exists(backupDatabasePath)) {
         if (!QFile::remove(backupDatabasePath)) {
             if (m_debug)
@@ -309,6 +309,9 @@ bool TonometerManager::cleanUp()
     if (m_debug)
         qDebug() << "TonometerManager::cleanUp";
 
+    if (QProcess::NotRunning != m_process.state())
+        m_process.close();
+
     if (!restoreDatabase()) {
         return false;
     }
@@ -364,7 +367,7 @@ QVariantMap TonometerManager::extractMeasures(const QString &eye)
 
     query.first();
 
-    int patientId = query.value("PatientID").toInt();
+    const int patientId = query.value("PatientID").toInt();
 
     query.prepare("SELECT * from Measures where PatientID = :patientId and Eye = :eye ORDER BY MeasureDate desc");
 

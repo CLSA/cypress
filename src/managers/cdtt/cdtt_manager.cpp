@@ -341,7 +341,7 @@ bool CDTTManager::cleanUp()
     m_test->reset();
 
     if(QProcess::NotRunning != m_process.state())
-        m_process.kill();
+        m_process.close();
 
     if(!m_outputFile.isEmpty() && QFileInfo::exists(m_outputFile))
     {

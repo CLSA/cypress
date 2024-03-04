@@ -79,33 +79,53 @@ void BloodPressureTest::simulate()
 
 bool BloodPressureTest::isValid() const
 {
-  bool okMeta = true;
-  foreach (const auto key, m_outputKeyList) {
-    if (!hasMetaData(key)) {
-      okMeta = false;
-      break;
+    bool okMeta = true;
+    foreach (const auto key, m_outputKeyList) {
+        if (!hasMetaData(key)) {
+            okMeta = false;
+            break;
+        }
     }
-  }
 
-  bool okTest = 1 <= getMeasurementCount();
-  if (okTest) {
-    foreach (const auto m, m_measurementList) {
-      if (!m->isValid()) {
-        okTest = false;
-        break;
-      }
+    bool okTest = 1 <= getMeasurementCount();
+    if (okTest) {
+        foreach (const auto m, m_measurementList) {
+            if (!m->isValid()) {
+                okTest = false;
+                break;
+            }
+        }
     }
-  }
 
-  qDebug() << "valid: " << (okMeta && okTest);
+    qDebug() << "valid: " << (okMeta && okTest);
 
-  return okMeta && okTest;
+    return okMeta && okTest;
 }
 
 // String keys are converted to snake_case
 //
 QJsonObject BloodPressureTest::toJsonObject() const
 {
+    //if (getManualEntryMode() == true) {
+    //    int sbpTotal = 0;
+    //    int dbpTotal = 0;
+    //    int pulseTotal = 0;
+
+    //    for (int i = 0; i < getMeasurementCount(); i++) {
+    //        auto measure = getMeasurement(i);
+
+    //        sbpTotal += measure.getAttributeValue("systolic").toDouble();
+    //        dbpTotal += measure.getAttributeValue("diastolic").toDouble();
+    //        pulseTotal += measure.getAttributeValue("pulse").toDouble();
+    //    }
+
+    //    double sbpAvg = qRound(sbpTotal / 3.0);
+    //    double dbpAvg = qRound(dbpTotal / 3.0);
+    //    double pulseAvg = qRound(pulseTotal / 3.0);
+
+    //    addDeviceAverage(sbpAvg, dbpAvg, pulseAvg);
+    //}
+
     QJsonObject testJson {};
     QJsonArray measurementArray {};
 

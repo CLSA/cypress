@@ -61,6 +61,8 @@
 //#include "server/handlers/signature_pad/signature_pad_status_request_handler.h"
 
 #include "server/handlers/general_proxy_consent/general_proxy_consent_request_handler.h"
+#include "server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h"
+
 #include "server/handlers/participant_report/participant_report_request_handler.h"
 
 #include "server/handlers/dxa/dxa_hip_session_request_handler.h"
@@ -226,8 +228,8 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
      {QString(R"(^/general_proxy_consent/?$)"),
       &InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler},
 
-     {QString(R"(^/general_proxy_consent/status?$)"),
-      &InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler},
+     {QString(R"(^/general_proxy_consent/status/?$)"),
+      &InstrumentRequestHandlerFactory::createGeneralProxyConsentStatusRequestHandler},
 
      {QString(R"(^/dxa1/session/?$)"),
       &InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler},
@@ -473,4 +475,9 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createParticipantReportRequ
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler()
 {
     return new GeneralProxyConsentRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createGeneralProxyConsentStatusRequestHandler()
+{
+    return new GeneralProxyConsentStatusRequestHandler;
 }

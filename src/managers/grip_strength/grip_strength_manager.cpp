@@ -28,20 +28,20 @@ GripStrengthManager::GripStrengthManager(QSharedPointer<GripStrengthSession> ses
 
 bool GripStrengthManager::isInstalled()
 {
-    bool isDebugMode = CypressSettings::isDebugMode();
-    bool isSimMode = CypressSettings::isSimMode();
+    const bool isDebugMode = CypressSettings::isDebugMode();
+    const bool isSimMode = CypressSettings::isSimMode();
 
     if (isSimMode)
         return true;
 
-    QString runnableName = CypressSettings::readSetting("grip_strength/runnableName").toString();
-    QString runnablePath = CypressSettings::readSetting("grip_strength/runnablePath").toString();
+    const QString runnableName = CypressSettings::readSetting("grip_strength/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("grip_strength/runnablePath").toString();
 
-    QString gripTestDBPath = CypressSettings::readSetting("grip_strength/gripTestDB").toString();
-    QString gripTestDataDBPath = CypressSettings::readSetting("grip_strength/gripTestDataDB").toString();
+    const QString gripTestDBPath = CypressSettings::readSetting("grip_strength/gripTestDB").toString();
+    const QString gripTestDataDBPath = CypressSettings::readSetting("grip_strength/gripTestDataDB").toString();
 
-    QString databasePath = CypressSettings::readSetting("grip_strength/databasePath").toString();
-    QString backupPath = CypressSettings::readSetting("grip_strength/backupPath").toString();
+    const QString databasePath = CypressSettings::readSetting("grip_strength/databasePath").toString();
+    const QString backupPath = CypressSettings::readSetting("grip_strength/backupPath").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull())
     {
@@ -93,7 +93,7 @@ bool GripStrengthManager::isInstalled()
 
     // check if exe is present and executable
     //
-    QFileInfo executable(runnableName);
+    const QFileInfo executable(runnableName);
     if (!executable.exists())
     {
         if (isDebugMode)
@@ -149,61 +149,80 @@ void GripStrengthManager::readOutput()
     ParadoxReader readerResults(m_gripTestDBPath);
     q_paradoxRecords results2 = readerResults.Read();
 
-    QSharedPointer<GripStrengthTest> test = qSharedPointerCast<GripStrengthTest>(m_test);
+    ParadoxReader readerTest(m_gripTestDataDBPath);
+    q_paradoxRecords results = readerTest.Read();
+
+    auto test = qSharedPointerCast<GripStrengthTest>(m_test);
 
     for (int i = 0; i < results2.length(); i++)
     {
-        test->addMetaData("exam_id", results2[i]["ExamID"].toInt());
-        test->addMetaData("test_id", results2[i]["TestID"].toInt());
-        test->addMetaData("test", results2[i]["Test"].toString());
-        test->addMetaData("rung", results2[i]["Rung"].toInt());
-        test->addMetaData("units", results2[i]["Units"].toString());
-        test->addMetaData("max_reps", results2[i]["MaxReps"].toInt());
-        test->addMetaData("sequence", results2[i]["Sequence"].toString());
-        test->addMetaData("rest", results2[i]["RestTime"].toInt());
-        test->addMetaData("rate", results2[i]["Rate"].toInt());
-        test->addMetaData("threshold", Tracker5Util::asKg(results2[i]["Threshold"].toInt()));
+        test->addMetaData("exam_id",      results2[i]["ExamID"].toInt());
+        test->addMetaData("test_id",      results2[i]["TestID"].toInt());
+        test->addMetaData("test",         results2[i]["Test"].toString());
+        test->addMetaData("rung",         results2[i]["Rung"].toInt());
+        test->addMetaData("units",        results2[i]["Units"].toString());
+        test->addMetaData("max_reps",     results2[i]["MaxReps"].toInt());
+        test->addMetaData("sequence",     results2[i]["Sequence"].toString());
+        test->addMetaData("rest",         results2[i]["RestTime"].toInt());
+        test->addMetaData("rate",         results2[i]["Rate"].toInt());
+        test->addMetaData("threshold",    Tracker5Util::asKg(results2[i]["Threshold"].toInt()));
         test->addMetaData("primary_stat", results2[i]["PrimaryStat"].toString());
-        test->addMetaData("norm_type", results2[i]["NormType"].toInt());
-        test->addMetaData("comparison", results2[i]["Comparison"].toInt());
-    }
+        test->addMetaData("norm_type",    results2[i]["NormType"].toInt());
+        test->addMetaData("comparison",   results2[i]["Comparison"].toInt());
 
-    ParadoxReader readerTest(m_gripTestDataDBPath);
-    q_paradoxRecords results = readerTest.Read();
+        test->addMetaData("average", Tracker5Util::asKg(results[0]["Average"].toInt()));
+        test->addMetaData("maximum", Tracker5Util::asKg(results[0]["Maximum"].toInt()));
+        test->addMetaData("cv",      results[0]["CV"].toInt());
+    }
 
     for (int i = 0; i < results.count(); i++)
     {
         QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
-
-        measurement->setAttribute("exam_id", results[i]["ExamID"].toInt());
-        measurement->setAttribute("test_id", results[i]["TestID"].toInt());
         measurement->setAttribute("position", results[i]["Position"].toInt());
-        measurement->setAttribute("side", results[i]["Side"].toInt());
-        measurement->setAttribute("rep1", Tracker5Util::asKg(results[i]["Rep1"].toInt()), "kg", 2);
-        measurement->setAttribute("rep2", Tracker5Util::asKg(results[i]["Rep2"].toInt()), "kg", 2);
-        measurement->setAttribute("rep3", Tracker5Util::asKg(results[i]["Rep3"].toInt()), "kg", 2);
-        measurement->setAttribute("rep4", Tracker5Util::asKg(results[i]["Rep4"].toInt()), "kg", 2);
-        measurement->setAttribute("rep5", Tracker5Util::asKg(results[i]["Rep5"].toInt()), "kg", 2);
-        measurement->setAttribute("rep6", Tracker5Util::asKg(results[i]["Rep6"].toInt()), "kg", 2);
-        measurement->setAttribute("rep7", Tracker5Util::asKg(results[i]["Rep7"].toInt()), "kg", 2);
-        measurement->setAttribute("rep8", Tracker5Util::asKg(results[i]["Rep8"].toInt()), "kg", 2);
-        measurement->setAttribute("rep9", Tracker5Util::asKg(results[i]["Rep9"].toInt()), "kg", 2);
-        measurement->setAttribute("rep10", Tracker5Util::asKg(results[i]["Rep10"].toInt()), "kg", 2);
+        measurement->setAttribute("side",     results[i]["Side"].toInt());
 
-        measurement->setAttribute("rep1_exclude", results[i]["Rep1Exclude"].toBool());
-        measurement->setAttribute("rep2_exclude", results[i]["Rep2Exclude"].toBool());
-        measurement->setAttribute("rep3_exclude", results[i]["Rep3Exclude"].toBool());
-        measurement->setAttribute("rep4_exclude", results[i]["Rep4Exclude"].toBool());
-        measurement->setAttribute("rep5_exclude", results[i]["Rep5Exclude"].toBool());
-        measurement->setAttribute("rep6_exclude", results[i]["Rep6Exclude"].toBool());
-        measurement->setAttribute("rep7_exclude", results[i]["Rep7Exclude"].toBool());
-        measurement->setAttribute("rep8_exclude", results[i]["Rep8Exclude"].toBool());
-        measurement->setAttribute("rep9_exclude", results[i]["Rep9Exclude"].toBool());
-        measurement->setAttribute("rep10_exclude", results[i]["Rep10Exclude"].toBool());
+        bool rep1Exclude = results[i]["Rep1Exclude"].toBool();
+        bool rep2Exclude = results[i]["Rep2Exclude"].toBool();
+        bool rep3Exclude = results[i]["Rep3Exclude"].toBool();
+        bool rep4Exclude = results[i]["Rep4Exclude"].toBool();
+        bool rep5Exclude = results[i]["Rep5Exclude"].toBool();
+        bool rep6Exclude = results[i]["Rep6Exclude"].toBool();
+        bool rep7Exclude = results[i]["Rep7Exclude"].toBool();
+        bool rep8Exclude = results[i]["Rep8Exclude"].toBool();
+        bool rep9Exclude = results[i]["Rep9Exclude"].toBool();
+        bool rep10Exclude = results[i]["Rep10Exclude"].toBool();
 
-        measurement->setAttribute("average", Tracker5Util::asKg(results[i]["Average"].toInt()), "kg", 2);
-        measurement->setAttribute("maximum", Tracker5Util::asKg(results[i]["Maximum"].toInt()), "kg", 2);
-        measurement->setAttribute("cv", results[i]["CV"].toInt());
+        double rep1 = Tracker5Util::asKg(results[i]["Rep1"].toInt());
+        double rep2 = Tracker5Util::asKg(results[i]["Rep2"].toInt());
+        double rep3 = Tracker5Util::asKg(results[i]["Rep3"].toInt());
+        double rep4 = Tracker5Util::asKg(results[i]["Rep4"].toInt());
+        double rep5 = Tracker5Util::asKg(results[i]["Rep5"].toInt());
+        double rep6 = Tracker5Util::asKg(results[i]["Rep6"].toInt());
+        double rep7 = Tracker5Util::asKg(results[i]["Rep7"].toInt());
+        double rep8 = Tracker5Util::asKg(results[i]["Rep8"].toInt());
+        double rep9 = Tracker5Util::asKg(results[i]["Rep9"].toInt());
+        double rep10 = Tracker5Util::asKg(results[i]["Rep10"].toInt());
+
+        if (!rep1Exclude && rep1 > 0)
+            measurement->setAttribute("rep1", rep1, "kg", 2);
+        if (!rep2Exclude && rep2 > 0)
+            measurement->setAttribute("rep2", rep2, "kg", 2);
+        if (!rep3Exclude && rep3 > 0)
+            measurement->setAttribute("rep3", rep3, "kg", 2);
+        if (!rep4Exclude && rep4 > 0)
+            measurement->setAttribute("rep4", rep4, "kg", 2);
+        if (!rep5Exclude && rep5 > 0)
+            measurement->setAttribute("rep5", rep5, "kg", 2);
+        if (!rep6Exclude && rep6 > 0)
+            measurement->setAttribute("rep6", rep6, "kg", 2);
+        if (!rep7Exclude && rep7 > 0)
+            measurement->setAttribute("rep7", rep7, "kg", 2);
+        if (!rep8Exclude && rep8 > 0)
+            measurement->setAttribute("rep8", rep8, "kg", 2);
+        if (!rep9Exclude && rep9 > 0)
+            measurement->setAttribute("rep9", rep9, "kg", 2);
+        if (!rep10Exclude && rep10 > 0)
+            measurement->setAttribute("rep10", rep10, "kg", 2);
 
         m_test->addMeasurement(measurement);
     }
@@ -213,7 +232,6 @@ void GripStrengthManager::readOutput()
 
     finish();
 }
-
 
 void GripStrengthManager::measure()
 {
@@ -291,12 +309,15 @@ bool GripStrengthManager::restoreData() {
 
 
 bool GripStrengthManager::cleanUp() {
+
+    if (QProcess::NotRunning != m_process.state())
+        m_process.close();
+
     if (m_debug)
         qDebug() << "GripStrengthManager::cleanUp";
 
-    if (!restoreData()) {
+    if (!restoreData())
         return false;
-    }
 
     return true;
 }

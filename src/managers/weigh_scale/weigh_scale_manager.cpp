@@ -19,7 +19,7 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     : SerialPortManager(session)
 {
     m_test.reset(new WeighScaleTest);
-    m_deviceName = CypressSettings::readSetting("weight_scale/portName").toString();
+    m_portName = CypressSettings::readSetting("weight_scale/portName").toString();
 
     if (m_debug) {
         qDebug() << "WeighScaleManager";
@@ -70,7 +70,7 @@ void WeighScaleManager::measure()
 
 void WeighScaleManager::addManualMeasurement()
 {
-    QSharedPointer<WeighScaleTest> test = qSharedPointerCast<WeighScaleTest>(m_test);
+    auto test = qSharedPointerCast<WeighScaleTest>(m_test);
     QSharedPointer<WeightMeasurement> measure(new WeightMeasurement);
 
     test->addMeasurement(measure);
@@ -129,7 +129,7 @@ void WeighScaleManager::selectDevice(const QSerialPortInfo &port)
     SerialPortManager::selectDevice(port);
 
     CypressSettings::writeSetting("weight_scale/portName", port.portName());
-    m_deviceName = port.portName();
+    m_portName = port.portName();
 }
 
 void WeighScaleManager::zeroDevice()

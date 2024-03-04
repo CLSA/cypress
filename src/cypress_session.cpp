@@ -1,9 +1,5 @@
 #include "cypress_session.h"
 
-//#include "dialogs/dialog_factory.h"
-//#include "auxiliary/Constants.h"
-//#include "managers/participant_report/participant_report_manager.h"
-
 #include <QException>
 
 
@@ -61,7 +57,7 @@ void CypressSession::end(const CypressSession::SessionStatus& status)
     m_status = status;
     m_endDateTime = QDateTime::currentDateTimeUtc();
 
-    //m_dialog->close();
+    m_dialog->close();
 
     if (CypressSettings::isDebugMode())
         qDebug() << "end session" << getSessionId() << m_endDateTime;

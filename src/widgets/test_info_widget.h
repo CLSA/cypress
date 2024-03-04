@@ -18,9 +18,9 @@ public:
 
     void setSessionInformation(const CypressSession& session);
     void setDeviceStatus(QString status);
+    void setStatus(const QString status);
+
 private:
-
-
     Ui::TestInfoWidget *ui;
 };
 

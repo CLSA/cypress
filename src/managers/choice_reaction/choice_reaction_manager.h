@@ -1,7 +1,6 @@
 #ifndef CHOICE_REACTION_MANAGER_H
 #define CHOICE_REACTION_MANAGER_H
 
-#include "data/choice_reaction/tests/choice_reaction_test.h"
 #include "managers/manager_base.h"
 #include "server/sessions/choice_reaction_session.h"
 

@@ -6,13 +6,14 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql xml net
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+
 TRANSLATIONS += \
     Cypress_en_CA.ts
 
-CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations
+CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations windows
 
 #QMAKE_LFLAGS += /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
-QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
+#QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
 
 # QtUsb
 INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
@@ -40,18 +41,19 @@ RC_ICONS = favicon.ico
 
 
 FORMS += \
-    cypress_main_window.ui \
+  cypress_main_window.ui \
   dialogs/audiometer_dialog.ui \
   dialogs/blood_pressure_dialog.ui \
   dialogs/body_composition_dialog.ui \
   dialogs/cdtt_dialog.ui \
   dialogs/choice_reaction_dialog.ui \
-    dialogs/cimt_vivid_i_dialog.ui \
-    dialogs/cimt_vivid_iq_dialog.ui \
+  dialogs/cimt_vivid_i_dialog.ui \
+  dialogs/cimt_vivid_iq_dialog.ui \
   dialogs/dxa_dialog.ui \
-    dialogs/dxa_hip_dialog.ui \
+  dialogs/dxa_hip_dialog.ui \
   dialogs/ecg_dialog.ui \
   dialogs/frax_dialog.ui \
+  dialogs/general_proxy_form_dialog.ui \
   dialogs/grip_strength_dialog.ui \
   dialogs/retinal_camera_dialog.ui \
   dialogs/runnable_dialog.ui \
@@ -59,31 +61,32 @@ FORMS += \
   dialogs/spirometer_dialog.ui \
   dialogs/tonometer_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
-    widgets/device_settings/audiometer_settings_widget.ui \
-    widgets/device_settings/blood_pressure_settings_widget.ui \
-    widgets/device_settings/body_composition_settings_widget.ui \
-    widgets/device_settings/cdtt_settings_widget.ui \
-    widgets/device_settings/choice_reaction_settings_widget.ui \
-    widgets/device_settings/dexa_settings_widget.ui \
-    widgets/device_settings/ecg_settings_widget.ui \
-    widgets/device_settings/frax_settings_widget.ui \
-    widgets/device_settings/grip_strength_settings_widget.ui \
-    widgets/device_settings/retinal_camera_settings_widget.ui \
-    #widgets/device_settings/signature_pad_settings_widget.ui \
-    widgets/device_settings/spirometer_settings_widget.ui \
-    widgets/device_settings/tonometer_settings_widget.ui \
-    widgets/device_settings/vivid_i_settings_widget.ui \
-    widgets/device_settings/weight_scale_settings_widget.ui \
-    widgets/dicom_widget.ui \
-    widgets/directory_picker_widget.ui \
-    widgets/file_picker_widget.ui \
-    widgets/measurement_table.ui \
-    widgets/serial_port_picker_widget.ui \
-    widgets/serial_port_widget.ui \
-    widgets/settings_dialog.ui \
-    widgets/submission_buttons.ui \
+  widgets/apex_transfer_widget.ui \
+  widgets/device_settings/audiometer_settings_widget.ui \
+  widgets/device_settings/blood_pressure_settings_widget.ui \
+  widgets/device_settings/body_composition_settings_widget.ui \
+  widgets/device_settings/cdtt_settings_widget.ui \
+  widgets/device_settings/choice_reaction_settings_widget.ui \
+  widgets/device_settings/dexa_settings_widget.ui \
+  widgets/device_settings/ecg_settings_widget.ui \
+  widgets/device_settings/frax_settings_widget.ui \
+  widgets/device_settings/grip_strength_settings_widget.ui \
+  widgets/device_settings/retinal_camera_settings_widget.ui \
+  #widgets/device_settings/signature_pad_settings_widget.ui \
+  widgets/device_settings/spirometer_settings_widget.ui \
+  widgets/device_settings/tonometer_settings_widget.ui \
+  widgets/device_settings/vivid_i_settings_widget.ui \
+  widgets/device_settings/weight_scale_settings_widget.ui \
+  widgets/dicom_widget.ui \
+  widgets/directory_picker_widget.ui \
+  widgets/file_picker_widget.ui \
+  widgets/measurement_table.ui \
+  widgets/serial_port_picker_widget.ui \
+  widgets/serial_port_widget.ui \
+  widgets/settings_dialog.ui \
+  widgets/submission_buttons.ui \
   widgets/test_info_widget.ui \
-    widgets/usb_port_picker.ui
+  widgets/usb_port_picker.ui
 
 RESOURCES += \
     resources.qrc
@@ -136,9 +139,6 @@ HEADERS += \
     data/dxa/measurements/hip_measurement.h \
     data/dxa/measurements/iva_imaging_measurement.h \
     data/dxa/measurements/whole_body_measurement.h \
-    data/dxa/pat_scan_query_helper.h \
-    data/dxa/reference_query_helper.h \
-    data/dxa/smbfilecopier.h \
     data/dxa/tests/dxa_test.h \
     data/ecg/measurements/ecg_measurement.h \
     data/ecg/tests/ecg_test.h \
@@ -174,6 +174,7 @@ HEADERS += \
     dialogs/dxa_hip_dialog.h \
     dialogs/ecg_dialog.h \
     dialogs/frax_dialog.h \
+    dialogs/general_proxy_form_dialog.h \
     dialogs/grip_strength_dialog.h \
     dialogs/retinal_camera_dialog.h \
     #dialogs/signature_pad_dialog.h \
@@ -185,7 +186,6 @@ HEADERS += \
     logging/debug_dialog.h \
     managers/audiometer/audiometer_manager.h \
     managers/blood_pressure/blood_pressure_manager.h \
-    managers/blood_pressure/bpm_communication.h \
     managers/blood_pressure/bpm_message.h \
     #managers/bluetooth/bluetooth_le_manager.h \
     managers/blood_pressure/bptru_200_driver.h \
@@ -193,7 +193,6 @@ HEADERS += \
     managers/cdtt/cdtt_manager.h \
     managers/choice_reaction/choice_reaction_manager.h \
     managers/dxa/apex_database_helper.h \
-    managers/dxa/dicom/LogWorker.h \
     managers/dxa/dicom/dicom_scp.h \
     managers/dxa/dxa_hip_manager.h \
     managers/dxa/dxa_manager.h \
@@ -221,6 +220,7 @@ HEADERS += \
     server/handlers/dxa/dxa_hip_session_request_handler.h \
     server/handlers/dxa/dxa_hip_status_request_handler.h \
     server/handlers/dxa/dxa_session_request_handler.h \
+    server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/sessions/audiometer_session.h \
@@ -275,6 +275,7 @@ HEADERS += \
     server/sessions/weigh_scale_session.h \
     server/utils.h \
     tray_application.h \
+    widgets/apex_transfer_widget.h \
     widgets/device_settings/audiometer_settings_widget.h \
     widgets/device_settings/blood_pressure_settings_widget.h \
     widgets/device_settings/body_composition_settings_widget.h \
@@ -337,9 +338,6 @@ SOURCES += \
     data/dxa/measurements/hip_measurement.cpp \
     data/dxa/measurements/iva_imaging_measurement.cpp \
     data/dxa/measurements/whole_body_measurement.cpp \
-    data/dxa/pat_scan_query_helper.cpp \
-    data/dxa/reference_query_helper.cpp \
-    data/dxa/smbfilecopier.cpp \
     data/dxa/tests/dxa_test.cpp \
     data/ecg/measurements/ecg_measurement.cpp \
     data/ecg/tests/ecg_test.cpp \
@@ -375,6 +373,7 @@ SOURCES += \
     dialogs/dxa_hip_dialog.cpp \
     dialogs/ecg_dialog.cpp \
     dialogs/frax_dialog.cpp \
+    dialogs/general_proxy_form_dialog.cpp \
     dialogs/grip_strength_dialog.cpp \
     dialogs/retinal_camera_dialog.cpp \
     #dialogs/signature_pad_dialog.cpp \
@@ -387,7 +386,6 @@ SOURCES += \
     main.cpp \
     managers/audiometer/audiometer_manager.cpp \
     managers/blood_pressure/blood_pressure_manager.cpp \
-    managers/blood_pressure/bpm_communication.cpp \
     managers/blood_pressure/bpm_message.cpp \
     #managers/bluetooth/bluetooth_le_manager.cpp \
     managers/blood_pressure/bptru_200_driver.cpp \
@@ -395,7 +393,6 @@ SOURCES += \
     managers/cdtt/cdtt_manager.cpp \
     managers/choice_reaction/choice_reaction_manager.cpp \
     managers/dxa/apex_database_helper.cpp \
-    managers/dxa/dicom/LogWorker.cpp \
     managers/dxa/dicom/dicom_scp.cpp \
     managers/dxa/dxa_hip_manager.cpp \
     managers/dxa/dxa_manager.cpp \
@@ -422,6 +419,7 @@ SOURCES += \
     server/handlers/dxa/dxa_hip_session_request_handler.cpp \
     server/handlers/dxa/dxa_hip_status_request_handler.cpp \
     server/handlers/dxa/dxa_session_request_handler.cpp \
+    server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
@@ -478,6 +476,7 @@ SOURCES += \
     server/sessions/weigh_scale_session.cpp \
     server/utils.cpp \
     tray_application.cpp \
+    widgets/apex_transfer_widget.cpp \
     widgets/device_settings/audiometer_settings_widget.cpp \
     widgets/device_settings/blood_pressure_settings_widget.cpp \
     widgets/device_settings/body_composition_settings_widget.cpp \

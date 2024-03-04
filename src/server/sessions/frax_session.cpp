@@ -23,8 +23,8 @@ void FraxSession::validate() const
     if (!isValidInteger("age"))
         throw ValidationError("age");
 
-    if (!isValidDate("dob", "yyyy-MM-dd"))
-        throw ValidationError("dob");
+    //if (!isValidDate("dob", "yyyy-MM-dd"))
+    //    throw ValidationError("dob");
 
     if (!isValidBool("alcohol"))
         throw ValidationError("alcohol");
@@ -37,6 +37,12 @@ void FraxSession::validate() const
 
     if (!isValidBool("mother_hip_fracture"))
         throw ValidationError("mother_hip_fracture");
+
+    //if (!isValidDouble("weight"))
+    //    throw ValidationError("weight");
+
+    //if (!isValidDouble("height"))
+    //    throw ValidationError("height");
 
     if (!isValidDouble("femoral_neck_bmd"))
         throw ValidationError("femoral_neck_bmd");
@@ -73,16 +79,17 @@ void FraxSession::calculateInputs()
     bool mother_hip_fracture = m_inputData.value("mother_hip_fracture").toBool();
     bool previous_fracture = father_hip_fracture || mother_hip_fracture;
     double t_score = calculateTScore(m_inputData.value("femoral_neck_bmd").toDouble());
+    double bmi = calculateBMI(m_inputData.value("weight").toDouble(), m_inputData.value("height").toDouble());
 
-    m_inputData.insert("rheumatoid_arthritis", (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
-    m_inputData.insert("previous_fracture", previous_fracture);
+    m_inputData.insert("rheumatoid_arthritis",   (m_inputData.value("ra_medications").toString() != "None") && (!m_inputData.value("ra_medications").toString().isEmpty()));
+    m_inputData.insert("previous_fracture",      previous_fracture);
     m_inputData.insert("secondary_osteoporosis", false);
-    m_inputData.insert("glucocorticoid", glucocorticoid);
-    m_inputData.insert("parent_hip_fracture", father_hip_fracture || mother_hip_fracture);
-    m_inputData.insert("t_score", t_score);
-    m_inputData.insert("type", "t");
-    m_inputData.insert("country_code", "19");
-    m_inputData.insert("body_mass_index", 0);
+    m_inputData.insert("glucocorticoid",         glucocorticoid);
+    m_inputData.insert("parent_hip_fracture",    father_hip_fracture || mother_hip_fracture);
+    m_inputData.insert("femoral_neck_bmd",       t_score);
+    m_inputData.insert("body_mass_index",        bmi);
+    m_inputData.insert("type",                  "t");
+    m_inputData.insert("country_code",           "19");
 
     if (m_debug)
     {
@@ -107,9 +114,7 @@ void FraxSession::isAvailable() const
 double FraxSession::calculateBMI(double weight_kg, double height_cm)
 {
     if (weight_kg <= 0 || height_cm <= 0)
-    {
         throw std::invalid_argument("Weight and height must be a positive number");
-    }
 
     double height_m = height_cm / 100.0;
 
@@ -136,38 +141,23 @@ bool FraxSession::calculateGlucocorticoid(int _age)
     int glucocorticoid_year = -1;
     int glucocorticoid_age = -1;
 
-
     if (!m_inputData.value("glucocorticoid_number").isNull())
-    {
         glucocorticoid_number = m_inputData.value("glucocorticoid_number").toString().toInt();
-    }
-
 
     if (!m_inputData.value("glucocorticoid_year").isNull())
-    {
         glucocorticoid_year = m_inputData.value("glucocorticoid_year").toString().toInt();
-    }
 
     if (!m_inputData.value("glucocorticoid_age").isNull())
-    {
         glucocorticoid_age = m_inputData.value("glucocorticoid_age").toString().toInt();
-    }
 
     int res = 0;
 
     if (age && glucocorticoid_number)
-    {
         res = (age - glucocorticoid_number) <= 1 ? 1 : 0;
-    }
     else if (glucocorticoid_year)
-    {
         res = (QDate::currentDate().year() - glucocorticoid_year) <= 1 ? 1 : 0;
-    }
-
     if (res == 1)
-    {
         res = glucocorticoid_age >= 3 ? 1 : 0 ;
-    }
 
     return res;
 }

@@ -49,7 +49,7 @@ FraxTest::FraxTest()
     m_outputKeyList << "previous_fracture";
     m_outputKeyList << "parent_hip_fracture";
     m_outputKeyList << "current_smoker";
-    m_outputKeyList << "gluccocorticoid";
+    m_outputKeyList << "glucocorticoid";
     m_outputKeyList << "rheumatoid_arthritis";
     m_outputKeyList << "secondary_osteoporosis";
     m_outputKeyList << "alcohol";
@@ -97,24 +97,34 @@ void FraxTest::fromFile(const QString& fileName)
         measure3->setAttribute("probability", list.at(15).toDouble(), "%");
         addMeasurement(measure3);
 
+        QString interp = "N/A";
+        const double p = list.at(15).toDouble(); // interpretation of osteoporotic_fracture_bmd result for report
+        if (p > 20)
+            interp = "High";
+        else if (p >= 10 && p <= 20)
+            interp = "Moderate";
+        else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
+            interp = "Low";
+        addMetaData("osteoporotic_fracture_bmd_interp", interp);
+
         QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
         measure4->setAttribute("type", "hip_fracture_bmd");
         measure4->setAttribute("probability", list.at(16).toDouble(), "%");
         addMeasurement(measure4);
 
-        addMetaData("type", list.at(0).toLower());
-        addMetaData("country_code", list.at(1).toUInt());
-        addMetaData("age", list.at(2).toDouble(), "yr");
-        addMetaData("sex", list.at(3).toUInt());
-        addMetaData("body_mass_index", list.at(4).toDouble(), "kg/m2");
-        addMetaData("previous_fracture", list.at(5).toUInt());
-        addMetaData("parent_hip_fracture", list.at(6).toUInt());
-        addMetaData("current_smoker", list.at(7).toUInt());
-        addMetaData("gluccocorticoid", list.at(8).toUInt());
-        addMetaData("rheumatoid_arthritis", list.at(9).toUInt());
+        addMetaData("type",                   list.at(0).toLower());
+        addMetaData("country_code",           list.at(1).toUInt());
+        addMetaData("age",                    list.at(2).toDouble(), "yr");
+        addMetaData("sex",                    list.at(3).toUInt());
+        addMetaData("body_mass_index",        list.at(4).toDouble(), "kg/m2");
+        addMetaData("previous_fracture",      list.at(5).toUInt());
+        addMetaData("parent_hip_fracture",    list.at(6).toUInt());
+        addMetaData("current_smoker",         list.at(7).toUInt());
+        addMetaData("glucocorticoid",         list.at(8).toUInt());
+        addMetaData("rheumatoid_arthritis",   list.at(9).toUInt());
         addMetaData("secondary_osteoporosis", list.at(10).toUInt());
-        addMetaData("alcohol", list.at(11).toUInt());
-        addMetaData("femoral_neck_tscore", list.at(12).toDouble());
+        addMetaData("alcohol",                list.at(11).toUInt());
+        addMetaData("femoral_neck_tscore",    list.at(12).toDouble());
     }
 }
 
@@ -207,23 +217,22 @@ bool FraxTest::isValid() const
 {
     bool okMeta = true;
     foreach (const auto key, m_outputKeyList) {
-      if (!hasMetaData(key)) {
-        qDebug() << "ERROR: test missing meta data" << key;
-        okMeta = false;
-        break;
-      }
+        if (!hasMetaData(key)) {
+            qDebug() << "ERROR: test missing meta data" << key;
+            okMeta = false;
+            break;
+        }
     }
 
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if (!m->isValid()) {
-          okTest = false;
-          break;
+    if(okTest) {
+        foreach(const auto m, m_measurementList)
+        {
+            if (!m->isValid()) {
+                okTest = false;
+                break;
+            }
         }
-      }
     }
 
     return okMeta && okTest;
@@ -235,7 +244,7 @@ QJsonObject FraxTest::toJsonObject() const
     auto measurements { getMeasurements() };
 
     foreach (auto measurement, measurements) {
-      measurementArray << measurement->toJsonObject();
+        measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject valuesObject {};

@@ -12,18 +12,50 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
     : DialogBase(parent, session)
     , ui(new Ui::DxaHipDialog)
 {
+    auto manager = qSharedPointerCast<DxaHipManager>(m_manager);
+    m_manager.reset(new DxaHipManager(session));
+
     ui->setupUi(this);
-
-    //ui->measurementTable->disableMeasureButton();
-    //ui->measurementTable->disableFinishButton();
-    ui->measurementTable->hideManualEntry();
-
     setWindowTitle("DXA 1");
 
-    m_manager.reset(new DxaHipManager(session));
-    QSharedPointer<DxaHipManager> manager = qSharedPointerCast<DxaHipManager>(m_manager);
-
     ui->testInfoWidget->setSessionInformation(*session);
+    ui->measurementTable->hideManualEntry();
+
+    ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
+
+    initManager();
+    initMeasurementTable();
+}
+
+void DxaHipDialog::initManager() {
+    auto manager = qSharedPointerCast<DxaHipManager>(m_manager);
+
+    // finished
+    connect(manager.get(), &DxaHipManager::success, this, &DxaHipDialog::success);
+
+    // critical error
+    connect(manager.get(), &DxaHipManager::error, this, &DxaHipDialog::error);
+
+    // can auto measure
+    connect(manager.get(), &DxaHipManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+
+    //
+    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), [=]() {
+        ui->measurementTable->disableMeasureButton();
+        manager->measure();
+    });
+
+    connect(manager.get(), &DxaHipManager::canFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->disableMeasureButton();
+        ui->measurementTable->enableFinishButton();
+    });
+}
+
+void DxaHipDialog::initMeasurementTable() {
+    auto manager = qSharedPointerCast<DxaHipManager>(m_manager);
 
     QList<TableColumn> columns;
     columns << TableColumn("PATIENT_ID", "Patient ID", new TextDelegate("", QRegExp(), false));
@@ -36,33 +68,16 @@ DxaHipDialog::DxaHipDialog(QWidget *parent, QSharedPointer<DxaHipSession> sessio
         ui->measurementTable->initializeModel(columns);
     });
 
-    // can auto measure
-    connect(manager.get(), &DxaHipManager::canMeasure, ui->measurementTable, [=]() {
-        ui->measurementTable->enableMeasureButton();
-    });
-
-    // can finish
-    //connect(manager, &DxaHipManager::canFinish, ui->measurementTable, [=]() {
-    //    ui->measurementTable->enableFinishButton();
-    //});
-
-    // finished
-    connect(manager.get(), &DxaHipManager::success, this, &DxaHipDialog::success);
-
-    // critical error
-    connect(manager.get(), &DxaHipManager::error, this, &DxaHipDialog::error);
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &DxaHipManager::addManualMeasurement);
 
     // data changed
     connect(manager.get(), &DxaHipManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
-    // request auto measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &DxaHipManager::measure);
-
     // request finish
     connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &DxaHipManager::finish);
 
-    // request adding manual measurement
-    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &DxaHipManager::addManualMeasurement);
+    connect(manager.get(), &DxaHipManager::status, ui->testInfoWidget, &TestInfoWidget::setStatus);
 }
 
 DxaHipDialog::~DxaHipDialog()

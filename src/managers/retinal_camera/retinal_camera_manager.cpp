@@ -36,8 +36,7 @@ RetinalCameraManager::RetinalCameraManager(QSharedPointer<RetinalCameraSession> 
 
 RetinalCameraManager::~RetinalCameraManager()
 {
-    if (m_db.isOpen())
-        m_db.close();
+
 }
 
 bool RetinalCameraManager::isInstalled()
@@ -171,6 +170,9 @@ bool RetinalCameraManager::cleanUp()
     if (m_debug)
         qDebug() << "RetinalCameraManager::cleanUp";
 
+    if (QProcess::NotRunning != m_process.state())
+        m_process.close();
+
     if (!m_db.isOpen())
         return false;
 
@@ -255,29 +257,26 @@ void RetinalCameraManager::finish()
     QJsonObject testJson = m_test->toJsonObject();
     testJson.insert("session", m_session->getJsonObject());
 
-    if (m_debug)
-        qDebug() << "finish: measurement count = " << m_test->getMeasurementCount();
+    qDebug() << "finish: measurement count = " << m_test->getMeasurementCount();
 
     for (int i = 0; i < m_test->getMeasurementCount(); i++) {
         const Measurement& measure = m_test->get(i);
-        const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").value().toString();
+        const QString &side = measure.getAttribute("EYE_SIDE_VENDOR").value().toString().trimmed();
 
         QString path = measure.getAttribute("EYE_PICT_VENDOR").value().toString().trimmed();
         path.replace("\\", "//");
 
         const QString &fileSize = FileUtils::getHumanReadableFileSize(path);
 
-        if (m_debug) {
-            qDebug() << "side" << side << " path: " << path << " size: " << fileSize;
-            qDebug() << measure.toJsonObject();
-        }
+        qDebug() << "side" << side << " path: " << path << " size: " << fileSize;
+        qDebug() << measure.toJsonObject();
 
-        const QString fileName = "EYE_" + side + ".jpg";
+        const QString fileName = "EYE_" + side + "_jpg";
         testJson.insert("files", QJsonObject {{ fileName, fileSize }});
 
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
                                    (host + endpoint + QString::number(answer_id) + "?filename=EYE_"
-                                                  + side).toStdString(),
+                                                  + side + ".jpg").toStdString(),
                                    "application/octet-stream",
                                    FileUtils::readFile(
                                    measure.getAttribute("EYE_PICT_VENDOR").toString()));
@@ -452,11 +451,19 @@ QJsonObject RetinalCameraManager::getLeftEye()
         "SELECT FileName, FileExt, StoragePathUid, CreateDate FROM Media WHERE PatientUid = "
         ":patientUid AND EyeType = 1 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
+
+    qDebug() << query.lastQuery();
+
     if (!query.exec()) {
         qDebug() << query.lastError().text();
     }
 
     QJsonObject results;
+
+    if (!query.size()) {
+        emit error("Could not find a left eye image");
+        return results;
+    }
 
     while (query.next()) {
         results["fileName"] = query.value(0).toString().trimmed();
@@ -464,6 +471,8 @@ QJsonObject RetinalCameraManager::getLeftEye()
         results["side"] = "left";
         results["storagePathUid"] = query.value(2).toString().trimmed();
         results["createDate"] = query.value(3).toString().trimmed();
+
+        qDebug() << results;
     }
 
     query.prepare("SELECT Location FROM StoragePaths WHERE StoragePathUid = :storagePathUid");
@@ -474,7 +483,8 @@ QJsonObject RetinalCameraManager::getLeftEye()
     }
 
     while (query.next()) {
-        results["filePath"] = query.value(0).toString();
+        results["filePath"] = query.value(0).toString().trimmed();
+        qDebug() << results;
     }
 
     return results;
@@ -488,17 +498,20 @@ QJsonObject RetinalCameraManager::getRightEye()
         ":patientUid AND EyeType = 2 AND Status = 1 AND Display = 1 ORDER BY CreateDate ASC");
     query.bindValue(":patientUid", defaultPatientUUID);
 
-    if (!query.exec()) {
-        qDebug() << query.lastError().text();
+    QJsonObject results;
+    if (!query.size()) {
+        emit error("Could not find a left eye image");
+        return results;
     }
 
-    QJsonObject results;
     while (query.next()) {
         results["fileName"] = query.value(0).toString().trimmed();
         results["fileExt"] = query.value(1).toString().trimmed();
         results["side"] = "right";
         results["storagePathUid"] = query.value(2).toString().trimmed();
         results["createDate"] = query.value(3).toString().trimmed();
+
+        qDebug() << results;
     }
 
     query.prepare("SELECT Location FROM StoragePaths WHERE StoragePathUid = :storagePathUid");
@@ -508,7 +521,8 @@ QJsonObject RetinalCameraManager::getRightEye()
     }
 
     while (query.next()) {
-        results["filePath"] = query.value(0).toString();
+        results["filePath"] = query.value(0).toString().trimmed();
+        qDebug() << results;
     }
 
     return results;

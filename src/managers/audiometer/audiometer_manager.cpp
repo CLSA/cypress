@@ -44,7 +44,7 @@ AudiometerManager::AudiometerManager(QSharedPointer<AudiometerSession> session)
     m_test.reset(new HearingTest);
     m_test->setExpectedMeasurementCount(16);
 
-    m_deviceName = CypressSettings::readSetting("audiometer/portName").toString();
+    m_portName = CypressSettings::readSetting("audiometer/portName").toString();
 }
 
 bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
@@ -55,7 +55,7 @@ bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
 
 bool AudiometerManager::isInstalled()
 {
-    QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
+    const QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
     if (portList.isEmpty()) {
         return false;
     }
@@ -139,7 +139,7 @@ void AudiometerManager::selectDevice(const QSerialPortInfo &port)
     SerialPortManager::selectDevice(port);
 
     CypressSettings::writeSetting("audiometer/portName", port.portName());
-    m_deviceName = port.portName();
+    m_portName = port.portName();
 }
 
 void AudiometerManager::measure()
@@ -184,10 +184,10 @@ void AudiometerManager::readDevice()
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
     //
-    QByteArray data = m_port.readAll();
+    const QByteArray data = m_port.readAll();
     m_buffer += data;
 
-    QSharedPointer<HearingTest> hearingTest = qSharedPointerCast<HearingTest>(m_test);
+    auto hearingTest = qSharedPointerCast<HearingTest>(m_test);
     if(hasEndCode(m_buffer))
     {
         hearingTest->fromArray(m_buffer);
@@ -219,6 +219,7 @@ bool AudiometerManager::clearData()
         qDebug() << "AudiometerManager::clearData";
 
     m_test->reset();
+
     emit dataChanged(m_test);
 
     return true;

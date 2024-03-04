@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QString>
 #include <QVariant>
+#include <QSqlDatabase>
 
 /*
  * Static ivar needed for computing T- and Z-scores. Map distinct BMD variable name(s) (eg., HTOT_BMD) for a given
@@ -27,6 +28,9 @@ public:
 
     static bool isInstalled();
     static QString getWebpageContents(const DXASession &session);
+
+signals:
+    void status(const QString newStatus);
 
 public slots:
     bool start() override;
@@ -52,6 +56,12 @@ private:
     QString m_logConfigPath;
     QString m_ascConfigPath;
 
+    QFileInfo m_patscanDbFileInfo;
+    QSqlDatabase m_patscanDb;
+
+    QFileInfo m_referenceDbFileInfo;
+    QSqlDatabase m_referenceDb;
+
     // Reset the session
     bool clearData() override;
 
@@ -60,6 +70,12 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
+
+    bool initReferenceDb();
+    bool initPatScanDb();
+
+    bool copyReferenceDb();
+    bool copyPatScanDb();
 };
 
 #endif // DXA_MANAGER_H

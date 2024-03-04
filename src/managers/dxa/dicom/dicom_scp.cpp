@@ -40,24 +40,12 @@ void DicomSCP::initProcess()
          << "--output-directory"
          << m_settings.value("dicom/out_dir").toString();
 
-    //args
-    //    << "+fst"
-    //    << m_settings.value("dicom/port").toString()
-    //    << "--config-file"
-    //    << "C:/dev/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/storescp.cfg"
-    //    << "default"
-    //    << "--log-config"
-    //    << "C:/dev/clsa/cypress/dcmtk-3.6.7/etc/dcmtk/logger.cfg"
-    //    << "--output-directory"
-    //    << m_settings.value("dicom/out_dir").toString();
-
     m_process->setWorkingDirectory(m_settings.value("dicom/working_dir", "").toString());
     m_process->setProgram(m_settings.value("dicom/program", "").toString());
     m_process->setArguments(args);
 
     QStringList list;
     list << m_settings.value("dicom/out_dir").toString();
-    qDebug() << list;
 
     m_fileSystemWatcher.reset(new QFileSystemWatcher(list));
 }

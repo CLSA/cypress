@@ -18,11 +18,6 @@
  * PatScanDb table (eg., Hip) and the corresponding bonerange code in the RefScanDb ReferenceCurve table (eg., 123.).
  * Additional BMD variables and codes should be added here for other tables (ie., Spine).
  */
-
-
-
-
-
 class DxaHipManager: public ManagerBase
 {
     Q_OBJECT
@@ -32,6 +27,10 @@ public:
 
     static bool isInstalled();
     static QString getWebpageContents(const DxaHipSession &session);
+
+signals:
+    void status(const QString newStatus);
+    void transfer();
 
 public slots:
     bool start() override;

@@ -56,10 +56,10 @@ public:
 
     void getPatientScan(const QSqlDatabase& db, const QString& participantId);
     void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
-    void computeTZScore(const QSqlDatabase& referenceDb, const QJsonObject& patientData);
+    void computeTZScore(const QSqlDatabase& referenceDb, const QJsonObject& patientData, const QString& scanDate);
 
     virtual void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) = 0;
-    double computeYearsDifference(const QDate& first, const QDate& second);
+    double computeYearsDifference(const QString& first, const QString& second);
 };
 
 #endif // DXA_MEASUREMENT_H

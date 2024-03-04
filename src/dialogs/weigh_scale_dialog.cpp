@@ -28,6 +28,9 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
     // ports have been scanned
     connect(manager.get(), &WeighScaleManager::scanningDevices, ui->serialPortPickerWidget, &SerialPortWidget::scanningForDevices);
 
+    // the default port in the .ini file was found, update the UI
+    connect(manager.get(), &WeighScaleManager::deviceSelected, ui->serialPortPickerWidget, &SerialPortWidget::deviceFound);
+
     // ports have been scanned
     connect(manager.get(), &WeighScaleManager::devicesDiscovered, ui->serialPortPickerWidget, &SerialPortWidget::devicesDiscovered);
 

@@ -222,6 +222,8 @@ void ForearmMeasurement::addDicomFile(DicomFile file)
 void ForearmMeasurement::getScanData(const QSqlDatabase &db,
                                  const QString &patientKey,
                                      const QString &scanId) {
+
+    qDebug() << "getting scan data for forearm";
     QSqlQuery query(db);
 
     query.prepare("SELECT * FROM Forearm WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");

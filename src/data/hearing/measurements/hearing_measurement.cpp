@@ -119,86 +119,63 @@ QMap<int,QString> HearingMeasurement::initFrequencyLookup()
     return map;
 }
 
-HearingMeasurement::HearingMeasurement(
-        const QString& side,
-        const int& index,
-        const QString& code)
-{
-  fromCode(side,index,code);
+HearingMeasurement::HearingMeasurement(const QString& side, const int& index, const QString& code) {
+    fromCode(side,index,code);
 }
 
 // index is the position 0-7 in the returned HTL string from
 // the RA300 RS232 port data
 //
-void HearingMeasurement::fromCode(const QString& side, const int& index, const QString& code)
-{
+void HearingMeasurement::fromCode(const QString& side, const int& index, const QString& code) {
     reset();
-    if(frequencyLookup.contains(index))
-    {
-      setAttribute("side", side.toLower());
-      setAttribute("test", frequencyLookup[index]);
-      if(codeLookup.contains(code))
-      {
-        QString err = codeLookup[code];
-        setAttribute("error", err);
-        setAttribute("outcome", outcomeLookup[err]);
-      }
-      else
-      {
-        QRegExp r("\\d*");
-        if(r.exactMatch(code))
-        {
-          setAttribute("level", code.toInt(), "dB");
+
+    if (frequencyLookup.contains(index)) {
+        setAttribute("side", side.toLower());
+        setAttribute("test", frequencyLookup[index]);
+
+        if (codeLookup.contains(code)) {
+            QString err = codeLookup[code];
+
+            setAttribute("error", err);
+            setAttribute("outcome", outcomeLookup[err]);
         }
-      }
+        else {
+            QRegExp r("\\d*");
+
+            if (r.exactMatch(code)) {
+               setAttribute("level", code.toInt(), "dB");
+            }
+        }
     }
 }
 
-bool HearingMeasurement::isValid() const
-{
-    // side test: level(units) OR error (outcome)
-    bool ok =
-      hasAttribute("side") &&
-      hasAttribute("test") &&
-      (
-        hasAttribute("level") ||
-        (
-          hasAttribute("error") &&
-          hasAttribute("outcome")
-        )
-      );
-    return ok;
+bool HearingMeasurement::isValid() const {
+    // side test: level (units) OR error (outcome)
+    const bool hasRequiredFields = hasAttribute("side") && hasAttribute("test");
+    const bool hasResultOrError = hasAttribute("level") || (hasAttribute("error") && hasAttribute("outcome"));
+
+    return hasRequiredFields && hasResultOrError;
 }
 
-QString HearingMeasurement::toString() const
-{
-  QString str;
-  if(isValid())
-  {
-    str = QString("%1 %2").arg(
-      getAttribute("side").toString(),
-      getAttribute("test").toString());
+QString HearingMeasurement::toString() const {
+    QString str;
 
-    if(hasAttribute("level"))
-    {
-      str = QString("%1 %2").arg(str,getAttribute("level").toString());
-    }
+    str = QString("%1 %2").arg(getAttribute("side").toString(), getAttribute("test").toString());
+    if (hasAttribute("level"))
+        str = QString("%1 %2").arg(str,getAttribute("level").toString());
     else
-    {
-      str = QString("%1 %2 %3").arg(str,
-          getAttribute("error").toString(),
-          getAttribute("outcome").toString());
-    }
-  }
-  return str;
+        str = QString("%1 %2 %3").arg(str, getAttribute("error").toString(), getAttribute("outcome").toString());
+
+    return str;
 }
 
-QDebug operator<<(QDebug dbg, const HearingMeasurement& item)
-{
+QDebug operator<<(QDebug dbg, const HearingMeasurement& item) {
     const QString str = item.toString();
+
     if(str.isEmpty())
-      dbg.nospace() << "Hearing Measurement()";
+        dbg.nospace() << "Hearing Measurement()";
     else
-      dbg.nospace() << "Hearing Measurement(" << str << " ...)";
+        dbg.nospace() << "Hearing Measurement(" << str << " ...)";
+
     return dbg.maybeSpace();
 }

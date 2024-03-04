@@ -31,8 +31,7 @@ QMap<QString, QVariant> EyeExtractorQueryUtil::extractData(const QSqlDatabase &d
     query.bindValue(":eyeTypeIntValue", eyeTypeIntValue);
     query.exec();
 
-    if (query.last())
-    {
+    if (query.last()) {
         QString storagePathUid = query.value("StoragePathUid").toString();
         QString fileName = query.value("FileName").toString().trimmed();
         QString extension = query.value("FileExt").toString().trimmed();
@@ -43,8 +42,7 @@ QMap<QString, QVariant> EyeExtractorQueryUtil::extractData(const QSqlDatabase &d
         data.insert("EYE_PICT_VENDOR", imageByteArray);
         data.insert("EYE_SIDE_VENDOR", sideName);
     }
-    else
-    {
+    else {
         qDebug() << "Missing Picture";
     }
 
@@ -54,12 +52,10 @@ QMap<QString, QVariant> EyeExtractorQueryUtil::extractData(const QSqlDatabase &d
 QByteArray EyeExtractorQueryUtil::pathToByteArray(const QString &location, const QString &fileName, const QString &extension)
 {
     QFile file(location + "/" + fileName + extension);
-    if (file.open(QIODevice::ReadOnly))
-    {
+    if (file.open(QIODevice::ReadOnly)) {
         return file.readAll();
     }
-    else
-    {
+    else {
         throw std::runtime_error("Failed to read the file");
     }
 }

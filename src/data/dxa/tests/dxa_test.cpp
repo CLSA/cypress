@@ -104,46 +104,19 @@ void DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
         if (bodyPartExamined == "HIP") // hip done in different stage
             continue;
 
-        if (bodyPartExamined == "")
-
         if (m_debug)
             qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
 
-        if (ivaImagingMeasurement->isValidDicomFile(file)) {
-            if (m_debug)
-                qDebug("Found IVA");
+        if (ivaImagingMeasurement->isValidDicomFile(file))
             ivaImagingMeasurement->addDicomFile(file);
-            QSharedPointer<IVAImagingMeasurement> measure(new IVAImagingMeasurement);
-            addMeasurement(measure);
-        }
-        else if (wholeBodyMeasurement->isValidDicomFile(file)) {
-            if (m_debug)
-                qDebug("Found WB");
-            QSharedPointer<WholeBodyScanMeasurement> measure(new WholeBodyScanMeasurement);
-            addMeasurement(measure);
+        else if (wholeBodyMeasurement->isValidDicomFile(file))
             wholeBodyMeasurement->addDicomFile(file);
-        }
-        else if (file.bodyPartExamined == "ARM" && file.laterality == "L" && leftForearmMeasurement->isValidDicomFile(file)) {
-            if (m_debug)
-                qDebug("Found left Forearm");
-            QSharedPointer<ForearmMeasurement> measure(new ForearmMeasurement(Side::LEFT));
-            addMeasurement(measure);
+        else if (file.bodyPartExamined == "ARM" && file.laterality == "L" && leftForearmMeasurement->isValidDicomFile(file))
             leftForearmMeasurement->addDicomFile(file);
-        }
-        else if (file.bodyPartExamined == "ARM" && file.laterality == "R" && rightForearmMeasurement->isValidDicomFile(file)) {
-            if (m_debug)
-                qDebug("Found right Forearm");
-            QSharedPointer<ForearmMeasurement> measure(new ForearmMeasurement(Side::RIGHT));
-            addMeasurement(measure);
+        else if (file.bodyPartExamined == "ARM" && file.laterality == "R" && rightForearmMeasurement->isValidDicomFile(file))
             rightForearmMeasurement->addDicomFile(file);
-        }
-        else if (apSpineMeasurement->isValidDicomFile(file)) {
-            if (m_debug)
-                qDebug("Found Spine");
-            QSharedPointer<ApSpineMeasurement> measure(new ApSpineMeasurement);
-            addMeasurement(measure);
+        else if (apSpineMeasurement->isValidDicomFile(file))
             apSpineMeasurement->addDicomFile(file);
-        }
         else {
             if (m_debug)
                 qDebug() << "Unknown file";
@@ -185,11 +158,11 @@ void DXATest::simulate()
 
 QJsonObject DXATest::toJsonObject() const
 {
-    QSharedPointer<QJsonObject> wholeBody = QSharedPointer<QJsonObject>::create();
-    QSharedPointer<QJsonObject> apSpine = QSharedPointer<QJsonObject>::create();
-    QSharedPointer<QJsonObject> leftForearm = QSharedPointer<QJsonObject>::create();
-    QSharedPointer<QJsonObject> rightForearm = QSharedPointer<QJsonObject>::create();
-    QSharedPointer<QJsonObject> ivaSpine = QSharedPointer<QJsonObject>::create();
+    auto wholeBody = QSharedPointer<QJsonObject>::create();
+    auto apSpine = QSharedPointer<QJsonObject>::create();
+    auto leftForearm = QSharedPointer<QJsonObject>::create();
+    auto rightForearm = QSharedPointer<QJsonObject>::create();
+    auto ivaSpine = QSharedPointer<QJsonObject>::create();
 
     QJsonObject json{};
     QJsonObject results{};

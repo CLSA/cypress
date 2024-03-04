@@ -1,7 +1,7 @@
 #include "cdtt_test.h"
-#include "../../../auxiliary/Utilities.h"
-#include "../../excel_query_helper.h"
-#include "../measurements/cdtt_measurement.h"
+#include "data/cdtt/measurements/cdtt_measurement.h"
+#include "data/excel_query_helper.h"
+#include "auxiliary/Utilities.h"
 
 #include <QDebug>
 #include <QJsonObject>
@@ -41,36 +41,36 @@ void CDTTTest::simulate(const QVariantMap &inputData)
     reset();
 
     addMetaData("subject_id", inputData["barcode"].toInt());
-    addMetaData("datetime",QDateTime::currentDateTime());
-    addMetaData("language","EN_CA");
-    addMetaData("talker","Male");
-    addMetaData("mode","Adaptive");
-    addMetaData("digits","TRIPLET-80");
+    addMetaData("datetime",   QDateTime::currentDateTime());
+    addMetaData("language",   "EN_CA");
+    addMetaData("talker",     "Male");
+    addMetaData("mode",       "Adaptive");
+    addMetaData("digits",     "TRIPLET-80");
     addMetaData("list_number",1);
-    addMetaData("msk_signal","SSNOISE");
-    addMetaData("test_ear","Binaural");
-    addMetaData("sp_level",65.0f,"dB");
-    addMetaData("msk_level",65.0f,"dB");
+    addMetaData("msk_signal", "SSNOISE");
+    addMetaData("test_ear",   "Binaural");
+    addMetaData("sp_level",   65.0f,"dB");
+    addMetaData("msk_level",  65.0f,"dB");
 
     // typical double range from -14 to +2
     //
-    double mu = QRandomGenerator::global()->generateDouble();
-    double srt = Utilities::interp(-14.0f,2.0f,mu);
-    addMetaData("speech_reception_threshold",srt,"dB");
+    const double mu = QRandomGenerator::global()->generateDouble();
+    const double srt = Utilities::interp(-14.0f,2.0f,mu);
+    addMetaData("speech_reception_threshold", srt, "dB");
 
     //typical double range 1 - 5
     //
-    double stddev = Utilities::interp(1.0f,5.0f,mu);
-    addMetaData("standard_deviation",stddev,"dB");
+    const double stddev = Utilities::interp(1.0f,5.0f,mu);
+    addMetaData("standard_deviation", stddev, "dB");
 
     // typical integer range 6 to 20
     //
     addMetaData("reversal_count",QRandomGenerator::global()->bounded(6, 20));
 
-    int numTrial = 24;
+    const int numTrial = 24;
     this->setExpectedMeasurementCount(numTrial);
-
     addMetaData("trial_count", numTrial);
+
     int trial = 1;
     do {
         QSharedPointer<CDTTMeasurement> measure(new CDTTMeasurement);
@@ -84,55 +84,38 @@ QStringList CDTTTest::toStringList() const
     QStringList list;
 
     if(hasMetaData("speech_reception_threshold"))
-    {
         list << QString("SRT: %1").arg(getMetaDataAsString("speech_reception_threshold"));
-    }
 
     if(hasMetaData("standard_deviation"))
-    {
         list << QString("StdDev: %1").arg(getMetaDataAsString("standard_deviation"));
-    }
 
     if(hasMetaData("reversal_count"))
-    {
         list << QString("Reversals: %1").arg(getMetaDataAsString("reversal_count"));
-    }
 
     if(hasMetaData("trial_count"))
-    {
         list << QString("Trials: %1").arg(getMetaDataAsString("trial_count"));
-    }
 
     foreach(const auto measure, m_measurementList)
-    {
         list << measure->toString();
-    }
 
     return list;
 }
 
 void CDTTTest::fromDatabase(const QSqlDatabase &db)
 {
-    if(db.isOpen())
-    {
+    if(db.isOpen()) {
         reset();
 
         bool ok = readBarcode(db);
 
-        if(ok)
-        {
+        if (ok)
             ok = readMetaData(db);
-        }
 
-        if(ok)
-        {
+        if (ok)
             ok = readSummary(db);
-        }
 
-        if(ok)
-        {
+        if (ok)
             readTrialData(db);
-        }
     }
 }
 
@@ -140,73 +123,74 @@ bool CDTTTest::readBarcode(const QSqlDatabase &db)
 {
     // get the barcode <=> subject_id
     //
-    qDebug() << "-----------getting barcode...";
+    qDebug() << "getting barcode...";
 
     QStringList header;
     header << "Subject ID:";
+
     ExcelQueryHelper helper("A1","B1","Main");
     helper.setOrder(ExcelQueryHelper::Order::Row);
     helper.setHeader(header);
-    bool ok = true;
-    if((ok = helper.buildQuery(db)))
-    {
-      helper.processQuery();
-      QJsonObject obj = helper.getOutput();
-      if(obj.contains("header_valid") &&
-         obj["header_valid"].toBool())
-      {
-         addMetaData("subject_id",obj["Subject ID:"].toString());
-      }
-      else
-          ok = false;
 
-      qDebug() << helper.getOutput().toVariantMap();
+    bool ok = true;
+    if ((ok = helper.buildQuery(db))) {
+        helper.processQuery();
+        QJsonObject obj = helper.getOutput();
+        if(obj.contains("header_valid") && obj["header_valid"].toBool()) {
+            addMetaData("subject_id",obj["Subject ID:"].toString());
+        }
+        else
+            ok = false;
+
+        qDebug() << helper.getOutput().toVariantMap();
     }
+
     return ok;
 }
 
-bool CDTTTest::readMetaData(const QSqlDatabase &db)
-{
-    qDebug() << "-----------getting meta data...";
+bool CDTTTest::readMetaData(const QSqlDatabase &db) {
+    qDebug() << "getting meta data...";
+
     // get the meta data
     ExcelQueryHelper helper = ExcelQueryHelper("A4","J5","Main");
     bool ok = true;
-    if((ok = helper.buildQuery(db)))
-    {
-      QStringList header;
-      header << "Date & time"
-             << "Language"
-             << "Talker"
-             << "Mode"
-             << "Digits"
-             << "List #"
-             << "MSK signal"
-             << "Test Ear"
-             << "SP level"
-             << "MSK level";
-      helper.setHeader(header);
-      helper.processQuery();
-      QJsonObject obj = helper.getOutput();
-      if(obj.contains("header_valid") &&
-         obj["header_valid"].toBool())
-      {
-         QString s = obj["Date & time"].toString().simplified().replace(", "," ");
-         addMetaData("datetime",QDateTime::fromString(s, "yyyy-MM-dd hh:mm:ss"));
-         addMetaData("language",obj["Language"].toString());
-         addMetaData("talker",obj["Talker"].toString());
-         addMetaData("mode",obj["Mode"].toString());
-         addMetaData("digits",obj["Digits"].toString());
-         addMetaData("list_number",obj["List #"].toInt());
-         addMetaData("msk_signal",obj["MSK signal"].toString());
-         addMetaData("test_ear",obj["Test Ear"].toString());
-         addMetaData("sp_level",obj["SP level"].toDouble(),"dB");
-         addMetaData("msk_level",obj["MSK level"].toDouble(),"dB");
-      }
-      else
-          ok = false;
 
-      qDebug() << helper.getOutput().toVariantMap();
+    if ((ok = helper.buildQuery(db))) {
+        QStringList header;
+        header << "Date & time"
+               << "Language"
+               << "Talker"
+               << "Mode"
+               << "Digits"
+               << "List #"
+               << "MSK signal"
+               << "Test Ear"
+               << "SP level"
+               << "MSK level";
+
+        helper.setHeader(header);
+        helper.processQuery();
+
+        QJsonObject obj = helper.getOutput();
+        if (obj.contains("header_valid") && obj["header_valid"].toBool()) {
+            QString s = obj["Date & time"].toString().simplified().replace(", "," ");
+            addMetaData("datetime",    QDateTime::fromString(s, "yyyy-MM-dd hh:mm:ss"));
+            addMetaData("language",    obj["Language"].toString());
+            addMetaData("talker",      obj["Talker"].toString());
+            addMetaData("mode",        obj["Mode"].toString());
+            addMetaData("digits",      obj["Digits"].toString());
+            addMetaData("list_number", obj["List #"].toInt());
+            addMetaData("msk_signal",  obj["MSK signal"].toString());
+            addMetaData("test_ear",    obj["Test Ear"].toString());
+            addMetaData("sp_level",    obj["SP level"].toDouble(),"dB");
+            addMetaData("msk_level",   obj["MSK level"].toDouble(),"dB");
+        }
+        else
+            ok = false;
+
+        qDebug() << helper.getOutput().toVariantMap();
     }
+
     return ok;
 }
 

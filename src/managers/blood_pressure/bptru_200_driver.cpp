@@ -29,7 +29,9 @@ void BpTru200Driver::run()
         {
             // write message
             BPMMessage message = writeQueue.dequeue();
-            write(message);
+            if (!write(message)) {
+                qDebug() << "couldn't write a message to the device..";
+            }
         }
         m_mutex.unlock();
 
