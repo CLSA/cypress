@@ -77,7 +77,19 @@ void WeighScaleManager::addManualMeasurement()
 
     const double average = test->calculateAverage();
     if (m_debug)
-      qDebug() << "WeighScaleTest::fromArray - new average" << average << "kg";
+      qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
+
+    emit dataChanged(m_test);
+}
+
+void WeighScaleManager::addManualEntry(const double weight) {
+    auto test = qSharedPointerCast<WeighScaleTest>(m_test);
+    QSharedPointer<WeightMeasurement> measure(new WeightMeasurement(weight, "kg"));
+
+    test->addMeasurement(measure);
+    const double average = test->calculateAverage();
+    if (m_debug)
+      qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
 
     emit dataChanged(m_test);
 }

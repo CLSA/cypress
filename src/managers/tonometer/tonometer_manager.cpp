@@ -32,10 +32,6 @@ TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
 
     m_db = QSqlDatabase::addDatabase("QODBC");
     m_db.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + QDir::toNativeSeparators(m_databasePath));
-    //if (!m_db.open()) {
-    //    qWarning() << "Error: Unable to connect to database.";
-    //    qWarning() << "Database error:" << m_db.lastError().text();
-    //}
 }
 
 TonometerManager::~TonometerManager()

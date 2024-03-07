@@ -6,7 +6,14 @@
 
 WeightMeasurement::WeightMeasurement()
 {
-    setAttribute("weight", 0.00f);
+    setAttribute("weight", 0.00f, "kg");
+    setAttribute("mode", "gross");
+    setAttribute("timestamp", QDateTime::currentDateTime());
+}
+
+WeightMeasurement::WeightMeasurement(const double weight, const QString unit)
+{
+    setAttribute("weight", weight, unit);
     setAttribute("mode", "gross");
     setAttribute("timestamp", QDateTime::currentDateTime());
 }

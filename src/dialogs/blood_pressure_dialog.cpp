@@ -19,6 +19,8 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
     ui->connectPushButton->setEnabled(false);
 
+    bpmManualEntryForm = new BpmManualEntryForm(this);
+
     QList<TableColumn> columns;
     columns << TableColumn("reading_number",
                            "#",
@@ -169,7 +171,27 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &BloodPressureManager::measure);
 
     connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
+        if (ui->armComboBox->currentText() == "---") {
+            QMessageBox::warning(this, "Select Arm",
+                         "Please select the arm used from the dropdown");
+            return;
+        }
+
+        if (ui->armBandSizeComboBox->currentText() == "---") {
+            QMessageBox::warning(
+                this, "Select Cuff Size",
+                "Please select the cuff size used from the dropdown");
+            return;
+        }
+
         manager->setManualEntry(true);
+
+        bpmManualEntryForm->clearForm();
+        bpmManualEntryForm->show();
+    });
+
+    connect(bpmManualEntryForm, &BpmManualEntryForm::manualBpmMeasure, this, [=](const int systolic, const int diastolic, const int pulse) {
+        manager->addManualEntry(systolic, diastolic, pulse);
     });
 
     // request finish

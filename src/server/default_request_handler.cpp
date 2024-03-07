@@ -1,6 +1,10 @@
-#include <string>
-#include <iostream>
-#include <fstream>
+#include "default_request_handler.h"
+#include "auxiliary/json_settings.h"
+
+#include <Poco/StreamCopier.h>
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -9,15 +13,8 @@
 #include <QProcess>
 #include <QDebug>
 
-#include <Poco/StreamCopier.h>
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-
-#include "default_request_handler.h"
-#include "auxiliary/json_settings.h"
-
-#include "cypress_application.h"
+#include <string>
+#include <iostream>
 
 void DefaultRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
@@ -36,18 +33,18 @@ void DefaultRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
 }
 
 QJsonObject DefaultRequestHandler::getRequestData(Poco::Net::HTTPServerRequest &request) {
-    // Step 1: Extract data from request
     std::istream& iStream = request.stream();
     std::string requestData;
     Poco::StreamCopier::copyToString(iStream, requestData);
 
-    // Step 2: Convert to QString
     QString qRequestData = QString::fromStdString(requestData);
 
-    // Step 3: Parse JSON data
-    QJsonDocument doc = QJsonDocument::fromJson(qRequestData.toUtf8());
+    qDebug() << "URI" << request.getURI().c_str();
+    qDebug() << "Origin" << request.get("Origin", "N/A").c_str();
+    qDebug() << "Host" << request.get("Host", "N/A").c_str();
+    qDebug() << "Content-Type" << request.get("Content-Type", "N/A").c_str();
 
-    // Step 4: Get JSON object
+    QJsonDocument doc = QJsonDocument::fromJson(qRequestData.toUtf8());
     QJsonObject json = doc.object();
 
     return json;

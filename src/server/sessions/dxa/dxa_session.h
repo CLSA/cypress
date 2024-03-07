@@ -11,6 +11,8 @@ public:
     // CypressSession interface
 public:
     QString getWebpageContents() const override;
+
+    void validate() const override;
     void initializeDialog() override;
     void isInstalled() const override;
     void isAvailable() const override;

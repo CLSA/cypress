@@ -91,6 +91,8 @@ public slots:
 
     bool start() override;
 
+    void finish() override;
+
     // Commands from GUI
     //
     void cycle();
@@ -103,12 +105,13 @@ public slots:
     void measure() override;
 
     void addManualMeasurement() override;
+    void addManualEntry(const int systolic, const int diastolic, const int pulse);
 
 private:
     State m_state { State::CONNECTING };
 
-    QScopedPointer<BpTru200Driver> m_driver;
-    QSharedPointer<QHidDevice> m_bpm200;
+    BpTru200Driver* m_driver;
+    QHidDevice* m_bpm200;
 
     QDateTime m_measurementStartTime;
 

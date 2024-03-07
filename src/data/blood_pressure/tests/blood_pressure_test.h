@@ -36,6 +36,8 @@ public:
     //
     bool verifyDeviceAverage(const int& sbp, const int& dbp, const int& pulse) const;
 
+    void updateAverage();
+
     void setCuffSize(const QString&);
     void setSide(const QString&);
     bool armInformationSet() const;

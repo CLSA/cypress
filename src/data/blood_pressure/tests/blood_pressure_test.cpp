@@ -82,6 +82,7 @@ bool BloodPressureTest::isValid() const
     bool okMeta = true;
     foreach (const auto key, m_outputKeyList) {
         if (!hasMetaData(key)) {
+            qDebug() << "missing" << key;
             okMeta = false;
             break;
         }
@@ -100,6 +101,53 @@ bool BloodPressureTest::isValid() const
     qDebug() << "valid: " << (okMeta && okTest);
 
     return okMeta && okTest;
+}
+
+void BloodPressureTest::updateAverage() {
+    int systolicTotal = 0;
+    int diastolicTotal = 0;
+    int pulseTotal = 0;
+
+    auto measurements = getMeasurements();
+    if (getMeasurementCount() <= 1)
+        return;
+
+    auto first = *m_measurementList.constFirst();
+    addMetaData("first_systolic", first.getAttribute("systolic"));
+    addMetaData("first_diastolic", first.getAttribute("diastolic"));
+    addMetaData("first_pulse", first.getAttribute("pulse"));
+    addMetaData("first_start_time", first.getAttribute("start_time"));
+    addMetaData("first_end_time", first.getAttribute("end_time"));
+
+    int n = getMeasurementCount();
+    for (int i = 1; i < n; i++) {
+        auto measure = get(i);
+        const int systolic = measure.getAttribute("systolic").value().toInt();
+        const int diastolic = measure.getAttribute("diastolic").value().toInt();
+        const int pulse = measure.getAttribute("pulse").value().toInt();
+
+        systolicTotal += systolic;
+        diastolicTotal += diastolic;
+        pulseTotal += pulse;
+    }
+
+    const double avgSbpCalc = qRound(systolicTotal * 1.0f / (n - 1));
+    const double avgDbpCalc = qRound(diastolicTotal * 1.0f / (n - 1));
+    const double avgPulseCalc = qRound(pulseTotal * 1.0f / (n - 1));
+
+    addMetaData("avg_count", QVariant(n - 1));
+    addMetaData("avg_systolic", avgSbpCalc, "mmHg");
+    addMetaData("avg_diastolic", avgDbpCalc, "mmHg");
+    addMetaData("avg_pulse", avgPulseCalc, "bpm");
+
+    systolicTotal += getMetaData("first_systolic").toInt();
+    diastolicTotal += getMetaData("first_diastolic").toInt();
+    pulseTotal += getMetaData("first_pulse").toInt();
+
+    addMetaData("total_avg_systolic", qRound(systolicTotal * 1.0f / n), "mmHg");
+    addMetaData("total_avg_diastolic",qRound(diastolicTotal * 1.0f / n),"mmHg");
+    addMetaData("total_avg_pulse",qRound(pulseTotal * 1.0f / n),"bpm");
+    addMetaData("total_avg_count", n);
 }
 
 // String keys are converted to snake_case
@@ -211,6 +259,7 @@ void BloodPressureTest::addDeviceAverage(const int& sbpAvg, const int& dbpAvg, c
     addMetaData("avg_count", QVariant(count));
 
     bool ok = true;
+
 
     if (avgSbpCalc == sbpAvg) {
         addMetaData("avg_systolic", sbpAvg, "mmHg");

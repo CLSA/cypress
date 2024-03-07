@@ -22,6 +22,8 @@ public:
     WeightMeasurement();
     ~WeightMeasurement() = default;
 
+    WeightMeasurement(const double weight, const QString unit);
+
     void fromArray(const QByteArray &);
 
     // String representation for debug and GUI display purposes

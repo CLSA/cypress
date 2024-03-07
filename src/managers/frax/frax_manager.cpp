@@ -52,14 +52,11 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     }
 }
 
-bool FraxManager::isInstalled()
+bool FraxManager::isInstalled(bool printMissing)
 {
-    const bool isDebugMode = CypressSettings::isDebugMode();
     const bool isSimMode = CypressSettings::isSimMode();
-
-    if (isSimMode) {
+    if (isSimMode)
         return true;
-    }
 
     const QString runnableName = CypressSettings::readSetting("frax/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("frax/runnablePath").toString();
@@ -72,71 +69,73 @@ bool FraxManager::isInstalled()
     const QString country_code = CypressSettings::readSetting("frax/countryCode").toString();
     const QString type_code = CypressSettings::readSetting("frax/typeCode").toString();
 
+    bool installed = true;
+
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "FraxManager::isInstalled - executable path is not defined";
-        return false;
+        if (printMissing)
+            qDebug() << "runnableName is not defined";
+        installed = false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "FraxManager::isInstalled - workingDirectoryPath is not defined";
-        return false;
+        if (printMissing)
+            qDebug() << "runnablePath is not defined";
+        installed = false;
     }
 
     if (outputFilePath.isNull() || outputFilePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "FraxManager::isInstalled - outputFile is not defined";
-        return false;
+        if (printMissing)
+            qDebug() << "outputFilePath is not defined";
+        installed = false;
     }
 
     if (inputFilePath.isNull() || inputFilePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "FraxManager::isInstalled - inputFile is not defined";
-
-        return false;
+        if (printMissing)
+            qDebug() << "inputFilePath is not defined";
+        installed = false;
     }
 
     if (temporaryFilePath.isNull() || temporaryFilePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "FraxManager::isInstalled - temporaryFile is not defined";
-        return false;
+        if (printMissing)
+            qDebug() << "temporaryFile is not defined";
+        installed = false;
     }
 
     if (country_code.isNull() || country_code.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "FraxManager::isInstalled - countryCode is not defined";
-        return false;
+        if (printMissing)
+            qDebug() << "countryCode is not defined";
+        installed = false;
+    }
+
+    if (type_code.isNull() || type_code.isNull()) {
+        if (printMissing)
+            qDebug() << "type_code is not defined";
+        installed = false;
     }
 
     const QFileInfo info(runnableName);
     const QDir workingDirectory(runnablePath);
 
     if (!info.exists()) {
-        if (isDebugMode) {
-            qDebug() << "FraxManager::isInstalled - executable does not exist at " << runnableName;
-        }
-
-        return false;
+        if (printMissing)
+            qDebug() << "executable does not exist at " << runnableName;
+        installed = false;
     }
 
     if (!info.isExecutable()) {
-        if (isDebugMode) {
-            qDebug() << "FraxManager::isInstalled - executable can not be run at " << runnableName;
-        }
-
-        return false;
+        if (printMissing)
+            qDebug() << "executable can not be run at " << runnableName;
+        installed = false;
     }
 
     if (!workingDirectory.exists()) {
-        if (isDebugMode) {
-            qDebug() << "FraxManager::isInstalled - working directory does not exist at "
+        if (printMissing)
+            qDebug() << "working directory does not exist at "
                      << runnablePath;
-        }
-        return false;
+        installed = false;
     }
 
-    return true;
+    return installed;
 }
 
 bool FraxManager::start()

@@ -1,6 +1,6 @@
 #include "bpm_message.h"
 
-#include "../../auxiliary/Utilities.h"
+#include "auxiliary/Utilities.h"
 #include <QList>
 
 /*

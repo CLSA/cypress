@@ -13,6 +13,12 @@ GeneralProxyManager::GeneralProxyManager(QSharedPointer<GenProxySession> session
 
     m_runnableName = CypressSettings::readSetting("general_proxy/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("general_proxy/runnablePath").toString();
+    m_pdftkPath = CypressSettings::readSetting("general_proxy/pdftkPath").toString();
+
+    qDebug() << "m_outputFilePath" << m_outputFilePath;
+    qDebug() << "m_pdftkPath" << m_pdftkPath;
+    qDebug() << "m_runnableName" << m_runnableName;
+    qDebug() << "m_runnablePath" << m_runnablePath;
 }
 
 bool GeneralProxyManager::start() {
@@ -30,6 +36,10 @@ bool GeneralProxyManager::isInstalled() {
     if (runnablePath.isNull() || runnableName.isEmpty())
         return false;
 
+    const QString pdftkPath = CypressSettings::readSetting("general_proxy/pdftkPath").toString();
+    if (pdftkPath.isNull() || pdftkPath.isEmpty())
+        return false;
+
     return true;
 }
 
@@ -42,12 +52,15 @@ void GeneralProxyManager::measure()
 
     QString language = m_session->getInputData().value("language").toString();
 
-    qDebug() << language;
 
     QDir currentDir = QDir::currentPath();
+
+    qDebug() << "language" << language;
+    qDebug() << "currentDir" << currentDir.absolutePath();
+
     QString outputPath = filler.fillPDF(
         currentDir.filePath(QString("general_proxy/gen_proxy_v1_1_%1.pdf").arg(language)),
-        currentDir.filePath(QString("general_proxy/gen_proxy_v1_1.fdf").arg(language)),
+        currentDir.filePath(QString("general_proxy/gen_proxy_v1_1.fdf")),
         inputData,
         m_outputFilePath
     );
@@ -56,7 +69,7 @@ void GeneralProxyManager::measure()
             this,
             &GeneralProxyManager::readOutput);
 
-    // error occured,
+    //// error occured,
     connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
         QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
@@ -130,7 +143,7 @@ void GeneralProxyManager::finish() {
 
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (host + endpoint + QString::number(answer_id) + "?filename=" + "gen_proxy_consent_" + m_session->getSessionId() + ".pdf").toStdString(),
+        (host + endpoint + QString::number(answer_id) + "?filename=" + "general_proxy_consent_" + m_session->getSessionId() + ".pdf").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(m_outputFilePath)
     );

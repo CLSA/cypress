@@ -15,6 +15,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
     m_manager.reset(new WeighScaleManager(session));
 
     QSharedPointer<WeighScaleManager> manager = qSharedPointerCast<WeighScaleManager>(m_manager);
+    weightManualEntryForm = new WeightScaleManualEntryForm(this);
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->disableMeasureButton();
@@ -101,6 +102,13 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
 
     connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
         manager->setManualEntry(true);
+
+        weightManualEntryForm->clearForm();
+        weightManualEntryForm->show();
+    });
+
+    connect(weightManualEntryForm, &WeightScaleManualEntryForm::manualWeightEntry, this, [=](const double weight) {
+        manager->addManualEntry(weight);
     });
 
     // request finish

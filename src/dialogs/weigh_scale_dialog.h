@@ -3,6 +3,7 @@
 
 #include "dialog_base.h"
 #include "ui_weigh_scale_dialog.h"
+#include "widgets/weight_scale_manual_entry_form.h"
 
 #include "server/sessions/weigh_scale_session.h"
 
@@ -16,6 +17,7 @@ public:
 
 
 private:
+    WeightScaleManualEntryForm* weightManualEntryForm;
     Ui::WeighScaleDialog *ui { Q_NULLPTR };
 };
 

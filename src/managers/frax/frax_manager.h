@@ -26,7 +26,7 @@ class FraxManager : public ManagerBase
 public:
     explicit FraxManager(QSharedPointer<FraxSession> session);
 
-    static bool isInstalled();
+    static bool isInstalled(bool printMissing = false);
 
 public slots:
     bool start() override;
@@ -38,10 +38,10 @@ private:
 
     QString m_country_code;
     QString m_type_code;
-    
+
     QString m_runnableName;		// full path to blackbox.exe
     QString m_runnablePath; // path to blackbox.exe directory
-    
+
     QString m_outputFilePath;    		// full path to output.txt
     QString m_inputFilePath;     		// full path to input.txt
     QString m_temporaryFilePath; 		// store a copy of the default input.txt

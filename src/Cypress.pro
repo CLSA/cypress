@@ -62,6 +62,7 @@ FORMS += \
   dialogs/tonometer_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
   widgets/apex_transfer_widget.ui \
+  widgets/bpm_manual_entry_form.ui \
   widgets/device_settings/audiometer_settings_widget.ui \
   widgets/device_settings/blood_pressure_settings_widget.ui \
   widgets/device_settings/body_composition_settings_widget.ui \
@@ -86,7 +87,8 @@ FORMS += \
   widgets/settings_dialog.ui \
   widgets/submission_buttons.ui \
   widgets/test_info_widget.ui \
-  widgets/usb_port_picker.ui
+  widgets/usb_port_picker.ui \
+  widgets/weight_scale_manual_entry_form.ui
 
 RESOURCES += \
     resources.qrc
@@ -276,6 +278,7 @@ HEADERS += \
     server/utils.h \
     tray_application.h \
     widgets/apex_transfer_widget.h \
+    widgets/bpm_manual_entry_form.h \
     widgets/device_settings/audiometer_settings_widget.h \
     widgets/device_settings/blood_pressure_settings_widget.h \
     widgets/device_settings/body_composition_settings_widget.h \
@@ -300,7 +303,8 @@ HEADERS += \
     widgets/settings_dialog.h \
     widgets/submission_buttons.h \
     widgets/test_info_widget.h \
-    widgets/usb_port_picker.h
+    widgets/usb_port_picker.h \
+    widgets/weight_scale_manual_entry_form.h
 
 SOURCES += \
     #auxiliary/bluetooth_util.cpp \
@@ -477,6 +481,7 @@ SOURCES += \
     server/utils.cpp \
     tray_application.cpp \
     widgets/apex_transfer_widget.cpp \
+    widgets/bpm_manual_entry_form.cpp \
     widgets/device_settings/audiometer_settings_widget.cpp \
     widgets/device_settings/blood_pressure_settings_widget.cpp \
     widgets/device_settings/body_composition_settings_widget.cpp \
@@ -501,4 +506,5 @@ SOURCES += \
     widgets/settings_dialog.cpp \
     widgets/submission_buttons.cpp \
     widgets/test_info_widget.cpp \
-    widgets/usb_port_picker.cpp
+    widgets/usb_port_picker.cpp \
+    widgets/weight_scale_manual_entry_form.cpp

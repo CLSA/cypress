@@ -41,9 +41,9 @@ bool BloodPressureMeasurement::isValid() const
     //       normal diastolic pressure: 60 - 80 mmHg
     //       normal pulse rate: 60 - 100 bpm
     //
-    const bool sbpValid = 0 < getSbp();
-    const bool dbpValid = 0 < getDbp();
-    const bool pulseValid = 0 < getPulse();
+    const bool sbpValid = 0 <= getSbp();
+    const bool dbpValid = 0 <= getDbp();
+    const bool pulseValid = 0 <= getPulse();
 
     return (sbpValid && dbpValid && pulseValid);
 }

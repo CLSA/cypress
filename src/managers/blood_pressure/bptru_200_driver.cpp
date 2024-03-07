@@ -3,8 +3,8 @@
 
 #include <QThread>
 
-BpTru200Driver::BpTru200Driver(QMutex& mutex, QSharedPointer<QHidDevice> bpm200, QObject *parent)
-    : QThread{parent}, m_mutex(mutex), m_bpm200(bpm200)
+BpTru200Driver::BpTru200Driver(QMutex& mutex, QHidDevice* hid, QObject *parent)
+    : QThread{parent}, m_mutex(mutex), m_bpm200(hid)
 {
     m_read_buffer.reset(new QByteArray(1024, 0));
     m_debug = CypressSettings::isDebugMode();

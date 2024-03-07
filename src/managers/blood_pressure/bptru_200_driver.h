@@ -169,7 +169,7 @@ class BpTru200Driver : public QThread
 {
     Q_OBJECT
 public:
-    explicit BpTru200Driver(QMutex& mutex, QSharedPointer<QHidDevice>, QObject *parent = nullptr);
+    explicit BpTru200Driver(QMutex& mutex, QHidDevice* hid, QObject *parent = nullptr);
     ~BpTru200Driver();
 
     qint32 write(BPMMessage message);
@@ -183,19 +183,17 @@ signals:
     void messagesReceived(QQueue<BPMMessage> messages);
 
 private:
-
     QScopedPointer<QByteArray> m_read_buffer;
 
     // mutex is for the write queue
     QMutex& m_mutex;
 
     QQueue<BPMMessage> readQueue;
-
-    QSharedPointer<QHidDevice> m_bpm200;
+    QHidDevice* m_bpm200;
 
     void parseData(quint32 bytesRead);
-
     bool m_debug;
+
     quint8 STX { 0x02 };
     quint8 ETX { 0x03 };
     quint8 reportNumber { 0x00 };

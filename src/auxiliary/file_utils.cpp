@@ -94,12 +94,15 @@ bool FileUtils::copyDirectory(QDir source, QDir destination, bool overwrite, boo
         QFile sourceFile(source.absoluteFilePath(file));
         QFile destinationFile(destination.absoluteFilePath(file));
 
+        qDebug() << "copying" << source.absoluteFilePath(file) << "to" << destination.absoluteFilePath(file);
+
         if (overwrite || !destinationFile.exists())
         {
-            destinationFile.remove();
-            if (!sourceFile.copy(destination.absoluteFilePath(file))) {
+            if (!destinationFile.remove())
+                qDebug() << "could not remove destination file";
+
+            if (!sourceFile.copy(destination.absoluteFilePath(file)))
                 return false;
-            }
         }
     }
 

@@ -3,7 +3,9 @@
 
 #include "dialog_base.h"
 
-#include "../server/sessions/bpm_session.h"
+#include "server/sessions/bpm_session.h"
+
+#include "widgets/bpm_manual_entry_form.h"
 
 #include "ui_blood_pressure_dialog.h"
 
@@ -17,6 +19,8 @@ public:
 
 private:
     Ui::BloodPressureDialog *ui { Q_NULLPTR };
+
+    BpmManualEntryForm* bpmManualEntryForm;
 };
 
 #endif // BLOOD_PRESSURE_DIALOG_H

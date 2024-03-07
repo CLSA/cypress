@@ -47,6 +47,7 @@ public slots:
     void measure() override;
 
     void addManualMeasurement() override;
+    void addManualEntry(const double weight);
 
 private slots:
 

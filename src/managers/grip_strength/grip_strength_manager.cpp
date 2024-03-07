@@ -6,6 +6,7 @@
 
 #include "cypress_settings.h"
 
+#include <QThread>
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
@@ -230,6 +231,8 @@ void GripStrengthManager::readOutput()
     if (m_debug)
         qDebug() << "GripStrengthManager::readOutput: " << m_test->toJsonObject();
 
+    QThread::sleep(5);
+    cleanUp();
     finish();
 }
 
@@ -290,6 +293,7 @@ bool GripStrengthManager::backupData() {
         qDebug() << "GripStrengthManager::backupData";
 
     if (!FileUtils::copyDirectory(QDir(m_databasePath), QDir(m_backupPath), true, false)) {
+        qDebug() << "failed to backup data";
         return false;
     }
 
@@ -301,6 +305,7 @@ bool GripStrengthManager::restoreData() {
         qDebug() << "GripStrengthManager::restoreData";
 
     if (!FileUtils::copyDirectory(QDir(m_backupPath), QDir(m_databasePath), true, false)) {
+        qDebug() << "failed to restore data";
         return false;
     }
 
@@ -348,8 +353,6 @@ void GripStrengthManager::configureProcess()
             QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
             if (m_debug)
                 qDebug() << "GripStrengthManager::process error: process error occured: " << s.join(" ").toLower();
-
-            cleanUp();
         });
 
     connect(&m_process, &QProcess::stateChanged,

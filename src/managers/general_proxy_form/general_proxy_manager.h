@@ -33,6 +33,7 @@ private:
 
     QString m_runnableName;
     QString m_runnablePath;
+    QString m_pdftkPath;
 };
 
 #endif // GENERALPROXYMANAGER_H

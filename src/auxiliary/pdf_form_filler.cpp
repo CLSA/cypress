@@ -12,15 +12,19 @@ PDFFormFiller::PDFFormFiller(QObject *parent)
 }
 
 QString PDFFormFiller::fillPDF(const QString& pdfTemplatePath, const QString& fdfTemplatePath, const QJsonObject& inputData, const QString& outputPath) {
-
-    qDebug() << fdfTemplatePath << pdfTemplatePath << inputData << outputPath;
+    qDebug()
+        << "FillPDF:"
+        << fdfTemplatePath
+        << pdfTemplatePath
+        << inputData
+        << outputPath;
 
     // Read the FDF content from file
     QFile fdfTemplateFile(fdfTemplatePath);
-    if (!fdfTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!fdfTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "can't open fdf file";
         throw QException();
-
-    qDebug() << 22;
+    }
 
     QTextStream in(&fdfTemplateFile);
     QString content = in.readAll();
@@ -31,16 +35,12 @@ QString PDFFormFiller::fillPDF(const QString& pdfTemplatePath, const QString& fd
         updateFieldValue(content, key, value.toString());
     }
 
-    qDebug() << 33;
-
-    //// Write the updated content to a temp FDF file
+    ////// Write the updated content to a temp FDF file
     QTemporaryFile tempFile;
     if (tempFile.open()) {
         QTextStream out(&tempFile);
         out << content;
     }
-
-    qDebug() << 42;
 
     QProcess pdftkProcess;
     QStringList arguments;
@@ -50,14 +50,15 @@ QString PDFFormFiller::fillPDF(const QString& pdfTemplatePath, const QString& fd
               << "output"
               << QDir::toNativeSeparators(outputPath);
 
-    qDebug() << 53;
+    qDebug() << "start pdftk..";
     pdftkProcess.start("C:/Program Files (x86)/PDFtk Server/bin/pdftk.exe", arguments);
     pdftkProcess.waitForFinished();
 
+    qDebug() << "pdftk finished..";
     tempFile.close();
     tempFile.remove();
+    qDebug() << "remove temp files..";
 
-    qDebug() << 59;
     return outputPath;
 }
 

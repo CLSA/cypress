@@ -22,8 +22,8 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
     m_test.reset(new BloodPressureTest);
     m_test->setExpectedMeasurementCount(6);
 
-    m_bpm200.reset(new QHidDevice(this));
-    m_driver.reset(new BpTru200Driver(m_mutex, m_bpm200));
+    m_bpm200 = new QHidDevice(this);
+    m_driver = new BpTru200Driver(m_mutex, m_bpm200, this);
 
     if (m_debug) {
         qDebug() << "BloodPressure";
@@ -34,7 +34,8 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
         qDebug() << session->getInputData();
     }
 
-    connect(m_driver.get(), &BpTru200Driver::messagesReceived, this, &BloodPressureManager::receiveMessages);
+    connect(m_driver, &BpTru200Driver::messagesReceived, this, &BloodPressureManager::receiveMessages);
+    //connect(m_driver, &BpTru200Driver::finished, this, &BpTru200Driver::deleteLater);
 }
 
 
@@ -42,6 +43,24 @@ BloodPressureManager::~BloodPressureManager()
 {
     if (m_debug)
         qDebug() << "destroy blood pressure manager";
+
+    if (m_driver != nullptr && m_driver->isRunning()) {
+        qDebug() << "requesting driver interrupt";
+        m_driver->requestInterruption();
+        qDebug() << "waiting...";
+        m_driver->wait();
+        qDebug() << "finished waiting...";
+    }
+
+    if (m_driver != nullptr) {
+        qDebug() << "delete driver...";
+        delete m_driver;
+    }
+
+    if (m_bpm200 != nullptr) {
+        qDebug() << "delete hid...";
+        delete m_bpm200;
+    }
 }
 
 bool BloodPressureManager::isInstalled()
@@ -110,7 +129,6 @@ void BloodPressureManager::connectToDevice()
     {
         qDebug() << "device already open";
         emit deviceConnected();
-
         return;
     }
 
@@ -119,7 +137,6 @@ void BloodPressureManager::connectToDevice()
         {
             qDebug() << "connected to bpm";
             qDebug() << m_bpm200->manufacturer();
-
         }
 
         m_driver->start();
@@ -174,8 +191,13 @@ void BloodPressureManager::disconnectFromDevice()
         return;
     }
 
+    qDebug() << "request interruption";
     m_driver->requestInterruption();
-
+    qDebug() << "wait";
+    m_driver->wait();
+    qDebug() << "close";
+    m_bpm200->close();
+    qDebug() << "disconnected";
     emit deviceDisconnected();
 }
 
@@ -409,6 +431,9 @@ void BloodPressureManager::onDeviceStopped(const BPMMessage &message)
         emit deviceStateChanged("Ready");
     }
 
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
+    test->updateAverage();
+
     emit measurementStopped();
 }
 
@@ -417,9 +442,9 @@ void BloodPressureManager::onInflateCuffPressure(const BPMMessage &message)
     if (m_debug)
         qDebug() << "BloodPressureManager::onInflateCuffPressure";
 
-    int ls = message.getData0() & 0x000000FF;
-    int ms = (message.getData1() << 8) & 0x0000FF00;
-    int pressure = ls + ms;
+    const int ls = message.getData0() & 0x000000FF;
+    const int ms = (message.getData1() << 8) & 0x0000FF00;
+    const int pressure = ls + ms;
 
     m_measurementStartTime = QDateTime::currentDateTime();
 
@@ -431,9 +456,9 @@ void BloodPressureManager::onDeflateCuffPressure(const BPMMessage &message)
     if (m_debug)
         qDebug() << "BloodPressureManager::onDeflateCuffPressure";
 
-    int ls = message.getData0() & 0x000000FF;
-    int ms = (message.getData1() << 8) & 0x0000FF00;
-    int pressure = ls + ms;
+    const int ls = message.getData0() & 0x000000FF;
+    const int ms = (message.getData1() << 8) & 0x0000FF00;
+    const int pressure = ls + ms;
 
     emit deflateCuffPressure(pressure);
 }
@@ -466,9 +491,9 @@ void BloodPressureManager::onBpAverage(const BPMMessage &message)
     if (m_debug)
         qDebug() << "bp average: " << message.getData0();
 
-    int sbp = message.getData1();
-    int dbp = message.getData2();
-    int pulse = message.getData3();
+    const int sbp = message.getData1();
+    const int dbp = message.getData2();
+    const int pulse = message.getData3();
 
     auto test = qSharedPointerCast<BloodPressureTest>(m_test);
     test->addDeviceAverage(sbp, dbp, pulse);
@@ -487,18 +512,17 @@ void BloodPressureManager::onBpReview(const BPMMessage &message)
 
     if (message.getData0() == 0) {
         qDebug() << "computing average";
-        int sbp = message.getData1();
-        int dbp = message.getData2();
-        int pulse = message.getData3();
+        const int sbp = message.getData1();
+        const int dbp = message.getData2();
+        const int pulse = message.getData3();
 
         auto test = qSharedPointerCast<BloodPressureTest>(m_test);
         test->addDeviceAverage(sbp, dbp, pulse);
 
         emit dataChanged(m_test);
 
-        if (test->isValid()) {
+        if (test->isValid())
             emit canFinish();
-        }
     }
 }
 
@@ -533,6 +557,13 @@ void BloodPressureManager::measure()
 {
 }
 
+void BloodPressureManager::finish() {
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
+    test->updateAverage();
+
+    ManagerBase::finish();
+}
+
 void BloodPressureManager::addManualMeasurement()
 {
     QSharedPointer<BloodPressureMeasurement> bpm(
@@ -543,10 +574,23 @@ void BloodPressureManager::addManualMeasurement()
                                      QDateTime::currentDateTimeUtc(),
                                      QDateTime::currentDateTimeUtc()));
     m_test->addMeasurement(bpm);
+    emit dataChanged(m_test);
+}
 
+void BloodPressureManager::addManualEntry(const int systolic, const int diastolic, const int pulse)
+{
+    auto test = qSharedPointerCast<BloodPressureTest>(m_test);
+    QSharedPointer<BloodPressureMeasurement> bpm(
+        new BloodPressureMeasurement(m_test->getMeasurementCount() + 1,
+                                     systolic,
+                                     diastolic,
+                                     pulse,
+                                     QDateTime::currentDateTimeUtc(),
+                                     QDateTime::currentDateTimeUtc()));
+    test->addMeasurement(bpm);
+    test->updateAverage();
 
-
-
+    qDebug() << "TEST" << test->toJsonObject();
     emit dataChanged(m_test);
 }
 

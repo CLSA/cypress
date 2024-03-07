@@ -86,6 +86,7 @@ public:
     CypressSession(const CypressSession&) = delete;
     CypressSession& operator=(const CypressSession&) = delete;
 
+    void setOrigin(const QString& originHeader);
     virtual ~CypressSession() {};
 
     virtual void initializeDialog() = 0;
@@ -126,11 +127,14 @@ public:
     QString getInterviewer() const;
     QDateTime getStartTime() const;
     QDateTime getEndTime() const;
+    QString getOrigin() const;
 
     QJsonObject getJsonObject() const;
 
 protected:
     SessionStatus m_status { SessionStatus::Unknown };
+
+    QString pineOrigin;
 
     // the device UI
     //
