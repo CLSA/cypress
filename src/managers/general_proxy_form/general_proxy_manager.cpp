@@ -51,8 +51,6 @@ void GeneralProxyManager::measure()
     inputData["enrollmentId"] = m_session->getBarcode();
 
     QString language = m_session->getInputData().value("language").toString();
-
-
     QDir currentDir = QDir::currentPath();
 
     qDebug() << "language" << language;
@@ -64,6 +62,8 @@ void GeneralProxyManager::measure()
         inputData,
         m_outputFilePath
     );
+
+
 
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
@@ -112,18 +112,25 @@ void GeneralProxyManager::readOutput() {
 }
 
 void GeneralProxyManager::finish() {
+
     const int answer_id = m_session->getAnswerId();
     const QString host = CypressSettings::getPineHost();
     const QString endpoint = CypressSettings::getPineEndpoint();
 
+    PDFFormFiller filler;
+    const QString dataFields = filler.dumpDataFields(m_outputFilePath);
+    const QJsonObject dataFieldsJson = filler.parseDataFields(dataFields);
+
+    qDebug() << "dataFieldsJson: " << dataFieldsJson;
+
     QJsonObject testJson {};
     QJsonObject filesJson {
-        { "gen_proxy_consent_" + m_session->getSessionId() + "_pdf", FileUtils::getHumanReadableFileSize(m_outputFilePath) }
+        { "general_proxy_pdf", FileUtils::getHumanReadableFileSize(m_outputFilePath) }
     };
 
     testJson.insert("files", filesJson);
     testJson.insert("metadata", {});
-    testJson.insert("results", QJsonArray {});
+    testJson.insert("results", QJsonArray { dataFieldsJson } );
     testJson.insert("session", m_session->getJsonObject());
 
     const QJsonObject responseJson { { "value", testJson } };

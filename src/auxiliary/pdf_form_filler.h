@@ -17,6 +17,12 @@ public:
     // Returns the output file path
     QString fillPDF(const QString& pdfTemplatePath, const QString& fdfTemplatePath, const QJsonObject& inputData, const QString& outputPath);
 
+    // Returns a string of all data fields and their values
+    QString dumpDataFields(const QString& pdfFilename);
+
+    // Parses data fields into key/value pairs
+    QJsonObject parseDataFields(const QString& dataFields);
+
 private:
     void updateFieldValue(QString& fileContents, const QString& fieldName, const QString& value);
 
