@@ -225,10 +225,7 @@ void DXAManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
     emit status(QString("Received %1 files").arg(filesReceived));
 
-    if (m_test->isValid()) {
-        emit canMeasure();
-    }
-
+    emit canMeasure();
     emit dataChanged(m_test);
 }
 

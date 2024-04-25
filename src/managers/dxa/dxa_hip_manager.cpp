@@ -235,9 +235,7 @@ void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
     emit dataChanged(m_test);
 
-    if (m_test->isValid()) {
-        emit canMeasure();
-    }
+    emit canMeasure();
 }
 
 // retrieve a measurement from the device
