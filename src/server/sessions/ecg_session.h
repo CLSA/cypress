@@ -6,7 +6,7 @@
 class ECGSession : public CypressSession
 {
 public:
-    explicit ECGSession(QObject *parent, const QJsonObject& inputData);
+    explicit ECGSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

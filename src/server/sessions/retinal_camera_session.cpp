@@ -3,13 +3,16 @@
 
 #include "dialogs/retinal_camera_dialog.h"
 
-RetinalCameraSession::RetinalCameraSession(QObject *parent, const QJsonObject &inputData, Side side)
-    : CypressSession{parent, inputData}
+RetinalCameraSession::RetinalCameraSession(
+    QObject *parent,
+    const QJsonObject &inputData,
+    const QString& origin,
+    Side side
+)
+    : CypressSession{parent, inputData, origin}
     , m_side(side)
 {
-
-    if (m_debug)
-        qDebug() << side;
+    qDebug() << side;
 }
 
 void RetinalCameraSession::initializeDialog()

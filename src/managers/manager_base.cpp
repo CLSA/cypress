@@ -33,8 +33,7 @@ ManagerBase::~ManagerBase()
 
 void ManagerBase::finish() {
 
-    if (m_debug)
-        qDebug() << "ManagerBase::finish";
+    qDebug() << "ManagerBase::finish";
 
     int answer_id = m_session->getAnswerId();
 
@@ -98,6 +97,10 @@ bool ManagerBase::sendComplete(QString uuid)
         "application/json",
         serializedData
     );
+}
+
+void ManagerBase::readOutput() {
+
 }
 
 void ManagerBase::setManualEntry(bool isManualEntry)

@@ -3,8 +3,8 @@
 
 #include "dialogs/grip_strength_dialog.h"
 
-GripStrengthSession::GripStrengthSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+GripStrengthSession::GripStrengthSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

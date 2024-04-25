@@ -54,7 +54,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "CLSA"},
         };
 
-        QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData));
+        QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -65,7 +65,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "CLSA"},
         };
 
-        QSharedPointer<WeighScaleSession> session(new WeighScaleSession(nullptr, inputData));
+        QSharedPointer<WeighScaleSession> session(new WeighScaleSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -81,7 +81,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"date_of_birth", "1995-12-06"},
         };
 
-        QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData));
+        QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -92,7 +92,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<DxaHipSession> session(new DxaHipSession(nullptr, inputData));
+        QSharedPointer<DxaHipSession> session(new DxaHipSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -103,7 +103,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<DXASession> session(new DXASession(nullptr, inputData));
+        QSharedPointer<DXASession> session(new DXASession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -114,7 +114,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<UltrasoundSession> session(new UltrasoundSession(nullptr, inputData));
+        QSharedPointer<UltrasoundSession> session(new UltrasoundSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -125,7 +125,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<ECGSession> session(new ECGSession(nullptr, inputData));
+        QSharedPointer<ECGSession> session(new ECGSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -136,7 +136,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<FraxSession> session(new FraxSession(nullptr, inputData));
+        QSharedPointer<FraxSession> session(new FraxSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -148,7 +148,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<AudiometerSession> session(new AudiometerSession(nullptr, inputData));
+        QSharedPointer<AudiometerSession> session(new AudiometerSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -160,7 +160,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<GripStrengthSession> session(new GripStrengthSession(nullptr, inputData));
+        QSharedPointer<GripStrengthSession> session(new GripStrengthSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -171,7 +171,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<RetinalCameraSession> session(new RetinalCameraSession(nullptr, inputData));
+        QSharedPointer<RetinalCameraSession> session(new RetinalCameraSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -182,7 +182,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<ChoiceReactionSession> session(new ChoiceReactionSession(nullptr, inputData));
+        QSharedPointer<ChoiceReactionSession> session(new ChoiceReactionSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -193,7 +193,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
             {"interviewer", "Test"},
         };
 
-        QSharedPointer<CDTTSession> session(new CDTTSession(nullptr, inputData));
+        QSharedPointer<CDTTSession> session(new CDTTSession(nullptr, inputData, "localhost:3000"));
         Cypress::getInstance().requestSession(session);
     });
 

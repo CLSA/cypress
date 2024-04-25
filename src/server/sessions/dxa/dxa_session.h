@@ -6,7 +6,7 @@
 class DXASession : public CypressSession
 {
 public:
-    explicit DXASession(QObject *parent, const QJsonObject& inputData);
+    explicit DXASession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

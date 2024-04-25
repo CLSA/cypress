@@ -67,14 +67,12 @@ bool TestBase::hasMetaData(const QString &key) const
     return m_metaData.hasAttribute(key);
 }
 
-// FIFO addition of measurements
-//
 void TestBase::addMeasurement(QSharedPointer<Measurement> item)
 {
     m_measurementList.append(item);
-    if (m_expectedMeasurementCount < m_measurementList.size()) {
-        m_measurementList.pop_front();
-    }
+    //if (m_expectedMeasurementCount < m_measurementList.size()) {
+    //    m_measurementList.pop_front();
+    //}
 }
 
 void TestBase::removeMeasurement(int index)

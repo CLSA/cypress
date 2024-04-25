@@ -6,7 +6,7 @@
 class BPMSession : public CypressSession
 {
 public:
-    explicit BPMSession(QObject *parent, const QJsonObject& inputData);
+    explicit BPMSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
 public:
     void isInstalled() const override;

@@ -2,8 +2,8 @@
 #include "managers/cdtt/cdtt_manager.h"
 #include "dialogs/cdtt_dialog.h"
 
-CDTTSession::CDTTSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+CDTTSession::CDTTSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

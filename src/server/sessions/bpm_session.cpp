@@ -2,8 +2,8 @@
 #include "managers/blood_pressure/blood_pressure_manager.h"
 #include "dialogs/blood_pressure_dialog.h"
 
-BPMSession::BPMSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+BPMSession::BPMSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

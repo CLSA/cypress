@@ -52,8 +52,7 @@ double WeighScaleTest::calculateAverage()
 
     addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
 
-    if (m_debug)
-          qDebug() << "WeighScaleTest: new average" << average << "kg";
+    qDebug() << "WeighScaleTest: new average" << average << "kg";
 
     return average;
 }
@@ -84,8 +83,7 @@ void WeighScaleTest::simulate()
     addMeasurement(weight2);
 
     double average = calculateAverage();
-    if (m_debug)
-        qDebug() << "WeighScaleTest::simulate - new average" << average << "kg";
+    qDebug() << "WeighScaleTest::simulate - new average" << average << "kg";
 
     addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
 }

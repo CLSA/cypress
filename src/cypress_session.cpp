@@ -3,7 +3,7 @@
 #include <QException>
 
 
-CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData):
+CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData, const QString& origin):
     QObject(parent), m_inputData(inputData)
 {
     m_barcode = m_inputData.value("barcode").toString();
@@ -12,15 +12,21 @@ CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData):
     m_language = m_inputData.value("language").toString();
     m_sessionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
     m_startDateTime = QDateTime::currentDateTimeUtc();
-
+    m_origin = origin;
     m_debug = CypressSettings::isDebugMode();
     m_sim = CypressSettings::isSimMode();
+}
+
+QString CypressSession::getOrigin() const {
+    return m_origin;
 }
 
 void CypressSession::validate() const
 {
     if (m_inputData.isEmpty())
         throw ValidationError("empty");
+    if (m_origin.isEmpty())
+        throw ValidationError("origin header");
     if (!isValidString("barcode"))
         throw ValidationError("barcode");
     if (!isValidInteger("answer_id"))

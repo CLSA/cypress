@@ -23,10 +23,7 @@ public:
 public slots:
     bool start() override;
     void measure() override;
-
-    void readOutput();
-
-    void addManualMeasurement() override;
+    void readOutput() override;
 
 private:
     void configureProcess();

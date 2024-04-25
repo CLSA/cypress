@@ -2,8 +2,8 @@
 #include "managers/ultrasound/vividi_manager.h"
 #include "dialogs/cimt_vivid_i_dialog.h"
 
-UltrasoundSession::UltrasoundSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+UltrasoundSession::UltrasoundSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

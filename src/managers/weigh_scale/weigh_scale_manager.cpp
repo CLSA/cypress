@@ -21,14 +21,12 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     m_test.reset(new WeighScaleTest);
     m_portName = CypressSettings::readSetting("weight_scale/portName").toString();
 
-    if (m_debug) {
-        qDebug() << "WeighScaleManager";
-
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-        qDebug() << session->getInputData();
-    }
+    qDebug() << "WeighScaleManager";
+    qDebug() << session->getSessionId();
+    qDebug() << session->getBarcode();
+    qDebug() << session->getInterviewer();
+    qDebug() << session->getInputData();
+    qDebug() << session->getOrigin();
 }
 
 bool WeighScaleManager::isInstalled()
@@ -38,8 +36,7 @@ bool WeighScaleManager::isInstalled()
 
 bool WeighScaleManager::start()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::measure";
+    qDebug() << "WeighScaleManager::measure";
 
     scanDevices();
 
@@ -52,8 +49,7 @@ bool WeighScaleManager::start()
 
 void WeighScaleManager::measure()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::measure";
+    qDebug() << "WeighScaleManager::measure";
 
     if (m_sim) {
         m_test->simulate();
@@ -76,8 +72,7 @@ void WeighScaleManager::addManualMeasurement()
     test->addMeasurement(measure);
 
     const double average = test->calculateAverage();
-    if (m_debug)
-      qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
+    qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
 
     emit dataChanged(m_test);
 }
@@ -88,16 +83,14 @@ void WeighScaleManager::addManualEntry(const double weight) {
 
     test->addMeasurement(measure);
     const double average = test->calculateAverage();
-    if (m_debug)
-      qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
+    qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
 
     emit dataChanged(m_test);
 }
 
 void WeighScaleManager::connectDevice()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::connectDevice";
+    qDebug() << "WeighScaleManager::connectDevice";
 
     // Connect to the serial port and set up listeners
 
@@ -146,8 +139,7 @@ void WeighScaleManager::selectDevice(const QSerialPortInfo &port)
 
 void WeighScaleManager::zeroDevice()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::zeroDevice";
+    qDebug() << "WeighScaleManager::zeroDevice";
 
     m_request = QByteArray("z");
     writeDevice();
@@ -155,15 +147,13 @@ void WeighScaleManager::zeroDevice()
 
 void WeighScaleManager::readDevice()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::readDevice";
+    qDebug() << "WeighScaleManager::readDevice";
 
     QByteArray data = m_port.readAll();
     m_buffer += data;
 
-    if (m_debug)
-        qDebug() << "WeighScaleManager::readDevice - read device received buffer "
-                 << m_buffer.toHex();
+    qDebug() << "WeighScaleManager::readDevice - read device received buffer "
+         << m_buffer.toHex();
 
     if (m_buffer.isEmpty())
         return;
@@ -177,12 +167,10 @@ void WeighScaleManager::readDevice()
         WeighScaleTest* test = static_cast<WeighScaleTest*>(m_test.get());
         test->fromArray(m_buffer);
 
-        if (m_debug)
-            qDebug() << "received p request, read buffer" << m_buffer;
+        qDebug() << "received p request, read buffer" << m_buffer;
 
         if (m_test->isValid()) {
-            if (m_debug)
-                qDebug() << "test is valid, can save results";
+            qDebug() << "test is valid, can save results";
 
             emit dataChanged(m_test);
             emit canFinish();
@@ -203,8 +191,7 @@ void WeighScaleManager::readDevice()
 
 void WeighScaleManager::writeDevice()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::writeDevice";
+    qDebug() << "WeighScaleManager::writeDevice";
 
     // prepare to receive data
     //
@@ -214,28 +201,23 @@ void WeighScaleManager::writeDevice()
 
 bool WeighScaleManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::setUp";
+    qDebug() << "WeighScaleManager::setUp";
 
     return true;
 }
 
 bool WeighScaleManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::cleanUp";
+    qDebug() << "WeighScaleManager::cleanUp";
 
     return clearData();
 }
 
 bool WeighScaleManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::clearData";
+    qDebug() << "WeighScaleManager::clearData";
 
     m_test->reset();
 
     return true;
 }
-
-

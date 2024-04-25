@@ -47,6 +47,8 @@ QJsonObject DefaultRequestHandler::getRequestData(Poco::Net::HTTPServerRequest &
     QJsonDocument doc = QJsonDocument::fromJson(qRequestData.toUtf8());
     QJsonObject json = doc.object();
 
+    json.insert("origin", request.get("Origin", "").c_str());
+
     return json;
 }
 

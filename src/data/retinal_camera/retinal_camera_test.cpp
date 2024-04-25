@@ -55,13 +55,16 @@ bool RetinalCameraTest::fromDatabaseResults(const QJsonObject &results)
 bool RetinalCameraTest::isValid() const
 {
     if (getMeasurementCount() != getExpectedMeasurementCount()) {
+        qDebug() << "measurement count" << getMeasurementCount() << "does not equal " << getExpectedMeasurementCount();
         return false;
     }
 
     const auto measurements = getMeasurements();
     foreach (auto measurement, measurements) {
-        if (!measurement->isValid())
+        if (!measurement->isValid()) {
+            qDebug() << "measurement is invalid:" << measurement->toJsonObject();
             return false;
+        }
     }
 
     return true;
@@ -85,7 +88,6 @@ QJsonObject RetinalCameraTest::toJsonObject() const
     return valuesObject;
 }
 
-QString RetinalCameraTest::toString() const
-{
+QString RetinalCameraTest::toString() const {
     return "";
 }

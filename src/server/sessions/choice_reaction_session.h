@@ -6,7 +6,7 @@
 class ChoiceReactionSession : public CypressSession
 {
 public:
-    explicit ChoiceReactionSession(QObject *parent, const QJsonObject& inputData);
+    explicit ChoiceReactionSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

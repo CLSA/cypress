@@ -7,6 +7,7 @@
 #include "auxiliary/windows_util.h"
 #include "auxiliary/network_utils.h"
 
+#include <QApplication>
 #include <QException>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -44,15 +45,11 @@ DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session)
 
     WindowsUtil::killProcessByName(L"storescp.exe");
 
-    if (m_debug) {
-        qDebug() << "DXAHipManager";
-
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-
-        qDebug() << session->getInputData();
-    }
+    qInfo() << "DXAHipManager";
+    qInfo() << session->getSessionId();
+    qInfo() << session->getBarcode();
+    qInfo() << session->getInterviewer();
+    qInfo() << session->getInputData();
 }
 
 DxaHipManager::~DxaHipManager()
@@ -250,8 +247,7 @@ bool DxaHipManager::setUp()
         new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
 
     connect(m_dicomServer.get(), &DcmRecv::running, this, [=]() {
-        if (m_debug)
-            qDebug() << "DxaHipManager::running - DICOM server is running...";
+        qDebug() << "DxaHipManager::running - DICOM server is running...";
     });
 
     connect(m_dicomServer.get(),
@@ -298,6 +294,8 @@ void DxaHipManager::measure()
     }
 
     emit status("Copying files from DEXA (1/2)");
+    QApplication::processEvents();
+
     // Copy the patient scan mdb file from Apex
     if (!initPatScanDb()) {
         emit error("Failed to copy the PatScan.mdb file from the Apex workstation");
@@ -305,13 +303,16 @@ void DxaHipManager::measure()
     }
 
     emit status("Copying files from DEXA (2/2)");
+    QApplication::processEvents();
     // Copy the reference mdb file from Apex
     if (!initReferenceDb()) {
         emit error("Failed to copy the reference.mdb file from the Apex workstation");
         return;
     }
 
-    emit status("Gathering variables..");
+    emit status("Gathering variables");
+    QApplication::processEvents();
+
     test->getPatientScan(m_patscanDb, m_session->getBarcode());
 
     QString patientKey = test->getMetaData("PATIENT_KEY").toString();
@@ -484,8 +485,7 @@ bool DxaHipManager::copyPatScanDb() {
     }
 
     if (!QFile::copy(m_patscanDbPath, localPatScanFileInfo.absoluteFilePath())) {
-        if (m_debug)
-            qDebug() << "error copying patscan db from " << m_refscanDbPath << "to" << localPatScanFileInfo.absoluteFilePath();
+        qDebug() << "error copying patscan db from " << m_refscanDbPath << "to" << localPatScanFileInfo.absoluteFilePath();
         return false;
     }
 
@@ -508,16 +508,13 @@ bool DxaHipManager::copyReferenceDb() {
     const QFileInfo localReferenceFileInfo(QDir::current().absoluteFilePath(apexReferenceFileInfo.fileName()));
     if (localReferenceFileInfo.exists()) {
         if (!QFile::remove(localReferenceFileInfo.absoluteFilePath())) {
-            if (m_debug)
-                qDebug() << "could not remove existing local reference db at: " << m_refscanDbPath;
+            qDebug() << "could not remove existing local reference db at: " << m_refscanDbPath;
             return false;
         }
     }
 
     if (!QFile::copy(m_refscanDbPath, localReferenceFileInfo.absoluteFilePath())) {
-        if (m_debug)
-            qDebug() << "error copying refscan db from " << m_refscanDbPath << "to" << localReferenceFileInfo.absoluteFilePath();
-
+        qDebug() << "error copying refscan db from " << m_refscanDbPath << "to" << localReferenceFileInfo.absoluteFilePath();
         return false;
     }
 

@@ -45,6 +45,7 @@ void DxaHipDialog::initManager() {
     //
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), [=]() {
         ui->measurementTable->disableMeasureButton();
+        QApplication::processEvents();
         manager->measure();
     });
 

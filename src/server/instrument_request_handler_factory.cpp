@@ -259,27 +259,24 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
     QString host              = QString::fromStdString(request.getHost().c_str());
     QString clientAddress     = QString::fromStdString(request.clientAddress().host().toString());
     QString clientPort        = QString::number(request.clientAddress().port());
+    QString origin            = QString::fromStdString(request.get("Origin").c_str());
 
+    qInfo() << "Origin" << origin;
     qInfo() << QString("%1: %2%3 from %4:%5").arg(method, host, uri, clientAddress, clientPort);
 
     QRegularExpressionMatch match;
     QMap<QString, createRequestHandlerImpl>::const_iterator handlerIter = urlMap.constBegin();
 
     if (method == "DELETE")
-    {
         return defaultDeleteSessionRequestHandler();
-    }
 
-    while (handlerIter != urlMap.constEnd())
-    {
+    while (handlerIter != urlMap.constEnd()) {
         QRegularExpression regex(handlerIter.key());
         createRequestHandlerImpl requestHandlerFactoryFunc = handlerIter.value();
 
         match = regex.match(uri);
         if (match.hasMatch())
-        {
             return requestHandlerFactoryFunc();
-        }
 
         ++handlerIter;
     }

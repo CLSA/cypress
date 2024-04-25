@@ -104,8 +104,7 @@ void DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
         if (bodyPartExamined == "HIP") // hip done in different stage
             continue;
 
-        if (m_debug)
-            qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
+        qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
 
         if (ivaImagingMeasurement->isValidDicomFile(file))
             ivaImagingMeasurement->addDicomFile(file);
@@ -117,10 +116,8 @@ void DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
             rightForearmMeasurement->addDicomFile(file);
         else if (apSpineMeasurement->isValidDicomFile(file))
             apSpineMeasurement->addDicomFile(file);
-        else {
-            if (m_debug)
-                qDebug() << "Unknown file";
-        }
+        else
+            qDebug() << "Unknown file";
     }
 }
 

@@ -28,10 +28,7 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
     QFile ifile(fileName);
     if(ifile.open(QIODevice::ReadOnly))
     {
-        if (m_debug)
-        {
-            qDebug() << "OK, reading input file " << fileName;
-        }
+        qDebug() << "OK, reading input file " << fileName;
 
         QTextStream stream(&ifile);
 
@@ -51,10 +48,7 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
             QString s = stream.readLine();
             QStringList list = s.split(",");
 
-            if (m_debug)
-            {
-                qDebug() << "reading line " << QString::number(++n_line) << " with number of items = " << QString::number(list.size());
-            }
+            qDebug() << "reading line " << QString::number(++n_line) << " with number of items = " << QString::number(list.size());
 
             if(!list.empty())
             {
@@ -69,10 +63,7 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
                     userid_pos = list.indexOf(QLatin1String("UserId"));
                     interviewerid_pos = list.indexOf(QLatin1String("InterviewerId"));
 
-                    if (m_debug)
-                    {
-                        qDebug() << "found header item positions at line " << QString::number(n_line);
-                    }
+                    qDebug() << "found header item positions at line " << QString::number(n_line);
                 }
                 else if(ChoiceReactionMeasurement::TEST_CODE == code)
                 {
@@ -81,62 +72,38 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
 
                     bool isValidMeasure = measure->isValid();
 
-                    if (m_debug)
-                    {
-                        qDebug() << "found " << (isValidMeasure ? "VALID" : "INVALID")
-                             << "measurement item positions at line " << QString::number(n_line);
-                    }
+                    qDebug() << "found " << (isValidMeasure ? "VALID" : "INVALID")
+                         << "measurement item positions at line " << QString::number(n_line);
 
                     if (isValidMeasure)
-                    {
                         measurements.append(measure);
-                    }
                 }
                 else if((ChoiceReactionMeasurement::TEST_CODE+1) == code)
                 {
 
-                    if (m_debug)
-                    {
-                        qDebug() << "found last line " << QString::number(n_line);
-                    }
+                    qDebug() << "found last line " << QString::number(n_line);
 
                     if(-1 != version_pos)
                     {
-                        if (m_debug)
-                        {
-                                qDebug() << "adding version meta info";
-                        }
-
+                        qDebug() << "adding version meta info";
                         addMetaData("version",list.at(version_pos));
                     }
 
                     if(-1 != clinic_pos)
                     {
-                        if (m_debug)
-                        {
-                            qDebug() << "adding clinic meta info";
-                        }
-
+                        qDebug() << "adding clinic meta info";
                         addMetaData("clinic",list.at(clinic_pos));
                     }
 
                     if(-1 != userid_pos)
                     {
-                        if (m_debug)
-                        {
-                            qDebug() << "adding user id meta info";
-                        }
-
+                        qDebug() << "adding user id meta info";
                         addMetaData("user_id",list.at(userid_pos));
                     }
 
                     if(-1 != interviewerid_pos)
                     {
-                        if (m_debug)
-                        {
-                            qDebug() << "adding interviewer id meta info";
-                        }
-
+                        qDebug() << "adding interviewer id meta info";
                         addMetaData("interviewer_id",list.at(interviewerid_pos));
                     }
 
@@ -150,18 +117,12 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
                         QString s = list.at(pos+1);
                         s = s.remove(QRegExp("\\s(AM|PM)$")).trimmed();
 
-                        if (m_debug)
-                        {
-                            qDebug() << "end datetime string " << s;
-                        }
+                        qDebug() << "end datetime string " << s;
 
                         QDateTime d = QDateTime::fromString(s, "MM/dd/yyyy HH:mm:ss");
                         addMetaData("end_datetime",d);
 
-                        if (m_debug)
-                        {
-                            qDebug() << "adding end datetime meta info";
-                        }
+                        qDebug() << "adding end datetime meta info";
                     }
                     pos = list.indexOf(QLatin1String("StartDateTimes"));
                     if(-1 != pos)
@@ -169,26 +130,17 @@ void ChoiceReactionTest::fromFile(const QString &fileName)
                         QString s = list.at(pos+1);
                         s = s.remove(QRegExp("\\s(AM|PM)$")).trimmed();
 
-                        if (m_debug)
-                        {
-                            qDebug() << "start datetime string " << s;
-                        }
+                        qDebug() << "start datetime string " << s;
 
                         QDateTime d = QDateTime::fromString(s, "MM/dd/yyyy HH:mm:ss");
                         addMetaData("start_datetime",d);
 
-                        if (m_debug)
-                        {
-                            qDebug() << "adding start datetime meta info";
-                        }
+                        qDebug() << "adding start datetime meta info";
                     }
                 }
                 else
                 {
-                    if (m_debug)
-                    {
-                        qDebug() << "ERROR: cannot parse line, bad code";
-                    }
+                    qDebug() << "ERROR: cannot parse line, bad code";
                 }
             }
         }
@@ -244,8 +196,7 @@ bool ChoiceReactionTest::isValid() const
     bool okMeta = true;
     foreach(const auto key, m_outputKeyList) {
         if(!hasMetaData(key)) {
-            if (m_debug)
-                qDebug() << "test does not have metadata key: " << key;
+            qDebug() << "test does not have metadata key: " << key;
 
             okMeta = false;
             break;
@@ -256,8 +207,7 @@ bool ChoiceReactionTest::isValid() const
     if (okTest) {
         foreach (const auto m, m_measurementList) {
             if (!m->isValid()) {
-                if (m_debug)
-                    qDebug() << "measurement is invalid: " << m->toStringList();
+                qDebug() << "measurement is invalid: " << m->toStringList();
 
                 okTest = false;
                 break;

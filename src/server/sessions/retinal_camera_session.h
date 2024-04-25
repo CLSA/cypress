@@ -10,6 +10,7 @@ class RetinalCameraSession : public CypressSession
 public:
     explicit RetinalCameraSession(QObject *parent,
                                   const QJsonObject &inputData,
+                                  const QString& origin,
                                   Side side = Side::Left);
 
 public:

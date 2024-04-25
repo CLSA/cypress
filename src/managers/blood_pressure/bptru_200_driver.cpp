@@ -12,8 +12,7 @@ BpTru200Driver::BpTru200Driver(QMutex& mutex, QHidDevice* hid, QObject *parent)
 
 BpTru200Driver::~BpTru200Driver()
 {
-    if (m_debug)
-        qDebug() << "BpTru200Driver::destroyed";
+    qDebug() << "BpTru200Driver::destructor";
 }
 
 
@@ -21,28 +20,24 @@ void BpTru200Driver::run()
 {
     while (!isInterruptionRequested() && !isFinished())
     {
-        if (m_debug)
-            qDebug() << "BpTru200Driver::run - checking write queue..";
+        qDebug() << "BpTru200Driver::run - checking write queue..";
 
         m_mutex.lock();
         if (!writeQueue.empty())
         {
             // write message
             BPMMessage message = writeQueue.dequeue();
-            if (!write(message)) {
+            if (!write(message))
                 qDebug() << "couldn't write a message to the device..";
-            }
         }
         m_mutex.unlock();
 
-        if (m_debug)
-            qDebug() << "BpTru200Driver::run - reading..";
+        qDebug() << "BpTru200Driver::run - reading..";
 
         read(300 /* ms */);
 
         if (!readQueue.isEmpty()) {
-            if (m_debug)
-                qDebug() << "BpTru200Driver::run - received message(s)..";
+            qDebug() << "BpTru200Driver::run - received message(s)..";
 
             emit messagesReceived(readQueue);
             readQueue.clear();
@@ -54,8 +49,7 @@ qint32 BpTru200Driver::write(BPMMessage message)
 {
     message.calculateCrc();
 
-    if (m_debug)
-        qDebug() << "BpTru200Driver::write - isValidCRC: " << message.isValidCRC();
+    qDebug() << "BpTru200Driver::write - isValidCRC: " << message.isValidCRC();
 
     QByteArray packedMessage;
 
@@ -70,46 +64,37 @@ qint32 BpTru200Driver::write(BPMMessage message)
     packedMessage.append(ETX);
 
     if (!m_bpm200->isOpen()) {
-        if (m_debug)
-            qDebug() << "BpTru200Driver::write - connection not open";
-
+        qDebug() << "BpTru200Driver::write - connection not open";
         return -1;
     }
 
     qint32 bytesWritten = m_bpm200->write(&packedMessage, packedMessage.size());
-    if (m_debug)
-        qDebug() << "BpTru200Driver::write -" << bytesWritten << "bytes";
+    qDebug() << "BpTru200Driver::write -" << bytesWritten << "bytes";
 
     return bytesWritten;
 }
 
 qint32 BpTru200Driver::read(int timeoutMs)
 {
-    if (m_debug)
-        qDebug() << "BpTru200Driver::read";
+    qDebug() << "BpTru200Driver::read timeoutMs = " << timeoutMs;
 
     if (!m_bpm200->isOpen())
     {
-        if (m_debug)
-            qDebug() << "BpTru200Driver::read - tried to read before device was connected..";
+        qDebug() << "tried to read before device was connected..";
         return -1;
     }
 
     m_read_buffer.get()->fill(0x00);
-    if (m_debug)
-        qDebug() << "BpTru200Driver::read - reading";
+    qDebug() << "reading";
 
     quint32 bytesRead = m_bpm200->read(m_read_buffer.get(), 1024, timeoutMs);
     if (bytesRead <= 0)
     {
-        if (m_debug)
-            qDebug() << "BpTru200Driver::read - bytes read <= 0, not parsing anything";
-
+        qDebug() << "bytes read <= 0, not parsing anything";
         return -1;
     }
 
-    if (m_debug)
-        qDebug() << "BpTru200Driver::read - bytes read: " << bytesRead;
+    qDebug() << "bytes read: " << bytesRead;
 
     parseData(bytesRead);
 
@@ -133,24 +118,16 @@ void BpTru200Driver::parseData(quint32 bytesRead)
 
                 BPMMessage message(messageId, data0, data1, data2, data3, crc);
 
-                if (m_debug)
-                    qDebug() << "BpTru200Driver::parseData - message: " << message.toString();
+                qDebug() << "BpTru200Driver::parseData - message: " << message.toString();
 
                 if (message.isValidCRC())
                 {
-                    if (m_debug)
-                        qDebug() << "parsed valid message";
-
+                    qDebug() << "parsed valid message";
                     readQueue.enqueue(message);
                 }
                 else
-                {
-                    if (m_debug)
-                        qDebug() << "error: message is not valid";
-                }
+                    qDebug() << "error: message is not valid";
             }
         }
     }
 }
-
-

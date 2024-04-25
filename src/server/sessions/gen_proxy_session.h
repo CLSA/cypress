@@ -6,7 +6,7 @@
 class GenProxySession : public CypressSession
 {
 public:
-    explicit GenProxySession(QObject *parent, const QJsonObject& inputData);
+    explicit GenProxySession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

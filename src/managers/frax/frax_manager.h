@@ -26,16 +26,16 @@ class FraxManager : public ManagerBase
 public:
     explicit FraxManager(QSharedPointer<FraxSession> session);
 
-    static bool isInstalled(bool printMissing = false);
+    static bool isInstalled();
 
 public slots:
     bool start() override;
 
     void measure() override;
 
-private:
-    void readOutput();
+    void readOutput() override;
 
+private:
     QString m_country_code;
     QString m_type_code;
 

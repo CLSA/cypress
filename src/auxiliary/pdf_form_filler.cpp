@@ -123,6 +123,7 @@ QJsonObject PDFFormFiller::parseDataFields(const QString& dataFields) {
             QStringList captures = fieldValueRegex.capturedTexts();
             if (captures.length() > 1) {
                 fieldValue = captures[1].trimmed();
+                fieldValue.replace("\\", "");
 
                 if (fieldValue == "Yes")
                     output[fieldName] = true;

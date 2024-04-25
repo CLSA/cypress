@@ -654,21 +654,18 @@ QList<QStringList> SpirometerTest::toStringListList()
 {
     QList<QStringList> data;
 
-    if(isValid())
-    {
-        for (int i = 0; i < m_measurementList.size(); i++) {
-            SpirometerMeasurement *m = static_cast<SpirometerMeasurement *>(
-                m_measurementList.at(i).get());
+    for (int i = 0; i < m_measurementList.size(); i++) {
+        SpirometerMeasurement *m = static_cast<SpirometerMeasurement *>(
+        m_measurementList.at(i).get());
 
-            if (SpirometerMeasurement::ResultType::typeTrial == m->getResultType()) {
-              if (data.isEmpty()) {
-                qDebug() << "adding attribute keys";
-                data.append(m->getAttributeKeys());
-              }
+        if (SpirometerMeasurement::ResultType::typeTrial == m->getResultType()) {
+          if (data.isEmpty()) {
+        qDebug() << "adding attribute keys";
+        data.append(m->getAttributeKeys());
+          }
 
-              qDebug() << "adding trial" << m->getAttribute("trial_number").toString();
-              data.append(m->toStringList(true));
-            }
+          qDebug() << "adding trial" << m->getAttribute("trial_number").toString();
+          data.append(m->toStringList(true));
         }
     }
 
@@ -689,15 +686,13 @@ bool SpirometerTest::isValid() const
     //}
 
     qDebug() << "validating number of measurements (4)" << getMeasurementCount();
-    bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if (okTest) {
-       foreach (const auto m, m_measurementList) {
-         if (!m->isValid()) {
-              qDebug() << "test invalid measurement";
-              okTest = false;
-              break;
-         }
-       }
+    bool okTest = true;
+    foreach (const auto m, m_measurementList) {
+        if (!m->isValid()) {
+            qDebug() << "test invalid measurement";
+            okTest = false;
+            break;
+        }
     }
 
     return okMeta && okTest;
@@ -735,6 +730,8 @@ QJsonObject SpirometerTest::toJsonObject() const
     value.insert("manual_entry", getManualEntryMode());
     value.insert("results", trialJson);
     value.insert("best_values", bestJson);
+
+    qDebug() << value;
 
     return value;
 }
@@ -782,13 +779,10 @@ void SpirometerTest::readPDFReportPath(const QDomNode& node)
         return;
     }
 
-    if (m_debug)
-        qDebug() << child.hasAttribute("Name") << child.tagName() << child.text() << child.attribute("Name");
+    qDebug() << child.hasAttribute("Name") << child.tagName() << child.text() << child.attribute("Name");
 
     if (child.hasAttribute("Name") && "Attachment" == child.attribute("Name")) {
-        if (m_debug)
-            qDebug() << "reading report path";
-
+        qDebug() << "reading report path";
         addMetaData("pdf_report_path", child.text());
     }
 }
@@ -924,12 +918,12 @@ void SpirometerTest::readBestValues(const QDomNode& node)
 
     qDebug() << "read best values";
 
-    if (best->isValid()) {
-      qDebug() << "OK best values";
-      addMeasurement(best);
-    } else {
-      qDebug() << "ERROR: failed to add best values";
-    }
+    //if (best->isValid()) {
+    qDebug() << "OK best values";
+    addMeasurement(best);
+    //} else {
+    //  qDebug() << "ERROR: failed to add best values";
+    //}
 }
 
 void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement* measure)

@@ -6,7 +6,7 @@
 class AudiometerSession : public CypressSession
 {
 public:
-    explicit AudiometerSession(QObject *parent, const QJsonObject& inputData);
+    explicit AudiometerSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
 public:
     void initializeDialog() override;

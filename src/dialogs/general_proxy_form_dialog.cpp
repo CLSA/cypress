@@ -17,6 +17,7 @@ GeneralProxyFormDialog::GeneralProxyFormDialog(QWidget *parent, QSharedPointer<G
     m_manager.reset(new GeneralProxyManager(session));
 
     auto manager = qSharedPointerCast<GeneralProxyManager>(m_manager);
+
     connect(manager.get(), &GeneralProxyManager::success, this, &GeneralProxyFormDialog::success);
     connect(manager.get(), &GeneralProxyManager::error, this, &GeneralProxyFormDialog::error);
 }

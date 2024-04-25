@@ -41,21 +41,16 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     m_inputKeyList << "alcohol";
     m_inputKeyList << "femoral_neck_bmd";
 
-    if (m_debug) {
-        qDebug() << "FraxManager";
-
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-
-        qDebug() << session->getInputData();
-    }
+    qInfo() << "FraxManager";
+    qInfo() << session->getSessionId();
+    qInfo() << session->getBarcode();
+    qInfo() << session->getInterviewer();
+    qInfo() << session->getInputData();
 }
 
-bool FraxManager::isInstalled(bool printMissing)
+bool FraxManager::isInstalled()
 {
-    const bool isSimMode = CypressSettings::isSimMode();
-    if (isSimMode)
+    if (CypressSettings::isSimMode())
         return true;
 
     const QString runnableName = CypressSettings::readSetting("frax/runnableName").toString();
@@ -69,79 +64,66 @@ bool FraxManager::isInstalled(bool printMissing)
     const QString country_code = CypressSettings::readSetting("frax/countryCode").toString();
     const QString type_code = CypressSettings::readSetting("frax/typeCode").toString();
 
-    bool installed = true;
-
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        if (printMissing)
-            qDebug() << "runnableName is not defined";
-        installed = false;
+        qInfo() << "runnableName is not defined";
+        return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        if (printMissing)
-            qDebug() << "runnablePath is not defined";
-        installed = false;
+        qInfo() << "runnablePath is not defined";
+        return false;
     }
 
     if (outputFilePath.isNull() || outputFilePath.isEmpty()) {
-        if (printMissing)
-            qDebug() << "outputFilePath is not defined";
-        installed = false;
+        qInfo() << "outputFilePath is not defined";
+        return false;
     }
 
     if (inputFilePath.isNull() || inputFilePath.isEmpty()) {
-        if (printMissing)
-            qDebug() << "inputFilePath is not defined";
-        installed = false;
+        qInfo() << "inputFilePath is not defined";
+        return false;
     }
 
     if (temporaryFilePath.isNull() || temporaryFilePath.isEmpty()) {
-        if (printMissing)
-            qDebug() << "temporaryFile is not defined";
-        installed = false;
+        qInfo() << "temporaryFile is not defined";
+        return false;
     }
 
     if (country_code.isNull() || country_code.isEmpty()) {
-        if (printMissing)
-            qDebug() << "countryCode is not defined";
-        installed = false;
+        qInfo() << "countryCode is not defined";
+        return false;
     }
 
     if (type_code.isNull() || type_code.isNull()) {
-        if (printMissing)
-            qDebug() << "type_code is not defined";
-        installed = false;
+        qInfo() << "type_code is not defined";
+        return false;
     }
 
     const QFileInfo info(runnableName);
     const QDir workingDirectory(runnablePath);
 
     if (!info.exists()) {
-        if (printMissing)
-            qDebug() << "executable does not exist at " << runnableName;
-        installed = false;
+        qInfo() << "executable does not exist at " << runnableName;
+        return false;
     }
 
     if (!info.isExecutable()) {
-        if (printMissing)
-            qDebug() << "executable can not be run at " << runnableName;
-        installed = false;
+        qInfo() << "executable can not be run at " << runnableName;
+        return false;
     }
 
     if (!workingDirectory.exists()) {
-        if (printMissing)
-            qDebug() << "working directory does not exist at "
+        qInfo() << "working directory does not exist at "
                      << runnablePath;
-        installed = false;
+        return false;
     }
 
-    return installed;
+    return true;
 }
 
 bool FraxManager::start()
 {
-    if (m_debug)
-        qDebug() << "FraxManager::start";
+    qDebug() << "FraxManager::start";
 
     if (!setUp()) {
         emit error("Could not setup FRAX device, please contact support.");
@@ -154,8 +136,7 @@ bool FraxManager::start()
 
 void FraxManager::measure()
 {
-    if (m_debug)
-        qDebug() << "FraxManager::measure";
+    qDebug() << "FraxManager::measure";
 
     clearData();
 
@@ -206,8 +187,7 @@ void FraxManager::measure()
 
 void FraxManager::readOutput()
 {
-    if (m_debug)
-        qDebug() << "FraxManager::readOutput";
+    qDebug() << "FraxManager::readOutput";
 
     auto test = qSharedPointerCast<FraxTest>(m_test);
 
@@ -225,8 +205,7 @@ void FraxManager::readOutput()
 
 void FraxManager::configureProcess()
 {
-    if (m_debug)
-        qDebug() << "FraxManager::configureProcess";
+    qDebug() << "FraxManager::configureProcess";
 
     // connect signals and slots to QProcess one time only
     //
@@ -244,23 +223,21 @@ void FraxManager::configureProcess()
     connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
         QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
     });
 
     connect(&m_process, &QProcess::stateChanged, this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "process state: " << s.join(" ").toLower();
+        qDebug() << "process state: " << s.join(" ").toLower();
     });
 
     // blackbox.exe and input.txt file are present
     //
     QDir workingDirectory(m_runnablePath);
-    QFileInfo inputFileInfo(m_inputFilePath);
+    //QFileInfo inputFileInfo(m_inputFilePath);
     QFileInfo fraxExecutableInfo(m_runnableName);
-    QFileInfo temporaryFileInfo(m_temporaryFilePath);
+    //QFileInfo temporaryFileInfo(m_temporaryFilePath);
 
     if (!workingDirectory.exists()) {
         emit error("working directory does not exist");
@@ -320,11 +297,8 @@ void FraxManager::configureProcess()
         stream << line << Qt::endl;
         input_file.close();
 
-        if (m_debug)
-        {
-            qDebug() << "populated input.txt file " << m_inputFilePath;
-            qDebug() << "content = " << line;
-        }
+        qDebug() << "populated input.txt file " << m_inputFilePath;
+        qDebug() << "content = " << line;
     }
     else
         emit error("Failed writing to input file");
@@ -332,8 +306,7 @@ void FraxManager::configureProcess()
 
 bool FraxManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "FraxManager::clearData";
+    qDebug() << "FraxManager::clearData";
 
     m_test->reset();
     return true;
@@ -343,14 +316,12 @@ bool FraxManager::clearData()
 // Set up device
 bool FraxManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "FraxManager::setUp";
+    qDebug() << "FraxManager::setUp";
 
     clearData();
 
-    if (!cleanUp()) {
+    if (!cleanUp())
         return false;
-    }
 
     configureProcess();
 
@@ -362,21 +333,17 @@ bool FraxManager::cleanUp()
 {
     // remove blackbox.exe generated output.txt file
     //
-    if (m_debug)
-        qDebug() << "FraxManager::cleanUp";
+    qDebug() << "FraxManager::cleanUp";
 
     if(QProcess::NotRunning != m_process.state())
         m_process.close();
 
-
     if (QFileInfo::exists(m_outputFilePath)) {
         QFile outputFile(m_outputFilePath);
-        if (!outputFile.remove()) {
+        if (!outputFile.remove())
             qDebug() << "could not remove output file";
-        }
-        else {
+        else
             qDebug() << "removed output file";
-        }
     }
 
     return true;

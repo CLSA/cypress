@@ -8,6 +8,7 @@
 #include "dicom/dcm_recv.h"
 #include "managers/dxa/dxa_manager.h"
 
+#include <QApplication>
 #include <QException>
 #include <QJsonDocument>
 #include <QMap>
@@ -43,15 +44,11 @@ DXAManager::DXAManager(QSharedPointer<DXASession> session)
 
     WindowsUtil::killProcessByName(L"storescp.exe");
 
-    if (m_debug) {
-        qDebug() << "DXAManager";
-
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-
-        qDebug() << session->getInputData();
-    }
+    qInfo() << "DXAManager";
+    qInfo() << session->getSessionId();
+    qInfo() << session->getBarcode();
+    qInfo() << session->getInterviewer();
+    qInfo() << session->getInputData();
 }
 
 DXAManager::~DXAManager()
@@ -241,8 +238,7 @@ bool DXAManager::setUp()
         new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
 
     connect(m_dicomServer.get(), &DcmRecv::running, this, [=]() {
-        if (m_debug)
-            qDebug() << "DxaManager::running - DICOM server is running...";
+        qDebug() << "DxaManager::running - DICOM server is running...";
     });
 
     connect(m_dicomServer.get(),
@@ -286,19 +282,26 @@ void DXAManager::measure()
         return;
     }
 
+    // TODO: file copy logic should be in its own thread to prevent event loop blocking
     emit status("Copying files from DEXA (1/2)");
+    QApplication::processEvents();
+
     if (!initPatScanDb()) {
         emit error("Failed to copy the PatScan.mdb file from the Apex workstation");
         return;
     }
 
     emit status("Copying files from DEXA (2/2)");
+    QApplication::processEvents();
+
     if (!initReferenceDb()) {
         emit error("Failed to copy the reference.mdb file from the Apex workstation");
         return;
     }
 
-    emit status("Gathering variables...");
+    emit status("Gathering variables");
+    QApplication::processEvents();
+
     test->getPatientScan(m_patscanDb, m_session->getBarcode());
     QString patientKey = test->getMetaData("PATIENT_KEY").toString();
     QJsonObject patientData {
@@ -317,7 +320,7 @@ void DXAManager::measure()
     m_referenceDb.close();
 
     emit canFinish();
-    emit status("Ready to submit...");
+    emit status("Ready to submit");
 }
 
 // implementation of final clean up of device after disconnecting and all
@@ -562,14 +565,12 @@ bool DXAManager::copyPatScanDb() {
 
     const QFileInfo localPatScanFileInfo(QDir::current().absoluteFilePath(patscanFileInfo.fileName()));
     if (localPatScanFileInfo.exists()) {
-        if (!QFile::remove(localPatScanFileInfo.absoluteFilePath())) {
+        if (!QFile::remove(localPatScanFileInfo.absoluteFilePath()))
             return false;
-        }
     }
 
     if (!QFile::copy(m_patscanDbPath, localPatScanFileInfo.absoluteFilePath())) {
-        if (m_debug)
-            qDebug() << "error copying patscan db from " << m_refscanDbPath << "to" << localPatScanFileInfo.absoluteFilePath();
+        qDebug() << "error copying patscan db from " << m_refscanDbPath << "to" << localPatScanFileInfo.absoluteFilePath();
         return false;
     }
 
@@ -592,16 +593,13 @@ bool DXAManager::copyReferenceDb() {
     const QFileInfo localReferenceFileInfo(QDir::current().absoluteFilePath(apexReferenceFileInfo.fileName()));
     if (localReferenceFileInfo.exists()) {
         if (!QFile::remove(localReferenceFileInfo.absoluteFilePath())) {
-            if (m_debug)
-                qDebug() << "could not remove existing local reference db at: " << m_refscanDbPath;
+            qDebug() << "could not remove existing local reference db at: " << m_refscanDbPath;
             return false;
         }
     }
 
     if (!QFile::copy(m_refscanDbPath, localReferenceFileInfo.absoluteFilePath())) {
-        if (m_debug)
-            qDebug() << "error copying refscan db from " << m_refscanDbPath << "to" << localReferenceFileInfo.absoluteFilePath();
-
+        qDebug() << "error copying refscan db from " << m_refscanDbPath << "to" << localReferenceFileInfo.absoluteFilePath();
         return false;
     }
 

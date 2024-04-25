@@ -48,9 +48,8 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     foreach (DicomFile file, dicomFiles) {
         QSharedPointer<CimtVividIMeasurement> measure(new CimtVividIMeasurement);
 
-        if (m_debug)
-            qDebug() << file.patientId << file.modality << file.studyDate << file.studyId
-                     << file.absFilePath << file.mediaStorageUID;
+        qDebug() << file.patientId << file.modality << file.studyDate << file.studyId
+                 << file.absFilePath << file.mediaStorageUID;
 
         auto measurements = m_test->getMeasurements();
 
@@ -72,43 +71,40 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         //measure->setAttribute("side", "");
 
         if (file.mediaStorageUID == UID_UltrasoundImageStorage) {
-            if (m_debug) {
-                qDebug() << "VividIManager::dicomFilesReceived: received still image "
-                         << m_stillImageIdCounter;
-            }
+            qDebug() << "VividIManager::dicomFilesReceived: received still image "
+                 << m_stillImageIdCounter;
 
             measure->setAttribute("name", "STILL_IMAGE_" + QString::number(m_stillImageIdCounter));
             measure->setAttribute("path", file.absFilePath);
             measure->setAttribute("study_id", file.studyId);
             measure->setAttribute("patient_id", file.patientId);
             measure->setAttribute("side", "");
+            measure->setAttribute("size", FileUtils::getHumanReadableFileSize(file.absFilePath));
 
             ++m_stillImageIdCounter;
 
         } else if (file.mediaStorageUID == UID_UltrasoundMultiframeImageStorage) {
-            if (m_debug) {
-                qDebug() << "VividIManager::dicomFilesReceived: received cineloop image"
-                         << m_cineloopCounter;
-            }
+            qDebug() << "VividIManager::dicomFilesReceived: received cineloop image"
+                 << m_cineloopCounter;
 
             measure->setAttribute("name", "CINELOOP_" + QString::number(m_cineloopCounter));
             measure->setAttribute("path", file.absFilePath);
             measure->setAttribute("study_id", file.studyId);
             measure->setAttribute("patient_id", file.patientId);
             measure->setAttribute("side", "");
+            measure->setAttribute("size", FileUtils::getHumanReadableFileSize(file.absFilePath));
 
             ++m_cineloopCounter;
 
         } else if (file.modality == "SR") {
-            if (m_debug) {
-                qDebug() << "VividIManager::dicomFilesReceived: received SR file" << m_srCounter;
-            }
+            qDebug() << "VividIManager::dicomFilesReceived: received SR file" << m_srCounter;
 
             measure->setAttribute("name", "SR_" + QString::number(m_srCounter));
             measure->setAttribute("path", file.absFilePath);
             measure->setAttribute("study_id", file.studyId);
             measure->setAttribute("patient_id", file.patientId);
             measure->setAttribute("side", "");
+            measure->setAttribute("size", FileUtils::getHumanReadableFileSize(file.absFilePath));
 
             ++m_srCounter;
         } else {
@@ -124,7 +120,10 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
 bool VividiManager::isInstalled()
 {
-    const bool isDebugMode = CypressSettings::isDebugMode();
+    qDebug() << "DxaHipManager::isInstalled";
+
+    if (CypressSettings::isSimMode())
+        return true;
 
     const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
@@ -137,84 +136,66 @@ bool VividiManager::isInstalled()
     const QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnableName is not defined";
+        qDebug() << "runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnablePath is not defined";
+        qDebug() << "runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - aeTitle is not defined";
+        qDebug() << "aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - host is not defined";
+        qDebug() << "host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - port is not defined";
+        qDebug() << "port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - storageDirPath is not defined";
+        qDebug() << "storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - logConfigPath is not defined";
+        qDebug() << "logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - ascConfigPath is not defined";
+        qDebug() << "ascConfigPath is not defined";
         return false;
     }
 
     const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnableName does not exist at"
-                     << runnableName;
+        qDebug() << "runnableName does not exist at" << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - runnableName is not executable at"
-                     << runnableName;
+        qDebug() << "runnableName is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - working directory does not exist at"
-                     << workingDir;
+        qDebug() << "working directory does not exist at" << workingDir;
         return false;
     }
     if (!workingDir.isDir()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - working directory is not writable at"
-                     << workingDir;
+        qDebug() << "working directory is not writable at" << workingDir;
         return false;
     }
     if (!workingDir.isWritable()) {
-        if (isDebugMode)
-            qDebug() << "DxaHipManager::isInstalled - working directory is not writable at"
-                     << workingDir;
+        qDebug() << "working directory is not writable at" << workingDir;
         return false;
     }
 
@@ -249,7 +230,6 @@ void VividiManager::measure()
 
 void VividiManager::finish()
 {
-
     const QString host = CypressSettings::getPineHost();
     const QString endpoint = CypressSettings::getPineEndpoint();
     const QString pine_path = CypressSettings::getAnswerUrl(m_session->getAnswerId());
@@ -302,16 +282,13 @@ void VividiManager::finish()
 
 bool VividiManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "VividiManager::cleanUp";
-
+    qDebug() << "VividiManager::cleanUp";
     return true;
 }
 
 bool VividiManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "VividiManager::clearData";
+    qDebug() << "VividiManager::clearData";
 
     m_test->reset();
 
@@ -324,9 +301,7 @@ bool VividiManager::clearData()
 
 bool VividiManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "VividiManager::cleanUp";
-
+    qDebug() << "VividiManager::cleanUp";
     return clearData();
 }
 

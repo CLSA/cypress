@@ -32,64 +32,47 @@ ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSessio
     // absolute path to output directory
     m_outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
 
-    if (m_debug) {
-        qDebug() << "ChoiceReactionManager";
-
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-
-        qDebug() << session->getInputData();
-    }
-
     m_test.reset(new ChoiceReactionTest);
+
+    qInfo() << "ChoiceReactionManager";
+    qInfo() << session->getSessionId();
+    qInfo() << session->getBarcode();
+    qInfo() << session->getInterviewer();
+    qInfo() << session->getInputData();
 }
 
 bool ChoiceReactionManager::isInstalled()
 {
-    const bool isDebugMode = CypressSettings::isDebugMode();
+    qDebug() << "ChoiceReactionManager::isInstalled";
 
     const QString runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
     const QString outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
 
-    if (runnableName.isNull() || runnableName.isEmpty())
-    {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled: runnableName is not defined";
-
+    if (runnableName.isNull() || runnableName.isEmpty()) {
+        qDebug() << "runnableName is not defined";
         return false;
     }
 
-    if (runnablePath.isNull() || runnablePath.isEmpty())
-    {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled: runnablePath is not defined";
-
+    if (runnablePath.isNull() || runnablePath.isEmpty()) {
+        qDebug() << "runnablePath is not defined";
         return false;
     }
 
-    if (outputPath.isNull() || outputPath.isEmpty())
-    {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled: outputPath is not defined";
-
+    if (outputPath.isNull() || outputPath.isEmpty()) {
+        qDebug() << "outputPath is not defined";
         return false;
     }
 
     const QFileInfo info(runnableName);
-    if (!info.exists())
-    {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled - CCB.exe does not exist at " << runnableName;
-
+    if (!info.exists()) {
+        qDebug() << "ChoiceReactionManager::isInstalled - CCB.exe does not exist at " << runnableName;
         return false;
     }
 
     if (!info.isExecutable())
     {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled - file is not executable at " << runnableName;
+        qDebug() << "ChoiceReactionManager::isInstalled - file is not executable at " << runnableName;
 
         return false;
     }
@@ -97,8 +80,7 @@ bool ChoiceReactionManager::isInstalled()
     const QDir working(runnablePath);
     if (!working.exists())
     {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled - working directory does not exist";
+        qDebug() << "ChoiceReactionManager::isInstalled - working directory does not exist";
 
         return false;
     }
@@ -106,9 +88,7 @@ bool ChoiceReactionManager::isInstalled()
     const QDir out(outputPath);
     if (!out.exists())
     {
-        if (isDebugMode)
-            qDebug() << "ChoiceReactionManager::isInstalled - output path does not exist";
-
+        qDebug() << "ChoiceReactionManager::isInstalled - output path does not exist";
         return false;
     }
 
@@ -117,12 +97,10 @@ bool ChoiceReactionManager::isInstalled()
 
 bool ChoiceReactionManager::start()
 {
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::start";
+    qDebug() << "ChoiceReactionManager::start";
 
-    if (!setUp()) {
+    if (!setUp())
         return false;
-    }
 
     measure();
     return true;
@@ -130,8 +108,7 @@ bool ChoiceReactionManager::start()
 
 void ChoiceReactionManager::measure()
 {
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::measure";
+    qDebug() << "ChoiceReactionManager::measure";
 
     clearData();
 
@@ -156,8 +133,7 @@ void ChoiceReactionManager::readOutput()
     // the output file.
     // user id and interviewer id are embedded in the csv file content.
     //
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::readOutput";
+    qDebug() << "ChoiceReactionManager::readOutput";
 
     if (QProcess::NormalExit != m_process.exitStatus()) {
         emit error("Process failed to finish correctly, cannot read output");
@@ -192,8 +168,7 @@ void ChoiceReactionManager::finish() {
 
     QDir dir(m_outputPath);
     if (!dir.exists()) {
-        if (m_debug)
-            qDebug() << "directory does not exist: " << m_outputPath;
+        qDebug() << "directory does not exist: " << m_outputPath;
         emit error("Output directory does not exist. Could not save measurements.");
     }
 
@@ -203,8 +178,7 @@ void ChoiceReactionManager::finish() {
 
     QFileInfo csvFile(dir.absoluteFilePath(outputFile));
     if (!csvFile.exists()) {
-        if (m_debug)
-            qDebug() << "file does not exist: " << csvFile.absoluteFilePath();
+        qDebug() << "file does not exist: " << csvFile.absoluteFilePath();
         emit error("Output excel file does not exist. Could not save measurements.");
         return;
     }
@@ -254,8 +228,7 @@ void ChoiceReactionManager::finish() {
 // Set up device
 bool ChoiceReactionManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::setUp";
+    qDebug() << "ChoiceReactionManager::setUp";
 
     if (!cleanUp())
         return false;
@@ -268,17 +241,17 @@ bool ChoiceReactionManager::setUp()
 // Clean up the device for for setup and next time
 bool ChoiceReactionManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::cleanUp";
+    qDebug() << "ChoiceReactionManager::cleanUp";
 
     m_test->reset();
 
+    // Close the process if it's already running
     if(QProcess::NotRunning != m_process.state()) {
         m_process.close();
-        //m_process.waitForFinished();
+        m_process.waitForFinished();
     }
 
-    // Clear all files
+    // Clear all output files
     QDir outputDir(m_outputPath);
     outputDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
 
@@ -296,8 +269,7 @@ bool ChoiceReactionManager::cleanUp()
 
 void ChoiceReactionManager::configureProcess()
 {
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::configureProcess";
+    qDebug() << "ChoiceReactionManager::configureProcess";
 
     // connect signals and slots to QProcess one time only
     //
@@ -315,19 +287,16 @@ void ChoiceReactionManager::configureProcess()
         this, [=](QProcess::ProcessError error)
         {
             QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            if (m_debug)
-                qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
         });
 
     connect(&m_process, &QProcess::stateChanged,
     this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "process state: " << s.join(" ").toLower();
+        qDebug() << "process state: " << s.join(" ").toLower();
     });
 
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::configureProcess - ok, configuring command";
+    qDebug() << "ChoiceReactionManager::configureProcess - ok, configuring command";
 
     // the inputs for command line args are present
     QStringList command;
@@ -358,16 +327,13 @@ void ChoiceReactionManager::configureProcess()
     m_process.setWorkingDirectory(m_runnablePath);
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    if (m_debug) {
-        qDebug() << "ChoiceReactionManager - process config args: " << m_process.arguments().join(" ");
-        qDebug() << "ChoiceReactionManager - process working dir: " << m_runnablePath;
-    }
+    qDebug() << "ChoiceReactionManager - process config args: " << m_process.arguments().join(" ");
+    qDebug() << "ChoiceReactionManager - process working dir: " << m_runnablePath;
 }
 
 bool ChoiceReactionManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "ChoiceReactionManager::clearData";
+    qDebug() << "ChoiceReactionManager::clearData";
 
     m_test->reset();
 

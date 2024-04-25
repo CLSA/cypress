@@ -4,7 +4,8 @@
 
 #include <stdexcept>
 
-FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData): CypressSession(parent, inputData)
+FraxSession::FraxSession(QObject* parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession(parent, inputData, origin)
 {
 }
 
@@ -17,8 +18,7 @@ void FraxSession::validate() const
 {
     CypressSession::validate();
 
-    if (m_debug)
-        qDebug() << m_inputData;
+    qDebug() << m_inputData;
 
     if (!isValidInteger("age"))
         throw ValidationError("age");
@@ -91,13 +91,10 @@ void FraxSession::calculateInputs()
     m_inputData.insert("type",                  "t");
     m_inputData.insert("country_code",           "19");
 
-    if (m_debug)
-    {
-        qDebug() << "glucocorticoid: " << glucocorticoid;
-        qDebug() << "father_hip_fracture: " << father_hip_fracture;
-        qDebug() << "mother_hip_fracture: " << mother_hip_fracture;
-        qDebug() << "previous_fracture: " << previous_fracture;
-    }
+    qDebug() << "glucocorticoid: " << glucocorticoid;
+    qDebug() << "father_hip_fracture: " << father_hip_fracture;
+    qDebug() << "mother_hip_fracture: " << mother_hip_fracture;
+    qDebug() << "previous_fracture: " << previous_fracture;
 }
 
 void FraxSession::isInstalled() const

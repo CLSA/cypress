@@ -80,7 +80,7 @@ public:
         Success,
         Cancelled,
     };
-    CypressSession(QObject* parent, const QJsonObject& inputData);
+    CypressSession(QObject* parent, const QJsonObject& inputData, const QString& origin);
 
     // Delete copy constructor and copy assignment operator.
     CypressSession(const CypressSession&) = delete;
@@ -105,16 +105,17 @@ public:
 
     virtual QString getWebpageContents() const
     {
-        return "<!DOCTYPE html>"
-               "<html lang=\"en\">"
-               "<head>"
-               "<meta charset=\"UTF-8\">"
-               "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-               "<title>Pine</title>"
-               "</head>"
-               "<body>"
-               "</body>"
-               "</html>";
+        return
+            "<!DOCTYPE html>"
+            "<html lang=\"en\">"
+            "<head>"
+            "<meta charset=\"UTF-8\">"
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+            "<title>Pine</title>"
+            "</head>"
+            "<body>"
+            "</body>"
+            "</html>";
     };
 
     SessionStatus getStatus() const;
@@ -134,7 +135,7 @@ public:
 protected:
     SessionStatus m_status { SessionStatus::Unknown };
 
-    QString pineOrigin;
+    QString m_origin;
 
     // the device UI
     //

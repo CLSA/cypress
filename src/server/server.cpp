@@ -65,63 +65,65 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
 {
     QSharedPointer<CypressSession> session;
 
+    const QString& origin = inputData.value("origin").toString();
+
     switch (type)
     {
         case Constants::MeasureType::Audiometer:
-            session = QSharedPointer<AudiometerSession>(new AudiometerSession(nullptr, inputData));
+            session = QSharedPointer<AudiometerSession>(new AudiometerSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Blood_Pressure:
-            session = QSharedPointer<BPMSession>(new BPMSession(nullptr, inputData));
+            session = QSharedPointer<BPMSession>(new BPMSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Body_Composition:
             break;
         case Constants::MeasureType::CDTT:
-            session = QSharedPointer<CDTTSession>(new CDTTSession(nullptr, inputData));
+            session = QSharedPointer<CDTTSession>(new CDTTSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::CarotidIntima:
-            session = QSharedPointer<UltrasoundSession>(new UltrasoundSession(nullptr, inputData));
+            session = QSharedPointer<UltrasoundSession>(new UltrasoundSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Choice_Reaction:
-            session = QSharedPointer<ChoiceReactionSession>(new ChoiceReactionSession(nullptr, inputData));
+            session = QSharedPointer<ChoiceReactionSession>(new ChoiceReactionSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::DxaDualHip:
-            session = QSharedPointer<DxaHipSession>(new DxaHipSession(nullptr, inputData));
+            session = QSharedPointer<DxaHipSession>(new DxaHipSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::DxaWholeBody:
-            session = QSharedPointer<DXASession>(new DXASession(nullptr, inputData));
+            session = QSharedPointer<DXASession>(new DXASession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::ECG:
-            session = QSharedPointer<ECGSession>(new ECGSession(nullptr, inputData));
+            session = QSharedPointer<ECGSession>(new ECGSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Frax:
-            session = QSharedPointer<FraxSession>(new FraxSession(nullptr, inputData));
+            session = QSharedPointer<FraxSession>(new FraxSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Grip_Strength:
-            session = QSharedPointer<GripStrengthSession>(new GripStrengthSession(nullptr, inputData));
+            session = QSharedPointer<GripStrengthSession>(new GripStrengthSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Retinal_Camera_Left:
-            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, Side::Left));
+            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, origin, Side::Left));
             break;
         case Constants::MeasureType::Retinal_Camera_Right:
-            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, Side::Right));
+            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, origin, Side::Right));
             break;
         case Constants::MeasureType::Spirometer:
-            session = QSharedPointer<SpirometerSession>(new SpirometerSession(nullptr, inputData));
+            session = QSharedPointer<SpirometerSession>(new SpirometerSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Tonometer:
-            session = QSharedPointer<TonometerSession>(new TonometerSession(nullptr, inputData));
+            session = QSharedPointer<TonometerSession>(new TonometerSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Thermometer:
             session = nullptr;
             break;
         case Constants::MeasureType::Weigh_Scale:
-            session = QSharedPointer<WeighScaleSession>(new WeighScaleSession(nullptr, inputData));
+            session = QSharedPointer<WeighScaleSession>(new WeighScaleSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Gen_Proxy_Consent:
-            session = QSharedPointer<GenProxySession>(new GenProxySession(nullptr, inputData));
+            session = QSharedPointer<GenProxySession>(new GenProxySession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Participant_Report:
-            session = QSharedPointer<ParticipantReportSession>(new ParticipantReportSession(nullptr, inputData));
+            session = QSharedPointer<ParticipantReportSession>(new ParticipantReportSession(nullptr, inputData, origin));
             break;
         default:
             throw QException();

@@ -2,8 +2,8 @@
 #include "managers/dxa/dxa_manager.h"
 #include "dialogs/dxa_dialog.h"
 
-DXASession::DXASession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+DXASession::DXASession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

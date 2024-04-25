@@ -29,31 +29,27 @@ SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
     // EMR Output File OnyxOut.xml
     m_outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
 
-    if (m_debug) {
-        qDebug() << "SpirometerManager";
+    qInfo() << "SpirometerManager";
+    qInfo() << session->getSessionId();
+    qInfo() << session->getBarcode();
+    qInfo() << session->getInterviewer();
+    qInfo() << session->getInputData();
 
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-        qDebug() << session->getInputData();
-
-        qDebug() << m_runnableName;
-        qDebug() << m_runnablePath;
-        qDebug() << m_dataPath;
-        qDebug() << m_inFileName;
-        qDebug() << m_outFileName;
-    }
+    qInfo() << m_runnableName;
+    qInfo() << m_runnablePath;
+    qInfo() << m_dataPath;
+    qInfo() << m_inFileName;
+    qInfo() << m_outFileName;
 
     m_test.reset(new SpirometerTest);
-    m_test->setExpectedMeasurementCount(4);
+    //m_test->setExpectedMeasurementCount(4);
 }
 
 bool SpirometerManager::isInstalled()
 {
-    const bool isDebugMode = CypressSettings::isDebugMode();
-    const bool isSimMode = CypressSettings::isSimMode();
+    qInfo() << "SpirometerManager::isInstalled";
 
-    if (isSimMode)
+    if (CypressSettings::isSimMode())
         return false;
 
     // path to EasyWarePro.exe
@@ -72,68 +68,47 @@ bool SpirometerManager::isInstalled()
     const QString outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::runnablePath - runnableName is not defined";
-
+        qInfo() << "runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::runnablePath - runnablePath is not defined";
-
+        qInfo() << "runnablePath is not defined";
         return false;
     }
 
     if (dataPath.isEmpty() || dataPath.isNull()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - dataPath is not defined";
-
+        qInfo() << "dataPath is not defined";
         return false;
     }
 
     if (inFileName.isEmpty() || inFileName.isNull()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - inFileName is not defined";
-
+        qInfo() << "inFileName is not defined";
         return false;
     }
 
     if (outFileName.isEmpty() || outFileName.isNull()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - outFileName is not defined";
-
+        qInfo() << "outFileName is not defined";
         return false;
     }
 
     const QFileInfo runnableInfo(runnableName);
     if (!runnableInfo.exists()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - EasyWarePro.exe does not exist at"
-                     << runnableName;
-
+        qInfo() << "EasyWarePro.exe does not exist at" << runnableName;
         return false;
     }
-
     if (!runnableInfo.isExecutable()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - EasyWarePro.exe is not executable at"
-                     << runnableName;
+        qInfo() << "EasyWarePro.exe is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo runnableDir(runnablePath);
     if (!runnableDir.isDir()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - Runnable dir is not executable at"
-                     << runnablePath;
+        qInfo() << "runnable dir is not executable at" << runnablePath;
         return false;
     }
-
     if (!runnableDir.isReadable()) {
-        if (isDebugMode)
-            qDebug() << "SpirometerManager::isInstalled - directory does not exist at"
-                     << runnableDir;
+        qInfo() << "directory does not exist at" << runnableDir;
         return false;
     }
 
@@ -142,8 +117,7 @@ bool SpirometerManager::isInstalled()
 
 bool SpirometerManager::start()
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::start";
+    qDebug() << "SpirometerManager::start";
 
     if (m_sim) {
         emit started(m_test);
@@ -165,8 +139,7 @@ bool SpirometerManager::start()
 
 void SpirometerManager::measure()
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::measure";
+    qDebug() << "SpirometerManager::measure";
 
     if (m_sim) {
         m_test->simulate(QVariantMap({
@@ -200,8 +173,7 @@ void SpirometerManager::measure()
 
 void SpirometerManager::readOutput()
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::readOutput";
+    qDebug() << "SpirometerManager::readOutput";
 
     if (QProcess::NormalExit != m_process.exitStatus()) {
         emit error("Process failed to finish correctly, cannot read output");
@@ -253,8 +225,7 @@ void SpirometerManager::finish()
         const QString pdfOutputFilePath = getOutputPdfPath();
         const QFileInfo pdfOutputInfo(pdfOutputFilePath);
 
-        if (m_debug)
-            qDebug() << "sending pdf output file: " << pdfOutputInfo.absoluteFilePath();
+        qDebug() << "sending pdf output file: " << pdfOutputInfo.absoluteFilePath();
 
         const QString fileSize = FileUtils::getHumanReadableFileSize(pdfOutputFilePath);
 
@@ -298,8 +269,7 @@ void SpirometerManager::finish()
 
 bool SpirometerManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::clearData";
+    qDebug() << "SpirometerManager::clearData";
 
     m_test->reset();
 
@@ -310,16 +280,13 @@ bool SpirometerManager::clearData()
 
 void SpirometerManager::backupDatabases() const
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::backupDatabases";
+    qDebug() << "SpirometerManager::backupDatabases";
 
     QString fromFile = getEWPDbName();
     QString toFile = getEWPDbCopyName();
 
     if (QFile::exists(fromFile)) {
-        if (m_debug)
-            qDebug() << "copied" << fromFile << "->" << toFile;
-
+        qDebug() << "copied" << fromFile << "->" << toFile;
         QFile::copy(fromFile, toFile);
     }
 
@@ -327,17 +294,14 @@ void SpirometerManager::backupDatabases() const
     toFile = getEWPOptionsDbCopyName();
 
     if (QFile::exists(fromFile)) {
-        if (m_debug)
-            qDebug() << "copied" << fromFile << "->" << toFile;
-
+        qDebug() << "copied" << fromFile << "->" << toFile;
         QFile::copy(fromFile, toFile);
     }
 }
 
 void SpirometerManager::restoreDatabases() const
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::restoreDatabases";
+    qDebug() << "SpirometerManager::restoreDatabases";
 
     QString toFile = getEWPDbName();
     QString fromFile = getEWPDbCopyName();
@@ -362,12 +326,10 @@ void SpirometerManager::restoreDatabases() const
 
 void SpirometerManager::configureProcess()
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::configureProcess";
+    qDebug() << "SpirometerManager::configureProcess";
 
     connect(&m_process, &QProcess::started, this, [this]() {
-        if (m_debug)
-            qDebug() << "SpirometerManager::process started: " << m_process.arguments().join(" ");
+        qDebug() << "SpirometerManager::process started: " << m_process.arguments().join(" ");
     });
 
     connect(&m_process,
@@ -378,25 +340,21 @@ void SpirometerManager::configureProcess()
     connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
         QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "SpirometerManager::process error occured: " << s.join(" ").toLower();
+        qDebug() << "SpirometerManager::process error occured: " << s.join(" ").toLower();
     });
 
     connect(&m_process, &QProcess::stateChanged, this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "SpiromterManager::process state: " << s.join(" ").toLower();
+        qDebug() << "SpiromterManager::process state: " << s.join(" ").toLower();
     });
 
-    if (m_debug)
-        qDebug() << "OK: configuring command";
+    qDebug() << "OK: configuring command";
 
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
 
-    if (m_debug)
-        qDebug() << "SpirometerManager::configureProcess - creating plugin xml";
+    qDebug() << "SpirometerManager::configureProcess - creating plugin xml";
 
     // write the inputs to EMR xml
     //
@@ -413,8 +371,7 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::removeXmlFiles() const
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::removeXmlFiles";
+    qDebug() << "SpirometerManager::removeXmlFiles";
 
     // delete OnyxOut.xml if it exists
     //
@@ -431,8 +388,7 @@ void SpirometerManager::removeXmlFiles() const
 
 QString SpirometerManager::getOutputPdfPath() const
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::getOutputPdfPath";
+    qDebug() << "SpirometerManager::getOutputPdfPath";
 
     auto test = qSharedPointerCast<SpirometerTest>(m_test);
     if (test->hasMetaData("pdf_report_path"))
@@ -443,8 +399,7 @@ QString SpirometerManager::getOutputPdfPath() const
 
 bool SpirometerManager::outputPdfExists() const
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::outputPdfExists";
+    qDebug() << "SpirometerManager::outputPdfExists";
 
     const QString outPdfPath = getOutputPdfPath();
     if (outPdfPath.isEmpty() || outPdfPath.isNull())
@@ -456,8 +411,7 @@ bool SpirometerManager::outputPdfExists() const
 // Set up device
 bool SpirometerManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "SpirometerManager::setUp";
+    qDebug() << "SpirometerManager::setUp";
 
     removeXmlFiles();
     backupDatabases();
@@ -469,8 +423,7 @@ bool SpirometerManager::setUp()
 
 // Clean up the device for next time
 bool SpirometerManager::cleanUp() {
-    if (m_debug)
-        qDebug() << "SpirometerManager::cleanUp";
+    qDebug() << "SpirometerManager::cleanUp";
 
     removeXmlFiles();
     restoreDatabases();

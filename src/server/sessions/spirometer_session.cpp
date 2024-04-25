@@ -3,8 +3,8 @@
 
 #include "dialogs/spirometer_dialog.h"
 
-SpirometerSession::SpirometerSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+SpirometerSession::SpirometerSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

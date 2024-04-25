@@ -6,7 +6,7 @@
 class CDTTSession : public CypressSession
 {
 public:
-    explicit CDTTSession(QObject *parent, const QJsonObject& inputData);
+    explicit CDTTSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

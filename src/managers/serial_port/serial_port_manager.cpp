@@ -18,8 +18,7 @@ bool SerialPortManager::start()
 
 void SerialPortManager::handleSerialPortError(QSerialPort::SerialPortError error)
 {
-    if (m_debug)
-        qCritical() << "ERROR: serial port " << m_port.errorString();
+    qCritical() << "ERROR: serial port " << m_port.errorString();
 
     if(error == QSerialPort::NoError)
         return;
@@ -27,20 +26,17 @@ void SerialPortManager::handleSerialPortError(QSerialPort::SerialPortError error
 
 void SerialPortManager::handleDataTerminalReadyChanged(bool set)
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::handleDataTerminalReadyChanged - " << (set ? "high" : "low");
+    qDebug() << "SerialPortManager::handleDataTerminalReadyChanged - " << (set ? "high" : "low");
 }
 
 void SerialPortManager::handleRequestToSendChanged(bool set)
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::handleRequestToSendChanged - " << (set ? "high" : "low");
+    qDebug() << "SerialPortManager::handleRequestToSendChanged - " << (set ? "high" : "low");
 }
 
 bool SerialPortManager::isDefined(const QString &label) const
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::isDefined - " << label;
+    qDebug() << "SerialPortManager::isDefined - " << label;
 
     if(m_deviceList.contains(label))
     {
@@ -53,8 +49,7 @@ bool SerialPortManager::isDefined(const QString &label) const
 
 QJsonObject SerialPortManager::getDeviceData(const QSerialPortInfo& info)
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::getDeviceData";
+    qDebug() << "SerialPortManager::getDeviceData";
 
     QJsonObject deviceData {{}};
 
@@ -84,16 +79,14 @@ QJsonObject SerialPortManager::getDeviceData(const QSerialPortInfo& info)
 
 void SerialPortManager::setDeviceData(const QJsonObject& deviceData)
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::getDeviceData";
+    qDebug() << "SerialPortManager::getDeviceData";
 
     m_deviceData = deviceData;
 }
 
 bool SerialPortManager::scanDevices()
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::scanningDevices";
+    qDebug() << "SerialPortManager::scanningDevices";
 
     m_deviceList.clear();
     emit scanningDevices();
@@ -124,8 +117,7 @@ bool SerialPortManager::scanDevices()
 
     if(found)
     {
-        if (m_debug)
-            qInfo() << "Found port device: " << m_portName;
+        qInfo() << "Found port device: " << m_portName;
 
         selectDevice(info);
         emit deviceSelected(info);
@@ -142,8 +134,7 @@ bool SerialPortManager::scanDevices()
 
 void SerialPortManager::selectDevice(const QSerialPortInfo &port)
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::selectDevice: " << port.portName();
+    qDebug() << "SerialPortManager::selectDevice: " << port.portName();
 
     setProperty("deviceName", port.portName());
     setDevice(port);
@@ -161,13 +152,11 @@ void SerialPortManager::setDevice(const QSerialPortInfo &info)
 
 void SerialPortManager::connectDevice()
 {
-    if (m_debug)
-        qDebug() << "SerialPortManager::connectDevice";
+    qDebug() << "SerialPortManager::connectDevice";
 
     if(m_port.isOpen())
     {
-        if (m_debug)
-            qDebug() << "closing port";
+        qDebug() << "closing port";
 
         m_port.close();
 

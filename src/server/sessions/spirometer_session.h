@@ -6,7 +6,7 @@
 class SpirometerSession : public CypressSession
 {
 public:
-    explicit SpirometerSession(QObject *parent, const QJsonObject& inputData);
+    explicit SpirometerSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

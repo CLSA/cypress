@@ -6,7 +6,7 @@
 class TonometerSession : public CypressSession
 {
 public:
-    explicit TonometerSession(QObject *parent, const QJsonObject& inputData);
+    explicit TonometerSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

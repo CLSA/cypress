@@ -4,8 +4,8 @@
 #include "dialogs/choice_reaction_dialog.h"
 #include "managers/choice_reaction/choice_reaction_manager.h"
 
-ChoiceReactionSession::ChoiceReactionSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+ChoiceReactionSession::ChoiceReactionSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

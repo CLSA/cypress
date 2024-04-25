@@ -27,20 +27,18 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     QDir outputDir(m_outputPath);
     m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
 
-    if (m_debug) {
-        qDebug() << "CDTTManager";
+    qDebug() << "CDTTManager";
 
-        qDebug() << m_jre;
-        qDebug() << m_runnableName;
-        qDebug() << m_runnablePath;
-        qDebug() << m_outputPath;
+    qDebug() << m_jre;
+    qDebug() << m_runnableName;
+    qDebug() << m_runnablePath;
+    qDebug() << m_outputPath;
 
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
+    qDebug() << session->getSessionId();
+    qDebug() << session->getBarcode();
+    qDebug() << session->getInterviewer();
 
-        qDebug() << session->getInputData();
-    }
+    qDebug() << session->getInputData();
 
     m_test.reset(new CDTTTest);
     m_test->setMinimumMeasurementCount(1);
@@ -112,8 +110,7 @@ bool CDTTManager::isInstalled()
 
 bool CDTTManager::start()
 {
-    if (m_debug)
-        qDebug() << "CDTT::start";
+    qDebug() << "CDTT::start";
 
     if (!setUp())
         return false;
@@ -126,16 +123,13 @@ bool CDTTManager::start()
 // Set up device
 bool CDTTManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "CDTT::setUp";
+    qDebug() << "CDTT::setUp";
 
-    if (!clearData()) {
+    if (!clearData())
         return false;
-    }
 
-    if (!cleanUp()) {
+    if (!cleanUp())
         return false;
-    }
 
     configureProcess();
 
@@ -144,8 +138,7 @@ bool CDTTManager::setUp()
 
 void CDTTManager::measure()
 {
-    if (m_debug)
-        qDebug() << "CDTT::measure";
+    qDebug() << "CDTT::measure";
 
     clearData();
 
@@ -163,8 +156,7 @@ void CDTTManager::measure()
 
 bool CDTTManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "CDTTManager::clearData";
+    qDebug() << "CDTTManager::clearData";
 
     m_test->reset();
 
@@ -173,8 +165,7 @@ bool CDTTManager::clearData()
 
 void CDTTManager::configureProcess()
 {
-    if (m_debug)
-        qDebug() << "CDTTManager::configureProcess";
+    qDebug() << "CDTTManager::configureProcess";
 
     QString command = m_jre; // C:/Program Files (x86)/Java/jre1.8.0_51/bin/javaw.exe
     QStringList arguments;
@@ -186,12 +177,10 @@ void CDTTManager::configureProcess()
     m_process.setWorkingDirectory(m_runnablePath);
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    if (m_debug) {
-        qDebug() << "CDTTManager::configureProcess - config args: "
-                 << m_process.arguments().join(" ");
-        qDebug() << "CDTTManager::configureProces - working dir: "
-                 << m_runnablePath;
-    }
+    qDebug() << "CDTTManager::configureProcess - config args: "
+         << m_process.arguments().join(" ");
+    qDebug() << "CDTTManager::configureProces - working dir: "
+         << m_runnablePath;
 
     // connect signals and slots to QProcess one time only
     //
@@ -223,8 +212,7 @@ void CDTTManager::configureProcess()
 
 void CDTTManager::readOutput()
 {
-    if (m_debug)
-        qDebug() << "CDTTManager::readOutput";
+    qDebug() << "CDTTManager::readOutput";
 
     if(QProcess::NormalExit != m_process.exitStatus()) {
         emit error("CDTT failed to finish correctly, cannot read data.");
@@ -239,8 +227,7 @@ void CDTTManager::readOutput()
         emit error("Error: cannot find the output .xlsx file");
     }
 
-    if (m_debug)
-        qDebug() << "found output xlsx file " << fileName;
+    qDebug() << "found output xlsx file " << fileName;
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName(
@@ -266,8 +253,7 @@ void CDTTManager::readOutput()
 
 
 void CDTTManager::finish() {
-    if (m_debug)
-        qDebug() << "ManagerBase::finish";
+    qDebug() << "CDTTManager::finish";
 
     const int answer_id = m_session->getAnswerId();
     const QString host = CypressSettings::getPineHost();
@@ -275,16 +261,14 @@ void CDTTManager::finish() {
 
     QDir dir(m_outputPath);
     if (!dir.exists()) {
-        if (m_debug)
-            qDebug() << "directory does not exist: " << m_outputPath;
+        qDebug() << "directory does not exist: " << m_outputPath;
         emit error("Output directory does not exist. Could not save measurements.");
     }
 
     QString outputFilePath = dir.absoluteFilePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
     QFileInfo excelFile(outputFilePath);
     if (!excelFile.exists()) {
-        if (m_debug)
-            qDebug() << "file does not exist: " << excelFile.absoluteFilePath();
+        qDebug() << "file does not exist: " << excelFile.absoluteFilePath();
         emit error("Output excel file does not exist. Could not save measurements.");
         return;
     }
@@ -335,8 +319,7 @@ void CDTTManager::finish() {
 // Clean up the device for next time
 bool CDTTManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "CDTTManager::cleanUp";
+    qDebug() << "CDTTManager::cleanUp";
 
     m_test->reset();
 

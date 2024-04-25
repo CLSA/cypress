@@ -41,6 +41,7 @@ void DialogBase::closeEvent(QCloseEvent* event)
     }
 
     if (m_session->getStatus() == CypressSession::SessionStatus::Cancelled) {
+        m_manager->cleanUp();
         QDialog::closeEvent(event);
         return;
     }
@@ -63,8 +64,7 @@ void DialogBase::closeEvent(QCloseEvent* event)
 
 void DialogBase::cancel(const QString& cancelMsg)
 {
-    if (m_debug)
-        qDebug() << "DialogBase::cancel";
+    qDebug() << "DialogBase::cancel";
 
     if (!m_sim)
         m_manager->sendCancellation(m_session->getSessionId());

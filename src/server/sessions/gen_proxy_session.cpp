@@ -3,8 +3,8 @@
 
 #include "managers/general_proxy_form/general_proxy_manager.h"
 
-GenProxySession::GenProxySession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+GenProxySession::GenProxySession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 
 }
@@ -35,6 +35,5 @@ void GenProxySession::isAvailable() const {
 //    GeneralProxyManager manager(QSharedPointer<GenProxySession>(this));
 //    manager.start();
 //
-//    if (m_debug)
-//        qDebug() << "GenProxySession::start " << getSessionId() << m_startDateTime;
+//    qDebug() << "GenProxySession::start " << getSessionId() << m_startDateTime;
 //}

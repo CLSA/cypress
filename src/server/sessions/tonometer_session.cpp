@@ -2,8 +2,8 @@
 #include "managers/tonometer/tonometer_manager.h"
 #include "dialogs/tonometer_dialog.h"
 
-TonometerSession::TonometerSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+TonometerSession::TonometerSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

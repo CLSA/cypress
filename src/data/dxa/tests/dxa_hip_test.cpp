@@ -35,16 +35,14 @@ void DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &ses
 
         if (file.bodyPartExamined == "HIP") {
             if (file.laterality == "L") {
-                if (m_debug)
-                    qDebug() << "DxaHipTest::fromDicomFiles - found left hip";
+                qDebug() << "DxaHipTest::fromDicomFiles - found left hip";
                 QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::LEFT));
                 if (measure->isValidDicomFile(file))
                 measure->addDicomFile(file);
                 addMeasurement(measure);
                 leftHipMeasurement = measure;
             } else {
-                if (m_debug)
-                    qDebug() << "DxaHipTest::fromDicomFiles - found right hip";
+                qDebug() << "DxaHipTest::fromDicomFiles - found right hip";
                 QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::RIGHT));
                 if (measure->isValidDicomFile(file))
                 measure->addDicomFile(file);

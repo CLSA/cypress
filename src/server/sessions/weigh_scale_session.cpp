@@ -2,8 +2,8 @@
 #include "managers/weigh_scale/weigh_scale_manager.h"
 #include "dialogs/weigh_scale_dialog.h"
 
-WeighScaleSession::WeighScaleSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+WeighScaleSession::WeighScaleSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

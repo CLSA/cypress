@@ -26,20 +26,14 @@ DcmRecv::DcmRecv(
 {
     m_debug = CypressSettings::isDebugMode();
 
-    if (!clearOutputDirectory()) {
-        if (m_debug)
-            qDebug() << "DcmRecv::DcmRecv - could not clear output directory";
-    }
+    if (!clearOutputDirectory())
+        qDebug() << "DcmRecv::DcmRecv - could not clear output directory";
 
-    if (!configureProcess()) {
-        if (m_debug)
-            qDebug() << "DcmRecv::DcmRecv - could not configure process";
-    }
+    if (!configureProcess())
+        qDebug() << "DcmRecv::DcmRecv - could not configure process";
 
-    if (!initializeOutputWatcher()) {
-        if (m_debug)
-            qDebug() << "DcmRecv::DcmRecv - could not start directory watcher";
-    }
+    if (!initializeOutputWatcher())
+        qDebug() << "DcmRecv::DcmRecv - could not start directory watcher";
 }
 
 DcmRecv::~DcmRecv()
@@ -64,8 +58,7 @@ bool DcmRecv::clearOutputDirectory()
     // Reset the output directory
     QDir outputDirInfo(m_outputDir);
     if (!outputDirInfo.mkpath(m_outputDir)) {
-        if (m_debug)
-            qDebug() << "DCMRECV: could not create the output directory";
+        qDebug() << "DCMRECV: could not create the output directory";
         return false;
     }
 
@@ -75,8 +68,7 @@ bool DcmRecv::clearOutputDirectory()
 bool DcmRecv::configureProcess()
 {
     if (!FileUtils::clearDirectory(m_outputDir)) {
-        if (m_debug)
-            qDebug() << "DCMRECV: could not could not clear output directory";
+        qDebug() << "DCMRECV: could not could not clear output directory";
         return false;
     }
 
@@ -189,8 +181,7 @@ bool DcmRecv::start()
         emit notRunning();
     }
 
-    if (m_debug)
-        qDebug() << "started dicom server" << arguments;
+    qDebug() << "started dicom server" << arguments;
 
     emit running();
 
@@ -212,28 +203,24 @@ QString DcmRecv::receivedFilesDir() const
 void DcmRecv::onReadyReadStandardOutput()
 {
     QByteArray output = m_process.readAllStandardOutput();
-    if (m_debug)
-        qDebug() << "DCMRECV stdout:" << output;
+    qDebug() << "DCMRECV stdout:" << output;
 }
 
 void DcmRecv::onReadyReadStandardError()
 {
     QByteArray error = m_process.readAllStandardError();
-    if (m_debug)
-        qDebug() << "DCMRECV stderr:" << error;
+    qDebug() << "DCMRECV stderr:" << error;
 }
 
 void DcmRecv::onErrorOccurred(QProcess::ProcessError error)
 {
-    if (m_debug)
-        qWarning() << "DCMRECV process error:" << error;
+    qWarning() << "DCMRECV process error:" << error;
 }
 
 void DcmRecv::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    if (m_debug)
-        qDebug() << "DCMRECV process finished with exit code" << exitCode << "and exit status"
-                 << exitStatus;
+    qDebug() << "DCMRECV process finished with exit code" << exitCode << "and exit status"
+             << exitStatus;
 
     if (exitCode == 0)
         emit exitNormal();

@@ -77,8 +77,7 @@ bool AudiometerManager::isInstalled()
 
 bool AudiometerManager::start()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::start";
+    qDebug() << "AudiometerManager::start";
 
     if (!setUp())
         return false;
@@ -94,16 +93,14 @@ bool AudiometerManager::start()
 
 bool AudiometerManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::setUp";
+    qDebug() << "AudiometerManager::setUp";
 
     return true;
 }
 
 void AudiometerManager::connectDevice()
 {
-    if (m_debug)
-        qDebug() << "WeighScaleManager::connectDevice";
+    qDebug() << "WeighScaleManager::connectDevice";
 
     // Connect to the serial port and set up listeners
 
@@ -144,8 +141,7 @@ void AudiometerManager::selectDevice(const QSerialPortInfo &port)
 
 void AudiometerManager::measure()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::measure";
+    qDebug() << "AudiometerManager::measure";
 
     if (m_sim)
     {
@@ -165,8 +161,7 @@ void AudiometerManager::measure()
 
 bool AudiometerManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::cleanUp";
+    qDebug() << "AudiometerManager::cleanUp";
 
     clearData();
 
@@ -178,8 +173,7 @@ bool AudiometerManager::cleanUp()
 
 void AudiometerManager::readDevice()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::readDevice";
+    qDebug() << "AudiometerManager::readDevice";
 
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
@@ -201,8 +195,7 @@ void AudiometerManager::readDevice()
 
 void AudiometerManager::writeDevice()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::writeDevice";
+    qDebug() << "AudiometerManager::writeDevice";
 
     // send a request to the audiometer to start data collection
     //
@@ -215,8 +208,7 @@ void AudiometerManager::writeDevice()
 
 bool AudiometerManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "AudiometerManager::clearData";
+    qDebug() << "AudiometerManager::clearData";
 
     m_test->reset();
 

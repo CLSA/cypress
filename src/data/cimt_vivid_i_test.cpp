@@ -143,6 +143,7 @@ QJsonObject CimtVividiTest::toJsonObject() const
 
     valuesObject.insert("metadata", getMetaData().toJsonObject());
     valuesObject.insert("results", results);
+    valuesObject.insert("manual_entry", getManualEntryMode());
 
     return valuesObject;
 }

@@ -25,14 +25,12 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
     m_bpm200 = new QHidDevice(this);
     m_driver = new BpTru200Driver(m_mutex, m_bpm200, this);
 
-    if (m_debug) {
-        qDebug() << "BloodPressure";
+    qDebug() << "BloodPressure";
 
-        qDebug() << session->getSessionId();
-        qDebug() << session->getBarcode();
-        qDebug() << session->getInterviewer();
-        qDebug() << session->getInputData();
-    }
+    qDebug() << session->getSessionId();
+    qDebug() << session->getBarcode();
+    qDebug() << session->getInterviewer();
+    qDebug() << session->getInputData();
 
     connect(m_driver, &BpTru200Driver::messagesReceived, this, &BloodPressureManager::receiveMessages);
     //connect(m_driver, &BpTru200Driver::finished, this, &BpTru200Driver::deleteLater);
@@ -41,8 +39,7 @@ BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
 
 BloodPressureManager::~BloodPressureManager()
 {
-    if (m_debug)
-        qDebug() << "destroy blood pressure manager";
+    qDebug() << "destroy blood pressure manager";
 
     if (m_driver != nullptr && m_driver->isRunning()) {
         qDebug() << "requesting driver interrupt";
@@ -71,12 +68,10 @@ bool BloodPressureManager::isInstalled()
 
 void BloodPressureManager::receiveMessages(QQueue<BPMMessage> messages)
 {
-    if (m_sim) {
+    if (m_sim)
         return;
-    }
 
-    if (m_debug)
-        qDebug() << "BloodPressureManager::received " << messages.length() << " messages";
+    qDebug() << "BloodPressureManager::received " << messages.length() << " messages";
 
     while (!messages.empty())
     {
@@ -115,8 +110,7 @@ void BloodPressureManager::receiveMessages(QQueue<BPMMessage> messages)
 
 void BloodPressureManager::connectToDevice()
 {
-    if (m_debug)
-        qDebug() << "attempt to connect to device...";
+    qDebug() << "attempt to connect to device...";
 
     if (m_sim) {
         handshake();
@@ -133,11 +127,8 @@ void BloodPressureManager::connectToDevice()
     }
 
     if (m_bpm200->open(vid, pid)) {
-        if (m_debug)
-        {
-            qDebug() << "connected to bpm";
-            qDebug() << m_bpm200->manufacturer();
-        }
+        qDebug() << "connected to bpm";
+        qDebug() << m_bpm200->manufacturer();
 
         m_driver->start();
         handshake();
@@ -150,9 +141,7 @@ void BloodPressureManager::connectToDevice()
 
 bool BloodPressureManager::start()
 {
-    if (m_debug) {
-        qDebug() << "BloodPressureManager::start";
-    }
+    qDebug() << "BloodPressureManager::start";
 
     if (m_sim) {
         qDebug() << "canConect";
@@ -210,9 +199,7 @@ void BloodPressureManager::cycle()
     }
 
     BPMMessage cycle(0x11, 0x03, 0x00, 0x00, 0x00);
-    if (m_debug) {
-        qDebug() << "BloodPressureManager::cycle - sending cycle command";
-    }
+    qDebug() << "BloodPressureManager::cycle - sending cycle command";
 
     m_mutex.lock();
     m_driver->writeQueue.enqueue(cycle);
@@ -229,9 +216,7 @@ void BloodPressureManager::clear()
 
     // clear device
     BPMMessage clear(0x11, 0x05, 0x00, 0x00, 0x00);
-    if (m_debug) {
-        qDebug() << "BloodPressureManager::clear - sending clear command";
-    }
+    qDebug() << "BloodPressureManager::clear - sending clear command";
 
     m_mutex.lock();
     m_driver->writeQueue.enqueue(clear);
@@ -248,9 +233,7 @@ void BloodPressureManager::startMeasurement()
     }
 
     BPMMessage start(0x11, 0x04, 0x00, 0x00, 0x00);
-    if (m_debug) {
-        qDebug() << "BloodPressureManager::start - sending start command";
-    }
+    qDebug() << "BloodPressureManager::start - sending start command";
 
     m_mutex.lock();
     m_driver->writeQueue.enqueue(start);
@@ -259,6 +242,7 @@ void BloodPressureManager::startMeasurement()
 
 void BloodPressureManager::stopMeasurement()
 {
+    qDebug() << "BloodPressureManager::stopMeasurement - sending stop command";
     if (m_sim) {
         BPMMessage fakeStopMessage;
         onDeviceStopped(fakeStopMessage);
@@ -266,9 +250,6 @@ void BloodPressureManager::stopMeasurement()
     }
 
     BPMMessage stop(0x11, 0x01, 0x00, 0x00, 0x00);
-    if (m_debug) {
-        qDebug() << "BloodPressureManager::start - sending stop command";
-    }
 
     m_mutex.lock();
     m_driver->writeQueue.enqueue(stop);
@@ -278,12 +259,10 @@ void BloodPressureManager::stopMeasurement()
 
 void BloodPressureManager::onDeviceHandshaked(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "BPMManager::deviceHandshaked";
+    qDebug() << "BPMManager::deviceHandshaked";
 
     if (m_sim) {
         emit deviceHandshaked("SIM");
-
         return;
     }
 
@@ -300,8 +279,7 @@ void BloodPressureManager::onDeviceCleared(const BPMMessage &message)
 {
     Q_UNUSED(message);
 
-    if (m_debug)
-        qDebug() << "BPMManager::deviceCleared";
+    qDebug() << "BPMManager::deviceCleared";
 
     if (m_state == State::CONNECTING) {
         cycle();
@@ -319,14 +297,12 @@ void BloodPressureManager::onDeviceReset(const BPMMessage &message)
 {
     Q_UNUSED(message);
 
-    if (m_debug)
-        qDebug() << "BPMManager::deviceReset";
+    qDebug() << "BloodPressureManager::deviceReset";
 }
 
 void BloodPressureManager::onDeviceCycled(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "BPMManager::deviceCycled";
+    qDebug() << "BloodPressureManager::deviceCycled";
 
     static quint8 cycleTime = 0;
 
@@ -357,8 +333,7 @@ void BloodPressureManager::onDeviceStarted(const BPMMessage &message)
 {
     Q_UNUSED(message);
 
-    if (m_debug)
-        qDebug() << "BPMManager::deviceStarted";
+    qDebug() << "BPMManager::onDeviceStarted";
 
     if (m_state == State::READY) {
         m_state = State::MEASURING;
@@ -422,9 +397,7 @@ void BloodPressureManager::onDeviceStarted(const BPMMessage &message)
 void BloodPressureManager::onDeviceStopped(const BPMMessage &message)
 {
     Q_UNUSED(message)
-
-    if (m_debug)
-        qDebug() << "BPMManager::deviceStopped";
+    qDebug() << "BloodPressureManager::onDeviceStopped";
 
     if (m_state == State::MEASURING) {
         m_state = State::READY;
@@ -439,8 +412,7 @@ void BloodPressureManager::onDeviceStopped(const BPMMessage &message)
 
 void BloodPressureManager::onInflateCuffPressure(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::onInflateCuffPressure";
+    qDebug() << "BloodPressureManager::onInflateCuffPressure";
 
     const int ls = message.getData0() & 0x000000FF;
     const int ms = (message.getData1() << 8) & 0x0000FF00;
@@ -453,8 +425,7 @@ void BloodPressureManager::onInflateCuffPressure(const BPMMessage &message)
 
 void BloodPressureManager::onDeflateCuffPressure(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::onDeflateCuffPressure";
+    qDebug() << "BloodPressureManager::onDeflateCuffPressure";
 
     const int ls = message.getData0() & 0x000000FF;
     const int ms = (message.getData1() << 8) & 0x0000FF00;
@@ -465,8 +436,7 @@ void BloodPressureManager::onDeflateCuffPressure(const BPMMessage &message)
 
 void BloodPressureManager::onBpResult(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::onBpResult";
+    qDebug() << "BloodPressureManager::onBpResult";
 
     const int sbp = message.getData1();
     const int dbp = message.getData2();
@@ -488,8 +458,7 @@ void BloodPressureManager::onBpResult(const BPMMessage &message)
 
 void BloodPressureManager::onBpAverage(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "bp average: " << message.getData0();
+    qDebug() << "BloodPressureManager::onBpAverage: avg = " << message.getData0();
 
     const int sbp = message.getData1();
     const int dbp = message.getData2();
@@ -500,15 +469,13 @@ void BloodPressureManager::onBpAverage(const BPMMessage &message)
 
     emit dataChanged(m_test);
 
-    if (test->isValid()) {
+    if (test->isValid())
         emit canFinish();
-    }
 }
 
 void BloodPressureManager::onBpReview(const BPMMessage &message)
 {
-    if (m_debug)
-        qDebug() << "bp review";
+    qDebug() << "BloodPressureManager::onBpReview";
 
     if (message.getData0() == 0) {
         qDebug() << "computing average";
@@ -529,8 +496,7 @@ void BloodPressureManager::onBpReview(const BPMMessage &message)
 
 void BloodPressureManager::setCuffSize(const QString &size)
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::setCuffSize" << size;
+    qDebug() << "BloodPressureManager::setCuffSize size =" << size;
 
     if(size.isNull() || size.isEmpty())
         return;
@@ -541,8 +507,7 @@ void BloodPressureManager::setCuffSize(const QString &size)
 
 void BloodPressureManager::setSide(const QString &side)
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::setSide" << side;
+    qDebug() << "BloodPressureManager::setSide side = " << side;
 
     if (side.isNull() || side.isEmpty())
         return;
@@ -597,25 +562,20 @@ void BloodPressureManager::addManualEntry(const int systolic, const int diastoli
 // Set up device
 bool BloodPressureManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::setUp";
-
+    qDebug() << "BloodPressureManager::setUp";
     return true;
 }
 
 // Clean up the device for next time
 bool BloodPressureManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::cleanUp";
-
+    qDebug() << "BloodPressureManager::cleanUp";
     return true;
 }
 
 void BloodPressureManager::handleAck(const BPMMessage& message)
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::handleAck" << message.getMessageId();
+    qDebug() << "BloodPressureManager::handleAck messageId = " << message.getMessageId();
 
     // get ack type
     quint8 ackType = message.getData0();
@@ -645,15 +605,13 @@ void BloodPressureManager::handleAck(const BPMMessage& message)
 void BloodPressureManager::handleNack(const BPMMessage& message)
 {
     // get nack type
-    if (m_debug)
-        qDebug() << "BloodPressureManager::handleNack: " << message.getMessageId();
+    qDebug() << "BloodPressureManager::handleNack: " << message.getMessageId();
 }
 
 void BloodPressureManager::handleButton(const BPMMessage& message)
 {
     // get button type
-    if (m_debug)
-        qDebug() << "BloodPressureManager::handleButton: " << message.getMessageId();
+    qDebug() << "BloodPressureManager::handleButton: " << message.getMessageId();
 
     quint8 buttonType = message.getData0();
     switch(buttonType)
@@ -678,8 +636,7 @@ void BloodPressureManager::handleButton(const BPMMessage& message)
 void BloodPressureManager::handleData(const BPMMessage& message)
 {
     // get data type
-    if (m_debug)
-        qDebug() << "BloodPressureManager::handleData: " << message.getMessageId();
+    qDebug() << "BloodPressureManager::handleData: " << message.getMessageId();
 
     quint8 messageId = message.getMessageId();
 
@@ -706,22 +663,19 @@ void BloodPressureManager::handleData(const BPMMessage& message)
 void BloodPressureManager::handleNotification(const BPMMessage& message)
 {
     // get notification type
-    if (m_debug)
-        qDebug() << "BloodPressureManager::handleNotification: " << message.getMessageId();
+    qDebug() << "BloodPressureManager::handleNotification: " << message.getMessageId();
 }
 
 void BloodPressureManager::handleNoMessage(const BPMMessage& message)
 {
     // get no message type
-    if (m_debug)
-        qDebug() << "BloodPressureManager::handleNoMessage: " << message.getMessageId();
+    qDebug() << "BloodPressureManager::handleNoMessage: " << message.getMessageId();
 }
 
 // Clean up the device for next time
 bool BloodPressureManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "BloodPressureManager::clearData";
+    qDebug() << "BloodPressureManager::clearData";
 
     m_test->reset();
     emit dataChanged(m_test);

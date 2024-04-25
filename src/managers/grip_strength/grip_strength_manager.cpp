@@ -116,24 +116,13 @@ bool GripStrengthManager::isInstalled()
 
 bool GripStrengthManager::start()
 {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::start";
+    qDebug() << "GripStrengthManager::start";
 
     if (m_sim)
-    {
-        emit started(m_test);
-        emit dataChanged(m_test);
-        emit canMeasure();
-
         return true;
-    }
 
-    if (!setUp()) {
+    if (!setUp())
         return false;
-    }
-
-    emit started(m_test);
-    emit dataChanged(m_test);
 
     measure();
 
@@ -228,8 +217,7 @@ void GripStrengthManager::readOutput()
         m_test->addMeasurement(measurement);
     }
 
-    if (m_debug)
-        qDebug() << "GripStrengthManager::readOutput: " << m_test->toJsonObject();
+    qDebug() << "GripStrengthManager::readOutput: " << m_test->toJsonObject();
 
     QThread::sleep(5);
     cleanUp();
@@ -238,16 +226,11 @@ void GripStrengthManager::readOutput()
 
 void GripStrengthManager::measure()
 {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::measure";
+    qDebug() << "GripStrengthManager::measure";
 
     if (m_sim) {
         clearData();
         m_test->simulate();
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
         return;
     }
 
@@ -264,24 +247,11 @@ void GripStrengthManager::measure()
     }
 }
 
-void GripStrengthManager::addManualMeasurement()
-{
-    if (m_debug)
-        qDebug() << "GripStrengthManager::addManualMeasurement";
-
-    QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
-    m_test->addMeasurement(measurement);
-
-    emit dataChanged(m_test);
-}
-
 bool GripStrengthManager::setUp() {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::setUp";
+    qDebug() << "GripStrengthManager::setUp";
 
-    if (!backupData()) {
+    if (!backupData())
         return false;
-    }
 
     configureProcess();
 
@@ -289,8 +259,7 @@ bool GripStrengthManager::setUp() {
 }
 
 bool GripStrengthManager::backupData() {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::backupData";
+    qDebug() << "GripStrengthManager::backupData";
 
     if (!FileUtils::copyDirectory(QDir(m_databasePath), QDir(m_backupPath), true, false)) {
         qDebug() << "failed to backup data";
@@ -301,8 +270,7 @@ bool GripStrengthManager::backupData() {
 }
 
 bool GripStrengthManager::restoreData() {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::restoreData";
+    qDebug() << "GripStrengthManager::restoreData";
 
     if (!FileUtils::copyDirectory(QDir(m_backupPath), QDir(m_databasePath), true, false)) {
         qDebug() << "failed to restore data";
@@ -318,8 +286,7 @@ bool GripStrengthManager::cleanUp() {
     if (QProcess::NotRunning != m_process.state())
         m_process.close();
 
-    if (m_debug)
-        qDebug() << "GripStrengthManager::cleanUp";
+    qDebug() << "GripStrengthManager::cleanUp";
 
     if (!restoreData())
         return false;
@@ -329,8 +296,7 @@ bool GripStrengthManager::cleanUp() {
 
 void GripStrengthManager::configureProcess()
 {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::configureProcess" << m_runnableName << m_runnablePath;
+    qDebug() << "GripStrengthManager::configureProcess" << m_runnableName << m_runnablePath;
 
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
@@ -340,10 +306,7 @@ void GripStrengthManager::configureProcess()
     //
     connect(&m_process, &QProcess::started,
         this, [this]() {
-
-            if (m_debug)
-                qDebug() << "GripStrengthManager::process started: " << m_process.arguments().join(" ");
-
+            qDebug() << "GripStrengthManager::process started: " << m_process.arguments().join(" ");
         });
 
     // error occured with grip strength process
@@ -351,15 +314,13 @@ void GripStrengthManager::configureProcess()
         this, [=](QProcess::ProcessError error)
         {
             QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            if (m_debug)
-                qDebug() << "GripStrengthManager::process error: process error occured: " << s.join(" ").toLower();
+            qDebug() << "GripStrengthManager::process error: process error occured: " << s.join(" ").toLower();
         });
 
     connect(&m_process, &QProcess::stateChanged,
     this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "GripStrengthManager::process state: " << s.join(" ").toLower();
+        qDebug() << "GripStrengthManager::process state: " << s.join(" ").toLower();
 
     });
 
@@ -370,8 +331,7 @@ void GripStrengthManager::configureProcess()
 
 bool GripStrengthManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "GripStrengthManager::clearData";
+    qDebug() << "GripStrengthManager::clearData";
 
     m_test->reset();
 

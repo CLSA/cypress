@@ -14,7 +14,7 @@ QString CimtVividIMeasurement::toString() const
     return QString("Side: %1, Name: %2, Size: %4").arg(
         getAttribute("side").toString(),
         getAttribute("name").toString(),
-        getAttribute("size").toString());
+        getAttribute("patient_id").toString());
 }
 
 QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
@@ -25,7 +25,7 @@ QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
 
 bool CimtVividIMeasurement::isValid() const
 {
-    if (hasAttribute("side") && hasAttribute("name") && hasAttribute("size"))
+    if (hasAttribute("side") && hasAttribute("name") && hasAttribute("patient_id"))
         return true;
 
     return false;

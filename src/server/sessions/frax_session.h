@@ -6,9 +6,7 @@
 class FraxSession : public CypressSession
 {
 public:
-    FraxSession(QObject* parent, const QJsonObject& inputData);
-
-
+    FraxSession(QObject* parent, const QJsonObject& inputData, const QString& origin);
 
 // CypressSession interface
 protected:

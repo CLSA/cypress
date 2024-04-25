@@ -6,7 +6,7 @@
 class ParticipantReportSession : public CypressSession
 {
 public:
-    explicit ParticipantReportSession(QObject *parent, const QJsonObject& inputData);
+    explicit ParticipantReportSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

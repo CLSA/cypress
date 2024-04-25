@@ -2,8 +2,8 @@
 #include "managers/ecg/ecg_manager.h"
 #include "dialogs/ecg_dialog.h"
 
-ECGSession::ECGSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+ECGSession::ECGSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 }
 

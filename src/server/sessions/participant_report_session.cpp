@@ -1,8 +1,8 @@
 #include "participant_report_session.h"
 #include "managers/participant_report/participant_report_manager.h"
 
-ParticipantReportSession::ParticipantReportSession(QObject *parent, const QJsonObject& inputData)
-    : CypressSession{parent, inputData}
+ParticipantReportSession::ParticipantReportSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin}
 {
 
 }
@@ -187,6 +187,5 @@ void ParticipantReportSession::start()
     ParticipantReportManager manager(QSharedPointer<ParticipantReportSession>(this));
     manager.start();
 
-    if (m_debug)
-        qDebug() << "ParticipantReportSession::start " << getSessionId() << m_startDateTime;
+    qDebug() << "ParticipantReportSession::start " << getSessionId() << m_startDateTime;
 }

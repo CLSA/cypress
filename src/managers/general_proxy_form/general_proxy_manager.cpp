@@ -63,8 +63,6 @@ void GeneralProxyManager::measure()
         m_outputFilePath
     );
 
-
-
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
             &GeneralProxyManager::readOutput);
@@ -73,15 +71,13 @@ void GeneralProxyManager::measure()
     connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
         QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
+        qDebug() << "ERROR: process error occured: " << s.join(" ").toLower();
     });
 
     connect(&m_process, &QProcess::stateChanged, this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
                                                                     Qt::SkipEmptyParts);
-        if (m_debug)
-            qDebug() << "process state: " << s.join(" ").toLower();
+        qDebug() << "process state: " << s.join(" ").toLower();
     });
 
     QStringList arguments { QDir::toNativeSeparators(outputPath) };
@@ -150,7 +146,7 @@ void GeneralProxyManager::finish() {
 
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (host + endpoint + QString::number(answer_id) + "?filename=" + "general_proxy_consent_" + m_session->getSessionId() + ".pdf").toStdString(),
+        (host + endpoint + QString::number(answer_id) + "?filename=general_proxy.pdf").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(m_outputFilePath)
     );

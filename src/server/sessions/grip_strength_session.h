@@ -6,7 +6,7 @@
 class GripStrengthSession : public CypressSession
 {
 public:
-    explicit GripStrengthSession(QObject *parent, const QJsonObject& inputData);
+    explicit GripStrengthSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

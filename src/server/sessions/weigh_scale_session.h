@@ -8,7 +8,7 @@
 class WeighScaleSession : public CypressSession
 {
 public:
-    explicit WeighScaleSession(QObject *parent, const QJsonObject& inputData);
+    explicit WeighScaleSession(QObject *parent, const QJsonObject& inputData, const QString& origin);
 
     // CypressSession interface
 public:

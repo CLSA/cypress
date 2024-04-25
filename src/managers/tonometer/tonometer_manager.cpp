@@ -41,8 +41,7 @@ TonometerManager::~TonometerManager()
 
 bool TonometerManager::start()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::start";
+    qDebug() << "TonometerManager::start";
 
     if (!backupData()) {
         qDebug() << "could not backup data";
@@ -148,8 +147,7 @@ bool TonometerManager::isInstalled()
 
 void TonometerManager::measure()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::measure";
+    qDebug() << "TonometerManager::measure";
 
     if (m_process.state() != QProcess::NotRunning) {
         emit error("ORA is already running");
@@ -166,8 +164,7 @@ void TonometerManager::measure()
 
 void TonometerManager::readOutput()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::readOutput";
+    qDebug() << "TonometerManager::readOutput";
 
     const QVariantMap leftResults = extractMeasures("L");
     const QVariantMap rightResults = extractMeasures("R");
@@ -182,8 +179,7 @@ void TonometerManager::readOutput()
 
 void TonometerManager::configureProcess()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::configureProcess";
+    qDebug() << "TonometerManager::configureProcess";
 
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
@@ -216,8 +212,7 @@ void TonometerManager::configureProcess()
 
 bool TonometerManager::clearData()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::clearData";
+    qDebug() << "TonometerManager::clearData";
 
     m_test->reset();
     restoreDatabase();
@@ -237,15 +232,13 @@ bool TonometerManager::backupData() {
     const QString backupDatabasePath = backupPath.absoluteFilePath(databasePath.fileName());
     if (QFileInfo::exists(backupDatabasePath)) {
         if (!QFile::remove(backupDatabasePath)) {
-            if (m_debug)
-                qDebug() << "tonometer backup exists but cannot be removed..";
+            qDebug() << "tonometer backup exists but cannot be removed..";
             return false;
         }
     }
 
     if (!QFile::copy(databasePath.absoluteFilePath(), backupDatabasePath)) {
-        if (m_debug)
-            qDebug() << "could not copy database file at " << databasePath.absoluteFilePath() << "to" << backupDatabasePath;
+        qDebug() << "could not copy database file at " << databasePath.absoluteFilePath() << "to" << backupDatabasePath;
         return false;
     }
 
@@ -274,14 +267,12 @@ bool TonometerManager::restoreData() {
 
 bool TonometerManager::setUp()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::setUp";
+    qDebug() << "TonometerManager::setUp";
 
     configureProcess();
 
-    if (!m_db.open()) {
+    if (!m_db.open())
         return false;
-    }
 
     bool ok = insertPatient(
         m_session->getBarcode() + "," + "CLSA",
@@ -302,15 +293,13 @@ bool TonometerManager::setUp()
 
 bool TonometerManager::cleanUp()
 {
-    if (m_debug)
-        qDebug() << "TonometerManager::cleanUp";
+    qDebug() << "TonometerManager::cleanUp";
 
     if (QProcess::NotRunning != m_process.state())
         m_process.close();
 
-    if (!restoreDatabase()) {
+    if (!restoreDatabase())
         return false;
-    }
 
     if (!restoreData()) {
         qDebug() << "could not restore database";

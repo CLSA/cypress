@@ -21,11 +21,7 @@
  * \sa SerialPortManager, BloodPressureManager, CDTTManager, AudiometerManager
  *
  */
-
-QT_FORWARD_DECLARE_CLASS(QSettings)
-QT_FORWARD_DECLARE_CLASS(QStandardItemModel)
-
-class CypressSession;
+QT_FORWARD_DECLARE_CLASS(CypressSession)
 
 class ManagerBase : public QObject
 {
@@ -46,28 +42,30 @@ public slots:
     //
     virtual bool start() = 0;
 
-    // actual measure will only execute if the barcode has been
-    // verified.  Subclasses must reimplement accordingly.
-    //
+    // Subclasses must reimplement accordingly.
+    // Usually called from the GUI when the device has finished
     virtual void measure() = 0;
 
     // subclasses call methods just prior to main close event
     //
     virtual void finish();
 
-    // Request from the view to add a manual measurement
+    // Usually used after a device process has exited successfully to read and parse any output data
+    // into test + measurement classes
+    virtual void readOutput();
+
+    // Request from the GUI to add a manual measurement
     virtual void addManualMeasurement();
-
-protected:
-
-    // Set up device
-    virtual bool setUp() = 0;
 
     // Reset the session
     virtual bool clearData() = 0;
 
     // Clean up the device for next time
     virtual bool cleanUp() = 0;
+
+protected:
+    // Set up device
+    virtual bool setUp() = 0;
 
     QSharedPointer<CypressSession> m_session;
     QSharedPointer<TestBase> m_test;
@@ -79,9 +77,6 @@ protected:
     bool m_sim { true };
 
     bool manualEntryMode { false };
-
-    QVariant getInputDataValue(const QString &);
-
 
 signals:
 
@@ -108,13 +103,6 @@ signals:
 
     // Something went wrong, critical error, couldn't save data
     void error(const QString& errorMsg);
-
-private:
-    // backupData
-    // restoreData
-    // restoreDirectoriesAndFiles
-    // restor
-
 };
 
 #endif // MANAGER_BASE_H

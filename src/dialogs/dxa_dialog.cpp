@@ -60,8 +60,8 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), [=]() {
         ui->measurementTable->disableMeasureButton();
+        QApplication::processEvents();
         manager->measure();
-        ui->measurementTable->enableMeasureButton();
     });
 
     // request finish

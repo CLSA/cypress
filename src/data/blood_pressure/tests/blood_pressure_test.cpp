@@ -108,9 +108,9 @@ void BloodPressureTest::updateAverage() {
     int diastolicTotal = 0;
     int pulseTotal = 0;
 
-    auto measurements = getMeasurements();
-    if (getMeasurementCount() <= 1)
+    if (getMeasurementCount() <= 0) {
         return;
+    }
 
     auto first = *m_measurementList.constFirst();
     addMetaData("first_systolic", first.getAttribute("systolic"));
@@ -119,8 +119,8 @@ void BloodPressureTest::updateAverage() {
     addMetaData("first_start_time", first.getAttribute("start_time"));
     addMetaData("first_end_time", first.getAttribute("end_time"));
 
-    int n = getMeasurementCount();
-    for (int i = 1; i < n; i++) {
+    const int n = getMeasurementCount();
+    for (int i = 1; i < n; i++) { // skip first measurement for avg, total_avg includes the first measure
         auto measure = get(i);
         const int systolic = measure.getAttribute("systolic").value().toInt();
         const int diastolic = measure.getAttribute("diastolic").value().toInt();
@@ -131,14 +131,22 @@ void BloodPressureTest::updateAverage() {
         pulseTotal += pulse;
     }
 
-    const double avgSbpCalc = qRound(systolicTotal * 1.0f / (n - 1));
-    const double avgDbpCalc = qRound(diastolicTotal * 1.0f / (n - 1));
-    const double avgPulseCalc = qRound(pulseTotal * 1.0f / (n - 1));
+    if (n > 1) {
+        const double avgSbpCalc = qRound(systolicTotal * 1.0f / (n - 1));
+        const double avgDbpCalc = qRound(diastolicTotal * 1.0f / (n - 1));
+        const double avgPulseCalc = qRound(pulseTotal * 1.0f / (n - 1));
 
-    addMetaData("avg_count", QVariant(n - 1));
-    addMetaData("avg_systolic", avgSbpCalc, "mmHg");
-    addMetaData("avg_diastolic", avgDbpCalc, "mmHg");
-    addMetaData("avg_pulse", avgPulseCalc, "bpm");
+        addMetaData("avg_count", n - 1);
+        addMetaData("avg_systolic", avgSbpCalc, "mmHg");
+        addMetaData("avg_diastolic", avgDbpCalc, "mmHg");
+        addMetaData("avg_pulse", avgPulseCalc, "bpm");
+    }
+    else {
+        addMetaData("avg_count", 1);
+        addMetaData("avg_systolic", first.getAttribute("systolic"));
+        addMetaData("avg_diastolic", first.getAttribute("diastolic"));
+        addMetaData("avg_pulse", first.getAttribute("pulse"));
+    }
 
     systolicTotal += getMetaData("first_systolic").toInt();
     diastolicTotal += getMetaData("first_diastolic").toInt();
@@ -154,26 +162,6 @@ void BloodPressureTest::updateAverage() {
 //
 QJsonObject BloodPressureTest::toJsonObject() const
 {
-    //if (getManualEntryMode() == true) {
-    //    int sbpTotal = 0;
-    //    int dbpTotal = 0;
-    //    int pulseTotal = 0;
-
-    //    for (int i = 0; i < getMeasurementCount(); i++) {
-    //        auto measure = getMeasurement(i);
-
-    //        sbpTotal += measure.getAttributeValue("systolic").toDouble();
-    //        dbpTotal += measure.getAttributeValue("diastolic").toDouble();
-    //        pulseTotal += measure.getAttributeValue("pulse").toDouble();
-    //    }
-
-    //    double sbpAvg = qRound(sbpTotal / 3.0);
-    //    double dbpAvg = qRound(dbpTotal / 3.0);
-    //    double pulseAvg = qRound(pulseTotal / 3.0);
-
-    //    addDeviceAverage(sbpAvg, dbpAvg, pulseAvg);
-    //}
-
     QJsonObject testJson {};
     QJsonArray measurementArray {};
 
@@ -338,16 +326,12 @@ bool BloodPressureTest::hasTotalAverage() const
 }
 
 void BloodPressureTest::setCuffSize(const QString &size) {
-    if (m_debug)
-        qDebug() << "blood pressure test: cuff size = " << size;
-
+    qDebug() << "blood pressure test: cuff size = " << size;
     addMetaData("cuff_size", QVariant(size));
 }
 
 void BloodPressureTest::setSide(const QString &side) {
-    if (m_debug)
-        qDebug() << "blood pressure test: side = " << side;
-
+    qDebug() << "blood pressure test: side = " << side;
     addMetaData("arm_used", QVariant(side));
 }
 
