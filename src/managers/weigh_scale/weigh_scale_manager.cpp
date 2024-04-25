@@ -29,13 +29,11 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     qDebug() << session->getOrigin();
 }
 
-bool WeighScaleManager::isInstalled()
-{
+bool WeighScaleManager::isInstalled() {
     return true;
 }
 
-bool WeighScaleManager::start()
-{
+bool WeighScaleManager::start() {
     qDebug() << "WeighScaleManager::measure";
 
     scanDevices();
@@ -47,8 +45,7 @@ bool WeighScaleManager::start()
     return true;
 }
 
-void WeighScaleManager::measure()
-{
+void WeighScaleManager::measure() {
     qDebug() << "WeighScaleManager::measure";
 
     if (m_sim) {
@@ -174,10 +171,8 @@ void WeighScaleManager::readDevice()
 
             emit dataChanged(m_test);
             emit canFinish();
-        } else {
-            QMessageBox::critical(nullptr, "Received invalid data", "Data received was invalid");
-            emit canMeasure();
         }
+
     } else if ("z" == QString(m_request)) {
         WeightMeasurement m;
         m.fromArray(m_buffer);

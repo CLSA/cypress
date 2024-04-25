@@ -1,8 +1,9 @@
 #include "cdtt_manager.h"
+#include "data/cdtt/tests/cdtt_test.h"
+#include "cypress_settings.h"
+
 #include "auxiliary/network_utils.h"
 #include "auxiliary/file_utils.h"
-
-#include "cypress_settings.h"
 
 #include <QDebug>
 #include <QDir>
@@ -51,57 +52,59 @@ CDTTManager::~CDTTManager()
 
 bool CDTTManager::isInstalled()
 {
+    qDebug() << "CDTTManager::isInstalled";
+
     const QString jre = CypressSettings::readSetting("cdtt/jre").toString();
     const QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     const QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
 
     if (jre.isNull() || jre.isEmpty()) {
-        qDebug() << "CDTTManager: jre is undefined";
+        qDebug() << "jre is undefined";
         return false;
     }
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "CDTTManager: runnableName is undefined";
+        qDebug() << "runnableName is undefined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qDebug() << "CDTTManager: runnablePath is undefined";
+        qDebug() << "runnablePath is undefined";
         return false;
     }
 
     if (outputPath.isNull() || outputPath.isEmpty()) {
-        qDebug() << "CDTTManager: outputPath is undefined";
+        qDebug() << "outputPath is undefined";
         return false;
     }
 
     const QFileInfo jreInfo(jre);
     if (!jreInfo.exists()) {
-        qDebug() << "CDTTManager: JRE does not exist at " << jre;
+        qDebug() << "JRE does not exist at " << jre;
         return false;
     }
 
     if (!jreInfo.isExecutable()) {
-        qDebug() << "CDTTManager: JRE is not executable at " << jre;
+        qDebug() << "JRE is not executable at " << jre;
         return false;
     }
 
     const QFileInfo runnableNameInfo(runnableName);
     if (!runnableNameInfo.isFile()) {
-        qDebug() << "CDTTManager: runnableName does not exist";
+        qDebug() << "runnableName does not exist";
         return false;
     }
 
     const QDir runnableDir(runnablePath);
     if (!runnableDir.exists()) {
-        qDebug() << "CDTTManager: runnablePath does not exist";
+        qDebug() << "runnablePath does not exist";
         return false;
     }
 
     const QDir outputDir(outputPath);
     if (!outputDir.exists()) {
-        qDebug() << "CDTTManager: output dir does not exist";
+        qDebug() << "output dir does not exist";
         return false;
     }
 
@@ -245,7 +248,7 @@ void CDTTManager::readOutput()
         return;
     }
 
-    QSharedPointer<CDTTTest> test = qSharedPointerCast<CDTTTest>(m_test);
+    auto test = qSharedPointerCast<CDTTTest>(m_test);
     test->fromDatabase(db);
     db.close();
     finish();
@@ -256,8 +259,13 @@ void CDTTManager::finish() {
     qDebug() << "CDTTManager::finish";
 
     const int answer_id = m_session->getAnswerId();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
+
+    qDebug() << pineOrigin;
+
+    //const QString host = CypressSettings::getPineHost();
+    //const QString endpoint = CypressSettings::getPineEndpoint();
 
     QDir dir(m_outputPath);
     if (!dir.exists()) {
@@ -287,18 +295,21 @@ void CDTTManager::finish() {
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
+
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (host + endpoint + QString::number(answer_id) + "?filename=" + "cdtt.xlsx").toStdString(),
+        (answerUrl + "?filename=cdtt.xlsx").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(excelFile.absoluteFilePath())
     );
 
     if (!ok) {
-        emit error("Could not transfer Ecg.xml to Pine.");
+        emit error("Could not transfer ECG file to Pine.");
+        return;
     }
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+    //QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
+
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),

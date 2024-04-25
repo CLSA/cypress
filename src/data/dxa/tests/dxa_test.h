@@ -25,7 +25,7 @@ public:
 
     bool hasAllNeededFiles() const;
 
-    void fromDicomFiles(QList<DicomFile> files, const DXASession &session);
+    int fromDicomFiles(QList<DicomFile> files, const DXASession &session);
 
     void simulate() override;
 

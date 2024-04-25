@@ -11,9 +11,11 @@ TestInfoWidget::~TestInfoWidget() {
     delete ui;
 }
 
-void TestInfoWidget::setSessionInformation(const CypressSession &session) {
+void TestInfoWidget::setSessionInformation(const CypressSession &session, const QString& deviceName) {
+    ui->deviceStatusValue->setText(deviceName);
     ui->barcodeValue->setText(session.getBarcode());
     ui->interviewerValue->setText(session.getInterviewer());
+    ui->startedValue->setText(session.getStartTime().toLocalTime().toString("hh:mm ap"));
 }
 
 void TestInfoWidget::setDeviceStatus(QString status) {

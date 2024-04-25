@@ -753,7 +753,7 @@ std::unique_ptr<QJsonObject> SpirometerTest::toJsonObjectHeap() {
        }
     }
 
-    QJsonObject json;
+    QJsonObject json {};
     QJsonObject deviceJson {};
     QJsonObject metaJson = m_metaData.toJsonObject();
 

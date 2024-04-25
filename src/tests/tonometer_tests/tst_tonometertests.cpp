@@ -10,6 +10,9 @@
 #include <QDate>
 
 #include "data/tonometer/tests/tonometer_test.h"
+#include "auxiliary/file_utils.h"
+
+#include "managers/dxa/apex_database_helper.h"
 
 // add necessary includes here
 
@@ -22,7 +25,12 @@ public:
     ~TonometerTests();
 
 private slots:
+    void initTestCase();
+    void cleanupTestCase();
+
     void test_case1();
+    void test_case2();
+    void test_case3();
 };
 
 
@@ -34,6 +42,28 @@ TonometerTests::TonometerTests() {
 TonometerTests::~TonometerTests() {
 
 
+}
+
+void TonometerTests::initTestCase() {
+    QVERIFY(FileUtils::copyDirectory(QDir("C:/work/clsa/test_temp_backup"), QDir("C:/work/clsa/test_temp")));
+}
+
+void TonometerTests::cleanupTestCase() {
+    QDir testDirectory("C:/work/clsa/test_temp");
+    testDirectory.removeRecursively();
+}
+
+void restoreDirectory() {
+    // check if the backup directory exists
+    // check if the old files exist
+    // if they do, remove them
+    // copy the backup directory to the old directory
+}
+
+void TonometerTests::test_case2() {
+    QVERIFY(FileUtils::copyDirectory(QDir("C:/work/clsa/test_temp_backup"), QDir("C:/work/clsa/test_temp")));
+    QVERIFY(FileUtils::copyDirectory(QDir("C:/work/clsa/test_temp_backup"), QDir("C:/work/clsa/test_temp")));
+    QVERIFY(FileUtils::copyDirectory(QDir("C:/work/clsa/test_temp"), QDir("C:/work/clsa/test_temp2")));
 }
 
 

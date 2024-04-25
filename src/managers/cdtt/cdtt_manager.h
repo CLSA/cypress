@@ -1,8 +1,6 @@
 #ifndef CDTT_MANAGER_H
 #define CDTT_MANAGER_H
 
-#include "cypress_session.h"
-#include "data/cdtt/tests/cdtt_test.h"
 #include "managers/manager_base.h"
 #include "server/sessions/cdtt_session.h"
 
@@ -46,6 +44,8 @@ public slots:
 
     void finish() override;
 
+    void readOutput() override;
+
 private:
     QProcess m_process;
 
@@ -67,7 +67,6 @@ private:
 
     void configureProcess();
 
-    void readOutput();
 };
 
 #endif // CDTT_MANAGER_H

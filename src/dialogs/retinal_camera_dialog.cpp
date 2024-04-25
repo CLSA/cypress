@@ -26,7 +26,6 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
 
     // critical error
     connect(manager.get(), &RetinalCameraManager::error, this, &RetinalCameraDialog::error);
-
 }
 
 RetinalCameraDialog::~RetinalCameraDialog()

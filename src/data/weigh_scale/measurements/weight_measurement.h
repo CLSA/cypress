@@ -1,7 +1,7 @@
 #ifndef WEIGHT_MEASUREMENT_H
 #define WEIGHT_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
  * \class WeightMeasurement

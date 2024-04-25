@@ -36,22 +36,23 @@ double WeighScaleTest::calculateAverage()
     auto &measurements = getMeasurements();
     double average = 0;
     double totalWeight = 0;
-    int numberOfMeasures = measurements.length();
 
-    if (numberOfMeasures <= 0) {
-        return 0.00;
-    }
+    if (measurements.length() < 1)
+        return -1;
 
+    int validMeasures = 0;
     for (auto &measure : measurements) {
         if (measure->hasAttribute("weight") && measure->getAttributeValue("weight").isValid()) {
             totalWeight += measure->getAttributeValue("weight").toDouble();
+            validMeasures++;
         }
     }
 
-    average = totalWeight / numberOfMeasures;
+    if (validMeasures == 0)
+        return -1;
 
-    addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
-
+    average = totalWeight / validMeasures;
+    addMetaData("average_weight", Utilities::round_to(average, 1), "kg");
     qDebug() << "WeighScaleTest: new average" << average << "kg";
 
     return average;
@@ -82,23 +83,32 @@ void WeighScaleTest::simulate()
     addMeasurement(weight1);
     addMeasurement(weight2);
 
-    double average = calculateAverage();
-    qDebug() << "WeighScaleTest::simulate - new average" << average << "kg";
-
-    addMetaData("average_weight", Utilities::round_to(average, 0.1), "kg");
+    calculateAverage();
 }
 
 void WeighScaleTest::fromArray(const QByteArray &arr)
 {
-    if (arr.isEmpty()) {
+    if (arr.isEmpty())
         return;
-    }
 
     QSharedPointer<WeightMeasurement> m(new WeightMeasurement);
     m->fromArray(arr);
 
     if (m->isValid()) {
-        addMeasurement(m);
+        //addMeasurement(m);
+        bool ok = true;
+        if(0 < getMeasurementCount())
+        {
+            WeightMeasurement& last = (WeightMeasurement&) lastMeasurement();
+            QDateTime prev = last.getAttributeValue("timestamp").toDateTime();
+            QDateTime curr = m->getAttributeValue("timestamp").toDateTime();
+            ok =  DELAY < prev.secsTo(curr);
+
+            if (!ok) // resent measurement
+                last.fromArray(arr);
+        }
+        if(ok)
+            addMeasurement(m);
     }
 
     calculateAverage();

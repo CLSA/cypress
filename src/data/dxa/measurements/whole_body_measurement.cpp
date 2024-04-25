@@ -312,17 +312,6 @@ QStringList WholeBodyScanMeasurement::toStringList(const bool& no_keys) const
     return QStringList {{}};
 };
 
-void WholeBodyScanMeasurement::simulate()
-{
-    QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/whole_body.json");
-
-    QStringList keys = json.keys();
-    for (const QString &key : keys)
-    {
-        QJsonValue value = json.value(key);
-        setAttribute(key, value);
-    }
-}
 
 bool WholeBodyScanMeasurement::isValid() const
 {

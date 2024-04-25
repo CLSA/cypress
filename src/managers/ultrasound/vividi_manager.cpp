@@ -116,6 +116,9 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     }
 
     emit dataChanged(m_test);
+    if (m_test->isValid()) {
+        emit canFinish();
+    }
 }
 
 bool VividiManager::isInstalled()
@@ -125,15 +128,15 @@ bool VividiManager::isInstalled()
     if (CypressSettings::isSimMode())
         return true;
 
-    const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
-    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    const QString runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
+    const QString aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
+    const QString host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
+    const QString port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
 
-    const QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    const QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    const QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    const QString storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
+    const QString logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
+    const QString ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         qDebug() << "runnableName is not defined";
@@ -215,24 +218,15 @@ bool VividiManager::start()
 
 void VividiManager::measure()
 {
-    if (CypressSettings::isSimMode())
-    {
-        m_test->simulate();
-
-        emit dataChanged(m_test);
+    if (m_test->isValid())
         emit canFinish();
-    }
-
-    if (m_test->isValid()) {
-        emit canFinish();
-    }
 }
 
 void VividiManager::finish()
 {
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
-    const QString pine_path = CypressSettings::getAnswerUrl(m_session->getAnswerId());
+    const int answer_id = m_session->getAnswerId();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
     QJsonObject responseJson{};
     QJsonObject filesJson {};
@@ -248,7 +242,7 @@ void VividiManager::finish()
         );
 
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                                   (pine_path
+                                   (answerUrl
                                                   + "?filename=" + measure.getAttribute("name").toString() + ".dcm").toStdString(),
                                    "application/octet-stream",
                                    data);
@@ -271,7 +265,7 @@ void VividiManager::finish()
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", pine_path.toStdString(), "application/json", serializedData);
+    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
     if (!ok) {
         emit error("Could not send results");
         return;

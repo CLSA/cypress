@@ -556,26 +556,27 @@ void BloodPressureManager::addManualEntry(const int systolic, const int diastoli
     test->updateAverage();
 
     qDebug() << "TEST" << test->toJsonObject();
+
     emit dataChanged(m_test);
 }
 
 // Set up device
 bool BloodPressureManager::setUp()
 {
-    qDebug() << "BloodPressureManager::setUp";
+    qInfo() << "BloodPressureManager::setUp";
     return true;
 }
 
 // Clean up the device for next time
 bool BloodPressureManager::cleanUp()
 {
-    qDebug() << "BloodPressureManager::cleanUp";
+    qInfo() << "BloodPressureManager::cleanUp";
     return true;
 }
 
 void BloodPressureManager::handleAck(const BPMMessage& message)
 {
-    qDebug() << "BloodPressureManager::handleAck messageId = " << message.getMessageId();
+    qInfo() << "BloodPressureManager::handleAck messageId = " << message.getMessageId();
 
     // get ack type
     quint8 ackType = message.getData0();
@@ -605,13 +606,13 @@ void BloodPressureManager::handleAck(const BPMMessage& message)
 void BloodPressureManager::handleNack(const BPMMessage& message)
 {
     // get nack type
-    qDebug() << "BloodPressureManager::handleNack: " << message.getMessageId();
+    qInfo() << "BloodPressureManager::handleNack: " << message.getMessageId();
 }
 
 void BloodPressureManager::handleButton(const BPMMessage& message)
 {
     // get button type
-    qDebug() << "BloodPressureManager::handleButton: " << message.getMessageId();
+    qInfo() << "BloodPressureManager::handleButton: " << message.getMessageId();
 
     quint8 buttonType = message.getData0();
     switch(buttonType)
@@ -636,7 +637,7 @@ void BloodPressureManager::handleButton(const BPMMessage& message)
 void BloodPressureManager::handleData(const BPMMessage& message)
 {
     // get data type
-    qDebug() << "BloodPressureManager::handleData: " << message.getMessageId();
+    qInfo() << "BloodPressureManager::handleData: " << message.getMessageId();
 
     quint8 messageId = message.getMessageId();
 
@@ -663,19 +664,19 @@ void BloodPressureManager::handleData(const BPMMessage& message)
 void BloodPressureManager::handleNotification(const BPMMessage& message)
 {
     // get notification type
-    qDebug() << "BloodPressureManager::handleNotification: " << message.getMessageId();
+    qInfo() << "BloodPressureManager::handleNotification: " << message.getMessageId();
 }
 
 void BloodPressureManager::handleNoMessage(const BPMMessage& message)
 {
     // get no message type
-    qDebug() << "BloodPressureManager::handleNoMessage: " << message.getMessageId();
+    qInfo() << "BloodPressureManager::handleNoMessage: " << message.getMessageId();
 }
 
 // Clean up the device for next time
 bool BloodPressureManager::clearData()
 {
-    qDebug() << "BloodPressureManager::clearData";
+    qInfo() << "BloodPressureManager::clearData";
 
     m_test->reset();
     emit dataChanged(m_test);

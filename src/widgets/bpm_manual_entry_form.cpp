@@ -13,35 +13,20 @@ BpmManualEntryForm::BpmManualEntryForm(QWidget *parent)
 
     setWindowTitle("Manual Entry");
 
-    ui->systolicValue->setValidator(new QIntValidator(0, 500));
-    ui->diastolicValue->setValidator(new QIntValidator(0, 500));
-    ui->pulseValue->setValidator(new QIntValidator(0, 500));
     ui->okButton->setEnabled(false);
 
-    connect(ui->systolicValue, &QLineEdit::textEdited, this, [=](const QString& systolic) {
-        bool ok = false;
-        m_systolic = systolic.toInt(&ok);
-        if (!ok)
-            return;
-
+    connect(ui->systolicValue, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](const int systolic) {
+        m_systolic = systolic;
         ui->okButton->setEnabled(validInputs());
     });
 
-    connect(ui->diastolicValue, &QLineEdit::textEdited, this, [=](const QString& diastolic) {
-        bool ok = false;
-        m_diastolic = diastolic.toInt(&ok);
-        if (!ok)
-            return;
-
+    connect(ui->diastolicValue, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](const int diastolic) {
+        m_diastolic = diastolic;
         ui->okButton->setEnabled(validInputs());
     });
 
-    connect(ui->pulseValue, &QLineEdit::textEdited, this, [=](const QString& pulse) {
-        bool ok = false;
-        m_pulse = pulse.toInt(&ok);
-        if (!ok)
-            return;
-
+    connect(ui->pulseValue, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](const int pulse) {
+        m_pulse = pulse;
         ui->okButton->setEnabled(validInputs());
     });
 

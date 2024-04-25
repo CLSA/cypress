@@ -16,7 +16,7 @@ public:
     explicit TestInfoWidget(QWidget *parent = nullptr);
     ~TestInfoWidget();
 
-    void setSessionInformation(const CypressSession& session);
+    void setSessionInformation(const CypressSession& session, const QString& deviceName = "");
     void setDeviceStatus(QString status);
     void setStatus(const QString status);
 

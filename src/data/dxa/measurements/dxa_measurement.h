@@ -29,18 +29,24 @@ class DXAMeasurement : public Measurement
 public:
     DXAMeasurement();
 
-    QStringList m_mdb_keys {};
-    QJsonObject readJsonFile(const QString &filePath);
+    void getPatientScan(const QSqlDatabase& db, const QString& participantId);
+    void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
+    void computeTZScore(const QSqlDatabase& referenceDb, const QJsonObject& patientData, const QString& scanDate);
 
-    QList<ValidDCMTag> m_metaInfoTagExistsWithValue {};
-    QList<ValidDCMTag> m_metaInfoTagExists {};
-    QList<ValidDCMTag> m_datasetTagExistsWithValue {};
-    QList<ValidDCMTag> m_datasetTagExists {};
+    double computeYearsDifference(const QString& first, const QString& second);
 
-    virtual bool isValidDicomFile(DicomFile file) const;
-
+    virtual bool isValidDicomFile(DicomFile file) const = 0;
     virtual bool hasAllNeededFiles() const = 0;
+    virtual void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) = 0;
 
+public: // Measurement
+    virtual bool isValid() const override;
+    virtual QString toString() const override;
+    virtual QStringList toStringList(const bool& no_keys = false) const override;
+
+    virtual void simulate() {};
+
+public: // getters
     virtual Side getSide() = 0;
     virtual quint8 getScanType() = 0;
     virtual QString getName() = 0;
@@ -48,18 +54,6 @@ public:
     virtual QString getRefType() = 0;
     virtual QString getRefSource() = 0;
 
-    virtual void simulate() {};
-
-    virtual bool isValid() const override;
-    virtual QString toString() const override;
-    virtual QStringList toStringList(const bool& no_keys = false) const override;
-
-    void getPatientScan(const QSqlDatabase& db, const QString& participantId);
-    void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
-    void computeTZScore(const QSqlDatabase& referenceDb, const QJsonObject& patientData, const QString& scanDate);
-
-    virtual void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) = 0;
-    double computeYearsDifference(const QString& first, const QString& second);
 };
 
 #endif // DXA_MEASUREMENT_H

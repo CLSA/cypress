@@ -25,7 +25,7 @@ SpirometerTests::~SpirometerTests() {}
 void SpirometerTests::test_case1() {
     SpirometerTest test;
 
-    test.fromFile("C:/work/clsa/Test Data/spirometer/OnyxOut.xml");
+    test.fromFile("C:/work/clsa/Test Data/spirometer/data.xml");
 
     qDebug() << "spirometer valid: " << test.isValid();
     qDebug() << test.toJsonObject();

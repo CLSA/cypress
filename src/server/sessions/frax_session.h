@@ -14,12 +14,11 @@ protected:
     void calculateInputs() override;
     void isInstalled() const override;
     void isAvailable() const override;
-
-    double calculateBMI(double weight_kg, double height_cm);
-    double calculateTScore(double femoral_neck_bmd);
-    bool calculateGlucocorticoid(int age);
-
     void initializeDialog() override;
+
+    //double calculateBMI(double weight_kg, double height_cm) const;
+    //double calculateTScore(double femoral_neck_bmd) const;
+    //bool calculateGlucocorticoid(int age);
 };
 
 #endif // FRAXSESSION_H

@@ -103,25 +103,32 @@ bool BloodPressureTest::isValid() const
     return okMeta && okTest;
 }
 
-void BloodPressureTest::updateAverage() {
+void BloodPressureTest::updateAverage()
+{
+    if (getMeasurementCount() <= 0)
+        return;
+
+    const auto first = *m_measurementList.constFirst();
+    addMetaData("first_systolic",   first.getAttribute("systolic"));
+    addMetaData("first_diastolic",  first.getAttribute("diastolic"));
+    addMetaData("first_pulse",      first.getAttribute("pulse"));
+    addMetaData("first_start_time", first.getAttribute("start_time"));
+    addMetaData("first_end_time",   first.getAttribute("end_time"));
+
+    const int n = getMeasurementCount();
+
+    int validMeasures = 0;
     int systolicTotal = 0;
     int diastolicTotal = 0;
     int pulseTotal = 0;
 
-    if (getMeasurementCount() <= 0) {
-        return;
-    }
-
-    auto first = *m_measurementList.constFirst();
-    addMetaData("first_systolic", first.getAttribute("systolic"));
-    addMetaData("first_diastolic", first.getAttribute("diastolic"));
-    addMetaData("first_pulse", first.getAttribute("pulse"));
-    addMetaData("first_start_time", first.getAttribute("start_time"));
-    addMetaData("first_end_time", first.getAttribute("end_time"));
-
-    const int n = getMeasurementCount();
     for (int i = 1; i < n; i++) { // skip first measurement for avg, total_avg includes the first measure
         auto measure = get(i);
+        if (!measure.isValid())
+            continue;
+
+        validMeasures++;
+
         const int systolic = measure.getAttribute("systolic").value().toInt();
         const int diastolic = measure.getAttribute("diastolic").value().toInt();
         const int pulse = measure.getAttribute("pulse").value().toInt();
@@ -131,31 +138,37 @@ void BloodPressureTest::updateAverage() {
         pulseTotal += pulse;
     }
 
-    if (n > 1) {
-        const double avgSbpCalc = qRound(systolicTotal * 1.0f / (n - 1));
-        const double avgDbpCalc = qRound(diastolicTotal * 1.0f / (n - 1));
-        const double avgPulseCalc = qRound(pulseTotal * 1.0f / (n - 1));
+    if (validMeasures >= 1) {
+        const double avgSbpCalc = qRound(systolicTotal * 1.0f / (validMeasures));
+        const double avgDbpCalc = qRound(diastolicTotal * 1.0f / (validMeasures));
+        const double avgPulseCalc = qRound(pulseTotal * 1.0f / (validMeasures));
 
-        addMetaData("avg_count", n - 1);
-        addMetaData("avg_systolic", avgSbpCalc, "mmHg");
+        addMetaData("avg_count",     validMeasures);
+        addMetaData("avg_systolic",  avgSbpCalc, "mmHg");
         addMetaData("avg_diastolic", avgDbpCalc, "mmHg");
-        addMetaData("avg_pulse", avgPulseCalc, "bpm");
-    }
-    else {
-        addMetaData("avg_count", 1);
-        addMetaData("avg_systolic", first.getAttribute("systolic"));
-        addMetaData("avg_diastolic", first.getAttribute("diastolic"));
-        addMetaData("avg_pulse", first.getAttribute("pulse"));
+        addMetaData("avg_pulse",     avgPulseCalc, "bpm");
     }
 
-    systolicTotal += getMetaData("first_systolic").toInt();
-    diastolicTotal += getMetaData("first_diastolic").toInt();
-    pulseTotal += getMetaData("first_pulse").toInt();
+    if (first.isValid()) {
+        validMeasures++;
 
-    addMetaData("total_avg_systolic", qRound(systolicTotal * 1.0f / n), "mmHg");
-    addMetaData("total_avg_diastolic",qRound(diastolicTotal * 1.0f / n),"mmHg");
-    addMetaData("total_avg_pulse",qRound(pulseTotal * 1.0f / n),"bpm");
-    addMetaData("total_avg_count", n);
+        systolicTotal += getMetaData("first_systolic").toInt();
+        diastolicTotal += getMetaData("first_diastolic").toInt();
+        pulseTotal += getMetaData("first_pulse").toInt();
+
+        addMetaData("total_avg_systolic",  qRound(systolicTotal * 1.0f / validMeasures), "mmHg");
+        addMetaData("total_avg_diastolic", qRound(diastolicTotal * 1.0f / validMeasures), "mmHg");
+        addMetaData("total_avg_pulse",     qRound(pulseTotal * 1.0f / validMeasures), "bpm");
+        addMetaData("total_avg_count",     validMeasures + 1);
+    }
+    else
+    {
+        addMetaData("total_avg_systolic",  qRound(systolicTotal * 1.0f / validMeasures), "mmHg");
+        addMetaData("total_avg_diastolic", qRound(diastolicTotal * 1.0f / validMeasures),"mmHg");
+        addMetaData("total_avg_pulse",     qRound(pulseTotal * 1.0f / validMeasures),"bpm");
+        addMetaData("total_avg_count",     validMeasures);
+    }
+
 }
 
 // String keys are converted to snake_case
@@ -179,7 +192,6 @@ QJsonObject BloodPressureTest::toJsonObject() const
 
 bool BloodPressureTest::verifyDeviceAverage(const int& sbp, const int& dbp, const int& pulse) const
 {
-    bool dataMatches = false;
     if(hasAverage())
     {
         const int avgSystolic = getMetaData("avg_systolic").toInt();
@@ -187,14 +199,15 @@ bool BloodPressureTest::verifyDeviceAverage(const int& sbp, const int& dbp, cons
         const int avgPulse = getMetaData("avg_pulse").toInt();
 
         if (avgSystolic == sbp && avgDiastolic == dbp && avgPulse == pulse) {
-            dataMatches = true;
+            return true;
         }
         else {
           qDebug() << QString("WARNING: Review data (sbp: %1, dbp: %2, pulse: %3) does not match average data (sbp: %4, dbp: %5, pulse: %6).")
                 .arg(sbp).arg(dbp).arg(pulse).arg(avgSystolic).arg(avgDiastolic).arg(avgPulse);
         }
     }
-    return dataMatches;
+
+    return false;
 }
 
 // add the average of the measurements provided by the device and compare

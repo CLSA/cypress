@@ -16,10 +16,8 @@ public:
     bool isValid() const override;
 
     void addDicomFile(DicomFile);
-    void simulate() override;
 
     bool isValidDicomFile(DicomFile file) const override;
-    DicomFile m_forearmDicomFile{};
     void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;
 
     Side getSide() override;
@@ -28,6 +26,8 @@ public:
     QString getBodyPartName() override;
     QString getRefType() override;
     QString getRefSource() override;
+
+    DicomFile m_forearmDicomFile{};
 
 private:
     bool hasForearmFile { false };

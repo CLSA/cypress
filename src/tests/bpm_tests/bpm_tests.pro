@@ -9,7 +9,7 @@ LIBS += -L"C:/work/clsa/cypress/dep/QtUsb_x86/lib" -lQt5Usb
 
 # OpenSSL
 INCLUDEPATH += C:/work/clsa/cypress/dep/OpenSSL-Win32/include
-LIBS += -L"C:/work/clsa/cypress/dep/OpenSSL-Win32/lib -llibssl -llibcrypto
+LIBS += -L"C:/work/clsa/cypress/dep/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
 INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Foundation/include

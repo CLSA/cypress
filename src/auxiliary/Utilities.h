@@ -47,15 +47,14 @@ public:
     }
 
     static inline double round_to();
-    static inline double round_to(double value, double precision = 1.0)
+    static inline double round_to(double value, int decimalPlaces = 1)
     {
-        return std::round(value / precision) * precision;
+        const double multiplier = std::pow(10.0, decimalPlaces);
+        return std::round(value * multiplier) / multiplier;
     }
 
     static const quint8 crcLUT[256];
 
-    static bool openUrl(QUrl url);
-    static void showMessageBox(const QString &title, const QString &text);
     static void prettyPrint(const QJsonObject &jsonObj);
 };
 

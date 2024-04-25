@@ -34,8 +34,7 @@ public slots:
 
     void finish() override;
 
-
-    void readOutput();
+    void readOutput() override;
 
 private:
     QString m_runnableName; // full pathspec to EasyWarePro.exe

@@ -6,9 +6,7 @@
 
 WeightMeasurement::WeightMeasurement()
 {
-    setAttribute("weight", 0.00f, "kg");
-    setAttribute("mode", "gross");
-    setAttribute("timestamp", QDateTime::currentDateTime());
+
 }
 
 WeightMeasurement::WeightMeasurement(const double weight, const QString unit)
@@ -23,6 +21,11 @@ void WeightMeasurement::fromArray(const QByteArray &arr)
     if(!arr.isEmpty())
     {
       QByteArray bytes(arr.simplified());
+
+      qDebug() << "raw: " << arr;
+      qDebug() << "simplified: " << bytes;
+      qDebug() << "hex: " << arr.toHex();
+
       QList<QByteArray> parts = bytes.split(' ');
       if(3 <= parts.size())
       {
@@ -47,16 +50,16 @@ bool WeightMeasurement::isValid() const
 {
     bool ok = false;
     if (hasAttribute("weight")) {
-        float fval = getAttributeValue("weight").toDouble(&ok);
+        double val = getAttributeValue("weight").toDouble(&ok);
         ok = ok && getAttribute("weight").hasUnits() && hasAttribute("mode")
-             && hasAttribute("timestamp") && 0.0f <= fval;
+             && hasAttribute("timestamp") && 0.0f <= val;
     }
     return ok;
 }
 
 bool WeightMeasurement::isZero() const
 {
-    return isValid() && 0.0f == getAttributeValue("WEIGHT").toDouble();
+    return isValid() && 0.0f == getAttributeValue("weight").toDouble();
 }
 
 QString WeightMeasurement::toString() const
@@ -65,9 +68,9 @@ QString WeightMeasurement::toString() const
   if(isValid())
   {
     QStringList list;
-    list << getAttribute("WEIGHT").toString();
-    list << getAttribute("MODE").toString();
-    QDateTime dt = getAttributeValue("TIMESTAMP").toDateTime();
+    list << getAttribute("weight").toString();
+    list << getAttribute("mode").toString();
+    QDateTime dt = getAttributeValue("timestamp").toDateTime();
     list << dt.date().toString("yyyy-MM-dd");
     list << dt.time().toString("hh:mm:ss");
     str = list.join(" ");

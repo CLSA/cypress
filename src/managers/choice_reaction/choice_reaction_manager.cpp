@@ -43,52 +43,49 @@ ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSessio
 
 bool ChoiceReactionManager::isInstalled()
 {
-    qDebug() << "ChoiceReactionManager::isInstalled";
+    qInfo() << "ChoiceReactionManager::isInstalled";
+    if (CypressSettings::isSimMode())
+        return true;
 
     const QString runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
     const QString outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "runnableName is not defined";
+        qInfo() << "runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qDebug() << "runnablePath is not defined";
+        qInfo() << "runnablePath is not defined";
         return false;
     }
 
     if (outputPath.isNull() || outputPath.isEmpty()) {
-        qDebug() << "outputPath is not defined";
+        qInfo() << "outputPath is not defined";
         return false;
     }
 
     const QFileInfo info(runnableName);
     if (!info.exists()) {
-        qDebug() << "ChoiceReactionManager::isInstalled - CCB.exe does not exist at " << runnableName;
+        qInfo() << "exe does not exist at " << runnableName;
         return false;
     }
 
-    if (!info.isExecutable())
-    {
-        qDebug() << "ChoiceReactionManager::isInstalled - file is not executable at " << runnableName;
-
+    if (!info.isExecutable()) {
+        qInfo() << "file is not executable at " << runnableName;
         return false;
     }
 
     const QDir working(runnablePath);
-    if (!working.exists())
-    {
-        qDebug() << "ChoiceReactionManager::isInstalled - working directory does not exist";
-
+    if (!working.exists()) {
+        qInfo() << "working directory does not exist";
         return false;
     }
 
     const QDir out(outputPath);
-    if (!out.exists())
-    {
-        qDebug() << "ChoiceReactionManager::isInstalled - output path does not exist";
+    if (!out.exists()) {
+        qInfo() << "output path does not exist";
         return false;
     }
 
@@ -149,22 +146,28 @@ void ChoiceReactionManager::readOutput()
 
     auto test = qSharedPointerCast<ChoiceReactionTest>(m_test);
 
-    if(dir.exists(outputFile))
-    {
+    if(dir.exists(outputFile)) {
         outputFile.prepend(QDir::separator());
         outputFile.prepend(m_outputPath);
 
         test->fromFile(outputFile);
         finish();
     }
-    else
+    else {
         emit error("Something went wrong. Please contact support");
+    }
 }
 
 void ChoiceReactionManager::finish() {
+    //const QString host = CypressSettings::getPineHost();
+    //const QString endpoint = CypressSettings::getPineEndpoint();
+    qInfo() << "ChoiceReactionManager::finish";
+
     const int answer_id = m_session->getAnswerId();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
+
+    qDebug() << answerUrl;
 
     QDir dir(m_outputPath);
     if (!dir.exists()) {
@@ -199,7 +202,7 @@ void ChoiceReactionManager::finish() {
 
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (host + endpoint + QString::number(answer_id) + "?filename=" + "data.csv").toStdString(),
+        (answerUrl  + "?filename=" + "data.csv").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(csvFile.absoluteFilePath())
     );
@@ -208,7 +211,6 @@ void ChoiceReactionManager::finish() {
         emit error("Could not transfer CSV file to Pine.");
     }
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),
@@ -222,7 +224,6 @@ void ChoiceReactionManager::finish() {
         emit success("Save successful. You may close this window.");
     else
         emit error("Something went wrong");
-
 }
 
 // Set up device

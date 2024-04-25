@@ -25,7 +25,7 @@ public:
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
 
-    void fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session);
+    int fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session);
 
     bool hasAllNeededFiles() const;
 

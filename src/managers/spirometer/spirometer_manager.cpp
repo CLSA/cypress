@@ -94,21 +94,21 @@ bool SpirometerManager::isInstalled()
 
     const QFileInfo runnableInfo(runnableName);
     if (!runnableInfo.exists()) {
-        qInfo() << "EasyWarePro.exe does not exist at" << runnableName;
+        qInfo() << "exe does not exist at" << runnableName;
         return false;
     }
     if (!runnableInfo.isExecutable()) {
-        qInfo() << "EasyWarePro.exe is not executable at" << runnableName;
+        qInfo() << "exe is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo runnableDir(runnablePath);
     if (!runnableDir.isDir()) {
-        qInfo() << "runnable dir is not executable at" << runnablePath;
+        qInfo() << "directory does not exist at" << runnablePath;
         return false;
     }
     if (!runnableDir.isReadable()) {
-        qInfo() << "directory does not exist at" << runnableDir;
+        qInfo() << "directory is missing read permissions at" << runnableDir;
         return false;
     }
 
@@ -196,8 +196,8 @@ void SpirometerManager::finish()
     auto test = qSharedPointerCast<SpirometerTest>(m_test);
 
     const int answerId = m_session->getAnswerId();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answerId);
 
     QJsonObject responseJson {};
     QJsonObject testJson = test->toJsonObject();
@@ -212,7 +212,7 @@ void SpirometerManager::finish()
 
         NetworkUtils::sendHTTPSRequest(
             Poco::Net::HTTPRequest::HTTP_PATCH,
-            (host + endpoint + QString::number(answerId) + "?filename=data.xml").toStdString(),
+            (answerUrl + "?filename=data.xml").toStdString(),
             "application/octet-stream",
             FileUtils::readFile(filePath)
         );
@@ -233,7 +233,7 @@ void SpirometerManager::finish()
 
         NetworkUtils::sendHTTPSRequest(
             Poco::Net::HTTPRequest::HTTP_PATCH,
-            (host + endpoint + QString::number(answerId) + "?filename=report.pdf").toStdString(),
+            (answerUrl + QString::number(answerId) + "?filename=report.pdf").toStdString(),
             "application/octet-stream",
             FileUtils::readFile(pdfOutputInfo.absoluteFilePath())
         );
@@ -249,7 +249,6 @@ void SpirometerManager::finish()
     const QJsonDocument jsonDoc(responseJson);
     const QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answerId);
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),

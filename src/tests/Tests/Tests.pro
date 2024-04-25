@@ -18,20 +18,20 @@ INCLUDEPATH += "C:/OpenSSL-Win32/include"
 LIBS += -L"C:/OpenSSL-Win32/lib" -llibssl -llibcrypto
 
 # POCO
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/bin
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Foundation/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Util/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Net/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Crypto/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/bin
 
-LIBS += -L"C:/Users/Anthony/Documents/GitHub/cypress/dep/poco-1.12.4-all/lib/" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+LIBS += -L"C:/work/clsa/cypress/dep/poco-1.12.4-all/lib/" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/include
-INCLUDEPATH += C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/lib/
+INCLUDEPATH += C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32/include
+INCLUDEPATH += C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32/lib/
 
-LIBS += -L"C:/Users/Anthony/Documents/GitHub/cypress/dep/dcmtk-3.6.7-win32/lib/" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+LIBS += -L"C:/work/clsa/cypress/dep/dcmtk-3.6.7-win32/lib/" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 
 # Topaz Signature Pad
 #INCLUDEPATH += $$PWD/../../../dep/SigLib/Include/

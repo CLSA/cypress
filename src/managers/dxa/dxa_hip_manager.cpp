@@ -57,12 +57,9 @@ DxaHipManager::~DxaHipManager()
     m_dicomServer->stop();
 }
 
-bool DxaHipManager::isInstalled()
-{
-    const bool isDebugMode = CypressSettings::isDebugMode();
-    const bool isSimMode = CypressSettings::isSimMode();
-
-    if (isSimMode)
+bool DxaHipManager::isInstalled() {
+    qDebug() << "DxaHipManager::isInstalled";
+    if (CypressSettings::isSimMode())
         return true;
 
     const QString runnableName   = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
@@ -79,144 +76,110 @@ bool DxaHipManager::isInstalled()
     const QString refscanDbPath  = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "runnableName is not defined";
+        qDebug() << "runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "runnablePath is not defined";
+        qDebug() << "runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "aeTitle is not defined";
+        qDebug() << "aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "host is not defined";
+        qDebug() << "host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "port is not defined";
+        qDebug() << "port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "storageDirPath is not defined";
+        qDebug() << "storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        if (isDebugMode)
-            qDebug() << "logConfigPath is not defined";
+        qDebug() << "logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "ascConfigPath is not defined";
+        qDebug() << "ascConfigPath is not defined";
         return false;
     }
 
     if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "patscanDbPath is not defined";
-
+        qDebug() << "patscanDbPath is not defined";
         return false;
     }
 
     const QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
-        if (isDebugMode)
-            qDebug() << "patscan file does not exist: "
-                     << patscanDbPath;
+        qDebug() << "patscan file does not exist at" << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isFile()) {
-        if (isDebugMode)
-            qDebug() << "patscan file is not a file at"
-                     << patscanDbPath;
+        qDebug() << "patscan file is not a file at" << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isReadable()) {
-        if (isDebugMode)
-            qDebug() << "patscan file is not readable at "
-                     << patscanDbPath;
+        qDebug() << "patscan file is not readable at" << patscanDbPath;
         return false;
     }
 
     if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "refscanDbPath is not defined at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo refscanFile(refscanDbPath);
     if (!refscanFile.exists()) {
-        if (isDebugMode)
-            qDebug() << "refscanDbPath is not defined at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
 
     if (!refscanFile.isFile()) {
-        if (isDebugMode)
-            qDebug() << "refscanDbPath is not a file at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not a file at" << refscanDbPath;
         return false;
     }
 
     if (!refscanFile.isReadable()) {
-        if (isDebugMode)
-            qDebug() << "refscanDbPath is not readable at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not readable at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
-        if (isDebugMode)
-            qDebug() << "runnableName does not exist at"
-                     << runnableName;
+        qDebug() << "runnableName does not exist at" << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
-        if (isDebugMode)
-            qDebug() << "runnableName is not executable at"
-                     << runnableName;
+        qDebug() << "runnableName is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
-        if (isDebugMode)
-            qDebug() << "working directory does not exist at"
-                     << workingDir;
+        qDebug() << "working directory does not exist at" << workingDir;
         return false;
     }
 
     if (!workingDir.isDir()) {
-        if (isDebugMode)
-            qDebug() << "working directory is not writable at"
-                     << workingDir;
+        qDebug() << "working directory is not writable at" << workingDir;
         return false;
     }
 
     if (!workingDir.isWritable()) {
-        if (isDebugMode)
-            qDebug() << "working directory is not writable at"
-                     << workingDir;
+        qDebug() << "working directory is not writable at" << workingDir;
         return false;
     }
 
@@ -266,11 +229,15 @@ void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     auto test = qSharedPointerCast<DxaHipTest>(m_test);
     auto session = qSharedPointerCast<DxaHipSession>(m_session);
 
-    test->fromDicomFiles(dicomFiles, *session);
+    int filesReceived = test->fromDicomFiles(dicomFiles, *session);
 
-    emit status(QString("Received %1 files").arg(dicomFiles.length()));
+    emit status(QString("Received %1 files").arg(filesReceived));
+
     emit dataChanged(m_test);
-    emit canMeasure();
+
+    if (m_test->isValid()) {
+        emit canMeasure();
+    }
 }
 
 // retrieve a measurement from the device
@@ -336,15 +303,13 @@ void DxaHipManager::measure()
 // implementation of final clean up of device after disconnecting and all
 // data has been retrieved and processed by any upstream classes
 //
-void DxaHipManager::finish()
-{
+void DxaHipManager::finish() {
     bool ok = false;
 
     auto test = qSharedPointerCast<DxaHipTest>(m_test);
     const int answer_id = m_session->getAnswerId();
-    const QString barcode = m_session->getBarcode();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
     // Hip
     QString hip_1_file_name = "L_HIP_DICOM.dcm";
@@ -368,13 +333,12 @@ void DxaHipManager::finish()
     }
 
     if (!testJson.value("results").toObject().value("hip_l").toObject().isEmpty()) {
-
-        QByteArray leftHipDicomFile = FileUtils::readFile(
+        const QByteArray leftHipDicomFile = FileUtils::readFile(
             test->leftHipMeasurement->m_hipDicomFile.absFilePath);
 
         ok = NetworkUtils::sendHTTPSRequest(
             Poco::Net::HTTPRequest::HTTP_PATCH,
-            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString() + "?filename=" + hip_1_file_name.replace("_dcm", ".dcm").toStdString(),
+            answerUrl.toStdString() + "?filename=" + hip_1_file_name.replace("_dcm", ".dcm").toStdString(),
             "application/octet-stream",
             leftHipDicomFile
         );
@@ -388,12 +352,12 @@ void DxaHipManager::finish()
     }
 
     if (!testJson.value("results").toObject().value("hip_r").toObject().isEmpty()) {
-        QByteArray rightHipDicomFile = FileUtils::readFile(
+        const QByteArray rightHipDicomFile = FileUtils::readFile(
             test->rightHipMeasurement->m_hipDicomFile.absFilePath);
 
         ok = NetworkUtils::sendHTTPSRequest(
             Poco::Net::HTTPRequest::HTTP_PATCH,
-            host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString()
+            answerUrl.toStdString()
                 + "?filename=" + hip_2_file_name.replace("_dcm", ".dcm").toStdString(),
             "application/octet-stream",
             rightHipDicomFile
@@ -414,12 +378,12 @@ void DxaHipManager::finish()
     QJsonObject responseJson = {};
     responseJson.insert("value", testJson);
 
-    QJsonDocument jsonDoc(responseJson);
-    QByteArray serializedData = jsonDoc.toJson();
+    const QJsonDocument jsonDoc(responseJson);
+    const QByteArray serializedData = jsonDoc.toJson();
 
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        host.toStdString() + endpoint.toStdString() + QString::number(answer_id).toStdString(),
+        answerUrl.toStdString(),
         "application/json",
         serializedData
     );
@@ -443,7 +407,6 @@ bool DxaHipManager::initPatScanDb() {
     if (!copyPatScanDb())
         return false;
 
-    // calculate totals and averages
     m_patscanDb = QSqlDatabase::addDatabase("QODBC", "patscan");
     m_patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
                               + QDir::toNativeSeparators(m_patscanDbFileInfo.absoluteFilePath()));
@@ -474,6 +437,7 @@ bool DxaHipManager::copyPatScanDb() {
     const QFileInfo patscanFileInfo(m_patscanDbPath);
     if (!patscanFileInfo.exists())
         return false;
+
     if (!patscanFileInfo.isReadable())
         return false;
 

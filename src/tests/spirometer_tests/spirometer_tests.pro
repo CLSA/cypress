@@ -47,7 +47,6 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../data/access_query_helper.cpp \
     ../../data/blood_pressure/measurements/blood_pressure_measurement.cpp \
     ../../data/blood_pressure/tests/blood_pressure_test.cpp \
-    ../../data/body_composition/commands.cpp \
     ../../data/body_composition/measurements/body_composition_measurement.cpp \
     ../../data/body_composition/tests/body_composition_test.cpp \
     ../../data/cdtt/measurements/cdtt_measurement.cpp \
@@ -62,9 +61,6 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../data/dxa/measurements/hip_measurement.cpp \
     ../../data/dxa/measurements/iva_imaging_measurement.cpp \
     ../../data/dxa/measurements/whole_body_measurement.cpp \
-    ../../data/dxa/pat_scan_query_helper.cpp \
-    ../../data/dxa/reference_query_helper.cpp \
-    ../../data/dxa/smbfilecopier.cpp \
     ../../data/dxa/tests/dxa_hip_test.cpp \
     ../../data/dxa/tests/dxa_test.cpp \
     ../../data/ecg/measurements/ecg_measurement.cpp \
@@ -101,6 +97,7 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../dialogs/dxa_hip_dialog.cpp \
     ../../dialogs/ecg_dialog.cpp \
     ../../dialogs/frax_dialog.cpp \
+    ../../dialogs/general_proxy_form_dialog.cpp \
     ../../dialogs/grip_strength_dialog.cpp \
     ../../dialogs/retinal_camera_dialog.cpp \
     ../../dialogs/spirometer_dialog.cpp \
@@ -110,14 +107,12 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../dicom/dicom_directory_watcher.cpp \
     ../../managers/audiometer/audiometer_manager.cpp \
     ../../managers/blood_pressure/blood_pressure_manager.cpp \
-    ../../managers/blood_pressure/bpm_communication.cpp \
     ../../managers/blood_pressure/bpm_message.cpp \
     ../../managers/blood_pressure/bpm_messages.cpp \
     ../../managers/blood_pressure/bptru_200_driver.cpp \
     ../../managers/body_composition/body_composition_manager.cpp \
     ../../managers/cdtt/cdtt_manager.cpp \
     ../../managers/choice_reaction/choice_reaction_manager.cpp \
-    ../../managers/dxa/dicom/LogWorker.cpp \
     ../../managers/dxa/dicom/dicom_scp.cpp \
     ../../managers/dxa/dxa_hip_manager.cpp \
     ../../managers/dxa/dxa_manager.cpp \
@@ -160,6 +155,7 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../server/handlers/frax/frax_request_handler.cpp \
     ../../server/handlers/frax/frax_status_request_handler.cpp \
     ../../server/handlers/general_proxy_consent/general_proxy_consent_request_handler.cpp \
+    ../../server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.cpp \
     ../../server/handlers/grip_strength/grip_strength_request_handler.cpp \
     ../../server/handlers/grip_strength/grip_strength_status_request_handler.cpp \
     ../../server/handlers/participant_report/participant_report_request_handler.cpp \
@@ -194,6 +190,7 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../server/sessions/ultrasound_session.cpp \
     ../../server/sessions/weigh_scale_session.cpp \
     ../../server/utils.cpp \
+    ../../widgets/bpm_manual_entry_form.cpp \
     ../../widgets/device_settings/audiometer_settings_widget.cpp \
     ../../widgets/device_settings/blood_pressure_settings_widget.cpp \
     ../../widgets/device_settings/body_composition_settings_widget.cpp \
@@ -217,7 +214,8 @@ SOURCES +=  tst_spirometertests.cpp \
     ../../widgets/settings_dialog.cpp \
     ../../widgets/submission_buttons.cpp \
     ../../widgets/test_info_widget.cpp \
-    ../../widgets/usb_port_picker.cpp
+    ../../widgets/usb_port_picker.cpp \
+    ../../widgets/weight_scale_manual_entry_form.cpp
 
 
 HEADERS += \
@@ -240,7 +238,6 @@ HEADERS += \
     ../../data/access_query_helper.h \
     ../../data/blood_pressure/measurements/blood_pressure_measurement.h \
     ../../data/blood_pressure/tests/blood_pressure_test.h \
-    ../../data/body_composition/commands.h \
     ../../data/body_composition/measurements/body_composition_measurement.h \
     ../../data/body_composition/tests/body_composition_test.h \
     ../../data/cdtt/measurements/cdtt_measurement.h \
@@ -255,9 +252,6 @@ HEADERS += \
     ../../data/dxa/measurements/hip_measurement.h \
     ../../data/dxa/measurements/iva_imaging_measurement.h \
     ../../data/dxa/measurements/whole_body_measurement.h \
-    ../../data/dxa/pat_scan_query_helper.h \
-    ../../data/dxa/reference_query_helper.h \
-    ../../data/dxa/smbfilecopier.h \
     ../../data/dxa/tests/dxa_hip_test.h \
     ../../data/dxa/tests/dxa_test.h \
     ../../data/ecg/measurements/ecg_measurement.h \
@@ -294,6 +288,7 @@ HEADERS += \
     ../../dialogs/dxa_hip_dialog.h \
     ../../dialogs/ecg_dialog.h \
     ../../dialogs/frax_dialog.h \
+    ../../dialogs/general_proxy_form_dialog.h \
     ../../dialogs/grip_strength_dialog.h \
     ../../dialogs/retinal_camera_dialog.h \
     ../../dialogs/spirometer_dialog.h \
@@ -303,14 +298,12 @@ HEADERS += \
     ../../dicom/dicom_directory_watcher.h \
     ../../managers/audiometer/audiometer_manager.h \
     ../../managers/blood_pressure/blood_pressure_manager.h \
-    ../../managers/blood_pressure/bpm_communication.h \
     ../../managers/blood_pressure/bpm_message.h \
     ../../managers/blood_pressure/bpm_messages.h \
     ../../managers/blood_pressure/bptru_200_driver.h \
     ../../managers/body_composition/body_composition_manager.h \
     ../../managers/cdtt/cdtt_manager.h \
     ../../managers/choice_reaction/choice_reaction_manager.h \
-    ../../managers/dxa/dicom/LogWorker.h \
     ../../managers/dxa/dicom/dicom_scp.h \
     ../../managers/dxa/dxa_hip_manager.h \
     ../../managers/dxa/dxa_manager.h \
@@ -354,6 +347,7 @@ HEADERS += \
     ../../server/handlers/frax/frax_request_handler.h \
     ../../server/handlers/frax/frax_status_request_handler.h \
     ../../server/handlers/general_proxy_consent/general_proxy_consent_request_handler.h \
+    ../../server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h \
     ../../server/handlers/grip_strength/grip_strength_request_handler.h \
     ../../server/handlers/grip_strength/grip_strength_status_request_handler.h \
     ../../server/handlers/participant_report/participant_report_request_handler.h \
@@ -387,6 +381,7 @@ HEADERS += \
     ../../server/sessions/ultrasound_session.h \
     ../../server/sessions/weigh_scale_session.h \
     ../../server/utils.h \
+    ../../widgets/bpm_manual_entry_form.h \
     ../../widgets/device_settings/audiometer_settings_widget.h \
     ../../widgets/device_settings/blood_pressure_settings_widget.h \
     ../../widgets/device_settings/body_composition_settings_widget.h \
@@ -410,7 +405,8 @@ HEADERS += \
     ../../widgets/settings_dialog.h \
     ../../widgets/submission_buttons.h \
     ../../widgets/test_info_widget.h \
-    ../../widgets/usb_port_picker.h
+    ../../widgets/usb_port_picker.h \
+    ../../widgets/weight_scale_manual_entry_form.h
 
 
 DISTFILES += \
@@ -435,6 +431,7 @@ FORMS += \
     ../../dialogs/dxa_hip_dialog.ui \
     ../../dialogs/ecg_dialog.ui \
     ../../dialogs/frax_dialog.ui \
+    ../../dialogs/general_proxy_form_dialog.ui \
     ../../dialogs/grip_strength_dialog.ui \
     ../../dialogs/retinal_camera_dialog.ui \
     ../../dialogs/runnable_dialog.ui \
@@ -442,6 +439,7 @@ FORMS += \
     ../../dialogs/thermometerdialog.ui \
     ../../dialogs/tonometer_dialog.ui \
     ../../dialogs/weigh_scale_dialog.ui \
+    ../../widgets/bpm_manual_entry_form.ui \
     ../../widgets/device_settings/audiometer_settings_widget.ui \
     ../../widgets/device_settings/blood_pressure_settings_widget.ui \
     ../../widgets/device_settings/body_composition_settings_widget.ui \
@@ -465,4 +463,5 @@ FORMS += \
     ../../widgets/settings_dialog.ui \
     ../../widgets/submission_buttons.ui \
     ../../widgets/test_info_widget.ui \
-    ../../widgets/usb_port_picker.ui
+    ../../widgets/usb_port_picker.ui \
+    ../../widgets/weight_scale_manual_entry_form.ui

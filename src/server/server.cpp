@@ -34,25 +34,31 @@ using namespace Poco::Net;
 
 Server::Server()
 {
-    try {
-        mainThread = QThread::currentThread();
-        //moveToThread(&serverThread);
+    bool binded = false;
+    while (!binded) {
+        try {
+            mainThread = QThread::currentThread();
+            //moveToThread(&serverThread);
 
-        HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
-        HTTPServerParams::Ptr pParams = new HTTPServerParams;
+            HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
+            HTTPServerParams::Ptr pParams = new HTTPServerParams;
 
-        QString addr = CypressSettings::readSetting("address").toString();
-        int port = CypressSettings::readSetting("port").toUInt();
+            QString addr = CypressSettings::readSetting("address").toString();
+            int port = CypressSettings::readSetting("port").toUInt();
 
-        Poco::Net::ServerSocket socket(Poco::Net::SocketAddress(addr.toStdString(), port));
-        socket.setReuseAddress(true);
-        socket.setReusePort(true);
+            Poco::Net::ServerSocket socket(Poco::Net::SocketAddress(addr.toStdString(), port));
+            socket.setReuseAddress(true);
+            socket.setReusePort(true);
 
-        server.reset(new HTTPServer(pFactory, socket, pParams));
-    } catch (const Poco::Exception& e) {
-        qDebug() << e.what();
-    } catch (...) {
-        qDebug() << "random exception";
+            server.reset(new HTTPServer(pFactory, socket, pParams));
+            binded = true;
+        } catch (const Poco::Exception& e) {
+            qDebug() << "waiting for network.." << e.what();
+            QThread::sleep(1);
+        } catch (...) {
+            qDebug() << "unknown exception";
+            break;
+        }
     }
 }
 

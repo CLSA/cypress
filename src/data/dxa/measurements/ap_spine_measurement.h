@@ -18,8 +18,6 @@ public:
 
     void addDicomFile(DicomFile);
 
-    void simulate() override;
-
     bool isValidDicomFile(DicomFile file) const override;
     bool isValid() const override;
 

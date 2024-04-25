@@ -66,7 +66,8 @@ bool TonometerManager::start()
 
 bool TonometerManager::isInstalled()
 {
-    const bool isDebugMode = CypressSettings::isDebugMode();
+    if (CypressSettings::isSimMode())
+        return true;
 
     const QString runnableName = CypressSettings::readSetting("tonometer/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("tonometer/runnablePath").toString();
@@ -74,71 +75,55 @@ bool TonometerManager::isInstalled()
     const QString temporaryPath = CypressSettings::readSetting("tonometer/temporaryPath").toString();
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "TonometerManager: runnablePath is not defined";
+        qDebug() << "runnablePath is not defined";
         return false;
     }
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "TonometerManager: runnableName is not defined";
+        qDebug() << "runnableName is not defined";
         return false;
     }
 
     if (databasePath.isNull() || databasePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "TonometerManager: databasePath is not defined";
+        qDebug() << "databasePath is not defined";
         return false;
     }
 
     if (temporaryPath.isNull() || temporaryPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "TonometerManager: temporaryPath is not defined";
+        qDebug() << "temporaryPath is not defined";
         return false;
     }
 
     const QDir runnablePathInfo(runnablePath);
     if (!runnablePathInfo.exists()) {
-        if (isDebugMode) {
-            qDebug() << "TonometerManager: runnable does not exist";
-        }
+        qDebug() << "runnable does not exist";
         return false;
     }
 
     const QFileInfo runnableNameInfo(runnableName);
     if (!runnableNameInfo.exists()) {
-        if (isDebugMode) {
-            qDebug() << "TonometerManager: runnable does not exist";
-        }
+        qDebug() << "runnable does not exist";
         return false;
     }
     if (!runnableNameInfo.isExecutable()) {
-        if (isDebugMode) {
-            qDebug() << "TonometerManager: runnable is not executable";
-        }
+        qDebug() << "runnable is not executable";
         return false;
     }
 
     const QFileInfo databaseFileInfo(databasePath);
     if (!databaseFileInfo.isFile()) {
-        if (isDebugMode) {
-            qDebug() << "TonometerManager: database is not a file";
-        }
+        qDebug() << "database is not a file";
         return false;
     }
 
     if (!databaseFileInfo.isReadable()) {
-        if (isDebugMode) {
-            qDebug() << "TonometerManager: database is not readable";
-        }
+        qDebug() << "database is not readable";
         return false;
     }
 
     const QDir backupDir(temporaryPath);
     if (!backupDir.exists()) {
-        if (isDebugMode) {
-            qDebug() << "TonometerManager: backup dir does not exist";
-        }
+        qDebug() << "backup dir does not exist";
         return false;
     }
 

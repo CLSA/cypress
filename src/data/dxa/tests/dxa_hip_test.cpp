@@ -24,8 +24,10 @@ DxaHipTest::DxaHipTest()
     rightHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement(Side::RIGHT));
 }
 
-void DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session)
+int DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session)
 {
+    int filesReceived = 0;
+
     foreach (const DicomFile &file, files) {
         if (file.patientId != session.getBarcode()) {
             qDebug() << "patientId" << file.patientId << "does not match session barcode"
@@ -41,17 +43,20 @@ void DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &ses
                 measure->addDicomFile(file);
                 addMeasurement(measure);
                 leftHipMeasurement = measure;
+                filesReceived++;
             } else {
                 qDebug() << "DxaHipTest::fromDicomFiles - found right hip";
                 QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::RIGHT));
                 if (measure->isValidDicomFile(file))
                 measure->addDicomFile(file);
                 addMeasurement(measure);
-
                 rightHipMeasurement = measure;
+                filesReceived++;
             }
         }
     }
+
+    return filesReceived;
 }
 
 

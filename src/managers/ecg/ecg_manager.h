@@ -20,6 +20,9 @@
  *
  */
 
+static const QString INIT_PATH = "initecg";
+static const QString DATABASE_PATH = "DATABASE";
+
 class ECGManager : public ManagerBase
 {
     enum FileType {
@@ -47,7 +50,7 @@ public slots:
 
     void finish() override;
 
-    void readOutput();
+    void readOutput() override;
 
 private:
     // full pathspec to Cardiosoft Cardio.exe
@@ -69,8 +72,7 @@ private:
 
     // path for Cardiosoft database backup to and restore from
     //
-    const QString INIT_PATH = "initecg";
-    const QString DATABASE_PATH = "DATABASE";
+
 
 
     QProcess m_process;

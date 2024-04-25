@@ -1,12 +1,9 @@
 #include "test_base.h"
-#include "cypress_settings.h"
 
 void TestBase::reset()
 {
     m_metaData.reset();
     m_measurementList.clear();
-    m_debug = CypressSettings::isDebugMode();
-    m_sim = CypressSettings::isSimMode();
 
     setManualEntryMode(false);
 }

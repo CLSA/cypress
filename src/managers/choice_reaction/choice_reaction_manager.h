@@ -52,8 +52,8 @@ public slots:
     void readOutput();
 
 private:
-    QString m_runnableName; // full pathspec to CCB.exe
-    QString m_runnablePath; // path to CCB.exe
+    QString m_runnableName;   // full pathspec to CCB.exe
+    QString m_runnablePath;   // path to CCB.exe
 
     QString m_outputPath;     // path to output .csv files
     QString m_outputFile;     // full pathspec to working output .csv file

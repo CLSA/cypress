@@ -56,12 +56,9 @@ DXAManager::~DXAManager()
     m_dicomServer->stop();
 }
 
-bool DXAManager::isInstalled()
-{
-    const bool isDebugMode = CypressSettings::isDebugMode();
-    const bool isSimMode = CypressSettings::isSimMode();
-
-    if (isSimMode)
+bool DXAManager::isInstalled() {
+    qDebug() << "runnableName is not defined";
+    if (CypressSettings::isSimMode())
         return true;
 
     const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
@@ -78,137 +75,106 @@ bool DXAManager::isInstalled()
     const QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - runnableName is not defined";
+        qDebug() << "runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - runnablePath is not defined";
+        qDebug() << "runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - aeTitle is not defined";
+        qDebug() << "aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - host is not defined";
+        qDebug() << "host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - port is not defined";
+        qDebug() << "port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - storageDirPath is not defined";
+        qDebug() << "storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - logConfigPath is not defined";
+        qDebug() << "logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - ascConfigPath is not defined";
+        qDebug() << "ascConfigPath is not defined";
         return false;
     }
 
     if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - patscanDbPath is not defined";
-
+        qDebug() << "patscanDbPath is not defined";
         return false;
     }
 
     const QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - patscan file does not exist: " << patscanDbPath;
+        qDebug() << "patscan file does not exist: " << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isFile()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - patscan file is not a file at" << patscanDbPath;
+        qDebug() << "patscan file is not a file at" << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isReadable()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - patscan file is not readable at "
-                     << patscanDbPath;
+        qDebug() << "patscan file is not readable at" << patscanDbPath;
         return false;
     }
 
     if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - refscanDbPath is not defined at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo refscanFile(refscanDbPath);
     if (!refscanFile.exists()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - refscanDbPath is not defined at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
     if (!refscanFile.isFile()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - refscanDbPath is not a file at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not a file at" << refscanDbPath;
         return false;
     }
     if (!refscanFile.isReadable()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - refscanDbPath is not readable at "
-                     << refscanDbPath;
+        qDebug() << "refscanDbPath is not readable at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - runnableName does not exist at" << runnableName;
+        qDebug() << "runnableName does not exist at" << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - runnableName is not executable at"
-                     << runnableName;
+        qDebug() << "runnableName is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - working directory does not exist at"
-                     << workingDir;
+        qDebug() << "working directory does not exist at" << workingDir;
         return false;
     }
     if (!workingDir.isDir()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - working directory is not writable at"
-                     << workingDir;
+        qDebug() << "working directory is not writable at" << workingDir;
         return false;
     }
     if (!workingDir.isWritable()) {
-        if (isDebugMode)
-            qDebug() << "DXAManager::isInstalled - working directory is not writable at"
-                     << workingDir;
+        qDebug() << "working directory is not writable at" << workingDir;
         return false;
     }
 
@@ -255,11 +221,15 @@ void DXAManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     auto test = qSharedPointerCast<DXATest>(m_test);
     auto session = qSharedPointerCast<DXASession>(m_session);
 
-    test->fromDicomFiles(dicomFiles, *session);
+    int filesReceived = test->fromDicomFiles(dicomFiles, *session);
 
-    emit status(QString("Received %1 files").arg(dicomFiles.length()));
+    emit status(QString("Received %1 files").arg(filesReceived));
+
+    if (m_test->isValid()) {
+        emit canMeasure();
+    }
+
     emit dataChanged(m_test);
-    emit canMeasure();
 }
 
 // retrieve a measurement from the device
@@ -328,26 +298,29 @@ void DXAManager::measure()
 //
 void DXAManager::finish()
 {
-    QSharedPointer<DXATest> test = qSharedPointerCast<DXATest>(m_test);
+    auto test = qSharedPointerCast<DXATest>(m_test);
 
-    int answer_id = m_session->getAnswerId();
-    QString barcode = m_session->getBarcode();
+    const int answer_id = m_session->getAnswerId();
+    const QString barcode = m_session->getBarcode();
+
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
     // Whole body
-    QByteArray wb_1 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody1.absFilePath);
-    QByteArray wb_2 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody2.absFilePath);
+    const QByteArray wb_1 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody1.absFilePath);
+    const QByteArray wb_2 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody2.absFilePath);
 
     QString wb_1_file_name = test->wholeBodyMeasurement->m_wholeBody1.name + ".dcm";
     QString wb_2_file_name = test->wholeBodyMeasurement->m_wholeBody2.name + ".dcm";
 
-    QByteArray sp_1 = FileUtils::readFile(test->apSpineMeasurement->m_apSpineFile.absFilePath);
+    const QByteArray sp_1 = FileUtils::readFile(test->apSpineMeasurement->m_apSpineFile.absFilePath);
 
     // AP Lumbar Spine
     QString sp_1_file_name = test->apSpineMeasurement->m_apSpineFile.name + ".dcm";
 
-    QByteArray iva_ot = FileUtils::readFile(test->ivaImagingMeasurement->m_dicomOtFile.absFilePath);
-    QByteArray iva_pr = FileUtils::readFile(test->ivaImagingMeasurement->m_dicomPrFile.absFilePath);
-    QByteArray iva_measure = FileUtils::readFile(
+    const QByteArray iva_ot = FileUtils::readFile(test->ivaImagingMeasurement->m_dicomOtFile.absFilePath);
+    const QByteArray iva_pr = FileUtils::readFile(test->ivaImagingMeasurement->m_dicomPrFile.absFilePath);
+    const QByteArray iva_measure = FileUtils::readFile(
         test->ivaImagingMeasurement->m_dicomMeasureFile.absFilePath);
 
     // IVA
@@ -357,11 +330,11 @@ void DXAManager::finish()
 
     // Forearm Left
     QString fa_1_file_name = "FA_L_DICOM.dcm";
-    QByteArray fa_1 = FileUtils::readFile(test->leftForearmMeasurement->m_forearmDicomFile.absFilePath);
+    const QByteArray fa_1 = FileUtils::readFile(test->leftForearmMeasurement->m_forearmDicomFile.absFilePath);
 
     // Forearm Right
     QString fa_2_file_name = "FA_R_DICOM.dcm";
-    QByteArray fa_2 = FileUtils::readFile(test->leftForearmMeasurement->m_forearmDicomFile.absFilePath);
+    const QByteArray fa_2 = FileUtils::readFile(test->leftForearmMeasurement->m_forearmDicomFile.absFilePath);
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
@@ -391,19 +364,16 @@ void DXAManager::finish()
     QJsonObject responseJson = {};
     responseJson.insert("value", testJson);
 
-    QJsonDocument jsonDoc(responseJson);
-    QByteArray serializedData = jsonDoc.toJson();
-
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getPineEndpoint();
+    const QJsonDocument jsonDoc(responseJson);
+    const QByteArray serializedData = jsonDoc.toJson();
 
     bool ok = false;
     ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                          (host + endpoint + QString::number(answer_id)).toStdString(),
+                          answerUrl.toStdString(),
                           "application/json",
                           serializedData);
     if (!ok) {
-            qDebug() << "error transmitting results";
+        qDebug() << "error transmitting results";
         return;
     }
 
@@ -411,8 +381,7 @@ void DXAManager::finish()
 
     if (!test->wholeBodyMeasurement->m_wholeBody1.absFilePath.isEmpty()) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                                             + "?filename=" + wb_1_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + wb_1_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   wb_1);
         if (!ok) {
@@ -423,8 +392,7 @@ void DXAManager::finish()
 
     if (!test->wholeBodyMeasurement->m_wholeBody2.absFilePath.isEmpty()) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + wb_2_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + wb_2_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   wb_2);
         if (!ok) {
@@ -435,8 +403,7 @@ void DXAManager::finish()
 
     if (test->apSpineMeasurement->m_hasApSpineFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + sp_1_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + sp_1_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   sp_1);
         if (!ok) {
@@ -447,8 +414,7 @@ void DXAManager::finish()
 
     if (test->ivaImagingMeasurement->hasOtFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + iva_ot_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + iva_ot_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   iva_ot);
         if (!ok) {
@@ -459,8 +425,7 @@ void DXAManager::finish()
 
     if (test->ivaImagingMeasurement->hasPrFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + iva_pr_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + iva_pr_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   iva_pr);
         if (!ok) {
@@ -471,8 +436,7 @@ void DXAManager::finish()
 
     if (test->ivaImagingMeasurement->hasMeasureFile) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + iva_measure_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + iva_measure_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   iva_measure);
         if (!ok) {
@@ -483,8 +447,7 @@ void DXAManager::finish()
 
     if (!test->leftForearmMeasurement->m_forearmDicomFile.absFilePath.isNull()) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + fa_1_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + fa_1_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   fa_1);
         if (!ok) {
@@ -496,8 +459,7 @@ void DXAManager::finish()
 
     if (!test->rightForearmMeasurement->m_forearmDicomFile.absFilePath.isNull()) {
         ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (host + endpoint + QString::number(answer_id)
-                         + "?filename=" + fa_2_file_name.replace("_dcm", ".dcm")).toStdString(),
+                  (answerUrl + "?filename=" + fa_2_file_name.replace("_dcm", ".dcm")).toStdString(),
                   "application/octet-stream",
                   fa_2);
         if (!ok) {
@@ -560,6 +522,7 @@ bool DXAManager::copyPatScanDb() {
     const QFileInfo patscanFileInfo(m_patscanDbPath);
     if (!patscanFileInfo.exists())
         return false;
+
     if (!patscanFileInfo.isReadable())
         return false;
 

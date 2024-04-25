@@ -26,7 +26,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="weightValue"/>
+        <widget class="QDoubleSpinBox" name="weightValue">
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <double>500.000000000000000</double>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

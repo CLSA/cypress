@@ -204,9 +204,7 @@ int main(int argc, char *argv[])
     }
 
     logAppInfo();
-
     logSystemInfo();
-
     logNetworkInfo();
 
     // Make sure the network is up and that the Pine server is alive

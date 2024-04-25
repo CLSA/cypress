@@ -110,8 +110,8 @@ void GeneralProxyManager::readOutput() {
 void GeneralProxyManager::finish() {
 
     const int answer_id = m_session->getAnswerId();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
     PDFFormFiller filler;
     const QString dataFields = filler.dumpDataFields(m_outputFilePath);
@@ -131,9 +131,7 @@ void GeneralProxyManager::finish() {
 
     const QJsonObject responseJson { { "value", testJson } };
     const QJsonDocument jsonDoc(responseJson);
-
     const QByteArray serializedData = jsonDoc.toJson();
-    const QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
 
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
@@ -146,7 +144,7 @@ void GeneralProxyManager::finish() {
 
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (host + endpoint + QString::number(answer_id) + "?filename=general_proxy.pdf").toStdString(),
+        (answerUrl + "?filename=general_proxy.pdf").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(m_outputFilePath)
     );

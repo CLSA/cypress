@@ -41,6 +41,21 @@ private slots:
     void dicomFilesReceived(QList<DicomFile> dicomFiles);
 
 private:
+    // Reset the session
+    bool clearData() override;
+
+    // Set up device
+    bool setUp() override;
+
+    // Clean up the device for next time
+    bool cleanUp() override;
+
+    bool initReferenceDb();
+    bool initPatScanDb();
+
+    bool copyReferenceDb();
+    bool copyPatScanDb();
+
     QScopedPointer<DcmRecv> m_dicomServer;
 
     QString m_runnableName;
@@ -61,21 +76,6 @@ private:
 
     QFileInfo m_referenceDbFileInfo;
     QSqlDatabase m_referenceDb;
-
-    // Reset the session
-    bool clearData() override;
-
-    // Set up device
-    bool setUp() override;
-
-    // Clean up the device for next time
-    bool cleanUp() override;
-
-    bool initReferenceDb();
-    bool initPatScanDb();
-
-    bool copyReferenceDb();
-    bool copyPatScanDb();
 };
 
 #endif // DXAHIPMANAGER_H

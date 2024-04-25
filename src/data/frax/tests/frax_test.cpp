@@ -97,14 +97,8 @@ void FraxTest::fromFile(const QString& fileName)
         measure3->setAttribute("probability", list.at(15).toDouble(), "%");
         addMeasurement(measure3);
 
-        QString interp = "N/A";
         const double p = list.at(15).toDouble(); // interpretation of osteoporotic_fracture_bmd result for report
-        if (p > 20)
-            interp = "High";
-        else if (p >= 10 && p <= 20)
-            interp = "Moderate";
-        else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
-            interp = "Low";
+        QString interp = interpretResults(p);
         addMetaData("osteoporotic_fracture_bmd_interp", interp);
 
         QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
@@ -126,6 +120,18 @@ void FraxTest::fromFile(const QString& fileName)
         addMetaData("alcohol",                list.at(11).toUInt());
         addMetaData("femoral_neck_tscore",    list.at(12).toDouble());
     }
+}
+
+QString FraxTest::interpretResults(double p)
+{
+    QString interp = "N/A";
+    if (p > 20.0)
+        interp = "High (> 20%)";
+    else if (p >= 10.0 && p <= 20.0)
+        interp = "Moderate (10% - 20%";
+    else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
+        interp = "Low (< 10%)";
+    return interp;
 }
 
 void FraxTest::simulate(const QVariantMap& input)
@@ -179,14 +185,7 @@ void FraxTest::simulate(const QVariantMap& input)
     measure3->setAttribute("probability", p, "%");
     addMeasurement(measure3);
 
-    QString interp = "N/A";
-    if (p > 20)
-        interp = "High";
-    else if (p >= 10 && p <= 20)
-        interp = "Moderate";
-    else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
-        interp = "Low";
-
+    QString interp = interpretResults(p);
     addMetaData("osteoporotic_fracture_bmd_interp", interp);
 
     QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);

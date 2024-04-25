@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QGroupBox" name="groupBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="title">
        <string>Room 1</string>
       </property>
@@ -44,6 +47,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="launchDxa1">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>DXA (Hip)</string>
          </property>
@@ -95,6 +101,9 @@
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="title">
        <string>Room 2</string>
       </property>
@@ -124,6 +133,9 @@
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox_3">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="title">
        <string>Room 3</string>
       </property>

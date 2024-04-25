@@ -13,11 +13,24 @@
 #include <QMessageBox>
 
 
+
+AudiometerManager::AudiometerManager(QSharedPointer<AudiometerSession> session)
+    : SerialPortManager(session)
+{
+    m_portName = CypressSettings::readSetting("audiometer/portName").toString();
+
+    qInfo() << "AudiometerManager";
+    qInfo() << "portName" << m_portName;
+
+    m_test.reset(new HearingTest);
+    //m_test->setExpectedMeasurementCount(16);
+}
+
 QByteArray AudiometerManager::END_CODE = AudiometerManager::initEndCode();
 
 QByteArray AudiometerManager::initEndCode()
 {
-    const char data[] = { '~', 'p', '\x17', 'Z', '^', QChar(QChar::SpecialCharacter::CarriageReturn).toLatin1() };
+    static const char data[] = { '~', 'p', '\x17', 'Z', '^', QChar(QChar::SpecialCharacter::CarriageReturn).toLatin1() };
 
     return QByteArray(data);
 }
@@ -38,15 +51,6 @@ bool AudiometerManager::hasEndCode(const QByteArray &arr) const
     return ok;
 }
 
-AudiometerManager::AudiometerManager(QSharedPointer<AudiometerSession> session)
-    : SerialPortManager(session)
-{
-    m_test.reset(new HearingTest);
-    m_test->setExpectedMeasurementCount(16);
-
-    m_portName = CypressSettings::readSetting("audiometer/portName").toString();
-}
-
 bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
 {
     // Check if the system location starts with "COM"
@@ -56,9 +60,8 @@ bool AudiometerManager::isRS232Port(const QSerialPortInfo& portInfo)
 bool AudiometerManager::isInstalled()
 {
     const QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
-    if (portList.isEmpty()) {
+    if (portList.isEmpty())
         return false;
-    }
 
     foreach (const QSerialPortInfo& portInfo, portList) {
         if (!isRS232Port(portInfo))
@@ -66,13 +69,24 @@ bool AudiometerManager::isInstalled()
 
         const QList<qint32> baudRates = portInfo.standardBaudRates();
         foreach (const qint32 baudRate, baudRates) {
-            if (baudRate >= 600 && baudRate <= 19200) {
+            if (baudRate >= 600 && baudRate <= 19200)
                 return true;
-            }
         }
     }
 
     return false;
+}
+
+void AudiometerManager::addManualEntry(const QString side, const QString test, const int level, const bool pass) {
+    auto audiometerTest = qSharedPointerCast<HearingTest>(m_test);
+    QSharedPointer<HearingMeasurement> measure(new HearingMeasurement(side, test, level, pass));
+    if (measure->isValid()) {
+        audiometerTest->addMeasurement(measure);
+        emit dataChanged(audiometerTest);
+        emit canFinish();
+    }
+
+    qDebug() << audiometerTest->toJsonObject();
 }
 
 bool AudiometerManager::start()
@@ -86,26 +100,34 @@ bool AudiometerManager::start()
 
     emit started(m_test);
     emit dataChanged(m_test);
-    emit canMeasure();
 
     return true;
 }
 
 bool AudiometerManager::setUp()
 {
-    qDebug() << "AudiometerManager::setUp";
-
+    qInfo() << "AudiometerManager::setUp";
     return true;
 }
 
 void AudiometerManager::connectDevice()
 {
-    qDebug() << "WeighScaleManager::connectDevice";
+    qInfo() << "AudiometerManager::connectDevice";
 
     // Connect to the serial port and set up listeners
+    if (m_port.isOpen()) {
+        disconnect(&m_port, &QSerialPort::readyRead,
+            this,    &AudiometerManager::readDevice);
 
-    if (m_port.isOpen())
-        m_port.close();
+        disconnect(&m_port, &QSerialPort::errorOccurred,
+            this,    &AudiometerManager::handleSerialPortError);
+
+        disconnect(&m_port, &QSerialPort::dataTerminalReadyChanged,
+            this,    &AudiometerManager::handleDataTerminalReadyChanged);
+
+        disconnect(&m_port, &QSerialPort::requestToSendChanged,
+            this,    &AudiometerManager::handleRequestToSendChanged);
+    }
 
     m_port.setDataBits(QSerialPort::Data8);
     m_port.setParity(QSerialPort::NoParity);
@@ -128,20 +150,20 @@ void AudiometerManager::connectDevice()
 
     if (m_port.open(QSerialPort::ReadWrite)) {
         emit deviceConnected(QSerialPortInfo(m_port));
+        emit canMeasure();
     }
 }
 
 void AudiometerManager::selectDevice(const QSerialPortInfo &port)
 {
     SerialPortManager::selectDevice(port);
-
     CypressSettings::writeSetting("audiometer/portName", port.portName());
     m_portName = port.portName();
 }
 
 void AudiometerManager::measure()
 {
-    qDebug() << "AudiometerManager::measure";
+    qInfo() << "AudiometerManager::measure";
 
     if (m_sim)
     {
@@ -153,7 +175,7 @@ void AudiometerManager::measure()
         return;
     }
 
-    const char cmd[] = { 0x05, '4', 0x0d };
+    static const char cmd[] = { 0x05, '4', 0x0d };
 
     m_request = QByteArray::fromRawData(cmd, 3);
     writeDevice();
@@ -161,7 +183,7 @@ void AudiometerManager::measure()
 
 bool AudiometerManager::cleanUp()
 {
-    qDebug() << "AudiometerManager::cleanUp";
+    qInfo() << "AudiometerManager::cleanUp";
 
     clearData();
 
@@ -173,7 +195,7 @@ bool AudiometerManager::cleanUp()
 
 void AudiometerManager::readDevice()
 {
-    qDebug() << "AudiometerManager::readDevice";
+    qInfo() << "AudiometerManager::readDevice";
 
     // read received data whenever the data ready signal is emitted and add it to the buffer
     // if the end code is received, validate the data and signal that the test is complete
@@ -184,18 +206,20 @@ void AudiometerManager::readDevice()
     auto hearingTest = qSharedPointerCast<HearingTest>(m_test);
     if(hasEndCode(m_buffer))
     {
+        clearData();
         hearingTest->fromArray(m_buffer);
         if(hearingTest->isValid())
         {
             emit dataChanged(m_test);
             emit canFinish();
         }
+        m_buffer.clear();
     }
 }
 
 void AudiometerManager::writeDevice()
 {
-    qDebug() << "AudiometerManager::writeDevice";
+    qInfo() << "AudiometerManager::writeDevice";
 
     // send a request to the audiometer to start data collection
     //
@@ -208,7 +232,7 @@ void AudiometerManager::writeDevice()
 
 bool AudiometerManager::clearData()
 {
-    qDebug() << "AudiometerManager::clearData";
+    qInfo() << "AudiometerManager::clearData";
 
     m_test->reset();
 

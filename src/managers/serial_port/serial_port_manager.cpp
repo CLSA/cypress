@@ -12,6 +12,7 @@ SerialPortManager::SerialPortManager(QSharedPointer<CypressSession> session)
 
 bool SerialPortManager::start()
 {
+    qInfo() << "SerialPortManager::start";
     scanDevices();
     return true;
 }
@@ -36,7 +37,7 @@ void SerialPortManager::handleRequestToSendChanged(bool set)
 
 bool SerialPortManager::isDefined(const QString &label) const
 {
-    qDebug() << "SerialPortManager::isDefined - " << label;
+    qInfo() << "SerialPortManager::isDefined - " << label;
 
     if(m_deviceList.contains(label))
     {
@@ -49,7 +50,7 @@ bool SerialPortManager::isDefined(const QString &label) const
 
 QJsonObject SerialPortManager::getDeviceData(const QSerialPortInfo& info)
 {
-    qDebug() << "SerialPortManager::getDeviceData";
+    qInfo() << "SerialPortManager::getDeviceData";
 
     QJsonObject deviceData {{}};
 
@@ -79,14 +80,14 @@ QJsonObject SerialPortManager::getDeviceData(const QSerialPortInfo& info)
 
 void SerialPortManager::setDeviceData(const QJsonObject& deviceData)
 {
-    qDebug() << "SerialPortManager::getDeviceData";
+    qInfo() << "SerialPortManager::getDeviceData";
 
     m_deviceData = deviceData;
 }
 
 bool SerialPortManager::scanDevices()
 {
-    qDebug() << "SerialPortManager::scanningDevices";
+    qInfo() << "SerialPortManager::scanningDevices";
 
     m_deviceList.clear();
     emit scanningDevices();
@@ -134,7 +135,7 @@ bool SerialPortManager::scanDevices()
 
 void SerialPortManager::selectDevice(const QSerialPortInfo &port)
 {
-    qDebug() << "SerialPortManager::selectDevice: " << port.portName();
+    qInfo() << "SerialPortManager::selectDevice: " << port.portName();
 
     setProperty("deviceName", port.portName());
     setDevice(port);
@@ -142,6 +143,8 @@ void SerialPortManager::selectDevice(const QSerialPortInfo &port)
 
 void SerialPortManager::setDevice(const QSerialPortInfo &info)
 {
+    qInfo() << "SerialPortManager::setDevice" << info.portName();
+
     m_port.setPort(info);
     if (m_port.open(QSerialPort::ReadWrite))
     {
@@ -152,7 +155,7 @@ void SerialPortManager::setDevice(const QSerialPortInfo &info)
 
 void SerialPortManager::connectDevice()
 {
-    qDebug() << "SerialPortManager::connectDevice";
+    qInfo() << "SerialPortManager::connectDevice";
 
     if(m_port.isOpen())
     {
@@ -201,6 +204,8 @@ void SerialPortManager::connectDevice()
 
 void SerialPortManager::disconnectDevice()
 {
+    qInfo() << "SerialPortManager::disconnectDevice";
+
     if (m_port.isOpen())
         m_port.close();
 
@@ -217,20 +222,24 @@ void SerialPortManager::disconnectDevice()
             this,    &SerialPortManager::handleRequestToSendChanged);
 
     emit cannotMeasure();
+    emit deviceDisconnected();
     emit canConnectDevice();
 }
 
 bool SerialPortManager::setUp()
 {
+    qInfo() << "SerialPortManager::setUp";
     return true;
 }
 
 bool SerialPortManager::clearData()
 {
+    qInfo() << "SerialPortManager::clearData";
     return true;
 }
 
 bool SerialPortManager::cleanUp()
 {
+    qInfo() << "SerialPortManager::cleanUp";
     return true;
 }

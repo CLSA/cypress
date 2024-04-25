@@ -89,8 +89,9 @@ bool DXATest::hasAllNeededFiles() const
     return true;
 }
 
-void DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
+int DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
 {
+    int filesReceived = 0;
     foreach (const DicomFile &file, files) {
         if (file.patientId != session.getBarcode()) {
             qDebug() << "file patient id " << file.patientId << "does not equal session barcode"
@@ -104,21 +105,37 @@ void DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
         if (bodyPartExamined == "HIP") // hip done in different stage
             continue;
 
-        qDebug() << "checking file: " << file.bodyPartExamined << file.seriesNumber;
+        qDebug() <<
+            "checking file: " <<
+            file.bodyPartExamined <<
+            file.seriesNumber;
 
-        if (ivaImagingMeasurement->isValidDicomFile(file))
+        if (ivaImagingMeasurement->isValidDicomFile(file)) {
             ivaImagingMeasurement->addDicomFile(file);
-        else if (wholeBodyMeasurement->isValidDicomFile(file))
+            filesReceived++;
+        }
+        else if (wholeBodyMeasurement->isValidDicomFile(file)) {
             wholeBodyMeasurement->addDicomFile(file);
-        else if (file.bodyPartExamined == "ARM" && file.laterality == "L" && leftForearmMeasurement->isValidDicomFile(file))
+            filesReceived++;
+        }
+        else if (file.bodyPartExamined == "ARM" && file.laterality == "L" && leftForearmMeasurement->isValidDicomFile(file)) {
             leftForearmMeasurement->addDicomFile(file);
-        else if (file.bodyPartExamined == "ARM" && file.laterality == "R" && rightForearmMeasurement->isValidDicomFile(file))
+            filesReceived++;
+        }
+        else if (file.bodyPartExamined == "ARM" && file.laterality == "R" && rightForearmMeasurement->isValidDicomFile(file)) {
             rightForearmMeasurement->addDicomFile(file);
-        else if (apSpineMeasurement->isValidDicomFile(file))
+            filesReceived++;
+        }
+        else if (apSpineMeasurement->isValidDicomFile(file)) {
             apSpineMeasurement->addDicomFile(file);
-        else
+            filesReceived++;
+        }
+        else {
             qDebug() << "Unknown file";
+        }
     }
+
+    return filesReceived;
 }
 
 void DXATest::getPatientScan(const QSqlDatabase &db, const QString &participantId) {

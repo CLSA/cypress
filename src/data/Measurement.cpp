@@ -1,8 +1,53 @@
 #include "measurement.h"
-#include "../auxiliary/Constants.h"
+#include "auxiliary/Constants.h"
 
 #include <QDebug>
 #include <QJsonObject>
+
+Measurement::Measurement() {}
+
+Measurement::Measurement(const Measurement &other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement::Measurement(Measurement &other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement::Measurement(const Measurement &&other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement::Measurement(Measurement &&other)
+{
+    m_attributes = other.m_attributes;
+}
+
+Measurement &Measurement::operator=(const Measurement &other)
+{
+    if (this != &other) {
+      m_attributes = other.m_attributes;
+    }
+    return *this;
+}
+
+bool Measurement::operator==(const Measurement &rhs) const
+{
+    return (this->getAttributes() == rhs.getAttributes());
+}
+
+bool Measurement::operator!=(const Measurement &rhs)
+{
+    return !(*this == rhs);
+}
+
+QString Measurement::toString() const
+{
+    return toStringList().join(" ");
+}
 
 bool Measurement::isValid() const
 {
@@ -124,50 +169,9 @@ QStringList Measurement::toStringList(const bool& no_keys) const
     return list;
 }
 
-Measurement::Measurement() {}
 
-Measurement::Measurement(const Measurement &other)
-{
-    m_attributes = other.m_attributes;
-}
 
-Measurement::Measurement(Measurement &other)
-{
-    m_attributes = other.m_attributes;
-}
 
-Measurement::Measurement(const Measurement &&other)
-{
-    m_attributes = other.m_attributes;
-}
-
-Measurement::Measurement(Measurement &&other)
-{
-    m_attributes = other.m_attributes;
-}
-
-Measurement &Measurement::operator=(const Measurement &other)
-{
-    if (this != &other) {
-      m_attributes = other.m_attributes;
-    }
-    return *this;
-}
-
-bool Measurement::operator==(const Measurement &rhs) const
-{
-    return (this->getAttributes() == rhs.getAttributes());
-}
-
-bool Measurement::operator!=(const Measurement &rhs)
-{
-    return !(*this == rhs);
-}
-
-QString Measurement::toString() const
-{
-    return toStringList().join(" ");
-}
 
 QJsonObject Measurement::toJsonObject() const
 {

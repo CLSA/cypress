@@ -21,10 +21,12 @@ public:
     //
     QJsonObject toJsonObject() const override;
 
-    void simulate(const QVariantMap&);
+    void simulate(const QVariantMap&) override;
 
 private:
     QStringList m_outputKeyList;
+
+    QString interpretResults(double p);
 
 };
 

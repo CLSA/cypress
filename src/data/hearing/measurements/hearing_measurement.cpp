@@ -1,5 +1,6 @@
 #include "hearing_measurement.h"
 
+#include <QJsonObject>
 #include <QDateTime>
 #include <QDebug>
 #include <QRegExp>
@@ -121,12 +122,27 @@ QMap<int,QString> HearingMeasurement::initFrequencyLookup()
 
 HearingMeasurement::HearingMeasurement(const QString& side, const int& index, const QString& code) {
     fromCode(side,index,code);
+
+    qDebug() << "HearingMeasurement";
+    qDebug() << toJsonObject();
+}
+
+
+HearingMeasurement::HearingMeasurement(const QString& side, const QString& test, const int level, const bool pass) {
+    setAttribute("side", side.toLower());
+    setAttribute("test", test);
+    setAttribute("level", level, "dB");
+    setAttribute("pass", pass);
+    setAttribute("outcome", "");
+    setAttribute("error", "");
 }
 
 // index is the position 0-7 in the returned HTL string from
 // the RA300 RS232 port data
 //
 void HearingMeasurement::fromCode(const QString& side, const int& index, const QString& code) {
+    qDebug() << "HearingMeasurement::fromCode" << side << index << code;
+
     reset();
 
     if (frequencyLookup.contains(index)) {
@@ -150,11 +166,17 @@ void HearingMeasurement::fromCode(const QString& side, const int& index, const Q
 }
 
 bool HearingMeasurement::isValid() const {
+    qInfo() << "HearingMeasurement::isValid";
+
     // side test: level (units) OR error (outcome)
     const bool hasRequiredFields = hasAttribute("side") && hasAttribute("test");
     const bool hasResultOrError = hasAttribute("level") || (hasAttribute("error") && hasAttribute("outcome"));
 
-    return hasRequiredFields && hasResultOrError;
+    const bool valid = hasRequiredFields && hasResultOrError;
+
+    qDebug() << valid;
+
+    return valid;
 }
 
 QString HearingMeasurement::toString() const {

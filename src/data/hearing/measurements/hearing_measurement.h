@@ -1,7 +1,7 @@
 #ifndef HEARING_MEASUREMENT_H
 #define HEARING_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
  * \class HearingMeasurement
@@ -18,6 +18,7 @@ public:
     HearingMeasurement() = default;
     ~HearingMeasurement() = default;
 
+    HearingMeasurement(const QString &side, const QString &test, const int level, const bool pass);
     HearingMeasurement(const QString&, const int&, const QString&);
 
     // String representation for debug and GUI display purposes
@@ -33,6 +34,7 @@ public:
     friend class HearingTest;
 
     void fromCode(const QString&, const int&, const QString&);
+
 
 private:
     static const q_stringMap codeLookup;

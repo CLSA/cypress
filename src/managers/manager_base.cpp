@@ -32,10 +32,12 @@ ManagerBase::~ManagerBase()
 }
 
 void ManagerBase::finish() {
-
     qDebug() << "ManagerBase::finish";
 
     int answer_id = m_session->getAnswerId();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
+    qDebug() <<  answerUrl;
 
     QJsonObject testJson = m_test->toJsonObject();
     testJson.insert("session", m_session->getJsonObject());
@@ -46,7 +48,6 @@ void ManagerBase::finish() {
     QJsonDocument jsonDoc(responseJson);
     QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),
@@ -62,19 +63,20 @@ void ManagerBase::finish() {
         emit error("Something went wrong");
 }
 
-bool ManagerBase::sendCancellation(QString uuid)
-{
-    QJsonObject data {
+bool ManagerBase::sendCancellation(QString uuid) {
+    qDebug() << "ManagerBase::sendCancellation";
+
+    const QJsonObject data {
         { "status", "cancelled" }
     };
 
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getDeviceEndpoint() + uuid;
-    QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer_device/uuid=" + uuid;
+    const QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
 
     return NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        host.toStdString() + endpoint.toStdString(),
+        answerUrl.toStdString(),
         "application/json",
         serializedData
     );
@@ -82,18 +84,20 @@ bool ManagerBase::sendCancellation(QString uuid)
 
 bool ManagerBase::sendComplete(QString uuid)
 {
-    QJsonObject data {
+    const QJsonObject data {
         { "status", "completed" }
     };
 
-    QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer_device/uuid=" + uuid;
 
-    QString host = CypressSettings::getPineHost();
-    QString endpoint = CypressSettings::getDeviceEndpoint() + uuid;
+    qDebug() << "sendComplete:" << answerUrl;
+
+    const QByteArray serializedData = JsonSettings::serializeJson(data).toUtf8();
 
     return NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        host.toStdString() + endpoint.toStdString(),
+        answerUrl.toStdString(),
         "application/json",
         serializedData
     );

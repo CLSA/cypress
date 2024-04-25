@@ -7,6 +7,26 @@
 #include <QStringBuilder>
 #include <QRandomGenerator>
 
+// PatientID bytes 4-17
+const static int PATIENT_ID_INDEX_START = 4;
+const static int PATIENT_ID_INDEX_END = 17;
+
+// TestID bytes 18-34
+const static int TEST_ID_INDEX_START = 18;
+const static int TEST_ID_INDEX_END = 34;
+
+// TestDatetime 35-50
+const static int TEST_DATETIME_INDEX_START = 35;
+const static int TEST_DATETIME_INDEX_END = 50;
+
+// CalibrationDate 51-58
+const static int CALIBRATION_DATE_INDEX_START = 51;
+const static int CALIBRATION_DATE_INDEX_END = 58;
+
+// ExaminerId 59 - 74
+const static int EXAMINER_ID_START = 59;
+const static int EXAMINER_ID_END = 74;
+
 HearingTest::HearingTest() {
     m_outputKeyList << "patient_id";
     m_outputKeyList << "test_datetime";
@@ -14,64 +34,33 @@ HearingTest::HearingTest() {
     m_outputKeyList << "test_id";
 }
 
-// Meta data
-
-// PatientID bytes 4-17
-// TestID bytes 18-34
-// TestDatetime 35-50
-// CalibrationDate
-const static int PATIENT_ID_INDEX_START = 4;
-const static int PATIENT_ID_INDEX_END = 17;
-
-const static int TEST_ID_INDEX_START = 18;
-const static int TEST_ID_INDEX_END = 34;
-
-const static int TEST_DATETIME_INDEX_START = 35;
-const static int TEST_DATETIME_INDEX_END = 50;
-
-const static int CALIBRATION_DATE_INDEX_START = 51;
-const static int CALIBRATION_DATE_INDEX_END = 58;
-
-const static int EXAMINER_ID_START = 59;
-const static int EXAMINER_ID_END = 74;
-
 bool HearingTest::isValid() const
 {
-    bool okMeta = true;
-    foreach (const auto key, m_outputKeyList) {
-      if (!hasMetaData(key)) {
-          okMeta = false;
-          break;
-      }
+    if (getMeasurementCount() < getExpectedMeasurementCount()) {
+        qDebug() << "count != expected";
+        return false;
     }
 
-    bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
-    if (okTest) {
-        foreach (const auto m, m_measurementList) {
-            if (!m->isValid()) {
-                okTest = false;
-                break;
-            }
+    foreach (const auto m, m_measurementList) {
+        if (!m->isValid()) {
+            return false;
         }
     }
 
-    return okMeta && okTest;
+    return true;
 }
 
 bool HearingTest::isPartial() const
 {
-    bool okTest = getMeasurementCount() >= getMinimumMeasurementCount();
-    if(okTest)
-    {
-      foreach(const auto m, m_measurementList)
-      {
-        if (!m->isValid()) {
-          okTest = false;
-          break;
-        }
-      }
+    if (getMeasurementCount() < getMinimumMeasurementCount())
+        return false;
+
+    foreach(const auto m, m_measurementList) {
+        if (!m->isValid())
+            return false;
     }
-    return okTest;
+
+    return true;
 }
 
 void HearingTest::simulate(const QVariantMap& inputData)
@@ -92,7 +81,7 @@ void HearingTest::simulate(const QVariantMap& inputData)
             measurement->setAttribute("side", side);
             measurement->setAttribute("test", i.value());
 
-            double level = QRandomGenerator::global()->bounded(1, 101);
+            const double level = QRandomGenerator::global()->bounded(1, 101);
 
             measurement->setAttribute("level", level);
             measurement->setAttribute("pass", level < 40);
@@ -143,9 +132,9 @@ void HearingTest::fromArray(const QByteArray &arr) {
 
     m_array = arr;
 
-    addMetaData("patient_id", readPatientID());
-    addMetaData("test_id", readTestID());
-    addMetaData("test_datetime", readTestDateTime());
+    addMetaData("patient_id",            readPatientID());
+    addMetaData("test_id",               readTestID());
+    addMetaData("test_datetime",         readTestDateTime());
     addMetaData("last_calibration_date", readCalibrationDate());
 
     QStringList sides = {"left", "right"};
@@ -154,8 +143,15 @@ void HearingTest::fromArray(const QByteArray &arr) {
         foreach (auto m, readHearingThresholdLevels(side)) {
             QSharedPointer<HearingMeasurement> measure(new HearingMeasurement(m));
 
-            double level = measure->getAttribute("level").value().toDouble();
-            measure->setAttribute("pass", level < 40);
+            QVariant level = measure->getAttribute("level").value();
+            const QString error = measure->getAttributeValue("error").toString();
+
+            bool ok { false };
+
+            double levelValue = level.toDouble(&ok);
+
+            if (ok && (error.isNull() || error.isEmpty()))
+                measure->setAttribute("pass", levelValue <= 40);
 
             addMeasurement(measure);
         }

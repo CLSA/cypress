@@ -37,6 +37,7 @@ public:
     static bool isRS232Port(const QSerialPortInfo& portInfo);
     static bool isInstalled();
 
+    void addManualEntry(const QString side, const QString test, const int level, const bool pass);
 
 public slots:
 

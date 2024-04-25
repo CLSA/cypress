@@ -52,7 +52,7 @@ bool ECGManager::isInstalled()
     const QString exportPath = CypressSettings::readSetting("ecg/exportPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "ECGManager::isInstalled: runnableName is not defined";
+        qDebug() << "runnableName is not defined";
         return false;
     }
 
@@ -68,24 +68,24 @@ bool ECGManager::isInstalled()
 
     const QFileInfo runnableInfo(runnableName);
     if (!runnableInfo.exists()) {
-        qInfo() << "runnableName does not exist";
+        qInfo() << runnableName << "does not exist";
         return false;
     }
 
     if (!runnableInfo.isExecutable()) {
-        qInfo() << "runnableName is not executable";
+        qInfo() << runnableName << "is not executable";
         return false;
     }
 
     const QDir workingInfo(workingPath);
     if (!workingInfo.exists()) {
-        qInfo() << "working info does not exist";
+        qInfo() << "workingPath could not be found";
         return false;
     }
 
     const QDir exportInfo(exportPath);
     if (!exportInfo.exists()) {
-        qInfo() << "export info does not exist";
+        qInfo() << "exportPath could not be found";
         return false;
     }
 
@@ -200,8 +200,8 @@ void ECGManager::readOutput()
 
 void ECGManager::finish() {
     const int answer_id = m_session->getAnswerId();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
     // Save the xml and pdf files
     const QFileInfo xmlFile(m_outputFile);
@@ -215,7 +215,7 @@ void ECGManager::finish() {
 
     bool ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (host + endpoint + QString::number(answer_id) + "?filename=" + "Ecg.xml").toStdString(),
+        (answerUrl + "?filename=" + "Ecg.xml").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(xmlFile.absoluteFilePath())
     );
@@ -232,10 +232,9 @@ void ECGManager::finish() {
     QJsonObject responseJson {};
     responseJson.insert("value", testJson);
 
-    QJsonDocument jsonDoc(responseJson);
-    QByteArray serializedData = jsonDoc.toJson();
+    const QJsonDocument jsonDoc(responseJson);
+    const QByteArray serializedData = jsonDoc.toJson();
 
-    QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),

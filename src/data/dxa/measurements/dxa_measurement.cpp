@@ -88,29 +88,6 @@ DXAMeasurement::DXAMeasurement()
 
 }
 
-QJsonObject DXAMeasurement::readJsonFile(const QString &filePath)
-{
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        switch (file.error()) {
-            case QFile::OpenError:
-                throw std::runtime_error("Open error");
-            case QFile::PermissionsError:
-                throw std::runtime_error("Permission error");
-            case QFile::ReadError:
-                throw std::runtime_error("Permission error");
-            default:
-                throw std::runtime_error(file.errorString().toStdString());
-        }
-    }
-
-    QByteArray jsonData = file.readAll();
-    QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonData));
-
-    return jsonDoc.object();
-}
-
 QString DXAMeasurement::toString() const
 {
    return "";
@@ -121,8 +98,6 @@ QStringList DXAMeasurement::toStringList(const bool& no_keys) const
     Q_UNUSED(no_keys)
     return QStringList {{}};
 }
-
-
 
 void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData) {
     QSqlQuery query(patscanDb);
@@ -150,7 +125,12 @@ void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QS
         setAttribute("SCAN_DATE", scanDate);
     }
 
-    qDebug() << "Found" << scanMode << "scan for : " << patientData << "SCANID: " << scanId << "SCAN_DATE: " << scanDate;
+    if (!hasAttribute("SCANID") || !hasAttribute("SCAN_MODE") || !hasAttribute("SCAN_DATE")) {
+        qDebug() << "Not found..";
+    }
+    else {
+        qDebug() << "Found" << scanMode << "scan for : " << patientData << "SCANID: " << scanId << "SCAN_DATE: " << scanDate;
+    }
 
     getScanData(patscanDb, patientData.value("PATIENT_KEY").toString(), scanId);
     computeTZScore(referenceDb, patientData, scanDate);
@@ -402,10 +382,6 @@ void DXAMeasurement::computeTZScore(const QSqlDatabase &referenceDb, const QJson
         qDebug() << "M_value: " << M_value << "X_value: " << X_value << "L_value: " << "L_value" << "sigma: " << sigma;
         qDebug() << "T SCORE: " << T_score;
 
-        // TODO
-        //T_score = static_cast<double>(static_cast<int>(T_score * 10.0)) / 10.0;
-        //if (0.0 == abs(T_score)) T_score = 0.;
-
         QString varName = "";
         if (getRefType() == "S" && bmdBoneRangeKey.startsWith("TOT_"))
             varName += "TOT_T";
@@ -569,57 +545,6 @@ bool DXAMeasurement::isValid() const
 {
     return false;
 }
-
-bool DXAMeasurement::isValidDicomFile(DicomFile file) const
-{
-    DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
-        return false;
-
-    DcmMetaInfo *metaInfo = loadedFileFormat.getMetaInfo();
-    DcmDataset *dataset = loadedFileFormat.getDataset();
-    OFString tagValue;
-
-    if (metaInfo == nullptr || dataset == nullptr) return false;
-
-    for (const ValidDCMTag& validTag : qAsConst(m_metaInfoTagExistsWithValue))
-    {
-        if (!metaInfo->tagExistsWithValue(validTag.key))
-            return false;
-
-        if (!metaInfo->findAndGetOFString(validTag.key, tagValue).good())
-            return false;
-
-        if (tagValue != validTag.value)
-            return false;
-    }
-
-    for (const ValidDCMTag& validTag : qAsConst(m_metaInfoTagExists))
-    {
-        if (!metaInfo->tagExists(validTag.key))
-            return false;
-    }
-
-    for (const ValidDCMTag& validTag : qAsConst(m_datasetTagExistsWithValue))
-    {
-        if (!dataset->tagExistsWithValue(validTag.key))
-            return false;
-
-        if (!dataset->findAndGetOFString(validTag.key, tagValue).good())
-            return false;
-
-        if (tagValue != validTag.value)
-            return false;
-    }
-
-    for (const ValidDCMTag& validTag : qAsConst(m_datasetTagExists))
-    {
-        if (!metaInfo->tagExists(validTag.key))
-            return false;
-    }
-
-    return true;
-};
 
 double DXAMeasurement::computeYearsDifference(const QString& first, const QString& second)
 {

@@ -2,25 +2,26 @@ QT += testlib gui widgets sql xml network serialport
 CONFIG += qt warn_on depend_includepath testcase
 
 # QtUsb
-INCLUDEPATH += C:/work/clsa/cypress/dep/QtUsb_x86/include
-LIBS += -L"C:/work/clsa/cypress/dep/QtUsb_x86/lib" -lQt5Usb
+INCLUDEPATH += $$PWD/../../../dep/QtUsb_x86/include
+LIBS += -L$$PWD/../../../dep/QtUsb_x86/lib -lQt5Usb
 
 # OpenSSL
-INCLUDEPATH += C:/work/clsa/cypress/dep/OpenSSL-Win32/include
-LIBS += -L"C:/work/clsa/cypress/dep/OpenSSL-Win32/lib" -llibssl -llibcrypto
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib/VC/x86/MD" -llibssl -llibcrypto
 
 # POCO
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Foundation/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Util/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Net/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/Crypto/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/NetSSL_OpenSSL/include
-INCLUDEPATH += C:/work/clsa/cypress/dep/poco-1.12.4-all/bin
-LIBS += -L"C:/work/clsa/cypress/dep/poco-1.12.4-all/lib/" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
+INCLUDEPATH += "C:/Program Files (x86)/Poco/include"
+LIBS += -L"C:/Program Files (x86)/Poco/lib" -lPocoFoundation -lPocoUtil -lPocoCrypto -lPocoNet -lPocoNetSSL
 
 # DCMTK
 INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
 LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+
+# Topaz Signature Pad
+# INCLUDEPATH += $$PWD/../dep/SigLib/Include/
+# INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+# DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
+LIBS += -L$$PWD/../../../dep/SigLib/SigTablt/Win32/ -lzlib
 
 TEMPLATE = app
 

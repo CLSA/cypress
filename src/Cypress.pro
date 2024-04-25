@@ -62,6 +62,7 @@ FORMS += \
   dialogs/tonometer_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
   widgets/apex_transfer_widget.ui \
+  widgets/audiometer_manual_entry_form.ui \
   widgets/bpm_manual_entry_form.ui \
   widgets/device_settings/audiometer_settings_widget.ui \
   widgets/device_settings/blood_pressure_settings_widget.ui \
@@ -117,12 +118,14 @@ HEADERS += \
     auxiliary/file_compressor.h \
     auxiliary/json_settings.h \
     auxiliary/tracker5_util.h \
+    auxiliary/validators.h \
     auxiliary/windows_util.h \
     cypress_application.h \
     cypress_main_window.h \
     cypress_session.h \
     cypress_settings.h \
     data/dxa/tests/dxa_hip_test.h \
+    data/frax/frax_helper.h \
     data/measurement.h \
     data/access_query_helper.h \
     data/blood_pressure/measurements/blood_pressure_measurement.h \
@@ -195,7 +198,6 @@ HEADERS += \
     managers/cdtt/cdtt_manager.h \
     managers/choice_reaction/choice_reaction_manager.h \
     managers/dxa/apex_database_helper.h \
-    managers/dxa/dicom/dicom_scp.h \
     managers/dxa/dxa_hip_manager.h \
     managers/dxa/dxa_manager.h \
     managers/ecg/ecg_manager.h \
@@ -278,6 +280,7 @@ HEADERS += \
     server/utils.h \
     tray_application.h \
     widgets/apex_transfer_widget.h \
+    widgets/audiometer_manual_entry_form.h \
     widgets/bpm_manual_entry_form.h \
     widgets/device_settings/audiometer_settings_widget.h \
     widgets/device_settings/blood_pressure_settings_widget.h \
@@ -318,12 +321,14 @@ SOURCES += \
     auxiliary/file_utils.cpp \
     auxiliary/json_settings.cpp \
     auxiliary/tracker5_util.cpp \
+    auxiliary/validators.cpp \
     auxiliary/windows_util.cpp \
     cypress_application.cpp \
     cypress_main_window.cpp \
     cypress_session.cpp \
     cypress_settings.cpp \
     data/dxa/tests/dxa_hip_test.cpp \
+    data/frax/frax_helper.cpp \
     data/measurement.cpp \
     data/access_query_helper.cpp \
     data/blood_pressure/measurements/blood_pressure_measurement.cpp \
@@ -397,7 +402,6 @@ SOURCES += \
     managers/cdtt/cdtt_manager.cpp \
     managers/choice_reaction/choice_reaction_manager.cpp \
     managers/dxa/apex_database_helper.cpp \
-    managers/dxa/dicom/dicom_scp.cpp \
     managers/dxa/dxa_hip_manager.cpp \
     managers/dxa/dxa_manager.cpp \
     managers/ecg/ecg_manager.cpp \
@@ -481,6 +485,7 @@ SOURCES += \
     server/utils.cpp \
     tray_application.cpp \
     widgets/apex_transfer_widget.cpp \
+    widgets/audiometer_manual_entry_form.cpp \
     widgets/bpm_manual_entry_form.cpp \
     widgets/device_settings/audiometer_settings_widget.cpp \
     widgets/device_settings/blood_pressure_settings_widget.cpp \

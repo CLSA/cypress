@@ -40,7 +40,9 @@ RetinalCameraManager::~RetinalCameraManager()
 
 bool RetinalCameraManager::isInstalled()
 {
-    const bool isDebugMode = CypressSettings::isDebugMode();
+    if (CypressSettings::isSimMode())
+        return true;
+
     const QString runnableName = CypressSettings::readSetting("retinal_camera/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("retinal_camera/runnablePath").toString();
 
@@ -49,26 +51,22 @@ bool RetinalCameraManager::isInstalled()
     const QString databaseUser = CypressSettings::readSetting("retinal_camera/database/user").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCamera: runnable name is not defined";
+        qDebug() << "RetinalCamera: runnable name is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCamera: runnable path is not defined";
+        qDebug() << "RetinalCamera: runnable path is not defined";
         return false;
     }
 
     if (databaseName.isEmpty() || databaseName.isNull()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCamera: database name is not defined";
+        qDebug() << "RetinalCamera: database name is not defined";
         return false;
     }
 
     if (databasePort.isEmpty() || databasePort.isNull()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCamera: database port is not defined";
+        qDebug() << "RetinalCamera: database port is not defined";
         return false;
     }
 
@@ -76,14 +74,12 @@ bool RetinalCameraManager::isInstalled()
     const QDir runnablePathInfo(runnablePath);
 
     if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCamera: ImageNet exe is not defined";
+        qDebug() << "RetinalCamera: ImageNet exe is not defined";
         return false;
     }
 
     if (!runnablePathInfo.exists()) {
-        if (isDebugMode)
-            qDebug() << "RetinalCamera: working directory does not exist";
+        qDebug() << "RetinalCamera: working directory does not exist";
         return false;
     }
 
@@ -236,8 +232,8 @@ void RetinalCameraManager::finish()
     qDebug() << "RetinalCameraManager::finish";
 
     const int answer_id = m_session->getAnswerId();
-    const QString host = CypressSettings::getPineHost();
-    const QString endpoint = CypressSettings::getPineEndpoint();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
     QJsonObject testJson = m_test->toJsonObject();
     testJson.insert("session", m_session->getJsonObject());
@@ -260,7 +256,7 @@ void RetinalCameraManager::finish()
         testJson.insert("files", QJsonObject {{ fileName, fileSize }});
 
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                                   (host + endpoint + QString::number(answer_id) + "?filename=EYE_"
+                                   (answerUrl + "?filename=EYE_"
                                                   + side + ".jpg").toStdString(),
                                    "application/octet-stream",
                                    FileUtils::readFile(
@@ -274,7 +270,6 @@ void RetinalCameraManager::finish()
 
     const QJsonDocument jsonDoc(values);
     const QByteArray serializedData = jsonDoc.toJson();
-    const QString answerUrl = CypressSettings::getAnswerUrl(answer_id);
 
     bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
 

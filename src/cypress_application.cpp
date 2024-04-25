@@ -42,7 +42,12 @@ Cypress::Cypress(QObject *parent) :
     connect(httpServer.get(), &Server::startSession, this,  &Cypress::requestSession);
     connect(httpServer.get(), &Server::endSession,   this,  &Cypress::forceSessionEnd);
 
-    httpServer->start();
+    try {
+        httpServer->start();
+    }
+    catch (...) {
+        qDebug() << "couldn't start...";
+    }
 }
 
 

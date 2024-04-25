@@ -10,11 +10,14 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     , ui(new Ui::AudiometerDialog)
 {
     ui->setupUi(this);
+    ui->measurementTable->disableFinishButton();
+    ui->measurementTable->disableMeasureButton();
+    ui->testInfoWidget->setSessionInformation(*session, "RA300");
+
+    audiometerManualEntryForm = new AudiometerManualEntryForm(this);
+
     m_manager.reset(new AudiometerManager(session));
-
-    QSharedPointer<AudiometerManager> manager = qSharedPointerCast<AudiometerManager>(m_manager);
-
-    ui->testInfoWidget->setSessionInformation(*session);
+    auto manager = qSharedPointerCast<AudiometerManager>(m_manager);
 
     QList<TableColumn> columns;
     columns << TableColumn("side", "Side", new TextDelegate("", QRegExp(), true));
@@ -44,9 +47,7 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     connect(ui->serialPortPickerWidget, &SerialPortWidget::connectDevice, manager.get(), &AudiometerManager::connectDevice);
 
     // the user requested to disconnect from the device
-    connect(ui->serialPortPickerWidget, &SerialPortWidget::disconnectDevice, manager.get(), [=]() {
-        ui->serialPortPickerWidget->deviceDisconnected();
-    });
+    connect(ui->serialPortPickerWidget, &SerialPortWidget::disconnectDevice, manager.get(), &AudiometerManager::disconnectDevice);
 
     // a connection was made, update ui
     connect(manager.get(), &AudiometerManager::deviceConnected, ui->serialPortPickerWidget, [=](const QSerialPortInfo& portInfo) {
@@ -56,7 +57,7 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
 
     // device disconnected, update ui
     connect(manager.get(), &AudiometerManager::deviceDisconnected, ui->serialPortPickerWidget, [=]() {
-        ui->serialPortPickerWidget->disconnectDevice();
+        ui->serialPortPickerWidget->deviceDisconnected();
         ui->measurementTable->disableMeasureButton();
     });
     // device started
@@ -84,11 +85,19 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     // data changed
     connect(manager.get(), &AudiometerManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
+
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &AudiometerManager::measure);
 
     connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
         manager->setManualEntry(true);
+
+        audiometerManualEntryForm->clearForm();
+        audiometerManualEntryForm->show();
+    });
+
+    connect(audiometerManualEntryForm, &AudiometerManualEntryForm::manualAudiometerMeasurement, this, [=](const QString side, const QString test, const int level) {
+        manager->addManualEntry(side, test, level, level < 40);
     });
 
     // request finish

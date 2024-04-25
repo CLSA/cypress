@@ -40,6 +40,8 @@ DcmRecv::~DcmRecv()
 {
     m_process.kill();
     m_process.waitForFinished();
+
+    clearOutputDirectory();
 }
 
 bool DcmRecv::initializeOutputWatcher()
@@ -56,8 +58,12 @@ bool DcmRecv::initializeOutputWatcher()
 bool DcmRecv::clearOutputDirectory()
 {
     // Reset the output directory
-    QDir outputDirInfo(m_outputDir);
-    if (!outputDirInfo.mkpath(m_outputDir)) {
+    QDir outputDir(m_outputDir);
+
+    if (outputDir.exists())
+        outputDir.removeRecursively();
+
+    if (!outputDir.mkpath(m_outputDir)) {
         qDebug() << "DCMRECV: could not create the output directory";
         return false;
     }
@@ -154,6 +160,17 @@ void DcmRecv::onFilesReceived()
                 if (dataset->findAndGetOFString(DCM_SeriesNumber, seriesNumber).good()) {
                     dicomFile.seriesNumber = seriesNumber.c_str();
                 }
+
+                qInfo() << "DICOM file";
+                qInfo() << dicomFile.mediaStorageUID;
+                qInfo() << dicomFile.laterality;
+                qInfo() << dicomFile.studyId;
+                qInfo() << dicomFile.patientId;
+                qInfo() << dicomFile.bodyPartExamined;
+                qInfo() << dicomFile.modality;
+                qInfo() << dicomFile.studyDate;
+                qInfo() << dicomFile.seriesNumber;
+                qInfo() << "\n";
 
                 receivedFiles.append(dicomFile);
             }

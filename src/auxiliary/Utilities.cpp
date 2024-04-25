@@ -1,12 +1,10 @@
 #include "Utilities.h"
 
 #include <QDateTime>
-#include <QDesktopServices>
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLoggingCategory>
-#include <QMessageBox>
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
@@ -161,30 +159,11 @@ void Logging::disable()
 
 void Logging::disabled(QtMsgType, const QMessageLogContext &, const QString &) {}
 
-bool Utilities::openUrl(QUrl url)
-{
-    bool success = QDesktopServices::openUrl(url);
-    if (!success)
-        qDebug() << "could not open URL: " << url;
-
-    return success;
-}
-
-
-void Utilities::showMessageBox(const QString& title, const QString& text)
-{
-    QMessageBox messageBox;
-    messageBox.setIcon(QMessageBox::Information);
-    messageBox.setText(text);
-    messageBox.setWindowTitle(title);
-    messageBox.exec();
-}
-
 void Utilities::prettyPrint(const QJsonObject &jsonObj)
 {
     QJsonDocument doc(jsonObj);
     QString jsonStr(doc.toJson(QJsonDocument::Indented));
-    qInfo() << jsonStr;
+    qDebug().noquote() << jsonStr;
 }
 
 

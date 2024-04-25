@@ -14,6 +14,7 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     ui->setupUi(this);
 
     ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
     ui->measurementTable->hideMeasureButton();
     ui->measurementTable->hideManualEntry();
     ui->measurementTable->setTitle("Files Received");

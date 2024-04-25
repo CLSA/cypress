@@ -70,68 +70,6 @@ const QList<QString> m_outputKeyList =
 
 ApSpineMeasurement::ApSpineMeasurement()
 {
-    m_mdb_keys = QStringList({
-        "NO_REGIONS", 	    // long
-        "STARTING_REGION",  // long
-
-        "L1_INCLUDED",      // boolean
-        "L1_AREA", 		    // double
-        "L1_BMC",           // double
-        "L1_BMD", 		    // double
-
-        "L2_INCLUDED",      // boolean
-        "L2_AREA", 		    // double
-        "L2_BMC", 		    // double
-        "L2_BMD", 		    // double
-
-        "L3_INCLUDED",  	// boolean
-        "L3_AREA",      	// double
-        "L3_BMC",       	// double
-        "L3_BMD",       	// double
-
-        "L4_INCLUDED",  	// boolean
-        "L4_AREA", 			// double
-        "L4_BMC", 			// double
-        "L4_BMD", 			// double
-
-        "TOT_AREA", 		// double
-        "TOT_BMC", 			// double
-        "TOT_BMD", 			// double
-
-        "TOT_T",
-        "TOT_Z",
-
-        "STD_TOT_BMD",  	// double
-
-        "ROI_TYPE", 		// long
-        "ROI_WIDTH", 		// double
-        "ROI_HEIGHT", 		// double
-
-        "PHYSICIAN_COMMENT" // string
-    });
-
-    ValidDCMTag modality(DCM_Modality, "OT");
-    ValidDCMTag bodyPartExamined(DCM_BodyPartExamined, "LSPINE");
-    ValidDCMTag samplesPerPixel(DCM_SamplesPerPixel, "3");
-    ValidDCMTag photometricInterpretation(DCM_PhotometricInterpretation, "RGB");
-    ValidDCMTag imageAndFluoroscopyAreaDoseProduct(DCM_ImageAndFluoroscopyAreaDoseProduct, "");
-    ValidDCMTag patientOrientation(DCM_PatientOrientation, "");
-    ValidDCMTag bitsAllocated(DCM_BitsAllocated, "");
-    ValidDCMTag pixelSpacing(DCM_PixelSpacing, "");
-    ValidDCMTag mediaStorageSOPClassUID(DCM_MediaStorageSOPClassUID, UID_SecondaryCaptureImageStorage);
-
-    m_metaInfoTagExists.append(mediaStorageSOPClassUID);
-
-    m_datasetTagExistsWithValue.append(modality);
-    m_datasetTagExistsWithValue.append(bodyPartExamined);
-    m_datasetTagExistsWithValue.append(samplesPerPixel);
-    m_datasetTagExistsWithValue.append(photometricInterpretation);
-
-    m_datasetTagExists.append(imageAndFluoroscopyAreaDoseProduct);
-    m_datasetTagExists.append(patientOrientation);
-    m_datasetTagExists.append(bitsAllocated);
-    m_datasetTagExists.append(pixelSpacing);
-    m_datasetTagExists.append(mediaStorageSOPClassUID);
 }
 
 Side ApSpineMeasurement::getSide()
@@ -179,18 +117,6 @@ QStringList ApSpineMeasurement::toStringList(const bool& no_keys) const
     Q_UNUSED(no_keys)
    return QStringList {{}};
 }
-
-void ApSpineMeasurement::simulate()
-{
-    QJsonObject json = readJsonFile("C:/Users/Anthony/Documents/GitHub/cypress/src/tests/fixtures/dxa/spine.json");
-
-    QStringList keys = json.keys();
-    for (const QString &key : keys)
-    {
-        QJsonValue value = json.value(key);
-        setAttribute(key, value);
-    }
-};
 
 bool ApSpineMeasurement::isValid() const
 {

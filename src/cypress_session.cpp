@@ -2,6 +2,8 @@
 
 #include <QException>
 
+#include "auxiliary/validators.h"
+
 
 CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData, const QString& origin):
     QObject(parent), m_inputData(inputData)
@@ -181,6 +183,7 @@ bool CypressSession::isValidBool(const QString& key) const
 
 bool CypressSession::isValidDate(const QString& key, const QString& dateFormat) const
 {
+
     if (!m_inputData.contains(key)) return false;
 
     QJsonValue val { m_inputData.value(key) };

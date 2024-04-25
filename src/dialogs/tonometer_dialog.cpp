@@ -12,7 +12,6 @@ TonometerDialog::TonometerDialog(QWidget *parent, QSharedPointer<TonometerSessio
     , ui(new Ui::TonometerDialog)
 {
     ui->setupUi(this);
-
     setWindowTitle("Tonometer");
 
     m_manager.reset(new TonometerManager(session));

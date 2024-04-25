@@ -25,8 +25,19 @@ QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
 
 bool CimtVividIMeasurement::isValid() const
 {
-    if (hasAttribute("side") && hasAttribute("name") && hasAttribute("patient_id"))
-        return true;
+    if (!hasAttribute("side"))
+        return false;
 
-    return false;
+    if (!hasAttribute("name"))
+        return false;
+
+    if (!hasAttribute("patient_id"))
+        return false;
+
+    const QString side = getAttribute("side").toString();
+    if (side != "left" || side != "right") {
+        qDebug() << "measure" << getAttribute("name").toString() << "does not have side defined";
+    }
+
+    return true;
 }
