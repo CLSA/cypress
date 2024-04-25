@@ -19,11 +19,12 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->enableRemoval(true);
 
     QList<TableColumn> columns;
     columns << TableColumn("weight", "Weight", new NumberDelegate(0, 1000, true, false, false, 2));
     columns << TableColumn("mode", "Mode", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("timestamp", "Time", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("timestamp", "Time", new TextDelegate("", QRegExp(), true));
 
     // port picker setup
     // ports have been scanned

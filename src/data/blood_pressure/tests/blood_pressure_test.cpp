@@ -105,8 +105,10 @@ bool BloodPressureTest::isValid() const
 
 void BloodPressureTest::updateAverage()
 {
-    if (getMeasurementCount() <= 0)
+    if (getMeasurementCount() <= 0) {
+        reset();
         return;
+    }
 
     const auto first = *m_measurementList.constFirst();
     addMetaData("first_systolic",   first.getAttribute("systolic"));
@@ -208,6 +210,11 @@ bool BloodPressureTest::verifyDeviceAverage(const int& sbp, const int& dbp, cons
     }
 
     return false;
+}
+
+void BloodPressureTest::reinterpret()
+{
+    updateAverage();
 }
 
 // add the average of the measurements provided by the device and compare
@@ -351,11 +358,4 @@ void BloodPressureTest::setSide(const QString &side) {
 bool BloodPressureTest::armInformationSet() const {
     return hasMetaData("cuff_size")
         && hasMetaData("arm_used");
-}
-
-void BloodPressureTest::reset() {
-    QList<QString> keys = m_outputKeyList;
-
-    m_metaData.remove(keys);
-    m_measurementList.clear();
 }

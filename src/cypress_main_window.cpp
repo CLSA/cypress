@@ -16,11 +16,11 @@
 //#include "widgets/device_settings/spirometer_settings_widget.h"
 //#include "widgets/device_settings/tonometer_settings_widget.h"
 #include "widgets/device_settings/weight_scale_settings_widget.h"
-//
+
 #include "server/sessions/audiometer_session.h"
 //#include "server/sessions/grip_strength_session.h"
 //#include "server/sessions/retinal_camera_session.h"
-//#include "server/sessions/bpm_session.h"
+#include "server/sessions/bpm_session.h"
 #include "server/sessions/weigh_scale_session.h"
 //#include "server/sessions/ecg_session.h"
 #include "server/sessions/dxa/dxa_hip_session.h"
@@ -46,17 +46,16 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     //    this->setCentralWidget(this);
     //});
 
-    //// Room 1
-    //connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
-    //    QJsonObject inputData {
-    //        {"language", "en"},
-    //        {"barcode", "12345678"},
-    //        {"interviewer", "CLSA"},
-    //    };
+    connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData {
+            {"language", "en"},
+            {"barcode", "12345678"},
+            {"interviewer", "CLSA"},
+        };
 
-    //    QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData, "localhost:3000"));
-    //    Cypress::getInstance().requestSession(session);
-    //});
+        QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData, "localhost:3000"));
+        Cypress::getInstance().requestSession(session);
+    });
 
     connect(ui->launchWeightScale, &QPushButton::clicked, this, [=]() {
        QJsonObject inputData {
@@ -141,16 +140,16 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     //});
 
     //// DCS Room 2
-    //connect(ui->launchAudiometer, &QPushButton::clicked, this, [=]() {
-    //    QJsonObject inputData {
-    //        {"language", "en"},
-    //        {"barcode", "12345678"},
-    //        {"interviewer", "Test"},
-    //    };
+    connect(ui->launchAudiometer, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData {
+            {"language", "en"},
+            {"barcode", "12345678"},
+            {"interviewer", "Test"},
+        };
 
-    //    QSharedPointer<AudiometerSession> session(new AudiometerSession(nullptr, inputData, "localhost:3000"));
-    //    Cypress::getInstance().requestSession(session);
-    //});
+        QSharedPointer<AudiometerSession> session(new AudiometerSession(nullptr, inputData, "localhost:3000"));
+        Cypress::getInstance().requestSession(session);
+    });
 
     //// DCS Room 3
     //connect(ui->launchGripStrength, &QPushButton::clicked, this, [=]() {

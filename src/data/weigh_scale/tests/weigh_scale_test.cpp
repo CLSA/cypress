@@ -31,6 +31,11 @@ bool WeighScaleTest::isValid() const
     return okTest;
 }
 
+void WeighScaleTest::reinterpret()
+{
+    calculateAverage();
+}
+
 double WeighScaleTest::calculateAverage()
 {
     auto &measurements = getMeasurements();
@@ -38,7 +43,10 @@ double WeighScaleTest::calculateAverage()
     double totalWeight = 0;
 
     if (measurements.length() < 1)
+    {
+        reset();
         return -1;
+    }
 
     int validMeasures = 0;
     for (auto &measure : measurements) {

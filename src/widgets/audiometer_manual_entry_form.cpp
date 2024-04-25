@@ -44,7 +44,7 @@ AudiometerManualEntryForm::AudiometerManualEntryForm(QWidget *parent)
         ui->okButton->setEnabled(false);
 
         if (validInputs()) {
-            emit manualAudiometerMeasurement(m_side, m_test, m_level, m_level < 40);
+            emit manualAudiometerMeasurement(m_side, m_test, m_level, m_level <= 40);
             hide();
             clearForm();
         }

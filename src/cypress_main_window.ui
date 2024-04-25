@@ -102,7 +102,7 @@
     <item>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="title">
        <string>Room 2</string>
@@ -110,6 +110,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QPushButton" name="launchAudiometer">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>Audiometer</string>
          </property>
@@ -134,7 +137,7 @@
     <item>
      <widget class="QGroupBox" name="groupBox_3">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="title">
        <string>Room 3</string>
@@ -142,6 +145,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QPushButton" name="launchGripStrength">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Grip Strength</string>
          </property>
@@ -149,6 +155,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="launchRetinalCamera">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Retinal Camera</string>
          </property>
@@ -163,6 +172,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="launchCDTT">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>CDTT</string>
          </property>
@@ -205,7 +217,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDevice_Settings">

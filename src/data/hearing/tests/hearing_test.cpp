@@ -84,7 +84,7 @@ void HearingTest::simulate(const QVariantMap& inputData)
             const double level = QRandomGenerator::global()->bounded(1, 101);
 
             measurement->setAttribute("level", level);
-            measurement->setAttribute("pass", level < 40);
+            measurement->setAttribute("pass", level <= 40);
 
             addMeasurement(measurement);
         }

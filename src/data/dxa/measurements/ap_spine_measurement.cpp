@@ -12,62 +12,6 @@
 #include <QSqlError>
 #include <QException>
 
-// { "L1_BMD",         "1..." },
-// { "L2_BMD",         ".2.." },
-// { "L3_BMD",         "..3." },
-// { "L4_BMD",         "...4" },
-// { "TOT_BMD",        "1234" },
-// { "TOT_L1_BMD",     "1..." },
-// { "TOT_L2_BMD",     ".2.." },
-// { "TOT_L3_BMD",     "..3." },
-// { "TOT_L4_BMD",     "...4" },
-// { "TOT_L1L2_BMD",   "12.." },
-// { "TOT_L1L3_BMD",   "1.3." },
-// { "TOT_L1L4_BMD",   "1..4" },
-// { "TOT_L2L3_BMD",   ".23." },
-// { "TOT_L2L4_BMD",   ".2.4" },
-//{ "TOT_L3L4_BMD",   "..34" },
-//{ "TOT_L1L2L3_BMD", "123." },
-//{ "TOT_L1L2L4_BMD", "12.4" },
-//{ "TOT_L1L3L4_BMD", "1.34" },
-//{ "TOT_L2L3L4_BMD", ".234" },
-
-const QList<QString> m_outputKeyList =
-{
-    "L1_INCLUDED",      // boolean
-    "L1_AREA", 		    // double
-    "L1_BMC",           // double
-    "L1_BMD", 		    // double
-
-    "L2_INCLUDED",      // boolean
-    "L2_AREA", 		    // double
-    "L2_BMC", 		    // double
-    "L2_BMD", 		    // double
-
-    "L3_INCLUDED",  	// boolean
-    "L3_AREA",      	// double
-    "L3_BMC",       	// double
-    "L3_BMD",       	// double
-
-    "L4_INCLUDED",  	// boolean
-    "L4_AREA", 			// double
-    "L4_BMC", 			// double
-    "L4_BMD", 			// double
-
-    "TOT_AREA", 		// double
-    "TOT_BMC", 			// double
-    "TOT_BMD", 			// double
-    "STD_TOT_BMD",  	// double
-    "ROI_TYPE", 		// long
-    "ROI_WIDTH", 		// double
-    "ROI_HEIGHT", 		// double
-
-    "NO_REGIONS", 	    // long
-    "STARTING_REGION",  // long
-    "PHYSICIAN_COMMENT" // string
-};
-
-
 ApSpineMeasurement::ApSpineMeasurement()
 {
 }

@@ -9,10 +9,6 @@ public:
     BloodPressureTest();
     ~BloodPressureTest() = default;
 
-    // reset only the measurement data, keeping cuff and arm side meta data
-    //
-    void reset() override;
-
     // Add the average provided by the device as meta data
     //
     void addDeviceAverage(const int& sbpAvg, const int& dbpAvg, const int& pulseAvg);
@@ -26,6 +22,8 @@ public:
     // simulate a complete test of 6 readings and computed averages
     //
     void simulate() override;
+
+    void reinterpret() override;
 
     // String keys are converted to snake_case
     //

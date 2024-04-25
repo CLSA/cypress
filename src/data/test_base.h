@@ -54,6 +54,8 @@ public:
 
     virtual void reset();
 
+    virtual void reinterpret();
+
 public:
     void addMetaData(const QString &key, const QVariant &value, const QString &units);
     void addMetaData(const QString &key, const QVariant &value, const int &precision);

@@ -11,19 +11,6 @@
 #include <QSqlError>
 #include <QException>
 
-// { "RU13TOT_BMD",    "1.." },
-// { "RUMIDTOT_BMD",   ".2." },
-// { "RUUDTOT_BMD",    "..3" },
-// { "RUTOT_BMD",      "123" },
-// { "R_13_BMD",       "R.." },
-// { "R_MID_BMD",      ".R." },
-// { "R_UD_BMD",       "..R" },
-// { "RTOT_BMD",       "RRR" },
-// { "U_13_BMD",       "U.." },
-// { "U_MID_BMD",      ".U." },
-// { "U_UD_BMD",       "..U" },
-// { "UTOT_BMD",       "UUU" },
-
 ForearmMeasurement::ForearmMeasurement(Side side): m_side { side }
 {
 }

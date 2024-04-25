@@ -249,7 +249,10 @@ public:
 
     void hideMeasureButton();
     void showMeasureButton();
-    
+
+    void enableRemoval(bool allow);
+
+
     void setTitle(const QString& title);
 signals:
     void measure();
@@ -261,7 +264,7 @@ public slots:
     void handleTestUpdate(QSharedPointer<TestBase> test);
 
     void addManualMeasurement();
-    void removeManualMeasurement();
+    void removeMeasurement();
 
 private slots:
     void handleChange(int row, int col);
@@ -273,6 +276,10 @@ private:
 
     bool manualEditsMade { false };
     bool manualEntryMode { false };
+
+    bool allowRemoval { false };
+
+    void addRemoveMeasureButton();
 
     Ui::MeasurementTable *ui;
     QSharedPointer<TestBase> m_test;

@@ -13,6 +13,7 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     ui->measurementTable->disableFinishButton();
     ui->measurementTable->disableMeasureButton();
     ui->testInfoWidget->setSessionInformation(*session, "RA300");
+    ui->measurementTable->enableRemoval(true);
 
     audiometerManualEntryForm = new AudiometerManualEntryForm(this);
 
@@ -97,7 +98,7 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     });
 
     connect(audiometerManualEntryForm, &AudiometerManualEntryForm::manualAudiometerMeasurement, this, [=](const QString side, const QString test, const int level) {
-        manager->addManualEntry(side, test, level, level < 40);
+        manager->addManualEntry(side, test, level, level <= 40);
     });
 
     // request finish

@@ -16,6 +16,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->hideMeasureButton();
+    ui->measurementTable->enableRemoval(true);
 
     ui->connectPushButton->setEnabled(false);
 
@@ -25,11 +26,11 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     columns << TableColumn("reading_number",
                            "#",
                            new NumberDelegate(0, 1000, true, false, false, 2));
-    columns << TableColumn("systolic", "Systolic (mmHg)", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("diastolic", "Diastolic (mmHg)", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("pulse", "Pulse (bpm)", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("systolic", "Systolic (mmHg)", new NumberDelegate(0, 200, false));
+    columns << TableColumn("diastolic", "Diastolic (mmHg)", new NumberDelegate(0, 200, false));
+    columns << TableColumn("pulse", "Pulse (bpm)", new NumberDelegate(0, 200, false));
     columns << TableColumn("start_time", "Start time", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("end_time", "End time", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("end_time", "End time", new TextDelegate("", QRegExp(), true));
 
     QStringList bandList = {"---", "Small", "Medium", "Large", "X-Large"};
     ui->armBandSizeComboBox->addItems(bandList);

@@ -82,6 +82,10 @@ void TestBase::removeMeasurement(int index)
     m_measurementList.removeAt(index);
 }
 
+void TestBase::reinterpret() {
+
+}
+
 Measurement &TestBase::getMeasurement(const int &index) const
 {
     if (index < 0 || index >= m_measurementList.size()) {

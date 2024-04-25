@@ -38,6 +38,8 @@ public:
     QJsonObject toJsonObject() const override;
 
     void simulate() override;
+
+    void reinterpret() override;
     double calculateAverage();
 
     // ms of delay between performing a measurement to allow for
