@@ -7,11 +7,13 @@
 *.filters
 *.TMP
 *.hint
-build*
 ~
 .*
-*Makefile*
-*release*
+Makefile*
+build*/
+release/
+debug/
+*.obj
 /out/build/x64-Debug/CMakeFiles
 /out/build/x64-Debug/.cmake/api/v1
 /out/build/x64-Debug/Testing/Temporary

@@ -3,7 +3,7 @@ import logging
 
 def test_audiometer(payload):
   try:
-      response = requests.post("http://127.0.0.1:9000/audiometer", json=payload)
+      response = requests.post("http://127.0.0.1:9001/audiometer", json=payload)
       print(response.status_code)
       print(response.text)
 
