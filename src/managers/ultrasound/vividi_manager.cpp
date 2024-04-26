@@ -8,6 +8,7 @@
 #include "auxiliary/network_utils.h"
 
 #include <QJsonDocument>
+#include <QMessageBox>
 
 
 VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
@@ -224,6 +225,12 @@ void VividiManager::measure()
 
 void VividiManager::finish()
 {
+    if (!m_test->isValid())
+    {
+        QMessageBox::warning(nullptr, "Incomplete", "Please ensure the side has been selected for all files");
+        return;
+    }
+
     const int answer_id = m_session->getAnswerId();
     const QString pineOrigin = m_session->getOrigin();
     const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);

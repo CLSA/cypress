@@ -26,7 +26,7 @@
 #include "server/sessions/dxa/dxa_hip_session.h"
 //#include "server/sessions/dxa/dxa_session.h"
 //#include "server/sessions/spirometer_session.h"
-//#include "server/sessions/ultrasound_session.h"
+#include "server/sessions/ultrasound_session.h"
 //#include "server/sessions/frax_session.h"
 //#include "server/sessions/cdtt_session.h"
 //#include "server/sessions/choice_reaction_session.h"
@@ -106,16 +106,16 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     //    Cypress::getInstance().requestSession(session);
     //});
 
-    //connect(ui->launchUltrasound, &QPushButton::clicked, this, [=]() {
-    //    QJsonObject inputData{
-    //        {"language", "en"},
-    //        {"barcode", "40008471"},
-    //        {"interviewer", "Test"},
-    //    };
+    connect(ui->launchUltrasound, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData{
+            {"language", "en"},
+            {"barcode", "40008471"},
+            {"interviewer", "Test"},
+        };
 
-    //    QSharedPointer<UltrasoundSession> session(new UltrasoundSession(nullptr, inputData, "localhost:3000"));
-    //    Cypress::getInstance().requestSession(session);
-    //});
+        QSharedPointer<UltrasoundSession> session(new UltrasoundSession(nullptr, inputData, "localhost:3000"));
+        Cypress::getInstance().requestSession(session);
+    });
 
     //connect(ui->launchEcg, &QPushButton::clicked, this, [=]() {
     //    QJsonObject inputData{

@@ -35,8 +35,9 @@ bool CimtVividIMeasurement::isValid() const
         return false;
 
     const QString side = getAttribute("side").toString();
-    if (side != "left" || side != "right") {
+    if (side != "Left" && side != "Right") {
         qDebug() << "measure" << getAttribute("name").toString() << "does not have side defined";
+        return false;
     }
 
     return true;

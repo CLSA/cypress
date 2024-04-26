@@ -72,6 +72,10 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &VividiManager::addManualMeasurement);
+
+    connect(ui->measurementTable, &MeasurementTable::cellChanged, this, [=]() {
+        manager->measure();
+    });
 }
 
 CimtVividiDialog::~CimtVividiDialog()

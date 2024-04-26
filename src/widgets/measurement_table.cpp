@@ -115,6 +115,8 @@ void MeasurementTable::handleChange(int row, int col)
     }
 
     m_test->reinterpret();
+
+    emit cellChanged();
 }
 
 void MeasurementTable::updateRowIds()

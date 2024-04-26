@@ -16,14 +16,18 @@ void CimtVividiTest::simulate()
 
 bool CimtVividiTest::isValid() const
 {
-    if (getMeasurementCount() != getExpectedMeasurementCount())
+    if (getMeasurementCount() != getExpectedMeasurementCount()) {
+        qDebug() << "Measurement count is incorrect";
         return false;
+    }
 
     auto measurements = getMeasurements();
     foreach (auto measurement, measurements)
     {
-        if (!measurement->isValid())
+        if (!measurement->isValid()) {
+            qDebug() << "Measurement is invalid" << measurement->toJsonObject();
             return false;
+        }
     }
 
     return true;

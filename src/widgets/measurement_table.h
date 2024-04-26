@@ -259,6 +259,7 @@ signals:
     void finish();
     void addMeasurement();
     void enterManualEntry();
+    void cellChanged();
 
 public slots:
     void handleTestUpdate(QSharedPointer<TestBase> test);
