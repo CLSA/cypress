@@ -46,15 +46,18 @@ public:
         Q_UNUSED(option);
 
         QComboBox *editor = new QComboBox(parent);
+
         editor->addItems(items);
         editor->setEditable(false);
-        if (isEditable && !placeholderText.isEmpty()) {
+
+        if (isEditable && !placeholderText.isEmpty())
             editor->setPlaceholderText(placeholderText);
-        }
+
         return editor;
     }
 
     void setEditorData(QWidget *editor, const QModelIndex &index) const override {
+        qDebug() << "set editor data";
         QString value = index.model()->data(index, Qt::EditRole).toString();
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         int itemIndex = comboBox->findText(value);
@@ -67,6 +70,7 @@ public:
     }
 
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+        qDebug() << "set model data";
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         if (isEditable) {
             model->setData(index, comboBox->currentText(), Qt::EditRole);

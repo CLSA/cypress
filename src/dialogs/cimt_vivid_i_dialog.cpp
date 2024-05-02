@@ -28,15 +28,15 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
 
     QList<TableColumn> columns;
 
-    columns << TableColumn("patient_id", "Patient ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("study_id", "Study ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("name", "Name", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("patient_id", "Patient ID", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("study_id", "Study ID", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("name", "Name", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("side",
                            "Side",
                            new ComboBoxDelegate(QStringList() << "Left"
                                                               << "Right",
                                                 true,
-                                                false,
+                                                true,
                                                 "Select a side"));
 
     // device/server started

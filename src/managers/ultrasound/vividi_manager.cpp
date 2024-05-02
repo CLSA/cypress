@@ -46,11 +46,23 @@ VividiManager::~VividiManager()
 
 void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
+    m_test->reset();
+    emit dataChanged(m_test);
+
+    bool invalidFiles = false;
+    QString incorrectPatientId;
+
     foreach (DicomFile file, dicomFiles) {
         QSharedPointer<CimtVividIMeasurement> measure(new CimtVividIMeasurement);
 
         qDebug() << file.patientId << file.modality << file.studyDate << file.studyId
                  << file.absFilePath << file.mediaStorageUID;
+
+        if (m_session->getBarcode() != file.patientId) {
+            invalidFiles = true;
+            incorrectPatientId = file.patientId;
+            break;
+        }
 
         auto measurements = m_test->getMeasurements();
 
@@ -64,12 +76,6 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
         if (foundDuplicate)
             continue;
-
-        //measure->setAttribute("name", "STILL_IMAGE_" + QString::number(m_stillImageIdCounter));
-        //measure->setAttribute("path", file.absFilePath);
-        //measure->setAttribute("study_id", file.studyId);
-        //measure->setAttribute("patient_id", file.patientId);
-        //measure->setAttribute("side", "");
 
         if (file.mediaStorageUID == UID_UltrasoundImageStorage) {
             qDebug() << "VividIManager::dicomFilesReceived: received still image "
@@ -116,10 +122,18 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         m_test->addMeasurement(measure);
     }
 
+    if (invalidFiles) {
+        QMessageBox::warning(nullptr, "Incorrect participant",
+                             QString("Received ID %1 which does not match %2")
+                                 .arg(incorrectPatientId, m_session->getBarcode()));
+        return;
+    }
+
     emit dataChanged(m_test);
     if (m_test->isValid()) {
         emit canFinish();
     }
+
 }
 
 bool VividiManager::isInstalled()
@@ -225,6 +239,9 @@ void VividiManager::measure()
 
 void VividiManager::finish()
 {
+    qDebug() << "VividiManager::finish";
+    qDebug() << m_test->toJsonObject();
+
     if (!m_test->isValid())
     {
         QMessageBox::warning(nullptr, "Incomplete", "Please ensure the side has been selected for all files");

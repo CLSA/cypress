@@ -109,7 +109,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     connect(ui->launchUltrasound, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData{
             {"language", "en"},
-            {"barcode", "40008471"},
+            {"barcode", "40000261"},
             {"interviewer", "Test"},
         };
 
