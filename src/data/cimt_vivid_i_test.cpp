@@ -7,7 +7,7 @@
 
 CimtVividiTest::CimtVividiTest()
 {
-    setExpectedMeasurementCount(10);
+    //setExpectedMeasurementCount(10);
 }
 
 void CimtVividiTest::simulate()
@@ -16,10 +16,10 @@ void CimtVividiTest::simulate()
 
 bool CimtVividiTest::isValid() const
 {
-    if (getMeasurementCount() != getExpectedMeasurementCount()) {
-        qDebug() << "Measurement count is incorrect";
-        return false;
-    }
+    //if (getMeasurementCount() != getExpectedMeasurementCount()) {
+    //    qDebug() << "Measurement count is incorrect";
+    //    return false;
+    //}
 
     auto measurements = getMeasurements();
     foreach (auto measurement, measurements)

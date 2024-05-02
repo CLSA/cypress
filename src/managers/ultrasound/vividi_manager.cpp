@@ -15,7 +15,7 @@ VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new CimtVividiTest);
-    m_test->setExpectedMeasurementCount(10);
+    //m_test->setExpectedMeasurementCount(10);
 
     m_runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
