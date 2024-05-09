@@ -1,24 +1,33 @@
 QT += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql xml network testlib
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport bluetooth sql xml network testlib usb
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
 
 TRANSLATIONS += \
     Cypress_en_CA.ts
 
 CONFIG += c++11 testcase no_testcase_installs lrelease embed_translations windows
 
-#QMAKE_LFLAGS += /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
-#QMAKE_LFLAGS_WINDOWS += "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\""
+# Debug libraries
+CONFIG(debug, debug|release) {
+# OpenSSL
+INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
+LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib/VC/x86/MDd" -llibssl -llibcrypto
 
-# QtUsb
-INCLUDEPATH += $$PWD/../dep/QtUsb_x86/include
-LIBS += -L$$PWD/../dep/QtUsb_x86/lib -lQt5Usb
+# POCO
+INCLUDEPATH += "C:/Program Files (x86)/Poco/include"
+LIBS += -L"C:/Program Files (x86)/Poco/lib" -lPocoFoundationd -lPocoUtild -lPocoCryptod -lPocoNetd -lPocoNetSSLd
 
+# DCMTK
+INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
+LIBS += -L"C:/Users/hoarea/CypressDeps/dcmtk-3.6.8/dcmtk-3.6.8/build/lib/Debug" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+}
+
+# Release libraries
+CONFIG(release, debug|release) {
 # OpenSSL
 INCLUDEPATH += "C:/Program Files (x86)/OpenSSL-Win32/include"
 LIBS += -L"C:/Program Files (x86)/OpenSSL-Win32/lib/VC/x86/MD" -llibssl -llibcrypto
@@ -30,12 +39,7 @@ LIBS += -L"C:/Program Files (x86)/Poco/lib" -lPocoFoundation -lPocoUtil -lPocoCr
 # DCMTK
 INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
 LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
-
-# Topaz Signature Pad
-# INCLUDEPATH += $$PWD/../dep/SigLib/Include/
-# INCLUDEPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
-# DEPENDPATH += $$PWD/../dep/SigLib/SigTablt/Win32/
-LIBS += -L$$PWD/../dep/SigLib/SigTablt/Win32/ -lzlib
+}
 
 RC_ICONS = favicon.ico
 
