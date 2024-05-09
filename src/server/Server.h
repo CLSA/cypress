@@ -30,10 +30,6 @@ public:
     //
     QString requestDevice(const Constants::MeasureType& device, const QJsonObject& inputData);
 
-    // request a PDF report session
-    //
-    QString requestReport(const Constants::ReportType& report, const QJsonObject& inputData);
-
     // pine is requesting the session end immediately
     //
     void forceSessionEnd(QString sessionId);

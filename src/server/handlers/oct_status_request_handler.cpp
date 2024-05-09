@@ -1,6 +1,6 @@
-#include "weigh_scale_status_request_handler.h"
-#include "managers/weigh_scale/weigh_scale_manager.h"
+#include "oct_status_request_handler.h"
 
+#include "managers/oct_manager.h"
 #include "auxiliary/json_settings.h"
 
 #include "Poco/Net/HTTPServerRequest.h"
@@ -9,12 +9,14 @@
 #include <QJsonObject>
 #include <QDebug>
 
-void WeighScaleStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+void OCTStatusRequestHandler::handleRequest(
+    Poco::Net::HTTPServerRequest &request,
+    Poco::Net::HTTPServerResponse &response)
 {
     Q_UNUSED(request)
     try {
         QJsonObject responseData {{
-            "status", WeighScaleManager::isInstalled() ? "available" : "unavailable"
+            "status", OCTManager::isInstalled() ? "available" : "unavailable"
         }};
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

@@ -55,6 +55,7 @@ FORMS += \
   dialogs/frax_dialog.ui \
   dialogs/general_proxy_form_dialog.ui \
   dialogs/grip_strength_dialog.ui \
+  dialogs/oct_dialog.ui \
   dialogs/retinal_camera_dialog.ui \
   dialogs/runnable_dialog.ui \
   #dialogs/signature_pad_dialog.ui \
@@ -154,6 +155,7 @@ HEADERS += \
     data/grip_strength/tests/grip_strength_test.h \
     data/hearing/measurements/hearing_measurement.h \
     data/hearing/tests/hearing_test.h \
+    data/oct_test.h \
     data/retinal_camera/database_manager.h \
     data/retinal_camera/retinal_camera_measurement.h \
     data/retinal_camera/retinal_camera_test.h \
@@ -181,6 +183,7 @@ HEADERS += \
     dialogs/frax_dialog.h \
     dialogs/general_proxy_form_dialog.h \
     dialogs/grip_strength_dialog.h \
+    dialogs/oct_dialog.h \
     dialogs/retinal_camera_dialog.h \
     #dialogs/signature_pad_dialog.h \
     dialogs/spirometer_dialog.h \
@@ -207,6 +210,8 @@ HEADERS += \
     managers/grip_strength/grip_strength_manager.h \
     managers/grip_strength/paradox_reader.h \
     managers/manager_base.h \
+    managers/oct_manager.h \
+    managers/ora_manager.h \
     managers/participant_report/participant_report_manager.h \
     managers/retinal_camera/retinal_camera_manager.h \
     managers/serial_port/serial_port_manager.h \
@@ -225,6 +230,8 @@ HEADERS += \
     server/handlers/dxa/dxa_hip_status_request_handler.h \
     server/handlers/dxa/dxa_session_request_handler.h \
     server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h \
+    server/handlers/oct_request_handler.h \
+    server/handlers/oct_status_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/sessions/audiometer_session.h \
@@ -271,6 +278,7 @@ HEADERS += \
     server/sessions/frax_session.h \
     server/sessions/gen_proxy_session.h \
     server/sessions/grip_strength_session.h \
+    server/sessions/oct_session.h \
     server/sessions/participant_report_session.h \
     server/sessions/retinal_camera_session.h \
     server/sessions/spirometer_session.h \
@@ -357,6 +365,7 @@ SOURCES += \
     data/grip_strength/tests/grip_strength_test.cpp \
     data/hearing/measurements/hearing_measurement.cpp \
     data/hearing/tests/hearing_test.cpp \
+    data/oct_test.cpp \
     data/retinal_camera/database_manager.cpp \
     data/retinal_camera/retinal_camera_measurement.cpp \
     data/retinal_camera/retinal_camera_test.cpp \
@@ -384,6 +393,7 @@ SOURCES += \
     dialogs/frax_dialog.cpp \
     dialogs/general_proxy_form_dialog.cpp \
     dialogs/grip_strength_dialog.cpp \
+    dialogs/oct_dialog.cpp \
     dialogs/retinal_camera_dialog.cpp \
     #dialogs/signature_pad_dialog.cpp \
     dialogs/spirometer_dialog.cpp \
@@ -411,6 +421,8 @@ SOURCES += \
     managers/grip_strength/grip_strength_manager.cpp \
     managers/grip_strength/paradox_reader.cpp \
     managers/manager_base.cpp \
+    managers/oct_manager.cpp \
+    managers/ora_manager.cpp \
     managers/participant_report/participant_report_manager.cpp \
     managers/retinal_camera/retinal_camera_manager.cpp \
     managers/serial_port/serial_port_manager.cpp \
@@ -428,6 +440,8 @@ SOURCES += \
     server/handlers/dxa/dxa_hip_status_request_handler.cpp \
     server/handlers/dxa/dxa_session_request_handler.cpp \
     server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.cpp \
+    server/handlers/oct_request_handler.cpp \
+    server/handlers/oct_status_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
@@ -476,6 +490,7 @@ SOURCES += \
     server/sessions/frax_session.cpp \
     server/sessions/gen_proxy_session.cpp \
     server/sessions/grip_strength_session.cpp \
+    server/sessions/oct_session.cpp \
     server/sessions/participant_report_session.cpp \
     server/sessions/retinal_camera_session.cpp \
     server/sessions/spirometer_session.cpp \

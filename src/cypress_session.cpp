@@ -41,8 +41,10 @@ void CypressSession::validate() const
 
 void CypressSession::start()
 {
+    qDebug() << "start";
     if (m_dialog == nullptr)
         throw QException();
+    qDebug() << "dialog isn't null";
 
     m_startDateTime = QDateTime::currentDateTimeUtc();
     m_status = SessionStatus::Started;

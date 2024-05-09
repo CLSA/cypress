@@ -57,9 +57,6 @@
 #include "server/handlers/ultrasound/ultrasound_request_handler.h"
 #include "server/handlers/ultrasound/ultrasound_status_request_handler.h"
 
-//#include "server/handlers/signature_pad/signature_pad_request_handler.h"
-//#include "server/handlers/signature_pad/signature_pad_status_request_handler.h"
-
 #include "server/handlers/general_proxy_consent/general_proxy_consent_request_handler.h"
 #include "server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h"
 
@@ -67,6 +64,9 @@
 
 #include "server/handlers/dxa/dxa_hip_session_request_handler.h"
 #include "server/handlers/dxa/dxa_session_request_handler.h"
+
+#include "server/handlers/oct_request_handler.h"
+#include "server/handlers/oct_status_request_handler.h"
 
 using namespace Poco::Net;
 
@@ -215,10 +215,6 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
      {QString(R"(^/weight_scale/delete/?$)"),
       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
-     //{ QString(R"(^/signature/?$)"), 	                   &InstrumentRequestHandlerFactory::createSignaturePadRequestHandler          },
-     //{ QString(R"(^/signature/delete/?$)"),                 &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler      },
-     //{ QString(R"(^/signature/status/?$)"),                 &InstrumentRequestHandlerFactory::createSignaturePadStatusRequestHandler  },
-
      {QString(R"(^/participant_report/?$)"),
       &InstrumentRequestHandlerFactory::createParticipantReportRequestHandler},
 
@@ -235,7 +231,13 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
       &InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler},
 
      {QString(R"(^/dxa2/session/?$)"),
-      &InstrumentRequestHandlerFactory::createDxaSessionRequestHandler}}};
+      &InstrumentRequestHandlerFactory::createDxaSessionRequestHandler},
+
+     {QString(R"(^/oct/?$)"), &InstrumentRequestHandlerFactory::createOCTSessionRequestHandler},
+     {QString(R"(^/oct/status/?$)"), &InstrumentRequestHandlerFactory::createOCTStatusRequestHandler}}
+};
+
+
 
 HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler()
 {
@@ -247,6 +249,16 @@ HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaSessionRequestHand
     return new DxaSessionRequestHandler;
 }
 
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTSessionRequestHandler()
+{
+    return new OCTRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTStatusRequestHandler()
+{
+    return new OCTStatusRequestHandler;
+}
+
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
     /*
@@ -254,8 +266,11 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
      * if there is no match, return the default request handler (404).
      *
      */
+
     QString uri               = QString::fromStdString(request.getURI());
     QString method            = QString::fromStdString(request.getMethod());
+    qInfo() << "uri" << uri << "method" << method;
+
     QString host              = QString::fromStdString(request.getHost().c_str());
     QString clientAddress     = QString::fromStdString(request.clientAddress().host().toString());
     QString clientPort        = QString::number(request.clientAddress().port());

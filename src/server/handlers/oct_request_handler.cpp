@@ -1,16 +1,18 @@
 #include "cypress_application.h"
+#include "oct_request_handler.h"
 
-#include "weigh_scale_request_handler.h"
 #include "auxiliary/json_settings.h"
 
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
-void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+
+void OCTRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
+    qDebug() << "OCT request handler";
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Weigh_Scale, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::OCT, requestData);
 
         QJsonObject data = getResponseData(sessionId);
         QString responseData = JsonSettings::serializeJson(data);
@@ -42,5 +44,8 @@ void WeighScaleRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
         std::ostream &out = response.send();
         out << exception.what();
         out.flush();
+    }
+    catch (...) {
+        qDebug() << "exception";
     }
 }

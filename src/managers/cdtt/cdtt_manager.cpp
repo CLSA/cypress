@@ -210,7 +210,7 @@ void CDTTManager::configureProcess()
         [](QProcess::ProcessState state) {
             QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
             qDebug() << "process state: " << s.join(" ").toLower();
-        });
+    });
 }
 
 void CDTTManager::readOutput()

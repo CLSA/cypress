@@ -46,7 +46,6 @@ VividiManager::~VividiManager()
 
 void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
-    m_test->reset();
     emit dataChanged(m_test);
 
     bool invalidFiles = false;
@@ -55,8 +54,12 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     foreach (DicomFile file, dicomFiles) {
         QSharedPointer<CimtVividIMeasurement> measure(new CimtVividIMeasurement);
 
-        qDebug() << file.patientId << file.modality << file.studyDate << file.studyId
-                 << file.absFilePath << file.mediaStorageUID;
+        qDebug() << file.patientId
+                 << file.modality
+                 << file.studyDate
+                 << file.studyId
+                 << file.absFilePath
+                 << file.mediaStorageUID;
 
         if (m_session->getBarcode() != file.patientId) {
             invalidFiles = true;
@@ -65,7 +68,6 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         }
 
         auto measurements = m_test->getMeasurements();
-
         bool foundDuplicate = false;
         for (auto measurement : measurements) {
             if (measurement->getAttributeValue("path").toString() == file.absFilePath) {
@@ -138,7 +140,7 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
 bool VividiManager::isInstalled()
 {
-    qDebug() << "DxaHipManager::isInstalled";
+    qDebug() << "UltrasoundManager::isInstalled";
 
     if (CypressSettings::isSimMode())
         return true;

@@ -52,7 +52,8 @@ public:
         DxaDualHip,
         Signature,
         Gen_Proxy_Consent,
-        Participant_Report
+        Participant_Report,
+        OCT
     };
     Q_ENUM(MeasureType)
 

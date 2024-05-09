@@ -11,6 +11,8 @@ public:
     void simulate() override;
     bool isValid() const override;
 
+    void reset() override;
+
     QJsonObject toJsonObject() const override;
     QString toString() const override;
 

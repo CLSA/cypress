@@ -14,6 +14,12 @@ void CimtVividiTest::simulate()
 {
 }
 
+void CimtVividiTest::reset()
+{
+    TestBase::reset();
+
+}
+
 bool CimtVividiTest::isValid() const
 {
     //if (getMeasurementCount() != getExpectedMeasurementCount()) {

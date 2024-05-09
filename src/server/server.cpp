@@ -1,13 +1,5 @@
-#include <QThread>
-#include <QSettings>
-#include <QDebug>
-
-#include <string>
-#include <iostream>
-
-#include "Poco/Net/HTTPServer.h"
 #include "cypress_settings.h"
-#include "cypress_application.h"
+
 #include "server/Server.h"
 #include "server/instrument_request_handler_factory.h"
 
@@ -27,24 +19,26 @@
 #include "sessions/weigh_scale_session.h"
 #include "sessions/gen_proxy_session.h"
 #include "sessions/participant_report_session.h"
+#include "sessions/oct_session.h"
 
+#include "Poco/Net/HTTPServer.h"
+
+#include <QThread>
+#include <QSettings>
+#include <QDebug>
 
 using namespace Poco::Net;
-
 
 Server::Server()
 {
     bool binded = false;
     while (!binded) {
         try {
-            mainThread = QThread::currentThread();
-            //moveToThread(&serverThread);
+            const HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
+            const HTTPServerParams::Ptr pParams = new HTTPServerParams;
 
-            HTTPRequestHandlerFactory::Ptr pFactory = new InstrumentRequestHandlerFactory;
-            HTTPServerParams::Ptr pParams = new HTTPServerParams;
-
-            QString addr = CypressSettings::readSetting("address").toString();
-            int port = CypressSettings::readSetting("port").toUInt();
+            const QString addr = CypressSettings::readSetting("address").toString();
+            const int port = CypressSettings::readSetting("port").toUInt();
 
             Poco::Net::ServerSocket socket(Poco::Net::SocketAddress(addr.toStdString(), port));
             socket.setReuseAddress(true);
@@ -72,6 +66,10 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
     QSharedPointer<CypressSession> session;
 
     const QString& origin = inputData.value("origin").toString();
+    if (origin.isNull() || origin.isEmpty()) {
+        qDebug() << "No origin";
+        throw QException();
+    }
 
     switch (type)
     {
@@ -125,6 +123,9 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Weigh_Scale:
             session = QSharedPointer<WeighScaleSession>(new WeighScaleSession(nullptr, inputData, origin));
             break;
+        case Constants::MeasureType::OCT:
+            session = QSharedPointer<OCTSession>(new OCTSession(nullptr, inputData, origin));
+            break;
         case Constants::MeasureType::Gen_Proxy_Consent:
             session = QSharedPointer<GenProxySession>(new GenProxySession(nullptr, inputData, origin));
             break;
@@ -136,35 +137,18 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
     }
 
     if (!session) {
-        qDebug() << "no session";
+        qDebug() << "No session";
         throw QException();
     }
 
-    session->moveToThread(mainThread);
     session->isInstalled();
     session->isAvailable();
     session->validate();
     session->calculateInputs();
-    qDebug() << "session thread" << session->thread()->currentThreadId();
 
     emit startSession(session);
 
-    //sessions.insert(session->getSessionId(), session);
-    //session->start();
-
     return session->getSessionId();
-}
-
-QString Server::requestReport(const Constants::ReportType& report, const QJsonObject& inputData)
-{
-    Q_UNUSED(inputData);
-    Q_UNUSED(report);
-    //CypressSession session(report, inputData);
-
-    //emit startReport(session);
-
-    //return session.getSessionId();
-    return "";
 }
 
 void Server::forceSessionEnd(QString sessionId)
@@ -174,16 +158,14 @@ void Server::forceSessionEnd(QString sessionId)
 
 void Server::start()
 {
-    //serverThread.start();
     server->start();
     qInfo() << "listening at " + QString::fromStdString(server->socket().address().toString());
 }
 
 void Server::stop()
 {
+    qDebug() << "Server::stop";
     server->stopAll(true);
-    qDebug() << "stop all";
-
     serverThread.quit();
     serverThread.wait();
 }

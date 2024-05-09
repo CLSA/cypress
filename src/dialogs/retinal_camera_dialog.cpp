@@ -15,16 +15,11 @@ RetinalCameraDialog::RetinalCameraDialog(QWidget *parent,
     ui->setupUi(this);
     setWindowTitle("Retinal Camera " + (session->getSide() == Side::Left ? QString("(Left)") : QString("(Right)")));
 
+    ui->testInfoWidget->setSessionInformation(*session);
     m_manager.reset(new RetinalCameraManager(session));
 
-    QSharedPointer<RetinalCameraManager> manager = qSharedPointerCast<RetinalCameraManager>(m_manager);
-
-    ui->testInfoWidget->setSessionInformation(*session);
-
-    // finished
+    auto manager = qSharedPointerCast<RetinalCameraManager>(m_manager);
     connect(manager.get(), &RetinalCameraManager::success, this, &RetinalCameraDialog::success);
-
-    // critical error
     connect(manager.get(), &RetinalCameraManager::error, this, &RetinalCameraDialog::error);
 }
 

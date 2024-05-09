@@ -81,8 +81,11 @@ public:
     static HTTPRequestHandler* createParticipantReportRequestHandler();
     static HTTPRequestHandler* createGeneralProxyConsentRequestHandler();
     static HTTPRequestHandler* createGeneralProxyConsentStatusRequestHandler();
-    static HTTPRequestHandler *createDxaHipSessionRequestHandler();
-    static HTTPRequestHandler *createDxaSessionRequestHandler();
+    static HTTPRequestHandler* createDxaHipSessionRequestHandler();
+    static HTTPRequestHandler* createDxaSessionRequestHandler();
+
+    static HTTPRequestHandler* createOCTSessionRequestHandler();
+    static HTTPRequestHandler* createOCTStatusRequestHandler();
 };
 
 #endif // INSTRUMENT_REQUEST_HANDLER_FACTORY_H

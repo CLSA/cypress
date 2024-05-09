@@ -1,14 +1,7 @@
 #ifndef WEIGH_SCALE_STATUS_REQUEST_HANDLER_H
 #define WEIGH_SCALE_STATUS_REQUEST_HANDLER_H
 
-#include <QJsonObject>
-#include <QDebug>
-
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-
 #include "server/default_request_handler.h"
-
 
 class WeighScaleStatusRequestHandler : public DefaultRequestHandler
 {
