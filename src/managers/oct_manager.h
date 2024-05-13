@@ -2,10 +2,9 @@
 #define OCT_MANAGER_H
 
 #include "manager_base.h"
-
 #include "server/sessions/oct_session.h"
 
-#include "dicom/dcm_recv.h"
+#include <QProcess>
 
 class OCTManager : public ManagerBase
 {
@@ -24,20 +23,13 @@ public slots:
     void finish() override;
     bool cleanUp() override;
 
-private slots:
-    void dicomFilesReceived(QList<DicomFile> dicomFiles);
+    void readOutput() override;
 
 private:
+    QProcess m_process;
     QString m_runnablePath;
     QString m_runnableName;
-    QString m_aeTitle;
-    QString m_host;
-    QString m_port;
-    QString m_storageDirPath;
-    QString m_logConfigPath;
-    QString m_ascConfigPath;
-
-    QScopedPointer<DcmRecv> m_dicomServer;
+    QString m_webpage;
 
     bool clearData() override;
     bool setUp() override;

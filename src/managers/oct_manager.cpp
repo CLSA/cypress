@@ -2,9 +2,9 @@
 
 #include "data/oct_test.h"
 
-#include "auxiliary/windows_util.h"
-
 #include "server/sessions/oct_session.h"
+
+#include <QFileInfo>
 
 
 OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { session }
@@ -13,38 +13,11 @@ OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { sessio
 
     m_runnableName = CypressSettings::readSetting("oct/dicom/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("oct/dicom/runnablePath").toString();
-
-    m_aeTitle = CypressSettings::readSetting("oct/dicom/aeTitle").toString();
-    m_host = CypressSettings::readSetting("oct/dicom/host").toString();
-    m_port = CypressSettings::readSetting("oct/dicom/port").toString();
-
-    m_storageDirPath = CypressSettings::readSetting("oct/dicom/storagePath").toString();
-    m_logConfigPath = CypressSettings::readSetting("oct/dicom/log_config").toString();
-    m_ascConfigPath = CypressSettings::readSetting("oct/dicom/asc_config").toString();
-
-    m_dicomServer.reset(
-        new DcmRecv(
-            m_runnableName,
-            m_ascConfigPath,
-            m_storageDirPath,
-            m_aeTitle,
-            m_port
-        )
-    );
-
-    WindowsUtil::killProcessByName(L"storescp.exe");
-
-    connect(
-        m_dicomServer.get(),
-        &DcmRecv::dicomFilesReceived,
-        this,
-        &OCTManager::dicomFilesReceived
-    );
+    m_webpage = CypressSettings::readSetting("oct/webpage").toString();
 }
 
 OCTManager::~OCTManager()
 {
-    m_dicomServer->stop();
 }
 
 bool OCTManager::isInstalled()
@@ -52,15 +25,9 @@ bool OCTManager::isInstalled()
     if (CypressSettings::isSimMode())
         return true;
 
-    const QString runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
-    const QString aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
-    const QString host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
-    const QString port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
-
-    const QString storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
-    const QString logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
-    const QString ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
+    const QString runnableName = CypressSettings::readSetting("oct/runnableName").toString();
+    const QString runnablePath = CypressSettings::readSetting("oct/runnablePath").toString();
+    const QString webpage = CypressSettings::readSetting("oct/webpage").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
         qDebug() << "runnableName is not defined";
@@ -72,33 +39,8 @@ bool OCTManager::isInstalled()
         return false;
     }
 
-    if (aeTitle.isNull() || aeTitle.isEmpty()) {
+    if (webpage.isNull() || webpage.isEmpty()) {
         qDebug() << "aeTitle is not defined";
-        return false;
-    }
-
-    if (host.isNull() || host.isEmpty()) {
-        qDebug() << "host is not defined";
-        return false;
-    }
-
-    if (port.isNull() || port.isEmpty()) {
-        qDebug() << "port is not defined";
-        return false;
-    }
-
-    if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qDebug() << "storageDirPath is not defined";
-        return false;
-    }
-
-    if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qDebug() << "logConfigPath is not defined";
-        return false;
-    }
-
-    if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qDebug() << "ascConfigPath is not defined";
         return false;
     }
 
@@ -133,7 +75,29 @@ bool OCTManager::start()
 {
     qDebug() << "OCTManager::start";
 
-    m_dicomServer->start();
+    const QString command = m_runnableName;
+
+    QStringList arguments;
+    arguments << m_webpage;
+
+    m_process.setProgram(command);
+    m_process.setArguments(arguments);
+    m_process.setWorkingDirectory(m_runnablePath);
+    m_process.setProcessChannelMode(QProcess::ForwardedChannels);
+
+    connect(&m_process, &QProcess::started, this, [=]() {
+        qDebug() << "process started: " << m_process.arguments().join(" ");
+    });
+
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [=]() {
+        qDebug() << "process finished, reading output";
+        readOutput();
+    });
+
+    m_process.start();
+
+    if (!m_process.waitForStarted())
+        return false;
 
     emit started(m_test);
     emit dataChanged(m_test);
@@ -142,9 +106,10 @@ bool OCTManager::start()
     return true;
 }
 
-void OCTManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
+void OCTManager::readOutput()
 {
-    qDebug() << "dicom files received:" << dicomFiles.length();
+    qDebug() << "OCTManager::readOutput";
+
 }
 
 void OCTManager::measure()

@@ -9,6 +9,7 @@
 
 #include <QJsonDocument>
 #include <QMessageBox>
+#include <QApplication>
 
 
 VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
@@ -128,6 +129,9 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         QMessageBox::warning(nullptr, "Incorrect participant",
                              QString("Received ID %1 which does not match %2")
                                  .arg(incorrectPatientId, m_session->getBarcode()));
+
+        m_test->reset();
+        emit dataChanged(m_test);
         return;
     }
 
@@ -237,6 +241,8 @@ void VividiManager::measure()
 {
     if (m_test->isValid())
         emit canFinish();
+    else
+        emit cannotFinish();
 }
 
 void VividiManager::finish()
@@ -267,6 +273,7 @@ void VividiManager::finish()
             FileUtils::getHumanReadableFileSize(measure.getAttribute("path").toString())
         );
 
+        QApplication::processEvents();
         bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
                                    (answerUrl
                                                   + "?filename=" + measure.getAttribute("name").toString() + ".dcm").toStdString(),

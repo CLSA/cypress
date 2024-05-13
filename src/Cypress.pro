@@ -23,7 +23,7 @@ LIBS += -L"C:/Program Files (x86)/Poco/lib" -lPocoFoundationd -lPocoUtild -lPoco
 
 # DCMTK
 INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
-LIBS += -L"C:/Users/hoarea/CypressDeps/dcmtk-3.6.8/dcmtk-3.6.8/build/lib/Debug" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+LIBS += -L"C:/Users/hoarea/CypressDeps/dcmtk-3.6.8/dcmtk-3.6.8/build-msvc-2022/lib/Debug" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 }
 
 # Release libraries

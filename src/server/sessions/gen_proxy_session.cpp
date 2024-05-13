@@ -16,6 +16,9 @@ void GenProxySession::initializeDialog() {
 void GenProxySession::validate() const
 {
     CypressSession::validate();
+
+    if (!isValidString("uid"))
+        throw ValidationError("uid");
 }
 
 void GenProxySession::isInstalled() const {
@@ -26,14 +29,3 @@ void GenProxySession::isInstalled() const {
 void GenProxySession::isAvailable() const {
 
 }
-
-//void GenProxySession::start()
-//{
-//    m_startDateTime = QDateTime::currentDateTimeUtc();
-//    m_status = SessionStatus::Started;
-//
-//    GeneralProxyManager manager(QSharedPointer<GenProxySession>(this));
-//    manager.start();
-//
-//    qDebug() << "GenProxySession::start " << getSessionId() << m_startDateTime;
-//}

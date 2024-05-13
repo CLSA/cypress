@@ -122,6 +122,7 @@ public:
     QJsonObject getInputData() const;
 
     int getAnswerId() const;
+    QString getUID() const;
     QString getSessionId() const;
     QString getBarcode() const;
     QString getLanguage() const;
@@ -146,6 +147,7 @@ protected:
     QJsonObject m_inputData;
 
     QString m_interviewer {};
+    QString m_uid {};
     int m_answerId {};
     QString m_sessionId {};
     QString m_barcode {};

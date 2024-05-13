@@ -18,6 +18,9 @@ public:
 
     static bool isInstalled();
 
+signals:
+    void cannotFinish();
+
 public slots:
     bool start() override;
     void measure() override;

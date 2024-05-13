@@ -58,8 +58,16 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
         ui->measurementTable->enableFinishButton();
     });
 
+    connect(manager.get(), &VividiManager::cannotFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->disableMeasureButton();
+    });
+
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &VividiManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
+        ui->measurementTable->disableFinishButton();
+        QApplication::processEvents();
+        manager->finish();
+    });
 
     // successful test
     connect(manager.get(), &VividiManager::success, this, &CimtVividiDialog::success);

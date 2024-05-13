@@ -9,6 +9,7 @@ CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData, co
     QObject(parent), m_inputData(inputData)
 {
     m_barcode = m_inputData.value("barcode").toString();
+    m_uid = m_inputData.value("uid").toString();
     m_answerId = m_inputData.value("answer_id").toInt();
     m_interviewer = m_inputData.value("interviewer").toString();
     m_language = m_inputData.value("language").toString();
@@ -77,6 +78,11 @@ void CypressSession::end(const CypressSession::SessionStatus& status)
 QString CypressSession::getSessionId() const
 {
     return m_sessionId;
+}
+
+QString CypressSession::getUID() const
+{
+    return m_uid;
 }
 
 int CypressSession::getAnswerId() const

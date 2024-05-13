@@ -48,7 +48,7 @@ void GeneralProxyManager::measure()
     PDFFormFiller filler;
     QJsonObject inputData;
 
-    inputData["enrollmentId"] = m_session->getBarcode();
+    inputData["enrollmentId"] = m_session->getUID();
 
     QString language = m_session->getInputData().value("language").toString();
     QDir currentDir = QDir::currentPath();
