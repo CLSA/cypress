@@ -56,6 +56,8 @@ private:
     QString m_outputPath;
     QString m_outputFile;
 
+    QString m_settingsFilePath;
+
     // Reset the session
     bool clearData() override;
 

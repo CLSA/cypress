@@ -5,6 +5,10 @@
 #include "server/sessions/oct_session.h"
 
 #include <QFileInfo>
+#include <QMessageBox>
+
+#include <QSqlQuery>
+#include <QSqlError>
 
 
 OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { session }
@@ -14,6 +18,10 @@ OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { sessio
     m_runnableName = CypressSettings::readSetting("oct/dicom/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("oct/dicom/runnablePath").toString();
     m_webpage = CypressSettings::readSetting("oct/webpage").toString();
+
+    m_databaseName = CypressSettings::readSetting("oct/database/name").toString();
+    m_databasePort = CypressSettings::readSetting("oct/database/port").toString();
+    m_databaseUser = CypressSettings::readSetting("oct/database/user").toString();
 }
 
 OCTManager::~OCTManager()
@@ -29,6 +37,10 @@ bool OCTManager::isInstalled()
     const QString runnablePath = CypressSettings::readSetting("oct/runnablePath").toString();
     const QString webpage = CypressSettings::readSetting("oct/webpage").toString();
 
+    const QString databaseName = CypressSettings::readSetting("oct/database/name").toString();
+    const QString databasePort = CypressSettings::readSetting("oct/database/port").toString();
+    const QString databaseUser = CypressSettings::readSetting("oct/database/user").toString();
+
     if (runnableName.isNull() || runnableName.isEmpty()) {
         qDebug() << "runnableName is not defined";
         return false;
@@ -40,7 +52,12 @@ bool OCTManager::isInstalled()
     }
 
     if (webpage.isNull() || webpage.isEmpty()) {
-        qDebug() << "aeTitle is not defined";
+        qDebug() << "webpage is not defined";
+        return false;
+    }
+
+    if (databaseName.isNull() || databaseName.isEmpty()) {
+        qDebug() << "databaseName is not defined";
         return false;
     }
 
@@ -75,8 +92,9 @@ bool OCTManager::start()
 {
     qDebug() << "OCTManager::start";
 
+    // Setup process
+    qDebug() << "OCTManager::start - setup process";
     const QString command = m_runnableName;
-
     QStringList arguments;
     arguments << m_webpage;
 
@@ -94,8 +112,66 @@ bool OCTManager::start()
         readOutput();
     });
 
-    m_process.start();
+    qDebug() << "OCTManager::start - connect to db";
 
+    // Connect to database
+    m_db = QSqlDatabase::addDatabase("QODBC");
+    m_db.setDatabaseName(m_databaseName);
+    if (!m_db.open())
+        return false;
+
+    // Cleanup database
+    qDebug() << "OCTManager::start - cleanup db";
+    QSqlQuery query(m_db);
+
+    query.prepare("DELETE * FROM Patients");
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+    query.prepare("DELETE * FROM People");
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+    query.prepare("DELETE * FROM OCTDSA");
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+    query.prepare("DELETE * FROM Media");
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+    query.prepare("DELETE * FROM Exams");
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+
+    // Prepare database
+    query.prepare("INSERT INTO Persons (PersonUid, SurName, ForeName) VALUES (:personUid, :firstName, :lastName");
+    query.bindValue(":personUid", defaultPersonUUID);
+    query.bindValue(":firstName", "CLSA");
+    query.bindValue(":lastName", "Participant");
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+
+    query.prepare("INSERT INTO Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUid, :participantId, :personUUID");
+    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.bindValue(":participantId", m_session->getBarcode());
+    query.bindValue(":personUUID", defaultPatientUUID);
+    if (!query.exec()) {
+        qDebug() << query.lastError().text();
+        return false;
+    }
+
+    qDebug() << "OCTManager::start - start ImageNet";
+    // Open IMAGENet webpage
+    m_process.start();
     if (!m_process.waitForStarted())
         return false;
 
@@ -109,12 +185,23 @@ bool OCTManager::start()
 void OCTManager::readOutput()
 {
     qDebug() << "OCTManager::readOutput";
-
+    measure();
 }
 
 void OCTManager::measure()
 {
     qDebug() << "OCTManager::measure";
+    QSqlQuery query(m_db);
+    query.prepare("SELECT * FROM OCTDSA WHERE PatientID = :patientId");
+    if (!query.exec())
+        return;
+    if (!query.size())
+        return;
+    query.prepare("SELECT * FROM Media WHERE PatientID = :patientId");
+    if (!query.exec())
+        return;
+    if (!query.size())
+        return;
     if (m_test->isValid())
         emit canFinish();
 }

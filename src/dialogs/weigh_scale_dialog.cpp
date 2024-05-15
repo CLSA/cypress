@@ -19,6 +19,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->disableMeasureButton();
+    ui->measurementTable->disableFinishButton();
     ui->measurementTable->enableRemoval(true);
 
     QList<TableColumn> columns;
@@ -48,10 +49,15 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
     // the user requested to connect to the device
     connect(ui->serialPortPickerWidget, &SerialPortWidget::connectDevice, manager.get(), &WeighScaleManager::connectDevice);
 
+    connect(manager.get(), &WeighScaleManager::cannotFinish, this, [=] {
+        ui->measurementTable->disableFinishButton();
+    });
+
     // the user requested to disconnect from the device
     connect(ui->serialPortPickerWidget, &SerialPortWidget::disconnectDevice, manager.get(), [=]() {
         ui->serialPortPickerWidget->deviceDisconnected();
         ui->zeroDevicePushButton->setEnabled(false);
+        ui->measurementTable->disableMeasureButton();
     });
 
     // a connection was made, update ui
@@ -117,6 +123,7 @@ WeighScaleDialog::WeighScaleDialog(QWidget *parent, QSharedPointer<WeighScaleSes
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &WeighScaleManager::addManualMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::removeMeasurement, manager.get(), &WeighScaleManager::removeMeasurement);
 
     // zero device
     connect(ui->zeroDevicePushButton, &QPushButton::clicked, manager.get(), &WeighScaleManager::zeroDevice);

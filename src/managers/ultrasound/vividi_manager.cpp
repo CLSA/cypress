@@ -47,11 +47,6 @@ VividiManager::~VividiManager()
 
 void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
-    emit dataChanged(m_test);
-
-    bool invalidFiles = false;
-    QString incorrectPatientId;
-
     foreach (DicomFile file, dicomFiles) {
         QSharedPointer<CimtVividIMeasurement> measure(new CimtVividIMeasurement);
 
@@ -63,9 +58,7 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
                  << file.mediaStorageUID;
 
         if (m_session->getBarcode() != file.patientId) {
-            invalidFiles = true;
-            incorrectPatientId = file.patientId;
-            break;
+            continue;
         }
 
         auto measurements = m_test->getMeasurements();
@@ -125,21 +118,9 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         m_test->addMeasurement(measure);
     }
 
-    if (invalidFiles) {
-        QMessageBox::warning(nullptr, "Incorrect participant",
-                             QString("Received ID %1 which does not match %2")
-                                 .arg(incorrectPatientId, m_session->getBarcode()));
-
-        m_test->reset();
-        emit dataChanged(m_test);
-        return;
-    }
-
     emit dataChanged(m_test);
-    if (m_test->isValid()) {
+    if (m_test->isValid())
         emit canFinish();
-    }
-
 }
 
 bool VividiManager::isInstalled()

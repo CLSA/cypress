@@ -529,19 +529,6 @@ void BloodPressureManager::finish() {
     ManagerBase::finish();
 }
 
-void BloodPressureManager::addManualMeasurement()
-{
-    QSharedPointer<BloodPressureMeasurement> bpm(
-        new BloodPressureMeasurement(m_test->getMeasurementCount() + 1,
-                                     0,
-                                     0,
-                                     0,
-                                     QDateTime::currentDateTimeUtc(),
-                                     QDateTime::currentDateTimeUtc()));
-    m_test->addMeasurement(bpm);
-    emit dataChanged(m_test);
-}
-
 void BloodPressureManager::addManualEntry(const int systolic, const int diastolic, const int pulse)
 {
     auto test = qSharedPointerCast<BloodPressureTest>(m_test);
@@ -555,9 +542,17 @@ void BloodPressureManager::addManualEntry(const int systolic, const int diastoli
     test->addMeasurement(bpm);
     test->updateAverage();
 
-    qDebug() << "TEST" << test->toJsonObject();
+    qDebug() << test->toJsonObject();
 
     emit dataChanged(m_test);
+}
+
+void BloodPressureManager::removeMeasurement(const int index)
+{
+    m_test->removeMeasurement(index);
+    emit dataChanged(m_test);
+
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
 // Set up device

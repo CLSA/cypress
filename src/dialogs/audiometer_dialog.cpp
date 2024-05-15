@@ -61,6 +61,7 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
         ui->serialPortPickerWidget->deviceDisconnected();
         ui->measurementTable->disableMeasureButton();
     });
+
     // device started
     connect(manager.get(), &AudiometerManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
@@ -71,10 +72,16 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
     connect(manager.get(), &AudiometerManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
+    connect(manager.get(), &AudiometerManager::cannotMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->disableMeasureButton();
+    });
 
     // can finish
     connect(manager.get(), &AudiometerManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
+    });
+    connect(manager.get(), &AudiometerManager::cannotFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->disableFinishButton();
     });
 
     // finished
@@ -85,7 +92,6 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
 
     // data changed
     connect(manager.get(), &AudiometerManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
 
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &AudiometerManager::measure);
@@ -106,6 +112,7 @@ AudiometerDialog::AudiometerDialog(QWidget *parent, QSharedPointer<AudiometerSes
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &AudiometerManager::addManualMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::removeMeasurement, manager.get(), &AudiometerManager::removeMeasurement);
 }
 
 AudiometerDialog::~AudiometerDialog()

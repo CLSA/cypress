@@ -51,6 +51,11 @@ bool WeightMeasurement::isValid() const
     bool ok = false;
     if (hasAttribute("weight")) {
         double val = getAttributeValue("weight").toDouble(&ok);
+
+        if (val <= 0) {
+            qDebug() << "weight is <= 0" << val;
+            return false;
+        }
         ok = ok && getAttribute("weight").hasUnits() && hasAttribute("mode")
              && hasAttribute("timestamp") && 0.0f <= val;
     }
@@ -59,7 +64,7 @@ bool WeightMeasurement::isValid() const
 
 bool WeightMeasurement::isZero() const
 {
-    return isValid() && 0.0f == getAttributeValue("weight").toDouble();
+    return 0.0f == getAttributeValue("weight").toDouble();
 }
 
 QString WeightMeasurement::toString() const

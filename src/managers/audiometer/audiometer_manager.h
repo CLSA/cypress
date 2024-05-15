@@ -2,6 +2,7 @@
 #define AUDIOMETER_MANAGER_H
 
 #include "managers/serial_port/serial_port_manager.h"
+
 #include "server/sessions/audiometer_session.h"
 
 
@@ -39,7 +40,11 @@ public:
 
     void addManualEntry(const QString side, const QString test, const int level, const bool pass);
 
+signals:
+    void cannotFinish();
+
 public slots:
+    void removeMeasurement(const int index);
 
     bool start() override;
 

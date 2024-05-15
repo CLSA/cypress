@@ -58,6 +58,7 @@ public:
 
 signals:
     void canConnect();
+    void cannotFinish();
 
     void deviceConnected();
     void deviceDisconnected();
@@ -104,8 +105,8 @@ public slots:
     //
     void measure() override;
 
-    void addManualMeasurement() override;
     void addManualEntry(const int systolic, const int diastolic, const int pulse);
+    void removeMeasurement(const int index);
 
 private:
     State m_state { State::CONNECTING };

@@ -80,13 +80,22 @@ bool AudiometerManager::isInstalled()
 void AudiometerManager::addManualEntry(const QString side, const QString test, const int level, const bool pass) {
     auto audiometerTest = qSharedPointerCast<HearingTest>(m_test);
     QSharedPointer<HearingMeasurement> measure(new HearingMeasurement(side, test, level, pass));
+
     if (measure->isValid()) {
         audiometerTest->addMeasurement(measure);
         emit dataChanged(audiometerTest);
         emit canFinish();
     }
+    else {
+        emit cannotFinish();
+    }
+}
 
-    qDebug() << audiometerTest->toJsonObject();
+void AudiometerManager::removeMeasurement(const int index) {
+    m_test->removeMeasurement(index);
+    emit dataChanged(m_test);
+
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
 bool AudiometerManager::start()

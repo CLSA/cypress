@@ -40,7 +40,7 @@ bool WeighScaleManager::start() {
 
     emit started(m_test);
     emit dataChanged(m_test);
-    emit canMeasure();
+    //emit canMeasure();
 
     return true;
 }
@@ -61,28 +61,32 @@ void WeighScaleManager::measure() {
     writeDevice();
 }
 
-void WeighScaleManager::addManualMeasurement()
-{
-    auto test = qSharedPointerCast<WeighScaleTest>(m_test);
-    QSharedPointer<WeightMeasurement> measure(new WeightMeasurement);
-
-    test->addMeasurement(measure);
-
-    const double average = test->calculateAverage();
-    qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
-
-    emit dataChanged(m_test);
-}
-
 void WeighScaleManager::addManualEntry(const double weight) {
     auto test = qSharedPointerCast<WeighScaleTest>(m_test);
     QSharedPointer<WeightMeasurement> measure(new WeightMeasurement(weight, "kg"));
 
     test->addMeasurement(measure);
+
     const double average = test->calculateAverage();
     qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
 
     emit dataChanged(m_test);
+
+    if (test->isValid()) {
+        emit canFinish();
+    }
+    else {
+        emit cannotFinish();
+    }
+}
+
+
+void WeighScaleManager::removeMeasurement(const int index)
+{
+    m_test->removeMeasurement(index);
+    emit dataChanged(m_test);
+
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
 void WeighScaleManager::connectDevice()

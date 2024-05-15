@@ -50,7 +50,7 @@ double WeighScaleTest::calculateAverage()
 
     int validMeasures = 0;
     for (auto &measure : measurements) {
-        if (measure->hasAttribute("weight") && measure->getAttributeValue("weight").isValid()) {
+        if (measure->isValid()) {
             totalWeight += measure->getAttributeValue("weight").toDouble();
             validMeasures++;
         }
@@ -128,11 +128,11 @@ QJsonObject WeighScaleTest::toJsonObject() const
     QJsonArray measurementArray {};
 
     foreach (auto measurement, m_measurementList) {
-      measurementArray << measurement->toJsonObject();
+        if (measurement->isValid())
+            measurementArray << measurement->toJsonObject();
     }
 
     QJsonObject metadata = getMetaData().toJsonObject();
-
     testJson.insert("results", measurementArray);
     testJson.insert("manual_entry", getManualEntryMode());
     testJson.insert("metadata", metadata);

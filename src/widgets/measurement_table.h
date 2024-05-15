@@ -255,21 +255,21 @@ public:
     void showMeasureButton();
 
     void enableRemoval(bool allow);
-
-
     void setTitle(const QString& title);
+
 signals:
     void measure();
     void finish();
     void addMeasurement();
+    void removeMeasurement(const int index);
     void enterManualEntry();
     void cellChanged();
 
 public slots:
     void handleTestUpdate(QSharedPointer<TestBase> test);
 
-    void addManualMeasurement();
-    void removeMeasurement();
+    void handleAddManualMeasurement();
+    void handleRemoveMeasurement();
 
 private slots:
     void handleChange(int row, int col);

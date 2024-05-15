@@ -274,6 +274,7 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
     QString host              = QString::fromStdString(request.getHost().c_str());
     QString clientAddress     = QString::fromStdString(request.clientAddress().host().toString());
     QString clientPort        = QString::number(request.clientAddress().port());
+
     QString origin            = QString::fromStdString(request.get("Origin").c_str());
 
     qInfo() << "Origin" << origin;

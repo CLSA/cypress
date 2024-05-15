@@ -16,6 +16,7 @@
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QSqlQuery>
 
 CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     : ManagerBase(session)
@@ -24,6 +25,7 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     m_runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     m_outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
+    m_settingsFilePath = CypressSettings::readSetting("cdtt/settingsFilePath").toString();
 
     QDir outputDir(m_outputPath);
     m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
@@ -58,6 +60,7 @@ bool CDTTManager::isInstalled()
     const QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     const QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
+    const QString settingsFilePath = CypressSettings::readSetting("cdtt/settingsFilePath").toString();
 
     if (jre.isNull() || jre.isEmpty()) {
         qDebug() << "jre is undefined";
@@ -76,6 +79,11 @@ bool CDTTManager::isInstalled()
 
     if (outputPath.isNull() || outputPath.isEmpty()) {
         qDebug() << "outputPath is undefined";
+        return false;
+    }
+
+    if (settingsFilePath.isNull() || settingsFilePath.isEmpty()) {
+        qDebug() << "settingsFilePath is undefined";
         return false;
     }
 
@@ -180,8 +188,35 @@ void CDTTManager::configureProcess()
     m_process.setWorkingDirectory(m_runnablePath);
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    qDebug() << QDir::toNativeSeparators(m_settingsFilePath);
+
+    db.setDatabaseName(
+        "DRIVER={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" + QDir::toNativeSeparators(m_settingsFilePath));
+
+    if (!db.isValid()) {
+        emit error("ERROR: invalid database");
+        return;
+    }
+
+    if (!db.open()) {
+        qDebug() << db.isOpenError();
+        qDebug() << db.lastError();
+        emit error("Cannot find the settings file");
+        return;
+    }
+
+    QSqlQuery query; //
+    query.prepare("UPDATE [DefaultParameters$] SET B2 = 'EN_CA'");
+    if (!query.exec()) {
+        qDebug() << query.lastQuery();
+        qDebug() << query.lastError();
+        emit error("Cannot set language settings");
+    }
+
     qDebug() << "CDTTManager::configureProcess - config args: "
          << m_process.arguments().join(" ");
+
     qDebug() << "CDTTManager::configureProces - working dir: "
          << m_runnablePath;
 

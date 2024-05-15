@@ -138,34 +138,27 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
         ui->disconnectPushButton->setEnabled(true);
     });
 
-    // device started
     connect(manager.get(), &BloodPressureManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
 
-    // can auto measure
     connect(manager.get(), &BloodPressureManager::canMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->enableMeasureButton();
     });
-
-    // cannot auto measure
     connect(manager.get(), &BloodPressureManager::cannotMeasure, ui->measurementTable, [=]() {
         ui->measurementTable->disableMeasureButton();
     });
 
-    // can finish
     connect(manager.get(), &BloodPressureManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
     });
+    connect(manager.get(), &BloodPressureManager::cannotFinish, ui->measurementTable, [=]() {
+        ui->measurementTable->disableFinishButton();
+    });
 
-    // finished
     connect(manager.get(), &BloodPressureManager::success, this, &BloodPressureDialog::success);
-
-    // critical error
     connect(manager.get(), &BloodPressureManager::error, this, &BloodPressureDialog::error);
-
-    // data changed
     connect(manager.get(), &BloodPressureManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // request auto measure
@@ -200,6 +193,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &BloodPressureManager::addManualMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::removeMeasurement, manager.get(), &BloodPressureManager::removeMeasurement);
 }
 
 BloodPressureDialog::~BloodPressureDialog()
