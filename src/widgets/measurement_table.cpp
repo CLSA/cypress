@@ -318,6 +318,8 @@ void MeasurementTable::setColumnDelegate(int col, QItemDelegate* itemDelegate)
 
 void MeasurementTable::toggleManualEntry(bool saveChanges)
 {
+    Q_UNUSED(saveChanges);
+
     manualEntryMode = !manualEntryMode;
     addRemoveMeasureButton();
 }

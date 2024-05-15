@@ -64,6 +64,7 @@ void DialogBase::closeEvent(QCloseEvent* event)
 
 void DialogBase::cancel(const QString& cancelMsg)
 {
+    Q_UNUSED(cancelMsg);
     qDebug() << "DialogBase::cancel";
 
     if (!m_sim)

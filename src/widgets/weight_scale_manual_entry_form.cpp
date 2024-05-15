@@ -12,7 +12,6 @@ WeightScaleManualEntryForm::WeightScaleManualEntryForm(QWidget *parent)
     setWindowTitle("Manual Entry");
 
     connect(ui->weightValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged) , this, [=](double weight) {
-        bool ok = false;
         m_weight = weight;
         ui->okButton->setEnabled(validInputs());
     });

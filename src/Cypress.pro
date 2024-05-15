@@ -455,7 +455,6 @@ SOURCES += \
     server/sessions/dxa/dxa_hip_session.cpp \
     server/sessions/dxa/dxa_session.cpp \
     server/sessions/ecg_session.cpp \
-    server/sessions/frax_session.cpp \
     server/handlers/audiometer/audiometer_request_handler.cpp \
     server/handlers/audiometer/audiometer_status_request_handler.cpp \
     server/handlers/blood_pressure/blood_pressure_request_handler.cpp \

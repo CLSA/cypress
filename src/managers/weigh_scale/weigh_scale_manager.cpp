@@ -40,7 +40,6 @@ bool WeighScaleManager::start() {
 
     emit started(m_test);
     emit dataChanged(m_test);
-    //emit canMeasure();
 
     return true;
 }
@@ -66,18 +65,10 @@ void WeighScaleManager::addManualEntry(const double weight) {
     QSharedPointer<WeightMeasurement> measure(new WeightMeasurement(weight, "kg"));
 
     test->addMeasurement(measure);
-
-    const double average = test->calculateAverage();
-    qDebug() << "WeighScaleTest::addManualMeasurement - new average" << average << "kg";
+    test->calculateAverage();
 
     emit dataChanged(m_test);
-
-    if (test->isValid()) {
-        emit canFinish();
-    }
-    else {
-        emit cannotFinish();
-    }
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
 
@@ -85,7 +76,6 @@ void WeighScaleManager::removeMeasurement(const int index)
 {
     m_test->removeMeasurement(index);
     emit dataChanged(m_test);
-
     m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
@@ -94,7 +84,6 @@ void WeighScaleManager::connectDevice()
     qDebug() << "WeighScaleManager::connectDevice";
 
     // Connect to the serial port and set up listeners
-
     if (m_port.isOpen())
         m_port.close();
 

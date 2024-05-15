@@ -59,6 +59,8 @@ QString GripStrengthMeasurement::toString() const
 
 void GripStrengthMeasurement::simulate(int i)
 {
+    Q_UNUSED(i);
+
     setAttribute("rung_position",  2);
     setAttribute("side", "Right");
 

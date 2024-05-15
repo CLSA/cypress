@@ -300,6 +300,9 @@ bool TonometerManager::insertPatient(
                                      const QString &sex,
                                      const int id)
 {
+    Q_UNUSED(id);
+    Q_UNUSED(birthDate);
+
     QSqlQuery query(m_db);
 
     query.prepare("INSERT INTO Patients ( Name, BirthDate, Sex, GroupID, ID, RaceID ) VALUES ( :name, :birthDate, :sex, :groupId, :id, :raceId )");

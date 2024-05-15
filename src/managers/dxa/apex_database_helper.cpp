@@ -1125,6 +1125,8 @@ void ApexDatabaseHelper::computeTZValues(const Scan& scan, const QDateTime& scan
 
 double ApexDatabaseHelper::computeYearsDifference(const QDateTime& first, const QDateTime& second)
 {
+    Q_UNUSED(first)
+    Q_UNUSED(second)
     //double diff = first.time().msec() - second;
     return 0.0;
 }
