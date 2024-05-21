@@ -76,7 +76,10 @@ CimtVividiDialog::CimtVividiDialog(QWidget *parent, QSharedPointer<UltrasoundSes
     connect(manager.get(), &VividiManager::error, this, &CimtVividiDialog::error);
 
     // data changed
-    connect(manager.get(), &VividiManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
+    connect(manager.get(), &VividiManager::dataChanged, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
+        ui->measurementTable->handleTestUpdate(test);
+        qDebug() << test->toJsonObject();
+    });
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &VividiManager::addManualMeasurement);

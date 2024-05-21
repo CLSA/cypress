@@ -188,32 +188,6 @@ void CDTTManager::configureProcess()
     m_process.setWorkingDirectory(m_runnablePath);
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-    qDebug() << QDir::toNativeSeparators(m_settingsFilePath);
-
-    db.setDatabaseName(
-        "DRIVER={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" + QDir::toNativeSeparators(m_settingsFilePath));
-
-    if (!db.isValid()) {
-        emit error("ERROR: invalid database");
-        return;
-    }
-
-    if (!db.open()) {
-        qDebug() << db.isOpenError();
-        qDebug() << db.lastError();
-        emit error("Cannot find the settings file");
-        return;
-    }
-
-    QSqlQuery query; //
-    query.prepare("UPDATE [DefaultParameters$] SET B2 = 'EN_CA'");
-    if (!query.exec()) {
-        qDebug() << query.lastQuery();
-        qDebug() << query.lastError();
-        emit error("Cannot set language settings");
-    }
-
     qDebug() << "CDTTManager::configureProcess - config args: "
          << m_process.arguments().join(" ");
 

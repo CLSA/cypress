@@ -61,15 +61,15 @@ void GripStrengthMeasurement::simulate(int i)
 {
     Q_UNUSED(i);
 
+    const double rep1 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
+    const double rep2 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
+    const double rep3 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
+
+    const double average = (rep1 + rep2 + rep3) / 3;
+    const double maximum = qMax(qMax(rep1, rep2), rep3);
+
     setAttribute("rung_position",  2);
     setAttribute("side", "Right");
-
-    double rep1 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
-    double rep2 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
-    double rep3 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
-
-    double average = (rep1 + rep2 + rep3) / 3;
-    double maximum = qMax(qMax(rep1, rep2), rep3);
 
     setAttribute("rep_1", rep1, "kg");
     setAttribute("rep_2", rep2, "kg");

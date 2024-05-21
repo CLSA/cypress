@@ -99,7 +99,11 @@ QStringList DXAMeasurement::toStringList(const bool& no_keys) const
     return QStringList {{}};
 }
 
-void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData) {
+void DXAMeasurement::getScanAnalysisData(
+    const QSqlDatabase &patscanDb,
+    const QSqlDatabase& referenceDb,
+    const QJsonObject& patientData
+) {
     QSqlQuery query(patscanDb);
 
     query.prepare("SELECT SCANID, SCAN_MODE, SCAN_DATE FROM ScanAnalysis WHERE PATIENT_KEY = :patientKey AND SCAN_TYPE = :scanType");
@@ -111,11 +115,16 @@ void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QS
         throw QException();
     }
 
+
+    qDebug() << "Patient: " << patientData.value("PATIENT_KEY").toString() << "scanType: " << getScanType();
+    qDebug() << "Number of scans: " << query.size();
+
     QString scanId;
     QString scanMode;
     QString scanDate;
 
     while (query.next()) {
+
         scanId = query.value("SCANID").toString();
         scanMode = query.value("SCAN_MODE").toString();
         scanDate = query.value("SCAN_DATE").toString();
@@ -124,6 +133,8 @@ void DXAMeasurement::getScanAnalysisData(const QSqlDatabase &patscanDb, const QS
         setAttribute("SCAN_MODE", scanMode);
         setAttribute("SCAN_DATE", scanDate);
     }
+
+    qDebug() << "Scan used: " << scanId << scanMode << scanDate;
 
     if (!hasAttribute("SCANID") || !hasAttribute("SCAN_MODE") || !hasAttribute("SCAN_DATE")) {
         qDebug() << "Not found..";

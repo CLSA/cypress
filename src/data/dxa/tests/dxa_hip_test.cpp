@@ -77,16 +77,14 @@ void DxaHipTest::getPatientScan(const QSqlDatabase &db, const QString &participa
         throw QException();
     }
 
-    if (!query.first()) {
-        return;
+    while (query.next()) {
+        addMetaData("PATIENT_KEY",  query.value("PATIENT_KEY").toString());
+        addMetaData("BIRTHDATE",    query.value("BIRTHDATE").toString());
+        addMetaData("SEX",          query.value("SEX").toString());
+        addMetaData("ETHNICITY",    query.value("ETHNICITY").toString());
+        addMetaData("WEIGHT", 	    query.value("WEIGHT").toDouble());
+        addMetaData("HEIGHT",       query.value("HEIGHT").toDouble());
     }
-
-    addMetaData("PATIENT_KEY",  query.value("PATIENT_KEY").toString());
-    addMetaData("BIRTHDATE",    query.value("BIRTHDATE").toString());
-    addMetaData("SEX",          query.value("SEX").toString());
-    addMetaData("ETHNICITY",    query.value("ETHNICITY").toString());
-    addMetaData("WEIGHT", 	    query.value("WEIGHT").toDouble());
-    addMetaData("HEIGHT",       query.value("HEIGHT").toDouble());
 }
 
 bool DxaHipTest::isValid() const

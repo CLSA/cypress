@@ -517,13 +517,18 @@ bool DXAManager::copyPatScanDb() {
 
     // Returns true if successful, otherwise false
     const QFileInfo patscanFileInfo(m_patscanDbPath);
-    if (!patscanFileInfo.exists())
+    if (!patscanFileInfo.exists()) {
+        qDebug() << "patscan file does not exist";
         return false;
+    }
 
-    if (!patscanFileInfo.isReadable())
+    if (!patscanFileInfo.isReadable()) {
+        qDebug() << "patscan file is not readable";
         return false;
+    }
 
     const QFileInfo localPatScanFileInfo(QDir::current().absoluteFilePath(patscanFileInfo.fileName()));
+    qDebug() << "local pat scan location" << localPatScanFileInfo.absoluteFilePath();
     if (localPatScanFileInfo.exists()) {
         if (!QFile::remove(localPatScanFileInfo.absoluteFilePath()))
             return false;

@@ -47,6 +47,9 @@ VividiManager::~VividiManager()
 
 void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
+    bool foundInvalidParticipant = false;
+    QString invalidId;
+
     foreach (DicomFile file, dicomFiles) {
         QSharedPointer<CimtVividIMeasurement> measure(new CimtVividIMeasurement);
 
@@ -58,6 +61,10 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
                  << file.mediaStorageUID;
 
         if (m_session->getBarcode() != file.patientId) {
+            qDebug() << "Received wrong ID" << file.patientId;
+            foundInvalidParticipant = true;
+            invalidId = file.patientId;
+
             continue;
         }
 
@@ -66,15 +73,17 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         for (auto measurement : measurements) {
             if (measurement->getAttributeValue("path").toString() == file.absFilePath) {
                 foundDuplicate = true;
+                qDebug() << "Found duplicate: " << file.absFilePath;
                 break;
             }
         }
 
-        if (foundDuplicate)
+        if (foundDuplicate) {
             continue;
+        }
 
         if (file.mediaStorageUID == UID_UltrasoundImageStorage) {
-            qDebug() << "VividIManager::dicomFilesReceived: received still image "
+            qInfo() << "VividIManager::dicomFilesReceived: received still image "
                  << m_stillImageIdCounter;
 
             measure->setAttribute("name", "STILL_IMAGE_" + QString::number(m_stillImageIdCounter));
@@ -87,7 +96,7 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
             ++m_stillImageIdCounter;
 
         } else if (file.mediaStorageUID == UID_UltrasoundMultiframeImageStorage) {
-            qDebug() << "VividIManager::dicomFilesReceived: received cineloop image"
+            qInfo() << "VividIManager::dicomFilesReceived: received cineloop image"
                  << m_cineloopCounter;
 
             measure->setAttribute("name", "CINELOOP_" + QString::number(m_cineloopCounter));
@@ -100,7 +109,7 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
             ++m_cineloopCounter;
 
         } else if (file.modality == "SR") {
-            qDebug() << "VividIManager::dicomFilesReceived: received SR file" << m_srCounter;
+            qInfo() << "VividIManager::dicomFilesReceived: received SR file" << m_srCounter;
 
             measure->setAttribute("name", "SR_" + QString::number(m_srCounter));
             measure->setAttribute("path", file.absFilePath);
@@ -111,16 +120,22 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
             ++m_srCounter;
         } else {
-            qDebug() << "found unknown dicom file";
+            qInfo() << "VividIManager::dicomFilesReceived: found unknown dicom file";
             continue;
         }
 
         m_test->addMeasurement(measure);
     }
 
+    if (foundInvalidParticipant)
+        QMessageBox::warning(nullptr, "Invalid participant", invalidId + " does not match " + m_session->getBarcode());
+
     emit dataChanged(m_test);
     if (m_test->isValid())
         emit canFinish();
+    else {
+        emit cannotFinish();
+    }
 }
 
 bool VividiManager::isInstalled()

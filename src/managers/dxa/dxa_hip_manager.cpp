@@ -402,8 +402,10 @@ bool DxaHipManager::cleanUp() {
 
 
 bool DxaHipManager::initPatScanDb() {
-    if (!copyPatScanDb())
+    if (!copyPatScanDb()) {
+        qDebug() << "could not copy patscan db";
         return false;
+    }
 
     m_patscanDb = QSqlDatabase::addDatabase("QODBC", "patscan");
     m_patscanDb.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb)};DBQ="
@@ -433,13 +435,18 @@ bool DxaHipManager::copyPatScanDb() {
 
     // Returns true if successful, otherwise false
     const QFileInfo patscanFileInfo(m_patscanDbPath);
-    if (!patscanFileInfo.exists())
+    if (!patscanFileInfo.exists()) {
+        qDebug() << "patscan file does not exist";
         return false;
+    }
 
-    if (!patscanFileInfo.isReadable())
+    if (!patscanFileInfo.isReadable()) {
+        qDebug() << "patscan file is not readable";
         return false;
+    }
 
     const QFileInfo localPatScanFileInfo(QDir::current().absoluteFilePath(patscanFileInfo.fileName()));
+    qDebug() << "PatScan location: " << localPatScanFileInfo.absoluteFilePath();
     if (localPatScanFileInfo.exists()) {
         if (!QFile::remove(localPatScanFileInfo.absoluteFilePath())) {
             return false;

@@ -50,6 +50,9 @@ QJsonObject CimtVividiTest::toJsonObject() const
     QJsonObject rightResults {{"side", "right"}};
     QJsonArray rightFiles {};
 
+    QJsonObject unknownResults {{"side", "unknown"}};
+    QJsonArray unknownFiles {};
+
     auto measurements { getMeasurements() };
     foreach(auto measurement, measurements)
     {
@@ -63,13 +66,20 @@ QJsonObject CimtVividiTest::toJsonObject() const
             leftFiles.append(measure);
         else if (side == "Right")
             rightFiles.append(measure);
+        else {
+            unknownFiles.append(measure);
+        }
     }
 
     leftResults["files"] = leftFiles;
     rightResults["files"] = rightFiles;
+    unknownResults["files"] = unknownFiles;
 
     results.append(leftResults);
     results.append(rightResults);
+
+    if (!unknownFiles.empty())
+        results.append(unknownResults);
 
     QJsonObject valuesObject {};
 
