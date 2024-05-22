@@ -1,7 +1,7 @@
 #ifndef TESTBASE_H
 #define TESTBASE_H
 
-#include "../auxiliary/Constants.h"
+#include "auxiliary/Constants.h"
 #include "measurement.h"
 
 #include <QException>
@@ -49,11 +49,7 @@ public:
     virtual QJsonObject toJsonObject() const = 0;
 
 public:
-    virtual void simulate();
-    virtual void simulate(const QVariantMap &inputData);
-
     virtual void reset();
-
     virtual void reinterpret();
 
 public:
@@ -105,7 +101,6 @@ protected:
     MetaData m_metaData;
 
     bool m_debug;
-    bool m_sim;
 
     bool isManualEntryMode{false};
 

@@ -1,7 +1,7 @@
 #ifndef CHOICE_REACTION_MEASUREMENT_H
 #define CHOICE_REACTION_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
 * \class ChoiceReationMeasurement
@@ -28,8 +28,6 @@ public:
     QString toString() const override;
 
     static const int TEST_CODE;
-
-    void simulate();
 };
 
 Q_DECLARE_METATYPE(ChoiceReactionMeasurement);

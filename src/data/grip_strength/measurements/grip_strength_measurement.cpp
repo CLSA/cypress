@@ -57,29 +57,6 @@ QString GripStrengthMeasurement::toString() const
         .arg(getAttribute("exam_cv").value().toString());
 }
 
-void GripStrengthMeasurement::simulate(int i)
-{
-    Q_UNUSED(i);
-
-    const double rep1 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
-    const double rep2 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
-    const double rep3 = Utilities::interp(5, 70, QRandomGenerator::global()->generateDouble());
-
-    const double average = (rep1 + rep2 + rep3) / 3;
-    const double maximum = qMax(qMax(rep1, rep2), rep3);
-
-    setAttribute("rung_position",  2);
-    setAttribute("side", "Right");
-
-    setAttribute("rep_1", rep1, "kg");
-    setAttribute("rep_2", rep2, "kg");
-    setAttribute("rep_3", rep3, "kg");
-
-    setAttribute("average", average, "kg");
-    setAttribute("maximum", maximum, "kg");
-    setAttribute("cv",      5);
-}
-
 QDebug operator<<(QDebug dbg, const GripStrengthMeasurement& item)
 {
     const QString measurementStr = item.toString();

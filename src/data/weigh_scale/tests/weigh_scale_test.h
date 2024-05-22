@@ -37,8 +37,6 @@ public:
     //
     QJsonObject toJsonObject() const override;
 
-    void simulate() override;
-
     void reinterpret() override;
     double calculateAverage();
 

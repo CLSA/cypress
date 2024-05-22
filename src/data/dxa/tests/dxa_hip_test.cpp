@@ -98,12 +98,6 @@ void DxaHipTest::reset()
     rightHipMeasurement->reset();
 }
 
-void DxaHipTest::simulate()
-{
-    leftHipMeasurement->simulate();
-    rightHipMeasurement->simulate();
-}
-
 QJsonObject DxaHipTest::toJsonObject() const
 {
     QJsonObject json{};

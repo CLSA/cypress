@@ -13,7 +13,6 @@ public:
 
 public:
     QString toString() const override;
-    QStringList toStringList(const bool &no_keys) const override;
 };
 
 #endif // RETINALCAMERAMEASUREMENT_H

@@ -1,7 +1,7 @@
 #ifndef ECG_MEASUREMENT_H
 #define ECG_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
 * \class ECGMeasurement
@@ -26,8 +26,6 @@ public:
     bool isValid() const override;
 
     QString toString() const override;
-
-    void simulate();
 
 private:
 

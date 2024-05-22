@@ -18,9 +18,3 @@ QString RetinalCameraMeasurement::toString() const
 {
     return getAttribute("EYE_SIDE_VENDOR").toString() + getAttribute("EYE_PICT_VENDOR").toString();
 }
-
-QStringList RetinalCameraMeasurement::toStringList(const bool &no_keys) const
-{
-    Q_UNUSED(no_keys)
-    return QStringList { };
-}

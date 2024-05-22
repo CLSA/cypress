@@ -11,8 +11,6 @@ public:
 
     QString toString() const override;
 
-    QStringList toStringList(const bool& no_keys = false) const override;
-
     bool isValid() const override;
 
     // DXAMeasurement interface

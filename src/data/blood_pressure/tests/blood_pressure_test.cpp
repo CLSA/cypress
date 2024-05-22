@@ -48,35 +48,6 @@ QString BloodPressureTest::toString() const
     return str;
 }
 
-void BloodPressureTest::simulate()
-{
-    int count = 6;
-    int systolicAvg = 0;
-    int diastolicAvg = 0;
-    int pulseAvg = 0;
-
-    for (int i = 0; i < count; i++) {
-        QSharedPointer<BloodPressureMeasurement> measurement(new BloodPressureMeasurement);
-
-        measurement->simulate(i);
-        addMeasurement(measurement);
-
-        if (i == 0) {
-            continue;
-        }
-
-        systolicAvg += measurement->getSbp();
-        diastolicAvg += measurement->getDbp();
-        pulseAvg += measurement->getPulse();
-    }
-
-    systolicAvg = qRound(systolicAvg * 1.0f / (count - 1));
-    diastolicAvg = qRound(diastolicAvg * 1.0f / (count - 1));
-    pulseAvg = qRound(pulseAvg * 1.0f / (count - 1));
-
-    addDeviceAverage(systolicAvg, diastolicAvg, pulseAvg);
-}
-
 bool BloodPressureTest::isValid() const
 {
     bool okMeta = true;

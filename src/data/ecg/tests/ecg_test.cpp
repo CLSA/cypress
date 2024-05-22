@@ -218,39 +218,6 @@ void ECGTest::readFilterSetting(const QDomNode& node)
     }
 }
 
-void ECGTest::simulate()
-{
-   reset();
-   addMetaData("observation_datetime",QDateTime::currentDateTime());
-   addMetaData("device_description","CardioSoft");
-   addMetaData("software_version","V6.71");
-   addMetaData("gender","unknown");
-   addMetaData("race","unknown");
-   addMetaData("pacemaker",false);
-   addMetaData("cubic_spline",false);
-   addMetaData("filter_50_Hz",true);
-   addMetaData("filter_60_Hz",false);
-   addMetaData("low_pass", 150, "Hz");
-
-   QSharedPointer<ECGMeasurement> m(new ECGMeasurement);
-   m->simulate();
-
-   addMeasurement(m);
-}
-
-QStringList ECGTest::toStringList() const
-{
-    QStringList list;
-    if(isValid())
-    {
-      const Measurement& m = getMeasurement(0);
-      list = m.toStringList();
-      foreach(const auto key, m_outputKeyList)
-        list << QString("%1: %2").arg(key,getMetaDataAsString(key));
-    }
-    return list;
-}
-
 // String representation for debug and GUI display purposes
 //
 QString ECGTest::toString() const

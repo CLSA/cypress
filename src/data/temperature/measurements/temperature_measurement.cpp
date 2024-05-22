@@ -111,23 +111,6 @@ void TemperatureMeasurement::fromArray(const QByteArray &arr)
   }
 }
 
-TemperatureMeasurement TemperatureMeasurement::simulate(const Constants::UnitsSystem &system)
-{
-   double mu = QRandomGenerator::global()->generateDouble();
-   double t = Utilities::interp(36.1f,37.2f,mu);
-   QString units = "C";
-   if(Constants::UnitsSystem::systemImperial == system)
-   {
-       t = t*9.0f/5.0f + 32.0f;
-       units = "F";
-   }
-   TemperatureMeasurement m;
-   m.setAttribute("mode","body");
-   m.setAttribute("temperature", t, units, 1);
-   m.setAttribute("timestamp",QDateTime::currentDateTime());
-   return m;
-}
-
 bool TemperatureMeasurement::isValid() const
 {
   bool ok = false;

@@ -17,8 +17,6 @@ public:
     //
     QString toString() const override;
 
-    QStringList toStringList() const;
-
     bool isValid() const override;
 
     // String keys are converted to snake_case

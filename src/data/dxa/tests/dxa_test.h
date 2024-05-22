@@ -27,8 +27,6 @@ public:
 
     int fromDicomFiles(QList<DicomFile> files, const DXASession &session);
 
-    void simulate() override;
-
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
 

@@ -1,8 +1,7 @@
 #ifndef TEMPERATURE_MEASUREMENT_H
 #define TEMPERATURE_MEASUREMENT_H
 
-#include "../../measurement.h"
-#include "../../../auxiliary/Constants.h"
+#include "data/measurement.h"
 
 
 /*!
@@ -28,8 +27,6 @@ public:
     QString toString() const override;
 
     bool isValid() const override;
-
-    static TemperatureMeasurement simulate(const Constants::UnitsSystem&);
 };
 
 Q_DECLARE_METATYPE(TemperatureMeasurement);

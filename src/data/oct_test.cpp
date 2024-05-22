@@ -20,11 +20,6 @@ QJsonObject OCTTest::toJsonObject() const
     return QJsonObject {};
 }
 
-void OCTTest::simulate()
-{
-
-}
-
 void OCTTest::reset()
 {
 

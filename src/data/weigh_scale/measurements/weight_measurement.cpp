@@ -36,16 +36,6 @@ void WeightMeasurement::fromArray(const QByteArray &arr)
     }
 }
 
-void WeightMeasurement::simulate()
-{
-    setAttribute("weight",
-                 QRandomGenerator::global()->generateDouble() * (100.0 - 50.0) + 50.0,
-                 "kg",
-                 1);
-    setAttribute("mode", "gross");
-    setAttribute("timestamp", QDateTime::currentDateTimeUtc());
-}
-
 bool WeightMeasurement::isValid() const
 {
     bool ok = false;

@@ -8,12 +8,6 @@ void TestBase::reset()
     setManualEntryMode(false);
 }
 
-void TestBase::simulate() {}
-
-void TestBase::simulate(const QVariantMap &inputData) {
-    Q_UNUSED(inputData)
-}
-
 void TestBase::setUnitsSystem(const Constants::UnitsSystem &system)
 {
     m_unitsSystem = system;
@@ -67,9 +61,6 @@ bool TestBase::hasMetaData(const QString &key) const
 void TestBase::addMeasurement(QSharedPointer<Measurement> item)
 {
     m_measurementList.append(item);
-    //if (m_expectedMeasurementCount < m_measurementList.size()) {
-    //    m_measurementList.pop_front();
-    //}
 }
 
 void TestBase::removeMeasurement(int index)

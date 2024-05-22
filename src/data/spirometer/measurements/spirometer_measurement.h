@@ -1,7 +1,7 @@
 #ifndef SPIROMETER_MEASUREMENT_H
 #define SPIROMETER_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
 * \class SpirometerMeasurement
@@ -27,8 +27,6 @@ public:
     bool isValid() const override;
 
     QString toString() const override;
-
-    QStringList toStringList(const bool& no_keys = false) const override;
 
     void simulate();
 

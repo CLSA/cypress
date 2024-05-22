@@ -24,13 +24,6 @@ QString WholeBodyScanMeasurement::toString() const
     return "";
 };
 
-QStringList WholeBodyScanMeasurement::toStringList(const bool& no_keys) const
-{
-    Q_UNUSED(no_keys)
-    return QStringList {{}};
-};
-
-
 bool WholeBodyScanMeasurement::isValid() const
 {
     return hasWholeBody1File && hasWholeBody2File;

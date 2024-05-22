@@ -11,7 +11,6 @@ public:
     ApSpineMeasurement();
 
     QString toString() const override;
-    QStringList toStringList(const bool& no_keys = false) const override;
 
     void addDicomFile(DicomFile);
 

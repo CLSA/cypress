@@ -46,7 +46,7 @@ bool Measurement::operator!=(const Measurement &rhs)
 
 QString Measurement::toString() const
 {
-    return toStringList().join(" ");
+    return "";
 }
 
 bool Measurement::isValid() const
@@ -157,22 +157,6 @@ int Measurement::getPrecision() const
     return m_precision;
 }
 
-QStringList Measurement::toStringList(const bool& no_keys) const
-{
-    QStringList list;
-    foreach(const auto x, m_attributes.toStdMap())
-    {
-      QString key = x.first; // the key
-      Measurement::Value value = x.second; // the value
-      list << (no_keys ? value.toString() : QString("%1: %2").arg(key,value.toString()));
-    }
-    return list;
-}
-
-
-
-
-
 QJsonObject Measurement::toJsonObject() const
 {
     QJsonObject json;
@@ -276,10 +260,6 @@ QString Measurement::Value::toString() const
       {
         if(m_value.canConvert<QString>())
           str = m_value.toString();
-        else if(m_value.canConvert<QStringList>())
-        {
-          str = m_value.toStringList().join(",");
-        }
         else
         {
           qCritical() << "value conversion to string may fail with type" << m_value.typeName();

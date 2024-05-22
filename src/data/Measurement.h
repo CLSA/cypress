@@ -85,8 +85,6 @@ public:
     //
     virtual QString toString() const;
 
-    virtual QStringList toStringList(const bool& no_keys = false) const;
-
     virtual bool isValid() const;
 
     // String keys are converted to snake_case

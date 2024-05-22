@@ -59,31 +59,6 @@ QString BloodPressureMeasurement::toString() const
         getAttributeValue("end_time").toString());
 }
 
-void BloodPressureMeasurement::simulate(const int &reading)
-{
-    static QDateTime previous = QDateTime::currentDateTime();
-
-    const int systolic = QRandomGenerator::global()->bounded(90,120);
-    const int diastolic = QRandomGenerator::global()->bounded(60,80);
-    const int pulse = QRandomGenerator::global()->bounded(60,100);
-    const int timeoffset = QRandomGenerator::global()->bounded(26000,99000);
-
-    QDateTime start = QDateTime::currentDateTime();
-
-    if (start < previous) start = previous;
-
-    QDateTime end = start.addMSecs(timeoffset);
-
-    previous = end;
-
-    setAttribute("reading_number", reading);
-    setAttribute("systolic", systolic, "mmHg");
-    setAttribute("diastolic", diastolic, "mmHg");
-    setAttribute("pulse", pulse, "bpm");
-    setAttribute("start_time", start);
-    setAttribute("end_time", end);
-}
-
 QDebug operator<<(QDebug dbg, const BloodPressureMeasurement& item)
 {
     const QString measurementStr = item.toString();

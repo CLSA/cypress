@@ -8,7 +8,6 @@ class CimtVividiTest : public TestBase
 public:
     CimtVividiTest();
 
-    void simulate() override;
     bool isValid() const override;
 
     void reset() override;

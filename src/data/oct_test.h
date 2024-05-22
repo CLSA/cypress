@@ -13,7 +13,6 @@ public:
     QString toString() const override;
     bool isValid() const override;
     QJsonObject toJsonObject() const override;
-    void simulate() override;
     void reset() override;
     void reinterpret() override;
 };

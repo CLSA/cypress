@@ -93,12 +93,6 @@ QString DXAMeasurement::toString() const
    return "";
 };
 
-QStringList DXAMeasurement::toStringList(const bool& no_keys) const
-{
-    Q_UNUSED(no_keys)
-    return QStringList {{}};
-}
-
 void DXAMeasurement::getScanAnalysisData(
     const QSqlDatabase &patscanDb,
     const QSqlDatabase& referenceDb,

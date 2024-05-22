@@ -83,55 +83,6 @@ QStringList TonometerTest::getMeasurementStrings(const QString &side) const
     return list;
 }
 
-void TonometerTest::simulate(const QVariantMap& input)
-{
-    reset();
-
-    qDebug() << "generating simulated data";
-
-    addMetaData("id", input["barcode"].toString());
-
-    QVariant value = input["sex"].toString().toLower().startsWith("f") ? 0 : -1;
-
-    addMetaData("sex",value);
-    addMetaData("date_of_birth",input["date_of_birth"].toDateTime());
-
-    double mu = QRandomGenerator::global()->generateDouble();
-
-    addMetaData("measure_number",1);
-    addMetaData("session_datetime",QDateTime::currentDateTime());
-    addMetaData("patient_id",QRandomGenerator::global()->bounded(1000, 9999));
-    addMetaData("ora_serial_number","000073158");
-    addMetaData("ora_software","2.11");
-    addMetaData("pc_software","3.01");
-    addMetaData("meds",QString(""));
-    addMetaData("conditions",QString(""));
-    addMetaData("notes_1",QString(""));
-    addMetaData("notes_2",QString(""));
-    addMetaData("notes_3",QString(""));
-    addMetaData("m_g2",6.711f);
-    addMetaData("b_g2",68.0f);
-    addMetaData("m_g3",4.444f);
-    addMetaData("b_g3",-22.9f);
-    addMetaData("iop_cc_coef",0.43f);
-    addMetaData("crf_coef",0.7f);
-    addMetaData("m_abc",Utilities::interp(1.03,1.09,mu));
-    addMetaData("b_abc",Utilities::interp(-23.85,-3.42,mu));
-    addMetaData("b_pp",6.12f);
-    addMetaData("best_weighted",0);
-
-    QStringList sides = {"left","right"};
-    foreach(const auto side, sides)
-    {
-        QSharedPointer<TonometerMeasurement> m(new TonometerMeasurement);
-        m->simulate(side);
-        if (m->isValid()) {
-          addMeasurement(m);
-        } else
-          qDebug() << "ERROR: simulated measurement is invalid";
-    }
-}
-
 // String representation for debug purposes
 //
 QString TonometerTest::toString() const

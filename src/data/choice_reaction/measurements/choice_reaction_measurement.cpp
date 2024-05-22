@@ -64,28 +64,6 @@ QString ChoiceReactionMeasurement::toString() const
   return s;
 }
 
-void ChoiceReactionMeasurement::simulate()
-{
-    static int id = 1;
-
-    // the response stimuluw is always a multiple of 50 ms
-    int stimulus_interval = QRandomGenerator::global()->bounded(1,15)*50;
-
-    // create a simulated time reaction based on the interval
-    int low = qMax(stimulus_interval - 50, 40);
-    int high = stimulus_interval + 200;
-    int time = QRandomGenerator::global()->bounded(low,high);
-
-    setAttribute("screen_id",
-      QString("RT%1").arg(id+7,2,10,QLatin1Char('0')));
-    setAttribute("response_correct", true);
-    setAttribute("elapsed_time",time,"ms");
-    setAttribute("correct_position",(0 == (id % 2) ? "left" : "right"));
-    setAttribute("response_stimulus_interval",stimulus_interval,"ms");
-
-    if(60 < id++) id = 1;
-}
-
 QDebug operator<<(QDebug dbg, const ChoiceReactionMeasurement &item)
 {
     const QString s = item.toString();

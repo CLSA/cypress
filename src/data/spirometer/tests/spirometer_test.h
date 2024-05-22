@@ -17,13 +17,9 @@ public:
 
     void fromFile(const QString&);
 
-    void simulate(const QVariantMap &inputData) override;
-
     // String representation for debug and GUI display purposes
     //
     QString toString() const override;
-
-    QList<QStringList> toStringListList();
 
     bool isValid() const override;
 

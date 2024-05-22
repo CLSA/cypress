@@ -1,7 +1,7 @@
 #ifndef BLOOD_PRESSURE_MEASUREMENT_H
 #define BLOOD_PRESSURE_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
  * \class BloodPressureMeasurement

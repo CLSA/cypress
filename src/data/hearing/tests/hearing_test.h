@@ -1,8 +1,8 @@
 #ifndef HEARING_TEST_H
 #define HEARING_TEST_H
 
-#include "../../test_base.h"
-#include "../measurements/hearing_measurement.h"
+#include "data/test_base.h"
+#include "data/hearing/measurements/hearing_measurement.h"
 
 /*!
  * \class HearingTest
@@ -37,8 +37,6 @@ public:
     bool isValid() const override;
 
     bool isPartial() const;
-
-    void simulate(const QVariantMap& inputData) override;
 
     const HearingMeasurement &getMeasurement(const QString &, const int &) const;
 

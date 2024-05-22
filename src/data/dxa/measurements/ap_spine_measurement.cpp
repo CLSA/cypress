@@ -56,12 +56,6 @@ QString ApSpineMeasurement::toString() const
    return "";
 };
 
-QStringList ApSpineMeasurement::toStringList(const bool& no_keys) const
-{
-    Q_UNUSED(no_keys)
-   return QStringList {{}};
-}
-
 bool ApSpineMeasurement::isValid() const
 {
     return isValidDicomFile(m_apSpineFile);

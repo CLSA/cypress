@@ -16,26 +16,6 @@ bool CDTTMeasurement::isValid() const
     return ok;
 }
 
-void CDTTMeasurement::simulate(const int& trial)
-{
-    QJsonArray stimulus;
-    QJsonArray response;
-
-    for (int i=0; i<3; i++) {
-        stimulus.append(QJsonValue(QRandomGenerator::global()->bounded(0,9)));
-        response.append(QJsonValue(QRandomGenerator::global()->bounded(0,9)));
-    }
-
-    QJsonObject obj;
-    obj["trial"] = QJsonValue(trial);
-    obj["stimulus"] = stimulus;
-    obj["response"] = response;
-
-    foreach(const auto key, obj.keys()) {
-        setAttribute(key,obj[key].toVariant());
-    }
-}
-
 QString CDTTMeasurement::toString() const {
     QString str;
     if (isValid()) {

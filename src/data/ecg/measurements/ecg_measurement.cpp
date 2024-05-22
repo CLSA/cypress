@@ -124,62 +124,6 @@ void ECGMeasurement::readRestingECGMeasurements(const QDomNode& node)
     }
 }
 
-void ECGMeasurement::simulate()
-{
-    setAttribute("diagnosis","Normal sinus rhythm Normal ECG");
-
-    int ival = QRandomGenerator::global()->bounded(32,107);
-    setAttribute("ventricular_rate",ival,"BPM");
-
-    ival = QRandomGenerator::global()->bounded(64,292);
-    setAttribute("pq_interval",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(40,139);
-    setAttribute("p_duration",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(52,172);
-    setAttribute("qrs_duration",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(306,522);
-    setAttribute("qt_interval",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(346,520);
-    setAttribute("qtc_interval",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(406,1451);
-    setAttribute("rr_interval",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(0,3000);
-    setAttribute("pp_interval",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(-40,135);
-    setAttribute("p_axis",ival,"degrees");
-
-    ival = QRandomGenerator::global()->bounded(-90,162);
-    setAttribute("r_axis",ival,"degrees");
-
-    ival = QRandomGenerator::global()->bounded(-90,162);
-    setAttribute("t_axis",ival,"degrees");
-
-    ival = QRandomGenerator::global()->bounded(5,19);
-    setAttribute("qrs_number",ival);
-
-    ival = QRandomGenerator::global()->bounded(156,360);
-    setAttribute("p_onset",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(216,444);
-    setAttribute("p_offset",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(372,462);
-    setAttribute("q_onset",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(498,594);
-    setAttribute("q_offset",ival,"ms");
-
-    ival = QRandomGenerator::global()->bounded(746,962);
-    setAttribute("t_offset",ival,"ms");
-}
-
 QString ECGMeasurement::toString() const
 {
     QString str;

@@ -17,12 +17,6 @@ QString CimtVividIMeasurement::toString() const
         getAttribute("patient_id").toString());
 }
 
-QStringList CimtVividIMeasurement::toStringList(const bool &no_keys) const
-{
-    Q_UNUSED(no_keys)
-    return QStringList {};
-}
-
 bool CimtVividIMeasurement::isValid() const
 {
     if (!hasAttribute("side"))

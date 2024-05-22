@@ -19,10 +19,6 @@ public:
 
     bool isValid() const override;
 
-    // simulate a complete test of 6 readings and computed averages
-    //
-    void simulate() override;
-
     void reinterpret() override;
 
     // String keys are converted to snake_case

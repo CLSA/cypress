@@ -134,68 +134,6 @@ QString FraxTest::interpretResults(double p)
     return interp;
 }
 
-void FraxTest::simulate(const QVariantMap& input)
-{
-    for (auto it = input.cbegin(); it != input.cend(); ++it) {
-        if("barcode" == it.key() || "language" == it.key())
-            continue;
-
-        QVariant value = it.value();
-
-        if("sex" == it.key()) {
-            value = "male" == value.toString() ? 0 : 1;
-        }
-        else if("femoral_neck_bmd" == it.key()) {
-            value = Utilities::tscore(value.toDouble());
-            QString key = "femoral_neck_tscore";
-            addMetaData(key, value);
-        }
-        else if(QVariant::Bool == value.type()) {
-            value = value.toUInt();
-        }
-
-        if("age" == it.key()) {
-            addMetaData(it.key(), value, "yr");
-        }
-        else if("body_mass_index" == it.key()) {
-            addMetaData(it.key(), value, "kg/m2");
-        }
-        else {
-            addMetaData(it.key(), value);
-        }
-    }
-
-    QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
-    double mu = QRandomGenerator::global()->generateDouble();
-
-    measure1->setAttribute("type", "osteoporotic_fracture");
-    double p = Utilities::interp(1.0f,30.0f,mu);
-    measure1->setAttribute("probability", p, "%");
-    addMeasurement(measure1);
-
-    QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
-    measure2->setAttribute("type", "hip_fracture");
-    p = Utilities::interp(0.0f,13.0f,mu);
-    measure2->setAttribute("probability", p, "%");
-    addMeasurement(measure2);
-
-    QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
-    measure3->setAttribute("TYPE", "osteoporotic_fracture_bmd");
-    p = Utilities::interp(0.0f, 30.0f, mu);
-    measure3->setAttribute("probability", p, "%");
-    addMeasurement(measure3);
-
-    QString interp = interpretResults(p);
-    addMetaData("osteoporotic_fracture_bmd_interp", interp);
-
-    QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
-    measure4->setAttribute("TYPE", "hip_fracture_bmd");
-    p = Utilities::interp(0.0f,8.0f,mu);
-    measure4->setAttribute("probability", p, "%");
-    addMeasurement(measure4);
-
-}
-
 // String representation for debug and GUI display purposes
 //
 QString FraxTest::toString() const

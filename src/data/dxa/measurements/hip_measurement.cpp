@@ -24,12 +24,6 @@ QString HipMeasurement::toString() const
     return "";
 };
 
-QStringList HipMeasurement::toStringList(const bool& no_keys) const
-{
-    Q_UNUSED(no_keys)
-    return QStringList {{}};
-}
-
 bool HipMeasurement::isValid() const
 {
     return m_hasHipFile;

@@ -1,7 +1,7 @@
 #ifndef FRAX_TEST_H
 #define FRAX_TEST_H
 
-#include "../../test_base.h"
+#include "data/test_base.h"
 
 class FraxTest : public TestBase
 {
@@ -20,8 +20,6 @@ public:
     // String keys are converted to snake_case
     //
     QJsonObject toJsonObject() const override;
-
-    void simulate(const QVariantMap&) override;
 
 private:
     QStringList m_outputKeyList;

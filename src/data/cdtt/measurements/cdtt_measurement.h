@@ -1,7 +1,7 @@
 #ifndef CDTT_MEASUREMENT_H
 #define CDTT_MEASUREMENT_H
 
-#include "../../measurement.h"
+#include "data/measurement.h"
 
 /*!
 * \class CDTTTMeasurement
@@ -22,8 +22,6 @@ public:
     ~CDTTMeasurement() = default;
 
     bool isValid() const override;
-
-    void simulate(const int&);
 
     QString toString() const override;
 };

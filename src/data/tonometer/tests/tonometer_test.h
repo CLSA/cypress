@@ -1,8 +1,8 @@
 #ifndef TONOMETER_TEST_H
 #define TONOMETER_TEST_H
 
-#include "../../test_base.h"
-#include "../measurements/tonometer_measurement.h"
+#include "data/test_base.h"
+#include "data/tonometer/measurements/tonometer_measurement.h"
 
 QT_FORWARD_DECLARE_CLASS(QJsonArray)
 
@@ -13,8 +13,6 @@ public:
     ~TonometerTest() = default;
 
     void fromVariantMapList(const QList<QVariantMap> &);
-
-    void simulate(const QVariantMap &) override;
 
     // String representation for debug purposes
     //

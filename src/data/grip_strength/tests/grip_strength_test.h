@@ -1,10 +1,10 @@
 #ifndef GRIP_STRENGTH_TEST_H
 #define GRIP_STRENGTH_TEST_H
 
-#include <QDir>
+#include "data/test_base.h"
+#include "data/grip_strength/measurements/grip_strength_measurement.h"
 
-#include "../../test_base.h"
-#include "../measurements/grip_strength_measurement.h"
+#include <QDir>
 
 class GripStrengthTest : public TestBase
 {
@@ -15,8 +15,6 @@ public:
     static const q_stringMap testMetaMap;
 
     QString toString() const override;
-
-    void simulate() override;
 
     bool isValid() const override;
 

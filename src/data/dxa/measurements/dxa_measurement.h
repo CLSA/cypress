@@ -42,7 +42,6 @@ public:
 public: // Measurement
     virtual bool isValid() const override;
     virtual QString toString() const override;
-    virtual QStringList toStringList(const bool& no_keys = false) const override;
 
     virtual void simulate() {};
 

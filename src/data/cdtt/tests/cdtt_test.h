@@ -1,7 +1,7 @@
 #ifndef CDTT_TEST_H
 #define CDTT_TEST_H
 
-#include "../../test_base.h"
+#include "data/test_base.h"
 
 #include <QJsonObject>
 
@@ -17,14 +17,11 @@ public:
     //
     void fromDatabase(const QSqlDatabase&);
 
-    void simulate(const QVariantMap &inputData) override;
-
     QString toString() const override;
 
     bool isValid() const override;
 
     QJsonObject toJsonObject() const override;
-    QStringList toStringList() const;
 
 private:
     QList<QString> m_outputKeyList;

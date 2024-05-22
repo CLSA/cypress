@@ -116,12 +116,6 @@ QString ForearmMeasurement::toString() const
     return "";
 };
 
-QStringList ForearmMeasurement::toStringList(const bool& no_keys) const
-{
-    Q_UNUSED(no_keys)
-    return QStringList {{}};
-}
-
 void ForearmMeasurement::addDicomFile(DicomFile file)
 {
     m_forearmDicomFile = file;

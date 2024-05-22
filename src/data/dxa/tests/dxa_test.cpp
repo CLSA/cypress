@@ -159,15 +159,6 @@ void DXATest::getPatientScan(const QSqlDatabase &db, const QString &participantI
     }
 }
 
-void DXATest::simulate()
-{
-    wholeBodyMeasurement->simulate();
-    apSpineMeasurement->simulate();
-    leftForearmMeasurement->simulate();
-    rightForearmMeasurement->simulate();
-    ivaImagingMeasurement->simulate();
-}
-
 QJsonObject DXATest::toJsonObject() const
 {
     auto wholeBody = QSharedPointer<QJsonObject>::create();

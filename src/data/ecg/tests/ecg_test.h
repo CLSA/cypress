@@ -12,12 +12,9 @@ public:
     ~ECGTest() = default;
 
     void fromFile(const QString &);
-
-    void simulate() override;
     bool isValid() const override;
 
     QString toString() const override;
-    QStringList toStringList() const;
     QJsonObject toJsonObject() const override;
 
 private:

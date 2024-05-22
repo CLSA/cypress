@@ -45,50 +45,6 @@ GripStrengthTest::GripStrengthTest()
     setExpectedMeasurementCount(2);
 }
 
-//bool GripStrengthTest::readGripTestOptions()
-//{
-//    return false;
-//    // Read in test information
-//    ParadoxReader gripTestReader(gripTestPath);
-//    QList<QJsonObject> records = gripTestReader.Read();
-//    foreach(const auto record, records) {
-//        foreach(const auto tag, testMetaMap.toStdMap()){
-//            if (record.contains(tag.first)) {
-//                addMetaData(tag.second, record[tag.first].toVariant());
-//            }
-//        }
-//    }
-//}
-
-
-void GripStrengthTest::simulate()
-{
-    addMetaData("rung", 2);
-    addMetaData("max_reps", 3);
-    addMetaData("sequence", "RR");
-    addMetaData("rest_time", 15, "s");
-    addMetaData("threshold", 5);
-
-    for (int i = 0; i < getExpectedMeasurementCount(); i++)
-    {
-        QSharedPointer<GripStrengthMeasurement> measurement(new GripStrengthMeasurement);
-        measurement->simulate(i);
-        addMeasurement(measurement);
-    }
-
-    double examMax = 0;
-    for (int i = 0; i < m_measurementList.size(); i++)
-    {
-        double val = m_measurementList[i]->getAttribute("maximum").value().toDouble();
-        if (val > examMax)
-        {
-            examMax = val;
-        }
-    }
-
-    addMetaData("max", examMax, "kg");
-}
-
 bool GripStrengthTest::readMeasurements()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "CLSA", "Cypress");

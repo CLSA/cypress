@@ -8,7 +8,6 @@ class RetinalCameraTest : public TestBase
 public:
     RetinalCameraTest();
 
-    void simulate(const QVariantMap& inputData) override;
     bool isValid() const override;
 
     QJsonObject toJsonObject() const override;

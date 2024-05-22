@@ -80,20 +80,6 @@ QString WeighScaleTest::toString() const
     return str;
 }
 
-void WeighScaleTest::simulate()
-{
-    QSharedPointer<WeightMeasurement> weight1(new WeightMeasurement);
-    weight1->simulate();
-
-    QSharedPointer<WeightMeasurement> weight2(new WeightMeasurement);
-    weight2->simulate();
-
-    addMeasurement(weight1);
-    addMeasurement(weight2);
-
-    calculateAverage();
-}
-
 void WeighScaleTest::fromArray(const QByteArray &arr)
 {
     if (arr.isEmpty())

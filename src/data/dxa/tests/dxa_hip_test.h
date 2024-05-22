@@ -20,8 +20,6 @@ public:
     bool isValid() const override;
     void reset() override;
 
-    void simulate() override;
-
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
 
