@@ -17,7 +17,6 @@ CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData, co
     m_startDateTime = QDateTime::currentDateTimeUtc();
     m_origin = origin;
     m_debug = CypressSettings::isDebugMode();
-    m_sim = CypressSettings::isSimMode();
 }
 
 QString CypressSession::getOrigin() const {

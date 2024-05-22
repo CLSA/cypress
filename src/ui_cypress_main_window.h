@@ -15,9 +15,9 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
@@ -52,30 +52,37 @@ public:
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QGroupBox *groupBox;
-    QHBoxLayout *horizontalLayout;
-    QPushButton *launchBpm;
+    QVBoxLayout *verticalLayout_2;
+    QGroupBox *groupBox_5;
+    QVBoxLayout *verticalLayout_6;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *launchGripStrength;
     QPushButton *launchSpirometer;
+    QPushButton *launchRetinalCamera;
+    QPushButton *launchCDTT;
+    QPushButton *launchEcg;
+    QPushButton *launchChoiceReaction;
+    QSpacerItem *horizontalSpacer_3;
+    QGroupBox *groupBox_4;
+    QVBoxLayout *verticalLayout_5;
+    QHBoxLayout *horizontalLayout_4;
+    QPushButton *launchAudiometer;
+    QPushButton *launchBpm;
     QPushButton *launchWeightScale;
+    QSpacerItem *horizontalSpacer;
+    QGroupBox *groupBox_3;
+    QVBoxLayout *verticalLayout_4;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *launchUltrasound;
     QPushButton *launchDxa1;
     QPushButton *launchDxa2;
-    QPushButton *launchUltrasound;
-    QPushButton *launchEcg;
     QPushButton *launchFrax;
     QSpacerItem *horizontalSpacer_2;
     QGroupBox *groupBox_2;
-    QHBoxLayout *horizontalLayout_2;
-    QPushButton *launchAudiometer;
-    QSpacerItem *horizontalSpacer;
-    QGroupBox *groupBox_3;
-    QHBoxLayout *horizontalLayout_3;
-    QPushButton *launchGripStrength;
-    QPushButton *launchRetinalCamera;
-    QPushButton *launchChoiceReaction;
-    QPushButton *launchCDTT;
-    QSpacerItem *horizontalSpacer_3;
-    QSpacerItem *verticalSpacer;
+    QVBoxLayout *verticalLayout_3;
+    QScrollArea *scrollArea;
+    QWidget *scrollAreaWidgetContents;
     QMenuBar *menubar;
-    QMenu *menuDevice_Settings;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *CypressMainWindow)
@@ -132,46 +139,121 @@ public:
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         groupBox->setEnabled(true);
-        horizontalLayout = new QHBoxLayout(groupBox);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        launchBpm = new QPushButton(groupBox);
-        launchBpm->setObjectName(QString::fromUtf8("launchBpm"));
+        verticalLayout_2 = new QVBoxLayout(groupBox);
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        groupBox_5 = new QGroupBox(groupBox);
+        groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
+        verticalLayout_6 = new QVBoxLayout(groupBox_5);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        launchGripStrength = new QPushButton(groupBox_5);
+        launchGripStrength->setObjectName(QString::fromUtf8("launchGripStrength"));
+        launchGripStrength->setEnabled(false);
 
-        horizontalLayout->addWidget(launchBpm);
+        horizontalLayout_2->addWidget(launchGripStrength);
 
-        launchSpirometer = new QPushButton(groupBox);
+        launchSpirometer = new QPushButton(groupBox_5);
         launchSpirometer->setObjectName(QString::fromUtf8("launchSpirometer"));
+        launchSpirometer->setEnabled(false);
 
-        horizontalLayout->addWidget(launchSpirometer);
+        horizontalLayout_2->addWidget(launchSpirometer);
 
-        launchWeightScale = new QPushButton(groupBox);
+        launchRetinalCamera = new QPushButton(groupBox_5);
+        launchRetinalCamera->setObjectName(QString::fromUtf8("launchRetinalCamera"));
+        launchRetinalCamera->setEnabled(false);
+
+        horizontalLayout_2->addWidget(launchRetinalCamera);
+
+        launchCDTT = new QPushButton(groupBox_5);
+        launchCDTT->setObjectName(QString::fromUtf8("launchCDTT"));
+        launchCDTT->setEnabled(false);
+
+        horizontalLayout_2->addWidget(launchCDTT);
+
+        launchEcg = new QPushButton(groupBox_5);
+        launchEcg->setObjectName(QString::fromUtf8("launchEcg"));
+        launchEcg->setEnabled(false);
+
+        horizontalLayout_2->addWidget(launchEcg);
+
+        launchChoiceReaction = new QPushButton(groupBox_5);
+        launchChoiceReaction->setObjectName(QString::fromUtf8("launchChoiceReaction"));
+        launchChoiceReaction->setEnabled(false);
+
+        horizontalLayout_2->addWidget(launchChoiceReaction);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_3);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_2);
+
+
+        verticalLayout_2->addWidget(groupBox_5);
+
+        groupBox_4 = new QGroupBox(groupBox);
+        groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
+        verticalLayout_5 = new QVBoxLayout(groupBox_4);
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        launchAudiometer = new QPushButton(groupBox_4);
+        launchAudiometer->setObjectName(QString::fromUtf8("launchAudiometer"));
+        launchAudiometer->setEnabled(false);
+
+        horizontalLayout_4->addWidget(launchAudiometer);
+
+        launchBpm = new QPushButton(groupBox_4);
+        launchBpm->setObjectName(QString::fromUtf8("launchBpm"));
+        launchBpm->setEnabled(false);
+
+        horizontalLayout_4->addWidget(launchBpm);
+
+        launchWeightScale = new QPushButton(groupBox_4);
         launchWeightScale->setObjectName(QString::fromUtf8("launchWeightScale"));
+        launchWeightScale->setEnabled(false);
 
-        horizontalLayout->addWidget(launchWeightScale);
+        horizontalLayout_4->addWidget(launchWeightScale);
 
-        launchDxa1 = new QPushButton(groupBox);
-        launchDxa1->setObjectName(QString::fromUtf8("launchDxa1"));
-        launchDxa1->setEnabled(true);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout->addWidget(launchDxa1);
+        horizontalLayout_4->addItem(horizontalSpacer);
 
-        launchDxa2 = new QPushButton(groupBox);
-        launchDxa2->setObjectName(QString::fromUtf8("launchDxa2"));
 
-        horizontalLayout->addWidget(launchDxa2);
+        verticalLayout_5->addLayout(horizontalLayout_4);
 
-        launchUltrasound = new QPushButton(groupBox);
+
+        verticalLayout_2->addWidget(groupBox_4);
+
+        groupBox_3 = new QGroupBox(groupBox);
+        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
+        verticalLayout_4 = new QVBoxLayout(groupBox_3);
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        launchUltrasound = new QPushButton(groupBox_3);
         launchUltrasound->setObjectName(QString::fromUtf8("launchUltrasound"));
+        launchUltrasound->setEnabled(false);
 
         horizontalLayout->addWidget(launchUltrasound);
 
-        launchEcg = new QPushButton(groupBox);
-        launchEcg->setObjectName(QString::fromUtf8("launchEcg"));
+        launchDxa1 = new QPushButton(groupBox_3);
+        launchDxa1->setObjectName(QString::fromUtf8("launchDxa1"));
+        launchDxa1->setEnabled(false);
 
-        horizontalLayout->addWidget(launchEcg);
+        horizontalLayout->addWidget(launchDxa1);
 
-        launchFrax = new QPushButton(groupBox);
+        launchDxa2 = new QPushButton(groupBox_3);
+        launchDxa2->setObjectName(QString::fromUtf8("launchDxa2"));
+        launchDxa2->setEnabled(false);
+
+        horizontalLayout->addWidget(launchDxa2);
+
+        launchFrax = new QPushButton(groupBox_3);
         launchFrax->setObjectName(QString::fromUtf8("launchFrax"));
+        launchFrax->setEnabled(false);
 
         horizontalLayout->addWidget(launchFrax);
 
@@ -180,94 +262,39 @@ public:
         horizontalLayout->addItem(horizontalSpacer_2);
 
 
+        verticalLayout_4->addLayout(horizontalLayout);
+
+
+        verticalLayout_2->addWidget(groupBox_3);
+
+
         verticalLayout->addWidget(groupBox);
 
         groupBox_2 = new QGroupBox(centralwidget);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setEnabled(true);
-        horizontalLayout_2 = new QHBoxLayout(groupBox_2);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        launchAudiometer = new QPushButton(groupBox_2);
-        launchAudiometer->setObjectName(QString::fromUtf8("launchAudiometer"));
-        launchAudiometer->setEnabled(true);
+        verticalLayout_3 = new QVBoxLayout(groupBox_2);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        scrollArea = new QScrollArea(groupBox_2);
+        scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+        scrollArea->setWidgetResizable(true);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 756, 226));
+        scrollArea->setWidget(scrollAreaWidgetContents);
 
-        horizontalLayout_2->addWidget(launchAudiometer);
-
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_2->addItem(horizontalSpacer);
+        verticalLayout_3->addWidget(scrollArea);
 
 
         verticalLayout->addWidget(groupBox_2);
 
-        groupBox_3 = new QGroupBox(centralwidget);
-        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        groupBox_3->setEnabled(true);
-        horizontalLayout_3 = new QHBoxLayout(groupBox_3);
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        launchGripStrength = new QPushButton(groupBox_3);
-        launchGripStrength->setObjectName(QString::fromUtf8("launchGripStrength"));
-        launchGripStrength->setEnabled(false);
-
-        horizontalLayout_3->addWidget(launchGripStrength);
-
-        launchRetinalCamera = new QPushButton(groupBox_3);
-        launchRetinalCamera->setObjectName(QString::fromUtf8("launchRetinalCamera"));
-        launchRetinalCamera->setEnabled(false);
-
-        horizontalLayout_3->addWidget(launchRetinalCamera);
-
-        launchChoiceReaction = new QPushButton(groupBox_3);
-        launchChoiceReaction->setObjectName(QString::fromUtf8("launchChoiceReaction"));
-
-        horizontalLayout_3->addWidget(launchChoiceReaction);
-
-        launchCDTT = new QPushButton(groupBox_3);
-        launchCDTT->setObjectName(QString::fromUtf8("launchCDTT"));
-        launchCDTT->setEnabled(true);
-
-        horizontalLayout_3->addWidget(launchCDTT);
-
-        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_3->addItem(horizontalSpacer_3);
-
-
-        verticalLayout->addWidget(groupBox_3);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
-
         CypressMainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(CypressMainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 800, 22));
-        menuDevice_Settings = new QMenu(menubar);
-        menuDevice_Settings->setObjectName(QString::fromUtf8("menuDevice_Settings"));
+        menubar->setGeometry(QRect(0, 0, 800, 21));
         CypressMainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(CypressMainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
         CypressMainWindow->setStatusBar(statusbar);
-
-        menubar->addAction(menuDevice_Settings->menuAction());
-        menuDevice_Settings->addAction(actionAudiometer_2);
-        menuDevice_Settings->addAction(actionCDTT_2);
-        menuDevice_Settings->addAction(actionCCB);
-        menuDevice_Settings->addAction(actionGrip_Strength);
-        menuDevice_Settings->addAction(actionVividI);
-        menuDevice_Settings->addAction(actionECG_2);
-        menuDevice_Settings->addAction(actionDEXA);
-        menuDevice_Settings->addAction(actionBody_Comp);
-        menuDevice_Settings->addAction(actionFrax);
-        menuDevice_Settings->addAction(actionRetinal_Cam);
-        menuDevice_Settings->addAction(actionSignature);
-        menuDevice_Settings->addAction(actionTonometer);
-        menuDevice_Settings->addAction(actionWeigh_Scale);
-        menuDevice_Settings->addAction(actionSpirometer);
-        menuDevice_Settings->addAction(actionBlood_Pressure);
-        menuDevice_Settings->addSeparator();
-        menuDevice_Settings->addAction(actionTest_Locally);
 
         retranslateUi(CypressMainWindow);
 
@@ -298,23 +325,24 @@ public:
         actionSpirometer->setText(QCoreApplication::translate("CypressMainWindow", "Spirometer", nullptr));
         actionBlood_Pressure->setText(QCoreApplication::translate("CypressMainWindow", "Blood Pressure", nullptr));
         actionTest_Locally->setText(QCoreApplication::translate("CypressMainWindow", "Test Locally", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("CypressMainWindow", "Room 1", nullptr));
-        launchBpm->setText(QCoreApplication::translate("CypressMainWindow", "BPM", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("CypressMainWindow", "Devices", nullptr));
+        groupBox_5->setTitle(QCoreApplication::translate("CypressMainWindow", "Executable", nullptr));
+        launchGripStrength->setText(QCoreApplication::translate("CypressMainWindow", "Grip Strength", nullptr));
         launchSpirometer->setText(QCoreApplication::translate("CypressMainWindow", "Spirometer", nullptr));
+        launchRetinalCamera->setText(QCoreApplication::translate("CypressMainWindow", "Retinal Camera", nullptr));
+        launchCDTT->setText(QCoreApplication::translate("CypressMainWindow", "CDTT", nullptr));
+        launchEcg->setText(QCoreApplication::translate("CypressMainWindow", "ECG", nullptr));
+        launchChoiceReaction->setText(QCoreApplication::translate("CypressMainWindow", "Choice Reaction", nullptr));
+        groupBox_4->setTitle(QCoreApplication::translate("CypressMainWindow", "Serial Port", nullptr));
+        launchAudiometer->setText(QCoreApplication::translate("CypressMainWindow", "Audiometer", nullptr));
+        launchBpm->setText(QCoreApplication::translate("CypressMainWindow", "BPM", nullptr));
         launchWeightScale->setText(QCoreApplication::translate("CypressMainWindow", "Weight", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("CypressMainWindow", "DICOM", nullptr));
+        launchUltrasound->setText(QCoreApplication::translate("CypressMainWindow", "CIMT", nullptr));
         launchDxa1->setText(QCoreApplication::translate("CypressMainWindow", "DXA (Hip)", nullptr));
         launchDxa2->setText(QCoreApplication::translate("CypressMainWindow", "DXA 2", nullptr));
-        launchUltrasound->setText(QCoreApplication::translate("CypressMainWindow", "CIMT", nullptr));
-        launchEcg->setText(QCoreApplication::translate("CypressMainWindow", "ECG", nullptr));
         launchFrax->setText(QCoreApplication::translate("CypressMainWindow", "FRAX", nullptr));
-        groupBox_2->setTitle(QCoreApplication::translate("CypressMainWindow", "Room 2", nullptr));
-        launchAudiometer->setText(QCoreApplication::translate("CypressMainWindow", "Audiometer", nullptr));
-        groupBox_3->setTitle(QCoreApplication::translate("CypressMainWindow", "Room 3", nullptr));
-        launchGripStrength->setText(QCoreApplication::translate("CypressMainWindow", "Grip Strength", nullptr));
-        launchRetinalCamera->setText(QCoreApplication::translate("CypressMainWindow", "Retinal Camera", nullptr));
-        launchChoiceReaction->setText(QCoreApplication::translate("CypressMainWindow", "Choice Reaction", nullptr));
-        launchCDTT->setText(QCoreApplication::translate("CypressMainWindow", "CDTT", nullptr));
-        menuDevice_Settings->setTitle(QCoreApplication::translate("CypressMainWindow", "Device Settings", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("CypressMainWindow", "Log", nullptr));
     } // retranslateUi
 
 };

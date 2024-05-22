@@ -8,8 +8,6 @@
 #include "managers/blood_pressure/bptru_200_driver.h"
 
 #include "auxiliary/Constants.h"
-#include "auxiliary/Utilities.h"
-#include "auxiliary/network_utils.h"
 
 #include <QApplication>
 #include <QStyle>
@@ -28,6 +26,8 @@
 #include <QHostInfo>
 #include <QNetworkInterface>
 
+#include <stdio.h>
+
 const QString orgName = "CLSA";
 const QString orgDomain = "clsa-elcv.ca";
 const QString appName = "Cypress";
@@ -36,60 +36,65 @@ const QString appVersion = "v0.1.0";
 // Custom message handler to write to a log file and stdout
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    Q_UNUSED(context)
+    QString txt = qFormatLogMessage(type, context, msg);
+    static FILE *f = fopen("./log.txt", "a");
 
-    QString txt;
-    switch (type) {
-    case QtDebugMsg:
-        txt = QString("debug: ");
-        break;
-    case QtInfoMsg:
-        txt = QString("info: ");
-        break;
-    case QtWarningMsg:
-        txt = QString("warning: ");
-        break;
-    case QtCriticalMsg:
-        txt = QString("critical: ");
-        break;
-    case QtFatalMsg:
-        txt = QString("fatal: ");
+    if (type == QtMsgType::QtDebugMsg && CypressSettings::isDebugMode()) {
+        fprintf(f, "DEBUG [%s] %s\n",
+            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            qPrintable(txt)
+        );
+    }
+    else if (QtMsgType::QtSystemMsg) {
+        fprintf(f, "SYSTEM [%s] %s\n",
+            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            qPrintable(txt)
+        );
+    }
+    else if (QtMsgType::QtInfoMsg) {
+        fprintf(f, "INFO [%s] %s\n",
+            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            qPrintable(txt)
+        );
+    }
+    else if (QtMsgType::QtWarningMsg) {
+        fprintf(f, "WARNING [%s] %s\n",
+            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            qPrintable(txt)
+        );
+    }
+    else if (QtMsgType::QtCriticalMsg) {
+        fprintf(f, "CRITICAL [%s] %s\n",
+            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            qPrintable(txt)
+        );
+    }
+    else if (QtMsgType::QtFatalMsg) {
+        fprintf(f, "FATAL [%s] %s\n",
+            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
+            qPrintable(txt)
+        );
     }
 
-    txt += msg;
-    txt.prepend(QDateTime::currentDateTime().toString("[dd.MM.yyyy hh:mm:ss] "));
-
-    QString path = QDir::currentPath() + "/logs";
-    QDir dir;
-    bool success { dir.mkpath(path) };
-    if (!success)
-    {
-        qFatal(("could not create log file directory at " + QDir::currentPath()).toStdString().c_str());
-    }
-
-    QFile outFile(path + "/log.txt");
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-
-    QTextStream ts(&outFile);
-    ts << txt << "\n";
-
-    fprintf(stdout, "%s\n", txt.toStdString().c_str());
-    fflush(stdout);
+    fflush(f);
 }
 
 // Removes old log files (>= 30 days old)
 void cleanupLogs()
 {
-    QString path = QDir::currentPath() + "/logs";
-    QDir dir(path);
-    if (!dir.exists())
-        return;
+    QString path = "./log.txt";
+    QFileInfo fileInfo(path);
 
-    QStringList logFiles = dir.entryList(QStringList() << "log*.txt", QDir::Files, QDir::Name);
-    for(const QString &logFile : logFiles) {
-        QFileInfo fileInfo(dir.absoluteFilePath(logFile));
-        if (fileInfo.lastModified().date().addDays(30) < QDate::currentDate()) {
-            dir.remove(logFile);
+    qDebug() << "log file created: " << fileInfo.birthTime().toString();
+    if (fileInfo.exists()) {
+        QFile file(path);
+
+        if (fileInfo.birthTime().date().addDays(30) < QDate::currentDate()) {
+            file.remove();
+        }
+
+        if (fileInfo.size() >= 100000000) { // 100mb
+            file.remove();
         }
     }
 }
@@ -102,7 +107,6 @@ void restartApplication(const QStringList& arguments) {
 
 void logSystemInfo()
 {
-    qInfo() << "\nHost Information";
     qInfo() << QHostInfo::localHostName();
     qInfo() << QSysInfo::productType() + " "
                + QSysInfo::productVersion() + " ("
@@ -114,7 +118,6 @@ void logSystemInfo()
 void logNetworkInfo()
 {
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-    qInfo() << "\nNetwork Interfaces";
     for(const QNetworkInterface &interface : interfaces) {
         QList<QNetworkAddressEntry> entries = interface.addressEntries();
         for(const QNetworkAddressEntry &entry : entries) {
@@ -127,7 +130,6 @@ void logNetworkInfo()
 
 void logAppInfo()
 {
-    qInfo() << "\nCypress Information";
     qInfo() << "Name:" << QCoreApplication::applicationName();
     qInfo() << "Version: " << QCoreApplication::applicationVersion();
     qInfo() << "Working Directory: " << QCoreApplication::applicationDirPath();
@@ -148,9 +150,7 @@ QString getStatusCheckString(const QString& arg1, bool arg2)
 bool checkAlive()
 {
     bool isAlive { true };
-
     qInfo() << getStatusCheckString("pine available", isAlive);
-
     return isAlive;
 }
 
@@ -170,8 +170,8 @@ bool downloadUpdate()
 
 int main(int argc, char *argv[])
 {
-    //qInstallMessageHandler(messageHandler);
-    //cleanupLogs();
+    qInstallMessageHandler(messageHandler);
+    cleanupLogs();
 
     // Setup Qt and defaults
     QGuiApplication::setOrganizationName(orgName);
@@ -222,7 +222,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    qInfo() << "\nDevices Installed";
     QJsonObject status = Cypress::getInstance().getStatus();
     QJsonObject deviceStatus = status["availableInstruments"].toObject();
     for (auto it = deviceStatus.constBegin(); it != deviceStatus.constEnd(); ++it) {
