@@ -9,13 +9,23 @@ class WholeBodyScanMeasurement : public DXAMeasurement
 public:
     WholeBodyScanMeasurement();
 
+    bool isValid() const override;
+
     QString toString() const override;
 
-    bool isValid() const override;
+    // Static methods
+public:
+    static bool isValidDicomFile(DicomFile file);
+    void getScanData(
+        const QSqlDatabase &db,
+        const QString &patientKey,
+        const QString &scanId
+    ) override;
+    static bool isWholeBody1(DcmFileFormat &file);
+    static bool isWholeBody2(DcmFileFormat &file);
 
     // DXAMeasurement interface
 public:
-    bool isValidDicomFile(DicomFile file) const override;
     void addDicomFile(DicomFile);
 
     Side getSide() override;
@@ -25,20 +35,9 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-    DicomFile m_wholeBody1{};
-    DicomFile m_wholeBody2{};
+    DicomFile m_dicomFile {};
+    bool m_hasDicomFile;
 
-    void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;
-
-private:
-    bool isWholeBody1(DcmFileFormat &file) const;
-    bool isWholeBody2(DcmFileFormat &file) const;
-
-    bool hasWholeBody1File{false};
-    bool hasWholeBody2File{false};
-
-    // DXAMeasurement interface
-public:
     bool hasAllNeededFiles() const override;
 };
 

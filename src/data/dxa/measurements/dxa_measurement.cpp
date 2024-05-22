@@ -118,7 +118,6 @@ void DXAMeasurement::getScanAnalysisData(
     QString scanDate;
 
     while (query.next()) {
-
         scanId = query.value("SCANID").toString();
         scanMode = query.value("SCAN_MODE").toString();
         scanDate = query.value("SCAN_DATE").toString();

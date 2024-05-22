@@ -15,7 +15,7 @@ public:
 
     // DXAMeasurement interface
 public:
-    bool isValidDicomFile(DicomFile file) const override;
+    static bool isValidDicomFile(DicomFile file);
 
     void addDicomFile(DicomFile);
 
@@ -26,17 +26,12 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-    bool isDicomMeasureFile(DcmFileFormat &file) const;
-    bool isDicomPRFile(DcmFileFormat &file) const;
-    bool isDicomOTFile(DcmFileFormat &file) const;
+    static bool isDicomMeasureFile(DcmFileFormat &file);
+    static bool isDicomPRFile(DcmFileFormat &file);
+    static bool isDicomOTFile(DcmFileFormat &file);
 
-    DicomFile m_dicomMeasureFile{};
-    DicomFile m_dicomPrFile{};
-    DicomFile m_dicomOtFile{};
-
-    bool hasMeasureFile{false};
-    bool hasOtFile{false};
-    bool hasPrFile{false};
+    DicomFile m_dicomFile {};
+    bool m_hasDicomFile {false};
 
     bool hasAllNeededFiles() const override;
     void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;

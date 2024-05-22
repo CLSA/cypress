@@ -8,7 +8,7 @@
 class ForearmMeasurement : public DXAMeasurement
 {
 public:
-    ForearmMeasurement(Side side);
+    ForearmMeasurement();
 
     QString toString() const override;
 
@@ -16,7 +16,8 @@ public:
 
     void addDicomFile(DicomFile);
 
-    bool isValidDicomFile(DicomFile file) const override;
+    static bool isValidDicomFile(DicomFile file);
+
     void getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) override;
 
     Side getSide() override;
@@ -26,15 +27,15 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-    DicomFile m_forearmDicomFile{};
-
-private:
-    bool hasForearmFile { false };
-    Side m_side;
+    DicomFile m_dicomFile{};
+    bool m_hasDicomFile { false };
 
     // DXAMeasurement interface
 public:
     bool hasAllNeededFiles() const override;
+
+private:
+    Side m_side;
 };
 
 #endif // FOREARM_MEASUREMENT_H

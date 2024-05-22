@@ -11,7 +11,7 @@
 #include <QSqlError>
 #include <QException>
 
-ForearmMeasurement::ForearmMeasurement(Side side): m_side { side }
+ForearmMeasurement::ForearmMeasurement()
 {
 }
 
@@ -20,18 +20,11 @@ Side ForearmMeasurement::getSide() {
 }
 
 quint8 ForearmMeasurement::getScanType() {
-    return 6;
+    return m_side == Side::LEFT ? 6 : 7;
 }
 
 QString ForearmMeasurement::getName() {
-    if (m_side == Side::LEFT) {
-        return "L_FA";
-    }
-    else if (m_side == Side::RIGHT) {
-        return "R_FA";
-    }
-
-    return "L_FA";
+    return m_side == Side::RIGHT ? "R_FA" : "L_FA";
 }
 
 QString ForearmMeasurement::getBodyPartName() {
@@ -48,16 +41,19 @@ QString ForearmMeasurement::getRefSource() {
 
 bool ForearmMeasurement::hasAllNeededFiles() const
 {
-    return hasForearmFile;
+    return m_hasDicomFile;
 }
 
 bool ForearmMeasurement::isValid() const
 {
-    return hasForearmFile;
+    return m_hasDicomFile;
 }
 
-bool ForearmMeasurement::isValidDicomFile(DicomFile file) const
+bool ForearmMeasurement::isValidDicomFile(DicomFile file)
 {
+    if (file.bodyPartExamined != "ARM" || (file.laterality != "R" && file.laterality != "L"))
+        return false;
+
     DcmFileFormat loadedFileFormat;
     if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
@@ -70,7 +66,6 @@ bool ForearmMeasurement::isValidDicomFile(DicomFile file) const
     OFString imageAndFluoroscopyAreaDoseProduct = "";
     OFString patientOrientation = "";
     OFString bitsAllocated = "8";
-    OFString laterality = "L";
     OFString photometricInterpretation = "RGB";
     OFString pixelSpacing = "";
     OFString samplesPerPixel = "3";
@@ -118,24 +113,32 @@ QString ForearmMeasurement::toString() const
 
 void ForearmMeasurement::addDicomFile(DicomFile file)
 {
-    m_forearmDicomFile = file;
-    m_forearmDicomFile.name = "FA_DICOM";
-    m_forearmDicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
-    hasForearmFile = true;
+    if (file.laterality == "L")
+        m_side = Side::LEFT;
+    else if (file.laterality == "R")
+        m_side = Side::RIGHT;
+    else {
+        qCritical() << "ForearmMeasurement::addDicomFile: forearm file does not have a laterality";
+        throw QException();
+    }
 
-    setAttribute("PATIENT_ID", file.patientId);
-    setAttribute("FILE_PATH", file.absFilePath);
-    setAttribute("STUDY_ID", file.studyId);
-    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
-    setAttribute("NAME", m_forearmDicomFile.name);
-    setAttribute("SIZE", m_forearmDicomFile.size);
+    file.name = "FA_DICOM";
+    file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+
+    setAttribute("NAME", 				file.name);
+    setAttribute("SIZE", 				file.size);
+    setAttribute("PATIENT_ID", 			file.patientId);
+    setAttribute("FILE_PATH", 			file.absFilePath);
+    setAttribute("STUDY_ID", 			file.studyId);
+    setAttribute("MEDIA_STORAGE_UID", 	file.mediaStorageUID);
+
+    m_dicomFile = file;
+    m_hasDicomFile = true;
 }
 
-void ForearmMeasurement::getScanData(const QSqlDatabase &db,
-                                 const QString &patientKey,
-                                     const QString &scanId) {
+void ForearmMeasurement::getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) {
+    qInfo() << "ForearmMeasurement::getScanData";
 
-    qDebug() << "getting scan data for forearm";
     QSqlQuery query(db);
 
     query.prepare("SELECT * FROM Forearm WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");

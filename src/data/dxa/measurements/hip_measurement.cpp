@@ -1,6 +1,5 @@
 #include "hip_measurement.h"
 
-#include "auxiliary/Utilities.h"
 #include "auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
@@ -14,7 +13,7 @@
 #include <QSqlError>
 #include <QException>
 
-HipMeasurement::HipMeasurement(Side side): m_side { side }
+HipMeasurement::HipMeasurement()
 {
 
 }
@@ -26,10 +25,10 @@ QString HipMeasurement::toString() const
 
 bool HipMeasurement::isValid() const
 {
-    return m_hasHipFile;
+    return m_hasDicomFile;
 }
 
-bool HipMeasurement::isValidDicomFile(DicomFile file) const
+bool HipMeasurement::isValidDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
     if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
@@ -45,7 +44,6 @@ bool HipMeasurement::isValidDicomFile(DicomFile file) const
     OFString patientOrientation = "";
     OFString bitsAllocated = "8";
     OFString photometricInterpretation = "RGB";
-    OFString laterality = "L";
     OFString pixelSpacing = "";
     OFString samplesPerPixel = "3";
     OFString mediaStorageSOPClassUID = UID_SecondaryCaptureImageStorage;
@@ -97,7 +95,7 @@ bool HipMeasurement::isValidDicomFile(DicomFile file) const
         return false;
 
     dataset->findAndGetOFString(DCM_Laterality, value);
-    if (value != laterality)
+    if (value != "L" && value != "R")
         return false;
 
     valid = dataset->tagExists(DCM_PixelSpacing);
@@ -125,20 +123,28 @@ bool HipMeasurement::isValidDicomFile(DicomFile file) const
 
 void HipMeasurement::addDicomFile(DicomFile file)
 {
-    qDebug() << "add hip measure";
+    if (file.laterality == "L")
+        m_side = Side::LEFT;
+    else if (file.laterality == "F")
+        m_side = Side::RIGHT;
+    else {
+        qCritical() << "HipMeasurement::addDicomFile: hip file does not have a laterality";
+        throw QException();
+    }
 
-    m_hipDicomFile = file;
-    m_hipDicomFile.name = "HIP_DICOM";
-    m_hipDicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
-    m_hasHipFile = true;
+    file.name = "HIP_DICOM";
+    file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
 
+    setAttribute("NAME",              file.name);
+    setAttribute("SIZE",              file.size);
     setAttribute("PATIENT_ID",        file.patientId);
     setAttribute("FILE_PATH",         file.absFilePath);
     setAttribute("STUDY_ID",          file.studyId);
     setAttribute("SIDE",              file.laterality);
     setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
-    setAttribute("NAME",              "HIP_DICOM");
-    setAttribute("SIZE",              m_hipDicomFile.size);
+
+    m_dicomFile = file;
+    m_hasDicomFile = true;
 }
 
 Side HipMeasurement::getSide() {
@@ -146,19 +152,11 @@ Side HipMeasurement::getSide() {
 }
 
 quint8 HipMeasurement::getScanType() {
-    if (m_side == Side::LEFT) {
-        return 2;
-    }
-
-    return 3;
+    return m_side == Side::LEFT ? 2 : 3;
 }
 
 QString HipMeasurement::getName() {
-    if (m_side == Side::LEFT) {
-        return "L_HIP";
-    }
-
-    return "R_HIP";
+    return m_side == Side::LEFT ? "L_HIP" : "R_HIP";
 }
 
 QString HipMeasurement::getBodyPartName() {
@@ -177,7 +175,6 @@ void HipMeasurement::getScanData(const QSqlDatabase &db,
                                  const QString &patientKey,
                                  const QString &scanId)
 {
-    qDebug() << "getting scan data for hip";
     QSqlQuery query(db);
 
     query.prepare("SELECT * FROM Hip WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");
@@ -244,7 +241,7 @@ void HipMeasurement::getScanData(const QSqlDatabase &db,
     setAttribute("NN_PCD",      query.value("NN_PCD").toDouble());
     setAttribute("NN_CMP",      query.value("NN_CMP").toDouble());
     setAttribute("NN_SECT_MOD", query.value("NN_SECT_MOD").toDouble());
-    setAttribute("NN_BR", 	  query.value("NN_BR").toDouble());
+    setAttribute("NN_BR", 	    query.value("NN_BR").toDouble());
 
     setAttribute("IT_BMD",      query.value("IT_BMD").toDouble());
     setAttribute("IT_CSA",      query.value("IT_CSA").toDouble());
@@ -267,11 +264,10 @@ void HipMeasurement::getScanData(const QSqlDatabase &db,
     setAttribute("FS_CMP",      query.value("FS_CMP").toDouble());
     setAttribute("FS_SECT_MOD", query.value("FS_SECT_MOD").toDouble());
     setAttribute("FS_BR",       query.value("FS_BR").toDouble());
-
     setAttribute("SHAFT_NECK_ANGLE", query.value("SHAFT_NECK_ANGLE").toDouble());
 }
 
 bool HipMeasurement::hasAllNeededFiles() const
 {
-    return m_hasHipFile;
+    return m_hasDicomFile;
 }

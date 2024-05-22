@@ -20,8 +20,6 @@ const QMap<QString, QString> DxaHipTest::ranges = {
 
 DxaHipTest::DxaHipTest()
 {
-    leftHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement(Side::LEFT));
-    rightHipMeasurement = QSharedPointer<HipMeasurement>(new HipMeasurement(Side::RIGHT));
 }
 
 int DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &session)
@@ -30,40 +28,41 @@ int DxaHipTest::fromDicomFiles(QList<DicomFile> files, const DxaHipSession &sess
 
     foreach (const DicomFile &file, files) {
         if (file.patientId != session.getBarcode()) {
-            qDebug() << "patientId" << file.patientId << "does not match session barcode"
-                     << session.getBarcode();
+            qDebug() << "DxaHipTest::fromDicomFiles: patientId" << file.patientId
+                     << "does not match session barcode" << session.getBarcode();
             continue;
         }
 
-        if (file.bodyPartExamined == "HIP") {
-            if (file.laterality == "L") {
-                qDebug() << "DxaHipTest::fromDicomFiles - found left hip";
-                QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::LEFT));
-                if (measure->isValidDicomFile(file))
-                measure->addDicomFile(file);
-                addMeasurement(measure);
-                leftHipMeasurement = measure;
-                filesReceived++;
-            } else {
-                qDebug() << "DxaHipTest::fromDicomFiles - found right hip";
-                QSharedPointer<HipMeasurement> measure(new HipMeasurement(Side::RIGHT));
-                if (measure->isValidDicomFile(file))
-                measure->addDicomFile(file);
-                addMeasurement(measure);
-                rightHipMeasurement = measure;
-                filesReceived++;
-            }
+        if (file.bodyPartExamined != "HIP") {
+            qWarning() << "DxaHipTest::fromDicomFiles: received a non-hip dicom file";
+            continue;
+        }
+
+        if (HipMeasurement::isValidDicomFile(file)) {
+            QSharedPointer<HipMeasurement> measure(new HipMeasurement);
+            measure->addDicomFile(file);
+            addMeasurement(measure);
+            filesReceived++;
         }
     }
 
     return filesReceived;
 }
 
+void DxaHipTest::getScanAnalysisData(
+    const QSqlDatabase& patscanDb,
+    const QSqlDatabase& referenceDb,
+    const QJsonObject& patientData) {
 
+    foreach(auto measure, m_measurementList) {
+        auto dxaMeasure = qSharedPointerDynamicCast<DXAMeasurement>(measure);
+        dxaMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
+    }
+}
 
 bool DxaHipTest::hasAllNeededFiles() const
 {
-    return leftHipMeasurement->hasAllNeededFiles();
+    return true;
 }
 
 void DxaHipTest::getPatientScan(const QSqlDatabase &db, const QString &participantId) {
@@ -89,13 +88,12 @@ void DxaHipTest::getPatientScan(const QSqlDatabase &db, const QString &participa
 
 bool DxaHipTest::isValid() const
 {
-    return leftHipMeasurement->isValid() || rightHipMeasurement->isValid();
+    return true;
 }
 
 void DxaHipTest::reset()
 {
-    leftHipMeasurement->reset();
-    rightHipMeasurement->reset();
+    TestBase::reset();
 }
 
 QJsonObject DxaHipTest::toJsonObject() const
@@ -104,8 +102,8 @@ QJsonObject DxaHipTest::toJsonObject() const
     QJsonObject results{};
     QJsonObject hip{};
 
-    results.insert("hip_l", leftHipMeasurement->toJsonObject());
-    results.insert("hip_r", rightHipMeasurement->toJsonObject());
+    //results.insert("hip_l", leftHipMeasurement->toJsonObject());
+    //results.insert("hip_r", rightHipMeasurement->toJsonObject());
 
     json.insert("results", results);
     json.insert("manual_entry", getManualEntryMode());

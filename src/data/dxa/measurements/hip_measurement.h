@@ -7,7 +7,7 @@
 class HipMeasurement : public DXAMeasurement
 {
 public:
-    HipMeasurement(Side side);
+    HipMeasurement();
 
     QString toString() const override;
 
@@ -15,10 +15,7 @@ public:
 
     // DXAMeasurement interface
 public:
-    bool isValidDicomFile(DicomFile file) const override;
-
-    DicomFile m_hipDicomFile;
-
+    static bool isValidDicomFile(DicomFile file);
     void addDicomFile(DicomFile);
 
     Side getSide() override;
@@ -30,13 +27,15 @@ public:
 
     void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) override;
 
-private:
-    Side m_side;
-    bool m_hasHipFile { false };
-
-    // DXAMeasurement interface
 public:
     bool hasAllNeededFiles() const override;
+
+private:
+    Side m_side;
+
+    DicomFile m_dicomFile;
+
+    bool m_hasDicomFile;
 };
 
 #endif // HIP_MEASUREMENT_H

@@ -31,13 +31,13 @@ public:
 
     void getPatientScan(const QSqlDatabase& db, const QString& participantId);
     void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
+    virtual void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) = 0;
     void computeTZScore(const QSqlDatabase& referenceDb, const QJsonObject& patientData, const QString& scanDate);
+
 
     double computeYearsDifference(const QString& first, const QString& second);
 
-    virtual bool isValidDicomFile(DicomFile file) const = 0;
     virtual bool hasAllNeededFiles() const = 0;
-    virtual void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) = 0;
 
 public: // Measurement
     virtual bool isValid() const override;

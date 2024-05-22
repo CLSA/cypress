@@ -14,7 +14,8 @@ public:
 
     void addDicomFile(DicomFile);
 
-    bool isValidDicomFile(DicomFile file) const override;
+    static bool isValidDicomFile(DicomFile file);
+
     bool isValid() const override;
 
     // DXAMeasurement interface

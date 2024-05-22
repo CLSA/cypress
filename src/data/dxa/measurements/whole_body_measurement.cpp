@@ -26,10 +26,10 @@ QString WholeBodyScanMeasurement::toString() const
 
 bool WholeBodyScanMeasurement::isValid() const
 {
-    return hasWholeBody1File && hasWholeBody2File;
+    return true;
 }
 
-bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file) const
+bool WholeBodyScanMeasurement::isValidDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
     if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
@@ -45,28 +45,31 @@ void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
         return;
     }
 
-    setAttribute("patientId", file.patientId);
-    setAttribute("filePath", file.absFilePath);
-    setAttribute("studyId", file.studyId);
-    setAttribute("mediaStorageUid", file.mediaStorageUID);
+    setAttribute("PATIENT_ID", file.patientId);
+    setAttribute("FILEPATH", file.absFilePath);
+    setAttribute("STUDY_ID", file.studyId);
+    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
 
     if (isWholeBody1(loadedFileFormat)) {
         qDebug() << "adding dicom 1";
+        qDebug() << file.absFilePath;
 
-        m_wholeBody1 = file;
-        m_wholeBody1.name = "WB_DICOM_1";
-        m_wholeBody1.size = FileUtils::getHumanReadableFileSize(m_wholeBody1.absFilePath);
+        m_dicomFile = file;
+        m_dicomFile.name = "WB_DICOM_1";
+        m_dicomFile.size = FileUtils::getHumanReadableFileSize(m_dicomFile.absFilePath);
 
-        hasWholeBody1File = true;
+        setAttribute("NAME", "WB_DICOM_1");
     }
 
     else if (isWholeBody2(loadedFileFormat)) {
         qDebug() << "adding dicom 2";
-        m_wholeBody2 = file;
-        m_wholeBody2.name = "WB_DICOM_2";
-        m_wholeBody2.size = FileUtils::getHumanReadableFileSize(m_wholeBody2.absFilePath);
+        qDebug() << file.absFilePath;
 
-        hasWholeBody2File = true;
+        m_dicomFile = file;
+        m_dicomFile.name = "WB_DICOM_2";
+        m_dicomFile.size = FileUtils::getHumanReadableFileSize(m_dicomFile.absFilePath);
+
+        setAttribute("NAME", "WB_DICOM_2");
     }
 }
 
@@ -94,7 +97,7 @@ QString WholeBodyScanMeasurement::getRefSource() {
     return "NHANES";
 }
 
-bool WholeBodyScanMeasurement::isWholeBody1(DcmFileFormat &file) const
+bool WholeBodyScanMeasurement::isWholeBody1(DcmFileFormat &file)
 {
     const OFString modality = "OT";
     const OFString bodyPartExamined = "";
@@ -155,7 +158,7 @@ bool WholeBodyScanMeasurement::isWholeBody1(DcmFileFormat &file) const
     return true;
 }
 
-bool WholeBodyScanMeasurement::isWholeBody2(DcmFileFormat &file) const
+bool WholeBodyScanMeasurement::isWholeBody2(DcmFileFormat &file)
 {
     const OFString modality = "OT";
     const OFString bodyPartExamined = "";
@@ -221,11 +224,10 @@ bool WholeBodyScanMeasurement::isWholeBody2(DcmFileFormat &file) const
 
 bool WholeBodyScanMeasurement::hasAllNeededFiles() const
 {
-    return hasWholeBody1File && hasWholeBody2File;
+    return m_hasDicomFile;
 }
 
-void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString &patientKey,
-                                           const QString &scanId) {
+void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString &patientKey, const QString &scanId) {
     // Whole body
     QSqlQuery query(db);
 
@@ -582,27 +584,27 @@ void WholeBodyScanMeasurement::getScanData(const QSqlDatabase &db, const QString
         return;
     }
 
-    setAttribute("FAT_STD", query.value("FAT_STD").toDouble());
-    setAttribute("LEAN_STD", query.value("LEAN_STD").toDouble());
-    setAttribute("BRAIN_FAT", query.value("BRAIN_FAT").toDouble());
-    setAttribute("WATER_LBM", query.value("WATER_LBM").toDouble());
-    setAttribute("TOTAL_PERCENT_FAT", query.value("TOTAL_PERCENT_FAT").toDouble());
-    setAttribute("BODY_MASS_INDEX", query.value("BODY_MASS_INDEX").toDouble());
+    setAttribute("FAT_STD", 				query.value("FAT_STD").toDouble());
+    setAttribute("LEAN_STD", 				query.value("LEAN_STD").toDouble());
+    setAttribute("BRAIN_FAT", 				query.value("BRAIN_FAT").toDouble());
+    setAttribute("WATER_LBM", 				query.value("WATER_LBM").toDouble());
+    setAttribute("TOTAL_PERCENT_FAT", 		query.value("TOTAL_PERCENT_FAT").toDouble());
+    setAttribute("BODY_MASS_INDEX", 		query.value("BODY_MASS_INDEX").toDouble());
 
-    setAttribute("ANDROID_GYNOID_RATIO", query.value("ANDROID_GYNOID_RATIO").toDouble());
-    setAttribute("ANDROID_PERCENT_FAT", query.value("ANDROID_PERCENT_FAT").toDouble());
-    setAttribute("GYNOID_PERCENT_FAT", query.value("GYNOID_PERCENT_FAT").toDouble());
+    setAttribute("ANDROID_GYNOID_RATIO", 	query.value("ANDROID_GYNOID_RATIO").toDouble());
+    setAttribute("ANDROID_PERCENT_FAT", 	query.value("ANDROID_PERCENT_FAT").toDouble());
+    setAttribute("GYNOID_PERCENT_FAT", 		query.value("GYNOID_PERCENT_FAT").toDouble());
 
-    setAttribute("FAT_MASS", query.value("FAT_MASS").toDouble());
-    setAttribute("TRUNK_LIMB_FAT_MASS_RATIO", query.value("TRUNK_LIMB_FAT_MASS_RATIO").toDouble());
-    setAttribute("FAT_MASS_HEIGHT_SQUARED", query.value("FAT_MASS_HEIGHT_SQUARED").toDouble());
-    setAttribute("TOTAL_FAT_MASS", query.value("TOTAL_FAT_MASS").toDouble());
+    setAttribute("FAT_MASS", 					query.value("FAT_MASS").toDouble());
+    setAttribute("TRUNK_LIMB_FAT_MASS_RATIO", 	query.value("TRUNK_LIMB_FAT_MASS_RATIO").toDouble());
+    setAttribute("FAT_MASS_HEIGHT_SQUARED", 	query.value("FAT_MASS_HEIGHT_SQUARED").toDouble());
+    setAttribute("TOTAL_FAT_MASS", 				query.value("TOTAL_FAT_MASS").toDouble());
 
-    setAttribute("LEAN_MASS_HEIGHT_SQUARED", query.value("LEAN_MASS_HEIGHT_SQUARED").toDouble());
-    setAttribute("APPENDAGE_LEAN_MASS_HEIGHT_2", query.value("APPENDAGE_LEAN_MASS_HEIGHT_2").toDouble());
-    setAttribute("TOTAL_LEAN_MASS", query.value("TOTAL_LEAN_MASS").toDouble());
+    setAttribute("LEAN_MASS_HEIGHT_SQUARED", 		query.value("LEAN_MASS_HEIGHT_SQUARED").toDouble());
+    setAttribute("APPENDAGE_LEAN_MASS_HEIGHT_2", 	query.value("APPENDAGE_LEAN_MASS_HEIGHT_2").toDouble());
+    setAttribute("TOTAL_LEAN_MASS", 				query.value("TOTAL_LEAN_MASS").toDouble());
 
-    setAttribute("PHYSICIAN_COMMENT", query.value("PHYSICIAN_COMMENT").toString());
+    setAttribute("PHYSICIAN_COMMENT", 				query.value("PHYSICIAN_COMMENT").toString());
 
     query.prepare("SELECT * FROM AndroidGynoidComposition WHERE PATIENT_KEY = :patientKey AND SCANID = :scanId");
     query.bindValue(":patientKey", patientKey);

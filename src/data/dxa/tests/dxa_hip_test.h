@@ -27,10 +27,11 @@ public:
 
     bool hasAllNeededFiles() const;
 
-    QSharedPointer<HipMeasurement> leftHipMeasurement;
-    QSharedPointer<HipMeasurement> rightHipMeasurement;
-
     void getPatientScan(const QSqlDatabase &db, const QString &participantId);
+    void getScanAnalysisData(const QSqlDatabase &patscanDb, const QSqlDatabase &referenceDb, const QJsonObject &patientData);
+private:
+    QSharedPointer<QJsonObject> leftHipScanAnalysis;
+    QSharedPointer<QJsonObject> rightHipScanAnalysis;
 };
 
 #endif // DXAHIPTEST_H

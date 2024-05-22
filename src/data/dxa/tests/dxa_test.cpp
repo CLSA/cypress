@@ -61,11 +61,6 @@ const QMap<QString, QString> DXATest::ranges = {
 
 DXATest::DXATest()
 {
-    wholeBodyMeasurement.reset(new WholeBodyScanMeasurement);
-    apSpineMeasurement.reset(new ApSpineMeasurement);
-    leftForearmMeasurement.reset(new ForearmMeasurement(Side::LEFT));
-    rightForearmMeasurement.reset(new ForearmMeasurement(Side::RIGHT));
-    ivaImagingMeasurement.reset(new IVAImagingMeasurement);
 }
 
 bool DXATest::isValid() const
@@ -75,13 +70,7 @@ bool DXATest::isValid() const
 
 void DXATest::reset()
 {
-    apSpineMeasurement->reset();
-    wholeBodyMeasurement->reset();
-
-    leftForearmMeasurement->reset();
-    rightForearmMeasurement->reset();
-
-    ivaImagingMeasurement->reset();
+    TestBase::reset();
 }
 
 bool DXATest::hasAllNeededFiles() const
@@ -94,44 +83,49 @@ int DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
     int filesReceived = 0;
     foreach (const DicomFile &file, files) {
         if (file.patientId != session.getBarcode()) {
-            qDebug() << "file patient id " << file.patientId << "does not equal session barcode"
-                     << session.getBarcode();
+            qWarning()
+                << "DXATest::fromDicomFiles: patientId" << file.patientId
+                << "does not equal session barcode" << session.getBarcode();
             continue;
         }
 
         QString bodyPartExamined = file.bodyPartExamined;
-        QString patientId = file.patientId;
 
-        if (bodyPartExamined == "HIP") // hip done in different stage
+        if (bodyPartExamined == "HIP") { // hip done in different stage
+            qWarning() << "DXATest::fromDicomFiles: received a hip dicom file";
             continue;
+        }
 
-        qDebug() <<
-            "checking file: " <<
-            file.bodyPartExamined <<
-            file.seriesNumber;
+        if (IVAImagingMeasurement::isValidDicomFile(file)) {
+            auto measure = QSharedPointer<IVAImagingMeasurement>(new IVAImagingMeasurement);
+            measure->addDicomFile(file);
+            addMeasurement(qSharedPointerCast<Measurement>(measure));
 
-        if (ivaImagingMeasurement->isValidDicomFile(file)) {
-            ivaImagingMeasurement->addDicomFile(file);
             filesReceived++;
         }
-        else if (wholeBodyMeasurement->isValidDicomFile(file)) {
-            wholeBodyMeasurement->addDicomFile(file);
+        else if (WholeBodyScanMeasurement::isValidDicomFile(file)) {
+            auto measure = QSharedPointer<WholeBodyScanMeasurement>(new WholeBodyScanMeasurement);
+            measure->addDicomFile(file);
+            addMeasurement(qSharedPointerCast<Measurement>(measure));
+
             filesReceived++;
         }
-        else if (file.bodyPartExamined == "ARM" && file.laterality == "L" && leftForearmMeasurement->isValidDicomFile(file)) {
-            leftForearmMeasurement->addDicomFile(file);
+        else if (ForearmMeasurement::isValidDicomFile(file)) {
+            auto measure = QSharedPointer<ForearmMeasurement>(new ForearmMeasurement);;
+            measure->addDicomFile(file);
+            addMeasurement(qSharedPointerCast<Measurement>(measure));
+
             filesReceived++;
         }
-        else if (file.bodyPartExamined == "ARM" && file.laterality == "R" && rightForearmMeasurement->isValidDicomFile(file)) {
-            rightForearmMeasurement->addDicomFile(file);
-            filesReceived++;
-        }
-        else if (apSpineMeasurement->isValidDicomFile(file)) {
-            apSpineMeasurement->addDicomFile(file);
+        else if (ApSpineMeasurement::isValidDicomFile(file)) {
+            auto measure = QSharedPointer<ApSpineMeasurement>(new ApSpineMeasurement);
+            measure->addDicomFile(file);
+            addMeasurement(qSharedPointerCast<Measurement>(measure));
+
             filesReceived++;
         }
         else {
-            qDebug() << "Unknown file";
+            qWarning() << "Unknown file";
         }
     }
 
@@ -141,7 +135,9 @@ int DXATest::fromDicomFiles(QList<DicomFile> files, const DXASession &session)
 void DXATest::getPatientScan(const QSqlDatabase &db, const QString &participantId) {
     QSqlQuery query(db);
 
-    query.prepare("SELECT PATIENT_KEY, BIRTHDATE, SEX, ETHNICITY, WEIGHT, HEIGHT FROM PATIENT WHERE IDENTIFIER1 = :participantId");
+    query.prepare("SELECT PATIENT_KEY, BIRTHDATE, SEX, ETHNICITY, WEIGHT, HEIGHT "
+                  "FROM PATIENT "
+                  "WHERE IDENTIFIER1 = :participantId");
     query.bindValue(":participantId", participantId);
 
     if (!query.exec()) {
@@ -159,6 +155,24 @@ void DXATest::getPatientScan(const QSqlDatabase &db, const QString &participantI
     }
 }
 
+void DXATest::getScanAnalysisData(
+    const QSqlDatabase& patscanDb,
+    const QSqlDatabase& referenceDb,
+    const QJsonObject& patientData) {
+
+    foreach (auto measure, m_measurementList) {
+        auto dxaMeasure = qSharedPointerDynamicCast<DXAMeasurement>(measure);
+
+        QString fileName = dxaMeasure->getAttribute("NAME").toString();
+
+        QStringList doScanAnalysis { "WB_DICOM_1", "SP_DICOM_1", "FA_DICOM" };
+
+        if (doScanAnalysis.contains(fileName)) {
+            dxaMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
+        }
+    }
+}
+
 QJsonObject DXATest::toJsonObject() const
 {
     auto wholeBody = QSharedPointer<QJsonObject>::create();
@@ -170,20 +184,41 @@ QJsonObject DXATest::toJsonObject() const
     QJsonObject json{};
     QJsonObject results{};
 
-    if (wholeBodyMeasurement)
-        *wholeBody = wholeBodyMeasurement->toJsonObject();
+    foreach (auto measure, m_measurementList) {
+        if (dynamic_cast<WholeBodyScanMeasurement*>(measure.get())) {
+            *wholeBody = measure->toJsonObject();
+        }
+        else if (dynamic_cast<ApSpineMeasurement*>(measure.get())) {
+            *apSpine = measure->toJsonObject();
+        }
+        else if (dynamic_cast<ForearmMeasurement*>(measure.get())) {
+            auto forearmMeasure = dynamic_cast<ForearmMeasurement*>(measure.get());
+            if (forearmMeasure->getSide() == Side::LEFT) {
+                *leftForearm = forearmMeasure->toJsonObject();
+            }
+            else if (forearmMeasure->getSide() == Side::RIGHT) {
+                *rightForearm = forearmMeasure->toJsonObject();
+            }
+        }
+        else if (dynamic_cast<IVAImagingMeasurement*>(measure.get())) {
+            *ivaSpine = measure->toJsonObject();
+        }
+    }
 
-    if (apSpineMeasurement)
-        *apSpine = apSpineMeasurement->toJsonObject();
+    //if (wholeBodyMeasurement)
+    //    *wholeBody = wholeBodyMeasurement->toJsonObject();
 
-    if (leftForearmMeasurement)
-        *leftForearm = leftForearmMeasurement->toJsonObject();
+    //if (apSpineMeasurement)
+    //    *apSpine = apSpineMeasurement->toJsonObject();
 
-    if (rightForearmMeasurement)
-        *rightForearm = rightForearmMeasurement->toJsonObject();
+    //if (leftForearmMeasurement)
+    //    *leftForearm = leftForearmMeasurement->toJsonObject();
 
-    if (ivaImagingMeasurement)
-        *ivaSpine = ivaImagingMeasurement->toJsonObject();
+    //if (rightForearmMeasurement)
+    //    *rightForearm = rightForearmMeasurement->toJsonObject();
+
+    //if (ivaImagingMeasurement)
+    //    *ivaSpine = ivaImagingMeasurement->toJsonObject();
 
     results.insert("ap_spine", *apSpine);
     results.insert("whole_body", *wholeBody);
@@ -193,6 +228,8 @@ QJsonObject DXATest::toJsonObject() const
 
     json.insert("results", results);
     json.insert("manual_entry", getManualEntryMode());
+
+    qDebug() << json;
 
     return json;
 }

@@ -1,16 +1,14 @@
 #ifndef DXA_TEST_H
 #define DXA_TEST_H
 
-#include "data/dxa/measurements/ap_spine_measurement.h"
-#include "data/dxa/measurements/forearm_measurement.h"
-#include "data/dxa/measurements/iva_imaging_measurement.h"
-#include "data/dxa/measurements/whole_body_measurement.h"
 #include "data/test_base.h"
 
 #include "dicom/dcm_recv.h"
 #include "server/sessions/dxa/dxa_session.h"
 
 #include "dcmtk/ofstd/ofstdinc.h"
+
+#include <QSqlDatabase>
 
 class DXATest : public TestBase
 {
@@ -30,13 +28,14 @@ public:
     virtual QJsonObject toJsonObject() const override;
     virtual QString toString() const override;
 
-    QScopedPointer<WholeBodyScanMeasurement> wholeBodyMeasurement;
-    QScopedPointer<ForearmMeasurement> leftForearmMeasurement;
-    QScopedPointer<ForearmMeasurement> rightForearmMeasurement;
-    QScopedPointer<ApSpineMeasurement> apSpineMeasurement;
-    QScopedPointer<IVAImagingMeasurement> ivaImagingMeasurement;
-
     void getPatientScan(const QSqlDatabase &db, const QString &participantId);
+    void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
+
+private:
+    QSharedPointer<QJsonObject> m_wholeBodyScanAnalysis;
+    QSharedPointer<QJsonObject> m_apSpineScanAnalysis;
+    QSharedPointer<QJsonObject> m_leftForearmScanAnalysis;
+    QSharedPointer<QJsonObject> m_rightForearmScanAnalysis;
 };
 
 #endif // DXA_TEST_H

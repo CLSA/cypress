@@ -1,4 +1,5 @@
 #include "iva_imaging_measurement.h"
+
 #include "auxiliary/file_utils.h"
 
 #include "dcmtk/dcmdata/dcuid.h"
@@ -19,57 +20,63 @@ QString IVAImagingMeasurement::toString() const
 
 bool IVAImagingMeasurement::isValid() const
 {
-    return hasMeasureFile && hasOtFile && hasPrFile;
+    return m_hasDicomFile;
 };
 
-bool IVAImagingMeasurement::isValidDicomFile(DicomFile file) const
+bool IVAImagingMeasurement::isValidDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
     if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return false;
 
-    return isDicomMeasureFile(loadedFileFormat) || isDicomOTFile(loadedFileFormat)
-           || isDicomPRFile(loadedFileFormat);
+    return isDicomMeasureFile(loadedFileFormat) || isDicomOTFile(loadedFileFormat) || isDicomPRFile(loadedFileFormat);
 }
 
 void IVAImagingMeasurement::addDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
-    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good()) {
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return;
-    }
 
     setAttribute("PATIENT_ID", file.patientId);
+    setAttribute("FILEPATH", file.absFilePath);
     setAttribute("STUDY_ID", file.studyId);
     setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
-    setAttribute("FILEPATH", file.absFilePath);
 
     if (isDicomMeasureFile(loadedFileFormat)) {
-        qDebug() << "adding IVA measure";
-        m_dicomMeasureFile = file;
-        m_dicomMeasureFile.name = "SEL_DICOM_MEASURE";
-        m_dicomMeasureFile.size = FileUtils::getHumanReadableFileSize(
-            m_dicomMeasureFile.absFilePath);
+        qDebug() << "IVAImagingMeasurement: adding IVA measure";
 
-        hasMeasureFile = true;
+        file.name = "SEL_DICOM_MEASURE";
+        file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+
+        setAttribute("NAME", file.name);
+
+        m_dicomFile = file;
+        m_hasDicomFile = true;
     }
 
     else if (isDicomPRFile(loadedFileFormat)) {
-        qDebug() << "adding IVA PR";
-        m_dicomPrFile = file;
-        m_dicomPrFile.name = "SEL_DICOM_PR";
-        m_dicomPrFile.size = FileUtils::getHumanReadableFileSize(m_dicomPrFile.absFilePath);
+        qInfo() << "IVAImagingMeasurement: adding IVA PR";
 
-        hasPrFile = true;
+        file.name = "SEL_DICOM_PR";
+        file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+
+        setAttribute("NAME", m_dicomFile.name);
+
+        m_dicomFile = file;
+        m_hasDicomFile = true;
     }
 
     else if (isDicomOTFile(loadedFileFormat)) {
-        qDebug() << "adding IVA OT";
-        m_dicomOtFile = file;
-        m_dicomOtFile.name = "SEL_DICOM_OT";
-        m_dicomOtFile.size = FileUtils::getHumanReadableFileSize(m_dicomOtFile.absFilePath);
+        qInfo() << "IVAImagingMeasurement: adding IVA OT";
 
-        hasOtFile = true;
+        file.name = "SEL_DICOM_OT";
+        file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+
+        setAttribute("NAME", file.name);
+
+        m_dicomFile = file;
+        m_hasDicomFile = true;
     }
 }
 
@@ -97,7 +104,7 @@ QString IVAImagingMeasurement::getRefSource() {
     return "NHANES";
 }
 
-bool IVAImagingMeasurement::isDicomMeasureFile(DcmFileFormat &file) const
+bool IVAImagingMeasurement::isDicomMeasureFile(DcmFileFormat &file)
 {
     OFString value = "";
     DcmDataset *dataset = file.getDataset();
@@ -158,7 +165,7 @@ bool IVAImagingMeasurement::isDicomMeasureFile(DcmFileFormat &file) const
     return true;
 }
 
-bool IVAImagingMeasurement::isDicomPRFile(DcmFileFormat &file) const
+bool IVAImagingMeasurement::isDicomPRFile(DcmFileFormat &file)
 {
     OFString value = "";
     DcmDataset *dataset = file.getDataset();
@@ -182,7 +189,7 @@ bool IVAImagingMeasurement::isDicomPRFile(DcmFileFormat &file) const
     return true;
 }
 
-bool IVAImagingMeasurement::isDicomOTFile(DcmFileFormat &file) const
+bool IVAImagingMeasurement::isDicomOTFile(DcmFileFormat &file)
 {
     OFString value = "";
     DcmDataset *dataset = file.getDataset();
@@ -230,7 +237,7 @@ bool IVAImagingMeasurement::isDicomOTFile(DcmFileFormat &file) const
 
 bool IVAImagingMeasurement::hasAllNeededFiles() const
 {
-    return hasMeasureFile && hasOtFile && hasPrFile;
+    return m_hasDicomFile;
 }
 
 void IVAImagingMeasurement::getScanData(const QSqlDatabase &db,

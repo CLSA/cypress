@@ -61,7 +61,7 @@ bool ApSpineMeasurement::isValid() const
     return isValidDicomFile(m_apSpineFile);
 }
 
-bool ApSpineMeasurement::isValidDicomFile(DicomFile file) const
+bool ApSpineMeasurement::isValidDicomFile(DicomFile file)
 {
     DcmFileFormat loadedFileFormat;
     if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
@@ -132,8 +132,6 @@ bool ApSpineMeasurement::isValidDicomFile(DicomFile file) const
 
 void ApSpineMeasurement::addDicomFile(DicomFile file)
 {
-    qDebug() << "adding spine 1";
-
     m_apSpineFile = file;
     m_apSpineFile.name = "SP_DICOM_1";
     m_apSpineFile.size = FileUtils::getHumanReadableFileSize(m_apSpineFile.absFilePath);
@@ -148,7 +146,7 @@ void ApSpineMeasurement::addDicomFile(DicomFile file)
 }
 
 void ApSpineMeasurement::getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) {
-    qDebug() << "getting scan data for spine";
+    qInfo() << "ApSpineMeasurement::getScanData";
 
     QSqlQuery query(db);
 
