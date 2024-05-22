@@ -22,7 +22,6 @@ DialogBase::DialogBase(QWidget *parent, QSharedPointer<CypressSession> session)
     setAttribute(Qt::WA_DeleteOnClose);
 
     m_debug = CypressSettings::isDebugMode();
-    m_sim = CypressSettings::isSimMode();
 }
 
 DialogBase::~DialogBase() {}
@@ -67,8 +66,7 @@ void DialogBase::cancel(const QString& cancelMsg)
     Q_UNUSED(cancelMsg);
     qDebug() << "DialogBase::cancel";
 
-    if (!m_sim)
-        m_manager->sendCancellation(m_session->getSessionId());
+    m_manager->sendCancellation(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::Cancelled);
 
@@ -79,8 +77,7 @@ void DialogBase::error(const QString& errorMsg)
 {
     QMessageBox::critical(nullptr, "Error", errorMsg);
 
-    if (!m_sim)
-        m_manager->sendCancellation(m_session->getSessionId());
+    m_manager->sendCancellation(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::CriticalError);
 
@@ -91,8 +88,7 @@ void DialogBase::success(const QString& successMsg)
 {
     QMessageBox::information(nullptr, "Measurement complete", successMsg);
 
-    if (!m_sim)
-        m_manager->sendComplete(m_session->getSessionId());
+    m_manager->sendComplete(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::Success);
 

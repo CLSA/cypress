@@ -161,16 +161,16 @@ void DcmRecv::onFilesReceived()
                     dicomFile.seriesNumber = seriesNumber.c_str();
                 }
 
-                qInfo() << "DICOM file";
-                qInfo() << dicomFile.mediaStorageUID;
-                qInfo() << dicomFile.laterality;
-                qInfo() << dicomFile.studyId;
-                qInfo() << dicomFile.patientId;
-                qInfo() << dicomFile.bodyPartExamined;
-                qInfo() << dicomFile.modality;
-                qInfo() << dicomFile.studyDate;
-                qInfo() << dicomFile.seriesNumber;
-                qInfo() << "\n";
+                qDebug() << "DICOM file";
+                qDebug() << dicomFile.mediaStorageUID;
+                qDebug() << dicomFile.laterality;
+                qDebug() << dicomFile.studyId;
+                qDebug() << dicomFile.patientId;
+                qDebug() << dicomFile.bodyPartExamined;
+                qDebug() << dicomFile.modality;
+                qDebug() << dicomFile.studyDate;
+                qDebug() << dicomFile.seriesNumber;
+                qDebug() << "\n";
 
                 receivedFiles.append(dicomFile);
             }

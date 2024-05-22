@@ -28,7 +28,6 @@ protected:
     bool isManualEntryMode{false};
 
     bool m_debug;
-    bool m_sim;
 
     QSharedPointer<CypressSession> m_session;
     QSharedPointer<ManagerBase> m_manager;

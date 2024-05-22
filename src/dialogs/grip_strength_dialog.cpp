@@ -11,12 +11,6 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent, QSharedPointer<GripStren
 {
     ui->setupUi(this);
 
-    //ui->measurementTable->disableMeasureButton();
-    //ui->measurementTable->disableFinishButton();
-
-    //if (!m_sim)
-    //ui->measurementTable->hideMeasureButton();
-
     this->setWindowTitle("Grip Strength");
     this->setWindowFlags(Qt::WindowFullscreenButtonHint);
 

@@ -15,7 +15,6 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include "widgets/measurement_table.h"
 #include "widgets/serial_port_widget.h"
@@ -33,13 +32,12 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *zeroDevicePushButton;
     MeasurementTable *measurementTable;
-    QSpacerItem *verticalSpacer;
 
     void setupUi(QDialog *WeighScaleDialog)
     {
         if (WeighScaleDialog->objectName().isEmpty())
             WeighScaleDialog->setObjectName(QString::fromUtf8("WeighScaleDialog"));
-        WeighScaleDialog->resize(654, 139);
+        WeighScaleDialog->resize(654, 133);
         verticalLayout_2 = new QVBoxLayout(WeighScaleDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         testInfoWidget = new TestInfoWidget(WeighScaleDialog);
@@ -69,10 +67,6 @@ public:
         measurementTable->setObjectName(QString::fromUtf8("measurementTable"));
 
         verticalLayout_2->addWidget(measurementTable);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacer);
 
 
         retranslateUi(WeighScaleDialog);

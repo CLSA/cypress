@@ -12,7 +12,6 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include "widgets/measurement_table.h"
 #include "widgets/serial_port_widget.h"
@@ -27,13 +26,12 @@ public:
     TestInfoWidget *testInfoWidget;
     SerialPortWidget *serialPortPickerWidget;
     MeasurementTable *measurementTable;
-    QSpacerItem *verticalSpacer;
 
     void setupUi(QDialog *AudiometerDialog)
     {
         if (AudiometerDialog->objectName().isEmpty())
             AudiometerDialog->setObjectName(QString::fromUtf8("AudiometerDialog"));
-        AudiometerDialog->resize(561, 106);
+        AudiometerDialog->resize(561, 60);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -61,10 +59,6 @@ public:
 
         verticalLayout_2->addWidget(measurementTable);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacer);
-
 
         retranslateUi(AudiometerDialog);
 
@@ -73,7 +67,7 @@ public:
 
     void retranslateUi(QDialog *AudiometerDialog)
     {
-        AudiometerDialog->setWindowTitle(QCoreApplication::translate("AudiometerDialog", "Hearing Measurement", nullptr));
+        AudiometerDialog->setWindowTitle(QCoreApplication::translate("AudiometerDialog", "Audiometer", nullptr));
     } // retranslateUi
 
 };
