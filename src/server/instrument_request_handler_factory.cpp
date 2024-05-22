@@ -266,19 +266,21 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
      * if there is no match, return the default request handler (404).
      *
      */
-
     QString uri               = QString::fromStdString(request.getURI());
     QString method            = QString::fromStdString(request.getMethod());
-    qInfo() << "uri" << uri << "method" << method;
 
     QString host              = QString::fromStdString(request.getHost().c_str());
     QString clientAddress     = QString::fromStdString(request.clientAddress().host().toString());
     QString clientPort        = QString::number(request.clientAddress().port());
 
-    QString origin            = QString::fromStdString(request.get("Origin").c_str());
+    QString origin            = QString::fromStdString(request.get("Origin", "N/A").c_str());
 
-    qInfo() << "Origin" << origin;
-    qInfo() << QString("%1: %2%3 from %4:%5").arg(method, host, uri, clientAddress, clientPort);
+    qInfo() << uri;
+    qInfo() << method;
+    qInfo() << host;
+    qInfo() << clientAddress;
+    qInfo() << clientPort;
+    qInfo() << origin;
 
     QRegularExpressionMatch match;
     QMap<QString, createRequestHandlerImpl>::const_iterator handlerIter = urlMap.constBegin();

@@ -21,20 +21,24 @@ WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     m_test.reset(new WeighScaleTest);
     m_portName = CypressSettings::readSetting("weight_scale/portName").toString();
 
-    qDebug() << "WeighScaleManager";
-    qDebug() << session->getSessionId();
-    qDebug() << session->getBarcode();
-    qDebug() << session->getInterviewer();
+    qInfo() << "WeighScaleManager::WeighScaleManager";
+
+    qInfo() << session->getSessionId();
+    qInfo() << session->getBarcode();
+    qInfo() << session->getInterviewer();
+    qInfo() << session->getOrigin();
+
     qDebug() << session->getInputData();
-    qDebug() << session->getOrigin();
 }
 
 bool WeighScaleManager::isInstalled() {
+    qInfo() << "WeighScaleManager::isInstalled";
+
     return true;
 }
 
 bool WeighScaleManager::start() {
-    qDebug() << "WeighScaleManager::measure";
+    qInfo() << "WeighScaleManager::start";
 
     scanDevices();
 
@@ -45,22 +49,15 @@ bool WeighScaleManager::start() {
 }
 
 void WeighScaleManager::measure() {
-    qDebug() << "WeighScaleManager::measure";
-
-    if (m_sim) {
-        m_test->simulate();
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
-        return;
-    }
+    qInfo() << "WeighScaleManager::measure";
 
     m_request = QByteArray("p");
     writeDevice();
 }
 
 void WeighScaleManager::addManualEntry(const double weight) {
+    qInfo() << "WeighScaleManager::addManualEntry";
+
     auto test = qSharedPointerCast<WeighScaleTest>(m_test);
     QSharedPointer<WeightMeasurement> measure(new WeightMeasurement(weight, "kg"));
 
@@ -74,6 +71,8 @@ void WeighScaleManager::addManualEntry(const double weight) {
 
 void WeighScaleManager::removeMeasurement(const int index)
 {
+    qInfo() << "WeighScaleManager::removeMeasurement";
+
     m_test->removeMeasurement(index);
     emit dataChanged(m_test);
     m_test->isValid() ? emit canFinish() : emit cannotFinish();
@@ -81,7 +80,7 @@ void WeighScaleManager::removeMeasurement(const int index)
 
 void WeighScaleManager::connectDevice()
 {
-    qDebug() << "WeighScaleManager::connectDevice";
+    qInfo() << "WeighScaleManager::connectDevice";
 
     // Connect to the serial port and set up listeners
     if (m_port.isOpen())
@@ -121,6 +120,8 @@ void WeighScaleManager::connectDevice()
 
 void WeighScaleManager::selectDevice(const QSerialPortInfo &port)
 {
+    qInfo() << "WeighScaleManager::selectDevice";
+
     SerialPortManager::selectDevice(port);
 
     CypressSettings::writeSetting("weight_scale/portName", port.portName());
@@ -129,7 +130,7 @@ void WeighScaleManager::selectDevice(const QSerialPortInfo &port)
 
 void WeighScaleManager::zeroDevice()
 {
-    qDebug() << "WeighScaleManager::zeroDevice";
+    qInfo() << "WeighScaleManager::zeroDevice";
 
     m_request = QByteArray("z");
     writeDevice();
@@ -137,7 +138,7 @@ void WeighScaleManager::zeroDevice()
 
 void WeighScaleManager::readDevice()
 {
-    qDebug() << "WeighScaleManager::readDevice";
+    qInfo() << "WeighScaleManager::readDevice";
 
     QByteArray data = m_port.readAll();
     m_buffer += data;
@@ -179,7 +180,7 @@ void WeighScaleManager::readDevice()
 
 void WeighScaleManager::writeDevice()
 {
-    qDebug() << "WeighScaleManager::writeDevice";
+    qInfo() << "WeighScaleManager::writeDevice";
 
     // prepare to receive data
     //
@@ -189,21 +190,21 @@ void WeighScaleManager::writeDevice()
 
 bool WeighScaleManager::setUp()
 {
-    qDebug() << "WeighScaleManager::setUp";
+    qInfo() << "WeighScaleManager::setUp";
 
     return true;
 }
 
 bool WeighScaleManager::cleanUp()
 {
-    qDebug() << "WeighScaleManager::cleanUp";
+    qInfo() << "WeighScaleManager::cleanUp";
 
     return clearData();
 }
 
 bool WeighScaleManager::clearData()
 {
-    qDebug() << "WeighScaleManager::clearData";
+    qInfo() << "WeighScaleManager::clearData";
 
     m_test->reset();
 

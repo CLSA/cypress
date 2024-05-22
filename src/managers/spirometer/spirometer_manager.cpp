@@ -29,7 +29,7 @@ SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
     // EMR Output File OnyxOut.xml
     m_outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
 
-    qInfo() << "SpirometerManager";
+    qInfo() << "SpirometerManager::SpirometerManager";
     qInfo() << session->getSessionId();
     qInfo() << session->getBarcode();
     qInfo() << session->getInterviewer();
@@ -42,7 +42,6 @@ SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
     qInfo() << m_outFileName;
 
     m_test.reset(new SpirometerTest);
-    //m_test->setExpectedMeasurementCount(4);
 }
 
 bool SpirometerManager::isInstalled()
@@ -68,47 +67,47 @@ bool SpirometerManager::isInstalled()
     const QString outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "runnableName is not defined";
+        qInfo() << "SpirometerManager::isInstalled: runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "runnablePath is not defined";
+        qInfo() << "SpirometerManager::isInstalled: runnablePath is not defined";
         return false;
     }
 
     if (dataPath.isEmpty() || dataPath.isNull()) {
-        qInfo() << "dataPath is not defined";
+        qInfo() << "SpirometerManager::isInstalled: dataPath is not defined";
         return false;
     }
 
     if (inFileName.isEmpty() || inFileName.isNull()) {
-        qInfo() << "inFileName is not defined";
+        qInfo() << "SpirometerManager::isInstalled: inFileName is not defined";
         return false;
     }
 
     if (outFileName.isEmpty() || outFileName.isNull()) {
-        qInfo() << "outFileName is not defined";
+        qInfo() << "SpirometerManager::isInstalled: outFileName is not defined";
         return false;
     }
 
     const QFileInfo runnableInfo(runnableName);
     if (!runnableInfo.exists()) {
-        qInfo() << "exe does not exist at" << runnableName;
+        qInfo() << "SpirometerManager::isInstalled: exe does not exist at" << runnableName;
         return false;
     }
     if (!runnableInfo.isExecutable()) {
-        qInfo() << "exe is not executable at" << runnableName;
+        qInfo() << "SpirometerManager::isInstalled: exe is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo runnableDir(runnablePath);
     if (!runnableDir.isDir()) {
-        qInfo() << "directory does not exist at" << runnablePath;
+        qInfo() << "SpirometerManager::isInstalled: directory does not exist at" << runnablePath;
         return false;
     }
     if (!runnableDir.isReadable()) {
-        qInfo() << "directory is missing read permissions at" << runnableDir;
+        qInfo() << "SpirometerManager::isInstalled: directory is missing read permissions at" << runnableDir;
         return false;
     }
 
@@ -118,14 +117,6 @@ bool SpirometerManager::isInstalled()
 bool SpirometerManager::start()
 {
     qDebug() << "SpirometerManager::start";
-
-    if (m_sim) {
-        emit started(m_test);
-        emit dataChanged(m_test);
-        emit canMeasure();
-
-        return false;
-    }
 
     if (!setUp()) {
         emit error("Something went wrong during setup");
@@ -139,23 +130,7 @@ bool SpirometerManager::start()
 
 void SpirometerManager::measure()
 {
-    qDebug() << "SpirometerManager::measure";
-
-    if (m_sim) {
-        m_test->simulate(QVariantMap({
-            {"barcode", m_session->getBarcode()},
-            {"smoker", m_session->getInputData()["smoker"].toBool()},
-            {"gender", m_session->getInputData()["gender"].toString()},
-            {"height", m_session->getInputData()["height"].toDouble()},
-            {"weight", m_session->getInputData()["weight"].toDouble()},
-            {"date_of_birth", m_session->getInputData()["date_of_birth"].toString()},
-        }));
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
-        return;
-    }
+    qInfo() << "SpirometerManager::measure";
 
     if (m_process.state() != QProcess::NotRunning) {
         emit error("CardioSoft is already running");
@@ -173,7 +148,7 @@ void SpirometerManager::measure()
 
 void SpirometerManager::readOutput()
 {
-    qDebug() << "SpirometerManager::readOutput";
+    qInfo() << "SpirometerManager::readOutput";
 
     if (QProcess::NormalExit != m_process.exitStatus()) {
         emit error("Process failed to finish correctly, cannot read output");
@@ -193,6 +168,8 @@ void SpirometerManager::readOutput()
 
 void SpirometerManager::finish()
 {
+    qInfo() << "SpirometerManager::finish";
+
     auto test = qSharedPointerCast<SpirometerTest>(m_test);
 
     const int answerId = m_session->getAnswerId();
@@ -268,7 +245,7 @@ void SpirometerManager::finish()
 
 bool SpirometerManager::clearData()
 {
-    qDebug() << "SpirometerManager::clearData";
+    qInfo() << "SpirometerManager::clearData";
 
     m_test->reset();
 
@@ -279,7 +256,7 @@ bool SpirometerManager::clearData()
 
 void SpirometerManager::backupDatabases() const
 {
-    qDebug() << "SpirometerManager::backupDatabases";
+    qInfo() << "SpirometerManager::backupDatabases";
 
     QString fromFile = getEWPDbName();
     QString toFile = getEWPDbCopyName();
@@ -300,7 +277,7 @@ void SpirometerManager::backupDatabases() const
 
 void SpirometerManager::restoreDatabases() const
 {
-    qDebug() << "SpirometerManager::restoreDatabases";
+    qInfo() << "SpirometerManager::restoreDatabases";
 
     QString toFile = getEWPDbName();
     QString fromFile = getEWPDbCopyName();
@@ -325,7 +302,7 @@ void SpirometerManager::restoreDatabases() const
 
 void SpirometerManager::configureProcess()
 {
-    qDebug() << "SpirometerManager::configureProcess";
+    qInfo() << "SpirometerManager::configureProcess";
 
     connect(&m_process, &QProcess::started, this, [this]() {
         qDebug() << "SpirometerManager::process started: " << m_process.arguments().join(" ");
@@ -370,7 +347,7 @@ void SpirometerManager::configureProcess()
 
 void SpirometerManager::removeXmlFiles() const
 {
-    qDebug() << "SpirometerManager::removeXmlFiles";
+    qInfo() << "SpirometerManager::removeXmlFiles";
 
     // delete OnyxOut.xml if it exists
     //
@@ -387,7 +364,7 @@ void SpirometerManager::removeXmlFiles() const
 
 QString SpirometerManager::getOutputPdfPath() const
 {
-    qDebug() << "SpirometerManager::getOutputPdfPath";
+    qInfo() << "SpirometerManager::getOutputPdfPath";
 
     auto test = qSharedPointerCast<SpirometerTest>(m_test);
     if (test->hasMetaData("pdf_report_path"))
@@ -398,7 +375,7 @@ QString SpirometerManager::getOutputPdfPath() const
 
 bool SpirometerManager::outputPdfExists() const
 {
-    qDebug() << "SpirometerManager::outputPdfExists";
+    qInfo() << "SpirometerManager::outputPdfExists";
 
     const QString outPdfPath = getOutputPdfPath();
     if (outPdfPath.isEmpty() || outPdfPath.isNull())
@@ -410,7 +387,7 @@ bool SpirometerManager::outputPdfExists() const
 // Set up device
 bool SpirometerManager::setUp()
 {
-    qDebug() << "SpirometerManager::setUp";
+    qInfo() << "SpirometerManager::setUp";
 
     removeXmlFiles();
     backupDatabases();
@@ -422,7 +399,7 @@ bool SpirometerManager::setUp()
 
 // Clean up the device for next time
 bool SpirometerManager::cleanUp() {
-    qDebug() << "SpirometerManager::cleanUp";
+    qInfo() << "SpirometerManager::cleanUp";
 
     removeXmlFiles();
     restoreDatabases();

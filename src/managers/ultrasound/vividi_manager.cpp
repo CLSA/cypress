@@ -15,8 +15,9 @@
 VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     : ManagerBase(session)
 {
+    qInfo() << "VividiManager::VividiManager";
+
     m_test.reset(new CimtVividiTest);
-    //m_test->setExpectedMeasurementCount(10);
 
     m_runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
@@ -47,6 +48,8 @@ VividiManager::~VividiManager()
 
 void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
+    qInfo() << "VividiManager::dicomFilesReceived";
+
     bool foundInvalidParticipant = false;
     QString invalidId;
 
@@ -140,7 +143,7 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
 bool VividiManager::isInstalled()
 {
-    qDebug() << "UltrasoundManager::isInstalled";
+    qInfo() << "VividiManager::isInstalled";
 
     if (CypressSettings::isSimMode())
         return true;
@@ -156,66 +159,66 @@ bool VividiManager::isInstalled()
     const QString ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "runnableName is not defined";
+        qInfo() << "VividiManager::isInstalled: runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qDebug() << "runnablePath is not defined";
+        qInfo() << "VividiManager::isInstalled: runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        qDebug() << "aeTitle is not defined";
+        qInfo() << "VividiManager::isInstalled: aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
-        qDebug() << "host is not defined";
+        qInfo() << "VividiManager::isInstalled: host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
-        qDebug() << "port is not defined";
+        qInfo() << "VividiManager::isInstalled: port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qDebug() << "storageDirPath is not defined";
+        qInfo() << "VividiManager::isInstalled: storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qDebug() << "logConfigPath is not defined";
+        qInfo() << "VividiManager::isInstalled: logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qDebug() << "ascConfigPath is not defined";
+        qInfo() << "VividiManager::isInstalled: ascConfigPath is not defined";
         return false;
     }
 
     const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
-        qDebug() << "runnableName does not exist at" << runnableName;
+        qInfo() << "VividiManager::isInstalled: runnableName does not exist at" << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
-        qDebug() << "runnableName is not executable at" << runnableName;
+        qInfo() << "VividiManager::isInstalled: runnableName is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
-        qDebug() << "working directory does not exist at" << workingDir;
+        qInfo() << "VividiManager::isInstalled: working directory does not exist at" << workingDir;
         return false;
     }
     if (!workingDir.isDir()) {
-        qDebug() << "working directory is not writable at" << workingDir;
+        qInfo() << "VividiManager::isInstalled: working directory is not writable at" << workingDir;
         return false;
     }
     if (!workingDir.isWritable()) {
-        qDebug() << "working directory is not writable at" << workingDir;
+        qInfo() << "VividiManager::isInstalled: working directory is not writable at" << workingDir;
         return false;
     }
 
@@ -224,6 +227,8 @@ bool VividiManager::isInstalled()
 
 bool VividiManager::start()
 {
+    qInfo() << "VividiManager::start";
+
     m_dicomServer->start();
 
     emit started(m_test);
@@ -235,6 +240,8 @@ bool VividiManager::start()
 
 void VividiManager::measure()
 {
+    qInfo() << "VividiManager::measure";
+
     if (m_test->isValid())
         emit canFinish();
     else
@@ -243,8 +250,7 @@ void VividiManager::measure()
 
 void VividiManager::finish()
 {
-    qDebug() << "VividiManager::finish";
-    qDebug() << m_test->toJsonObject();
+    qInfo() << "VividiManager::finish";
 
     if (!m_test->isValid())
     {
@@ -305,13 +311,13 @@ void VividiManager::finish()
 
 bool VividiManager::setUp()
 {
-    qDebug() << "VividiManager::cleanUp";
+    qInfo() << "VividiManager::setUp";
     return true;
 }
 
 bool VividiManager::clearData()
 {
-    qDebug() << "VividiManager::clearData";
+    qInfo() << "VividiManager::clearData";
 
     m_test->reset();
 
@@ -324,7 +330,8 @@ bool VividiManager::clearData()
 
 bool VividiManager::cleanUp()
 {
-    qDebug() << "VividiManager::cleanUp";
+    qInfo() << "VividiManager::cleanUp";
+
     return clearData();
 }
 

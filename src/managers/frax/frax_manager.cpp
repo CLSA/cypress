@@ -41,7 +41,7 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     m_inputKeyList << "alcohol";
     m_inputKeyList << "femoral_neck_bmd";
 
-    qInfo() << "FraxManager";
+    qInfo() << "FraxManager::FraxManager";
     qInfo() << session->getSessionId();
     qInfo() << session->getBarcode();
     qInfo() << session->getInterviewer();
@@ -50,6 +50,8 @@ FraxManager::FraxManager(QSharedPointer<FraxSession> session)
 
 bool FraxManager::isInstalled()
 {
+    qInfo() << "FraxManager::isInstalled";
+
     if (CypressSettings::isSimMode())
         return true;
 
@@ -65,37 +67,37 @@ bool FraxManager::isInstalled()
     const QString type_code = CypressSettings::readSetting("frax/typeCode").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "runnableName is not defined";
+        qInfo() << "FraxManager::isInstalled: runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "runnablePath is not defined";
+        qInfo() << "FraxManager::isInstalled: runnablePath is not defined";
         return false;
     }
 
     if (outputFilePath.isNull() || outputFilePath.isEmpty()) {
-        qInfo() << "outputFilePath is not defined";
+        qInfo() << "FraxManager::isInstalled: outputFilePath is not defined";
         return false;
     }
 
     if (inputFilePath.isNull() || inputFilePath.isEmpty()) {
-        qInfo() << "inputFilePath is not defined";
+        qInfo() << "FraxManager::isInstalled: inputFilePath is not defined";
         return false;
     }
 
     if (temporaryFilePath.isNull() || temporaryFilePath.isEmpty()) {
-        qInfo() << "temporaryFile is not defined";
+        qInfo() << "FraxManager::isInstalled: temporaryFile is not defined";
         return false;
     }
 
     if (country_code.isNull() || country_code.isEmpty()) {
-        qInfo() << "countryCode is not defined";
+        qInfo() << "FraxManager::isInstalled: countryCode is not defined";
         return false;
     }
 
     if (type_code.isNull() || type_code.isNull()) {
-        qInfo() << "type_code is not defined";
+        qInfo() << "FraxManager::isInstalled: type_code is not defined";
         return false;
     }
 
@@ -103,17 +105,17 @@ bool FraxManager::isInstalled()
     const QDir workingDirectory(runnablePath);
 
     if (!info.exists()) {
-        qInfo() << "executable does not exist at " << runnableName;
+        qInfo() << "FraxManager::isInstalled: executable does not exist at " << runnableName;
         return false;
     }
 
     if (!info.isExecutable()) {
-        qInfo() << "executable can not be run at " << runnableName;
+        qInfo() << "FraxManager::isInstalled: executable can not be run at " << runnableName;
         return false;
     }
 
     if (!workingDirectory.exists()) {
-        qInfo() << "working directory does not exist at "
+        qInfo() << "FraxManager::isInstalled: working directory does not exist at "
                      << runnablePath;
         return false;
     }
@@ -139,38 +141,6 @@ void FraxManager::measure()
     qDebug() << "FraxManager::measure";
 
     clearData();
-
-    if (m_sim) {
-        QVariantMap map;
-        QJsonObject inputData = m_session->getInputData();
-
-        map.insert("type", 						m_type_code);
-        map.insert("country_code", 				m_country_code);
-
-        map.insert("age", 						inputData.value("age"));
-        map.insert("sex", 						inputData.value("sex"));
-        map.insert("bmi", 						inputData.value("bmi"));
-        map.insert("previous_fracture", 		inputData.value("previous_fracture"));
-        map.insert("parent_hip_fracture", 		inputData.value("parent_hip_fracture"));
-        map.insert("current_smoker", 			inputData.value("current_smoker"));
-        map.insert("glucocorticoid", 			inputData.value("glucocorticoid"));
-        map.insert("rheumatoid_arthritis", 		inputData.value("rheumatoid_arthritis"));
-        map.insert("secondary_osteoporosis", 	inputData.value("secondary_osteoporosis"));
-        map.insert("t_score", 					inputData.value("t_score"));
-        map.insert("z_score", 					inputData.value("z_score"));
-        map.insert("alcohol", 					inputData.value("alcohol"));
-        map.insert("birth_date", 				inputData.value("birth_date"));
-        map.insert("interview_date", 			inputData.value("interview_date"));
-        map.insert("height", 					inputData.value("height"));
-        map.insert("height2", 					inputData.value("height2"));
-
-        m_test->simulate(map);
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
-        return;
-    }
 
     if (m_process.state() != QProcess::NotRunning) {
         QMessageBox::critical(nullptr, "Error", "Program is already running");

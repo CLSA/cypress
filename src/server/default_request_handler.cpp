@@ -39,11 +39,6 @@ QJsonObject DefaultRequestHandler::getRequestData(Poco::Net::HTTPServerRequest &
 
     QString qRequestData = QString::fromStdString(requestData);
 
-    qDebug() << "URI" << request.getURI().c_str();
-    qDebug() << "Origin" << request.get("Origin", "N/A").c_str();
-    qDebug() << "Host" << request.get("Host", "N/A").c_str();
-    qDebug() << "Content-Type" << request.get("Content-Type", "N/A").c_str();
-
     QJsonDocument doc = QJsonDocument::fromJson(qRequestData.toUtf8());
     QJsonObject json = doc.object();
 

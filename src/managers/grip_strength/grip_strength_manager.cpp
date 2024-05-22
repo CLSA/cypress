@@ -23,11 +23,21 @@ GripStrengthManager::GripStrengthManager(QSharedPointer<GripStrengthSession> ses
     m_backupPath = CypressSettings::readSetting("grip_strength/backupPath").toString();
     m_databasePath = CypressSettings::readSetting("grip_strength/databasePath").toString();
 
+    qInfo() << "GripStrengthManager::GripStrengthManager";
+    qInfo() << "runnableName:" 	<< m_runnableName;
+    qInfo() << "runnablePath:" 	<< m_runnablePath;
+    qInfo() << "gripTestDBPath:" << m_gripTestDBPath;
+    qInfo() << "gripTestDataDBPath:" << m_gripTestDBPath;
+
+    qInfo() << "sessionId:" 	<< session->getSessionId();
+    qInfo() << "barcode:" 		<< session->getBarcode();
+    qInfo() << "interviewer:" 	<< session->getInterviewer();
+
     m_test.reset(new GripStrengthTest);
 }
 
 bool GripStrengthManager::isInstalled() {
-    qDebug() << "GripStrengthManager::isInstalled";
+    qInfo() << "GripStrengthManager::isInstalled";
     if (CypressSettings::isSimMode())
         return true;
 
@@ -41,32 +51,32 @@ bool GripStrengthManager::isInstalled() {
     const QString backupPath = CypressSettings::readSetting("grip_strength/backupPath").toString();
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
-        qDebug() << "runnableName is not defined";
+        qInfo() << "GripStrengthManager::isInstalled: runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qDebug() << "runnablePath is not defined";
+        qInfo() << "GripStrengthManager::isInstalled: runnablePath is not defined";
         return false;
     }
 
     if (databasePath.isEmpty() || databasePath.isNull()) {
-        qDebug() << "databasePath is not defined";
+        qInfo() << "GripStrengthManager::isInstalled: databasePath is not defined";
         return false;
     }
 
     if (gripTestDBPath.isEmpty() || gripTestDBPath.isNull()) {
-        qDebug() << "gripTestDBPath is not defined";
+        qInfo() << "GripStrengthManager::isInstalled: gripTestDBPath is not defined";
         return false;
     }
 
     if (gripTestDataDBPath.isEmpty() || gripTestDataDBPath.isNull()) {
-        qDebug() << "gripTestDataDBPath is not defined";
+        qInfo() << "GripStrengthManager::isInstalled: gripTestDataDBPath is not defined";
         return false;
     }
 
     if (backupPath.isEmpty() || backupPath.isNull()) {
-        qDebug() << "backupPath is not defined";
+        qInfo() << "GripStrengthManager::isInstalled: backupPath is not defined";
         return false;
     }
 
@@ -74,12 +84,12 @@ bool GripStrengthManager::isInstalled() {
     //
     const QFileInfo executable(runnableName);
     if (!executable.exists()) {
-        qDebug() << "file does not exist at " << runnableName;
+        qInfo() << "GripStrengthManager::isInstalled: file does not exist at " << runnableName;
         return false;
     }
 
     if (!executable.isExecutable()) {
-        qDebug() << "file is not executable at " << runnableName;
+        qInfo() << "GripStrengthManager::isInstalled: file is not executable at " << runnableName;
         return false;
     }
 
@@ -88,10 +98,7 @@ bool GripStrengthManager::isInstalled() {
 
 
 bool GripStrengthManager::start() {
-    qDebug() << "GripStrengthManager::start";
-
-    if (m_sim)
-        return true;
+    qInfo() << "GripStrengthManager::start";
 
     if (!setUp())
         return false;
@@ -102,7 +109,7 @@ bool GripStrengthManager::start() {
 }
 
 void GripStrengthManager::readOutput() {
-    qDebug() << "GripStrengthManager::readOutput";
+    qInfo() << "GripStrengthManager::readOutput";
 
     if (QProcess::NormalExit != m_process.exitStatus()) {
         emit error("Process failed to finish correctly, cannot read output");
@@ -197,12 +204,6 @@ void GripStrengthManager::readOutput() {
 void GripStrengthManager::measure() {
     qDebug() << "GripStrengthManager::measure";
 
-    if (m_sim) {
-        clearData();
-        m_test->simulate();
-        return;
-    }
-
     if (m_process.state() != QProcess::NotRunning) {
         emit error("Program is already running");
         return;
@@ -217,7 +218,7 @@ void GripStrengthManager::measure() {
 }
 
 bool GripStrengthManager::setUp() {
-    qDebug() << "GripStrengthManager::setUp";
+    qInfo() << "GripStrengthManager::setUp";
 
     if (!backupData())
         return false;
@@ -228,7 +229,7 @@ bool GripStrengthManager::setUp() {
 }
 
 bool GripStrengthManager::backupData() {
-    qDebug() << "GripStrengthManager::backupData";
+    qInfo() << "GripStrengthManager::backupData";
 
     if (!FileUtils::copyDirectory(QDir(m_databasePath), QDir(m_backupPath), true, false)) {
         qDebug() << "failed to backup data";
@@ -239,10 +240,10 @@ bool GripStrengthManager::backupData() {
 }
 
 bool GripStrengthManager::restoreData() {
-    qDebug() << "GripStrengthManager::restoreData";
+    qInfo() << "GripStrengthManager::restoreData";
 
     if (!FileUtils::copyDirectory(QDir(m_backupPath), QDir(m_databasePath), true, false)) {
-        qDebug() << "failed to restore data";
+        qWarning() << "failed to restore data";
         return false;
     }
 
@@ -251,7 +252,7 @@ bool GripStrengthManager::restoreData() {
 
 
 bool GripStrengthManager::cleanUp() {
-    qDebug() << "GripStrengthManager::cleanUp";
+    qInfo() << "GripStrengthManager::cleanUp";
 
     if (QProcess::NotRunning != m_process.state())
         m_process.close();
@@ -263,7 +264,7 @@ bool GripStrengthManager::cleanUp() {
 }
 
 void GripStrengthManager::configureProcess() {
-    qDebug() << "GripStrengthManager::configureProcess" << m_runnableName << m_runnablePath;
+    qInfo() << "GripStrengthManager::configureProcess" << m_runnableName << m_runnablePath;
 
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
@@ -273,7 +274,7 @@ void GripStrengthManager::configureProcess() {
     //
     connect(&m_process, &QProcess::started,
         this, [this]() {
-            qDebug() << "GripStrengthManager::process started: " << m_process.arguments().join(" ");
+            qInfo() << "GripStrengthManager::process started: " << m_process.arguments().join(" ");
         });
 
     // error occured with grip strength process
@@ -281,13 +282,13 @@ void GripStrengthManager::configureProcess() {
         this, [=](QProcess::ProcessError error)
         {
             QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-            qDebug() << "GripStrengthManager::process error: process error occured: " << s.join(" ").toLower();
+            qWarning() << "GripStrengthManager::process error: process error occured: " << s.join(" ").toLower();
         });
 
     connect(&m_process, &QProcess::stateChanged,
     this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
-        qDebug() << "GripStrengthManager::process state: " << s.join(" ").toLower();
+        qInfo() << "GripStrengthManager::process state: " << s.join(" ").toLower();
 
     });
 
@@ -297,7 +298,7 @@ void GripStrengthManager::configureProcess() {
 }
 
 bool GripStrengthManager::clearData() {
-    qDebug() << "GripStrengthManager::clearData";
+    qInfo() << "GripStrengthManager::clearData";
     m_test->reset();
     return true;
 }

@@ -74,7 +74,6 @@ protected:
     QList<QString> m_inputKeyList;
 
     bool m_debug { true };
-    bool m_sim { true };
 
     bool manualEntryMode { false };
 

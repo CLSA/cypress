@@ -173,17 +173,6 @@ void AudiometerManager::selectDevice(const QSerialPortInfo &port)
 void AudiometerManager::measure()
 {
     qInfo() << "AudiometerManager::measure";
-
-    if (m_sim)
-    {
-        m_test->simulate(QVariantMap({{"barcode", m_session->getBarcode()}}));
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
-        return;
-    }
-
     static const char cmd[] = { 0x05, '4', 0x0d };
 
     m_request = QByteArray::fromRawData(cmd, 3);

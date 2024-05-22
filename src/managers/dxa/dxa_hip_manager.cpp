@@ -76,110 +76,110 @@ bool DxaHipManager::isInstalled() {
     const QString refscanDbPath  = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "runnableName is not defined";
+        qInfo() << "DxaHipManager::isInstalled: runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qDebug() << "runnablePath is not defined";
+        qInfo() << "DxaHipManager::isInstalled: runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        qDebug() << "aeTitle is not defined";
+        qInfo() << "DxaHipManager::isInstalled: aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
-        qDebug() << "host is not defined";
+        qInfo() << "DxaHipManager::isInstalled: host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
-        qDebug() << "port is not defined";
+        qInfo() << "DxaHipManager::isInstalled: port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qDebug() << "storageDirPath is not defined";
+        qInfo() << "DxaHipManager::isInstalled: storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qDebug() << "logConfigPath is not defined";
+        qInfo() << "DxaHipManager::isInstalled: logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qDebug() << "ascConfigPath is not defined";
+        qInfo() << "DxaHipManager::isInstalled: ascConfigPath is not defined";
         return false;
     }
 
     if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
-        qDebug() << "patscanDbPath is not defined";
+        qInfo() << "DxaHipManager::isInstalled: patscanDbPath is not defined";
         return false;
     }
 
     const QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
-        qDebug() << "patscan file does not exist at" << patscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: patscan file does not exist at" << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isFile()) {
-        qDebug() << "patscan file is not a file at" << patscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: patscan file is not a file at" << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isReadable()) {
-        qDebug() << "patscan file is not readable at" << patscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: patscan file is not readable at" << patscanDbPath;
         return false;
     }
 
     if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
-        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo refscanFile(refscanDbPath);
     if (!refscanFile.exists()) {
-        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
 
     if (!refscanFile.isFile()) {
-        qDebug() << "refscanDbPath is not a file at" << refscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not a file at" << refscanDbPath;
         return false;
     }
 
     if (!refscanFile.isReadable()) {
-        qDebug() << "refscanDbPath is not readable at" << refscanDbPath;
+        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not readable at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
-        qDebug() << "runnableName does not exist at" << runnableName;
+        qInfo() << "DxaHipManager::isInstalled: runnableName does not exist at" << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
-        qDebug() << "runnableName is not executable at" << runnableName;
+        qInfo() << "DxaHipManager::isInstalled: runnableName is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
-        qDebug() << "working directory does not exist at" << workingDir;
+        qInfo() << "DxaHipManager::isInstalled: working directory does not exist at" << workingDir;
         return false;
     }
 
     if (!workingDir.isDir()) {
-        qDebug() << "working directory is not writable at" << workingDir;
+        qInfo() << "DxaHipManager::isInstalled: working directory is not writable at" << workingDir;
         return false;
     }
 
     if (!workingDir.isWritable()) {
-        qDebug() << "working directory is not writable at" << workingDir;
+        qInfo() << "DxaHipManager::isInstalled: working directory is not writable at" << workingDir;
         return false;
     }
 
@@ -242,17 +242,6 @@ void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 //
 void DxaHipManager::measure()
 {
-    //emit transfer();
-    if (m_sim) {
-        m_test->reset();
-        m_test->simulate();
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
-        return;
-    }
-
     auto test = qSharedPointerCast<DxaHipTest>(m_test);
     if (!test->hasAllNeededFiles()) {
         QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");

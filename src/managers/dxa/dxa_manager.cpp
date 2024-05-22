@@ -44,7 +44,7 @@ DXAManager::DXAManager(QSharedPointer<DXASession> session)
 
     WindowsUtil::killProcessByName(L"storescp.exe");
 
-    qInfo() << "DXAManager";
+    qInfo() << "DXAManager::DXAManager";
     qInfo() << session->getSessionId();
     qInfo() << session->getBarcode();
     qInfo() << session->getInterviewer();
@@ -57,7 +57,6 @@ DXAManager::~DXAManager()
 }
 
 bool DXAManager::isInstalled() {
-    qDebug() << "runnableName is not defined";
     if (CypressSettings::isSimMode())
         return true;
 
@@ -75,106 +74,106 @@ bool DXAManager::isInstalled() {
     const QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "runnableName is not defined";
+        qInfo() << "DXAManager::isInstalled: runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qDebug() << "runnablePath is not defined";
+        qInfo() << "DXAManager::isInstalled: runnablePath is not defined";
         return false;
     }
 
     if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        qDebug() << "aeTitle is not defined";
+        qInfo() << "DXAManager::isInstalled: aeTitle is not defined";
         return false;
     }
 
     if (host.isNull() || host.isEmpty()) {
-        qDebug() << "host is not defined";
+        qInfo() << "DXAManager::isInstalled: host is not defined";
         return false;
     }
 
     if (port.isNull() || port.isEmpty()) {
-        qDebug() << "port is not defined";
+        qInfo() << "DXAManager::isInstalled: port is not defined";
         return false;
     }
 
     if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qDebug() << "storageDirPath is not defined";
+        qInfo() << "DXAManager::isInstalled: storageDirPath is not defined";
         return false;
     }
 
     if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qDebug() << "logConfigPath is not defined";
+        qInfo() << "DXAManager::isInstalled: logConfigPath is not defined";
         return false;
     }
 
     if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qDebug() << "ascConfigPath is not defined";
+        qInfo() << "DXAManager::isInstalled: ascConfigPath is not defined";
         return false;
     }
 
     if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
-        qDebug() << "patscanDbPath is not defined";
+        qInfo() << "DXAManager::isInstalled: patscanDbPath is not defined";
         return false;
     }
 
     const QFileInfo patscanFile(patscanDbPath);
     if (!patscanFile.exists()) {
-        qDebug() << "patscan file does not exist: " << patscanDbPath;
+        qInfo() << "DXAManager::isInstalled: patscan file does not exist: " << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isFile()) {
-        qDebug() << "patscan file is not a file at" << patscanDbPath;
+        qInfo() << "DXAManager::isInstalled: patscan file is not a file at" << patscanDbPath;
         return false;
     }
 
     if (!patscanFile.isReadable()) {
-        qDebug() << "patscan file is not readable at" << patscanDbPath;
+        qInfo() << "DXAManager::isInstalled: patscan file is not readable at" << patscanDbPath;
         return false;
     }
 
     if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
-        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
+        qInfo() << "DXAManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo refscanFile(refscanDbPath);
     if (!refscanFile.exists()) {
-        qDebug() << "refscanDbPath is not defined at" << refscanDbPath;
+        qInfo() << "DXAManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
         return false;
     }
     if (!refscanFile.isFile()) {
-        qDebug() << "refscanDbPath is not a file at" << refscanDbPath;
+        qInfo() << "DXAManager::isInstalled: refscanDbPath is not a file at" << refscanDbPath;
         return false;
     }
     if (!refscanFile.isReadable()) {
-        qDebug() << "refscanDbPath is not readable at" << refscanDbPath;
+        qInfo() << "DXAManager::isInstalled: refscanDbPath is not readable at" << refscanDbPath;
         return false;
     }
 
     const QFileInfo exeInfo(runnableName);
     if (!exeInfo.exists()) {
-        qDebug() << "runnableName does not exist at" << runnableName;
+        qInfo() << "DXAManager::isInstalled: runnableName does not exist at" << runnableName;
         return false;
     }
     if (!exeInfo.isExecutable()) {
-        qDebug() << "runnableName is not executable at" << runnableName;
+        qInfo() << "DXAManager::isInstalled: runnableName is not executable at" << runnableName;
         return false;
     }
 
     const QFileInfo workingDir(runnablePath);
     if (!workingDir.exists()) {
-        qDebug() << "working directory does not exist at" << workingDir;
+        qInfo() << "DXAManager::isInstalled: working directory does not exist at" << workingDir;
         return false;
     }
     if (!workingDir.isDir()) {
-        qDebug() << "working directory is not writable at" << workingDir;
+        qInfo() << "DXAManager::isInstalled: working directory is not writable at" << workingDir;
         return false;
     }
     if (!workingDir.isWritable()) {
-        qDebug() << "working directory is not writable at" << workingDir;
+        qInfo() << "DXAManager::isInstalled: working directory is not writable at" << workingDir;
         return false;
     }
 
@@ -233,16 +232,6 @@ void DXAManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 //
 void DXAManager::measure()
 {
-    if (m_sim) {
-        m_test->reset();
-        m_test->simulate();
-
-        emit dataChanged(m_test);
-        emit canFinish();
-
-        return;
-    }
-
     auto test = qSharedPointerCast<DXATest>(m_test);
     if (!test->hasAllNeededFiles()) {
         QMessageBox::warning(nullptr, "Warning", "Have not received all images from Hologic Apex");

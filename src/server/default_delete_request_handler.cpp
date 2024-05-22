@@ -1,10 +1,5 @@
 #include "default_delete_request_handler.h"
-
 #include "cypress_application.h"
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <regex>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -16,6 +11,10 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+
+#include <string>
+#include <iostream>
+#include <regex>
 
 void DefaultDeleteSessionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {

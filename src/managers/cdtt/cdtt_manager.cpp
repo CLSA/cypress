@@ -30,18 +30,19 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     QDir outputDir(m_outputPath);
     m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
 
-    qDebug() << "CDTTManager";
+    qInfo() << "CDTTManager::CDTTManager";
+    qInfo() << "jre:" 			<< m_jre;
+    qInfo() << "runnableName:" 	<< m_runnableName;
+    qInfo() << "runnablePath:" 	<< m_runnablePath;
+    qInfo() << "outputPath:"	<< m_outputPath;
 
-    qDebug() << m_jre;
-    qDebug() << m_runnableName;
-    qDebug() << m_runnablePath;
-    qDebug() << m_outputPath;
+    qInfo() << "settingsPath:"  << m_settingsFilePath;
+    qInfo() << "outputPath:" 	<< m_outputFile;
 
-    qDebug() << session->getSessionId();
-    qDebug() << session->getBarcode();
-    qDebug() << session->getInterviewer();
-
-    qDebug() << session->getInputData();
+    qInfo() << "sessionId:" 	<< session->getSessionId();
+    qInfo() << "barcode:" 		<< session->getBarcode();
+    qInfo() << "interviewer:" 	<< session->getInterviewer();
+    qInfo() << "language:" 		<< session->getLanguage();
 
     m_test.reset(new CDTTTest);
     m_test->setMinimumMeasurementCount(1);
@@ -54,7 +55,7 @@ CDTTManager::~CDTTManager()
 
 bool CDTTManager::isInstalled()
 {
-    qDebug() << "CDTTManager::isInstalled";
+    qInfo() << "CDTTManager::isInstalled";
 
     const QString jre = CypressSettings::readSetting("cdtt/jre").toString();
     const QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
@@ -63,56 +64,56 @@ bool CDTTManager::isInstalled()
     const QString settingsFilePath = CypressSettings::readSetting("cdtt/settingsFilePath").toString();
 
     if (jre.isNull() || jre.isEmpty()) {
-        qDebug() << "jre is undefined";
+        qInfo() << "CDTTManager::isInstalled: jre is undefined";
         return false;
     }
 
     if (runnableName.isNull() || runnableName.isEmpty()) {
-        qDebug() << "runnableName is undefined";
+        qInfo() << "CDTTManager::isInstalled: runnableName is undefined";
         return false;
     }
 
     if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qDebug() << "runnablePath is undefined";
+        qInfo() << "CDTTManager::isInstalled: runnablePath is undefined";
         return false;
     }
 
     if (outputPath.isNull() || outputPath.isEmpty()) {
-        qDebug() << "outputPath is undefined";
+        qInfo() << "CDTTManager::isInstalled: outputPath is undefined";
         return false;
     }
 
     if (settingsFilePath.isNull() || settingsFilePath.isEmpty()) {
-        qDebug() << "settingsFilePath is undefined";
+        qInfo() << "CDTTManager::isInstalled: settingsFilePath is undefined";
         return false;
     }
 
     const QFileInfo jreInfo(jre);
     if (!jreInfo.exists()) {
-        qDebug() << "JRE does not exist at " << jre;
+        qInfo() << "CDTTManager::isInstalled: JRE does not exist at " << jre;
         return false;
     }
 
     if (!jreInfo.isExecutable()) {
-        qDebug() << "JRE is not executable at " << jre;
+        qInfo() << "CDTTManager::isInstalled: JRE is not executable at " << jre;
         return false;
     }
 
     const QFileInfo runnableNameInfo(runnableName);
     if (!runnableNameInfo.isFile()) {
-        qDebug() << "runnableName does not exist";
+        qInfo() << "CDTTManager::isInstalled: runnableName does not exist";
         return false;
     }
 
     const QDir runnableDir(runnablePath);
     if (!runnableDir.exists()) {
-        qDebug() << "runnablePath does not exist";
+        qInfo() << "CDTTManager::isInstalled: runnablePath does not exist";
         return false;
     }
 
     const QDir outputDir(outputPath);
     if (!outputDir.exists()) {
-        qDebug() << "output dir does not exist";
+        qInfo() << "CDTTManager::isInstalled: output dir does not exist";
         return false;
     }
 
@@ -224,7 +225,7 @@ void CDTTManager::configureProcess()
 
 void CDTTManager::readOutput()
 {
-    qDebug() << "CDTTManager::readOutput";
+    qInfo() << "CDTTManager::readOutput";
 
     if(QProcess::NormalExit != m_process.exitStatus()) {
         emit error("CDTT failed to finish correctly, cannot read data.");
@@ -239,7 +240,7 @@ void CDTTManager::readOutput()
         emit error("Error: cannot find the output .xlsx file");
     }
 
-    qDebug() << "found output xlsx file " << fileName;
+    qInfo() << "CDTTManager::readOutput:" << fileName;
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName(
@@ -252,7 +253,7 @@ void CDTTManager::readOutput()
 
 
     if (!db.open()) {
-        qDebug() << "cannot find valid file";
+        qInfo() << "CDTTManager::readOutput: cannot find valid file";
         emit error("Error: cannot find valid file");
         return;
     }
@@ -265,27 +266,22 @@ void CDTTManager::readOutput()
 
 
 void CDTTManager::finish() {
-    qDebug() << "CDTTManager::finish";
+    qInfo() << "CDTTManager::finish";
 
     const int answer_id = m_session->getAnswerId();
     const QString pineOrigin = m_session->getOrigin();
     const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
-    qDebug() << pineOrigin;
-
-    //const QString host = CypressSettings::getPineHost();
-    //const QString endpoint = CypressSettings::getPineEndpoint();
-
     QDir dir(m_outputPath);
     if (!dir.exists()) {
-        qDebug() << "directory does not exist: " << m_outputPath;
+        qInfo() << "CDTTManager::finish: directory does not exist -" << m_outputPath;
         emit error("Output directory does not exist. Could not save measurements.");
     }
 
     QString outputFilePath = dir.absoluteFilePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
     QFileInfo excelFile(outputFilePath);
     if (!excelFile.exists()) {
-        qDebug() << "file does not exist: " << excelFile.absoluteFilePath();
+        qInfo() << "CDTTManager::finish: file does not exist - " << excelFile.absoluteFilePath();
         emit error("Output excel file does not exist. Could not save measurements.");
         return;
     }
@@ -328,10 +324,12 @@ void CDTTManager::finish() {
 
     cleanUp();
 
-    if (ok)
+    if (ok) {
         emit success("Save successful. You may close this window.");
-    else
+    }
+    else {
         emit error("Something went wrong");
+    }
 }
 
 
