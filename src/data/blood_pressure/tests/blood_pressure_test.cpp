@@ -76,19 +76,36 @@ bool BloodPressureTest::isValid() const
 
 void BloodPressureTest::updateAverage()
 {
-    if (getMeasurementCount() <= 0) {
-        reset();
+    const int n = getMeasurementCount();
+
+    if (n <= 1) {
+        removeMetaData("first_systolic");
+        removeMetaData("first_diastolic");
+        removeMetaData("first_pulse");
+        removeMetaData("first_start_time");
+        removeMetaData("first_end_time");
+
+        removeMetaData("avg_count");
+        removeMetaData("avg_systolic");
+        removeMetaData("avg_diastolic");
+        removeMetaData("avg_pulse");
+
+        removeMetaData("total_avg_systolic");
+        removeMetaData("total_avg_diastolic");
+        removeMetaData("total_avg_pulse");
+        removeMetaData("total_avg_count");
+
         return;
     }
 
     const auto first = *m_measurementList.constFirst();
+
     addMetaData("first_systolic",   first.getAttribute("systolic"));
     addMetaData("first_diastolic",  first.getAttribute("diastolic"));
     addMetaData("first_pulse",      first.getAttribute("pulse"));
     addMetaData("first_start_time", first.getAttribute("start_time"));
     addMetaData("first_end_time",   first.getAttribute("end_time"));
 
-    const int n = getMeasurementCount();
 
     int validMeasures = 0;
     int systolicTotal = 0;

@@ -231,7 +231,7 @@ void DxaHipManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
     int filesReceived = test->fromDicomFiles(dicomFiles, *session);
 
-    emit status(QString("Received %1 files").arg(filesReceived));
+    emit status(QString("Received %1 file(s)").arg(filesReceived));
 
     emit dataChanged(m_test);
 
@@ -277,8 +277,7 @@ void DxaHipManager::measure()
         { "ETHNICITY", test->getMetaData("ETHNICITY").toString() }
     };
 
-    test->leftHipMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
-    test->rightHipMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
+    test->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
 
     m_patscanDb.close();
     m_referenceDb.close();
@@ -291,71 +290,50 @@ void DxaHipManager::measure()
 // data has been retrieved and processed by any upstream classes
 //
 void DxaHipManager::finish() {
-    bool ok = false;
-
     auto test = qSharedPointerCast<DxaHipTest>(m_test);
+
     const int answer_id = m_session->getAnswerId();
+    const QString barcode = m_session->getBarcode();
+
     const QString pineOrigin = m_session->getOrigin();
     const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
-    // Hip
-    QString hip_1_file_name = "L_HIP_DICOM.dcm";
-    QString hip_2_file_name = "R_HIP_DICOM.dcm";
+    QJsonObject files {};
+
+    foreach (auto measure, test->getMeasurements()) {
+        const auto dxaMeasure = qSharedPointerDynamicCast<DXAMeasurement>(measure);
+
+        const QString name = dxaMeasure->getAttribute("NAME").toString();
+        const QString path = dxaMeasure->dicomFile.absFilePath;
+        const QString fileName = dxaMeasure->dicomFile.fileName;
+
+        if (!path.isEmpty()) {
+            files.insert(name + "_dcm", dxaMeasure->dicomFile.size);
+
+            const QByteArray data = FileUtils::readFile(path);
+
+            bool ok = NetworkUtils::sendHTTPSRequest(
+                "PATCH", (answerUrl + "?filename=" + fileName).toStdString(),
+                "application/octet-stream",
+                data
+            );
+
+            if (!ok) {
+                qDebug() << "error transmitting file: " << fileName;
+                return;
+            }
+        }
+    }
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
-    QJsonObject files = {};
 
     if (!testJson.value("results").toObject().value("hip_l").toObject().isEmpty()) {
-        files.insert(hip_1_file_name.replace(".", "_"),
-                     FileUtils::getHumanReadableFileSize(
-                         test->leftHipMeasurement->m_hipDicomFile.absFilePath));
-    }
-
-    if (!testJson.value("results").toObject().value("hip_r").toObject().isEmpty()) {
-        files.insert(hip_2_file_name.replace(".", "_"),
-                     FileUtils::getHumanReadableFileSize(
-                         test->rightHipMeasurement->m_hipDicomFile.absFilePath));
-    }
-
-    if (!testJson.value("results").toObject().value("hip_l").toObject().isEmpty()) {
-        const QByteArray leftHipDicomFile = FileUtils::readFile(
-            test->leftHipMeasurement->m_hipDicomFile.absFilePath);
-
-        ok = NetworkUtils::sendHTTPSRequest(
-            Poco::Net::HTTPRequest::HTTP_PATCH,
-            answerUrl.toStdString() + "?filename=" + hip_1_file_name.replace("_dcm", ".dcm").toStdString(),
-            "application/octet-stream",
-            leftHipDicomFile
-        );
-
         metadata.insert("femoral_neck_bmd", testJson.value("results").toObject().value("hip_l").toObject().value("neck_bmd").toDouble());
-
-        if (!ok) {
-            qDebug() << "PATCH dicom failed";
-            return;
-        }
     }
-
-    if (!testJson.value("results").toObject().value("hip_r").toObject().isEmpty()) {
-        const QByteArray rightHipDicomFile = FileUtils::readFile(
-            test->rightHipMeasurement->m_hipDicomFile.absFilePath);
-
-        ok = NetworkUtils::sendHTTPSRequest(
-            Poco::Net::HTTPRequest::HTTP_PATCH,
-            answerUrl.toStdString()
-                + "?filename=" + hip_2_file_name.replace("_dcm", ".dcm").toStdString(),
-            "application/octet-stream",
-            rightHipDicomFile
-        );
-
+    else if (!testJson.value("results").toObject().value("hip_r").toObject().isEmpty()) {
         metadata.insert("femoral_neck_bmd", testJson.value("results").toObject().value("hip_r").toObject().value("neck_bmd").toDouble());
-
-        if (!ok) {
-            qDebug() << "PATCH dicom failed";
-            return;
-        }
     }
 
     testJson.insert("session", sessionObj);
@@ -368,20 +346,20 @@ void DxaHipManager::finish() {
     const QJsonDocument jsonDoc(responseJson);
     const QByteArray serializedData = jsonDoc.toJson();
 
-    ok = NetworkUtils::sendHTTPSRequest(
-        Poco::Net::HTTPRequest::HTTP_PATCH,
-        answerUrl.toStdString(),
-        "application/json",
-        serializedData
-    );
+    bool ok = false;
+    ok = NetworkUtils::sendHTTPSRequest("PATCH",
+                          answerUrl.toStdString(),
+                          "application/json",
+                          serializedData);
+    if (!ok) {
+        qDebug() << "error transmitting results";
+        return;
+    }
 
-    qDebug() << responseJson;
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    qDebug() << jsonString.toStdString().c_str();
 
-    if (!ok)
-        emit error("Could not send results to Pine");
-    else
-        emit success("Saved images to Pine, you may now close this window");
-
+    emit success("Success: files saved to Pine");
     cleanUp();
 }
 

@@ -93,6 +93,18 @@ bool GripStrengthManager::isInstalled() {
         return false;
     }
 
+    const QFileInfo examDatabase(gripTestDBPath);
+    if (!examDatabase.exists() || !examDatabase.isReadable()) {
+        qInfo() << "GripStrengthManager::isInstalled: file is not readable at " << gripTestDBPath;
+        return false;
+    }
+
+    const QFileInfo examData(gripTestDataDBPath);
+    if (!examData.exists() || !examData.isReadable()) {
+        qInfo() << "GripStrengthManager::isInstalled: file is not readable at " << gripTestDBPath;
+        return false;
+    }
+
     return true;
 }
 
@@ -149,27 +161,27 @@ void GripStrengthManager::readOutput() {
         measurement->setAttribute("position", results[i]["Position"].toInt());
         measurement->setAttribute("side",     results[i]["Side"].toInt());
 
-        bool rep1Exclude = results[i]["Rep1Exclude"].toBool();
-        bool rep2Exclude = results[i]["Rep2Exclude"].toBool();
-        bool rep3Exclude = results[i]["Rep3Exclude"].toBool();
-        bool rep4Exclude = results[i]["Rep4Exclude"].toBool();
-        bool rep5Exclude = results[i]["Rep5Exclude"].toBool();
-        bool rep6Exclude = results[i]["Rep6Exclude"].toBool();
-        bool rep7Exclude = results[i]["Rep7Exclude"].toBool();
-        bool rep8Exclude = results[i]["Rep8Exclude"].toBool();
-        bool rep9Exclude = results[i]["Rep9Exclude"].toBool();
-        bool rep10Exclude = results[i]["Rep10Exclude"].toBool();
+        const bool rep1Exclude = results[i]["Rep1Exclude"].toBool();
+        const bool rep2Exclude = results[i]["Rep2Exclude"].toBool();
+        const bool rep3Exclude = results[i]["Rep3Exclude"].toBool();
+        const bool rep4Exclude = results[i]["Rep4Exclude"].toBool();
+        const bool rep5Exclude = results[i]["Rep5Exclude"].toBool();
+        const bool rep6Exclude = results[i]["Rep6Exclude"].toBool();
+        const bool rep7Exclude = results[i]["Rep7Exclude"].toBool();
+        const bool rep8Exclude = results[i]["Rep8Exclude"].toBool();
+        const bool rep9Exclude = results[i]["Rep9Exclude"].toBool();
+        const bool rep10Exclude = results[i]["Rep10Exclude"].toBool();
 
-        double rep1 = Tracker5Util::asKg(results[i]["Rep1"].toInt());
-        double rep2 = Tracker5Util::asKg(results[i]["Rep2"].toInt());
-        double rep3 = Tracker5Util::asKg(results[i]["Rep3"].toInt());
-        double rep4 = Tracker5Util::asKg(results[i]["Rep4"].toInt());
-        double rep5 = Tracker5Util::asKg(results[i]["Rep5"].toInt());
-        double rep6 = Tracker5Util::asKg(results[i]["Rep6"].toInt());
-        double rep7 = Tracker5Util::asKg(results[i]["Rep7"].toInt());
-        double rep8 = Tracker5Util::asKg(results[i]["Rep8"].toInt());
-        double rep9 = Tracker5Util::asKg(results[i]["Rep9"].toInt());
-        double rep10 = Tracker5Util::asKg(results[i]["Rep10"].toInt());
+        const double rep1 = Tracker5Util::asKg(results[i]["Rep1"].toInt());
+        const double rep2 = Tracker5Util::asKg(results[i]["Rep2"].toInt());
+        const double rep3 = Tracker5Util::asKg(results[i]["Rep3"].toInt());
+        const double rep4 = Tracker5Util::asKg(results[i]["Rep4"].toInt());
+        const double rep5 = Tracker5Util::asKg(results[i]["Rep5"].toInt());
+        const double rep6 = Tracker5Util::asKg(results[i]["Rep6"].toInt());
+        const double rep7 = Tracker5Util::asKg(results[i]["Rep7"].toInt());
+        const double rep8 = Tracker5Util::asKg(results[i]["Rep8"].toInt());
+        const double rep9 = Tracker5Util::asKg(results[i]["Rep9"].toInt());
+        const double rep10 = Tracker5Util::asKg(results[i]["Rep10"].toInt());
 
         if (!rep1Exclude && rep1 > 0)
             measurement->setAttribute("rep1", rep1, "kg", 2);

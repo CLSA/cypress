@@ -20,8 +20,6 @@ public:
 
     // DXAMeasurement interface
 public:
-    DicomFile m_apSpineFile;
-
     void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) override;
 
     Side getSide() override;

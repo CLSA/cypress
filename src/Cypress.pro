@@ -207,12 +207,14 @@ HEADERS += \
     managers/dxa/apex_database_helper.h \
     managers/dxa/dxa_hip_manager.h \
     managers/dxa/dxa_manager.h \
+    managers/easy_connect_manager.h \
     managers/ecg/ecg_manager.h \
     managers/emr/emr_plugin_writer.h \
     managers/frax/frax_manager.h \
     managers/general_proxy_form/general_proxy_manager.h \
     managers/grip_strength/grip_strength_manager.h \
     managers/grip_strength/paradox_reader.h \
+    managers/hearcon_manager.h \
     managers/manager_base.h \
     managers/oct_manager.h \
     managers/ora_manager.h \
@@ -224,6 +226,7 @@ HEADERS += \
     managers/spirometer/spirometer_manager.h \
     managers/tonometer/tonometer_manager.h \
     managers/ultrasound/vividi_manager.h \
+    managers/watch_bp_manager.h \
     managers/weigh_scale/weigh_scale_manager.h \
     server/Server.h \
     server/default_delete_request_handler.h \
@@ -418,12 +421,14 @@ SOURCES += \
     managers/dxa/apex_database_helper.cpp \
     managers/dxa/dxa_hip_manager.cpp \
     managers/dxa/dxa_manager.cpp \
+    managers/easy_connect_manager.cpp \
     managers/ecg/ecg_manager.cpp \
     managers/emr/emr_plugin_writer.cpp \
     managers/frax/frax_manager.cpp \
     managers/general_proxy_form/general_proxy_manager.cpp \
     managers/grip_strength/grip_strength_manager.cpp \
     managers/grip_strength/paradox_reader.cpp \
+    managers/hearcon_manager.cpp \
     managers/manager_base.cpp \
     managers/oct_manager.cpp \
     managers/ora_manager.cpp \
@@ -435,6 +440,7 @@ SOURCES += \
     managers/spirometer/spirometer_manager.cpp \
     managers/tonometer/tonometer_manager.cpp \
     managers/ultrasound/vividi_manager.cpp \
+    managers/watch_bp_manager.cpp \
     managers/weigh_scale/weigh_scale_manager.cpp \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \

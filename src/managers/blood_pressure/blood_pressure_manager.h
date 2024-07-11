@@ -37,13 +37,17 @@ class BloodPressureManager : public ManagerBase
 {
     Q_OBJECT
 
+public:
     enum State {
-        CONNECTING,
+        DISCONNECTED,
+        CONNECTED,
+        CYCLING,
         READY,
         MEASURING,
+        STOPPED,
+        COMPLETE
     };
 
-public:
     explicit BloodPressureManager(QSharedPointer<BPMSession> session);
     ~BloodPressureManager();
 
@@ -63,19 +67,14 @@ signals:
     void deviceConnected();
     void deviceDisconnected();
 
-    void deviceHandshaked(const QString& firmware);
-    void deviceCycled(const QString& newCycle);
+    void deviceCycled(const quint8 newCycle);
     void deviceCleared();
 
     void measurementStarted();
     void measurementStopped();
 
-    void handshaked(QString firmwareVersion);
-
-    void inflateCuffPressure(int cuffPressure);
-    void deflateCuffPressure(int cuffPressure);
-
-    void deviceStateChanged(QString state);
+    void deviceStateChanged(const BloodPressureManager::State state);
+    void cuffPressureChanged(const int cuffPressure);
 
     void bpResult();
     void bpAverage();
@@ -109,7 +108,7 @@ public slots:
     void removeMeasurement(const int index);
 
 private:
-    State m_state { State::CONNECTING };
+    State m_state { State::DISCONNECTED };
 
     BpTru200Driver* m_driver;
     QHidDevice* m_bpm200;

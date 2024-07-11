@@ -63,6 +63,7 @@ public slots:
     // Clean up the device for next time
     virtual bool cleanUp() = 0;
 
+    virtual void checkIfFinished();
 protected:
     // Set up device
     virtual bool setUp() = 0;
@@ -96,6 +97,8 @@ signals:
     // (update GUI enable write button and update the results display)
     //
     void canFinish();
+
+    void cannotFinish();
 
     // Session successful, data sent to server
     void success(const QString& successMsg);

@@ -16,6 +16,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->hideMeasureButton();
+    ui->measurementTable->disableFinishButton();
     ui->measurementTable->enableRemoval(true);
 
     ui->connectPushButton->setEnabled(false);
@@ -44,9 +45,7 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
         ui->connectPushButton->setEnabled(true);
     });
 
-    connect(manager.get(), &BloodPressureManager::deviceStateChanged, this, [=](QString state) {
-        ui->stateValue->setText(state);
-    });
+    connect(manager.get(), &BloodPressureManager::deviceStateChanged, this, &BloodPressureDialog::deviceStateChanged);
 
     connect(ui->connectPushButton, &QPushButton::clicked, manager.get(), [=]() {
       if (ui->armComboBox->currentText() == "---") {
@@ -65,90 +64,36 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
       manager->connectToDevice();
     });
 
-    connect(ui->disconnectPushButton,
-            &QPushButton::clicked,
-            manager.get(),
-            &BloodPressureManager::disconnectFromDevice);
+    connect(ui->disconnectPushButton, &QPushButton::clicked, manager.get(), &BloodPressureManager::disconnectFromDevice);
 
     connect(ui->cyclePushButton, &QPushButton::clicked, manager.get(), &BloodPressureManager::cycle);
     connect(ui->clearPushButton, &QPushButton::clicked, manager.get(), &BloodPressureManager::clear);
 
-    connect(ui->startPushButton,
-            &QPushButton::clicked,
-            manager.get(),
-            &BloodPressureManager::startMeasurement);
+    connect(ui->startPushButton, &QPushButton::clicked, manager.get(), &BloodPressureManager::startMeasurement);
+    connect(ui->stopPushButton,  &QPushButton::clicked, manager.get(), &BloodPressureManager::stopMeasurement);
 
-    connect(ui->stopPushButton,
-            &QPushButton::clicked,
-            manager.get(),
-            &BloodPressureManager::stopMeasurement);
-
-    connect(manager.get(), &BloodPressureManager::deviceHandshaked, this, [=](QString firmware) {
-        qDebug() << "handshaked, setting controls";
-
-        ui->connectPushButton->setEnabled(false);
-        ui->disconnectPushButton->setEnabled(true);
-
-        ui->cyclePushButton->setEnabled(true);
-        ui->clearPushButton->setEnabled(true);
-        ui->startPushButton->setEnabled(true);
-    });
-
-    connect(manager.get(), &BloodPressureManager::deviceCycled, this, [=](QString cycle) {
-        ui->cycleValue->setText(cycle);
-    });
-
-    connect(manager.get(), &BloodPressureManager::inflateCuffPressure, this, [=](int cuffPressure) {
-        ui->cuffPressureValue->setText(QString::number(cuffPressure));
-    });
-
-    connect(manager.get(), &BloodPressureManager::deflateCuffPressure, this, [=](int cuffPressure) {
-        ui->cuffPressureValue->setText(QString::number(cuffPressure));
-    });
-
-    connect(manager.get(), &BloodPressureManager::deviceCleared, this, [=]() {
-        ui->readingValue->setText("");
-    });
-
-    connect(manager.get(), &BloodPressureManager::deviceDisconnected, this, [=]() {
-        ui->connectPushButton->setEnabled(true);
-
-        ui->disconnectPushButton->setEnabled(false);
-        ui->startPushButton->setEnabled(false);
-        ui->stopPushButton->setEnabled(false);
-        ui->cyclePushButton->setEnabled(false);
-        ui->clearPushButton->setEnabled(false);
-    });
-
-    connect(manager.get(), &BloodPressureManager::measurementStarted, this, [=]() {
-        ui->stopPushButton->setEnabled(true);
-        ui->startPushButton->setEnabled(false);
-
-        ui->clearPushButton->setEnabled(false);
-        ui->cyclePushButton->setEnabled(false);
-        ui->disconnectPushButton->setEnabled(false);
-    });
-
-    connect(manager.get(), &BloodPressureManager::measurementStopped, this, [=]() {
-        ui->stopPushButton->setEnabled(false);
-        ui->startPushButton->setEnabled(true);
-
-        ui->clearPushButton->setEnabled(true);
-        ui->cyclePushButton->setEnabled(true);
-        ui->disconnectPushButton->setEnabled(true);
-    });
+    connect(manager.get(), &BloodPressureManager::deviceCleared, this, &BloodPressureDialog::deviceCleared);
+    connect(manager.get(), &BloodPressureManager::deviceCycled,  this, &BloodPressureDialog::deviceCycled);
 
     connect(manager.get(), &BloodPressureManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
+    connect(manager.get(), &BloodPressureManager::measurementStarted, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
+        Q_UNUSED(test)
+        //ui->measurementTable->initializeModel(columns);
+        qDebug() << "measurement started";
+        qDebug() << test->toJsonObject();
+    });
 
-    connect(manager.get(), &BloodPressureManager::canMeasure, ui->measurementTable, [=]() {
-        ui->measurementTable->enableMeasureButton();
+    connect(manager.get(), &BloodPressureManager::measurementStopped, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
+        Q_UNUSED(test)
+        //ui->measurementTable->initializeModel(columns);
+        qDebug() << "measurement started";
+        qDebug() << test->toJsonObject();
     });
-    connect(manager.get(), &BloodPressureManager::cannotMeasure, ui->measurementTable, [=]() {
-        ui->measurementTable->disableMeasureButton();
-    });
+
+    connect(manager.get(), &BloodPressureManager::cuffPressureChanged, this, &BloodPressureDialog::cuffPressureChanged);
 
     connect(manager.get(), &BloodPressureManager::canFinish, ui->measurementTable, [=]() {
         ui->measurementTable->enableFinishButton();
@@ -160,9 +105,6 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
     connect(manager.get(), &BloodPressureManager::success, this, &BloodPressureDialog::success);
     connect(manager.get(), &BloodPressureManager::error, this, &BloodPressureDialog::error);
     connect(manager.get(), &BloodPressureManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
-
-    // request auto measure
-    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &BloodPressureManager::measure);
 
     connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
         if (ui->armComboBox->currentText() == "---") {
@@ -200,4 +142,121 @@ BloodPressureDialog::~BloodPressureDialog()
 {
     qDebug() << "destroy blood pressure dialog";
     delete ui;
+}
+
+void BloodPressureDialog::deviceStateChanged(const BloodPressureManager::State state)
+{
+    switch (state) {
+        case BloodPressureManager::CONNECTED:
+            deviceConnected();
+            break;
+        case BloodPressureManager::DISCONNECTED:
+            deviceDisconnected();
+            break;
+        case BloodPressureManager::CYCLING:
+            deviceCycling();
+            break;
+        case BloodPressureManager::READY:
+            deviceReady();
+            break;
+        case BloodPressureManager::MEASURING:
+            deviceMeasuring();
+            break;
+        case BloodPressureManager::STOPPED:
+            deviceStopped();
+            break;
+        case BloodPressureManager::COMPLETE:
+            deviceComplete();
+            break;
+    }
+}
+
+void BloodPressureDialog::deviceConnected()
+{
+    ui->connectPushButton->setEnabled(false);
+    ui->disconnectPushButton->setEnabled(true);
+
+    ui->cyclePushButton->setEnabled(true);
+    ui->clearPushButton->setEnabled(true);
+    ui->startPushButton->setEnabled(true);
+}
+
+void BloodPressureDialog::deviceDisconnected()
+{
+    ui->connectPushButton->setEnabled(true);
+
+    ui->disconnectPushButton->setEnabled(false);
+    ui->startPushButton->setEnabled(false);
+    ui->stopPushButton->setEnabled(false);
+    ui->cyclePushButton->setEnabled(false);
+    ui->clearPushButton->setEnabled(false);
+}
+
+void BloodPressureDialog::deviceCycling()
+{
+    ui->stateValue->setText("Cycling");
+
+    ui->disconnectPushButton->setEnabled(false);
+    ui->startPushButton->setEnabled(false);
+    ui->stopPushButton->setEnabled(false);
+    ui->cyclePushButton->setEnabled(false);
+    ui->clearPushButton->setEnabled(false);
+}
+
+void BloodPressureDialog::deviceCycled(const quint8 cycle)
+{
+    ui->cycleValue->setText(QString::number(cycle));
+
+}
+
+void BloodPressureDialog::deviceCleared()
+{
+    ui->stateValue->setText("");
+    ui->cuffPressureValue->setText("");
+}
+
+void BloodPressureDialog::deviceReady()
+{
+    ui->stateValue->setText("Ready");
+
+    ui->connectPushButton->setEnabled(false);
+    ui->disconnectPushButton->setEnabled(true);
+
+    ui->cyclePushButton->setEnabled(true);
+    ui->clearPushButton->setEnabled(true);
+    ui->startPushButton->setEnabled(true);
+}
+
+void BloodPressureDialog::deviceMeasuring()
+{
+    ui->stateValue->setText("Measuring");
+
+    ui->stopPushButton->setEnabled(true);
+    ui->startPushButton->setEnabled(false);
+
+    ui->clearPushButton->setEnabled(false);
+    ui->cyclePushButton->setEnabled(false);
+    ui->disconnectPushButton->setEnabled(false);
+}
+
+void BloodPressureDialog::deviceStopped()
+{
+    ui->stateValue->setText("Stopped");
+
+    ui->stopPushButton->setEnabled(false);
+    ui->startPushButton->setEnabled(true);
+
+    ui->clearPushButton->setEnabled(true);
+    ui->cyclePushButton->setEnabled(true);
+    ui->disconnectPushButton->setEnabled(true);
+}
+
+void BloodPressureDialog::deviceComplete()
+{
+    ui->stateValue->setText("Complete");
+}
+
+void BloodPressureDialog::cuffPressureChanged(const int cuffPressure)
+{
+    ui->cuffPressureValue->setText(QString::number(cuffPressure));
 }

@@ -58,7 +58,7 @@ QString ApSpineMeasurement::toString() const
 
 bool ApSpineMeasurement::isValid() const
 {
-    return isValidDicomFile(m_apSpineFile);
+    return isValidDicomFile(dicomFile);
 }
 
 bool ApSpineMeasurement::isValidDicomFile(DicomFile file)
@@ -132,17 +132,20 @@ bool ApSpineMeasurement::isValidDicomFile(DicomFile file)
 
 void ApSpineMeasurement::addDicomFile(DicomFile file)
 {
-    m_apSpineFile = file;
-    m_apSpineFile.name = "SP_DICOM_1";
-    m_apSpineFile.size = FileUtils::getHumanReadableFileSize(m_apSpineFile.absFilePath);
-    m_hasApSpineFile = true;
+    dicomFile = file;
+    dicomFile.name = "SP_DICOM_1";
+    dicomFile.fileName = "SP_DICOM_1.dcm";
+    dicomFile.size = FileUtils::getHumanReadableFileSize(dicomFile.absFilePath);
 
-    setAttribute("PATIENT_ID", file.patientId);
-    setAttribute("FILEPATH", file.absFilePath);
-    setAttribute("STUDY_ID", file.studyId);
-    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
-    setAttribute("NAME", m_apSpineFile.name);
-    setAttribute("SIZE", m_apSpineFile.size);
+
+    setAttribute("NAME", 					dicomFile.name);
+    setAttribute("PATIENT_ID", 				dicomFile.patientId);
+    setAttribute("FILEPATH", 				dicomFile.absFilePath);
+    setAttribute("STUDY_ID", 				dicomFile.studyId);
+    setAttribute("MEDIA_STORAGE_UID", 		dicomFile.mediaStorageUID);
+    setAttribute("SIZE", 					dicomFile.size);
+
+    m_hasApSpineFile = true;
 }
 
 void ApSpineMeasurement::getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) {

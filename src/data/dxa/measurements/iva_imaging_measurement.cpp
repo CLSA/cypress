@@ -38,46 +38,39 @@ void IVAImagingMeasurement::addDicomFile(DicomFile file)
     if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
         return;
 
-    setAttribute("PATIENT_ID", file.patientId);
-    setAttribute("FILEPATH", file.absFilePath);
-    setAttribute("STUDY_ID", file.studyId);
-    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
+    dicomFile = file;
+    dicomFile.size = FileUtils::getHumanReadableFileSize(dicomFile.absFilePath);
 
     if (isDicomMeasureFile(loadedFileFormat)) {
         qDebug() << "IVAImagingMeasurement: adding IVA measure";
 
-        file.name = "SEL_DICOM_MEASURE";
-        file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+        dicomFile.name = "SEL_DICOM_MEASURE";
+        dicomFile.fileName = "SEL_DICOM_MEASURE.dcm";
 
-        setAttribute("NAME", file.name);
-
-        m_dicomFile = file;
         m_hasDicomFile = true;
     }
 
     else if (isDicomPRFile(loadedFileFormat)) {
         qInfo() << "IVAImagingMeasurement: adding IVA PR";
 
-        file.name = "SEL_DICOM_PR";
-        file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
-
-        setAttribute("NAME", m_dicomFile.name);
-
-        m_dicomFile = file;
-        m_hasDicomFile = true;
+        dicomFile.name = "SEL_DICOM_PR";
+        dicomFile.fileName = "SEL_DICOM_PR.dcm";
     }
 
     else if (isDicomOTFile(loadedFileFormat)) {
         qInfo() << "IVAImagingMeasurement: adding IVA OT";
 
-        file.name = "SEL_DICOM_OT";
-        file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
-
-        setAttribute("NAME", file.name);
-
-        m_dicomFile = file;
-        m_hasDicomFile = true;
+        dicomFile.name = "SEL_DICOM_OT";
+        dicomFile.fileName = "SEL_DICOM_OT.dcm";
     }
+
+    setAttribute("NAME", 				dicomFile.name);
+    setAttribute("PATIENT_ID", 			dicomFile.patientId);
+    setAttribute("FILEPATH", 			dicomFile.absFilePath);
+    setAttribute("STUDY_ID", 			dicomFile.studyId);
+    setAttribute("MEDIA_STORAGE_UID", 	dicomFile.mediaStorageUID);
+
+    m_hasDicomFile = true;
 }
 
 Side IVAImagingMeasurement::getSide() {

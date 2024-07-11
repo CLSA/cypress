@@ -167,9 +167,8 @@ void DXATest::getScanAnalysisData(
 
         QStringList doScanAnalysis { "WB_DICOM_1", "SP_DICOM_1", "FA_DICOM" };
 
-        if (doScanAnalysis.contains(fileName)) {
+        if (doScanAnalysis.contains(fileName))
             dxaMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
-        }
     }
 }
 
@@ -185,13 +184,15 @@ QJsonObject DXATest::toJsonObject() const
     QJsonObject results{};
 
     foreach (auto measure, m_measurementList) {
-        if (dynamic_cast<WholeBodyScanMeasurement*>(measure.get())) {
-            *wholeBody = measure->toJsonObject();
+        if (qSharedPointerDynamicCast<WholeBodyScanMeasurement>(measure)) {
+            if (measure->getAttribute("NAME").toString() == "WB_DICOM_1")
+                *wholeBody = measure->toJsonObject();
         }
-        else if (dynamic_cast<ApSpineMeasurement*>(measure.get())) {
+        else if (qSharedPointerDynamicCast<ApSpineMeasurement>(measure)) {
+            if (measure->getAttribute("NAME").toString() == "SP_DICOM_1")
             *apSpine = measure->toJsonObject();
         }
-        else if (dynamic_cast<ForearmMeasurement*>(measure.get())) {
+        else if (qSharedPointerDynamicCast<ForearmMeasurement>(measure)) {
             auto forearmMeasure = dynamic_cast<ForearmMeasurement*>(measure.get());
             if (forearmMeasure->getSide() == Side::LEFT) {
                 *leftForearm = forearmMeasure->toJsonObject();
@@ -200,25 +201,10 @@ QJsonObject DXATest::toJsonObject() const
                 *rightForearm = forearmMeasure->toJsonObject();
             }
         }
-        else if (dynamic_cast<IVAImagingMeasurement*>(measure.get())) {
+        else if (qSharedPointerDynamicCast<IVAImagingMeasurement>(measure)) {
             *ivaSpine = measure->toJsonObject();
         }
     }
-
-    //if (wholeBodyMeasurement)
-    //    *wholeBody = wholeBodyMeasurement->toJsonObject();
-
-    //if (apSpineMeasurement)
-    //    *apSpine = apSpineMeasurement->toJsonObject();
-
-    //if (leftForearmMeasurement)
-    //    *leftForearm = leftForearmMeasurement->toJsonObject();
-
-    //if (rightForearmMeasurement)
-    //    *rightForearm = rightForearmMeasurement->toJsonObject();
-
-    //if (ivaImagingMeasurement)
-    //    *ivaSpine = ivaImagingMeasurement->toJsonObject();
 
     results.insert("ap_spine", *apSpine);
     results.insert("whole_body", *wholeBody);

@@ -16,9 +16,6 @@ void GenProxySession::initializeDialog() {
 void GenProxySession::validate() const
 {
     CypressSession::validate();
-
-    if (!isValidString("uid"))
-        throw ValidationError("uid");
 }
 
 void GenProxySession::isInstalled() const {

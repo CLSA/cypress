@@ -11,7 +11,6 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "widgets/measurement_table.h"
@@ -25,13 +24,12 @@ public:
     QVBoxLayout *verticalLayout_5;
     TestInfoWidget *testInfoWidget;
     MeasurementTable *measurementTable;
-    QSpacerItem *verticalSpacer;
 
     void setupUi(QWidget *DXADialog)
     {
         if (DXADialog->objectName().isEmpty())
             DXADialog->setObjectName(QString::fromUtf8("DXADialog"));
-        DXADialog->resize(719, 351);
+        DXADialog->resize(719, 44);
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -48,10 +46,6 @@ public:
         measurementTable->setObjectName(QString::fromUtf8("measurementTable"));
 
         verticalLayout_5->addWidget(measurementTable);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_5->addItem(verticalSpacer);
 
 
         retranslateUi(DXADialog);

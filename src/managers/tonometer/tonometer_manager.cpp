@@ -45,20 +45,17 @@ bool TonometerManager::start()
 
     if (!backupData()) {
         qCritical() << "TonometerManager::start: could not backup data";
-
         return false;
     }
 
     if (!clearData()) {
         qCritical() << "TonometerManager::start: could not clear data";
-
         emit error("Something went wrong");
         return false;
     }
 
     if (!setUp()) {
         qCritical() << "TonometerManager::start: could not backup data";
-
         emit error("Something went wrong");
         return false;
     }

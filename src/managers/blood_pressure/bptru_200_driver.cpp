@@ -20,25 +20,20 @@ void BpTru200Driver::run()
 {
     while (!isInterruptionRequested() && !isFinished())
     {
-        qDebug() << "BpTru200Driver::run - checking write queue..";
-
         m_mutex.lock();
         if (!writeQueue.empty())
         {
             // write message
             BPMMessage message = writeQueue.dequeue();
-            if (!write(message))
+            if (!write(message)) {
                 qDebug() << "couldn't write a message to the device..";
+            }
         }
         m_mutex.unlock();
-
-        qDebug() << "BpTru200Driver::run - reading..";
 
         read(300 /* ms */);
 
         if (!readQueue.isEmpty()) {
-            qDebug() << "BpTru200Driver::run - received message(s)..";
-
             emit messagesReceived(readQueue);
             readQueue.clear();
         }
@@ -48,8 +43,6 @@ void BpTru200Driver::run()
 qint32 BpTru200Driver::write(BPMMessage message)
 {
     message.calculateCrc();
-
-    qDebug() << "BpTru200Driver::write - isValidCRC: " << message.isValidCRC();
 
     QByteArray packedMessage;
 
@@ -69,15 +62,12 @@ qint32 BpTru200Driver::write(BPMMessage message)
     }
 
     qint32 bytesWritten = m_bpm200->write(&packedMessage, packedMessage.size());
-    qDebug() << "BpTru200Driver::write -" << bytesWritten << "bytes";
 
     return bytesWritten;
 }
 
 qint32 BpTru200Driver::read(int timeoutMs)
 {
-    qDebug() << "BpTru200Driver::read timeoutMs = " << timeoutMs;
-
     if (!m_bpm200->isOpen())
     {
         qDebug() << "tried to read before device was connected..";
@@ -85,16 +75,12 @@ qint32 BpTru200Driver::read(int timeoutMs)
     }
 
     m_read_buffer.get()->fill(0x00);
-    qDebug() << "reading";
 
     quint32 bytesRead = m_bpm200->read(m_read_buffer.get(), 1024, timeoutMs);
     if (bytesRead <= 0)
     {
-        qDebug() << "bytes read <= 0, not parsing anything";
         return -1;
     }
-
-    qDebug() << "bytes read: " << bytesRead;
 
     parseData(bytesRead);
 
@@ -103,9 +89,6 @@ qint32 BpTru200Driver::read(int timeoutMs)
 
 void BpTru200Driver::parseData(quint32 bytesRead)
 {
-    if (bytesRead % 9 != 0)
-        qDebug() << "BpTru200Driver::parseData - there may be partial messages..." << bytesRead % 9;
-
     for (quint32 i = 0; i < bytesRead; i++) {
         if (m_read_buffer->at(i) == STX && (i + 7) < bytesRead) {
             if (m_read_buffer->at(i + 7) == ETX) {
@@ -118,15 +101,10 @@ void BpTru200Driver::parseData(quint32 bytesRead)
 
                 BPMMessage message(messageId, data0, data1, data2, data3, crc);
 
-                qDebug() << "BpTru200Driver::parseData - message: " << message.toString();
-
                 if (message.isValidCRC())
-                {
-                    qDebug() << "parsed valid message";
                     readQueue.enqueue(message);
-                }
                 else
-                    qDebug() << "error: message is not valid";
+                    qDebug() << "error: message is not valid" << messageId << data0 << data1 << data2 << data3 << crc;
             }
         }
     }

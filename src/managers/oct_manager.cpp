@@ -193,29 +193,47 @@ void OCTManager::measure()
     qDebug() << "OCTManager::measure";
     QSqlQuery query(m_db);
     query.prepare("SELECT * FROM OCTDSA WHERE PatientID = :patientId");
-    if (!query.exec())
+
+    if (!query.exec()) {
+        qWarning() << "Select failed";
         return;
-    if (!query.size())
+    }
+
+    if (!query.size()) {
+        qWarning() << "Select returned 0 records";
         return;
+    }
+
     query.prepare("SELECT * FROM Media WHERE PatientID = :patientId");
-    if (!query.exec())
+    if (!query.exec()) {
+        qWarning() << "Select returned 0 records";
         return;
-    if (!query.size())
+    }
+    if (!query.size()) {
+        qWarning() << "Select returned 0 records";
         return;
-    if (m_test->isValid())
+    }
+
+    if (m_test->isValid()) {
         emit canFinish();
+    }
 }
 
 void OCTManager::finish()
 {
     qDebug() << "OCTManager::finish";
+
 }
 
 bool OCTManager::clearData()
 {
     qDebug() << "OCTManager::clearData";
-
     m_test->reset();
+
+
+    QJsonObject json = m_test->toJsonObject();
+
+
     return true;
 }
 

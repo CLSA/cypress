@@ -97,8 +97,6 @@ void MeasurementTable::handleChange(int row, int col)
     Q_UNUSED(row)
     Q_UNUSED(col)
 
-    qDebug() << "cell changed row:" << row << "col:" << col;
-
     Measurement &measure = m_test->get(row);
     TableColumn& column = m_columns[col];
     Measurement::Value attribute = measure.getAttribute(column.key);
@@ -150,6 +148,11 @@ void MeasurementTable::setTableColumns()
         }
 
         ui->measurementTable->setHorizontalHeaderLabels(headerNames);
+
+        if (manualEntryMode || allowRemoval)
+        {
+            addRemoveMeasureButton();
+        }
     }
 }
 
@@ -187,8 +190,6 @@ void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
     if (m_test.isNull())
         return;
 
-    //qDebug() << m_test->toJsonObject();
-
     const QVector<QSharedPointer<Measurement>> measurements = m_test->getMeasurements();
 
     ui->measurementTable->setRowCount(0);
@@ -204,8 +205,6 @@ void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
 
             foreach (auto column, m_columns)
             {
-                qDebug() << column.key;
-                qDebug() << measurement->getAttribute(column.key).value();
                 QTableWidgetItem *item = new QTableWidgetItem();
                 item->setData(Qt::EditRole, measurement->getAttributeValue(column.key));
                 ui->measurementTable->setItem(row, col++, item);
@@ -213,7 +212,6 @@ void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
             }
             if (manualEntryMode || allowRemoval)
             {
-                qDebug() << "adding removal button";
                 QPushButton* btn = new QPushButton("Remove", this);
 
                 btn->setProperty("row_id", row);
@@ -260,7 +258,7 @@ void MeasurementTable::showMeasureButton()
 void MeasurementTable::enableRemoval(bool allow)
 {
     allowRemoval = allow;
-    if (allowRemoval)
+    if (allow)
     {
         addRemoveMeasureButton();
     }
@@ -319,6 +317,7 @@ void MeasurementTable::setColumnDelegate(int col, QItemDelegate* itemDelegate)
 void MeasurementTable::toggleManualEntry(bool saveChanges)
 {
     Q_UNUSED(saveChanges);
+    qDebug() << "toggle manual entry";
 
     manualEntryMode = !manualEntryMode;
     addRemoveMeasureButton();
@@ -326,11 +325,14 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
 
 void MeasurementTable::addRemoveMeasureButton()
 {
+    qDebug() << "AddRemoveMeasureButton";
     const int columnCount = ui->measurementTable->columnCount();
     const auto lastColHeader = ui->measurementTable->horizontalHeaderItem(columnCount - 1);
 
-    if (lastColHeader != nullptr && lastColHeader->text() == "Actions")
+    if (lastColHeader != nullptr && lastColHeader->text() == "Actions") {
+        qDebug() << "return";
         return;
+    }
 
     const int newColumn = ui->measurementTable->columnCount();
     ui->measurementTable->insertColumn(newColumn);

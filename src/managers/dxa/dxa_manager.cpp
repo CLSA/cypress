@@ -8,6 +8,8 @@
 #include "dicom/dcm_recv.h"
 #include "managers/dxa/dxa_manager.h"
 
+#include "data/dxa/measurements/dxa_measurement.h"
+
 #include <QApplication>
 #include <QException>
 #include <QJsonDocument>
@@ -180,22 +182,6 @@ bool DXAManager::isInstalled() {
     return true;
 }
 
-// what the manager does in response to the main application
-// window invoking its run method
-//
-bool DXAManager::start()
-{
-    if (!setUp())
-        return false;
-
-    m_dicomServer->start();
-
-    emit started(m_test);
-    emit dataChanged(m_test);
-
-    return true;
-}
-
 // Set up device
 bool DXAManager::setUp()
 {
@@ -214,6 +200,22 @@ bool DXAManager::setUp()
     return true;
 }
 
+// what the manager does in response to the main application
+// window invoking its run method
+//
+bool DXAManager::start()
+{
+    if (!setUp())
+        return false;
+
+    m_dicomServer->start();
+
+    emit started(m_test);
+    emit dataChanged(m_test);
+
+    return true;
+}
+
 void DXAManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
     // pass received dicom files to test class
@@ -222,7 +224,7 @@ void DXAManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
     int filesReceived = test->fromDicomFiles(dicomFiles, *session);
 
-    emit status(QString("Received %1 files").arg(filesReceived));
+    emit status(QString("Received %1 file(s)").arg(filesReceived));
 
     emit canMeasure();
     emit dataChanged(m_test);
@@ -267,10 +269,7 @@ void DXAManager::measure()
         { "ETHNICITY",   test->getMetaData("ETHNICITY").toString() }
     };
 
-    test->wholeBodyMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
-    test->leftForearmMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
-    test->rightForearmMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
-    test->apSpineMeasurement->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
+    test->getScanAnalysisData(m_patscanDb, m_referenceDb, patientData);
 
     m_patscanDb.close();
     m_referenceDb.close();
@@ -292,60 +291,40 @@ void DXAManager::finish()
     const QString pineOrigin = m_session->getOrigin();
     const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
 
-    // Whole body
-    const QByteArray wb_1 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody1.absFilePath);
-    const QByteArray wb_2 = FileUtils::readFile(test->wholeBodyMeasurement->m_wholeBody2.absFilePath);
+    QJsonObject files {};
 
-    QString wb_1_file_name = test->wholeBodyMeasurement->m_wholeBody1.name + ".dcm";
-    QString wb_2_file_name = test->wholeBodyMeasurement->m_wholeBody2.name + ".dcm";
+    foreach (auto measure, test->getMeasurements()) {
+        const auto dxaMeasure = qSharedPointerDynamicCast<DXAMeasurement>(measure);
 
-    const QByteArray sp_1 = FileUtils::readFile(test->apSpineMeasurement->m_apSpineFile.absFilePath);
+        const QString name = dxaMeasure->getAttribute("NAME").toString();
+        const QString path = dxaMeasure->dicomFile.absFilePath;
+        const QString fileName = dxaMeasure->dicomFile.fileName;
 
-    // AP Lumbar Spine
-    QString sp_1_file_name = test->apSpineMeasurement->m_apSpineFile.name + ".dcm";
+        if (!path.isEmpty()) {
+            files.insert(name + "_dcm", dxaMeasure->dicomFile.size);
 
-    const QByteArray iva_ot = FileUtils::readFile(test->ivaImagingMeasurement->m_dicomOtFile.absFilePath);
-    const QByteArray iva_pr = FileUtils::readFile(test->ivaImagingMeasurement->m_dicomPrFile.absFilePath);
-    const QByteArray iva_measure = FileUtils::readFile(
-        test->ivaImagingMeasurement->m_dicomMeasureFile.absFilePath);
+            const QByteArray data = FileUtils::readFile(path);
 
-    // IVA
-    QString iva_ot_file_name = test->ivaImagingMeasurement->m_dicomOtFile.name + ".dcm";
-    QString iva_pr_file_name = test->ivaImagingMeasurement->m_dicomPrFile.name + ".dcm";
-    QString iva_measure_file_name = test->ivaImagingMeasurement->m_dicomMeasureFile.name + ".dcm";
+            bool ok = NetworkUtils::sendHTTPSRequest(
+                "PATCH", (answerUrl + "?filename=" + fileName).toStdString(),
+                "application/octet-stream",
+                data
+            );
 
-    // Forearm Left
-    QString fa_1_file_name = "FA_L_DICOM.dcm";
-    const QByteArray fa_1 = FileUtils::readFile(test->leftForearmMeasurement->m_forearmDicomFile.absFilePath);
-
-    // Forearm Right
-    QString fa_2_file_name = "FA_R_DICOM.dcm";
-    const QByteArray fa_2 = FileUtils::readFile(test->leftForearmMeasurement->m_forearmDicomFile.absFilePath);
+            if (!ok) {
+                qDebug() << "error transmitting file: " << fileName;
+                return;
+            }
+        }
+    }
 
     QJsonObject testJson = m_test->toJsonObject();
     QJsonObject sessionObj = m_session->getJsonObject();
     QJsonObject metadata = m_test->getMetaData().toJsonObject();
 
-    QJsonObject files = {};
-    files.insert(wb_1_file_name.replace(".", "_"),
-                 test->wholeBodyMeasurement->m_wholeBody1.size);
-    files.insert(wb_2_file_name.replace(".", "_"),
-                 test->wholeBodyMeasurement->m_wholeBody2.size);
-    files.insert(sp_1_file_name.replace(".", "_"),
-                 test->apSpineMeasurement->m_apSpineFile.size);
-    files.insert(iva_ot_file_name.replace(".", "_"),
-                 test->ivaImagingMeasurement->m_dicomOtFile.size);
-    files.insert(iva_pr_file_name.replace(".", "_"),
-                 test->ivaImagingMeasurement->m_dicomPrFile.size);
-    files.insert(iva_measure_file_name.replace(".", "_"),
-                 test->ivaImagingMeasurement->m_dicomMeasureFile.size);
-    files.insert(fa_1_file_name.replace(".", "_"),
-                 test->leftForearmMeasurement->m_forearmDicomFile.size);
-    files.insert(fa_2_file_name.replace(".", "_"),
-                 test->rightForearmMeasurement->m_forearmDicomFile.size);
-
     testJson.insert("session", sessionObj);
     testJson.insert("files", files);
+    testJson.insert("metadata", metadata);
 
     QJsonObject responseJson = {};
     responseJson.insert("value", testJson);
@@ -363,100 +342,10 @@ void DXAManager::finish()
         return;
     }
 
-    qDebug() << responseJson;
-
-    if (!test->wholeBodyMeasurement->m_wholeBody1.absFilePath.isEmpty()) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + wb_1_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  wb_1);
-        if (!ok) {
-            qDebug() << "error transmitting file: " << wb_1_file_name;
-            return;
-        }
-    }
-
-    if (!test->wholeBodyMeasurement->m_wholeBody2.absFilePath.isEmpty()) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + wb_2_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  wb_2);
-        if (!ok) {
-            qDebug() << "error transmitting file: " << wb_2_file_name;
-            return;
-        }
-    }
-
-    if (test->apSpineMeasurement->m_hasApSpineFile) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + sp_1_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  sp_1);
-        if (!ok) {
-            qDebug() << "error transmitting file: " << sp_1_file_name;
-            return;
-        }
-    }
-
-    if (test->ivaImagingMeasurement->hasOtFile) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + iva_ot_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  iva_ot);
-        if (!ok) {
-            qDebug() << "error transmitting file: " << iva_ot_file_name;
-            return;
-        }
-    }
-
-    if (test->ivaImagingMeasurement->hasPrFile) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + iva_pr_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  iva_pr);
-        if (!ok) {
-            qDebug() << "error transmitting file: " << iva_pr_file_name;
-            return;
-        }
-    }
-
-    if (test->ivaImagingMeasurement->hasMeasureFile) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + iva_measure_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  iva_measure);
-        if (!ok) {
-            qDebug() << "error transmitting file: " << iva_measure_file_name;
-            return;
-        }
-    }
-
-    if (!test->leftForearmMeasurement->m_forearmDicomFile.absFilePath.isNull()) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + fa_1_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  fa_1);
-        if (!ok) {
-            //emit error("Could not transmit file");
-            qDebug() << "error transmitting file: " << fa_1_file_name;
-            return;
-        }
-    }
-
-    if (!test->rightForearmMeasurement->m_forearmDicomFile.absFilePath.isNull()) {
-        ok = NetworkUtils::sendHTTPSRequest("PATCH",
-                  (answerUrl + "?filename=" + fa_2_file_name.replace("_dcm", ".dcm")).toStdString(),
-                  "application/octet-stream",
-                  fa_2);
-        if (!ok) {
-            //emit error("Could not transmit file");
-            qDebug() << "error transmitting file: " << fa_2_file_name;
-            return;
-        }
-    }
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    qDebug() << jsonString.toStdString().c_str();
 
     emit success("Success: files saved to Pine");
-
     cleanUp();
 }
 

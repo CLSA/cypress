@@ -26,8 +26,8 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     ui->testInfoWidget->setSessionInformation(*session);
 
     QList<TableColumn> columns;
-    columns << TableColumn("PATIENT_ID", "Patient ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("STUDY_ID", "Study ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("PATIENT_ID", "Patient ID", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("NAME", "Name", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("MEDIA_STORAGE_UID", "Media UID", new TextDelegate("", QRegExp(), true));
 
     // device started

@@ -33,6 +33,13 @@ void TestBase::addMetaData(const QString &key, const QVariant &value)
     m_metaData.setAttribute(key, value);
 }
 
+void TestBase::removeMetaData(const QString& key)
+{
+    if (m_metaData.hasAttribute(key)) {
+        m_metaData.removeAttribute(key);
+    }
+}
+
 void TestBase::addMetaData(const QString &key, const Measurement::Value &value)
 {
     m_metaData.setAttribute(key, value);

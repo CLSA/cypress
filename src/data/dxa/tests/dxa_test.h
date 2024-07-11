@@ -30,12 +30,6 @@ public:
 
     void getPatientScan(const QSqlDatabase &db, const QString &participantId);
     void getScanAnalysisData(const QSqlDatabase& patscanDb, const QSqlDatabase& referenceDb, const QJsonObject& patientData);
-
-private:
-    QSharedPointer<QJsonObject> m_wholeBodyScanAnalysis;
-    QSharedPointer<QJsonObject> m_apSpineScanAnalysis;
-    QSharedPointer<QJsonObject> m_leftForearmScanAnalysis;
-    QSharedPointer<QJsonObject> m_rightForearmScanAnalysis;
 };
 
 #endif // DXA_TEST_H

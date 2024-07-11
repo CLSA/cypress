@@ -123,27 +123,34 @@ bool HipMeasurement::isValidDicomFile(DicomFile file)
 
 void HipMeasurement::addDicomFile(DicomFile file)
 {
-    if (file.laterality == "L")
+    dicomFile = file;
+    dicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+
+    if (dicomFile.laterality == "L") {
         m_side = Side::LEFT;
-    else if (file.laterality == "F")
+
+        dicomFile.name = "L_HIP_DICOM";
+        dicomFile.fileName = "L_HIP_DICOM.dcm";
+    }
+    else if (dicomFile.laterality == "R") {
         m_side = Side::RIGHT;
+
+        dicomFile.name = "R_HIP_DICOM";
+        dicomFile.fileName = "R_HIP_DICOM.dcm";
+    }
     else {
         qCritical() << "HipMeasurement::addDicomFile: hip file does not have a laterality";
         throw QException();
     }
 
-    file.name = "HIP_DICOM";
-    file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+    setAttribute("NAME",              dicomFile.name);
+    setAttribute("SIZE",              dicomFile.size);
+    setAttribute("PATIENT_ID",        dicomFile.patientId);
+    setAttribute("FILE_PATH",         dicomFile.absFilePath);
+    setAttribute("STUDY_ID",          dicomFile.studyId);
+    setAttribute("SIDE",              dicomFile.laterality);
+    setAttribute("MEDIA_STORAGE_UID", dicomFile.mediaStorageUID);
 
-    setAttribute("NAME",              file.name);
-    setAttribute("SIZE",              file.size);
-    setAttribute("PATIENT_ID",        file.patientId);
-    setAttribute("FILE_PATH",         file.absFilePath);
-    setAttribute("STUDY_ID",          file.studyId);
-    setAttribute("SIDE",              file.laterality);
-    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
-
-    m_dicomFile = file;
     m_hasDicomFile = true;
 }
 

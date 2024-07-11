@@ -25,16 +25,11 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-    void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) override;
-
-public:
     bool hasAllNeededFiles() const override;
-
-private:
+    void getScanData(const QSqlDatabase& db, const QString& patientKey, const QString& scanId) override;
     Side m_side;
 
-    DicomFile m_dicomFile;
-
+private:
     bool m_hasDicomFile;
 };
 

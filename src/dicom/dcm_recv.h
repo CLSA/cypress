@@ -19,6 +19,7 @@ struct DicomFile {
     QString seriesNumber {};
     QString size {};
     QString name {};
+    QString fileName {};
     QString absFilePath {};
     QString laterality {};
 };

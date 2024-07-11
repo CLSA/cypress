@@ -269,8 +269,8 @@ bool RetinalCameraManager::cleanupDatabase()
     }
 
     QSqlQuery query(m_db);
-    query.prepare("SELECT FileName, FileExt, StoragePathUid FROM Media WHERE PatientUid = :patientUUID");
-    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.prepare("SELECT FileName, FileExt, StoragePathUid FROM Media");
+    //query.bindValue(":patientUUID", defaultPatientUUID);
 
     qDebug() << query.lastQuery();
 
@@ -293,8 +293,8 @@ bool RetinalCameraManager::cleanupDatabase()
         file.remove();
     }
 
-    query.prepare("DELETE FROM Exams WHERE PatientUid = :patientUUID");
-    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.prepare("DELETE FROM Exams");
+    //query.bindValue(":patientUUID", defaultPatientUUID);
     qDebug() << query.lastQuery();
 
     if (!query.exec()) {
@@ -303,8 +303,8 @@ bool RetinalCameraManager::cleanupDatabase()
     }
 
 
-    query.prepare("DELETE FROM Media WHERE PatientUid = :patientUUID");
-    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.prepare("DELETE FROM Media");
+    //query.bindValue(":patientUUID", defaultPatientUUID);
     qDebug() << query.lastQuery();
 
     if (!query.exec()) {
@@ -312,8 +312,8 @@ bool RetinalCameraManager::cleanupDatabase()
         return false;
     }
 
-    query.prepare("DELETE FROM Patients WHERE PatientUid = :patientUUID");
-    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.prepare("DELETE FROM Patients");
+    //query.bindValue(":patientUUID", defaultPatientUUID);
     qDebug() << query.lastQuery();
 
     if (!query.exec()) {

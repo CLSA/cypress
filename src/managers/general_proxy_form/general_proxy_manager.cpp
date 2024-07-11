@@ -48,7 +48,7 @@ void GeneralProxyManager::measure()
     PDFFormFiller filler;
     QJsonObject inputData;
 
-    inputData["enrollmentId"] = m_session->getUID();
+    inputData["enrollmentId"] = m_session->getBarcode();
 
     QString language = m_session->getInputData().value("language").toString();
     QDir currentDir = QDir::currentPath();
@@ -62,6 +62,7 @@ void GeneralProxyManager::measure()
         inputData,
         m_outputFilePath
     );
+
 
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this,
@@ -80,7 +81,11 @@ void GeneralProxyManager::measure()
         qDebug() << "process state: " << s.join(" ").toLower();
     });
 
+    qDebug() << outputPath;
+
     QStringList arguments { QDir::toNativeSeparators(outputPath) };
+
+    qDebug() << "output path: " << arguments;
 
     m_process.setProgram(m_runnableName);
     m_process.setArguments(arguments);

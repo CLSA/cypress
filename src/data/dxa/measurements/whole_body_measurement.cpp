@@ -45,32 +45,29 @@ void WholeBodyScanMeasurement::addDicomFile(DicomFile file)
         return;
     }
 
-    setAttribute("PATIENT_ID", file.patientId);
-    setAttribute("FILEPATH", file.absFilePath);
-    setAttribute("STUDY_ID", file.studyId);
-    setAttribute("MEDIA_STORAGE_UID", file.mediaStorageUID);
+    dicomFile = file;
+    dicomFile.size = FileUtils::getHumanReadableFileSize(dicomFile.absFilePath);
 
     if (isWholeBody1(loadedFileFormat)) {
-        qDebug() << "adding dicom 1";
-        qDebug() << file.absFilePath;
+        qInfo() << "adding dicom 1";
 
-        m_dicomFile = file;
-        m_dicomFile.name = "WB_DICOM_1";
-        m_dicomFile.size = FileUtils::getHumanReadableFileSize(m_dicomFile.absFilePath);
-
-        setAttribute("NAME", "WB_DICOM_1");
+        dicomFile.name = "WB_DICOM_1";
+        dicomFile.fileName = "WB_DICOM_1.dcm";
     }
 
     else if (isWholeBody2(loadedFileFormat)) {
-        qDebug() << "adding dicom 2";
-        qDebug() << file.absFilePath;
+        qInfo() << "adding dicom 2";
 
-        m_dicomFile = file;
-        m_dicomFile.name = "WB_DICOM_2";
-        m_dicomFile.size = FileUtils::getHumanReadableFileSize(m_dicomFile.absFilePath);
-
-        setAttribute("NAME", "WB_DICOM_2");
+        dicomFile.name = "WB_DICOM_2";
+        dicomFile.fileName = "WB_DICOM_2.dcm";
     }
+
+
+    setAttribute("NAME", 				dicomFile.name);
+    setAttribute("PATIENT_ID", 			dicomFile.patientId);
+    setAttribute("FILEPATH", 			dicomFile.absFilePath);
+    setAttribute("STUDY_ID", 			dicomFile.studyId);
+    setAttribute("MEDIA_STORAGE_UID", 	dicomFile.mediaStorageUID);
 }
 
 Side WholeBodyScanMeasurement::getSide() {

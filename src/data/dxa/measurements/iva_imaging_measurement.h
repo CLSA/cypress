@@ -30,7 +30,6 @@ public:
     static bool isDicomPRFile(DcmFileFormat &file);
     static bool isDicomOTFile(DcmFileFormat &file);
 
-    DicomFile m_dicomFile {};
     bool m_hasDicomFile {false};
 
     bool hasAllNeededFiles() const override;

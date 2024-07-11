@@ -51,9 +51,6 @@ public:
     QHBoxLayout *state;
     QLabel *stateLabel;
     QLabel *stateValue;
-    QHBoxLayout *reading;
-    QLabel *readingLabel;
-    QLabel *readingValue;
     QHBoxLayout *cuffPressure;
     QLabel *cuffPressureLabel;
     QLabel *cuffPressureValue;
@@ -61,13 +58,12 @@ public:
     QLabel *cycleLabel;
     QLabel *cycleValue;
     MeasurementTable *measurementTable;
-    QSpacerItem *verticalSpacer;
 
     void setupUi(QDialog *BloodPressureDialog)
     {
         if (BloodPressureDialog->objectName().isEmpty())
             BloodPressureDialog->setObjectName(QString::fromUtf8("BloodPressureDialog"));
-        BloodPressureDialog->resize(643, 418);
+        BloodPressureDialog->resize(643, 354);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -206,21 +202,6 @@ public:
 
         verticalLayout_3->addLayout(state);
 
-        reading = new QHBoxLayout();
-        reading->setObjectName(QString::fromUtf8("reading"));
-        readingLabel = new QLabel(currentMeasurement);
-        readingLabel->setObjectName(QString::fromUtf8("readingLabel"));
-
-        reading->addWidget(readingLabel);
-
-        readingValue = new QLabel(currentMeasurement);
-        readingValue->setObjectName(QString::fromUtf8("readingValue"));
-
-        reading->addWidget(readingValue);
-
-
-        verticalLayout_3->addLayout(reading);
-
         cuffPressure = new QHBoxLayout();
         cuffPressure->setObjectName(QString::fromUtf8("cuffPressure"));
         cuffPressureLabel = new QLabel(currentMeasurement);
@@ -259,10 +240,6 @@ public:
 
         verticalLayout_2->addWidget(measurementTable);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacer);
-
 
         retranslateUi(BloodPressureDialog);
 
@@ -284,8 +261,6 @@ public:
         currentMeasurement->setTitle(QCoreApplication::translate("BloodPressureDialog", "Current Measurement", nullptr));
         stateLabel->setText(QCoreApplication::translate("BloodPressureDialog", "State", nullptr));
         stateValue->setText(QString());
-        readingLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Reading", nullptr));
-        readingValue->setText(QString());
         cuffPressureLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Cuff Pressure", nullptr));
         cuffPressureValue->setText(QString());
         cycleLabel->setText(QCoreApplication::translate("BloodPressureDialog", "Cycle", nullptr));

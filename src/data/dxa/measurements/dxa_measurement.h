@@ -39,6 +39,8 @@ public:
 
     virtual bool hasAllNeededFiles() const = 0;
 
+    DicomFile dicomFile;
+
 public: // Measurement
     virtual bool isValid() const override;
     virtual QString toString() const override;

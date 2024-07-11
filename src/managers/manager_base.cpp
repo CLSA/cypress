@@ -117,3 +117,8 @@ void ManagerBase::addManualMeasurement()
 {
     return;
 }
+
+void ManagerBase::checkIfFinished()
+{
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
+}

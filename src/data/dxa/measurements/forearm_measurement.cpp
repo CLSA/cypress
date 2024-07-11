@@ -113,26 +113,35 @@ QString ForearmMeasurement::toString() const
 
 void ForearmMeasurement::addDicomFile(DicomFile file)
 {
-    if (file.laterality == "L")
+    DcmFileFormat loadedFileFormat;
+    if (!loadedFileFormat.loadFile(file.absFilePath.toStdString().c_str()).good())
+        return;
+
+    dicomFile = file;
+    dicomFile.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+
+    if (file.laterality == "L") {
         m_side = Side::LEFT;
-    else if (file.laterality == "R")
+        dicomFile.name = "FA_L_DICOM";
+        dicomFile.fileName= "FA_L_DICOM.dcm";
+    }
+    else if (file.laterality == "R") {
         m_side = Side::RIGHT;
+        dicomFile.name = "FA_R_DICOM";
+        dicomFile.fileName= "FA_R_DICOM.dcm";
+    }
     else {
         qCritical() << "ForearmMeasurement::addDicomFile: forearm file does not have a laterality";
         throw QException();
     }
 
-    file.name = "FA_DICOM";
-    file.size = FileUtils::getHumanReadableFileSize(file.absFilePath);
+    setAttribute("NAME", 				dicomFile.name);
+    setAttribute("SIZE", 				dicomFile.size);
+    setAttribute("PATIENT_ID", 			dicomFile.patientId);
+    setAttribute("FILE_PATH", 			dicomFile.absFilePath);
+    setAttribute("STUDY_ID", 			dicomFile.studyId);
+    setAttribute("MEDIA_STORAGE_UID", 	dicomFile.mediaStorageUID);
 
-    setAttribute("NAME", 				file.name);
-    setAttribute("SIZE", 				file.size);
-    setAttribute("PATIENT_ID", 			file.patientId);
-    setAttribute("FILE_PATH", 			file.absFilePath);
-    setAttribute("STUDY_ID", 			file.studyId);
-    setAttribute("MEDIA_STORAGE_UID", 	file.mediaStorageUID);
-
-    m_dicomFile = file;
     m_hasDicomFile = true;
 }
 

@@ -93,6 +93,8 @@ public:
     bool getManualEntryMode() const;
     void setManualEntryMode(bool isManualEntry);
 
+    void removeMetaData(const QString &key);
+
 protected:
     QVector<QSharedPointer<Measurement>> m_measurementList;
 

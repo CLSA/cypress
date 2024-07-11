@@ -25,7 +25,6 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     m_runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     m_outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
-    m_settingsFilePath = CypressSettings::readSetting("cdtt/settingsFilePath").toString();
 
     QDir outputDir(m_outputPath);
     m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
@@ -36,7 +35,6 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     qInfo() << "runnablePath:" 	<< m_runnablePath;
     qInfo() << "outputPath:"	<< m_outputPath;
 
-    qInfo() << "settingsPath:"  << m_settingsFilePath;
     qInfo() << "outputPath:" 	<< m_outputFile;
 
     qInfo() << "sessionId:" 	<< session->getSessionId();
@@ -61,7 +59,6 @@ bool CDTTManager::isInstalled()
     const QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
     const QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
-    const QString settingsFilePath = CypressSettings::readSetting("cdtt/settingsFilePath").toString();
 
     if (jre.isNull() || jre.isEmpty()) {
         qInfo() << "CDTTManager::isInstalled: jre is undefined";
@@ -80,11 +77,6 @@ bool CDTTManager::isInstalled()
 
     if (outputPath.isNull() || outputPath.isEmpty()) {
         qInfo() << "CDTTManager::isInstalled: outputPath is undefined";
-        return false;
-    }
-
-    if (settingsFilePath.isNull() || settingsFilePath.isEmpty()) {
-        qInfo() << "CDTTManager::isInstalled: settingsFilePath is undefined";
         return false;
     }
 

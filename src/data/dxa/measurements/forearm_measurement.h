@@ -27,7 +27,6 @@ public:
     QString getRefType() override;
     QString getRefSource() override;
 
-    DicomFile m_dicomFile{};
     bool m_hasDicomFile { false };
 
     // DXAMeasurement interface

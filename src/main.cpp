@@ -27,6 +27,7 @@
 #include <QNetworkInterface>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 const QString orgName = "CLSA";
 const QString orgDomain = "clsa-elcv.ca";
@@ -38,14 +39,9 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 {
     QString txt = qFormatLogMessage(type, context, msg);
     static FILE *f = fopen("./log.txt", "a");
+    static QTextStream ts( stdout );
 
-    if (type == QtMsgType::QtDebugMsg && CypressSettings::isDebugMode()) {
-        fprintf(f, "DEBUG [%s] %s\n",
-            qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
-            qPrintable(txt)
-        );
-    }
-    else if (QtMsgType::QtSystemMsg) {
+    if (QtMsgType::QtSystemMsg) {
         fprintf(f, "SYSTEM [%s] %s\n",
             qPrintable(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")),
             qPrintable(txt)
@@ -77,6 +73,10 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     }
 
     fflush(f);
+
+    // print to console
+    ts << msg << "\n";
+    ts.flush();
 }
 
 // Removes old log files (>= 30 days old)

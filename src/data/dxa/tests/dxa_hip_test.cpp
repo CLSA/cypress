@@ -55,8 +55,8 @@ void DxaHipTest::getScanAnalysisData(
     const QJsonObject& patientData) {
 
     foreach(auto measure, m_measurementList) {
-        auto dxaMeasure = qSharedPointerDynamicCast<DXAMeasurement>(measure);
-        dxaMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
+        auto hipMeasure = qSharedPointerDynamicCast<DXAMeasurement>(measure);
+        hipMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
     }
 }
 
@@ -102,8 +102,15 @@ QJsonObject DxaHipTest::toJsonObject() const
     QJsonObject results{};
     QJsonObject hip{};
 
-    //results.insert("hip_l", leftHipMeasurement->toJsonObject());
-    //results.insert("hip_r", rightHipMeasurement->toJsonObject());
+    foreach (auto measure, m_measurementList) {
+        const auto hipMeasure = qSharedPointerDynamicCast<HipMeasurement>(measure);
+        if (hipMeasure->m_side == Side::LEFT) {
+            results.insert("hip_l", measure->toJsonObject());
+        }
+        else if (hipMeasure->m_side == Side::RIGHT) {
+            results.insert("hip_r", measure->toJsonObject());
+        }
+    }
 
     json.insert("results", results);
     json.insert("manual_entry", getManualEntryMode());

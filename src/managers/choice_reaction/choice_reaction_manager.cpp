@@ -17,6 +17,7 @@
 #include <QJsonDocument>
 #include <QMessageBox>
 
+
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
@@ -169,6 +170,7 @@ void ChoiceReactionManager::finish() {
     if (!dir.exists()) {
         qDebug() << "directory does not exist: " << m_outputPath;
         emit error("Output directory does not exist. Could not save measurements.");
+        return;
     }
 
     QStringList pattern;
