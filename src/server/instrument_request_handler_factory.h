@@ -33,8 +33,14 @@ public:
     static HTTPRequestHandler* createAudiometerRequestHandler();
     static HTTPRequestHandler* createAudiometerStatusRequestHandler();
 
+    static HTTPRequestHandler* createHearconRequestHandler();
+    static HTTPRequestHandler* createHearconStatusRequestHandler();
+
     static HTTPRequestHandler* createBloodPressureRequestHandler();
     static HTTPRequestHandler* createBloodPressureStatusRequestHandler();
+
+    static HTTPRequestHandler* createWatchBPRequestHandler();
+    static HTTPRequestHandler* createWatchBPStatusRequestHandler();
 
     static HTTPRequestHandler* createDxaHipRequestHandler();
     static HTTPRequestHandler* createDxaHipStatusRequestHandler();

@@ -1,0 +1,21 @@
+#include "hearcon_session.h"
+
+#include "dialogs/hearcon_dialog.h"
+#include "managers/hearcon_manager.h"
+
+HearconSession::HearconSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
+    : CypressSession{parent, inputData, origin} {
+}
+
+void HearconSession::isInstalled() const {
+    if (!HearconManager::isInstalled())
+        throw NotInstalledError("Audiometer is not installed on this workstation");
+}
+
+void HearconSession::isAvailable() const {
+
+}
+
+void HearconSession::initializeDialog() {
+    m_dialog = new HearconDialog(nullptr, QSharedPointer<HearconSession>(this));
+}

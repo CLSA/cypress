@@ -15,6 +15,10 @@
 #include "managers/ultrasound/vividi_manager.h"
 #include "managers/weigh_scale/weigh_scale_manager.h"
 
+#include "managers/general_proxy_form/general_proxy_manager.h"
+#include "managers/hearcon_manager.h"
+#include "managers/watch_bp_manager.h"
+
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -124,10 +128,11 @@ QJsonObject Cypress::getStatus()
     QJsonObject availableInstruments {{}};
 
     statusJson["availableInstruments"] = QJsonObject{
+        {"general_proxy", GeneralProxyManager::isInstalled()},
         {"audiometer", AudiometerManager::isInstalled()},
+        {"hearcon", HearconManager::isInstalled()},
         {"blood_pressure", BloodPressureManager::isInstalled()},
-        {"temperature", false},
-        {"body_composition", false},
+        {"watch_bp", WatchBPManager::isInstalled()},
         {"cdtt", CDTTManager::isInstalled()},
         {"choice_reaction", ChoiceReactionManager::isInstalled()},
         {"dxa", DxaHipManager::isInstalled()},
@@ -139,7 +144,6 @@ QJsonObject Cypress::getStatus()
         {"tonometer", TonometerManager::isInstalled()},
         {"ultrasound", VividiManager::isInstalled()},
         {"weigh_scale", WeighScaleManager::isInstalled()},
-        {"signature_pad", false},
     };
 
     return statusJson;

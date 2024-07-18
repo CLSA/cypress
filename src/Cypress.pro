@@ -59,12 +59,14 @@ FORMS += \
   dialogs/frax_dialog.ui \
   dialogs/general_proxy_form_dialog.ui \
   dialogs/grip_strength_dialog.ui \
+  dialogs/hearcon_dialog.ui \
   dialogs/oct_dialog.ui \
   dialogs/retinal_camera_dialog.ui \
   dialogs/runnable_dialog.ui \
   #dialogs/signature_pad_dialog.ui \
   dialogs/spirometer_dialog.ui \
   dialogs/tonometer_dialog.ui \
+  dialogs/watch_bp_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
   widgets/apex_transfer_widget.ui \
   widgets/audiometer_manual_entry_form.ui \
@@ -129,8 +131,12 @@ HEADERS += \
     cypress_main_window.h \
     cypress_session.h \
     cypress_settings.h \
+    data/blood_pressure/measurements/watch_bp_measurement.h \
+    data/blood_pressure/tests/watch_bp_test.h \
     data/dxa/tests/dxa_hip_test.h \
     data/frax/frax_helper.h \
+    data/hearing/measurements/hearcon_measurement.h \
+    data/hearing/tests/hearcon_test.h \
     data/measurement.h \
     data/access_query_helper.h \
     data/blood_pressure/measurements/blood_pressure_measurement.h \
@@ -187,11 +193,13 @@ HEADERS += \
     dialogs/frax_dialog.h \
     dialogs/general_proxy_form_dialog.h \
     dialogs/grip_strength_dialog.h \
+    dialogs/hearcon_dialog.h \
     dialogs/oct_dialog.h \
     dialogs/retinal_camera_dialog.h \
     #dialogs/signature_pad_dialog.h \
     dialogs/spirometer_dialog.h \
     dialogs/tonometer_dialog.h \
+    dialogs/watch_bp_dialog.h \
     dialogs/weigh_scale_dialog.h \
     dicom/dcm_recv.h \
     dicom/dicom_directory_watcher.h \
@@ -232,6 +240,10 @@ HEADERS += \
     server/default_delete_request_handler.h \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
+    server/handlers/audiometer/hearcon_request_handler.h \
+    server/handlers/audiometer/hearcon_status_request_handler.h \
+    server/handlers/blood_pressure/watch_bp_request_handler.h \
+    server/handlers/blood_pressure/watch_bp_status_request_handler.h \
     server/handlers/dxa/dxa_hip_request_handler.h \
     server/handlers/dxa/dxa_hip_session_request_handler.h \
     server/handlers/dxa/dxa_hip_status_request_handler.h \
@@ -285,12 +297,15 @@ HEADERS += \
     server/sessions/frax_session.h \
     server/sessions/gen_proxy_session.h \
     server/sessions/grip_strength_session.h \
+    server/sessions/hearcon_session.h \
     server/sessions/oct_session.h \
+    server/sessions/ora_session.h \
     server/sessions/participant_report_session.h \
     server/sessions/retinal_camera_session.h \
     server/sessions/spirometer_session.h \
     server/sessions/tonometer_session.h \
     server/sessions/ultrasound_session.h \
+    server/sessions/watch_bp_session.h \
     server/sessions/weigh_scale_session.h \
     server/utils.h \
     tray_application.h \
@@ -342,8 +357,12 @@ SOURCES += \
     cypress_main_window.cpp \
     cypress_session.cpp \
     cypress_settings.cpp \
+    data/blood_pressure/measurements/watch_bp_measurement.cpp \
+    data/blood_pressure/tests/watch_bp_test.cpp \
     data/dxa/tests/dxa_hip_test.cpp \
     data/frax/frax_helper.cpp \
+    data/hearing/measurements/hearcon_measurement.cpp \
+    data/hearing/tests/hearcon_test.cpp \
     data/measurement.cpp \
     data/access_query_helper.cpp \
     data/blood_pressure/measurements/blood_pressure_measurement.cpp \
@@ -400,11 +419,13 @@ SOURCES += \
     dialogs/frax_dialog.cpp \
     dialogs/general_proxy_form_dialog.cpp \
     dialogs/grip_strength_dialog.cpp \
+    dialogs/hearcon_dialog.cpp \
     dialogs/oct_dialog.cpp \
     dialogs/retinal_camera_dialog.cpp \
     #dialogs/signature_pad_dialog.cpp \
     dialogs/spirometer_dialog.cpp \
     dialogs/tonometer_dialog.cpp \
+    dialogs/watch_bp_dialog.cpp \
     dialogs/weigh_scale_dialog.cpp \
     dicom/dcm_recv.cpp \
     dicom/dicom_directory_watcher.cpp \
@@ -445,6 +466,10 @@ SOURCES += \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
+    server/handlers/audiometer/hearcon_request_handler.cpp \
+    server/handlers/audiometer/hearcon_status_request_handler.cpp \
+    server/handlers/blood_pressure/watch_bp_request_handler.cpp \
+    server/handlers/blood_pressure/watch_bp_status_request_handler.cpp \
     server/handlers/dxa/dxa_hip_request_handler.cpp \
     server/handlers/dxa/dxa_hip_session_request_handler.cpp \
     server/handlers/dxa/dxa_hip_status_request_handler.cpp \
@@ -499,12 +524,15 @@ SOURCES += \
     server/sessions/frax_session.cpp \
     server/sessions/gen_proxy_session.cpp \
     server/sessions/grip_strength_session.cpp \
+    server/sessions/hearcon_session.cpp \
     server/sessions/oct_session.cpp \
+    server/sessions/ora_session.cpp \
     server/sessions/participant_report_session.cpp \
     server/sessions/retinal_camera_session.cpp \
     server/sessions/spirometer_session.cpp \
     server/sessions/tonometer_session.cpp \
     server/sessions/ultrasound_session.cpp \
+    server/sessions/watch_bp_session.cpp \
     server/sessions/weigh_scale_session.cpp \
     server/utils.cpp \
     tray_application.cpp \

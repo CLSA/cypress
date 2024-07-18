@@ -5,7 +5,9 @@
 
 #include "sessions/frax_session.h"
 #include "sessions/audiometer_session.h"
+#include "sessions/hearcon_session.h"
 #include "sessions/bpm_session.h"
+#include "sessions/watch_bp_session.h"
 #include "sessions/cdtt_session.h"
 #include "sessions/ultrasound_session.h"
 #include "sessions/choice_reaction_session.h"
@@ -76,8 +78,14 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Audiometer:
             session = QSharedPointer<AudiometerSession>(new AudiometerSession(nullptr, inputData, origin));
             break;
+        case Constants::MeasureType::Hearcon:
+            session = QSharedPointer<HearconSession>(new HearconSession(nullptr, inputData, origin));
+            break;
         case Constants::MeasureType::Blood_Pressure:
             session = QSharedPointer<BPMSession>(new BPMSession(nullptr, inputData, origin));
+            break;
+        case Constants::MeasureType::Watch_BP:
+            session = QSharedPointer<WatchBPSession>(new WatchBPSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Body_Composition:
             break;

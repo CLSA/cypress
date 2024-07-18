@@ -1,53 +1,84 @@
 #include "watch_bp_manager.h"
 
+#include "data/blood_pressure/tests/watch_bp_test.h"
+
+#include <QMessageBox>
 #include <QJsonObject>
+#include <QJsonArray>
+#include <QSqlError>
+
 #include <QFile>
 #include <QDir>
 
-WatchBPManager::WatchBPManager(QSharedPointer<CypressSession> session): ManagerBase(session)
+#include <windows.h>
+#include <TlHelp32.h>
+
+WatchBPManager::WatchBPManager(QSharedPointer<WatchBPSession> session): ManagerBase(session)
 {
+    m_processName = CypressSettings::readSetting("watch_bp/processName").toString();
     m_runnableName = CypressSettings::readSetting("watch_bp/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("watch_bp/runnablePath").toString();
     m_databasePath = CypressSettings::readSetting("watch_bp/databasePath").toString();
+    m_backupDatabasePath = CypressSettings::readSetting("watch_bp/backupDatabasePath").toString();
+
+    m_test.reset(new WatchBPTest);
 }
 
 bool WatchBPManager::isInstalled()
 {
+    const QString processName = CypressSettings::readSetting("watch_bp/processName").toString();
     const QString runnableName = CypressSettings::readSetting("watch_bp/runnableName").toString();
     const QString runnablePath = CypressSettings::readSetting("watch_bp/runnablePath").toString();
     const QString databasePath = CypressSettings::readSetting("watch_bp/databasePath").toString();
+    const QString backupDatabasePath = CypressSettings::readSetting("watch_bp/backupDatabasePath").toString();
+
+    if (backupDatabasePath.isEmpty() || backupDatabasePath.isNull()) {
+        qInfo() << "WatchBPManager::isInstalled - backupDatabasePath is not defined";
+        return false;
+    }
+
+    if (processName.isEmpty() || processName.isNull()) {
+        qInfo() << "WatchBPManager::isInstalled - processName is not defined";
+        return false;
+    }
 
     if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "RetinalCamera: runnableName is not defined";
+        qInfo() << "WatchBPManager::isInstalled - runnableName is not defined";
         return false;
     }
 
     if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "RetinalCamera: runnablePath is not defined";
+        qInfo() << "WatchBPManager::isInstalled - runnablePath is not defined";
         return false;
     }
 
     if (databasePath.isEmpty() || databasePath.isNull()) {
-        qInfo() << "RetinalCamera: databasePath is not defined";
+        qInfo() << "WatchBPManager::isInstalled - databasePath is not defined";
         return false;
     }
 
-    const QDir runnablePathInfo(runnableName);
+    const QDir runnablePathInfo(runnablePath);
     const QFileInfo runnableNameInfo(runnableName);
     const QFileInfo databasePathInfo(databasePath);
+    const QFileInfo backupDatabasePathInfo(backupDatabasePath);
 
     if (!runnablePathInfo.exists()) {
-        qInfo() << "RetinalCamera: runnablePath does not exist";
+        qInfo() << "WatchBPManager::isInstalled - runnablePath does not exist";
         return false;
     }
 
     if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
-        qInfo() << "RetinalCamera: runnableName is not executable";
+        qInfo() << "WatchBPManager::isInstalled - runnableName is not executable";
         return false;
     }
 
     if (!databasePathInfo.exists() || !databasePathInfo.isReadable()) {
-        qInfo() << "RetinalCamera: databasePath is not readable";
+        qInfo() << "WatchBPManager::isInstalled - databasePath is not readable";
+        return false;
+    }
+
+    if (!backupDatabasePathInfo.exists() || !backupDatabasePathInfo.isReadable()) {
+        qInfo() << "WatchBPManager::isInstalled - backupDatabasePath is not readable";
         return false;
     }
 
@@ -56,6 +87,27 @@ bool WatchBPManager::isInstalled()
 
 bool WatchBPManager::start()
 {
+    qCritical() << "WatchBPManager::start";
+
+    if (QFileInfo::exists(m_databasePath)) {
+        qDebug() << "WatchBPManager::start - database exists, removing";
+
+        if (!QFile::remove(m_databasePath)) {
+            qCritical() << "WatchBPManager::start - could not remove existing database file";
+            QMessageBox::critical(nullptr, "Error", "Could not start WatchBP Analyzer. Please contact support");
+            return false;
+        }
+    }
+
+    QFile backupDatabaseFile(m_backupDatabasePath);
+    if (!backupDatabaseFile.copy(m_databasePath)) {
+        qCritical() << "WatchBPManager::start - could not copy backup database to data folder";
+        QMessageBox::critical(nullptr, "Error", "Could not start WatchBP Analyzer. please contact support");
+        return false;
+    }
+
+    qDebug() << "WatchBPManager::start - copied backup";
+
     m_database = QSqlDatabase::addDatabase("QSQLITE");
     m_database.setDatabaseName(m_databasePath);
 
@@ -65,54 +117,23 @@ bool WatchBPManager::start()
     }
 
     QSqlQuery query;
-
-    query.prepare("DELETE FROM Data");
-    if (!query.exec()) {
-        qCritical() << "WatchBPManager::start: " << query.lastError();
-        return false;
-    }
-
-    query.prepare("DELETE FROM DataPVPWave");
-    if (!query.exec()) {
-        qCritical() << "WatchBPManager::start: " << query.lastError();
-        return false;
-    }
-
-    query.prepare("DELETE FROM Info");
-    if (!query.exec()) {
-        qCritical() << "WatchBPManager::start: " << query.lastError();
-        return false;
-    }
-
-    query.prepare("DELETE FROM PVPWave");
-    if (!query.exec()) {
-        qCritical() << "WatchBPManager::start: " << query.lastError();
-        return false;
-    }
-
-    query.prepare("DELETE FROM Patient");
-    if (!query.exec()) {
-        qCritical() << "WatchBPManager::start: " << query.lastError();
-        return false;
-    }
-
-    //query.prepare("DELETE FROM Physician");
-    //if (!query.exec()) {
-    //    qCritical() << "WatchBPManager::start: " << query.lastError();
-    //    return false;
-    //}
-
     query.prepare("INSERT INTO Patient "
-                  "(Name, ID, Gender, Age, DOB, Physician) values "
-                  "(:name, :id, :gender, :dob, :physician)");
+                  "(Name, ID, Gender, DOB, Physician) values "
+                  "(:name, :id, :sex, :dob, :physician)");
 
-    query.bindValue(":name", "CLSA Participant");
-    query.bindValue(":id", "12345678");
-    query.bindValue(":gender", "M");
-    query.bindValue(":dob", "1995-12-06");
-    query.bindValue(":physician", "None");
+    query.bindValue(":name",   "Participant");
+    query.bindValue(":id",     m_session->getBarcode());
+    query.bindValue(":sex",    m_session->getInputData().value("sex").toString() == "F" ? 1 : 0);
+    query.bindValue(":dob",    m_session->getInputData().value("dob").toString());
+    query.bindValue(":physician", "CLSA");
 
-    qInfo() << "WatchBPManager::start";
+    if (!query.exec()) {
+        qCritical() << "Can't insert patient" << query.lastError();
+        return false;
+    }
+
+    qDebug() << "WatchBPManager::start - update patient";
+
     QString command = m_runnableName;
     QStringList arguments;
 
@@ -159,9 +180,9 @@ void WatchBPManager::readOutput()
     qInfo() << "WatchBPManager::readOutput";
 
     QSqlQuery dataQuery;
-
     dataQuery.prepare("SELECT * FROM Data");
     if (!dataQuery.exec()) {
+        qCritical() << "Query failed";
         return;
     }
 
@@ -173,12 +194,9 @@ void WatchBPManager::readOutput()
             { "DIA", 			dataQuery.value(3).toInt()       },
             { "MAP", 			dataQuery.value(4).toInt()       },
             { "PP", 			dataQuery.value(5).toInt()       },
-            { "Spare5", 		dataQuery.value(6).toFloat()     },
             { "cSYS", 			dataQuery.value(7).toInt() 	     },
             { "cDIA", 			dataQuery.value(8).toInt()       },
             { "cPP", 			dataQuery.value(9).toInt()       },
-            { "Spare3", 		dataQuery.value(10).toInt()      },
-            { "Spare4", 		dataQuery.value(11).toFloat()    },
             { "HR", 			dataQuery.value(12).toInt()      },
             { "AFIB", 			dataQuery.value(13).toInt()   	 },
             { "Spare1", 		dataQuery.value(14).toInt()   	 },
@@ -196,25 +214,47 @@ void WatchBPManager::readOutput()
             { "Interval1C", 	dataQuery.value(26).toInt()      },
             { "Interval2C", 	dataQuery.value(27).toInt()      },
             { "Option", 		dataQuery.value(28).toInt()      },
-            { "Spare2", 		dataQuery.value(29).toString()   },
-            { "Spare6", 		dataQuery.value(30).toString()   },
-            { "Spare7", 		dataQuery.value(31).toInt()      },
-            { "Spare8", 		dataQuery.value(32).toInt()      },
-            { "Spare9", 		dataQuery.value(33).toInt()      },
-            { "Spare10", 		dataQuery.value(34).toInt()      },
-            { "Spare11", 		dataQuery.value(35).toString()   },
-            { "Spare12", 		dataQuery.value(36).toString()   },
-            { "Spare13", 		dataQuery.value(37).toString()   },
-            { "Spare14", 		dataQuery.value(38).toString()   },
-            { "Spare15", 		dataQuery.value(39).toString()   },
-            { "Spare16", 		dataQuery.value(40).toString()   },
-            { "Spare17", 		dataQuery.value(41).toString()   },
-            { "Spare18", 		dataQuery.value(42).toString()   },
-            { "Spare19", 		dataQuery.value(43).toString()   },
-            { "Spare20", 		dataQuery.value(44).toString()   },
         };
 
-        QSqlQuery dataPVP;
+        const int dataId = measurement.value("ID").toInt();
+
+        QSqlQuery dataPVP {};
+
+        dataPVP.prepare(
+            "SELECT "
+                "DataPVPWave.DataId, "
+                "DataPVPWave.PVPWaveId, "
+                "PVPWave.Index, "
+                "PVPWave.Part, "
+                "PVPWave.Type, "
+                "PVPWave.Resolution, "
+                "PVPWave.PointsBlobbed "
+            "FROM DataPVPWave INNER JOIN PVPWave ON DataPVPWave.PVPWaveId = PVPWave.Index "
+            "WHERE DataPVPWave.DataId = :dataId");
+
+        dataPVP.bindValue(":dataId", dataId);
+        if (!dataQuery.exec()) {
+            qCritical() << "Query 2 failed";
+            return;
+        }
+
+        QJsonArray pvp {};
+
+        while (dataPVP.next()) {
+            QJsonObject data = {
+                { "DataId",        dataPVP.value(0).toInt()    },
+                { "PVPWaveId",     dataPVP.value(1).toInt()    },
+                { "Index",         dataPVP.value(2).toInt()    },
+                { "Part",          dataPVP.value(3).toInt()    },
+                { "Type",          dataPVP.value(4).toInt()    },
+                { "Resolution",    dataPVP.value(5).toInt()    },
+                { "PointsBlobbed", dataPVP.value(6).toString() },
+            };
+
+            pvp.append(data);
+        }
+
+        measurement.insert("pvp", pvp);
     }
 }
 

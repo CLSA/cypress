@@ -30,6 +30,8 @@ public:
     enum MeasureType {
         Unknown,
         Audiometer,
+        Watch_BP,
+        Hearcon,
         Blood_Pressure,
         Body_Composition,
         CDTT,

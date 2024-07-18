@@ -1,14 +1,26 @@
 #include <QTest>
 
-#include "tst_grip_strength.h"
-#include "tst_retinal_camera.h"
+#include <atlbase.h>
+#include <atldbcli.h>
+#include <atldbsch.h> // if you are using schema template
+
+
 
 int main(int argc, char *argv[])
 {
-    int status = 0;
+    //hr = rs.Open();
 
-    status |= QTest::qExec(new TestGripStrength, argc, argv);
-    status |= QTest::qExec(new TestRetinalCamera, argc, argv);
+    //LPCOLESTR fileName { L"C:\ProgramData\Ra660\DataSources\RA660.sdf" };
+    //HRESULT res = dataSource->OpenFromFileName(fileName);
 
-    return status;
+    //qDebug() << res;
+
+    //dataSource->Close();
+
+    //// CSession* session = new CSession();
+
+    //delete dataSource;
+    //delete fileName;
+
+    return 0;
 }

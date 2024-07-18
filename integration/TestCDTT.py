@@ -5,24 +5,16 @@ import time
 
 def test_cdtt(payload):
   try:
-      response = requests.post("http://127.0.0.1:9000/cdtt", json=payload)
+      response = requests.post("http://127.0.0.1:9000/cdtt", json=payload, headers={"Origin": "127.0.0.1"})
       print(response.status_code)
       print(response.text)
 
       data = response.json()
       session_id = data['sessionId']
 
-      print("Press Enter to continue...")
-      while input() != "":
-        pass
-
-      response = requests.delete(f"http://127.0.0.1:9000/cdtt/${session_id}")
-      print(response.status_code)
-      print(response.text)
-
   except requests.exceptions.RequestException as e:
       logging.error(f"Exception: {e}")
 
 
 if __name__ == '__main__':
-  test_cdtt({ "answer_id": "10199", "barcode": "string", "language": "en", "interviewer": "string" })
+  test_cdtt({ "answer_id": 10199, "barcode": "string", "language": "en", "interviewer": "string", "origin": "127.0.0.1" })

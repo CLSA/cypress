@@ -209,6 +209,8 @@ void BloodPressureManager::stopMeasurement()
 
 void BloodPressureManager::onDeviceHandshaked(const BPMMessage &message)
 {
+    Q_UNUSED(message)
+
     qDebug() << "BPMManager::deviceHandshaked";
     emit deviceStateChanged(State::CONNECTED);
 

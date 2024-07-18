@@ -2,6 +2,7 @@
 #define WATCH_BP_MANAGER_H
 
 #include "manager_base.h"
+#include "server/sessions/watch_bp_session.h"
 
 #include <QProcess>
 #include <QSqlDatabase>
@@ -11,7 +12,7 @@
 class WatchBPManager : public ManagerBase
 {
 public:
-    WatchBPManager(QSharedPointer<CypressSession> session);
+    WatchBPManager(QSharedPointer<WatchBPSession> session);
 
     static bool isInstalled();
 
@@ -32,9 +33,11 @@ private:
     QSqlDatabase m_database;
     QProcess m_process;
 
+    QString m_processName;
     QString m_runnableName;
     QString m_runnablePath;
     QString m_databasePath;
+    QString m_backupDatabasePath;
 };
 
 #endif // WATCH_BP_MANAGER_H

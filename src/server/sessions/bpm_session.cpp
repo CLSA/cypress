@@ -5,6 +5,7 @@
 BPMSession::BPMSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
     : CypressSession{parent, inputData, origin}
 {
+
 }
 
 void BPMSession::isInstalled() const {

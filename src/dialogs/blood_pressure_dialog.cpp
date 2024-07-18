@@ -79,19 +79,19 @@ BloodPressureDialog::BloodPressureDialog(QWidget *parent, QSharedPointer<BPMSess
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
     });
-    connect(manager.get(), &BloodPressureManager::measurementStarted, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
-        Q_UNUSED(test)
-        //ui->measurementTable->initializeModel(columns);
-        qDebug() << "measurement started";
-        qDebug() << test->toJsonObject();
-    });
+    //connect(manager.get(), &BloodPressureManager::measurementStarted, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
+    //    Q_UNUSED(test)
+    //    //ui->measurementTable->initializeModel(columns);
+    //    qDebug() << "measurement started";
+    //    qDebug() << test->toJsonObject();
+    //});
 
-    connect(manager.get(), &BloodPressureManager::measurementStopped, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
-        Q_UNUSED(test)
-        //ui->measurementTable->initializeModel(columns);
-        qDebug() << "measurement started";
-        qDebug() << test->toJsonObject();
-    });
+    //connect(manager.get(), &BloodPressureManager::measurementStopped, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
+    //    Q_UNUSED(test)
+    //    //ui->measurementTable->initializeModel(columns);
+    //    qDebug() << "measurement started";
+    //    qDebug() << test->toJsonObject();
+    //});
 
     connect(manager.get(), &BloodPressureManager::cuffPressureChanged, this, &BloodPressureDialog::cuffPressureChanged);
 
