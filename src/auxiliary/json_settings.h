@@ -6,7 +6,7 @@
 namespace JsonSettings {
     QJsonObject readJsonFromFile(const QString &path);
     QJsonObject deserializeJson(const QString &jsonString);
-    QString serializeJson(const QJsonObject &jsonObject);
+    QString serializeJson(const QJsonObject &jsonObject, const bool indented = false);
 
     bool readSettingsJson(QIODevice &device, QVariantMap &map);
     bool writeSettingsJson(QIODevice &device, const QVariantMap &map);

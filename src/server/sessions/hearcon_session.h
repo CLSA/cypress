@@ -12,6 +12,8 @@ public:
     void initializeDialog() override;
     void isInstalled() const override;
     void isAvailable() const override;
+
+    void validate() const override;
 };
 
 #endif // HEARCON_SESSION_H

@@ -17,6 +17,7 @@
 #include "sessions/grip_strength_session.h"
 #include "sessions/retinal_camera_session.h"
 #include "sessions/spirometer_session.h"
+#include "sessions/easyone_connect_session.h"
 #include "sessions/tonometer_session.h"
 #include "sessions/weigh_scale_session.h"
 #include "sessions/gen_proxy_session.h"
@@ -122,11 +123,11 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Spirometer:
             session = QSharedPointer<SpirometerSession>(new SpirometerSession(nullptr, inputData, origin));
             break;
+        case Constants::MeasureType::EasyOneConnect:
+            session = QSharedPointer<EasyoneConnectSession>(new EasyoneConnectSession(nullptr, inputData, origin));
+            break;
         case Constants::MeasureType::Tonometer:
             session = QSharedPointer<TonometerSession>(new TonometerSession(nullptr, inputData, origin));
-            break;
-        case Constants::MeasureType::Thermometer:
-            session = nullptr;
             break;
         case Constants::MeasureType::Weigh_Scale:
             session = QSharedPointer<WeighScaleSession>(new WeighScaleSession(nullptr, inputData, origin));

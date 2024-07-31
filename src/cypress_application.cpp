@@ -10,7 +10,10 @@
 #include "managers/frax/frax_manager.h"
 #include "managers/grip_strength/grip_strength_manager.h"
 #include "managers/retinal_camera/retinal_camera_manager.h"
+
 #include "managers/spirometer/spirometer_manager.h"
+#include "managers/spirometer/easyone_manager.h"
+
 #include "managers/tonometer/tonometer_manager.h"
 #include "managers/ultrasound/vividi_manager.h"
 #include "managers/weigh_scale/weigh_scale_manager.h"
@@ -18,6 +21,7 @@
 #include "managers/general_proxy_form/general_proxy_manager.h"
 #include "managers/hearcon_manager.h"
 #include "managers/watch_bp_manager.h"
+
 
 #include <QDateTime>
 #include <QDebug>
@@ -141,6 +145,7 @@ QJsonObject Cypress::getStatus()
         {"grip_strength", GripStrengthManager::isInstalled()},
         {"retinal_camera", RetinalCameraManager::isInstalled()},
         {"spirometer", SpirometerManager::isInstalled()},
+        {"easyone_connect", EasyoneConnectManager::isInstalled()},
         {"tonometer", TonometerManager::isInstalled()},
         {"ultrasound", VividiManager::isInstalled()},
         {"weigh_scale", WeighScaleManager::isInstalled()},

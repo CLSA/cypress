@@ -6,11 +6,12 @@
 #include <QProcess>
 #include <QFile>
 
+#include "server/sessions/hearcon_session.h"
 
 class HearconManager : public ManagerBase
 {
 public:
-    HearconManager(QSharedPointer<CypressSession> session);
+    HearconManager(QSharedPointer<HearconSession> session);
 
     static bool isInstalled();
     // ManagerBase interface

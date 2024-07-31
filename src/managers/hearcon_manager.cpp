@@ -11,36 +11,16 @@
 #include <windows.h>
 #include <TlHelp32.h>
 
-bool isProcessRunning(const std::wstring &processName) {
-    PROCESSENTRY32 entry;
+#include "auxiliary/windows_util.h"
 
-    entry.dwSize = sizeof(PROCESSENTRY32);
 
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-    if (!snapshot) {
-        return false;
-    }
-
-    if (Process32First(snapshot, &entry)) {
-        do {
-            if (std::wstring(entry.szExeFile) == processName) {
-                CloseHandle(snapshot);
-                return true;
-            }
-        } while(Process32Next(snapshot, &entry));
-    }
-
-    CloseHandle(snapshot);
-
-    return false;
-}
-
-HearconManager::HearconManager(QSharedPointer<CypressSession> session): ManagerBase(session)
+HearconManager::HearconManager(QSharedPointer<HearconSession> session): ManagerBase(session)
 {
+    m_processName = CypressSettings::readSetting("hearcon/processName").toString();
+
     m_processPath = CypressSettings::readSetting("hearcon/processPath").toString();
     m_processFile.setFileName(m_processPath);
 
-    m_processName = CypressSettings::readSetting("hearcon/processName").toString();
     m_workingPath = CypressSettings::readSetting("hearcon/workingPath").toString();
 
     m_backupDatabasePath = CypressSettings::readSetting("hearcon/ra660/backupDatabasePath").toString();
@@ -130,28 +110,13 @@ bool HearconManager::start()
 {
     qDebug() << "HearconManager::start";
 
-    if (isProcessRunning(m_processName.toStdWString())) {
+    if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
         qCritical() << "HearconManager::start - error, process is already running";
         QMessageBox::critical(nullptr, "Error", "HearCon is already running. Please close the application and try again.");
         return false;
     }
 
-    // Remove existing directory e and copy over clean directory from backup
-    if (m_existingDatabase.exists()) {
-        qDebug() << "HearconManager::start - database exists, removing";
-
-        QFileDevice::Permissions permissions = m_existingDatabase.permissions();
-
-        qDebug() << m_existingDatabase.fileName();
-        qDebug() << "read user: " << permissions.testFlag(QFileDevice::ReadUser);
-        qDebug() << "write user: " << permissions.testFlag(QFileDevice::WriteUser);
-
-        if (!QFile::remove(m_existingDatabasePath)) {
-            qCritical() << "HearconManager::start - could not remove existing database file";
-            QMessageBox::critical(nullptr, "Error", "Could not start HearCon, please contact support");
-            return false;
-        }
-    }
+    QFile::remove(m_existingDatabasePath);
 
     /// Copy backup to the database location
     if (!m_backupDatabaseFile.copy(m_existingDatabasePath)) {
@@ -166,9 +131,9 @@ bool HearconManager::start()
         << m_existingDatabasePath
         << m_readerOutputPath
         << "initialize"
-        << "40001010"
-        << "1950-01-01"
-        << "F";
+        << m_session->getBarcode()
+        << m_session->getInputData()["dob"].toString()
+        << m_session->getInputData()["sex"].toString();
 
     m_plugin.setProgram(m_readerPath);
     m_plugin.setArguments(pluginArguments);
@@ -177,6 +142,9 @@ bool HearconManager::start()
 
     m_plugin.start();
     m_plugin.waitForFinished();
+
+    qDebug() << m_plugin.readAllStandardOutput();
+    qDebug() << m_plugin.readAllStandardError();
 
     // Launch Hearcon app
     QStringList arguments;
@@ -196,11 +164,11 @@ bool HearconManager::start()
 
 void HearconManager::measure()
 {
-    if (isProcessRunning(m_processName.toStdWString())) {
-        qCritical() << "HearconManager::start - error, process is already running";
-        QMessageBox::warning(nullptr, "Application still running", "HearCon is still running. Please close the application and try again.");
-        return;
-    }
+    //if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
+    //    qCritical() << "HearconManager::start - error, process is already running";
+    //    QMessageBox::warning(nullptr, "Application still running", "HearCon is still running. Please close the application and try again.");
+    //    return;
+    //}
 
     qDebug() << "HearconManager::measure";
     QStringList arguments;
@@ -208,9 +176,9 @@ void HearconManager::measure()
         << m_existingDatabasePath
         << m_readerOutputPath
         << "get_results"
-        << "40001010"
-        << "1950-01-01"
-        << "F";
+        << m_session->getBarcode()
+        << m_session->getInputData()["dob"].toString()
+        << m_session->getInputData()["sex"].toString();
 
     m_plugin.setProgram(m_readerPath);
     m_plugin.setArguments(arguments);
@@ -222,31 +190,35 @@ void HearconManager::measure()
     m_plugin.start();
     m_plugin.waitForFinished();
 
+    qDebug() << m_plugin.readAllStandardOutput();
+    qDebug() << m_plugin.readAllStandardError();
+    qDebug() << "Finished";
+
     // Read file from script
-    QFileInfo output(m_readerOutputPath);
+    //QFileInfo output(m_readerOutputPath);
 
-    if (!output.exists()) {
-        qCritical() << "HearconManager::readOutput - no results found";
-        emit error("No results found. Please contact support.");
-        return;
-    }
+    //if (!output.exists()) {
+    //    qCritical() << "HearconManager::readOutput - no results found";
+    //    emit error("No results found. Please contact support.");
+    //    return;
+    //}
 
-    if (!output.isReadable()) {
-        qCritical() << "HearconManager::readOutput - cannot access results";
-        emit error("Cannot access results. Please contact support.");
-        return;
-    }
+    //if (!output.isReadable()) {
+    //    qCritical() << "HearconManager::readOutput - cannot access results";
+    //    emit error("Cannot access results. Please contact support.");
+    //    return;
+    //}
 
-    auto test = qSharedPointerCast<HearconTest>(m_test);
-    test->fromJsonFile(m_readerOutputPath);
+    //auto test = qSharedPointerCast<HearconTest>(m_test);
+    //test->fromJsonFile(m_readerOutputPath);
 
-    if (test->isValid()) {
-        emit canFinish();
-    }
-    else {
-        qCritical() << "HearconManager::readOutput - results were invalid";
-        emit error("Results were invalid. Please contact support.");
-    }
+    //if (test->isValid()) {
+    //    emit canFinish();
+    //}
+    //else {
+    //    qCritical() << "HearconManager::readOutput - results were invalid";
+    //    emit error("Results were invalid. Please contact support.");
+    //}
 }
 
 void HearconManager::readOutput() {

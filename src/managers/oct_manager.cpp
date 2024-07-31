@@ -195,7 +195,7 @@ void OCTManager::measure()
     query.prepare("SELECT * FROM OCTDSA WHERE PatientID = :patientId");
 
     if (!query.exec()) {
-        qWarning() << "Select failed";
+        qWarning() << "Select from OCTDSA failed";
         return;
     }
 
@@ -206,7 +206,7 @@ void OCTManager::measure()
 
     query.prepare("SELECT * FROM Media WHERE PatientID = :patientId");
     if (!query.exec()) {
-        qWarning() << "Select returned 0 records";
+        qWarning() << "Select from media failed";
         return;
     }
     if (!query.size()) {

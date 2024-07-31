@@ -12,7 +12,7 @@ public:
 
     void setInputData(const QVariantMap&);
 
-    void write(const QString&) const;
+    void write(const QString&, const QString& patientId = "ONYX") const;
 
 private:
 
@@ -21,7 +21,7 @@ private:
     void addHeader(QXmlStreamWriter&) const;
     void addCommand(QXmlStreamWriter&) const;
     void addParameter(QXmlStreamWriter&, const QString&, const QString&) const;
-    void addPatients(QXmlStreamWriter&) const;
+    void addPatients(QXmlStreamWriter&, const QString& patientId = "ONYX") const;
     void addPatientDataAtPresent(QXmlStreamWriter&) const;
 };
 

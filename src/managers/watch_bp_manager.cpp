@@ -1,4 +1,5 @@
 #include "watch_bp_manager.h"
+#include "auxiliary/json_settings.h"
 
 #include "data/blood_pressure/tests/watch_bp_test.h"
 
@@ -59,7 +60,6 @@ bool WatchBPManager::isInstalled()
 
     const QDir runnablePathInfo(runnablePath);
     const QFileInfo runnableNameInfo(runnableName);
-    const QFileInfo databasePathInfo(databasePath);
     const QFileInfo backupDatabasePathInfo(backupDatabasePath);
 
     if (!runnablePathInfo.exists()) {
@@ -69,11 +69,6 @@ bool WatchBPManager::isInstalled()
 
     if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
         qInfo() << "WatchBPManager::isInstalled - runnableName is not executable";
-        return false;
-    }
-
-    if (!databasePathInfo.exists() || !databasePathInfo.isReadable()) {
-        qInfo() << "WatchBPManager::isInstalled - databasePath is not readable";
         return false;
     }
 
@@ -89,15 +84,7 @@ bool WatchBPManager::start()
 {
     qCritical() << "WatchBPManager::start";
 
-    if (QFileInfo::exists(m_databasePath)) {
-        qDebug() << "WatchBPManager::start - database exists, removing";
-
-        if (!QFile::remove(m_databasePath)) {
-            qCritical() << "WatchBPManager::start - could not remove existing database file";
-            QMessageBox::critical(nullptr, "Error", "Could not start WatchBP Analyzer. Please contact support");
-            return false;
-        }
-    }
+    QFile::remove(m_databasePath);
 
     QFile backupDatabaseFile(m_backupDatabasePath);
     if (!backupDatabaseFile.copy(m_databasePath)) {
@@ -186,6 +173,10 @@ void WatchBPManager::readOutput()
         return;
     }
 
+    QJsonObject output;
+
+    QJsonArray measurements;
+
     while (dataQuery.next()) {
         QJsonObject measurement {
             { "ID", 			dataQuery.value(0).toInt()       },
@@ -255,6 +246,22 @@ void WatchBPManager::readOutput()
         }
 
         measurement.insert("pvp", pvp);
+
+        measurements.append(measurement);
+    }
+
+    output["measurements"] = measurements;
+
+    QString data = JsonSettings::serializeJson(output, true);
+
+    QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.txt");
+
+    qDebug() << "write" << data;
+    QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.txt");
+    if (file.open(QFile::WriteOnly | QFile::Text)) {
+        QTextStream stream(&file);
+        stream << data;
+        file.close();
     }
 }
 
@@ -272,6 +279,7 @@ bool WatchBPManager::clearData()
 bool WatchBPManager::cleanUp()
 {
     qInfo() << "WatchBPManager::cleanUp";
+
     return true;
 }
 

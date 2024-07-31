@@ -43,6 +43,7 @@ public:
         Retinal_Camera_Left,
         Retinal_Camera_Right,
         Spirometer,
+        EasyOneConnect,
         Thermometer,
         Tonometer,
         Weigh_Scale,

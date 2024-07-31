@@ -1,6 +1,31 @@
 #include "windows_util.h"
 
 #include <QProcess>
+#include <QDebug>
+
+bool WindowsUtil::isProcessRunning(const std::wstring &processName) {
+    PROCESSENTRY32 entry;
+
+    entry.dwSize = sizeof(PROCESSENTRY32);
+
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    if (!snapshot) {
+        return false;
+    }
+
+    if (Process32First(snapshot, &entry)) {
+        do {
+            if (std::wstring(entry.szExeFile) == processName) {
+                CloseHandle(snapshot);
+                return true;
+            }
+        } while(Process32Next(snapshot, &entry));
+    }
+
+    CloseHandle(snapshot);
+
+    return false;
+}
 
 DWORD WindowsUtil::findProcessId(const std::wstring &processName)
 {

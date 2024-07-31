@@ -23,8 +23,9 @@ bool WatchBPTest::isValid() const
 
 QJsonObject WatchBPTest::toJsonObject() const
 {
-    QJsonObject json {};
+    QJsonObject json{};
 
+    // lorem ipsum todo
     return json;
 }
 

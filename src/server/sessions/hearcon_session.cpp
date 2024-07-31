@@ -16,6 +16,16 @@ void HearconSession::isAvailable() const {
 
 }
 
+void HearconSession::validate() const {
+    CypressSession::validate();
+
+    if (!isValidString("sex"))
+        throw ValidationError("sex");
+
+    if (!isValidDate("dob", "yyyy-MM-dd"))
+        throw ValidationError("dob");
+}
+
 void HearconSession::initializeDialog() {
     m_dialog = new HearconDialog(nullptr, QSharedPointer<HearconSession>(this));
 }

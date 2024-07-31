@@ -38,6 +38,9 @@
 #include "server/handlers/spirometer/spirometer_request_handler.h"
 #include "server/handlers/spirometer/spirometer_status_request_handler.h"
 
+#include "server/handlers/spirometer/easyone_connect_request_handler.h"
+#include "server/handlers/spirometer/easyone_connect_status_request_handler.h"
+
 #include "server/handlers/tonometer/tonometer_request_handler.h"
 #include "server/handlers/tonometer/tonometer_status_request_handler.h"
 
@@ -135,6 +138,10 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/spirometer/?$)"),        &InstrumentRequestHandlerFactory::createSpirometerRequestHandler },
     { QString(R"(^/spirometer/status/?$)"), &InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler },
     { QString(R"(^/spirometer/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
+
+    { QString(R"(^/easyone_connect/?$)"),        &InstrumentRequestHandlerFactory::createEasyoneConnectRequestHandler},
+    { QString(R"(^/easyone_connect/status/?$)"), &InstrumentRequestHandlerFactory::createEasyoneConnectStatusRequestHandler},
+    { QString(R"(^/easyone_connect/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
     { QString(R"(^/tonometer/?$)"),        &InstrumentRequestHandlerFactory::createTonometerRequestHandler},
     { QString(R"(^/tonometer/status/?$)"), &InstrumentRequestHandlerFactory::createTonometerStatusRequestHandler},
@@ -327,6 +334,16 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createSpirometerRequestHand
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createSpirometerStatusRequestHandler()
 {
     return new SpirometerStatusRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createEasyoneConnectRequestHandler()
+{
+    return new EasyoneConnectRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createEasyoneConnectStatusRequestHandler()
+{
+    return new EasyoneConnectStatusRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createECGRequestHandler()

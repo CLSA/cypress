@@ -9,6 +9,7 @@
 class WindowsUtil
 {
 public:
+    static bool isProcessRunning(const std::wstring &processName);
     static DWORD findProcessId(const std::wstring &processName);
     static void killProcessByName(const std::wstring &processName);
 };

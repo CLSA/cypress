@@ -55,6 +55,7 @@ FORMS += \
   dialogs/cimt_vivid_iq_dialog.ui \
   dialogs/dxa_dialog.ui \
   dialogs/dxa_hip_dialog.ui \
+  dialogs/easyone_dialog.ui \
   dialogs/ecg_dialog.ui \
   dialogs/frax_dialog.ui \
   dialogs/general_proxy_form_dialog.ui \
@@ -121,7 +122,6 @@ HEADERS += \
     auxiliary/network_utils.h \
     auxiliary/pdf_form_filler.h \
     auxiliary/utilities.h \
-    auxiliary/command_line_parser.h \
     auxiliary/file_compressor.h \
     auxiliary/json_settings.h \
     auxiliary/tracker5_util.h \
@@ -169,7 +169,9 @@ HEADERS += \
     data/retinal_camera/database_manager.h \
     data/retinal_camera/retinal_camera_measurement.h \
     data/retinal_camera/retinal_camera_test.h \
+    data/spirometer/measurements/easyone_measurement.h \
     data/spirometer/measurements/spirometer_measurement.h \
+    data/spirometer/tests/easyone_test.h \
     data/spirometer/tests/spirometer_test.h \
     data/temperature/measurements/temperature_measurement.h \
     data/temperature/tests/temperature_test.h \
@@ -189,6 +191,7 @@ HEADERS += \
     dialogs/dialog_factory.h \
     dialogs/dxa_dialog.h \
     dialogs/dxa_hip_dialog.h \
+    dialogs/easyone_dialog.h \
     dialogs/ecg_dialog.h \
     dialogs/frax_dialog.h \
     dialogs/general_proxy_form_dialog.h \
@@ -231,6 +234,7 @@ HEADERS += \
     managers/serial_port/serial_port_manager.h \
     #managers/signature_pad/signature_pad_communication.h \
     #managers/signature_pad/signature_pad_manager.h \
+    managers/spirometer/easyone_manager.h \
     managers/spirometer/spirometer_manager.h \
     managers/tonometer/tonometer_manager.h \
     managers/ultrasound/vividi_manager.h \
@@ -253,12 +257,15 @@ HEADERS += \
     server/handlers/oct_status_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
+    server/handlers/spirometer/easyone_connect_request_handler.h \
+    server/handlers/spirometer/easyone_connect_status_request_handler.h \
     server/sessions/audiometer_session.h \
     server/sessions/bpm_session.h \
     server/sessions/cdtt_session.h \
     server/sessions/choice_reaction_session.h \
     server/sessions/dxa/dxa_hip_session.h \
     server/sessions/dxa/dxa_session.h \
+    server/sessions/easyone_connect_session.h \
     server/sessions/ecg_session.h \
     server/handlers/audiometer/audiometer_request_handler.h \
     server/handlers/audiometer/audiometer_status_request_handler.h \
@@ -346,7 +353,6 @@ SOURCES += \
     auxiliary/network_utils.cpp \
     auxiliary/pdf_form_filler.cpp \
     auxiliary/utilities.cpp \
-    auxiliary/command_line_parser.cpp \
     auxiliary/file_compressor.cpp \
     auxiliary/file_utils.cpp \
     auxiliary/json_settings.cpp \
@@ -395,7 +401,9 @@ SOURCES += \
     data/retinal_camera/database_manager.cpp \
     data/retinal_camera/retinal_camera_measurement.cpp \
     data/retinal_camera/retinal_camera_test.cpp \
+    data/spirometer/measurements/easyone_measurement.cpp \
     data/spirometer/measurements/spirometer_measurement.cpp \
+    data/spirometer/tests/easyone_test.cpp \
     data/spirometer/tests/spirometer_test.cpp \
     data/temperature/measurements/temperature_measurement.cpp \
     data/temperature/tests/temperature_test.cpp \
@@ -415,6 +423,7 @@ SOURCES += \
     dialogs/dialog_factory.cpp \
     dialogs/dxa_dialog.cpp \
     dialogs/dxa_hip_dialog.cpp \
+    dialogs/easyone_dialog.cpp \
     dialogs/ecg_dialog.cpp \
     dialogs/frax_dialog.cpp \
     dialogs/general_proxy_form_dialog.cpp \
@@ -458,6 +467,7 @@ SOURCES += \
     managers/serial_port/serial_port_manager.cpp \
     #managers/signature_pad/signature_pad_communication.cpp \
     #managers/signature_pad/signature_pad_manager.cpp \
+    managers/spirometer/easyone_manager.cpp \
     managers/spirometer/spirometer_manager.cpp \
     managers/tonometer/tonometer_manager.cpp \
     managers/ultrasound/vividi_manager.cpp \
@@ -479,12 +489,15 @@ SOURCES += \
     server/handlers/oct_status_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
+    server/handlers/spirometer/easyone_connect_request_handler.cpp \
+    server/handlers/spirometer/easyone_connect_status_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
     server/sessions/bpm_session.cpp \
     server/sessions/cdtt_session.cpp \
     server/sessions/choice_reaction_session.cpp \
     server/sessions/dxa/dxa_hip_session.cpp \
     server/sessions/dxa/dxa_session.cpp \
+    server/sessions/easyone_connect_session.cpp \
     server/sessions/ecg_session.cpp \
     server/handlers/audiometer/audiometer_request_handler.cpp \
     server/handlers/audiometer/audiometer_status_request_handler.cpp \

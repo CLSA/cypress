@@ -13,10 +13,19 @@ QJsonObject JsonSettings::readJsonFromFile(const QString &path)
     return jsonDoc.object();
 }
 
-QString JsonSettings::serializeJson(const QJsonObject& jsonObject)
+QString JsonSettings::serializeJson(const QJsonObject& jsonObject, const bool indented)
 {
    QJsonDocument jsonDoc(jsonObject);
-   QString jsonString = jsonDoc.toJson();
+
+   QString jsonString;
+
+   if (indented) {
+       jsonString = jsonDoc.toJson(QJsonDocument::JsonFormat::Indented);
+   }
+   else {
+       jsonString = jsonDoc.toJson();
+   }
+
    return jsonString;
 }
 

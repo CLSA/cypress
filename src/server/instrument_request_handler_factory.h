@@ -51,15 +51,21 @@ public:
     static HTTPRequestHandler* createUltrasoundRequestHandler();
     static HTTPRequestHandler* createUltrasoundStatusRequestHandler();
 
+    // Spirometer
     static HTTPRequestHandler* createSpirometerRequestHandler();
     static HTTPRequestHandler* createSpirometerStatusRequestHandler();
+    static HTTPRequestHandler* createEasyoneConnectRequestHandler();
+    static HTTPRequestHandler* createEasyoneConnectStatusRequestHandler();
 
+    // ECG
     static HTTPRequestHandler* createEcgRequestHandler();
     static HTTPRequestHandler* createEcgStatusRequestHandler();
 
+    // FRAX
     static HTTPRequestHandler* createFraxRequestHandler();
     static HTTPRequestHandler* createFraxStatusRequestHandler();
 
+    // Tonometer
     static HTTPRequestHandler* createTonometerRequestHandler();
     static HTTPRequestHandler* createTonometerStatusRequestHandler();
 

@@ -19,10 +19,7 @@ SpirometerDialog::SpirometerDialog(QWidget *parent, QSharedPointer<SpirometerSes
 
     ui->testInfoWidget->setSessionInformation(*session);
 
-    // finished
     connect(manager.get(), &SpirometerManager::success, this, &SpirometerDialog::success);
-
-    // critical error
     connect(manager.get(), &SpirometerManager::error, this, &SpirometerDialog::error);
 }
 

@@ -16,7 +16,7 @@ void EMRPluginWriter::setInputData(const QVariantMap& input)
     m_input = input;
 }
 
-void EMRPluginWriter::write(const QString& fileName) const
+void EMRPluginWriter::write(const QString& fileName, const QString& patientId) const
 {
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly|QIODevice::Text)) {
@@ -29,7 +29,7 @@ void EMRPluginWriter::write(const QString& fileName) const
 
     addHeader(stream);
     addCommand(stream);
-    addPatients(stream);
+    addPatients(stream, patientId);
 
     stream.writeEndElement();
     stream.writeEndDocument();
@@ -61,12 +61,12 @@ void EMRPluginWriter::addCommand(QXmlStreamWriter& stream) const
     stream.writeEndElement();
 }
 
-void EMRPluginWriter::addPatients(QXmlStreamWriter& stream) const
+void EMRPluginWriter::addPatients(QXmlStreamWriter& stream, const QString& patientId) const
 {
     stream.writeStartElement("Patients");
 
     stream.writeStartElement("Patient");
-    stream.writeAttribute("ID", "ONYX");
+    stream.writeAttribute("ID", patientId);
     stream.writeEmptyElement("LastName");
     stream.writeEmptyElement("FirstName");
     stream.writeTextElement("IsBioCal", "false");
