@@ -11,7 +11,7 @@ WatchBPSession::WatchBPSession(QObject *parent, const QJsonObject& inputData, co
 
 void WatchBPSession::isInstalled() const
 {
-    if (!WatchBPManager::isInstalled())
+    if (WatchBPManager::config.hasErrors())
         throw NotInstalledError("");
 }
 

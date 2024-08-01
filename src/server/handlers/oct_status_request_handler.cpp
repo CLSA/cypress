@@ -16,7 +16,7 @@ void OCTStatusRequestHandler::handleRequest(
     Q_UNUSED(request)
     try {
         QJsonObject responseData {{
-            "status", OCTManager::isInstalled() ? "available" : "unavailable"
+            "status", !OCTManager::config.hasErrors() ? "available" : "unavailable"
         }};
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

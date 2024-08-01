@@ -2,6 +2,7 @@
 #define HEARCON_MANAGER_H
 
 #include "manager_base.h"
+#include "config/device_config.h"
 
 #include <QProcess>
 #include <QFile>
@@ -13,7 +14,8 @@ class HearconManager : public ManagerBase
 public:
     HearconManager(QSharedPointer<HearconSession> session);
 
-    static bool isInstalled();
+    static DeviceConfig config;
+
     // ManagerBase interface
 public slots:
     bool start();

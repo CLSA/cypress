@@ -1,5 +1,4 @@
 #include "hearcon_manager.h"
-#include "cypress_settings.h"
 #include "data/hearing/tests/hearcon_test.h"
 
 #include <QFile>
@@ -13,97 +12,37 @@
 
 #include "auxiliary/windows_util.h"
 
+DeviceConfig HearconManager::config {{
+    { "processName",             { "hearcon/processName",                NonEmptyString }},
+    { "processPath",             { "hearcon/processPath",                Exe            }},
+    { "workingPath",             { "hearcon/workingPath",                Dir            }},
+    { "backupDatabasePath",      { "hearcon/ra660/backupDatabasePath",   File           }},
+    { "existingDatabasePath",    { "hearcon/ra660/existingDatabasePath", File           }},
+    { "readerPath",              { "hearcon/plugin/path",                Exe            }},
+    { "readerWorkingDirectory",  { "hearcon/plugin/workingDirectory",    Dir            }},
+    { "readerOutputPath",        { "hearcon/plugin/outputDirectory",     NonEmptyString }},
+}};
 
 HearconManager::HearconManager(QSharedPointer<HearconSession> session): ManagerBase(session)
 {
-    m_processName = CypressSettings::readSetting("hearcon/processName").toString();
+    m_processName = config.getSetting("processName");
 
-    m_processPath = CypressSettings::readSetting("hearcon/processPath").toString();
+    m_processPath = config.getSetting("processPath");
     m_processFile.setFileName(m_processPath);
 
-    m_workingPath = CypressSettings::readSetting("hearcon/workingPath").toString();
+    m_workingPath = config.getSetting("workingPath");
 
-    m_backupDatabasePath = CypressSettings::readSetting("hearcon/ra660/backupDatabasePath").toString();
+    m_backupDatabasePath = config.getSetting("backupDatabasePath");
     m_backupDatabaseFile.setFileName(m_backupDatabasePath);
 
-    m_existingDatabasePath = CypressSettings::readSetting("hearcon/ra660/existingDatabasePath").toString();
+    m_existingDatabasePath = config.getSetting("existingDatabasePath");
     m_existingDatabase.setFileName(m_existingDatabasePath);
 
-    m_readerPath = CypressSettings::readSetting("hearcon/plugin/path").toString();
-    m_readerWorkingDirectory = CypressSettings::readSetting("hearcon/plugin/workingDirectory").toString();
-    m_readerOutputPath = CypressSettings::readSetting("hearcon/plugin/outputDirectory").toString();
+    m_readerPath = config.getSetting("readerPath");
+    m_readerWorkingDirectory = config.getSetting("readerWorkingDirectory");
+    m_readerOutputPath = config.getSetting("readerOutputPath");
 
     m_test.reset(new HearconTest);
-}
-
-bool HearconManager::isInstalled()
-{
-    const QString processPath = CypressSettings::readSetting("hearcon/processPath").toString();
-    const QString processName = CypressSettings::readSetting("hearcon/processName").toString();
-    const QString workingPath = CypressSettings::readSetting("hearcon/workingPath").toString();
-
-    const QString backupDatabasePath = CypressSettings::readSetting("hearcon/ra660/backupDatabasePath").toString();
-    const QString existingDatabasePath = CypressSettings::readSetting("hearcon/ra660/existingDatabasePath").toString();
-
-
-    const QString readerPath = CypressSettings::readSetting("hearcon/plugin/path").toString();
-    const QString readerWorkingDirectory = CypressSettings::readSetting("hearcon/plugin/workingDirectory").toString();
-    const QString readerOutputPath = CypressSettings::readSetting("hearcon/plugin/outputDirectory").toString();
-
-    if (backupDatabasePath.isEmpty() || backupDatabasePath.isNull()) {
-        qWarning() << "HearconManager::isInstalled - backupDatabasePath is not defined";
-        return false;
-    }
-
-    QFileInfo backupDatabaseFile(backupDatabasePath);
-    if (!backupDatabaseFile.exists() || !backupDatabaseFile.isReadable()) {
-        qWarning() << "HearconManager::start - backupDatabaseFile does not exist";
-        // If not, show error message
-        return false;
-    }
-
-    if (existingDatabasePath.isEmpty() || existingDatabasePath.isNull()) {
-        qWarning() << "HearconManager::isInstalled- existingDatabasePath is not defined";
-        return false;
-    }
-
-    if (processPath.isEmpty() || processPath.isNull()) {
-        qWarning() << "HearconManager::isInstalled - processPath is not defined";
-        return false;
-    }
-
-    QFileInfo processFile(processPath);
-    if (!processFile.exists() || !processFile.isExecutable()) {
-        qWarning() << "HearconManager::isInstalled - process does not exist";
-        return false;
-    }
-
-    if (processName.isEmpty() || processName.isNull()) {
-        qWarning() << "HearconManager::isInstalled - processName is not defined";
-        return false;
-    }
-
-    if (workingPath.isEmpty() || workingPath.isNull()) {
-        qWarning() << "HearconManager::isInstalled - working path is not defined";
-        return false;
-    }
-
-    if (readerPath.isNull() || readerPath.isEmpty()) {
-        qWarning() << "HearconManager::isInstalled - hearcon/reader/path is not defined";
-        return false;
-    }
-
-    if (readerWorkingDirectory.isNull() || readerWorkingDirectory.isEmpty()) {
-        qWarning() << "HearconManager::isInstalled - hearcon/reader/workingDirectory is not defined";
-        return false;
-    }
-
-    if (readerOutputPath.isNull() || readerOutputPath.isEmpty()) {
-        qWarning() << "HearconManager::isInstalled - hearcon/reader/outputDirectory is not defined";
-        return false;
-    }
-
-    return true;
 }
 
 bool HearconManager::start()
@@ -164,12 +103,6 @@ bool HearconManager::start()
 
 void HearconManager::measure()
 {
-    //if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
-    //    qCritical() << "HearconManager::start - error, process is already running";
-    //    QMessageBox::warning(nullptr, "Application still running", "HearCon is still running. Please close the application and try again.");
-    //    return;
-    //}
-
     qDebug() << "HearconManager::measure";
     QStringList arguments;
     arguments
@@ -195,22 +128,24 @@ void HearconManager::measure()
     qDebug() << "Finished";
 
     // Read file from script
-    //QFileInfo output(m_readerOutputPath);
+    QFileInfo output(m_readerOutputPath);
 
-    //if (!output.exists()) {
-    //    qCritical() << "HearconManager::readOutput - no results found";
-    //    emit error("No results found. Please contact support.");
-    //    return;
-    //}
+    if (!output.exists()) {
+        qCritical() << "HearconManager::readOutput - no results found";
+        emit error("Test incomplete");
+        return;
+    }
 
-    //if (!output.isReadable()) {
-    //    qCritical() << "HearconManager::readOutput - cannot access results";
-    //    emit error("Cannot access results. Please contact support.");
-    //    return;
-    //}
+    if (!output.isReadable()) {
+        qCritical() << "HearconManager::readOutput - cannot access results";
+        emit error("Cannot access results. Please contact support.");
+        return;
+    }
 
-    //auto test = qSharedPointerCast<HearconTest>(m_test);
-    //test->fromJsonFile(m_readerOutputPath);
+    auto test = qSharedPointerCast<HearconTest>(m_test);
+    test->fromJsonFile(m_readerOutputPath);
+
+    qDebug() << test->toJsonObject();
 
     //if (test->isValid()) {
     //    emit canFinish();

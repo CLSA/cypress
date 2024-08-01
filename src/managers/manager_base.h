@@ -8,6 +8,9 @@
 #include <QObject>
 #include <QWidget>
 
+#include <QDir>
+#include <QFileInfo>
+
 /*!
  * \class ManagerBase
  * \brief The base Manager class
@@ -22,6 +25,10 @@
  *
  */
 QT_FORWARD_DECLARE_CLASS(CypressSession)
+
+
+
+
 
 class ManagerBase : public QObject
 {

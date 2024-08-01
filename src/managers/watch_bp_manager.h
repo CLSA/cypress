@@ -2,6 +2,8 @@
 #define WATCH_BP_MANAGER_H
 
 #include "manager_base.h"
+#include "config/device_config.h"
+
 #include "server/sessions/watch_bp_session.h"
 
 #include <QProcess>
@@ -14,7 +16,7 @@ class WatchBPManager : public ManagerBase
 public:
     WatchBPManager(QSharedPointer<WatchBPSession> session);
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
     // ManagerBase interface
 public slots:

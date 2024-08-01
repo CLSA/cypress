@@ -9,7 +9,7 @@ void WatchBPStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", WatchBPManager::isInstalled() ? "available" : "unavailable"}
+            {"status", WatchBPManager::config.hasErrors() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

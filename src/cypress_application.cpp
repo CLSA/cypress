@@ -2,6 +2,7 @@
 #include "cypress_application.h"
 
 #include "managers/audiometer/audiometer_manager.h"
+#include "managers/oct_manager.h"
 #include "managers/blood_pressure/blood_pressure_manager.h"
 #include "managers/cdtt/cdtt_manager.h"
 #include "managers/choice_reaction/choice_reaction_manager.h"
@@ -10,18 +11,14 @@
 #include "managers/frax/frax_manager.h"
 #include "managers/grip_strength/grip_strength_manager.h"
 #include "managers/retinal_camera/retinal_camera_manager.h"
-
 #include "managers/spirometer/spirometer_manager.h"
 #include "managers/spirometer/easyone_manager.h"
-
 #include "managers/tonometer/tonometer_manager.h"
 #include "managers/ultrasound/vividi_manager.h"
 #include "managers/weigh_scale/weigh_scale_manager.h"
-
 #include "managers/general_proxy_form/general_proxy_manager.h"
 #include "managers/hearcon_manager.h"
 #include "managers/watch_bp_manager.h"
-
 
 #include <QDateTime>
 #include <QDebug>
@@ -41,7 +38,6 @@ Cypress& Cypress::getInstance()
 
     return *app;
 }
-
 
 Cypress::Cypress(QObject *parent) :
     QObject(parent),
@@ -131,24 +127,26 @@ QJsonObject Cypress::getStatus()
 
     QJsonObject availableInstruments {{}};
 
+
     statusJson["availableInstruments"] = QJsonObject{
-        {"general_proxy", GeneralProxyManager::isInstalled()},
-        {"audiometer", AudiometerManager::isInstalled()},
-        {"hearcon", HearconManager::isInstalled()},
-        {"blood_pressure", BloodPressureManager::isInstalled()},
-        {"watch_bp", WatchBPManager::isInstalled()},
-        {"cdtt", CDTTManager::isInstalled()},
-        {"choice_reaction", ChoiceReactionManager::isInstalled()},
-        {"dxa", DxaHipManager::isInstalled()},
-        {"ecg", ECGManager::isInstalled()},
-        {"frax", FraxManager::isInstalled()},
-        {"grip_strength", GripStrengthManager::isInstalled()},
-        {"retinal_camera", RetinalCameraManager::isInstalled()},
-        {"spirometer", SpirometerManager::isInstalled()},
-        {"easyone_connect", EasyoneConnectManager::isInstalled()},
-        {"tonometer", TonometerManager::isInstalled()},
-        {"ultrasound", VividiManager::isInstalled()},
-        {"weigh_scale", WeighScaleManager::isInstalled()},
+        {"general_proxy", 		GeneralProxyManager::isInstalled()},
+        {"audiometer", 			AudiometerManager::isInstalled()},
+        {"hearcon", 			!HearconManager::config.hasErrors() ? QJsonValue(true) : HearconManager::config.getErrors()},
+        {"blood_pressure", 		BloodPressureManager::isInstalled()},
+        {"watch_bp", 			!WatchBPManager::config.hasErrors() ? QJsonValue(true) : WatchBPManager::config.getErrors()},
+        {"cdtt", 				CDTTManager::isInstalled()},
+        {"choice_reaction", 	ChoiceReactionManager::isInstalled()},
+        {"dxa", 				DxaHipManager::isInstalled()},
+        {"ecg", 				ECGManager::isInstalled()},
+        {"frax", 				FraxManager::isInstalled()},
+        {"grip_strength", 		GripStrengthManager::isInstalled()},
+        {"retinal_camera", 		RetinalCameraManager::isInstalled()},
+        {"spirometer", 			SpirometerManager::isInstalled()},
+        {"easyone_connect", 	!EasyoneConnectManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
+        {"tonometer", 			TonometerManager::isInstalled()},
+        {"ultrasound", 			VividiManager::isInstalled()},
+        {"weigh_scale", 		WeighScaleManager::isInstalled()},
+        {"oct", 				!OCTManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
     };
 
     return statusJson;

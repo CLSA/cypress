@@ -8,6 +8,7 @@
 #include "managers/blood_pressure/bptru_200_driver.h"
 
 #include "auxiliary/Constants.h"
+#include "auxiliary/json_settings.h"
 
 #include <QApplication>
 #include <QStyle>
@@ -224,12 +225,14 @@ int main(int argc, char *argv[])
 
     QJsonObject status = Cypress::getInstance().getStatus();
     QJsonObject deviceStatus = status["availableInstruments"].toObject();
-    for (auto it = deviceStatus.constBegin(); it != deviceStatus.constEnd(); ++it) {
-        QString deviceName = it.key();
-        bool available = it.value().toBool();
 
-        qInfo() << getStatusCheckString(deviceName, available);
-    }
+    qDebug().noquote() << JsonSettings::prettyPrintJson(deviceStatus);
+    //for (auto it = deviceStatus.constBegin(); it != deviceStatus.constEnd(); ++it) {
+    //    QString deviceName = it.key();
+    //    bool available = it.value().toBool();
+
+    //    qInfo() << getStatusCheckString(deviceName, available);
+    //}
 
     Cypress::getInstance();
 

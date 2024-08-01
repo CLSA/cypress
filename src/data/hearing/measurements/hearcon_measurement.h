@@ -13,8 +13,6 @@ public:
     // Measurement interface
 public:
     bool isValid() const override;
-    QString toString() const override;
-    QJsonObject toJsonObject() const override;
 };
 
 #endif // HEARCON_MEASUREMENT_H

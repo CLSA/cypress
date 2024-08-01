@@ -9,7 +9,7 @@ void EasyoneConnectStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequ
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", EasyoneConnectManager::isInstalled() ? "available" : "unavailable"}
+            {"status", !EasyoneConnectManager::config.hasErrors() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

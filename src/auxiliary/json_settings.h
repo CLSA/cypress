@@ -16,6 +16,8 @@ namespace JsonSettings {
 
     void parseJsonObject(QJsonObject &json, QString prefix, QVariantMap &map);
     QJsonObject restoreJsonObject(QVariantMap &map);
+
+    QByteArray prettyPrintJson(const QJsonObject& json);
 }
 
 #endif // JSON_SETTINGS_H

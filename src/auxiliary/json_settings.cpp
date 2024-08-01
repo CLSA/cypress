@@ -152,3 +152,10 @@ bool JsonSettings::writeSettingsJson(QIODevice &device, const QVariantMap &map)
     device.write(QJsonDocument(buffer).toJson());
     return true;
 }
+
+QByteArray JsonSettings::prettyPrintJson(const QJsonObject &json)
+{
+    QJsonDocument doc(json);
+
+    return doc.toJson(QJsonDocument::Indented);
+}

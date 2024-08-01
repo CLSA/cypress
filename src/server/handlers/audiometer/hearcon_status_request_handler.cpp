@@ -8,7 +8,7 @@ void HearconStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
     Q_UNUSED(request)
     try {
         QString responseData = JsonSettings::serializeJson(QJsonObject {{
-            "status", HearconManager::isInstalled() ? "available" : "unavailable"
+            "status", !HearconManager::config.hasErrors() ? "available" : "unavailable"
         }});
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

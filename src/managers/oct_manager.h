@@ -2,29 +2,33 @@
 #define OCT_MANAGER_H
 
 #include "manager_base.h"
+#include "config/device_config.h"
+
 #include "server/sessions/oct_session.h"
 
 #include <QProcess>
 #include <QSqlDatabase>
 
+
 class OCTManager : public ManagerBase
 {
+
 public:
     OCTManager(QSharedPointer<OCTSession> session);
     ~OCTManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 signals:
     void status(const QString newStatus);
 
 public slots:
     bool start() override;
-    void measure() override;
-    void finish() override;
-    bool cleanUp() override;
-
     void readOutput() override;
+    void finish() override;
+
+    void measure() override {};
+    bool cleanUp() override { return true; };
 
 private:
     QString defaultPersonUUID = "11111111-2222-3333-4444-555555555555";
@@ -35,14 +39,15 @@ private:
 
     QString m_runnablePath;
     QString m_runnableName;
-    QString m_webpage;
+    QString m_exportPath;
 
+    QString m_databaseBackup;
     QString m_databaseName;
-    QString m_databasePort;
-    QString m_databaseUser;
 
-    bool clearData() override;
-    bool setUp() override;
+    void configureProcess();
+
+    bool clearData() override { return true; };
+    bool setUp() override { return true; };
 };
 
 #endif // OCT_MANAGER_H

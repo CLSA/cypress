@@ -1,8 +1,10 @@
 #ifndef EASYONE_MANAGER_H
 #define EASYONE_MANAGER_H
 
-#include "data/spirometer/tests/easyone_test.h"
 #include "managers/manager_base.h"
+#include "config/device_config.h"
+
+#include "data/spirometer/tests/easyone_test.h"
 #include "server/sessions/easyone_connect_session.h"
 #include <QProcess>
 
@@ -13,7 +15,7 @@ public:
     EasyoneConnectManager(QSharedPointer<EasyoneConnectSession> session);
     ~EasyoneConnectManager() = default;
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
     bool start() override;

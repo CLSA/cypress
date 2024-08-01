@@ -14,70 +14,23 @@
 #include <windows.h>
 #include <TlHelp32.h>
 
+DeviceConfig WatchBPManager::config {{
+    { "processName",         { "watch_bp/processName",        NonEmptyString }},
+    { "runnableName",        { "watch_bp/runnableName",       Exe }},
+    { "runnablePath",        { "watch_bp/runnablePath",       Dir }},
+    { "databasePath",        { "watch_bp/databasePath",       File }},
+    { "backupDatabasePath",  { "watch_bp/backupDatabasePath", File }},
+}};
+
 WatchBPManager::WatchBPManager(QSharedPointer<WatchBPSession> session): ManagerBase(session)
 {
-    m_processName = CypressSettings::readSetting("watch_bp/processName").toString();
-    m_runnableName = CypressSettings::readSetting("watch_bp/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("watch_bp/runnablePath").toString();
-    m_databasePath = CypressSettings::readSetting("watch_bp/databasePath").toString();
-    m_backupDatabasePath = CypressSettings::readSetting("watch_bp/backupDatabasePath").toString();
+    m_processName = config.getSetting("processName");
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
+    m_databasePath = config.getSetting("databasePath");
+    m_backupDatabasePath = config.getSetting("backupDatabasePath");
 
     m_test.reset(new WatchBPTest);
-}
-
-bool WatchBPManager::isInstalled()
-{
-    const QString processName = CypressSettings::readSetting("watch_bp/processName").toString();
-    const QString runnableName = CypressSettings::readSetting("watch_bp/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("watch_bp/runnablePath").toString();
-    const QString databasePath = CypressSettings::readSetting("watch_bp/databasePath").toString();
-    const QString backupDatabasePath = CypressSettings::readSetting("watch_bp/backupDatabasePath").toString();
-
-    if (backupDatabasePath.isEmpty() || backupDatabasePath.isNull()) {
-        qInfo() << "WatchBPManager::isInstalled - backupDatabasePath is not defined";
-        return false;
-    }
-
-    if (processName.isEmpty() || processName.isNull()) {
-        qInfo() << "WatchBPManager::isInstalled - processName is not defined";
-        return false;
-    }
-
-    if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "WatchBPManager::isInstalled - runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "WatchBPManager::isInstalled - runnablePath is not defined";
-        return false;
-    }
-
-    if (databasePath.isEmpty() || databasePath.isNull()) {
-        qInfo() << "WatchBPManager::isInstalled - databasePath is not defined";
-        return false;
-    }
-
-    const QDir runnablePathInfo(runnablePath);
-    const QFileInfo runnableNameInfo(runnableName);
-    const QFileInfo backupDatabasePathInfo(backupDatabasePath);
-
-    if (!runnablePathInfo.exists()) {
-        qInfo() << "WatchBPManager::isInstalled - runnablePath does not exist";
-        return false;
-    }
-
-    if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
-        qInfo() << "WatchBPManager::isInstalled - runnableName is not executable";
-        return false;
-    }
-
-    if (!backupDatabasePathInfo.exists() || !backupDatabasePathInfo.isReadable()) {
-        qInfo() << "WatchBPManager::isInstalled - backupDatabasePath is not readable";
-        return false;
-    }
-
-    return true;
 }
 
 bool WatchBPManager::start()

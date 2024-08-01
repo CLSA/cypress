@@ -12,119 +12,58 @@
 
 #include <QMessageBox>
 
+DeviceConfig EasyoneConnectManager::config {{
+    {"processName",  {"easyone/processName",  NonEmptyString }},
+    {"runnableName", {"easyone/runnableName", Exe  			 }},
+    {"runnablePath", {"easyone/runnablePath", Dir            }},
+    {"exchangePath", {"easyone/exchangePath", Dir            }},
+    {"databasePath", {"easyone/databasePath", Dir            }},
+    {"backupPath",   {"easyone/backupPath",   Dir            }},
+    {"inFileName",   {"easyone/inFileName",   NonEmptyString }},
+    {"outFileName",  {"easyone/outFileName",  NonEmptyString }},
+}};
+
 EasyoneConnectManager::EasyoneConnectManager(QSharedPointer<EasyoneConnectSession> session): ManagerBase(session)
 {
     // Full path to EasyWarePro.exe
-    m_processName = CypressSettings::readSetting("easyone/processName").toString();
-    m_runnableName = CypressSettings::readSetting("easyone/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("easyone/runnablePath").toString(); // path to EasyWarePro.exe directory
-    m_exchangePath = CypressSettings::readSetting("easyone/exchangePath").toString();
-    m_databasePath = CypressSettings::readSetting("easyone/databasePath").toString();
-
-    m_backupPath = CypressSettings::readSetting("easyone/backupPath").toString();
-
-    m_inFileName = CypressSettings::readSetting("easyone/inFileName").toString();
-    m_outFileName = CypressSettings::readSetting("easyone/outFileName").toString();
-
-    qInfo() << "EasyoneConnectManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
-
-    qInfo() << m_processName;
-    qInfo() << m_runnableName;
-    qInfo() << m_runnablePath;
-    qInfo() << m_exchangePath;
-    qInfo() << m_databasePath;
-
-    qInfo() << m_inFileName;
-    qInfo() << m_outFileName;
+    m_processName = config.getSetting("processName");
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath"); // path to EasyWarePro.exe directory
+    m_exchangePath = config.getSetting("exchangePath");
+    m_databasePath = config.getSetting("databasePath");
+    m_backupPath = config.getSetting("backupPath");
+    m_inFileName = config.getSetting("inFileName");
+    m_outFileName = config.getSetting("outFileName");
 
     m_test.reset(new EasyoneTest);
 }
 
-bool EasyoneConnectManager::isInstalled()
+void EasyoneConnectManager::configureProcess()
 {
-    qInfo() << "EasyoneConnectManager::isInstalled";
+    m_process.setProgram(m_runnableName);
 
-    const QString processName = CypressSettings::readSetting("easyone/processName").toString();
-    const QString runnableName = CypressSettings::readSetting("easyone/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("easyone/runnablePath").toString();
-    const QString exchangePath = CypressSettings::readSetting("easyone/exchangePath").toString();
-    const QString databasePath = CypressSettings::readSetting("easyone/databasePath").toString();
-    const QString backupPath = CypressSettings::readSetting("easyone/backupPath").toString();
+    connect(&m_process, &QProcess::started, this, [this]() {
+        qDebug() << "EasyoneConnectManager::process started: " << m_process.arguments().join(" ");
+    });
 
-    const QString inFileName = CypressSettings::readSetting("easyone/inFileName").toString();
-    const QString outFileName = CypressSettings::readSetting("easyone/outFileName").toString();
+    connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
+        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
+                                                                    Qt::SkipEmptyParts);
+        qDebug() << "EasyoneConnectManager::process error occured: " << s.join(" ").toLower();
+    });
 
-    if (processName.isEmpty() || processName.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: processName is not defined";
-        return false;
-    }
+    connect(&m_process, &QProcess::stateChanged, this, [=](QProcess::ProcessState state) {
+        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
+                                                                    Qt::SkipEmptyParts);
+        qDebug() << "EasyoneConnectManager::process state: " << s.join(" ").toLower();
+    });
 
-    if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (exchangePath.isEmpty() || exchangePath.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: exchangePath is not defined";
-        return false;
-    }
-
-    if (databasePath.isEmpty() || databasePath.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: databasePath is not defined";
-        return false;
-    }
-
-    if (backupPath.isEmpty() || backupPath.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: backupPath is not defined";
-        return false;
-    }
-
-    if (inFileName.isEmpty() || inFileName.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: inFileName is not defined";
-        return false;
-    }
-
-    if (outFileName.isEmpty() || outFileName.isNull()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: outFileName is not defined";
-        return false;
-    }
-
-    const QFileInfo runnableInfo(runnableName);
-    if (!runnableInfo.exists()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: exe does not exist at" << runnableName;
-        return false;
-    }
-    if (!runnableInfo.isExecutable()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: exe is not executable at" << runnableName;
-        return false;
-    }
-
-    const QFileInfo runnableDir(runnablePath);
-    if (!runnableDir.isDir()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: directory does not exist at" << runnablePath;
-        return false;
-    }
-    if (!runnableDir.isReadable()) {
-        qInfo() << "EasyoneConnectManager::isInstalled: directory is missing read permissions at" << runnableDir;
-        return false;
-    }
-
-    return true;
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
+            &EasyoneConnectManager::readOutput);
 }
 
 bool EasyoneConnectManager::start()
 {
-    qDebug() << "EasyoneConnectManager::start";
-
     // Make sure application isn't running
     qDebug() << "EasyoneConnectManager::start - check if running";
     if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
@@ -173,66 +112,14 @@ bool EasyoneConnectManager::start()
     return true;
 }
 
-void EasyoneConnectManager::measure()
-{
-    qDebug() << "EasyoneConnectManager::measure";
-}
-
-void EasyoneConnectManager::finish()
-{
-    qDebug() << "EasyoneConnectManager::finish";
-}
-
 void EasyoneConnectManager::readOutput()
 {
     qDebug() << "EasyoneConnectManager::readOutput";
 }
 
-QString EasyoneConnectManager::getEMRInXmlName() const { return QString("%1/%2").arg(m_exchangePath, m_inFileName); }
-
-QString EasyoneConnectManager::getEMROutXmlName() const { return QString("%1/%2").arg(m_exchangePath, m_outFileName); }
-
-bool EasyoneConnectManager::clearData()
+void EasyoneConnectManager::finish()
 {
-    qDebug() << "EasyoneConnectManager::clearData";
-    return true;
-}
-
-bool EasyoneConnectManager::setUp()
-{
-    qDebug() << "EasyoneConnectManager::setUp";
-    return true;
-}
-
-bool EasyoneConnectManager::cleanUp()
-{
-    qDebug() << "EasyoneConnectManager::cleanUp";
-    return true;
-}
-
-void EasyoneConnectManager::configureProcess()
-{
-    m_process.setProgram(m_runnableName);
-    connect(&m_process, &QProcess::started, this, [this]() {
-        qDebug() << "EasyoneConnectManager::process started: " << m_process.arguments().join(" ");
-    });
-
-    connect(&m_process,
-            QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this,
-            &EasyoneConnectManager::readOutput);
-
-    connect(&m_process, &QProcess::errorOccurred, this, [=](QProcess::ProcessError error) {
-        QStringList s = QVariant::fromValue(error).toString().split(QRegExp("(?=[A-Z])"),
-                                                                    Qt::SkipEmptyParts);
-        qDebug() << "EasyoneConnectManager::process error occured: " << s.join(" ").toLower();
-    });
-
-    connect(&m_process, &QProcess::stateChanged, this, [=](QProcess::ProcessState state) {
-        QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"),
-                                                                    Qt::SkipEmptyParts);
-        qDebug() << "EasyoneConnectManager::process state: " << s.join(" ").toLower();
-    });
+    qDebug() << "EasyoneConnectManager::finish";
 }
 
 QString EasyoneConnectManager::getOutputPdfPath() const
@@ -256,3 +143,7 @@ bool EasyoneConnectManager::outputPdfExists() const
 
     return QFileInfo::exists(outPdfPath);
 }
+
+QString EasyoneConnectManager::getEMRInXmlName() const { return QString("%1/%2").arg(m_exchangePath, m_inFileName); }
+
+QString EasyoneConnectManager::getEMROutXmlName() const { return QString("%1/%2").arg(m_exchangePath, m_outFileName); }

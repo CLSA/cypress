@@ -127,6 +127,7 @@ HEADERS += \
     auxiliary/tracker5_util.h \
     auxiliary/validators.h \
     auxiliary/windows_util.h \
+    config/device_config.h \
     cypress_application.h \
     cypress_main_window.h \
     cypress_session.h \
@@ -359,6 +360,7 @@ SOURCES += \
     auxiliary/tracker5_util.cpp \
     auxiliary/validators.cpp \
     auxiliary/windows_util.cpp \
+    config/device_config.cpp \
     cypress_application.cpp \
     cypress_main_window.cpp \
     cypress_session.cpp \

@@ -8,7 +8,7 @@ EasyoneConnectSession::EasyoneConnectSession(QObject *parent, const QJsonObject&
 
 void EasyoneConnectSession::isInstalled() const
 {
-    if (!EasyoneConnectManager::isInstalled())
+    if (!EasyoneConnectManager::config.hasErrors())
         throw NotInstalledError("Spirometer is not installed on this workstation");
 }
 
