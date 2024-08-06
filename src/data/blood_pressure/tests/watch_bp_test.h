@@ -25,6 +25,8 @@ public:
     QString toString() const;
     QJsonObject toJsonObject() const;
 
+    void fromJson(const QJsonObject&);
+
 private:
     QList<QString> m_outputKeyList;
 };

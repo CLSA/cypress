@@ -35,14 +35,23 @@ QString WatchBPMeasurement::toString() const
 
 bool WatchBPMeasurement::isValid() const
 {
-    foreach (const auto key, m_outputKeyList) {
-        if (!m_attributes.contains(key)) {
-            qDebug() << "missing" << key;
-            return false;
+    return true;
+}
+
+void WatchBPMeasurement::fromJson(const QJsonObject& data)
+{
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        QString key = it.key();
+        QJsonValue val = it.value();
+
+        if (key == "Date") {
+            setAttribute(key, QDateTime::fromSecsSinceEpoch(val.toInt()));
+        }
+        else {
+            setAttribute(key, val);
         }
     }
-
-    return true;
 }
 
 QJsonObject WatchBPMeasurement::toJsonObject() const

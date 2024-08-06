@@ -9,7 +9,7 @@ void ORAStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reques
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", TonometerManager::isInstalled() ? "available" : "unavailable" }
+            { "status", !ORAManager::config.hasErrors() ? "available" : "unavailable" }
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

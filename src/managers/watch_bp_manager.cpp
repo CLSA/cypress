@@ -17,10 +17,10 @@
 
 DeviceConfig WatchBPManager::config {{
     { "processName",         { "watch_bp/processName",        NonEmptyString }},
-    { "runnableName",        { "watch_bp/runnableName",       Exe }},
-    { "runnablePath",        { "watch_bp/runnablePath",       Dir }},
-    { "databasePath",        { "watch_bp/databasePath",       File }},
-    { "backupDatabasePath",  { "watch_bp/backupDatabasePath", File }},
+    { "runnableName",        { "watch_bp/runnableName",       Exe            }},
+    { "runnablePath",        { "watch_bp/runnablePath",       Dir            }},
+    { "databasePath",        { "watch_bp/databasePath",       File           }},
+    { "backupDatabasePath",  { "watch_bp/backupDatabasePath", File           }},
 }};
 
 WatchBPManager::WatchBPManager(QSharedPointer<WatchBPSession> session): ManagerBase(session)
@@ -116,6 +116,8 @@ bool WatchBPManager::start()
 
 void WatchBPManager::measure()
 {
+    m_test->reset();
+
     QSqlQuery dataQuery;
     dataQuery.prepare("SELECT * FROM Data");
     if (!dataQuery.exec()) {
@@ -124,94 +126,131 @@ void WatchBPManager::measure()
     }
 
     QJsonObject output;
-
     QJsonArray measurements;
 
     while (dataQuery.next()) {
         QJsonObject measurement {
-            { "ID", 			dataQuery.value(0).toInt()       },
-            { "Patient", 		dataQuery.value(1).toInt()       },
-            { "SYS", 			dataQuery.value(2).toInt()       },
-            { "DIA", 			dataQuery.value(3).toInt()       },
-            { "MAP", 			dataQuery.value(4).toInt()       },
-            { "PP", 			dataQuery.value(5).toInt()       },
-            { "cSYS", 			dataQuery.value(7).toInt() 	     },
-            { "cDIA", 			dataQuery.value(8).toInt()       },
-            { "cPP", 			dataQuery.value(9).toInt()       },
-            { "HR", 			dataQuery.value(12).toInt()      },
-            { "AFIB", 			dataQuery.value(13).toInt()   	 },
-            { "Spare1", 		dataQuery.value(14).toInt()   	 },
-            { "CODE", 			dataQuery.value(15).toString()   },
-            { "NOTE", 			dataQuery.value(16).toString()   },
-            { "Condition", 		dataQuery.value(17).toInt()   	 },
-            { "UpdateTime", 	dataQuery.value(12).toInt()   	 },
-            { "Device", 		dataQuery.value(19).toInt()   	 },
-            { "Date", 			dataQuery.value(20).toInt()   	 },
-            { "BPM", 			dataQuery.value(21).toString()   },
-            { "AwakeTime", 		dataQuery.value(22).toInt()   	 },
-            { "AsleepTime", 	dataQuery.value(23).toInt()      },
-            { "Interval1", 		dataQuery.value(24).toInt()      },
-            { "Interval2", 		dataQuery.value(25).toInt()      },
-            { "Interval1C", 	dataQuery.value(26).toInt()      },
-            { "Interval2C", 	dataQuery.value(27).toInt()      },
-            { "Option", 		dataQuery.value(28).toInt()      },
+            { "ID", 			dataQuery.value(0).toJsonValue()},
+            { "Patient", 		dataQuery.value(1).toJsonValue()},
+            { "SYS", 			dataQuery.value(2).toJsonValue()},
+            { "DIA", 			dataQuery.value(3).toJsonValue()},
+            { "MAP", 			dataQuery.value(4).toJsonValue()},
+            { "PP", 			dataQuery.value(5).toJsonValue()},
+            { "Spare5", 		dataQuery.value(6).toJsonValue()},
+            { "cSYS", 			dataQuery.value(7).toJsonValue()},
+            { "cDIA", 			dataQuery.value(8).toJsonValue()},
+            { "cPP", 			dataQuery.value(9).toJsonValue()},
+            { "Spare3", 		dataQuery.value(10).toJsonValue()},
+            { "Spare4", 		dataQuery.value(11).toJsonValue()},
+            { "HR", 			dataQuery.value(12).toJsonValue()},
+            { "AFIB", 			dataQuery.value(13).toJsonValue()},
+            { "Spare1", 		dataQuery.value(14).toJsonValue()},
+            { "CODE", 			dataQuery.value(15).toJsonValue()},
+            { "NOTE", 			dataQuery.value(16).toJsonValue()},
+            { "Condition", 		dataQuery.value(17).toJsonValue()},
+            { "UpdateTime", 	dataQuery.value(18).toJsonValue()},
+            { "Device", 		dataQuery.value(19).toJsonValue()},
+            { "Date", 			dataQuery.value(20).toJsonValue()},
+            { "BPM", 			dataQuery.value(21).toJsonValue()},
+            { "AwakeTime", 		dataQuery.value(22).toJsonValue()},
+            { "AsleepTime", 	dataQuery.value(23).toJsonValue()},
+            { "Interval1", 		dataQuery.value(24).toJsonValue()},
+            { "Interval2", 		dataQuery.value(25).toJsonValue()},
+            { "Interval1C", 	dataQuery.value(26).toJsonValue()},
+            { "Interval2C", 	dataQuery.value(27).toJsonValue()},
+            { "Option", 		dataQuery.value(28).toJsonValue()},
+            { "Spare2", 		dataQuery.value(29).toJsonValue()},
+            { "Spare6", 		dataQuery.value(30).toJsonValue()},
+            { "Spare7", 		dataQuery.value(31).toJsonValue()},
+            { "Spare8", 		dataQuery.value(32).toJsonValue()},
+            { "Spare9", 		dataQuery.value(33).toJsonValue()},
+            { "Spare10", 		dataQuery.value(34).toJsonValue()},
+            { "Spare11", 		dataQuery.value(35).toJsonValue()},
+            { "Spare12", 		dataQuery.value(36).toJsonValue()},
+            { "Spare13", 		dataQuery.value(37).toJsonValue()},
+            { "Spare14", 		dataQuery.value(38).toJsonValue()},
+            { "Spare15", 		dataQuery.value(39).toJsonValue()},
+            { "Spare16", 		dataQuery.value(40).toJsonValue()},
+            { "Spare17", 		dataQuery.value(41).toJsonValue()},
+            { "Spare18", 		dataQuery.value(42).toJsonValue()},
+            { "Spare19", 		dataQuery.value(43).toJsonValue()},
+            { "Spare20", 		dataQuery.value(44).toJsonValue()},
         };
 
-        const int dataId = measurement.value("ID").toInt();
+        //const int dataId = measurement.value("ID").toInt();
 
-        QSqlQuery dataPVP {};
+        //QSqlQuery dataPVP {};
 
-        dataPVP.prepare(
-            "SELECT "
-                "DataPVPWave.DataId, "
-                "DataPVPWave.PVPWaveId, "
-                "PVPWave.Index, "
-                "PVPWave.Part, "
-                "PVPWave.Type, "
-                "PVPWave.Resolution, "
-                "PVPWave.PointsBlobbed "
-            "FROM DataPVPWave INNER JOIN PVPWave ON DataPVPWave.PVPWaveId = PVPWave.Index "
-            "WHERE DataPVPWave.DataId = :dataId");
+        //dataPVP.prepare(
+        //    "SELECT "
+        //        "DataPVPWave.DataId, "
+        //        "DataPVPWave.PVPWaveId, "
+        //        "PVPWave.Index, "
+        //        "PVPWave.Part, "
+        //        "PVPWave.Type, "
+        //        "PVPWave.Resolution, "
+        //        "PVPWave.PointsBlobbed "
+        //    "FROM DataPVPWave INNER JOIN PVPWave ON DataPVPWave.PVPWaveId = PVPWave.Index "
+        //    "WHERE DataPVPWave.DataId = :dataId");
 
-        dataPVP.bindValue(":dataId", dataId);
-        if (!dataQuery.exec()) {
-            qCritical() << "Query 2 failed";
-            return;
-        }
+        //dataPVP.bindValue(":dataId", dataId);
+        //if (!dataPVP.exec()) {
+        //    qCritical() << "Query 2 failed";
+        //    return;
+        //}
 
-        QJsonArray pvp {};
+        //QJsonArray pvp {};
 
-        while (dataPVP.next()) {
-            QJsonObject data = {
-                { "DataId",        dataPVP.value(0).toInt()    },
-                { "PVPWaveId",     dataPVP.value(1).toInt()    },
-                { "Index",         dataPVP.value(2).toInt()    },
-                { "Part",          dataPVP.value(3).toInt()    },
-                { "Type",          dataPVP.value(4).toInt()    },
-                { "Resolution",    dataPVP.value(5).toInt()    },
-                { "PointsBlobbed", dataPVP.value(6).toString() },
-            };
+        //while (dataPVP.next()) {
+        //    QJsonObject data = {
+        //        { "DataId",        dataPVP.value(0).toJsonValue() },
+        //        { "PVPWaveId",     dataPVP.value(1).toJsonValue() },
+        //        { "Index",         dataPVP.value(2).toJsonValue() },
+        //        { "Part",          dataPVP.value(3).toJsonValue() },
+        //        { "Type",          dataPVP.value(4).toJsonValue() },
+        //        { "Resolution",    dataPVP.value(5).toJsonValue() },
+        //        { "PointsBlobbed", dataPVP.value(6).toJsonValue() },
+        //    };
 
-            pvp.append(data);
-        }
+        //    pvp.append(data);
+        //}
 
-        measurement.insert("pvp", pvp);
+        //measurement.insert("pvp", pvp);
         measurements.append(measurement);
     }
 
     output["measurements"] = measurements;
 
-    QString data = JsonSettings::serializeJson(output, true);
+    auto test = qSharedPointerCast<WatchBPTest>(m_test);
 
-    QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
+    qDebug().noquote() << output;
 
-    qDebug() << "write" << data;
-    QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
-    if (file.open(QFile::WriteOnly | QFile::Text)) {
-        QTextStream stream(&file);
-        stream << data;
-        file.close();
+    test->fromJson(output);
+
+    emit dataChanged(test);
+
+    if (test->isValid()) {
+        qDebug() << "test is valid";
+        emit canFinish();
     }
+    else {
+        qDebug() << "test is invalid";
+        emit cannotFinish();
+    }
+
+    qDebug().noquote() << JsonSettings::prettyPrintJson(test->toJsonObject());
+
+    //QString data = JsonSettings::serializeJson(output, true);
+
+    //QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
+
+    //qDebug() << "write" << data;
+    //QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
+    //if (file.open(QFile::WriteOnly | QFile::Text)) {
+    //    QTextStream stream(&file);
+    //    stream << data;
+    //    file.close();
+    //}
 }
 
 void WatchBPManager::finish()
@@ -239,8 +278,7 @@ void WatchBPManager::addManualEntry(const int systolic, const int diastolic, con
     bpm->setAttribute("SYS", systolic);
     bpm->setAttribute("DIA", diastolic);
     bpm->setAttribute("PP", pulse);
-    bpm->setAttribute("StartTime", QDateTime::currentDateTimeUtc());
-    bpm->setAttribute("EndTime", QDateTime::currentDateTimeUtc());
+    bpm->setAttribute("Date", QDateTime::currentDateTimeUtc());
 
     test->addMeasurement(bpm);
     test->updateAverage();

@@ -26,8 +26,7 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
     columns << TableColumn("SYS", "Systolic (mmHg)", new NumberDelegate(0, 200, false));
     columns << TableColumn("DIA", "Diastolic (mmHg)", new NumberDelegate(0, 200, false));
     columns << TableColumn("PP", "Pulse (bpm)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("AwakeTime", "Start time", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("AsleepTime", "End time", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("Date", "Start time", new TextDelegate("", QRegExp(), true));
 
     connect(manager.get(), &WatchBPManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)

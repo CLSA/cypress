@@ -2,6 +2,8 @@
 
 #include <QJsonArray>
 
+#include "data/blood_pressure/measurements/watch_bp_measurement.h"
+
 WatchBPTest::WatchBPTest()
 {
     //m_outputKeyList << "Gender";
@@ -16,6 +18,21 @@ WatchBPTest::WatchBPTest()
     //m_outputKeyList << "NightDIA";
 }
 
+void WatchBPTest::fromJson(const QJsonObject& data)
+{
+    const QJsonArray& measures = data.value("measurements").toArray();
+
+    for (auto it = measures.begin(); it != measures.end(); ++it)
+    {
+        const QJsonObject& measureData = (*it).toObject();
+
+        QSharedPointer<WatchBPMeasurement> measure(new WatchBPMeasurement);
+
+        measure->fromJson(measureData);
+
+        addMeasurement(measure);
+    }
+}
 
 bool WatchBPTest::isValid() const
 {
@@ -89,9 +106,9 @@ void WatchBPTest::updateAverage()
 
     addMetaData("first_systolic",   first.getAttribute("SYS"));
     addMetaData("first_diastolic",  first.getAttribute("DIA"));
-    addMetaData("first_pulse",      first.getAttribute("PP"));
-    addMetaData("first_start_time", first.getAttribute("AwakeTime"));
-    addMetaData("first_end_time",   first.getAttribute("AsleepTime"));
+    addMetaData("first_pulse",      first.getAttribute("HR"));
+    addMetaData("first_start_time", first.getAttribute("Date"));
+    addMetaData("first_end_time",   first.getAttribute("Date"));
 
 
     int validMeasures = 0;
@@ -108,7 +125,7 @@ void WatchBPTest::updateAverage()
 
         const int systolic = measure.getAttribute("SYS").value().toInt();
         const int diastolic = measure.getAttribute("DIA").value().toInt();
-        const int pulse = measure.getAttribute("PP").value().toInt();
+        const int pulse = measure.getAttribute("HR").value().toInt();
 
         systolicTotal += systolic;
         diastolicTotal += diastolic;

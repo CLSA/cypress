@@ -1,12 +1,16 @@
 #include "cypress_main_window.h"
 #include "cypress_application.h"
 
+#include "server/sessions/easyone_connect_session.h"
+#include "server/sessions/hearcon_session.h"
 #include "ui_cypress_main_window.h"
 
 #include "server/sessions/audiometer_session.h"
 #include "server/sessions/grip_strength_session.h"
 #include "server/sessions/retinal_camera_session.h"
+
 #include "server/sessions/bpm_session.h"
+#include "server/sessions/watch_bp_session.h"
 #include "server/sessions/weigh_scale_session.h"
 #include "server/sessions/ecg_session.h"
 #include "server/sessions/dxa/dxa_hip_session.h"
@@ -53,21 +57,22 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     };
 
     ui->launchAudiometer->setEnabled(true);
-    ui->launchWeightScale->setEnabled(true);
+    //ui->launchWeightScale->setEnabled(true);
     ui->launchSpirometer->setEnabled(true);
-    ui->launchDxa1->setEnabled(true);
-    ui->launchDxa2->setEnabled(true);
-    ui->launchFrax->setEnabled(true);
-    ui->launchUltrasound->setEnabled(true);
-    ui->launchEcg->setEnabled(true);
-    ui->launchGripStrength->setEnabled(true);
-    ui->launchRetinalCamera->setEnabled(true);
-    ui->launchChoiceReaction->setEnabled(true);
-    ui->launchCDTT->setEnabled(true);
+    //ui->launchDxa1->setEnabled(true);
+    //ui->launchDxa2->setEnabled(true);
+    //ui->launchFrax->setEnabled(true);
+    //ui->launchUltrasound->setEnabled(true);
+    //ui->launchEcg->setEnabled(true);
+    //ui->launchGripStrength->setEnabled(true);
+    //ui->launchRetinalCamera->setEnabled(true);
+    //ui->launchChoiceReaction->setEnabled(true);
+    //ui->launchCDTT->setEnabled(true);
     ui->launchBpm->setEnabled(true);
 
     connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData, origin));
+        //QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData, origin));
+        QSharedPointer<WatchBPSession> session(new WatchBPSession(nullptr, inputData, origin));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -77,7 +82,8 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     });
 
     connect(ui->launchSpirometer, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData, origin));
+        //QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData, origin));
+        QSharedPointer<EasyoneConnectSession> session(new EasyoneConnectSession(nullptr, inputData, origin));
         Cypress::getInstance().requestSession(session);
     });
 
@@ -107,7 +113,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     });
 
     connect(ui->launchAudiometer, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<AudiometerSession> session(new AudiometerSession(nullptr, inputData, origin));
+        QSharedPointer<HearconSession> session(new HearconSession(nullptr, inputData, origin));
         Cypress::getInstance().requestSession(session);
     });
 

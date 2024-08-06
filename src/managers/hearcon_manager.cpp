@@ -103,6 +103,8 @@ bool HearconManager::start()
 
 void HearconManager::measure()
 {
+    m_test->reset();
+
     qDebug() << "HearconManager::measure";
     QStringList arguments;
     arguments

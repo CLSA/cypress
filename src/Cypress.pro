@@ -38,7 +38,7 @@ LIBS += -L"C:/Program Files (x86)/Poco/lib" -lPocoFoundation -lPocoUtil -lPocoCr
 
 # DCMTK
 INCLUDEPATH += "C:/Program Files (x86)/DCMTK/include"
-LIBS += -L"C:/Program Files (x86)/DCMTK/lib" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
+LIBS += -L"C:/Users/hoarea/CypressDeps/dcmtk-3.6.8/dcmtk-3.6.8/build-msvc-2022/lib/Release" -ldcmdata -loflog -lofstd -lws2_32 -lnetapi32 -lwsock32 -ladvapi32 -liphlpapi
 }
 
 RC_ICONS = favicon.ico
