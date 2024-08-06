@@ -21,13 +21,6 @@ public slots:
     bool start();
     void measure();
     void finish();
-    void readOutput();
-    void addManualMeasurement();
-    bool clearData();
-    bool cleanUp();
-
-protected:
-    bool setUp();
 
 private:
     QProcess m_hearcon;

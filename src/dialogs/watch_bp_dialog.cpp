@@ -12,23 +12,34 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
     auto manager = qSharedPointerCast<WatchBPManager>(m_manager);
 
     ui->testInfoWidget->setSessionInformation(*session);
+    ui->measurementTable->disableFinishButton();
+    ui->measurementTable->disableMeasureButton();
 
-    ui->measurementTable->hideMeasureButton();
+    //ui->measurementTable->hideMeasureButton();
     ui->measurementTable->enableRemoval(true);
+    bpmManualEntryForm = new BpmManualEntryForm(this);
 
     QList<TableColumn> columns;
-    columns << TableColumn("reading_number",
+    columns << TableColumn("ID",
                            "#",
                            new NumberDelegate(0, 1000, true, false, false, 2));
-    columns << TableColumn("systolic", "Systolic (mmHg)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("diastolic", "Diastolic (mmHg)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("pulse", "Pulse (bpm)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("start_time", "Start time", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("end_time", "End time", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("SYS", "Systolic (mmHg)", new NumberDelegate(0, 200, false));
+    columns << TableColumn("DIA", "Diastolic (mmHg)", new NumberDelegate(0, 200, false));
+    columns << TableColumn("PP", "Pulse (bpm)", new NumberDelegate(0, 200, false));
+    columns << TableColumn("AwakeTime", "Start time", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("AsleepTime", "End time", new TextDelegate("", QRegExp(), true));
 
     connect(manager.get(), &WatchBPManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
         ui->measurementTable->initializeModel(columns);
+    });
+
+    connect(manager.get(), &WatchBPManager::canMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->enableMeasureButton();
+    });
+    connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &WatchBPManager::measure);
+    connect(manager.get(), &WatchBPManager::cannotMeasure, ui->measurementTable, [=]() {
+        ui->measurementTable->disableMeasureButton();
     });
 
     connect(manager.get(), &WatchBPManager::canFinish, ui->measurementTable, [=]() {
@@ -43,7 +54,14 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
     connect(manager.get(), &WatchBPManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
+        manager->setManualEntry(true);
 
+        bpmManualEntryForm->clearForm();
+        bpmManualEntryForm->show();
+    });
+
+    connect(bpmManualEntryForm, &BpmManualEntryForm::manualBpmMeasure, this, [=](const int systolic, const int diastolic, const int pulse) {
+        manager->addManualEntry(systolic, diastolic, pulse);
     });
 
     // request finish
@@ -51,7 +69,7 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &WatchBPManager::addManualMeasurement);
-    //connect(ui->measurementTable, &MeasurementTable::removeMeasurement, manager.get(), &WatchBPManager::removeMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::removeMeasurement, manager.get(), &WatchBPManager::removeMeasurement);
 }
 
 WatchBPDialog::~WatchBPDialog()

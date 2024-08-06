@@ -2,6 +2,7 @@
 #include "auxiliary/json_settings.h"
 
 #include "data/blood_pressure/tests/watch_bp_test.h"
+#include "data/blood_pressure/measurements/watch_bp_measurement.h"
 
 #include <QMessageBox>
 #include <QJsonObject>
@@ -35,6 +36,8 @@ WatchBPManager::WatchBPManager(QSharedPointer<WatchBPSession> session): ManagerB
 
 bool WatchBPManager::start()
 {
+    emit started(m_test);
+
     qCritical() << "WatchBPManager::start";
 
     QFile::remove(m_databasePath);
@@ -82,11 +85,17 @@ bool WatchBPManager::start()
     m_process.setWorkingDirectory(m_runnablePath);
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
 
-    connect(&m_process, &QProcess::started, this, [this]() {
-        qDebug() << "Process started: " << m_process.arguments().join(" ");
+    connect(
+        &m_process,
+        &QProcess::started,
+        this,
+        [this]() {
+            qDebug() << "Process started: " << m_process.arguments().join(" ");
     });
 
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &WatchBPManager::readOutput);
+    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this]() {
+        emit canMeasure();
+    });
 
     connect(&m_process, &QProcess::errorOccurred, this,
             [](QProcess::ProcessError error) {
@@ -107,18 +116,6 @@ bool WatchBPManager::start()
 
 void WatchBPManager::measure()
 {
-    qInfo() << "WatchBPManager::measure";
-}
-
-void WatchBPManager::finish()
-{
-    qInfo() << "WatchBPManager::finish";
-}
-
-void WatchBPManager::readOutput()
-{
-    qInfo() << "WatchBPManager::readOutput";
-
     QSqlQuery dataQuery;
     dataQuery.prepare("SELECT * FROM Data");
     if (!dataQuery.exec()) {
@@ -199,7 +196,6 @@ void WatchBPManager::readOutput()
         }
 
         measurement.insert("pvp", pvp);
-
         measurements.append(measurement);
     }
 
@@ -207,10 +203,10 @@ void WatchBPManager::readOutput()
 
     QString data = JsonSettings::serializeJson(output, true);
 
-    QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.txt");
+    QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
 
     qDebug() << "write" << data;
-    QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.txt");
+    QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
     if (file.open(QFile::WriteOnly | QFile::Text)) {
         QTextStream stream(&file);
         stream << data;
@@ -218,25 +214,62 @@ void WatchBPManager::readOutput()
     }
 }
 
-void WatchBPManager::addManualMeasurement()
+void WatchBPManager::finish()
+{
+    qInfo() << "WatchBPManager::finish";
+
+    auto test = qSharedPointerCast<WatchBPTest>(m_test);
+    test->updateAverage();
+
+    if (test->getMeasurementCount() < 2) {
+        qWarning() << "WatchBPManager::finish - invalid test, this should not occur";
+        m_test->reset();
+        QMessageBox::critical(nullptr, "Unexpected error", "An unexpected error occurred, please use manual entry or try again");
+        return;
+    }
+}
+
+void WatchBPManager::addManualEntry(const int systolic, const int diastolic, const int pulse)
 {
     qInfo() << "WatchBPManager::addManualMeasurement";
+    auto test = qSharedPointerCast<WatchBPTest>(m_test);
+
+    QSharedPointer<WatchBPMeasurement> bpm(new WatchBPMeasurement());
+    bpm->setAttribute("ID", m_test->getMeasurementCount() + 1);
+    bpm->setAttribute("SYS", systolic);
+    bpm->setAttribute("DIA", diastolic);
+    bpm->setAttribute("PP", pulse);
+    bpm->setAttribute("StartTime", QDateTime::currentDateTimeUtc());
+    bpm->setAttribute("EndTime", QDateTime::currentDateTimeUtc());
+
+    test->addMeasurement(bpm);
+    test->updateAverage();
+
+    qDebug() << test->toJsonObject();
+
+    emit dataChanged(m_test);
+
+    if (m_test->isValid()) {
+        emit canFinish();
+    }
+    else {
+        emit cannotFinish();
+    }
 }
 
-bool WatchBPManager::clearData()
+void WatchBPManager::removeMeasurement(const int index)
 {
-    qInfo() << "WatchBPManager::clearData";
-    return true;
-}
+    qInfo() << "WatchBPManager::removeMeasurement: " << index;
+    auto test = qSharedPointerCast<WatchBPTest>(m_test);
 
-bool WatchBPManager::cleanUp()
-{
-    qInfo() << "WatchBPManager::cleanUp";
+    test->removeMeasurement(index);
+    test->updateAverage();
 
-    return true;
-}
-
-bool WatchBPManager::setUp()
-{
-    return false;
+    emit dataChanged(m_test);
+    if (m_test->isValid()) {
+        emit canFinish();
+    }
+    else {
+        emit cannotFinish();
+    }
 }

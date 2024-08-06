@@ -62,6 +62,7 @@ FORMS += \
   dialogs/grip_strength_dialog.ui \
   dialogs/hearcon_dialog.ui \
   dialogs/oct_dialog.ui \
+  dialogs/ora_dialog.ui \
   dialogs/retinal_camera_dialog.ui \
   dialogs/runnable_dialog.ui \
   #dialogs/signature_pad_dialog.ui \
@@ -199,6 +200,7 @@ HEADERS += \
     dialogs/grip_strength_dialog.h \
     dialogs/hearcon_dialog.h \
     dialogs/oct_dialog.h \
+    dialogs/ora_dialog.h \
     dialogs/retinal_camera_dialog.h \
     #dialogs/signature_pad_dialog.h \
     dialogs/spirometer_dialog.h \
@@ -260,6 +262,8 @@ HEADERS += \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/handlers/spirometer/easyone_connect_request_handler.h \
     server/handlers/spirometer/easyone_connect_status_request_handler.h \
+    server/handlers/tonometer/ora_request_handler.h \
+    server/handlers/tonometer/ora_status_request_handler.h \
     server/sessions/audiometer_session.h \
     server/sessions/bpm_session.h \
     server/sessions/cdtt_session.h \
@@ -432,6 +436,7 @@ SOURCES += \
     dialogs/grip_strength_dialog.cpp \
     dialogs/hearcon_dialog.cpp \
     dialogs/oct_dialog.cpp \
+    dialogs/ora_dialog.cpp \
     dialogs/retinal_camera_dialog.cpp \
     #dialogs/signature_pad_dialog.cpp \
     dialogs/spirometer_dialog.cpp \
@@ -493,6 +498,8 @@ SOURCES += \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/handlers/spirometer/easyone_connect_request_handler.cpp \
     server/handlers/spirometer/easyone_connect_status_request_handler.cpp \
+    server/handlers/tonometer/ora_request_handler.cpp \
+    server/handlers/tonometer/ora_status_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
     server/sessions/bpm_session.cpp \
     server/sessions/cdtt_session.cpp \

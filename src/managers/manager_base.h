@@ -65,15 +65,15 @@ public slots:
     virtual void addManualMeasurement();
 
     // Reset the session
-    virtual bool clearData() = 0;
+    virtual bool clearData() { return true; };
 
     // Clean up the device for next time
-    virtual bool cleanUp() = 0;
+    virtual bool cleanUp() { return true; };
 
     virtual void checkIfFinished();
 protected:
     // Set up device
-    virtual bool setUp() = 0;
+    virtual bool setUp() { return true; };
 
     QSharedPointer<CypressSession> m_session;
     QSharedPointer<TestBase> m_test;

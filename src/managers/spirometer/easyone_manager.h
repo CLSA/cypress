@@ -19,7 +19,7 @@ public:
 
 public slots:
     bool start() override;
-    void measure() override;
+    void measure() override {};
     void finish() override;
     void readOutput() override;
 
@@ -40,9 +40,9 @@ private:
     QProcess m_process;
     QSharedPointer<EasyoneTest> m_test;
 
-    bool clearData() override;
-    bool setUp() override;
-    bool cleanUp() override;
+    bool clearData() override { return true; } ;
+    bool setUp() override { return true; };
+    bool cleanUp() override { return true; };
 
     void configureProcess();
 

@@ -3,6 +3,7 @@
 
 #include "dialog_base.h"
 #include "server/sessions/watch_bp_session.h"
+#include "widgets/bpm_manual_entry_form.h"
 #include "ui_watch_bp_dialog.h"
 
 #include <QDebug>
@@ -19,6 +20,8 @@ public:
 
 private:
     Ui::WatchBPDialog *ui;
+
+    BpmManualEntryForm* bpmManualEntryForm;
 };
 
 #endif // WATCH_BP_DIALOG_H

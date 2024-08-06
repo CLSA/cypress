@@ -145,7 +145,17 @@ void HearconManager::measure()
     auto test = qSharedPointerCast<HearconTest>(m_test);
     test->fromJsonFile(m_readerOutputPath);
 
-    qDebug() << test->toJsonObject();
+    //QString data = JsonSettings::serializeJson(test->toJsonObject(), true);
+
+    //QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/hearcon/output.json");
+
+    //qDebug() << "write" << data;
+    //QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
+    //if (file.open(QFile::WriteOnly | QFile::Text)) {
+    //    QTextStream stream(&file);
+    //    stream << data;
+    //    file.close();
+    //}
 
     //if (test->isValid()) {
     //    emit canFinish();
@@ -156,36 +166,7 @@ void HearconManager::measure()
     //}
 }
 
-void HearconManager::readOutput() {
-    qDebug() << "HearconManager::readOutput";
-}
-
 void HearconManager::finish()
 {
     qDebug() << "HearconManager::finish";
 }
-
-void HearconManager::addManualMeasurement()
-{
-    qDebug() << "HearconManager::addManualMeasurement";
-}
-
-bool HearconManager::clearData()
-{
-    qDebug() << "HearconManager::clearData";
-    return true;
-}
-
-bool HearconManager::cleanUp()
-{
-    qDebug() << "HearconManager::cleanUp";
-    return true;
-}
-
-bool HearconManager::setUp()
-{
-    qDebug() << "HearconManager::setUp";
-    return true;
-}
-
-

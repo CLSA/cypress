@@ -1,6 +1,5 @@
-#ifndef TONOMETER_STATUS_REQUEST_HANDLER_H
-#define TONOMETER_STATUS_REQUEST_HANDLER_H
-
+#ifndef ORA_STATUS_REQUEST_HANDLER_H
+#define ORA_STATUS_REQUEST_HANDLER_H
 
 #include "server/default_request_handler.h"
 
@@ -10,10 +9,10 @@
 #include <QJsonObject>
 #include <QDebug>
 
-class TonometerStatusRequestHandler : public DefaultRequestHandler
+class ORAStatusRequestHandler: public DefaultRequestHandler
 {
 public:
     void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
 };
 
-#endif // TONOMETER_STATUS_REQUEST_HANDLER_H
+#endif // ORA_STATUS_REQUEST_HANDLER_H

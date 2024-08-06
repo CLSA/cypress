@@ -2,6 +2,7 @@
 #include "auxiliary/json_settings.h"
 
 #include "data/hearing/measurements/hearcon_measurement.h"
+
 HearconTest::HearconTest() {}
 
 void HearconTest::fromJsonFile(const QString &filePath)

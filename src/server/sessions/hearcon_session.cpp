@@ -8,7 +8,7 @@ HearconSession::HearconSession(QObject *parent, const QJsonObject& inputData, co
 }
 
 void HearconSession::isInstalled() const {
-    if (!HearconManager::config.hasErrors())
+    if (HearconManager::config.hasErrors())
         throw NotInstalledError("Audiometer is not installed on this workstation");
 }
 

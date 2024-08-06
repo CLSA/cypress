@@ -24,21 +24,21 @@ public:
     static HTTPRequestHandler* createGripStrengthRequestHandler();
     static HTTPRequestHandler* createGripStrengthStatusRequestHandler();
 
+    // Retinal Camera
     static HTTPRequestHandler* createRetinalCameraRequestHandler();
     static HTTPRequestHandler* createRetinalCameraStatusRequestHandler();
-
     static HTTPRequestHandler* createRetinalCameraLeftRequestHandler();
     static HTTPRequestHandler* createRetinalCameraRightRequestHandler();
 
+    // Audiometer
     static HTTPRequestHandler* createAudiometerRequestHandler();
     static HTTPRequestHandler* createAudiometerStatusRequestHandler();
-
     static HTTPRequestHandler* createHearconRequestHandler();
     static HTTPRequestHandler* createHearconStatusRequestHandler();
 
+    // Blood Pressure
     static HTTPRequestHandler* createBloodPressureRequestHandler();
     static HTTPRequestHandler* createBloodPressureStatusRequestHandler();
-
     static HTTPRequestHandler* createWatchBPRequestHandler();
     static HTTPRequestHandler* createWatchBPStatusRequestHandler();
 
@@ -68,6 +68,8 @@ public:
     // Tonometer
     static HTTPRequestHandler* createTonometerRequestHandler();
     static HTTPRequestHandler* createTonometerStatusRequestHandler();
+    static HTTPRequestHandler* createORARequestHandler();
+    static HTTPRequestHandler* createORAStatusRequestHandler();
 
     static HTTPRequestHandler* createCDTTRequestHandler();
     static HTTPRequestHandler* createCDTTStatusRequestHandler();
@@ -86,9 +88,6 @@ public:
 
     static HTTPRequestHandler* createECGRequestHandler();
     static HTTPRequestHandler* createECGStatusRequestHandler();
-
-    //static HTTPRequestHandler* createSignaturePadRequestHandler();
-    //static HTTPRequestHandler* createSignaturePadStatusRequestHandler();
 
     static HTTPRequestHandler* createParticipantReportRequestHandler();
     static HTTPRequestHandler* createGeneralProxyConsentRequestHandler();

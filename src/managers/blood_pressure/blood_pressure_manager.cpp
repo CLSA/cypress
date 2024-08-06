@@ -503,22 +503,6 @@ void BloodPressureManager::removeMeasurement(const int index)
     }
 }
 
-// Set up device
-bool BloodPressureManager::setUp()
-{
-    qInfo() << "BloodPressureManager::setUp";
-
-    return true;
-}
-
-// Clean up the device for next time
-bool BloodPressureManager::cleanUp()
-{
-    qInfo() << "BloodPressureManager::cleanUp";
-
-    return true;
-}
-
 void BloodPressureManager::handleAck(const BPMMessage& message)
 {
     qDebug() << "BloodPressureManager::handleAck messageId = " << message.getMessageId();

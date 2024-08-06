@@ -62,7 +62,6 @@ public:
 
 signals:
     void canConnect();
-    void cannotFinish();
 
     void deviceConnected();
     void deviceDisconnected();
@@ -120,14 +119,8 @@ private:
     // device data is separate from test data
     Measurement m_deviceData;
 
-    // Set up device
-    bool setUp() override;
-
     // Reset the session
     bool clearData() override;
-
-    // Clean up the device for next time
-    bool cleanUp() override;
 
     void handshake();
 

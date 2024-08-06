@@ -12,11 +12,18 @@ public:
 
     // TestBase interface
 public:
-    QString toString() const;
+
     bool isValid() const;
-    QJsonObject toJsonObject() const;
     void reset();
     void reinterpret();
+
+    void updateAverage();
+
+    void setCuffSize(const QString&);
+    void setSide(const QString&);
+
+    QString toString() const;
+    QJsonObject toJsonObject() const;
 
 private:
     QList<QString> m_outputKeyList;

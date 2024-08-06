@@ -35,12 +35,35 @@ QString WatchBPMeasurement::toString() const
 
 bool WatchBPMeasurement::isValid() const
 {
-    return false;
+    foreach (const auto key, m_outputKeyList) {
+        if (!m_attributes.contains(key)) {
+            qDebug() << "missing" << key;
+            return false;
+        }
+    }
+
+    return true;
 }
 
 QJsonObject WatchBPMeasurement::toJsonObject() const
 {
-    QJsonObject json { };
-
+    QJsonObject json;
+    foreach(const auto x, m_attributes.toStdMap())
+    {
+      // convert to space delimited phrases to snake_case
+      //
+      QString key = QString(x.first);
+      Value v = x.second;
+      QJsonValue jval = QJsonValue::fromVariant(v.value());
+      if(v.hasUnits())
+      {
+          QJsonObject obj;
+          obj.insert("value", jval);
+          obj.insert("units", v.units());
+          json.insert(key,obj);
+      }
+      else
+        json.insert(key,jval);
+    }
     return json;
 }

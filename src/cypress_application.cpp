@@ -19,6 +19,7 @@
 #include "managers/general_proxy_form/general_proxy_manager.h"
 #include "managers/hearcon_manager.h"
 #include "managers/watch_bp_manager.h"
+#include "managers/ora_manager.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -147,6 +148,7 @@ QJsonObject Cypress::getStatus()
         {"ultrasound", 			VividiManager::isInstalled()},
         {"weigh_scale", 		WeighScaleManager::isInstalled()},
         {"oct", 				!OCTManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
+        {"ora", 				!ORAManager::config.hasErrors() ? QJsonValue(true) : ORAManager::config.getErrors()},
     };
 
     return statusJson;

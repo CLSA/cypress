@@ -18,20 +18,18 @@ public:
 
     static DeviceConfig config;
 
+    void addManualEntry(const int systolic, const int diastolic, const int pulse);
+    void removeMeasurement(const int index);
+
     // ManagerBase interface
 public slots:
     bool start() override;
     void measure() override;
     void finish() override;
-    void readOutput() override;
-    void addManualMeasurement() override;
-    bool clearData() override;
-    bool cleanUp() override;
-
-protected:
-    bool setUp() override;
 
 private:
+
+
     QSqlDatabase m_database;
     QProcess m_process;
 

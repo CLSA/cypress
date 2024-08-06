@@ -44,6 +44,9 @@
 #include "server/handlers/tonometer/tonometer_request_handler.h"
 #include "server/handlers/tonometer/tonometer_status_request_handler.h"
 
+#include "server/handlers/tonometer/ora_request_handler.h"
+#include "server/handlers/tonometer/ora_status_request_handler.h"
+
 #include "server/handlers/weigh_scale/weigh_scale_request_handler.h"
 #include "server/handlers/weigh_scale/weigh_scale_status_request_handler.h"
 
@@ -147,6 +150,10 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/tonometer/status/?$)"), &InstrumentRequestHandlerFactory::createTonometerStatusRequestHandler},
     { QString(R"(^/tonometer/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
+    { QString(R"(^/ora/?$)"),        &InstrumentRequestHandlerFactory::createORARequestHandler},
+    { QString(R"(^/ora/status/?$)"), &InstrumentRequestHandlerFactory::createORAStatusRequestHandler},
+    { QString(R"(^/ora/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
+
     { QString(R"(^/carotid_intima/?$)"),        &InstrumentRequestHandlerFactory::createUltrasoundRequestHandler},
     { QString(R"(^/carotid_intima/status/?$)"), &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler},
     { QString(R"(^/carotid_intima/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
@@ -162,26 +169,6 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/oct/?$)"), &InstrumentRequestHandlerFactory::createOCTSessionRequestHandler},
     { QString(R"(^/oct/status/?$)"), &InstrumentRequestHandlerFactory::createOCTStatusRequestHandler}}
 };
-
-HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler()
-{
-    return new DxaHipSessionRequestHandler;
-}
-
-HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaSessionRequestHandler()
-{
-    return new DxaSessionRequestHandler;
-}
-
-HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTSessionRequestHandler()
-{
-    return new OCTRequestHandler;
-}
-
-HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTStatusRequestHandler()
-{
-    return new OCTStatusRequestHandler;
-}
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
@@ -224,6 +211,26 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
     }
 
     return new DefaultRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler()
+{
+    return new DxaHipSessionRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaSessionRequestHandler()
+{
+    return new DxaSessionRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTSessionRequestHandler()
+{
+    return new OCTRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTStatusRequestHandler()
+{
+    return new OCTStatusRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler()
@@ -374,6 +381,16 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createTonometerRequestHandl
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createTonometerStatusRequestHandler()
 {
     return new TonometerStatusRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createORARequestHandler()
+{
+    return new ORARequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createORAStatusRequestHandler()
+{
+    return new ORAStatusRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createCDTTRequestHandler()
