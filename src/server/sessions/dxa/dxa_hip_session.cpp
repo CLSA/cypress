@@ -71,7 +71,7 @@ QString DxaHipSession::getWebpageContents() const
 }
 
 void DxaHipSession::isInstalled() const {
-    if (!DxaHipManager::isInstalled())
+    if (DxaHipManager::config.hasErrors())
         throw NotInstalledError("DXA is not installed on this workstation");
 }
 

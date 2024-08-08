@@ -20,6 +20,7 @@
 #include "managers/hearcon_manager.h"
 #include "managers/watch_bp_manager.h"
 #include "managers/ora_manager.h"
+#include "managers/ultrasound/vivid_iq_manager.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -135,20 +136,25 @@ QJsonObject Cypress::getStatus()
         {"hearcon", 			!HearconManager::config.hasErrors() ? QJsonValue(true) : HearconManager::config.getErrors()},
         {"blood_pressure", 		BloodPressureManager::isInstalled()},
         {"watch_bp", 			!WatchBPManager::config.hasErrors() ? QJsonValue(true) : WatchBPManager::config.getErrors()},
-        {"cdtt", 				CDTTManager::isInstalled()},
+        {"cdtt", 				!CDTTManager::config.hasErrors() ? QJsonValue(true) : CDTTManager::config.getErrors()},
         {"choice_reaction", 	ChoiceReactionManager::isInstalled()},
-        {"dxa", 				DxaHipManager::isInstalled()},
+        {"dxa", 				!DxaHipManager::config.hasErrors() ? QJsonValue(true) : DxaHipManager::config.getErrors()},
         {"ecg", 				ECGManager::isInstalled()},
-        {"frax", 				FraxManager::isInstalled()},
+        {"frax", 				!FraxManager::config.hasErrors() ? QJsonValue(true) : FraxManager::config.getErrors()},
         {"grip_strength", 		GripStrengthManager::isInstalled()},
+
         {"retinal_camera", 		RetinalCameraManager::isInstalled()},
+
         {"spirometer", 			SpirometerManager::isInstalled()},
+
         {"easyone_connect", 	!EasyoneConnectManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
         {"tonometer", 			TonometerManager::isInstalled()},
-        {"ultrasound", 			VividiManager::isInstalled()},
+
+        {"ora", 				!ORAManager::config.hasErrors() ? QJsonValue(true) : ORAManager::config.getErrors()},
+        {"cimt", 				VividiManager::isInstalled()},
+        {"ultrasound", 			!VividIQManager::config.hasErrors() ? QJsonValue(true) : VividIQManager::config.getErrors()},
         {"weigh_scale", 		WeighScaleManager::isInstalled()},
         {"oct", 				!OCTManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
-        {"ora", 				!ORAManager::config.hasErrors() ? QJsonValue(true) : ORAManager::config.getErrors()},
     };
 
     return statusJson;

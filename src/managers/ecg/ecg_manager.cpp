@@ -12,6 +12,7 @@
 #include <QJsonDocument>
 #include <QMessageBox>
 
+
 ECGManager::ECGManager(QSharedPointer<ECGSession> session)
     : ManagerBase(session)
 {
@@ -28,16 +29,6 @@ ECGManager::ECGManager(QSharedPointer<ECGSession> session)
     m_outputFile = m_exportPath + "/" + session->getBarcode() + ".xml";
 
     m_test.reset(new ECGTest);
-
-    qInfo() << "ECGManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
-    qInfo() << m_runnableName;
-    qInfo() << m_workingPath;
-    qInfo() << m_exportPath;
-    qInfo() << m_outputFile;
 }
 
 bool ECGManager::isInstalled()

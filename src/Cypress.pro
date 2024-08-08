@@ -68,6 +68,7 @@ FORMS += \
   #dialogs/signature_pad_dialog.ui \
   dialogs/spirometer_dialog.ui \
   dialogs/tonometer_dialog.ui \
+  dialogs/vivid_iq_dialog.ui \
   dialogs/watch_bp_dialog.ui \
   dialogs/weigh_scale_dialog.ui \
   widgets/apex_transfer_widget.ui \
@@ -137,6 +138,8 @@ HEADERS += \
     data/blood_pressure/tests/watch_bp_test.h \
     data/dxa/tests/dxa_hip_test.h \
     data/frax/frax_helper.h \
+    data/grip_strength/measurements/jtech_measurement.h \
+    data/grip_strength/tests/jtech_test.h \
     data/hearing/measurements/hearcon_measurement.h \
     data/hearing/tests/hearcon_test.h \
     data/measurement.h \
@@ -178,8 +181,12 @@ HEADERS += \
     data/temperature/measurements/temperature_measurement.h \
     data/temperature/tests/temperature_test.h \
     data/test_base.h \
+    data/tonometer/measurements/ora_measurement.h \
     data/tonometer/measurements/tonometer_measurement.h \
+    data/tonometer/tests/ora_test.h \
     data/tonometer/tests/tonometer_test.h \
+    data/ultrasound/vivid_iq_measurement.h \
+    data/ultrasound/vivid_iq_test.h \
     data/weigh_scale/measurements/weight_measurement.h \
     data/weigh_scale/tests/weigh_scale_test.h \
     dialogs/audiometer_dialog.h \
@@ -205,6 +212,7 @@ HEADERS += \
     #dialogs/signature_pad_dialog.h \
     dialogs/spirometer_dialog.h \
     dialogs/tonometer_dialog.h \
+    dialogs/vivid_iq_dialog.h \
     dialogs/watch_bp_dialog.h \
     dialogs/weigh_scale_dialog.h \
     dicom/dcm_recv.h \
@@ -227,6 +235,7 @@ HEADERS += \
     managers/frax/frax_manager.h \
     managers/general_proxy_form/general_proxy_manager.h \
     managers/grip_strength/grip_strength_manager.h \
+    managers/grip_strength/jtech_manager.h \
     managers/grip_strength/paradox_reader.h \
     managers/hearcon_manager.h \
     managers/manager_base.h \
@@ -240,6 +249,7 @@ HEADERS += \
     managers/spirometer/easyone_manager.h \
     managers/spirometer/spirometer_manager.h \
     managers/tonometer/tonometer_manager.h \
+    managers/ultrasound/vivid_iq_manager.h \
     managers/ultrasound/vividi_manager.h \
     managers/watch_bp_manager.h \
     managers/weigh_scale/weigh_scale_manager.h \
@@ -310,6 +320,7 @@ HEADERS += \
     server/sessions/gen_proxy_session.h \
     server/sessions/grip_strength_session.h \
     server/sessions/hearcon_session.h \
+    server/sessions/jtech_session.h \
     server/sessions/oct_session.h \
     server/sessions/ora_session.h \
     server/sessions/participant_report_session.h \
@@ -373,6 +384,8 @@ SOURCES += \
     data/blood_pressure/tests/watch_bp_test.cpp \
     data/dxa/tests/dxa_hip_test.cpp \
     data/frax/frax_helper.cpp \
+    data/grip_strength/measurements/jtech_measurement.cpp \
+    data/grip_strength/tests/jtech_test.cpp \
     data/hearing/measurements/hearcon_measurement.cpp \
     data/hearing/tests/hearcon_test.cpp \
     data/measurement.cpp \
@@ -414,8 +427,12 @@ SOURCES += \
     data/temperature/measurements/temperature_measurement.cpp \
     data/temperature/tests/temperature_test.cpp \
     data/test_base.cpp \
+    data/tonometer/measurements/ora_measurement.cpp \
     data/tonometer/measurements/tonometer_measurement.cpp \
+    data/tonometer/tests/ora_test.cpp \
     data/tonometer/tests/tonometer_test.cpp \
+    data/ultrasound/vivid_iq_measurement.cpp \
+    data/ultrasound/vivid_iq_test.cpp \
     data/weigh_scale/measurements/weight_measurement.cpp \
     data/weigh_scale/tests/weigh_scale_test.cpp \
     dialogs/audiometer_dialog.cpp \
@@ -441,6 +458,7 @@ SOURCES += \
     #dialogs/signature_pad_dialog.cpp \
     dialogs/spirometer_dialog.cpp \
     dialogs/tonometer_dialog.cpp \
+    dialogs/vivid_iq_dialog.cpp \
     dialogs/watch_bp_dialog.cpp \
     dialogs/weigh_scale_dialog.cpp \
     dicom/dcm_recv.cpp \
@@ -464,6 +482,7 @@ SOURCES += \
     managers/frax/frax_manager.cpp \
     managers/general_proxy_form/general_proxy_manager.cpp \
     managers/grip_strength/grip_strength_manager.cpp \
+    managers/grip_strength/jtech_manager.cpp \
     managers/grip_strength/paradox_reader.cpp \
     managers/hearcon_manager.cpp \
     managers/manager_base.cpp \
@@ -477,6 +496,7 @@ SOURCES += \
     managers/spirometer/easyone_manager.cpp \
     managers/spirometer/spirometer_manager.cpp \
     managers/tonometer/tonometer_manager.cpp \
+    managers/ultrasound/vivid_iq_manager.cpp \
     managers/ultrasound/vividi_manager.cpp \
     managers/watch_bp_manager.cpp \
     managers/weigh_scale/weigh_scale_manager.cpp \
@@ -547,6 +567,7 @@ SOURCES += \
     server/sessions/gen_proxy_session.cpp \
     server/sessions/grip_strength_session.cpp \
     server/sessions/hearcon_session.cpp \
+    server/sessions/jtech_session.cpp \
     server/sessions/oct_session.cpp \
     server/sessions/ora_session.cpp \
     server/sessions/participant_report_session.cpp \

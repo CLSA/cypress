@@ -1,4 +1,5 @@
 #include "ora_manager.h"
+#include "data/tonometer/tests/ora_test.h"
 
 #include <QSqlQuery>
 #include <QSqlError>
@@ -16,12 +17,21 @@ ORAManager::ORAManager(QSharedPointer<ORASession> session): ManagerBase { sessio
     m_runnablePath = config.getSetting("runnablePath");
     m_databasePath = config.getSetting("databasePath");
     m_backupDatabasePath = config.getSetting("backupDatabasePath");
+
+    m_test.reset(new ORATest);
 }
 
 bool ORAManager::start()
 {
     qInfo() << "TonometerManager::configureProcess";
 
+    // restore database
+
+    // connect to database
+
+    // insert patient
+
+    // configure process
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
     m_process.setProcessChannelMode(QProcess::ForwardedChannels);
@@ -49,11 +59,16 @@ bool ORAManager::start()
         qDebug() << "process state: " << s.join(" ").toLower();
     });
 
+    // start process
+    m_process.start();
+
     return true;
 }
 
 void ORAManager::readOutput()
 {
+    qDebug() << "ORAManager::readOutput";
+    finish();
     //QSqlQuery query;
 
     //query.prepare("SELECT * FROM ");
@@ -87,5 +102,6 @@ void ORAManager::readOutput()
 
 void ORAManager::finish()
 {
+    qDebug() << "ORAManager::finish";
     // send data
 }

@@ -39,6 +39,11 @@ private:
     QString m_readerPath;
     QString m_readerWorkingDirectory;
     QString m_readerOutputPath;
+
+    bool processAlreadyRunning();
+    bool restoreDatabase();
+    bool configurePlugin(const QString& operation);
+    bool configureProcess();
 };
 
 #endif // HEARCON_MANAGER_H

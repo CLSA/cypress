@@ -24,166 +24,44 @@
 #include <QVariant>
 
 
+DeviceConfig DxaHipManager::config {{
+    {"runnableName",   {"dxa/dicom/runnableName",   Exe }},
+    {"runnablePath",   {"dxa/dicom/runnablePath",   Dir }},
+    {"aeTitle",        {"dxa/dicom/aeTitle",        NonEmptyString }},
+    {"host",           {"dxa/dicom/host",           NonEmptyString }},
+    {"port", 		   {"dxa/dicom/port",           NonEmptyString }},
+    {"storageDirPath", {"dxa/dicom/storagePath", Dir }},
+    {"logConfigPath",  {"dxa/dicom/log_config",     File }},
+    {"ascConfigPath",  {"dxa/dicom/asc_config",     File }},
+    {"patscanDbPath",  {"dxa/patscanDbPath",        File }},
+    {"refscanDbPath",  {"dxa/refscanDbPath",        File }},
+}};
+
 DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new DxaHipTest);
 
-    m_runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
 
-    m_aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    m_host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    m_port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    m_aeTitle = config.getSetting("aeTitle");
+    m_host = config.getSetting("host");
+    m_port = config.getSetting("port");
 
-    m_storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    m_logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    m_ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    m_storageDirPath = config.getSetting("storagePath");
+    m_logConfigPath = config.getSetting("logConfigPath");
+    m_ascConfigPath = config.getSetting("ascConfigPath");
 
-    m_patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
-    m_refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
+    m_patscanDbPath = config.getSetting("patscanDbPath");
+    m_refscanDbPath = config.getSetting("refscanDbPath");
 
     WindowsUtil::killProcessByName(L"storescp.exe");
-
-    qInfo() << "DXAHipManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
 }
 
 DxaHipManager::~DxaHipManager()
 {
     m_dicomServer->stop();
-}
-
-bool DxaHipManager::isInstalled() {
-    qDebug() << "DxaHipManager::isInstalled";
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName   = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    const QString runnablePath   = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
-    const QString aeTitle        = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    const QString host           = CypressSettings::readSetting("dxa/dicom/host").toString();
-    const QString port           = CypressSettings::readSetting("dxa/dicom/port").toString();
-
-    const QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    const QString logConfigPath  = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    const QString ascConfigPath  = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
-
-    const QString patscanDbPath  = CypressSettings::readSetting("dxa/patscanDbPath").toString();
-    const QString refscanDbPath  = CypressSettings::readSetting("dxa/refscanDbPath").toString();
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: aeTitle is not defined";
-        return false;
-    }
-
-    if (host.isNull() || host.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: host is not defined";
-        return false;
-    }
-
-    if (port.isNull() || port.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: port is not defined";
-        return false;
-    }
-
-    if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: storageDirPath is not defined";
-        return false;
-    }
-
-    if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qInfo() << "DxaHipManager::isInstalled: logConfigPath is not defined";
-        return false;
-    }
-
-    if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: ascConfigPath is not defined";
-        return false;
-    }
-
-    if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: patscanDbPath is not defined";
-        return false;
-    }
-
-    const QFileInfo patscanFile(patscanDbPath);
-    if (!patscanFile.exists()) {
-        qInfo() << "DxaHipManager::isInstalled: patscan file does not exist at" << patscanDbPath;
-        return false;
-    }
-
-    if (!patscanFile.isFile()) {
-        qInfo() << "DxaHipManager::isInstalled: patscan file is not a file at" << patscanDbPath;
-        return false;
-    }
-
-    if (!patscanFile.isReadable()) {
-        qInfo() << "DxaHipManager::isInstalled: patscan file is not readable at" << patscanDbPath;
-        return false;
-    }
-
-    if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
-        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
-        return false;
-    }
-
-    const QFileInfo refscanFile(refscanDbPath);
-    if (!refscanFile.exists()) {
-        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
-        return false;
-    }
-
-    if (!refscanFile.isFile()) {
-        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not a file at" << refscanDbPath;
-        return false;
-    }
-
-    if (!refscanFile.isReadable()) {
-        qInfo() << "DxaHipManager::isInstalled: refscanDbPath is not readable at" << refscanDbPath;
-        return false;
-    }
-
-    const QFileInfo exeInfo(runnableName);
-    if (!exeInfo.exists()) {
-        qInfo() << "DxaHipManager::isInstalled: runnableName does not exist at" << runnableName;
-        return false;
-    }
-    if (!exeInfo.isExecutable()) {
-        qInfo() << "DxaHipManager::isInstalled: runnableName is not executable at" << runnableName;
-        return false;
-    }
-
-    const QFileInfo workingDir(runnablePath);
-    if (!workingDir.exists()) {
-        qInfo() << "DxaHipManager::isInstalled: working directory does not exist at" << workingDir;
-        return false;
-    }
-
-    if (!workingDir.isDir()) {
-        qInfo() << "DxaHipManager::isInstalled: working directory is not writable at" << workingDir;
-        return false;
-    }
-
-    if (!workingDir.isWritable()) {
-        qInfo() << "DxaHipManager::isInstalled: working directory is not writable at" << workingDir;
-        return false;
-    }
-
-    return true;
 }
 
 // what the manager does in response to the main application

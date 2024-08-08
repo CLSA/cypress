@@ -3,6 +3,7 @@
 
 #include "managers/manager_base.h"
 #include "server/sessions/cdtt_session.h"
+#include "config/device_config.h"
 
 #include <QProcess>
 
@@ -29,7 +30,7 @@ public:
     explicit CDTTManager(QSharedPointer<CDTTSession> session);
     ~CDTTManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
 

@@ -26,19 +26,92 @@ DeviceConfig EasyoneConnectManager::config {{
 EasyoneConnectManager::EasyoneConnectManager(QSharedPointer<EasyoneConnectSession> session): ManagerBase(session)
 {
     // Full path to EasyWarePro.exe
-    m_processName = config.getSetting("processName");
+    m_processName  = config.getSetting("processName");
     m_runnableName = config.getSetting("runnableName");
     m_runnablePath = config.getSetting("runnablePath"); // path to EasyWarePro.exe directory
     m_exchangePath = config.getSetting("exchangePath");
     m_databasePath = config.getSetting("databasePath");
-    m_backupPath = config.getSetting("backupPath");
-    m_inFileName = config.getSetting("inFileName");
-    m_outFileName = config.getSetting("outFileName");
+    m_backupPath   = config.getSetting("backupPath");
+    m_inFileName   = config.getSetting("inFileName");
+    m_outFileName  = config.getSetting("outFileName");
 
     m_test.reset(new EasyoneTest);
 }
 
-void EasyoneConnectManager::configureProcess()
+bool EasyoneConnectManager::start()
+{
+    // Make sure application isn't running
+    qDebug() << "EasyoneConnectManager::start - check if running";
+    if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
+        qCritical() << "EasyoneConnectManager::start - error, process is already running";
+        QMessageBox::critical(nullptr, "Error", "EasyOne Connect is already running. Please close the application and try again.");
+        return false;
+    }
+
+    if (!restoreDatabase())
+        return false;
+
+    // Write EMR plugin
+    qDebug() << "EasyoneConnectManager::start - writing plugin";
+    if (!writeEMRRequest())
+        return false;
+
+    // Launch application
+    qDebug() << "EasyoneConnectManager::start - launching EasyOne Connect";
+    if (!configureProcess())
+        return false;
+
+    m_process.start();
+
+    return true;
+}
+
+void EasyoneConnectManager::readOutput()
+{
+    qDebug() << "EasyoneConnectManager::readOutput";
+    finish();
+}
+
+void EasyoneConnectManager::finish()
+{
+    qDebug() << "EasyoneConnectManager::finish";
+    ManagerBase::finish();
+}
+
+bool EasyoneConnectManager::restoreDatabase()
+{
+    // Clear out database
+    QFile::remove(m_databasePath + "/database.sqlite");
+    QFile::remove(m_databasePath + "/EasyOneConnectOptions.mdb");
+
+    // Restore database from backup
+    if (!FileUtils::copyFile(m_backupPath + "/database.sqlite", m_databasePath + "/database.sqlite")) {
+        qCritical() << "EasyoneConnectManager::restoreDatabase - could not remove options.mdb";
+        QMessageBox::critical(nullptr, "Error", "Something went wrong");
+        return false;
+    }
+
+    if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnectOptions.mdb", m_databasePath + "/EasyOneConnectOptions.mdb")) {
+        qCritical() << "EasyoneConnectManager::restoreDatabase - could not restore options.mdb";
+        QMessageBox::critical(nullptr, "Error", "Something went wrong");
+        return false;
+    }
+
+    return true;
+}
+
+bool EasyoneConnectManager::writeEMRRequest()
+{
+    EMRPluginWriter writer;
+    const QDir xmlPath(m_exchangePath);
+
+    writer.setInputData(m_session->getInputData().toVariantMap());
+    writer.write(xmlPath.filePath(m_inFileName), m_session->getBarcode());
+
+    return true;
+}
+
+bool EasyoneConnectManager::configureProcess()
 {
     m_process.setProgram(m_runnableName);
 
@@ -60,66 +133,8 @@ void EasyoneConnectManager::configureProcess()
 
     connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
             &EasyoneConnectManager::readOutput);
-}
-
-bool EasyoneConnectManager::start()
-{
-    // Make sure application isn't running
-    qDebug() << "EasyoneConnectManager::start - check if running";
-    if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
-        qCritical() << "EasyoneConnectManager::start - error, process is already running";
-        QMessageBox::critical(nullptr, "Error", "EasyOne Connect is already running. Please close the application and try again.");
-        return false;
-    }
-
-    // Clear out database
-    qDebug() << "EasyoneConnectManager::start - clearing database.sqlite";
-    QFile::remove(m_databasePath + "/database.sqlite");
-
-    qDebug() << "EasyoneConnectManager::start - clearing EasyOneConnectOptions.mdb";
-    QFile::remove(m_databasePath + "/EasyOneConnectOptions.mdb");
-
-    // Restore database from backup
-    qDebug() << "EasyoneConnectManager::start - restoring database.sqlite backup";
-    qDebug() << m_backupPath + "/database.sqlite" << " " << m_databasePath + "/database.sqlite";
-    if (!FileUtils::copyFile(m_backupPath + "/database.sqlite", m_databasePath + "/database.sqlite")) {
-        qCritical() << "EasyoneConnectManager::start - could not remove options.mdb";
-        QMessageBox::critical(nullptr, "Error", "Something went wrong");
-        return false;
-    }
-
-    qDebug() << "EasyoneConnectManager::start - restoring EasyOneConnectOptions.mdb backup";
-    if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnectOptions.mdb", m_databasePath + "/EasyOneConnectOptions.mdb")) {
-        qCritical() << "EasyoneConnectManager::start - could not restore options.mdb";
-        QMessageBox::critical(nullptr, "Error", "Something went wrong");
-        return false;
-    }
-
-    // Write EMR plugin
-    qDebug() << "EasyoneConnectManager::start - writing plugin";
-
-    EMRPluginWriter writer;
-    const QDir xmlPath(m_exchangePath);
-
-    writer.setInputData(m_session->getInputData().toVariantMap());
-    writer.write(xmlPath.filePath(m_inFileName), m_session->getBarcode());
-
-    // Launch application
-    qDebug() << "EasyoneConnectManager::start - launching EasyOne Connect";
-    configureProcess();
-    m_process.start();
 
     return true;
-}
-
-void EasyoneConnectManager::readOutput()
-{
-    qDebug() << "EasyoneConnectManager::readOutput";
-}
-
-void EasyoneConnectManager::finish()
-{
-    qDebug() << "EasyoneConnectManager::finish";
 }
 
 QString EasyoneConnectManager::getOutputPdfPath() const

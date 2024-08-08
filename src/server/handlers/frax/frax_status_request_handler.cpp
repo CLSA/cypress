@@ -7,7 +7,7 @@ void FraxStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
     Q_UNUSED(request)
     try {
         QJsonObject responseData {{
-            "status", FraxManager::isInstalled() ? "available" : "unavailable"
+            "status", !FraxManager::config.hasErrors() ? "available" : "unavailable"
         }};
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

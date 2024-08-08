@@ -8,7 +8,7 @@ CDTTSession::CDTTSession(QObject *parent, const QJsonObject& inputData, const QS
 }
 
 void CDTTSession::isInstalled() const {
-    if (!CDTTManager::isInstalled())
+    if (CDTTManager::config.hasErrors())
         throw NotInstalledError("CDTT is not installed on this workstation");
 }
 

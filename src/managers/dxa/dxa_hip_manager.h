@@ -7,6 +7,8 @@
 
 #include "server/sessions/dxa/dxa_hip_session.h"
 
+#include "config/device_config.h"
+
 #include <QMap>
 #include <QObject>
 #include <QSqlDatabase>
@@ -25,7 +27,8 @@ public:
     explicit DxaHipManager(QSharedPointer<DxaHipSession> session);
     ~DxaHipManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
+
     static QString getWebpageContents(const DxaHipSession &session);
 
 signals:

@@ -9,7 +9,7 @@ void DxaHipStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", DxaHipManager::isInstalled() ? "available" : "unavailable"}
+            {"status", !DxaHipManager::config.hasErrors() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

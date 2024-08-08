@@ -18,29 +18,23 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+DeviceConfig CDTTManager::config {{
+    {"runnableName", 	{"cdtt/runnableName", File }},
+    {"runnablePath", 	{"cdtt/runnablePath", Dir  }},
+    {"outputPath", 		{"cdtt/outputPath",   Dir  }},
+    {"jre", 			{"cdtt/jre", 		  Exe  }},
+}};
+
 CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     : ManagerBase(session)
 {
-    m_jre = CypressSettings::readSetting("cdtt/jre").toString();
-    m_runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
-    m_outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
+    m_outputPath = config.getSetting("outputPath");
+    m_jre = config.getSetting("jre");
 
     QDir outputDir(m_outputPath);
     m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
-
-    qInfo() << "CDTTManager::CDTTManager";
-    qInfo() << "jre:" 			<< m_jre;
-    qInfo() << "runnableName:" 	<< m_runnableName;
-    qInfo() << "runnablePath:" 	<< m_runnablePath;
-    qInfo() << "outputPath:"	<< m_outputPath;
-
-    qInfo() << "outputPath:" 	<< m_outputFile;
-
-    qInfo() << "sessionId:" 	<< session->getSessionId();
-    qInfo() << "barcode:" 		<< session->getBarcode();
-    qInfo() << "interviewer:" 	<< session->getInterviewer();
-    qInfo() << "language:" 		<< session->getLanguage();
 
     m_test.reset(new CDTTTest);
     m_test->setMinimumMeasurementCount(1);
@@ -49,67 +43,6 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
 CDTTManager::~CDTTManager()
 {
     QSqlDatabase::removeDatabase("xlsx_connection");
-}
-
-bool CDTTManager::isInstalled()
-{
-    qInfo() << "CDTTManager::isInstalled";
-
-    const QString jre = CypressSettings::readSetting("cdtt/jre").toString();
-    const QString runnableName = CypressSettings::readSetting("cdtt/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("cdtt/runnablePath").toString();
-    const QString outputPath = CypressSettings::readSetting("cdtt/outputPath").toString();
-
-    if (jre.isNull() || jre.isEmpty()) {
-        qInfo() << "CDTTManager::isInstalled: jre is undefined";
-        return false;
-    }
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "CDTTManager::isInstalled: runnableName is undefined";
-        return false;
-    }
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "CDTTManager::isInstalled: runnablePath is undefined";
-        return false;
-    }
-
-    if (outputPath.isNull() || outputPath.isEmpty()) {
-        qInfo() << "CDTTManager::isInstalled: outputPath is undefined";
-        return false;
-    }
-
-    const QFileInfo jreInfo(jre);
-    if (!jreInfo.exists()) {
-        qInfo() << "CDTTManager::isInstalled: JRE does not exist at " << jre;
-        return false;
-    }
-
-    if (!jreInfo.isExecutable()) {
-        qInfo() << "CDTTManager::isInstalled: JRE is not executable at " << jre;
-        return false;
-    }
-
-    const QFileInfo runnableNameInfo(runnableName);
-    if (!runnableNameInfo.isFile()) {
-        qInfo() << "CDTTManager::isInstalled: runnableName does not exist";
-        return false;
-    }
-
-    const QDir runnableDir(runnablePath);
-    if (!runnableDir.exists()) {
-        qInfo() << "CDTTManager::isInstalled: runnablePath does not exist";
-        return false;
-    }
-
-    const QDir outputDir(outputPath);
-    if (!outputDir.exists()) {
-        qInfo() << "CDTTManager::isInstalled: output dir does not exist";
-        return false;
-    }
-
-    return true;
 }
 
 bool CDTTManager::start()

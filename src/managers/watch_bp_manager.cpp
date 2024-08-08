@@ -36,29 +36,57 @@ WatchBPManager::WatchBPManager(QSharedPointer<WatchBPSession> session): ManagerB
 
 bool WatchBPManager::start()
 {
+    qDebug() << "WatchBPManager::start";
     emit started(m_test);
 
-    qCritical() << "WatchBPManager::start";
+    if (!restoreBackup())
+        return false;
 
+    if (!configureDatabase())
+        return false;
+
+    if (!addPatient())
+        return false;
+
+    if (!configureProcess())
+        return false;
+
+    m_process.start();
+
+    return true;
+}
+
+bool WatchBPManager::restoreBackup()
+{
+    qDebug() << "WatchBPManager::restoreBackup";
     QFile::remove(m_databasePath);
-
     QFile backupDatabaseFile(m_backupDatabasePath);
     if (!backupDatabaseFile.copy(m_databasePath)) {
-        qCritical() << "WatchBPManager::start - could not copy backup database to data folder";
+        qCritical() << "WatchBPManager::restoreBackup - could not copy backup database to data folder";
         QMessageBox::critical(nullptr, "Error", "Could not start WatchBP Analyzer. please contact support");
         return false;
     }
 
-    qDebug() << "WatchBPManager::start - copied backup";
+    return true;
+}
 
+bool WatchBPManager::configureDatabase()
+{
+    qDebug() << "WatchBPManager::configureDatabase";
     m_database = QSqlDatabase::addDatabase("QSQLITE");
     m_database.setDatabaseName(m_databasePath);
 
     if (!m_database.open()) {
-        qCritical() << "WatchBPManager::start: " << m_database.lastError();
+        qCritical() << "WatchBPManager::configureDatabase: " << m_database.lastError();
         return false;
     }
 
+    return true;
+}
+
+bool WatchBPManager::addPatient()
+{
+    qDebug() << "WatchBPManager::addPatient";
     QSqlQuery query;
     query.prepare("INSERT INTO Patient "
                   "(Name, ID, Gender, DOB, Physician) values "
@@ -75,7 +103,12 @@ bool WatchBPManager::start()
         return false;
     }
 
-    qDebug() << "WatchBPManager::start - update patient";
+    return true;
+}
+
+bool WatchBPManager::configureProcess()
+{
+    qDebug() << "WatchBPManager::configureProcess";
 
     QString command = m_runnableName;
     QStringList arguments;
@@ -109,13 +142,12 @@ bool WatchBPManager::start()
                 qDebug() << "process state: " << s.join(" ").toLower();
             });
 
-    m_process.start();
-
     return true;
 }
 
 void WatchBPManager::measure()
 {
+    qDebug() << "WatchBPManager::measure";
     m_test->reset();
 
     QSqlQuery dataQuery;
@@ -130,51 +162,51 @@ void WatchBPManager::measure()
 
     while (dataQuery.next()) {
         QJsonObject measurement {
-            { "ID", 			dataQuery.value(0).toJsonValue()},
-            { "Patient", 		dataQuery.value(1).toJsonValue()},
-            { "SYS", 			dataQuery.value(2).toJsonValue()},
-            { "DIA", 			dataQuery.value(3).toJsonValue()},
-            { "MAP", 			dataQuery.value(4).toJsonValue()},
-            { "PP", 			dataQuery.value(5).toJsonValue()},
-            { "Spare5", 		dataQuery.value(6).toJsonValue()},
-            { "cSYS", 			dataQuery.value(7).toJsonValue()},
-            { "cDIA", 			dataQuery.value(8).toJsonValue()},
-            { "cPP", 			dataQuery.value(9).toJsonValue()},
-            { "Spare3", 		dataQuery.value(10).toJsonValue()},
-            { "Spare4", 		dataQuery.value(11).toJsonValue()},
-            { "HR", 			dataQuery.value(12).toJsonValue()},
-            { "AFIB", 			dataQuery.value(13).toJsonValue()},
-            { "Spare1", 		dataQuery.value(14).toJsonValue()},
-            { "CODE", 			dataQuery.value(15).toJsonValue()},
-            { "NOTE", 			dataQuery.value(16).toJsonValue()},
-            { "Condition", 		dataQuery.value(17).toJsonValue()},
-            { "UpdateTime", 	dataQuery.value(18).toJsonValue()},
-            { "Device", 		dataQuery.value(19).toJsonValue()},
-            { "Date", 			dataQuery.value(20).toJsonValue()},
-            { "BPM", 			dataQuery.value(21).toJsonValue()},
-            { "AwakeTime", 		dataQuery.value(22).toJsonValue()},
-            { "AsleepTime", 	dataQuery.value(23).toJsonValue()},
-            { "Interval1", 		dataQuery.value(24).toJsonValue()},
-            { "Interval2", 		dataQuery.value(25).toJsonValue()},
-            { "Interval1C", 	dataQuery.value(26).toJsonValue()},
-            { "Interval2C", 	dataQuery.value(27).toJsonValue()},
-            { "Option", 		dataQuery.value(28).toJsonValue()},
-            { "Spare2", 		dataQuery.value(29).toJsonValue()},
-            { "Spare6", 		dataQuery.value(30).toJsonValue()},
-            { "Spare7", 		dataQuery.value(31).toJsonValue()},
-            { "Spare8", 		dataQuery.value(32).toJsonValue()},
-            { "Spare9", 		dataQuery.value(33).toJsonValue()},
-            { "Spare10", 		dataQuery.value(34).toJsonValue()},
-            { "Spare11", 		dataQuery.value(35).toJsonValue()},
-            { "Spare12", 		dataQuery.value(36).toJsonValue()},
-            { "Spare13", 		dataQuery.value(37).toJsonValue()},
-            { "Spare14", 		dataQuery.value(38).toJsonValue()},
-            { "Spare15", 		dataQuery.value(39).toJsonValue()},
-            { "Spare16", 		dataQuery.value(40).toJsonValue()},
-            { "Spare17", 		dataQuery.value(41).toJsonValue()},
-            { "Spare18", 		dataQuery.value(42).toJsonValue()},
-            { "Spare19", 		dataQuery.value(43).toJsonValue()},
-            { "Spare20", 		dataQuery.value(44).toJsonValue()},
+            { "ID", 			dataQuery.value(0).toJsonValue()  },
+            { "Patient", 		dataQuery.value(1).toJsonValue()  },
+            { "SYS", 			dataQuery.value(2).toJsonValue()  },
+            { "DIA", 			dataQuery.value(3).toJsonValue()  },
+            { "MAP", 			dataQuery.value(4).toJsonValue()  },
+            { "PP", 			dataQuery.value(5).toJsonValue()  },
+            { "Spare5", 		dataQuery.value(6).toJsonValue()  },
+            { "cSYS", 			dataQuery.value(7).toJsonValue()  },
+            { "cDIA", 			dataQuery.value(8).toJsonValue()  },
+            { "cPP", 			dataQuery.value(9).toJsonValue()  },
+            { "Spare3", 		dataQuery.value(10).toJsonValue() },
+            { "Spare4", 		dataQuery.value(11).toJsonValue() },
+            { "HR", 			dataQuery.value(12).toJsonValue() },
+            { "AFIB", 			dataQuery.value(13).toJsonValue() },
+            { "Spare1", 		dataQuery.value(14).toJsonValue() },
+            { "CODE", 			dataQuery.value(15).toJsonValue() },
+            { "NOTE", 			dataQuery.value(16).toJsonValue() },
+            { "Condition", 		dataQuery.value(17).toJsonValue() },
+            { "UpdateTime", 	dataQuery.value(18).toJsonValue() },
+            { "Device", 		dataQuery.value(19).toJsonValue() },
+            { "Date", 			dataQuery.value(20).toJsonValue() },
+            { "BPM", 			dataQuery.value(21).toJsonValue() },
+            { "AwakeTime", 		dataQuery.value(22).toJsonValue() },
+            { "AsleepTime", 	dataQuery.value(23).toJsonValue() },
+            { "Interval1", 		dataQuery.value(24).toJsonValue() },
+            { "Interval2", 		dataQuery.value(25).toJsonValue() },
+            { "Interval1C", 	dataQuery.value(26).toJsonValue() },
+            { "Interval2C", 	dataQuery.value(27).toJsonValue() },
+            { "Option", 		dataQuery.value(28).toJsonValue() },
+            { "Spare2", 		dataQuery.value(29).toJsonValue() },
+            { "Spare6", 		dataQuery.value(30).toJsonValue() },
+            { "Spare7", 		dataQuery.value(31).toJsonValue() },
+            { "Spare8", 		dataQuery.value(32).toJsonValue() },
+            { "Spare9", 		dataQuery.value(33).toJsonValue() },
+            { "Spare10", 		dataQuery.value(34).toJsonValue() },
+            { "Spare11", 		dataQuery.value(35).toJsonValue() },
+            { "Spare12", 		dataQuery.value(36).toJsonValue() },
+            { "Spare13", 		dataQuery.value(37).toJsonValue() },
+            { "Spare14", 		dataQuery.value(38).toJsonValue() },
+            { "Spare15", 		dataQuery.value(39).toJsonValue() },
+            { "Spare16", 		dataQuery.value(40).toJsonValue() },
+            { "Spare17", 		dataQuery.value(41).toJsonValue() },
+            { "Spare18", 		dataQuery.value(42).toJsonValue() },
+            { "Spare19", 		dataQuery.value(43).toJsonValue() },
+            { "Spare20", 		dataQuery.value(44).toJsonValue() },
         };
 
         //const int dataId = measurement.value("ID").toInt();
@@ -228,29 +260,9 @@ void WatchBPManager::measure()
     test->fromJson(output);
 
     emit dataChanged(test);
-
-    if (test->isValid()) {
-        qDebug() << "test is valid";
-        emit canFinish();
-    }
-    else {
-        qDebug() << "test is invalid";
-        emit cannotFinish();
-    }
+    checkIfFinished();
 
     qDebug().noquote() << JsonSettings::prettyPrintJson(test->toJsonObject());
-
-    //QString data = JsonSettings::serializeJson(output, true);
-
-    //QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
-
-    //qDebug() << "write" << data;
-    //QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
-    //if (file.open(QFile::WriteOnly | QFile::Text)) {
-    //    QTextStream stream(&file);
-    //    stream << data;
-    //    file.close();
-    //}
 }
 
 void WatchBPManager::finish()
@@ -266,6 +278,8 @@ void WatchBPManager::finish()
         QMessageBox::critical(nullptr, "Unexpected error", "An unexpected error occurred, please use manual entry or try again");
         return;
     }
+
+    ManagerBase::finish();
 }
 
 void WatchBPManager::addManualEntry(const int systolic, const int diastolic, const int pulse)
@@ -286,13 +300,7 @@ void WatchBPManager::addManualEntry(const int systolic, const int diastolic, con
     qDebug() << test->toJsonObject();
 
     emit dataChanged(m_test);
-
-    if (m_test->isValid()) {
-        emit canFinish();
-    }
-    else {
-        emit cannotFinish();
-    }
+    checkIfFinished();
 }
 
 void WatchBPManager::removeMeasurement(const int index)
@@ -304,10 +312,5 @@ void WatchBPManager::removeMeasurement(const int index)
     test->updateAverage();
 
     emit dataChanged(m_test);
-    if (m_test->isValid()) {
-        emit canFinish();
-    }
-    else {
-        emit cannotFinish();
-    }
+    checkIfFinished();
 }

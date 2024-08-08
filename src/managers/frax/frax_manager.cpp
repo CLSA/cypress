@@ -11,116 +11,31 @@
 #include <QStandardItemModel>
 #include <QMessageBox>
 
+DeviceConfig FraxManager::config {{
+    { "runnableName",       { "frax/runnableName",       Exe }},
+    { "runnablePath",       { "frax/runnablePath",       Dir }},
+    { "outputFilePath",     { "frax/outputFilePath",     NonEmptyString }},
+    { "inputFilePath",      { "frax/inputFilePath",      NonEmptyString }},
+    { "countryCode",        { "frax/countryCode",        NonEmptyString }},
+    { "typeCode",           { "frax/typeCode",           NonEmptyString }},
+}};
+
 FraxManager::FraxManager(QSharedPointer<FraxSession> session)
     : ManagerBase(session)
 {
-    m_runnableName = CypressSettings::readSetting("frax/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("frax/runnablePath").toString();
-    m_outputFilePath = CypressSettings::readSetting("frax/outputFilePath").toString();
-    m_inputFilePath = CypressSettings::readSetting("frax/inputFilePath").toString();
-    m_temporaryFilePath = CypressSettings::readSetting("frax/temporaryFilePath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
+    m_outputFilePath = config.getSetting("outputFilePath");
+    m_inputFilePath = config.getSetting("inputFilePath");
 
-    m_country_code = CypressSettings::readSetting("frax/countryCode").toString();
-    m_type_code = CypressSettings::readSetting("frax/typeCode").toString();
+    m_country_code = config.getSetting("countryCode");
+    m_type_code = config.getSetting("typeCode");
 
     m_test.reset(new FraxTest);
 
     // key/value pairs needed to build input.txt
     //
-    m_inputKeyList << "type";
-    m_inputKeyList << "country_code";
-    m_inputKeyList << "age";
-    m_inputKeyList << "sex";
-    m_inputKeyList << "body_mass_index";
-    m_inputKeyList << "previous_fracture";
-    m_inputKeyList << "parent_hip_fracture";
-    m_inputKeyList << "current_smoker";
-    m_inputKeyList << "glucocorticoid";
-    m_inputKeyList << "rheumatoid_arthritis";
-    m_inputKeyList << "secondary_osteoporosis";
-    m_inputKeyList << "alcohol";
-    m_inputKeyList << "femoral_neck_bmd";
 
-    qInfo() << "FraxManager::FraxManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
-}
-
-bool FraxManager::isInstalled()
-{
-    qInfo() << "FraxManager::isInstalled";
-
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName = CypressSettings::readSetting("frax/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("frax/runnablePath").toString();
-
-    const QString outputFilePath = CypressSettings::readSetting("frax/outputFilePath").toString();
-    const QString inputFilePath = CypressSettings::readSetting("frax/inputFilePath").toString();
-
-    const QString temporaryFilePath = CypressSettings::readSetting("frax/temporaryFilePath").toString();
-
-    const QString country_code = CypressSettings::readSetting("frax/countryCode").toString();
-    const QString type_code = CypressSettings::readSetting("frax/typeCode").toString();
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "FraxManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "FraxManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (outputFilePath.isNull() || outputFilePath.isEmpty()) {
-        qInfo() << "FraxManager::isInstalled: outputFilePath is not defined";
-        return false;
-    }
-
-    if (inputFilePath.isNull() || inputFilePath.isEmpty()) {
-        qInfo() << "FraxManager::isInstalled: inputFilePath is not defined";
-        return false;
-    }
-
-    if (temporaryFilePath.isNull() || temporaryFilePath.isEmpty()) {
-        qInfo() << "FraxManager::isInstalled: temporaryFile is not defined";
-        return false;
-    }
-
-    if (country_code.isNull() || country_code.isEmpty()) {
-        qInfo() << "FraxManager::isInstalled: countryCode is not defined";
-        return false;
-    }
-
-    if (type_code.isNull() || type_code.isNull()) {
-        qInfo() << "FraxManager::isInstalled: type_code is not defined";
-        return false;
-    }
-
-    const QFileInfo info(runnableName);
-    const QDir workingDirectory(runnablePath);
-
-    if (!info.exists()) {
-        qInfo() << "FraxManager::isInstalled: executable does not exist at " << runnableName;
-        return false;
-    }
-
-    if (!info.isExecutable()) {
-        qInfo() << "FraxManager::isInstalled: executable can not be run at " << runnableName;
-        return false;
-    }
-
-    if (!workingDirectory.exists()) {
-        qInfo() << "FraxManager::isInstalled: working directory does not exist at "
-                     << runnablePath;
-        return false;
-    }
-
-    return true;
 }
 
 bool FraxManager::start()
@@ -205,9 +120,7 @@ void FraxManager::configureProcess()
     // blackbox.exe and input.txt file are present
     //
     QDir workingDirectory(m_runnablePath);
-    //QFileInfo inputFileInfo(m_inputFilePath);
     QFileInfo fraxExecutableInfo(m_runnableName);
-    //QFileInfo temporaryFileInfo(m_temporaryFilePath);
 
     if (!workingDirectory.exists()) {
         emit error("working directory does not exist");
@@ -222,32 +135,22 @@ void FraxManager::configureProcess()
     m_process.setProgram(m_runnableName);
     m_process.setWorkingDirectory(m_runnablePath);
 
-    // backup original input.txt
-    //
-    //if (!QFileInfo::exists(m_temporaryFilePath)) {
-    //    if (!QFile::copy(m_inputFilePath, m_temporaryFilePath))
-    //        emit error("Could not configure FRAX");
-    //}
-
-    // generate input.txt file content
-    // exclude interview barcode and language
-    //
     QStringList list;
-    QJsonObject sessionInputData = m_session->getInputData();
+    QJsonObject inputData = m_session->getInputData();
 
-    foreach (const auto key, m_inputKeyList) {
-        QVariant value = sessionInputData[key].toVariant();
-
-        if ("sex" == key)
-            value = value.toString()[0].toLower() == 'm' ? 0 : 1;
-
-        else {
-            if(QVariant::Bool == value.type())
-                value = value.toUInt();
-        }
-
-        list << value.toString();
-    }
+    list << inputData.value("type").toString();
+    list << inputData.value("country_code").toString();
+    list << inputData.value("age").toString();
+    list << (inputData.value("sex").toString().toLower() == 'm' ? "0" : "1");
+    list << inputData.value("body_mass_index").toString();
+    list << inputData.value("previous_fracture").toString();
+    list << inputData.value("parent_hip_fracture").toString();
+    list << inputData.value("current_smoker").toString();
+    list << inputData.value("glucocorticoid").toString();
+    list << inputData.value("rheumatoid_arthritis").toString();
+    list << inputData.value("secondary_osteoporosis").toString();
+    list << inputData.value("alcohol").toString();
+    list << inputData.value("femoral_neck_bmd").toString();
 
     // Write input.txt file
     QString line = list.join(",");

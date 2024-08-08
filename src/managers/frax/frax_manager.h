@@ -4,6 +4,8 @@
 #include "managers/manager_base.h"
 #include "server/sessions/frax_session.h"
 
+#include "config/device_config.h"
+
 #include <QProcess>
 
 /*!
@@ -26,7 +28,7 @@ class FraxManager : public ManagerBase
 public:
     explicit FraxManager(QSharedPointer<FraxSession> session);
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
     bool start() override;
@@ -44,7 +46,6 @@ private:
 
     QString m_outputFilePath;    		// full path to output.txt
     QString m_inputFilePath;     		// full path to input.txt
-    QString m_temporaryFilePath; 		// store a copy of the default input.txt
 
     QProcess m_process;
 

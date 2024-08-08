@@ -44,7 +44,9 @@ private:
     bool setUp() override { return true; };
     bool cleanUp() override { return true; };
 
-    void configureProcess();
+    bool restoreDatabase();
+    bool writeEMRRequest();
+    bool configureProcess();
 
     QString getOutputPdfPath() const;
     bool outputPdfExists() const;

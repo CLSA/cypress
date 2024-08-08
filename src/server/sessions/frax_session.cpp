@@ -98,7 +98,7 @@ void FraxSession::calculateInputs()
 
 void FraxSession::isInstalled() const
 {
-    if (!FraxManager::isInstalled())
+    if (FraxManager::config.hasErrors())
         throw NotInstalledError("FRAX is not installed on this workstation");
 }
 

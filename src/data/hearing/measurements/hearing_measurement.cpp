@@ -174,8 +174,6 @@ bool HearingMeasurement::isValid() const {
 
     const bool valid = hasRequiredFields && hasResultOrError;
 
-    qDebug() << valid;
-
     return valid;
 }
 

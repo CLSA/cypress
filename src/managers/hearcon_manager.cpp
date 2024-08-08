@@ -49,35 +49,18 @@ bool HearconManager::start()
 {
     qDebug() << "HearconManager::start";
 
-    if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
+    if (processAlreadyRunning())
+    {
         qCritical() << "HearconManager::start - error, process is already running";
         QMessageBox::critical(nullptr, "Error", "HearCon is already running. Please close the application and try again.");
         return false;
     }
 
-    QFile::remove(m_existingDatabasePath);
-
-    /// Copy backup to the database location
-    if (!m_backupDatabaseFile.copy(m_existingDatabasePath)) {
-        qCritical() << "HearconManager::start - could not copy backup database to data folder";
-        QMessageBox::critical(nullptr, "Error", "Could not start HearCon, please contact support");
+    if (!restoreDatabase())
         return false;
-    }
 
-    // Run initializer plugin
-    QStringList pluginArguments;
-    pluginArguments
-        << m_existingDatabasePath
-        << m_readerOutputPath
-        << "initialize"
-        << m_session->getBarcode()
-        << m_session->getInputData()["dob"].toString()
-        << m_session->getInputData()["sex"].toString();
-
-    m_plugin.setProgram(m_readerPath);
-    m_plugin.setArguments(pluginArguments);
-    m_plugin.setWorkingDirectory(m_readerWorkingDirectory);
-    m_plugin.setProcessChannelMode(QProcess::ForwardedChannels);
+    if (!configurePlugin("initialize"))
+        return false;
 
     m_plugin.start();
     m_plugin.waitForFinished();
@@ -85,15 +68,11 @@ bool HearconManager::start()
     qDebug() << m_plugin.readAllStandardOutput();
     qDebug() << m_plugin.readAllStandardError();
 
-    // Launch Hearcon app
-    QStringList arguments;
-    m_hearcon.setProgram(m_processPath);
-    m_hearcon.setArguments(arguments);
-    m_hearcon.setWorkingDirectory(m_workingPath);
+    if (!configureProcess())
+        return false;
 
     m_hearcon.start();
     m_hearcon.waitForStarted();
-
     // TODO add process error handling
 
     emit canMeasure();
@@ -104,21 +83,10 @@ bool HearconManager::start()
 void HearconManager::measure()
 {
     m_test->reset();
-
     qDebug() << "HearconManager::measure";
-    QStringList arguments;
-    arguments
-        << m_existingDatabasePath
-        << m_readerOutputPath
-        << "get_results"
-        << m_session->getBarcode()
-        << m_session->getInputData()["dob"].toString()
-        << m_session->getInputData()["sex"].toString();
 
-    m_plugin.setProgram(m_readerPath);
-    m_plugin.setArguments(arguments);
-    m_plugin.setWorkingDirectory(m_readerWorkingDirectory);
-    m_plugin.setProcessChannelMode(QProcess::ForwardedChannels);
+    if (!configurePlugin("get_results"))
+        return;
 
     qDebug() << "HearconManager::readOutput - starting readerProcess";
 
@@ -127,11 +95,9 @@ void HearconManager::measure()
 
     qDebug() << m_plugin.readAllStandardOutput();
     qDebug() << m_plugin.readAllStandardError();
-    qDebug() << "Finished";
 
     // Read file from script
     QFileInfo output(m_readerOutputPath);
-
     if (!output.exists()) {
         qCritical() << "HearconManager::readOutput - no results found";
         emit error("Test incomplete");
@@ -144,31 +110,72 @@ void HearconManager::measure()
         return;
     }
 
-    auto test = qSharedPointerCast<HearconTest>(m_test);
-    test->fromJsonFile(m_readerOutputPath);
+    qSharedPointerCast<HearconTest>(m_test)->fromJsonFile(m_readerOutputPath);
 
-    //QString data = JsonSettings::serializeJson(test->toJsonObject(), true);
-
-    //QFile::remove("C:/Users/hoarea/cypress-builds/Cypress/hearcon/output.json");
-
-    //qDebug() << "write" << data;
-    //QFile file("C:/Users/hoarea/cypress-builds/Cypress/watch_bp/output.json");
-    //if (file.open(QFile::WriteOnly | QFile::Text)) {
-    //    QTextStream stream(&file);
-    //    stream << data;
-    //    file.close();
-    //}
-
-    //if (test->isValid()) {
-    //    emit canFinish();
-    //}
-    //else {
-    //    qCritical() << "HearconManager::readOutput - results were invalid";
-    //    emit error("Results were invalid. Please contact support.");
-    //}
+    emit dataChanged(m_test);
+    checkIfFinished();
 }
 
 void HearconManager::finish()
 {
     qDebug() << "HearconManager::finish";
+    ManagerBase::finish();
 }
+
+bool HearconManager::restoreDatabase()
+{
+    QFile::remove(m_existingDatabasePath);
+    /// Copy backup to the database location
+    if (!m_backupDatabaseFile.copy(m_existingDatabasePath)) {
+        qCritical() << "HearconManager::start - could not copy backup database to data folder";
+        QMessageBox::critical(nullptr, "Error", "Could not start HearCon, please contact support");
+        return false;
+    }
+
+    return true;
+}
+
+bool HearconManager::processAlreadyRunning()
+{
+    if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
+
+        return true;
+    }
+
+    return false;
+}
+
+bool HearconManager::configurePlugin(const QString& operation)
+{
+    // Run initializer plugin
+    QStringList pluginArguments;
+    pluginArguments
+        << m_existingDatabasePath
+        << m_readerOutputPath
+        << operation
+        << m_session->getBarcode()
+        << m_session->getInputData()["dob"].toString()
+        << m_session->getInputData()["sex"].toString();
+
+    m_plugin.setProgram(m_readerPath);
+    m_plugin.setArguments(pluginArguments);
+    m_plugin.setWorkingDirectory(m_readerWorkingDirectory);
+    m_plugin.setProcessChannelMode(QProcess::ForwardedChannels);
+
+    return true;
+}
+
+bool HearconManager::configureProcess()
+{
+    // Launch Hearcon app
+    QStringList arguments;
+    m_hearcon.setProgram(m_processPath);
+    m_hearcon.setArguments(arguments);
+    m_hearcon.setWorkingDirectory(m_workingPath);
+
+    return true;
+}
+
+
+
+

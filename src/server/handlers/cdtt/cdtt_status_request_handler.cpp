@@ -7,7 +7,7 @@ void CDTTStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reque
 {
     Q_UNUSED(request)
     try {
-        QJsonObject responseJson {{"status", CDTTManager::isInstalled() ? "available" : "unavailable" }};
+        QJsonObject responseJson {{"status", !CDTTManager::config.hasErrors() ? "available" : "unavailable" }};
         QString responseData = JsonSettings::serializeJson(responseJson);
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

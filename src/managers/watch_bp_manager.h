@@ -28,6 +28,10 @@ public slots:
     void finish() override;
 
 private:
+    bool restoreBackup();
+    bool configureDatabase();
+    bool addPatient();
+    bool configureProcess();
 
 
     QSqlDatabase m_database;
