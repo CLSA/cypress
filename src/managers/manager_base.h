@@ -43,6 +43,8 @@ public:
 
     void setManualEntry(bool isManualEntry);
 
+    virtual bool sendFiles();
+
 public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)
@@ -81,9 +83,9 @@ protected:
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
 
-    bool m_debug { true };
-
     bool manualEntryMode { false };
+
+    QString getAnswerUrl();
 
 signals:
 

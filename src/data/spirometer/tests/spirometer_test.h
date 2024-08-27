@@ -32,7 +32,7 @@ public:
 
     std::unique_ptr<QJsonObject> toJsonObjectHeap();
 
-private:
+protected:
     QStringList m_outputKeyList;
 
     void readPDFReportPath(const QDomNode&);

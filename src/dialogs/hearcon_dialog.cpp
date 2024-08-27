@@ -1,7 +1,7 @@
 #include "hearcon_dialog.h"
 #include "ui_hearcon_dialog.h"
 
-#include "managers/hearcon_manager.h"
+#include "managers/audiometer/hearcon_manager.h"
 
 HearconDialog::HearconDialog(QWidget *parent, QSharedPointer<HearconSession> session)
     : DialogBase(parent, session)
@@ -18,8 +18,7 @@ HearconDialog::HearconDialog(QWidget *parent, QSharedPointer<HearconSession> ses
     columns << TableColumn("side", "Side", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("test", "Test", new TextDelegate("", QRegExp(), true));
     columns << TableColumn("level", "Level", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("outcome", "Outcome", new TextDelegate("", QRegExp(), true));
-    columns << TableColumn("error", "Error", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("pass", "Pass", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager.get(), &HearconManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
@@ -55,6 +54,8 @@ HearconDialog::HearconDialog(QWidget *parent, QSharedPointer<HearconSession> ses
     // request auto measure
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &HearconManager::measure);
 
+    // request finish
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &HearconManager::finish);
 }
 
 HearconDialog::~HearconDialog()

@@ -61,6 +61,7 @@ FORMS += \
   dialogs/general_proxy_form_dialog.ui \
   dialogs/grip_strength_dialog.ui \
   dialogs/hearcon_dialog.ui \
+  dialogs/mac5_dialog.ui \
   dialogs/oct_dialog.ui \
   dialogs/ora_dialog.ui \
   dialogs/retinal_camera_dialog.ui \
@@ -137,6 +138,8 @@ HEADERS += \
     data/blood_pressure/measurements/watch_bp_measurement.h \
     data/blood_pressure/tests/watch_bp_test.h \
     data/dxa/tests/dxa_hip_test.h \
+    data/ecg/measurements/mac5_measurement.h \
+    data/ecg/tests/mac5_test.h \
     data/frax/frax_helper.h \
     data/grip_strength/measurements/jtech_measurement.h \
     data/grip_strength/tests/jtech_test.h \
@@ -172,6 +175,8 @@ HEADERS += \
     data/hearing/tests/hearing_test.h \
     data/oct_test.h \
     data/retinal_camera/database_manager.h \
+    data/retinal_camera/oct_measurement.h \
+    data/retinal_camera/oct_test.h \
     data/retinal_camera/retinal_camera_measurement.h \
     data/retinal_camera/retinal_camera_test.h \
     data/spirometer/measurements/easyone_measurement.h \
@@ -206,6 +211,7 @@ HEADERS += \
     dialogs/general_proxy_form_dialog.h \
     dialogs/grip_strength_dialog.h \
     dialogs/hearcon_dialog.h \
+    dialogs/mac5_dialog.h \
     dialogs/oct_dialog.h \
     dialogs/ora_dialog.h \
     dialogs/retinal_camera_dialog.h \
@@ -229,18 +235,18 @@ HEADERS += \
     managers/dxa/apex_database_helper.h \
     managers/dxa/dxa_hip_manager.h \
     managers/dxa/dxa_manager.h \
-    managers/easy_connect_manager.h \
     managers/ecg/ecg_manager.h \
+    managers/ecg/mac5_manager.h \
     managers/emr/emr_plugin_writer.h \
     managers/frax/frax_manager.h \
     managers/general_proxy_form/general_proxy_manager.h \
     managers/grip_strength/grip_strength_manager.h \
     managers/grip_strength/jtech_manager.h \
     managers/grip_strength/paradox_reader.h \
-    managers/hearcon_manager.h \
+    managers/audiometer/hearcon_manager.h \
     managers/manager_base.h \
-    managers/oct_manager.h \
-    managers/ora_manager.h \
+    managers/retinal_camera/oct_manager.h \
+    managers/tonometer/ora_manager.h \
     managers/participant_report/participant_report_manager.h \
     managers/retinal_camera/retinal_camera_manager.h \
     managers/serial_port/serial_port_manager.h \
@@ -251,7 +257,7 @@ HEADERS += \
     managers/tonometer/tonometer_manager.h \
     managers/ultrasound/vivid_iq_manager.h \
     managers/ultrasound/vividi_manager.h \
-    managers/watch_bp_manager.h \
+    managers/blood_pressure/watch_bp_manager.h \
     managers/weigh_scale/weigh_scale_manager.h \
     server/Server.h \
     server/default_delete_request_handler.h \
@@ -265,15 +271,21 @@ HEADERS += \
     server/handlers/dxa/dxa_hip_session_request_handler.h \
     server/handlers/dxa/dxa_hip_status_request_handler.h \
     server/handlers/dxa/dxa_session_request_handler.h \
+    server/handlers/ecg/mac5_request_handler.h \
+    server/handlers/ecg/mac5_status_request_handler.h \
     server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h \
-    server/handlers/oct_request_handler.h \
-    server/handlers/oct_status_request_handler.h \
+    server/handlers/retinal_camera/oct_left_request_handler.h \
+    server/handlers/retinal_camera/oct_left_status_request_handler.h \
+    server/handlers/retinal_camera/oct_right_request_handler.h \
+    server/handlers/retinal_camera/oct_right_status_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.h \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.h \
     server/handlers/spirometer/easyone_connect_request_handler.h \
     server/handlers/spirometer/easyone_connect_status_request_handler.h \
     server/handlers/tonometer/ora_request_handler.h \
     server/handlers/tonometer/ora_status_request_handler.h \
+    server/handlers/ultrasound/vivid_iq_request_handler.h \
+    server/handlers/ultrasound/vivid_iq_status_request_handler.h \
     server/sessions/audiometer_session.h \
     server/sessions/bpm_session.h \
     server/sessions/cdtt_session.h \
@@ -321,6 +333,7 @@ HEADERS += \
     server/sessions/grip_strength_session.h \
     server/sessions/hearcon_session.h \
     server/sessions/jtech_session.h \
+    server/sessions/mac5_session.h \
     server/sessions/oct_session.h \
     server/sessions/ora_session.h \
     server/sessions/participant_report_session.h \
@@ -328,6 +341,7 @@ HEADERS += \
     server/sessions/spirometer_session.h \
     server/sessions/tonometer_session.h \
     server/sessions/ultrasound_session.h \
+    server/sessions/vivid_iq_session.h \
     server/sessions/watch_bp_session.h \
     server/sessions/weigh_scale_session.h \
     server/utils.h \
@@ -383,6 +397,8 @@ SOURCES += \
     data/blood_pressure/measurements/watch_bp_measurement.cpp \
     data/blood_pressure/tests/watch_bp_test.cpp \
     data/dxa/tests/dxa_hip_test.cpp \
+    data/ecg/measurements/mac5_measurement.cpp \
+    data/ecg/tests/mac5_test.cpp \
     data/frax/frax_helper.cpp \
     data/grip_strength/measurements/jtech_measurement.cpp \
     data/grip_strength/tests/jtech_test.cpp \
@@ -418,6 +434,8 @@ SOURCES += \
     data/hearing/tests/hearing_test.cpp \
     data/oct_test.cpp \
     data/retinal_camera/database_manager.cpp \
+    data/retinal_camera/oct_measurement.cpp \
+    data/retinal_camera/oct_test.cpp \
     data/retinal_camera/retinal_camera_measurement.cpp \
     data/retinal_camera/retinal_camera_test.cpp \
     data/spirometer/measurements/easyone_measurement.cpp \
@@ -452,6 +470,7 @@ SOURCES += \
     dialogs/general_proxy_form_dialog.cpp \
     dialogs/grip_strength_dialog.cpp \
     dialogs/hearcon_dialog.cpp \
+    dialogs/mac5_dialog.cpp \
     dialogs/oct_dialog.cpp \
     dialogs/ora_dialog.cpp \
     dialogs/retinal_camera_dialog.cpp \
@@ -476,18 +495,18 @@ SOURCES += \
     managers/dxa/apex_database_helper.cpp \
     managers/dxa/dxa_hip_manager.cpp \
     managers/dxa/dxa_manager.cpp \
-    managers/easy_connect_manager.cpp \
     managers/ecg/ecg_manager.cpp \
+    managers/ecg/mac5_manager.cpp \
     managers/emr/emr_plugin_writer.cpp \
     managers/frax/frax_manager.cpp \
     managers/general_proxy_form/general_proxy_manager.cpp \
     managers/grip_strength/grip_strength_manager.cpp \
     managers/grip_strength/jtech_manager.cpp \
     managers/grip_strength/paradox_reader.cpp \
-    managers/hearcon_manager.cpp \
+    managers/audiometer/hearcon_manager.cpp \
     managers/manager_base.cpp \
-    managers/oct_manager.cpp \
-    managers/ora_manager.cpp \
+    managers/retinal_camera/oct_manager.cpp \
+    managers/tonometer/ora_manager.cpp \
     managers/participant_report/participant_report_manager.cpp \
     managers/retinal_camera/retinal_camera_manager.cpp \
     managers/serial_port/serial_port_manager.cpp \
@@ -498,7 +517,7 @@ SOURCES += \
     managers/tonometer/tonometer_manager.cpp \
     managers/ultrasound/vivid_iq_manager.cpp \
     managers/ultrasound/vividi_manager.cpp \
-    managers/watch_bp_manager.cpp \
+    managers/blood_pressure/watch_bp_manager.cpp \
     managers/weigh_scale/weigh_scale_manager.cpp \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
@@ -511,15 +530,21 @@ SOURCES += \
     server/handlers/dxa/dxa_hip_session_request_handler.cpp \
     server/handlers/dxa/dxa_hip_status_request_handler.cpp \
     server/handlers/dxa/dxa_session_request_handler.cpp \
+    server/handlers/ecg/mac5_request_handler.cpp \
+    server/handlers/ecg/mac5_status_request_handler.cpp \
     server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.cpp \
-    server/handlers/oct_request_handler.cpp \
-    server/handlers/oct_status_request_handler.cpp \
+    server/handlers/retinal_camera/oct_left_request_handler.cpp \
+    server/handlers/retinal_camera/oct_left_status_request_handler.cpp \
+    server/handlers/retinal_camera/oct_right_request_handler.cpp \
+    server/handlers/retinal_camera/oct_right_status_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_left_request_handler.cpp \
     server/handlers/retinal_camera/retinal_camera_right_request_handler.cpp \
     server/handlers/spirometer/easyone_connect_request_handler.cpp \
     server/handlers/spirometer/easyone_connect_status_request_handler.cpp \
     server/handlers/tonometer/ora_request_handler.cpp \
     server/handlers/tonometer/ora_status_request_handler.cpp \
+    server/handlers/ultrasound/vivid_iq_request_handler.cpp \
+    server/handlers/ultrasound/vivid_iq_status_request_handler.cpp \
     server/sessions/audiometer_session.cpp \
     server/sessions/bpm_session.cpp \
     server/sessions/cdtt_session.cpp \
@@ -568,6 +593,7 @@ SOURCES += \
     server/sessions/grip_strength_session.cpp \
     server/sessions/hearcon_session.cpp \
     server/sessions/jtech_session.cpp \
+    server/sessions/mac5_session.cpp \
     server/sessions/oct_session.cpp \
     server/sessions/ora_session.cpp \
     server/sessions/participant_report_session.cpp \
@@ -575,6 +601,7 @@ SOURCES += \
     server/sessions/spirometer_session.cpp \
     server/sessions/tonometer_session.cpp \
     server/sessions/ultrasound_session.cpp \
+    server/sessions/vivid_iq_session.cpp \
     server/sessions/watch_bp_session.cpp \
     server/sessions/weigh_scale_session.cpp \
     server/utils.cpp \

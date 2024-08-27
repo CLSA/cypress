@@ -19,8 +19,6 @@ ChoiceReactionTest::ChoiceReactionTest()
     m_outputKeyList << "interviewer_id";
     m_outputKeyList << "number_of_measurements";
     m_outputKeyList << "version";
-
-    m_debug = CypressSettings::isDebugMode();
 }
 
 void ChoiceReactionTest::fromFile(const QString &fileName)

@@ -1,7 +1,7 @@
 #ifndef ORA_MANAGER_H
 #define ORA_MANAGER_H
 
-#include "manager_base.h"
+#include "managers/manager_base.h"
 #include "server/sessions/ora_session.h"
 #include "config/device_config.h"
 
@@ -33,6 +33,8 @@ private:
 
     QString m_databasePath;
     QString m_backupDatabasePath;
+
+    QVariantMap extractMeasures(const QString &eye);
 };
 
 #endif // ORA_MANAGER_H

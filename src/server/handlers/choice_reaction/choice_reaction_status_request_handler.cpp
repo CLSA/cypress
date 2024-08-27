@@ -7,7 +7,7 @@ void ChoiceReactionStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequ
 {
     Q_UNUSED(request)
     try {
-        QJsonObject responseJson = {{"status", ChoiceReactionManager::isInstalled() ? "available" : "unavailable"}};
+        QJsonObject responseJson = {{"status", !ChoiceReactionManager::config.hasErrors() ? "available" : "unavailable"}};
         QString responseData = JsonSettings::serializeJson(responseJson);
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

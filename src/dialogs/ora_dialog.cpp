@@ -1,5 +1,5 @@
 #include "ora_dialog.h"
-#include "managers/ora_manager.h"
+#include "managers/tonometer/ora_manager.h"
 #include "ui_ora_dialog.h"
 
 ORADialog::ORADialog(QWidget *parent, QSharedPointer<ORASession> session)

@@ -394,16 +394,15 @@ void RetinalCameraManager::readOutput()
 
     QJsonObject results;
     switch (session->getSide()) {
-        case Side::Left:
+        case RetinalCameraSession::Side::Left:
             results = getLeftEye();
             break;
-        case Side::Right:
+        case RetinalCameraSession::Side::Right:
             results = getRightEye();
             break;
     }
 
     test->fromDatabaseResults(results);
-
     finish();
 }
 

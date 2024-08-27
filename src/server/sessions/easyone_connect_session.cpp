@@ -2,9 +2,13 @@
 #include "managers/spirometer/easyone_manager.h"
 #include "dialogs/easyone_dialog.h"
 
+#include "auxiliary/json_settings.h"
+
 EasyoneConnectSession::EasyoneConnectSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
     : CypressSession{parent, inputData, origin}
-{}
+{
+    qDebug().noquote() << JsonSettings::prettyPrintJson(inputData);
+}
 
 void EasyoneConnectSession::isInstalled() const
 {
@@ -24,17 +28,17 @@ void EasyoneConnectSession::validate() const
     if (!isValidDate("dob", "yyyy-MM-dd"))
         throw ValidationError("dob");
 
-    if (!isValidBool("smoker"))
-        throw ValidationError("smoker");
+    if (!isValidDouble("height"))
+        throw ValidationError("height");
 
     if (!isValidString("sex"))
         throw ValidationError("sex");
 
-    if (!isValidDouble("height"))
-        throw ValidationError("height");
-
     if (!isValidDouble("weight"))
         throw ValidationError("weight");
+
+    if (!isValidBool("smoker"))
+        throw ValidationError("smoker");
 }
 
 void EasyoneConnectSession::calculateInputs()

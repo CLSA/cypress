@@ -27,8 +27,6 @@ public slots:
 protected:
     bool isManualEntryMode{false};
 
-    bool m_debug;
-
     QSharedPointer<CypressSession> m_session;
     QSharedPointer<ManagerBase> m_manager;
 

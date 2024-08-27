@@ -24,8 +24,6 @@ DcmRecv::DcmRecv(
     m_aeTitle(aeTitle),
     m_port(port)
 {
-    m_debug = CypressSettings::isDebugMode();
-
     if (!clearOutputDirectory())
         qDebug() << "DcmRecv::DcmRecv - could not clear output directory";
 

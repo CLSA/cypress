@@ -92,10 +92,10 @@ bool WatchBPManager::addPatient()
                   "(Name, ID, Gender, DOB, Physician) values "
                   "(:name, :id, :sex, :dob, :physician)");
 
-    query.bindValue(":name",   "Participant");
-    query.bindValue(":id",     m_session->getBarcode());
-    query.bindValue(":sex",    m_session->getInputData().value("sex").toString() == "F" ? 1 : 0);
-    query.bindValue(":dob",    m_session->getInputData().value("dob").toString());
+    query.bindValue(":name",      "Participant");
+    query.bindValue(":id",        m_session->getBarcode());
+    query.bindValue(":sex",       m_session->getInputData().value("sex").toString() == "F" ? 1 : 0);
+    query.bindValue(":dob",       m_session->getInputData().value("dob").toString());
     query.bindValue(":physician", "CLSA");
 
     if (!query.exec()) {
@@ -297,9 +297,8 @@ void WatchBPManager::addManualEntry(const int systolic, const int diastolic, con
     test->addMeasurement(bpm);
     test->updateAverage();
 
-    qDebug() << test->toJsonObject();
-
     emit dataChanged(m_test);
+
     checkIfFinished();
 }
 
@@ -312,5 +311,6 @@ void WatchBPManager::removeMeasurement(const int index)
     test->updateAverage();
 
     emit dataChanged(m_test);
+
     checkIfFinished();
 }

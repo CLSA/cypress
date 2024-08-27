@@ -7,7 +7,7 @@ void ORARequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poc
 {
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::Tonometer, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::ORA, requestData);
 
         QJsonObject data = getResponseData(sessionId);
         QString responseData = JsonSettings::serializeJson(data);

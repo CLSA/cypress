@@ -65,8 +65,6 @@ private slots:
     void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-    bool m_debug;
-
     bool clearOutputDirectory();
     bool configureProcess();
     bool initializeOutputWatcher();

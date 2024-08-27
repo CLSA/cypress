@@ -376,7 +376,6 @@ private:
     QHidDevice* m_bpm200;
 
     void parseData(quint32 bytesRead);
-    bool m_debug;
 
     quint8 STX { 0x02 };
     quint8 ETX { 0x03 };

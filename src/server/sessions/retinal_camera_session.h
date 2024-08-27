@@ -3,11 +3,11 @@
 
 #include "cypress_session.h"
 
-enum Side { Left, Right };
 
 class RetinalCameraSession : public CypressSession
 {
 public:
+    enum Side { Left, Right };
     explicit RetinalCameraSession(QObject *parent,
                                   const QJsonObject &inputData,
                                   const QString& origin,

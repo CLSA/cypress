@@ -156,8 +156,6 @@ protected:
     QDateTime m_startDateTime {};
     QDateTime m_endDateTime {};
 
-    bool m_debug;
-
     bool isValidString(const QString& key) const;
     bool isValidDouble(const QString& key) const;
     bool isValidInteger(const QString& key) const;

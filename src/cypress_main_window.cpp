@@ -3,19 +3,19 @@
 
 #include "server/sessions/easyone_connect_session.h"
 #include "server/sessions/hearcon_session.h"
+#include "server/sessions/vivid_iq_session.h"
+
 #include "ui_cypress_main_window.h"
 
 #include "server/sessions/audiometer_session.h"
 #include "server/sessions/grip_strength_session.h"
 #include "server/sessions/retinal_camera_session.h"
 
-#include "server/sessions/bpm_session.h"
 #include "server/sessions/watch_bp_session.h"
 #include "server/sessions/weigh_scale_session.h"
-#include "server/sessions/ecg_session.h"
+#include "server/sessions/mac5_session.h"
 #include "server/sessions/dxa/dxa_hip_session.h"
 #include "server/sessions/dxa/dxa_session.h"
-#include "server/sessions/spirometer_session.h"
 #include "server/sessions/ultrasound_session.h"
 #include "server/sessions/frax_session.h"
 #include "server/sessions/cdtt_session.h"
@@ -29,23 +29,27 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
     ui(new Ui::CypressMainWindow)
 {
     ui->setupUi(this);
-
-    qDebug() << "CypressMainWindow";
-
     if (!CypressSettings::isDebugMode())
         return;
 
-    const QString origin = CypressSettings::readSetting("debug/origin").toString();
-    const QString barcode = CypressSettings::readSetting("debug/barcode").toString();
-    const QString language = CypressSettings::readSetting("debug/language").toString();
-    const QString interviewer = CypressSettings::readSetting("debug/interviewer").toString();
-    const QString date_of_birth = CypressSettings::readSetting("debug/date_of_birth").toString();
-    const QString gender = CypressSettings::readSetting("debug/gender").toString();
-    const QString height = CypressSettings::readSetting("debug/height").toString();
-    const QString weight = CypressSettings::readSetting("debug/weight").toString();
-    const bool smoker = CypressSettings::readSetting("debug/smoker").toBool();
+    enableDevices(true);
+    enableDebugParticipant();
+    enableDebugDevices();
+}
 
-    const QJsonObject inputData{
+QJsonObject CypressMainWindow::getDebugInputData()
+{
+    QString origin = CypressSettings::readSetting("debug/origin").toString();
+    QString barcode = CypressSettings::readSetting("debug/barcode").toString();
+    QString language = CypressSettings::readSetting("debug/language").toString();
+    QString interviewer = CypressSettings::readSetting("debug/interviewer").toString();
+    QString date_of_birth = CypressSettings::readSetting("debug/date_of_birth").toString();
+    QString gender = CypressSettings::readSetting("debug/gender").toString();
+    QString height = CypressSettings::readSetting("debug/height").toString();
+    QString weight = CypressSettings::readSetting("debug/weight").toString();
+    bool smoker = CypressSettings::readSetting("debug/smoker").toBool();
+
+    QJsonObject inputData {
         {"language", 		language},
         {"barcode", 		barcode},
         {"interviewer", 	interviewer},
@@ -56,87 +60,154 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
         {"date_of_birth", 	date_of_birth},
     };
 
-    ui->launchAudiometer->setEnabled(true);
-    //ui->launchWeightScale->setEnabled(true);
-    ui->launchSpirometer->setEnabled(true);
+    return inputData;
+}
+
+void CypressMainWindow::enableDevices(bool enabled)
+{
+    // 1
+
+    // New
+    ui->launchAudiometer->setEnabled(enabled);
+    ui->launchBpm->setEnabled(enabled);
+    ui->launchSpirometer->setEnabled(enabled);
+    ui->launchEcg->setEnabled(enabled);
+    ui->launchUltrasound->setEnabled(enabled);
+
+    // Old
+    ui->launchWeightScale->setEnabled(true);
+    ui->launchChoiceReaction->setEnabled(enabled);
+    ui->launchCDTT->setEnabled(enabled);
+
     //ui->launchDxa1->setEnabled(true);
     //ui->launchDxa2->setEnabled(true);
-    //ui->launchFrax->setEnabled(true);
-    //ui->launchUltrasound->setEnabled(true);
-    //ui->launchEcg->setEnabled(true);
-    //ui->launchGripStrength->setEnabled(true);
-    //ui->launchRetinalCamera->setEnabled(true);
-    //ui->launchChoiceReaction->setEnabled(true);
-    //ui->launchCDTT->setEnabled(true);
-    ui->launchBpm->setEnabled(true);
+    //ui->launchFrax->setEnabled(enabled);
 
+    // 2
+    //ui->launchGripStrength->setEnabled(enabled);
+    //ui->launchRetinalCamera->setEnabled(enabled);
+    //ui->launchTonometer->setEnabled(enabled);
+}
+
+void CypressMainWindow::enableDebugParticipant()
+{
+    QJsonObject iniInputData = getDebugInputData();
+
+    ui->barcodeValue->setText(iniInputData["barcode"].toString());
+    ui->weightValue->setText(iniInputData["weight"].toString());
+    ui->heightValue->setText(iniInputData["height"].toString());
+    ui->sexValue->setCurrentIndex(iniInputData["gender"] == "Female" ? 0 : 1);
+    ui->dateOfBirthValue->setDate(QDate::fromString(iniInputData["date_of_birth"].toString()));
+
+    ui->barcodeValue->setEnabled(true);
+    ui->weightValue->setEnabled(true);
+    ui->heightValue->setEnabled(true);
+    ui->sexValue->setEnabled(true);
+    ui->dateOfBirthValue->setEnabled(true);
+
+    connect(ui->barcodeValue, &QLineEdit::textChanged, this, [=](const QString& barcodeValue) {
+        CypressSettings::writeSetting("debug/barcode", barcodeValue);
+    });
+
+    connect(ui->weightValue, &QLineEdit::textChanged, this, [=](const QString& weightValue) {
+        CypressSettings::writeSetting("debug/weight", weightValue);
+    });
+
+    connect(ui->heightValue, &QLineEdit::textChanged, this, [=](const QString& heightValue) {
+        CypressSettings::writeSetting("debug/height", heightValue);
+    });
+
+    connect(ui->sexValue, &QComboBox::currentTextChanged, this, [=](const QString& sexValue) {
+        CypressSettings::writeSetting("debug/gender", sexValue);
+    });
+
+    connect(ui->dateOfBirthValue, &QDateEdit::dateChanged, this, [=](const QDate& dateValue) {
+        CypressSettings::writeSetting("debug/date_of_birth", dateValue.toString(Qt::DateFormat::ISODate));
+    });
+}
+
+void CypressMainWindow::enableDebugDevices()
+{
     connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
-        //QSharedPointer<BPMSession> session(new BPMSession(nullptr, inputData, origin));
-        QSharedPointer<WatchBPSession> session(new WatchBPSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<WatchBPSession> session(new WatchBPSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchWeightScale, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<WeighScaleSession> session(new WeighScaleSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<WeighScaleSession> session(new WeighScaleSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchSpirometer, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData = getDebugInputData();
         //QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData, origin));
-        QSharedPointer<EasyoneConnectSession> session(new EasyoneConnectSession(nullptr, inputData, origin));
+        QSharedPointer<EasyoneConnectSession> session(new EasyoneConnectSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchDxa1, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<DxaHipSession> session(new DxaHipSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<DxaHipSession> session(new DxaHipSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchDxa2, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<DXASession> session(new DXASession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<DXASession> session(new DXASession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchUltrasound, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<UltrasoundSession> session(new UltrasoundSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<VividIQSession> session(new VividIQSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchEcg, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<ECGSession> session(new ECGSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<Mac5Session> session(new Mac5Session(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchFrax, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<FraxSession> session(new FraxSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<FraxSession> session(new FraxSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchAudiometer, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<HearconSession> session(new HearconSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<HearconSession> session(new HearconSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchGripStrength, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<GripStrengthSession> session(new GripStrengthSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<GripStrengthSession> session(new GripStrengthSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchRetinalCamera, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<RetinalCameraSession> session(new RetinalCameraSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<RetinalCameraSession> session(new RetinalCameraSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchChoiceReaction, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<ChoiceReactionSession> session(new ChoiceReactionSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<ChoiceReactionSession> session(new ChoiceReactionSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
     connect(ui->launchCDTT, &QPushButton::clicked, this, [=]() {
-        QSharedPointer<CDTTSession> session(new CDTTSession(nullptr, inputData, origin));
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<CDTTSession> session(new CDTTSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 }
+
 
 CypressMainWindow::~CypressMainWindow()
 {

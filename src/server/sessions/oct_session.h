@@ -3,16 +3,23 @@
 
 #include "cypress_session.h"
 
+
 class OCTSession : public CypressSession
 {
 public:
-    explicit OCTSession(QObject* parent, const QJsonObject& inputData, const QString& origin);
+    enum Side { Left, Right };
+
+    explicit OCTSession(QObject* parent, const QJsonObject& inputData, const QString& origin, OCTSession::Side side);
+
+    OCTSession::Side getSide();
 
     // CypressSession interface
-public:
     void initializeDialog() override;
     void isInstalled() const override;
     void isAvailable() const override;
+
+private:
+    OCTSession::Side m_side { Left };
 };
 
 #endif // OCT_SESSION_H

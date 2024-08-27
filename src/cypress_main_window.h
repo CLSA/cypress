@@ -27,6 +27,11 @@ private:
     QPushButton *m_button;
 
     QSharedPointer<DialogBase> m_device_dialog;
+    QJsonObject getDebugInputData();
+
+    void enableDevices(bool enabled);
+    void enableDebugParticipant();
+    void enableDebugDevices();
 };
 
 #endif // CYPRESS_MAIN_WINDOW_H

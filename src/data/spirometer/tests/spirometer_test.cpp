@@ -1,7 +1,5 @@
 #include "spirometer_test.h"
-#include "../measurements/spirometer_measurement.h"
-
-#include "../../../auxiliary/Utilities.h"
+#include "data/spirometer/measurements/spirometer_measurement.h"
 
 #include <QDomDocument>
 #include <QFile>
@@ -347,8 +345,6 @@ QJsonObject SpirometerTest::toJsonObject() const
     value.insert("manual_entry", getManualEntryMode());
     value.insert("results", trialJson);
     value.insert("best_values", bestJson);
-
-    qDebug() << value;
 
     return value;
 }

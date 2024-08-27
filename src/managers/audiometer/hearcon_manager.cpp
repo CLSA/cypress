@@ -11,6 +11,7 @@
 #include <TlHelp32.h>
 
 #include "auxiliary/windows_util.h"
+#include "auxiliary/json_settings.h"
 
 DeviceConfig HearconManager::config {{
     { "processName",             { "hearcon/processName",                NonEmptyString }},
@@ -47,6 +48,8 @@ HearconManager::HearconManager(QSharedPointer<HearconSession> session): ManagerB
 
 bool HearconManager::start()
 {
+    emit started(m_test);
+
     qDebug() << "HearconManager::start";
 
     if (processAlreadyRunning())
@@ -112,6 +115,7 @@ void HearconManager::measure()
 
     qSharedPointerCast<HearconTest>(m_test)->fromJsonFile(m_readerOutputPath);
 
+    qDebug().noquote() << JsonSettings::prettyPrintJson(m_test->toJsonObject());
     emit dataChanged(m_test);
     checkIfFinished();
 }
@@ -155,7 +159,7 @@ bool HearconManager::configurePlugin(const QString& operation)
         << operation
         << m_session->getBarcode()
         << m_session->getInputData()["dob"].toString()
-        << m_session->getInputData()["sex"].toString();
+        << m_session->getInputData()["sex"].toString()[0].toUpper();
 
     m_plugin.setProgram(m_readerPath);
     m_plugin.setArguments(pluginArguments);

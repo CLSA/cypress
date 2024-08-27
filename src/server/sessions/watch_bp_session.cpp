@@ -1,6 +1,6 @@
 #include "watch_bp_session.h"
 
-#include "managers/watch_bp_manager.h"
+#include "managers/blood_pressure/watch_bp_manager.h"
 #include "dialogs/watch_bp_dialog.h"
 
 WatchBPSession::WatchBPSession(QObject *parent, const QJsonObject& inputData, const QString& origin)

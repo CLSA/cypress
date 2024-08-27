@@ -30,30 +30,50 @@ OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { sessio
     m_test.reset(new OCTTest);
 }
 
-OCTManager::~OCTManager() {}
+OCTManager::~OCTManager()
+{
+
+}
 
 bool OCTManager::start()
 {
     // Check if chrome is already running
 
-    // Connect to database
     qDebug() << "OCTManager::start - connect to database";
+
+
     m_db = QSqlDatabase::addDatabase("QODBC");
     m_db.setDatabaseName(m_databaseName);
+
     if (!m_db.open()) {
         qCritical() << "OCTManager::start - could not connect to database";
         return false;
     }
 
-    // Restore database
-    qDebug() << "OCTManager::start - restore database";
-    QSqlQuery query(m_db);
-    query.prepare("RESTORE DATABASE :databaseName FROM DISK = :databaseBackup WITH RECOVERY");
-    query.bindValue(":databaseName", m_databaseName);
-    query.bindValue(":databaseBackup", m_databaseBackup);
-
+    if (!m_db.transaction()) {
+        qCritical() << "Couldn't start transaction" << m_db.lastError();
+        return false;
+    }
+    QSqlQuery query;
+    query.prepare("ALTER DATABASE [IMAGEnet] SET single_user with rollback immediate");
     if (!query.exec()) {
-        qCritical() << "OCTManager::start - could not restore database";
+        qCritical() << "Couldn't set database to single_user";
+        return false;
+    }
+    query.prepare("RESTORE DATABASE [IMAGEnet] FROM DISK = N'C:\\Users\\Public\\Documents\\oct.bak' WITH FILE = 1, NOUNLOAD, STATS = 5");
+    if (!query.exec()) {
+        qCritical() << "Couldn't restore database";
+        return false;
+    }
+
+    query.prepare("ALTER DATABASE [IMAGEnet] SET multi_user");
+    if (!query.exec()) {
+        qCritical() << "Couldn't set database to multi_user";
+        return false;
+    }
+
+    if (!m_db.commit()) {
+        qCritical() << "Couldn't commit " << query.lastError();
         return false;
     }
 
@@ -62,11 +82,13 @@ bool OCTManager::start()
     if (!FileUtils::clearDirectory(m_exportPath))
     {
         qCritical() << "OCTManager::start - could not clear export directory";
+        return false;
     }
 
     // Prepare database
+    m_db.transaction();
     qDebug() << "OCTManager::start - inserting person";
-    query.prepare("INSERT INTO Persons (PersonUid, SurName, ForeName) VALUES (:personUid, :firstName, :lastName");
+    query.prepare("INSERT INTO IMAGEnet.dbo.Persons (PersonUid, SurName, ForeName) VALUES (:personUid, :firstName, :lastName)");
     query.bindValue(":personUid", defaultPersonUUID);
     query.bindValue(":firstName", "CLSA");
     query.bindValue(":lastName", "Participant");
@@ -74,29 +96,36 @@ bool OCTManager::start()
         qCritical() << query.lastError().text();
         return false;
     }
-
     qDebug() << "OCTManager::start - inserting patient";
-    query.prepare("INSERT INTO Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUid, :participantId, :personUUID");
-    query.bindValue(":patientUUID", defaultPatientUUID);
+    query.prepare("INSERT INTO IMAGEnet.dbo.Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUid, :participantId, :personUUID)");
+    query.bindValue(":patientUid", defaultPatientUUID);
     query.bindValue(":participantId", m_session->getBarcode());
     query.bindValue(":personUUID", defaultPatientUUID);
     if (!query.exec()) {
         qCritical() << "OCTManager::start - " << query.lastError().text();
         return false;
     }
+    m_db.commit();
 
     // Setup process
-    qDebug() << "OCTManager::start - configure process";
     configureProcess();
-
-    qDebug() << "OCTManager::start - start imagenet";
     m_process.start();
+
     if (!m_process.waitForStarted())
         return false;
 
     emit started(m_test);
     emit dataChanged(m_test);
     emit canMeasure();
+
+    // Listen to directory changes
+    m_directoryWatcher.reset(new DicomDirectoryWatcher(m_exportPath));
+
+    // Whenever it changes, get the files
+    connect(m_directoryWatcher.get(),
+            &DicomDirectoryWatcher::dicomDirectoryChanged,
+            this,
+            &OCTManager::readOutput);
 
     return true;
 }
@@ -111,43 +140,34 @@ void OCTManager::configureProcess()
     connect(&m_process, &QProcess::started, this, [=]() {
         qDebug() << "process started: " << m_process.arguments().join(" ");
     });
-
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [=]() {
-        qDebug() << "process finished, reading output";
-        readOutput();
-    });
 }
 
 void OCTManager::readOutput()
 {
-    qDebug() << "OCTManager::measure";
-    QSqlQuery query(m_db);
+    QDir exportDir(m_exportPath);
 
-    query.prepare("SELECT * FROM OCTDSA WHERE PatientID = :patientId");
-    if (!query.exec()) {
-        qCritical() << "Select from OCTDSA failed";
-        return;
+    QFileInfoList entries = exportDir.entryInfoList();
+
+    QStringList filePaths;
+
+    foreach (auto entry, entries)
+    {
+        if (entry.suffix() == "dcm")
+        {
+            qDebug() << entry.absoluteFilePath();
+            filePaths.append(entry.absoluteFilePath());
+        }
     }
 
-    if (!query.size()) {
-        qWarning() << "Select returned 0 records";
-    }
+    m_test->setFiles(filePaths);
 
-    query.prepare("SELECT * FROM Media WHERE PatientID = :patientId");
-    if (!query.exec()) {
-        qCritical() << "Select from media failed";
-        return;
-    }
-    if (!query.size()) {
-        qWarning() << "Select returned 0 records";
-    }
-
-    if (m_test->isValid()) {
-        emit canFinish();
+    if (m_test->getFiles().keys().length() >= 2) {
+        finish();
     }
 }
 
 void OCTManager::finish()
 {
     qDebug() << "OCTManager::finish";
+    ManagerBase::finish();
 }

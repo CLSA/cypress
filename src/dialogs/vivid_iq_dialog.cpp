@@ -26,9 +26,9 @@ VividIQDialog::VividIQDialog(QWidget *parent, QSharedPointer<CypressSession> ses
     });
 
     QList<TableColumn> columns;
-    columns << TableColumn("PATIENT_ID", "Patient ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("STUDY_ID", "Study ID", new TextDelegate("", QRegExp(), false));
-    columns << TableColumn("MEDIA_STORAGE_UID", "Media UID", new TextDelegate("", QRegExp(), true));
+    columns << TableColumn("patient_id", "Patient ID", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("path", "path", new TextDelegate("", QRegExp(), false));
+    columns << TableColumn("size", "size", new TextDelegate("", QRegExp(), true));
 
     // device started
     connect(manager.get(), &VividIQManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {

@@ -1,5 +1,5 @@
 #include "watch_bp_dialog.h"
-#include "managers/watch_bp_manager.h"
+#include "managers/blood_pressure/watch_bp_manager.h"
 #include "ui_watch_bp_dialog.h"
 
 WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> session)

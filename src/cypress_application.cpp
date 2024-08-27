@@ -2,24 +2,25 @@
 #include "cypress_application.h"
 
 #include "managers/audiometer/audiometer_manager.h"
-#include "managers/oct_manager.h"
+#include "managers/retinal_camera/oct_manager.h"
 #include "managers/blood_pressure/blood_pressure_manager.h"
 #include "managers/cdtt/cdtt_manager.h"
 #include "managers/choice_reaction/choice_reaction_manager.h"
 #include "managers/dxa/dxa_hip_manager.h"
 #include "managers/ecg/ecg_manager.h"
+#include "managers/ecg/mac5_manager.h"
 #include "managers/frax/frax_manager.h"
 #include "managers/grip_strength/grip_strength_manager.h"
 #include "managers/retinal_camera/retinal_camera_manager.h"
 #include "managers/spirometer/spirometer_manager.h"
 #include "managers/spirometer/easyone_manager.h"
 #include "managers/tonometer/tonometer_manager.h"
+#include "managers/tonometer/ora_manager.h"
 #include "managers/ultrasound/vividi_manager.h"
 #include "managers/weigh_scale/weigh_scale_manager.h"
 #include "managers/general_proxy_form/general_proxy_manager.h"
-#include "managers/hearcon_manager.h"
-#include "managers/watch_bp_manager.h"
-#include "managers/ora_manager.h"
+#include "managers/audiometer/hearcon_manager.h"
+#include "managers/blood_pressure/watch_bp_manager.h"
 #include "managers/ultrasound/vivid_iq_manager.h"
 
 #include <QDateTime>
@@ -127,29 +128,23 @@ QJsonObject Cypress::getStatus()
     statusJson["addresses"] = QJsonArray::fromStringList(addresses);
     statusJson["port"] = "8000";
 
-    QJsonObject availableInstruments {{}};
-
-
-    statusJson["availableInstruments"] = QJsonObject{
-        {"general_proxy", 		GeneralProxyManager::isInstalled()},
+    statusJson["availableInstruments"] = QJsonObject {
+        {"general_proxy", 		!GeneralProxyManager::config.hasErrors() ? QJsonValue(true) : GeneralProxyManager::config.getErrors() },
         {"audiometer", 			AudiometerManager::isInstalled()},
         {"hearcon", 			!HearconManager::config.hasErrors() ? QJsonValue(true) : HearconManager::config.getErrors()},
         {"blood_pressure", 		BloodPressureManager::isInstalled()},
         {"watch_bp", 			!WatchBPManager::config.hasErrors() ? QJsonValue(true) : WatchBPManager::config.getErrors()},
         {"cdtt", 				!CDTTManager::config.hasErrors() ? QJsonValue(true) : CDTTManager::config.getErrors()},
-        {"choice_reaction", 	ChoiceReactionManager::isInstalled()},
+        {"choice_reaction", 	!ChoiceReactionManager::config.hasErrors() ? QJsonValue(true) : ChoiceReactionManager::config.getErrors()},
         {"dxa", 				!DxaHipManager::config.hasErrors() ? QJsonValue(true) : DxaHipManager::config.getErrors()},
         {"ecg", 				ECGManager::isInstalled()},
+        {"mac5", 				!Mac5Manager::config.hasErrors() ? QJsonValue(true) : Mac5Manager::config.getErrors()},
         {"frax", 				!FraxManager::config.hasErrors() ? QJsonValue(true) : FraxManager::config.getErrors()},
         {"grip_strength", 		GripStrengthManager::isInstalled()},
-
         {"retinal_camera", 		RetinalCameraManager::isInstalled()},
-
         {"spirometer", 			SpirometerManager::isInstalled()},
-
         {"easyone_connect", 	!EasyoneConnectManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
         {"tonometer", 			TonometerManager::isInstalled()},
-
         {"ora", 				!ORAManager::config.hasErrors() ? QJsonValue(true) : ORAManager::config.getErrors()},
         {"cimt", 				VividiManager::isInstalled()},
         {"ultrasound", 			!VividIQManager::config.hasErrors() ? QJsonValue(true) : VividIQManager::config.getErrors()},

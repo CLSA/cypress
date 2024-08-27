@@ -3,6 +3,7 @@
 
 #include "managers/manager_base.h"
 #include "server/sessions/gen_proxy_session.h"
+#include "config/device_config.h"
 
 #include <QProcess>
 
@@ -11,7 +12,7 @@ class GeneralProxyManager : public ManagerBase
 public:
     GeneralProxyManager(QSharedPointer<GenProxySession> session);
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
     bool start();

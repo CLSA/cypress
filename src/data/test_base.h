@@ -4,7 +4,9 @@
 #include "auxiliary/Constants.h"
 #include "measurement.h"
 
+#include <QJsonObject>
 #include <QException>
+#include <QFileInfo>
 
 /*!
  * \class TestBase
@@ -23,9 +25,27 @@
 
 QT_FORWARD_DECLARE_CLASS(QJsonObject)
 
+
+
+
 class TestBase
 {
 public:
+    struct File {
+        QString name;
+        QString path;
+        QString size;
+
+        QJsonObject toJsonObject() {
+            QJsonObject result;
+
+            result["name"] = name;
+            result["path"] = path;
+            result["size"] = size;
+            return result;
+        }
+    };
+
     TestBase() = default;
     virtual ~TestBase() = default;
 
@@ -46,7 +66,7 @@ public:
     //
     virtual bool isValid() const = 0;
 
-    virtual QJsonObject toJsonObject() const = 0;
+    virtual QJsonObject toJsonObject() const;
 
 public:
     virtual void reset();
@@ -95,14 +115,15 @@ public:
 
     void removeMetaData(const QString &key);
 
+    void setFiles(const QStringList& filePaths);
+    QJsonObject getFiles();
+
 protected:
     QVector<QSharedPointer<Measurement>> m_measurementList;
 
-    QList<QVariant> m_files;
+    QJsonObject m_files;
 
     MetaData m_metaData;
-
-    bool m_debug;
 
     bool isManualEntryMode{false};
 

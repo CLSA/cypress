@@ -1,9 +1,9 @@
 #include "easyone_manager.h"
-
+#include "managers/emr/emr_plugin_writer.h"
 #include "data/spirometer/tests/easyone_test.h"
 
-#include "managers/emr/emr_plugin_writer.h"
 #include "auxiliary/windows_util.h"
+#include "auxiliary/network_utils.h"
 #include "auxiliary/file_utils.h"
 
 #include <QFile>
@@ -69,30 +69,80 @@ bool EasyoneConnectManager::start()
 void EasyoneConnectManager::readOutput()
 {
     qDebug() << "EasyoneConnectManager::readOutput";
+
+    if (QProcess::NormalExit != m_process.exitStatus()) {
+        emit error("Process failed to finish correctly, cannot read output");
+        return;
+    }
+
+    if (!QFileInfo::exists(getEMROutXmlName())) {
+        emit error("Cannot find the output file");
+        return;
+    }
+
+    auto test = qSharedPointerCast<EasyoneTest>(m_test);
+    test->fromFile(getEMROutXmlName());
+
     finish();
 }
 
 void EasyoneConnectManager::finish()
 {
-    qDebug() << "EasyoneConnectManager::finish";
-    ManagerBase::finish();
+    auto test = qSharedPointerCast<SpirometerTest>(m_test);
+
+    const QString answerUrl = getAnswerUrl();
+
+    QStringList filePaths = {
+        { getEMROutXmlName() },
+        { getOutputPdfPath() },
+    };
+
+    m_test->setFiles(filePaths);
+
+    QJsonObject testJson = m_test->toJsonObject();
+    testJson.insert("session", m_session->getJsonObject());
+
+    if (!ManagerBase::sendFiles())
+    {
+        qDebug() << "Sending files failed";
+    }
+
+    QJsonObject responseJson {};
+    responseJson.insert("value", testJson);
+
+    const QJsonDocument jsonDoc(responseJson);
+    const QByteArray serializedData = jsonDoc.toJson();
+
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        answerUrl.toStdString(),
+        "application/json",
+        serializedData
+    );
+
+    if (ok) {
+        emit success("Save successful. You may close this window.");
+    }
+    else {
+        emit error("Something went wrong");
+    }
 }
 
 bool EasyoneConnectManager::restoreDatabase()
 {
     // Clear out database
-    QFile::remove(m_databasePath + "/database.sqlite");
+    QFile::remove(m_databasePath + "/EasyOneConnect.sqlite");
     QFile::remove(m_databasePath + "/EasyOneConnectOptions.mdb");
 
     // Restore database from backup
-    if (!FileUtils::copyFile(m_backupPath + "/database.sqlite", m_databasePath + "/database.sqlite")) {
-        qCritical() << "EasyoneConnectManager::restoreDatabase - could not remove options.mdb";
+    if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnect.sqlite", m_databasePath + "/EasyOneConnect.sqlite")) {
+        qCritical() << "EasyoneConnectManager::restoreDatabase - could not copy EasyOneConnect.sqlite";
         QMessageBox::critical(nullptr, "Error", "Something went wrong");
         return false;
     }
 
     if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnectOptions.mdb", m_databasePath + "/EasyOneConnectOptions.mdb")) {
-        qCritical() << "EasyoneConnectManager::restoreDatabase - could not restore options.mdb";
+        qCritical() << "EasyoneConnectManager::restoreDatabase - could not copy EasyOneConnectOptions.mdb";
         QMessageBox::critical(nullptr, "Error", "Something went wrong");
         return false;
     }
@@ -139,26 +189,15 @@ bool EasyoneConnectManager::configureProcess()
 
 QString EasyoneConnectManager::getOutputPdfPath() const
 {
-    qInfo() << "EasyoneConnectManager::getOutputPdfPath";
-
-    auto test = qSharedPointerCast<EasyoneTest>(m_test);
-    if (test->hasMetaData("pdf_report_path"))
-        return test->getMetaDataAsString("pdf_report_path");
-
-    return "";
+    return QString("%1/%2.pdf").arg(m_exchangePath, m_session->getBarcode());
 }
 
-bool EasyoneConnectManager::outputPdfExists() const
+QString EasyoneConnectManager::getEMRInXmlName() const
 {
-    qInfo() << "EasyoneConnectManager::outputPdfExists";
-
-    const QString outPdfPath = getOutputPdfPath();
-    if (outPdfPath.isEmpty() || outPdfPath.isNull())
-        return false;
-
-    return QFileInfo::exists(outPdfPath);
+    return QString("%1/%2").arg(m_exchangePath, m_inFileName);
 }
 
-QString EasyoneConnectManager::getEMRInXmlName() const { return QString("%1/%2").arg(m_exchangePath, m_inFileName); }
-
-QString EasyoneConnectManager::getEMROutXmlName() const { return QString("%1/%2").arg(m_exchangePath, m_outFileName); }
+QString EasyoneConnectManager::getEMROutXmlName() const
+{
+    return QString("%1/%2").arg(m_exchangePath, m_outFileName);
+}

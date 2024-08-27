@@ -48,6 +48,18 @@ void WatchBPMeasurement::fromJson(const QJsonObject& data)
         if (key == "Date") {
             setAttribute(key, QDateTime::fromSecsSinceEpoch(val.toInt()));
         }
+
+        else if (key == "SYS") {
+            setAttribute("systolic", val.toInt(), "mmHg");
+        }
+
+        else if (key == "DIA") {
+            setAttribute("diastolic", val.toInt(), "mmHg");
+        }
+
+        else if (key == "HR") {
+            setAttribute("pulse", val.toInt(), "bpm");
+        }
         else {
             setAttribute(key, val);
         }

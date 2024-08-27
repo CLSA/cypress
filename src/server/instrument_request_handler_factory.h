@@ -60,6 +60,8 @@ public:
     // ECG
     static HTTPRequestHandler* createEcgRequestHandler();
     static HTTPRequestHandler* createEcgStatusRequestHandler();
+    static HTTPRequestHandler* createMac5RequestHandler();
+    static HTTPRequestHandler* createMac5StatusRequestHandler();
 
     // FRAX
     static HTTPRequestHandler* createFraxRequestHandler();
@@ -83,9 +85,6 @@ public:
     static HTTPRequestHandler* createWeighScaleRequestHandler();
     static HTTPRequestHandler* createWeighScaleStatusRequestHandler();
 
-    static HTTPRequestHandler* createBodyCompositionRequestHandler();
-    static HTTPRequestHandler* createBodyCompositionStatusRequestHandler();
-
     static HTTPRequestHandler* createECGRequestHandler();
     static HTTPRequestHandler* createECGStatusRequestHandler();
 
@@ -95,8 +94,13 @@ public:
     static HTTPRequestHandler* createDxaHipSessionRequestHandler();
     static HTTPRequestHandler* createDxaSessionRequestHandler();
 
-    static HTTPRequestHandler* createOCTSessionRequestHandler();
-    static HTTPRequestHandler* createOCTStatusRequestHandler();
+    static HTTPRequestHandler* createOCTLeftSessionRequestHandler();
+    static HTTPRequestHandler* createOCTLeftStatusRequestHandler();
+    static HTTPRequestHandler* createOCTRightSessionRequestHandler();
+    static HTTPRequestHandler* createOCTRightStatusRequestHandler();
+
+    static HTTPRequestHandler* createVividIQRequestHandler();
+    static HTTPRequestHandler* createVividIQStatusRequestHandler();
 };
 
 #endif // INSTRUMENT_REQUEST_HANDLER_FACTORY_H

@@ -23,6 +23,9 @@
 #include "sessions/gen_proxy_session.h"
 #include "sessions/participant_report_session.h"
 #include "sessions/oct_session.h"
+#include "sessions/ora_session.h"
+#include "sessions/mac5_session.h"
+#include "sessions/vivid_iq_session.h"
 
 #include "Poco/Net/HTTPServer.h"
 
@@ -115,10 +118,10 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
             session = QSharedPointer<GripStrengthSession>(new GripStrengthSession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Retinal_Camera_Left:
-            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, origin, Side::Left));
+            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, origin, RetinalCameraSession::Side::Left));
             break;
         case Constants::MeasureType::Retinal_Camera_Right:
-            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, origin, Side::Right));
+            session = QSharedPointer<RetinalCameraSession>(new RetinalCameraSession(nullptr, inputData, origin, RetinalCameraSession::Side::Right));
             break;
         case Constants::MeasureType::Spirometer:
             session = QSharedPointer<SpirometerSession>(new SpirometerSession(nullptr, inputData, origin));
@@ -132,15 +135,25 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         case Constants::MeasureType::Weigh_Scale:
             session = QSharedPointer<WeighScaleSession>(new WeighScaleSession(nullptr, inputData, origin));
             break;
-        case Constants::MeasureType::OCT:
-            session = QSharedPointer<OCTSession>(new OCTSession(nullptr, inputData, origin));
+        case Constants::MeasureType::OCT_Left:
+            session = QSharedPointer<OCTSession>(new OCTSession(nullptr, inputData, origin, OCTSession::Side::Left));
+            break;
+        case Constants::MeasureType::OCT_Right:
+            session = QSharedPointer<OCTSession>(new OCTSession(nullptr, inputData, origin, OCTSession::Side::Right));
+            break;
+        case Constants::MeasureType::ORA:
+            session = QSharedPointer<ORASession>(new ORASession(nullptr, inputData, origin));
             break;
         case Constants::MeasureType::Gen_Proxy_Consent:
             session = QSharedPointer<GenProxySession>(new GenProxySession(nullptr, inputData, origin));
             break;
-        case Constants::MeasureType::Participant_Report:
-            session = QSharedPointer<ParticipantReportSession>(new ParticipantReportSession(nullptr, inputData, origin));
+        case Constants::MeasureType::Mac5:
+            session = QSharedPointer<Mac5Session>(new Mac5Session(nullptr, inputData, origin));
             break;
+        case Constants::MeasureType::VividIQ:
+            session = QSharedPointer<VividIQSession>(new VividIQSession(nullptr, inputData, origin));
+            break;
+
         default:
             throw QException();
     }

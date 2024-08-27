@@ -9,11 +9,10 @@ QString VividIQTest::toString() const
 
 bool VividIQTest::isValid() const
 {
-    return false;
+    return true;
 }
 
 QJsonObject VividIQTest::toJsonObject() const
 {
-    QJsonObject json;
-    return json;
+    return TestBase::toJsonObject();
 }

@@ -4,9 +4,12 @@
 #include "dialogs/choice_reaction_dialog.h"
 #include "managers/choice_reaction/choice_reaction_manager.h"
 
+#include "auxiliary/json_settings.h"
+
 ChoiceReactionSession::ChoiceReactionSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
     : CypressSession{parent, inputData, origin}
 {
+    qDebug().noquote() << JsonSettings::prettyPrintJson(inputData);
 }
 
 void ChoiceReactionSession::initializeDialog()
@@ -16,7 +19,7 @@ void ChoiceReactionSession::initializeDialog()
 
 void ChoiceReactionSession::isInstalled() const
 {
-    if (!ChoiceReactionManager::isInstalled())
+    if (ChoiceReactionManager::config.hasErrors())
         throw NotInstalledError("Choice Reaction is not installed on this workstation");
 }
 

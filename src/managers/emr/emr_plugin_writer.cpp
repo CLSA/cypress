@@ -47,9 +47,9 @@ void EMRPluginWriter::addParameter(QXmlStreamWriter &stream, const QString& name
 void EMRPluginWriter::addHeader(QXmlStreamWriter& stream) const
 {
     stream.writeStartElement("ndd");
-    stream.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-    stream.writeAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
-    stream.writeAttribute("Version", "ndd.EasyWarePro.V1");
+    //stream.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    //stream.writeAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+    //stream.writeAttribute("Version", "ndd.EasyWarePro.V1");
 }
 
 void EMRPluginWriter::addCommand(QXmlStreamWriter& stream) const
@@ -85,16 +85,15 @@ void EMRPluginWriter::addPatientDataAtPresent(QXmlStreamWriter& stream) const
     //
     QString gender = m_input["sex"].toString().toLower();
     gender = gender.at(0).toUpper() + gender.mid(1);
-    stream.writeTextElement("Gender", gender);
 
-    stream.writeTextElement("DateOfBirth", m_input["dob"].toDate().toString("yyyy-MM-dd"));
-    stream.writeTextElement("ComputedDateOfBirth", "false");
+    stream.writeTextElement("Gender", gender);
+    stream.writeTextElement("DateOfBirth", m_input["dob"].toString());
 
     // TODO: check that the units are decimal m ?
     //
     stream.writeTextElement("Height", QString::number(m_input["height"].toDouble() / 100.0));
     stream.writeTextElement("Weight", QString::number(m_input["weight"].toDouble()));
-    stream.writeTextElement("Ethnicity", m_input["ethnicity"].toString());
+    stream.writeTextElement("Ethnicity", "Caucasian");
 
     //stream.writeTextElement("Ethnicity", m_ethnicity);
     stream.writeTextElement("Smoker", (m_input["smoker"].toBool() ? "Yes" : "No"));

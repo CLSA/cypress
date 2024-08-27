@@ -21,76 +21,25 @@
 QString ChoiceReactionManager::CCB_PREFIX = "CLSA_ELCV";
 QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
+DeviceConfig ChoiceReactionManager::config {{
+    {"runnableName", {"choice_reaction/runnableName",  Exe }},
+    {"runnablePath", {"choice_reaction/runnablePath", Dir }},
+    {"outputPath",   {"choice_reaction/outputPath",    Dir }},
+}};
+
 ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSession> session)
     : ManagerBase(session)
 {
     // absolute path to exe
-    m_runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
+    m_runnableName = config.getSetting("runnableName");
 
     // absolute path to working directory
-    m_runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
+    m_runnablePath = config.getSetting("runnablePath");
 
     // absolute path to output directory
-    m_outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
+    m_outputPath = config.getSetting("outputPath");
 
     m_test.reset(new ChoiceReactionTest);
-
-    qInfo() << "ChoiceReactionManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
-}
-
-bool ChoiceReactionManager::isInstalled()
-{
-    qInfo() << "ChoiceReactionManager::isInstalled";
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName = CypressSettings::readSetting("choice_reaction/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("choice_reaction/runnablePath").toString();
-    const QString outputPath = CypressSettings::readSetting("choice_reaction/outputPath").toString();
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (outputPath.isNull() || outputPath.isEmpty()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: outputPath is not defined";
-        return false;
-    }
-
-    const QFileInfo info(runnableName);
-    if (!info.exists()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: exe does not exist at " << runnableName;
-        return false;
-    }
-
-    if (!info.isExecutable()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: file is not executable at " << runnableName;
-        return false;
-    }
-
-    const QDir working(runnablePath);
-    if (!working.exists()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: working directory does not exist";
-        return false;
-    }
-
-    const QDir out(outputPath);
-    if (!out.exists()) {
-        qInfo() << "ChoiceReactionManager::isInstalled: output path does not exist";
-        return false;
-    }
-
-    return true;
 }
 
 bool ChoiceReactionManager::start()

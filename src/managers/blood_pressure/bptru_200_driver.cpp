@@ -7,7 +7,6 @@ BpTru200Driver::BpTru200Driver(QMutex& mutex, QHidDevice* hid, QObject *parent)
     : QThread{parent}, m_mutex(mutex), m_bpm200(hid)
 {
     m_read_buffer.reset(new QByteArray(1024, 0));
-    m_debug = CypressSettings::isDebugMode();
 }
 
 BpTru200Driver::~BpTru200Driver()

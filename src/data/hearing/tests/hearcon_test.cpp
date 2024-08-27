@@ -76,8 +76,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMetaData("revBatch", 	json.value("revBatch"));
 
     QSharedPointer<HearconMeasurement> l250(new HearconMeasurement);
-    l250->setAttribute("side",     "left");
-    l250->setAttribute("test",     "l250");
+    l250->setAttribute("side",     "Left");
+    l250->setAttribute("test",     "250 Hz");
     l250->setAttribute("level",    json.value("l250"), "dB");
     l250->setAttribute("pass",     json.value("l250").toInt() <= 40);
     l250->setAttribute("outcome",  "");
@@ -85,8 +85,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l250);
 
     QSharedPointer<HearconMeasurement> l500(new HearconMeasurement);
-    l500->setAttribute("side",     "left");
-    l500->setAttribute("test",     "l500");
+    l500->setAttribute("side",     "Left");
+    l500->setAttribute("test",     "500 Hz");
     l500->setAttribute("level",    json.value("l500"), "dB");
     l500->setAttribute("pass",     json.value("l500").toInt() <= 40);
     l500->setAttribute("outcome",  "");
@@ -94,8 +94,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l500);
 
     QSharedPointer<HearconMeasurement> l1000(new HearconMeasurement);
-    l1000->setAttribute("side",     "left");
-    l1000->setAttribute("test",     "l1000");
+    l1000->setAttribute("side",     "Left");
+    l1000->setAttribute("test",     "1000 Hz");
     l1000->setAttribute("level",    json.value("l1000"), "dB");
     l1000->setAttribute("pass",     json.value("l1000").toInt() <= 40);
     l1000->setAttribute("outcome",  "");
@@ -103,8 +103,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l1000);
 
     QSharedPointer<HearconMeasurement> l1500(new HearconMeasurement);
-    l1500->setAttribute("side",     "left");
-    l1500->setAttribute("test",     "l1500");
+    l1500->setAttribute("side",     "Left");
+    l1500->setAttribute("test",     "1500 Hz");
     l1500->setAttribute("level",    json.value("l1500"), "dB");
     l1500->setAttribute("pass",     json.value("l1500").toInt() <= 40);
     l1500->setAttribute("outcome",  "");
@@ -112,8 +112,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l1500);
 
     QSharedPointer<HearconMeasurement> l2000(new HearconMeasurement);
-    l2000->setAttribute("side",     "left");
-    l2000->setAttribute("test",     "l2000");
+    l2000->setAttribute("side",     "Left");
+    l2000->setAttribute("test",     "2000 Hz");
     l2000->setAttribute("level",    json.value("l2000"), "dB");
     l2000->setAttribute("pass",     json.value("l2000").toInt() <= 40);
     l2000->setAttribute("outcome",  "");
@@ -121,8 +121,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l2000);
 
     QSharedPointer<HearconMeasurement> l3000(new HearconMeasurement);
-    l3000->setAttribute("side",     "left");
-    l3000->setAttribute("test",     "l3000");
+    l3000->setAttribute("side",     "Left");
+    l3000->setAttribute("test",     "3000 Hz");
     l3000->setAttribute("level",    json.value("l3000"), "dB");
     l3000->setAttribute("pass",     json.value("l3000").toInt() <= 40);
     l3000->setAttribute("outcome",  "");
@@ -130,8 +130,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l3000);
 
     QSharedPointer<HearconMeasurement> l4000(new HearconMeasurement);
-    l4000->setAttribute("side",     "left");
-    l4000->setAttribute("test",     "l4000");
+    l4000->setAttribute("side",     "Left");
+    l4000->setAttribute("test",     "4000 Hz");
     l4000->setAttribute("level",    json.value("l4000"), "dB");
     l4000->setAttribute("pass",     json.value("l4000").toInt() <= 40);
     l4000->setAttribute("outcome",  "");
@@ -139,8 +139,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l4000);
 
     QSharedPointer<HearconMeasurement> l6000(new HearconMeasurement);
-    l6000->setAttribute("side",     "left");
-    l6000->setAttribute("test",     "l6000");
+    l6000->setAttribute("side",     "Left");
+    l6000->setAttribute("test",     "6000 Hz");
     l6000->setAttribute("level",    json.value("l6000"), "dB");
     l6000->setAttribute("pass",     json.value("l6000").toInt() <= 40);
     l6000->setAttribute("outcome",  "");
@@ -148,8 +148,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l6000);
 
     QSharedPointer<HearconMeasurement> l8000(new HearconMeasurement);
-    l8000->setAttribute("side",     "left");
-    l8000->setAttribute("test",     "l8000");
+    l8000->setAttribute("side",     "Left");
+    l8000->setAttribute("test",     "8000 Hz");
     l8000->setAttribute("level",    json.value("l8000"), "dB");
     l8000->setAttribute("pass",     json.value("l8000").toInt() <= 40);
     l8000->setAttribute("outcome",  "");
@@ -157,8 +157,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(l8000);
 
     QSharedPointer<HearconMeasurement> r250(new HearconMeasurement);
-    r250->setAttribute("side",     "right");
-    r250->setAttribute("test",     "r250");
+    r250->setAttribute("side",     "Right");
+    r250->setAttribute("test",     "250 Hz");
     r250->setAttribute("level",    json.value("r250"), "dB");
     r250->setAttribute("pass",     json.value("r250").toInt() <= 40);
     r250->setAttribute("outcome",  "");
@@ -166,8 +166,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r250);
 
     QSharedPointer<HearconMeasurement> r500(new HearconMeasurement);
-    r500->setAttribute("side",     "right");
-    r500->setAttribute("test",     "r500");
+    r500->setAttribute("side",     "Right");
+    r500->setAttribute("test",     "500 Hz");
     r500->setAttribute("level",    json.value("r500"), "dB");
     r500->setAttribute("pass",     json.value("r500").toInt() <= 40);
     r500->setAttribute("outcome",  "");
@@ -175,8 +175,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r500);
 
     QSharedPointer<HearconMeasurement> r1000(new HearconMeasurement);
-    r1000->setAttribute("side",     "right");
-    r1000->setAttribute("test",     "r1000");
+    r1000->setAttribute("side",     "Right");
+    r1000->setAttribute("test",     "1000 Hz");
     r1000->setAttribute("level",    json.value("r1000"), "dB");
     r1000->setAttribute("pass",     json.value("r1000").toInt() <= 40);
     r1000->setAttribute("outcome",  "");
@@ -184,8 +184,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r1000);
 
     QSharedPointer<HearconMeasurement> r1500(new HearconMeasurement);
-    r1500->setAttribute("side",     "right");
-    r1500->setAttribute("test",     "r1500");
+    r1500->setAttribute("side",     "Right");
+    r1500->setAttribute("test",     "1500 Hz");
     r1500->setAttribute("level",    json.value("r1500"), "dB");
     r1500->setAttribute("pass",     json.value("r1500").toInt() <= 40);
     r1500->setAttribute("outcome",  "");
@@ -193,8 +193,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r1500);
 
     QSharedPointer<HearconMeasurement> r2000(new HearconMeasurement);
-    r2000->setAttribute("side",     "right");
-    r2000->setAttribute("test",     "r2000");
+    r2000->setAttribute("side",     "Right");
+    r2000->setAttribute("test",     "2000 Hz");
     r2000->setAttribute("level",    json.value("r2000"), "dB");
     r2000->setAttribute("pass",     json.value("r2000").toInt() <= 40);
     r2000->setAttribute("outcome",  "");
@@ -202,8 +202,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r2000);
 
     QSharedPointer<HearconMeasurement> r3000(new HearconMeasurement);
-    r3000->setAttribute("side",     "right");
-    r3000->setAttribute("test",     "r3000");
+    r3000->setAttribute("side",     "Right");
+    r3000->setAttribute("test",     "3000 Hz");
     r3000->setAttribute("level",    json.value("r3000"), "dB");
     r3000->setAttribute("pass",     json.value("r3000").toInt() <= 40);
     r3000->setAttribute("outcome",  "");
@@ -211,8 +211,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r3000);
 
     QSharedPointer<HearconMeasurement> r4000(new HearconMeasurement);
-    r4000->setAttribute("side",     "right");
-    r4000->setAttribute("test",     "r4000");
+    r4000->setAttribute("side",     "Right");
+    r4000->setAttribute("test",     "4000 Hz");
     r4000->setAttribute("level",    json.value("r4000"), "dB");
     r4000->setAttribute("pass",     json.value("r4000").toInt() <= 40);
     r4000->setAttribute("outcome",  "");
@@ -220,8 +220,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r4000);
 
     QSharedPointer<HearconMeasurement> r6000(new HearconMeasurement);
-    r6000->setAttribute("side",     "right");
-    r6000->setAttribute("test",     "r6000");
+    r6000->setAttribute("side",     "Right");
+    r6000->setAttribute("test",     "6000 Hz");
     r6000->setAttribute("level",    json.value("r6000"), "dB");
     r6000->setAttribute("pass",     json.value("r6000").toInt() <= 40);
     r6000->setAttribute("outcome",  "");
@@ -229,8 +229,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMeasurement(r6000);
 
     QSharedPointer<HearconMeasurement> r8000(new HearconMeasurement);
-    r8000->setAttribute("side",     "right");
-    r8000->setAttribute("test",     "r8000");
+    r8000->setAttribute("side",     "Right");
+    r8000->setAttribute("test",     "8000 Hz");
     r8000->setAttribute("level",    json.value("r8000"), "dB");
     r8000->setAttribute("pass",     json.value("r8000").toInt() <= 40);
     r8000->setAttribute("outcome",  "");
@@ -266,9 +266,9 @@ QJsonObject HearconTest::toJsonObject() const
         QString side = measureJson["side"].toString();
 
         measureJson.remove("side");
-        if (side == "left")
+        if (side == "Left")
             leftResults.append(measureJson);
-        else if (side == "right")
+        else if (side == "Right")
             rightResults.append(measureJson);
     }
 
@@ -282,7 +282,7 @@ QJsonObject HearconTest::toJsonObject() const
 
 void HearconTest::reset()
 {
-
+    TestBase::reset();
 }
 
 void HearconTest::reinterpret()

@@ -1,17 +1,12 @@
-#include "oct_status_request_handler.h"
+#include "oct_right_status_request_handler.h"
 
-#include "managers/oct_manager.h"
+#include "cypress_application.h"
+#include "managers/retinal_camera/oct_manager.h"
+
 #include "auxiliary/json_settings.h"
 
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
 
-#include <QJsonObject>
-#include <QDebug>
-
-void OCTStatusRequestHandler::handleRequest(
-    Poco::Net::HTTPServerRequest &request,
-    Poco::Net::HTTPServerResponse &response)
+void OCTRightStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     Q_UNUSED(request)
     try {

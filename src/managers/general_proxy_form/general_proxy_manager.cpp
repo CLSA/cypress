@@ -8,12 +8,17 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-GeneralProxyManager::GeneralProxyManager(QSharedPointer<GenProxySession> session): ManagerBase(session) {
-    m_outputFilePath = QDir::currentPath() + "/" + m_session->getBarcode() + ".pdf";
+DeviceConfig GeneralProxyManager::config {{
+    { "runnableName", {"general_proxy/runnableName", Exe }},
+    { "runnablePath", {"general_proxy/runnablePath", Dir }},
+    { "pdftkPath",    {"general_proxy/pdftkPath",    Dir }},
+}};
 
+GeneralProxyManager::GeneralProxyManager(QSharedPointer<GenProxySession> session): ManagerBase(session) {
     m_runnableName = CypressSettings::readSetting("general_proxy/runnableName").toString();
     m_runnablePath = CypressSettings::readSetting("general_proxy/runnablePath").toString();
     m_pdftkPath = CypressSettings::readSetting("general_proxy/pdftkPath").toString();
+    m_outputFilePath = QDir::currentPath() + "/" + m_session->getBarcode() + ".pdf";
 
     qDebug() << "m_outputFilePath" << m_outputFilePath;
     qDebug() << "m_pdftkPath" << m_pdftkPath;
@@ -27,28 +32,12 @@ bool GeneralProxyManager::start() {
 }
 
 
-bool GeneralProxyManager::isInstalled() {
-    const QString runnableName = CypressSettings::readSetting("general_proxy/runnableName").toString();
-    if (runnableName.isNull() || runnableName.isEmpty())
-        return false;
-
-    const QString runnablePath = CypressSettings::readSetting("general_proxy/runnablePath").toString();
-    if (runnablePath.isNull() || runnableName.isEmpty())
-        return false;
-
-    const QString pdftkPath = CypressSettings::readSetting("general_proxy/pdftkPath").toString();
-    if (pdftkPath.isNull() || pdftkPath.isEmpty())
-        return false;
-
-    return true;
-}
-
 void GeneralProxyManager::measure()
 {
     PDFFormFiller filler;
     QJsonObject inputData;
 
-    inputData["enrollmentId"] = m_session->getBarcode();
+    inputData["enrollmentId"] = m_session->getInputData().value("uid").toString();
 
     QString language = m_session->getInputData().value("language").toString();
     QDir currentDir = QDir::currentPath();

@@ -7,7 +7,7 @@ void GeneralProxyConsentStatusRequestHandler::handleRequest(Poco::Net::HTTPServe
     Q_UNUSED(request)
     try {
         QJsonObject responseData {{
-            "status", GeneralProxyManager::isInstalled() ? "available" : "unavailable"
+            "status", !GeneralProxyManager::config.hasErrors() ? "available" : "unavailable"
         }};
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

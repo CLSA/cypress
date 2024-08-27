@@ -23,9 +23,6 @@ public:
 
 private:
     QList<QString> m_outputKeyList;
-
-    bool m_debug;
-
 };
 
 Q_DECLARE_METATYPE(ChoiceReactionTest);

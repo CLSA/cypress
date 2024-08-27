@@ -1,7 +1,7 @@
 #ifndef WATCH_BP_MANAGER_H
 #define WATCH_BP_MANAGER_H
 
-#include "manager_base.h"
+#include "managers/manager_base.h"
 #include "config/device_config.h"
 
 #include "server/sessions/watch_bp_session.h"

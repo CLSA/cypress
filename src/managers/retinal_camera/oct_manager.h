@@ -1,10 +1,11 @@
 #ifndef OCT_MANAGER_H
 #define OCT_MANAGER_H
 
-#include "manager_base.h"
+#include "managers/manager_base.h"
 #include "config/device_config.h"
 
 #include "server/sessions/oct_session.h"
+#include "dicom/dicom_directory_watcher.h"
 
 #include <QProcess>
 #include <QSqlDatabase>
@@ -33,6 +34,8 @@ public slots:
 private:
     QString defaultPersonUUID = "11111111-2222-3333-4444-555555555555";
     QString defaultPatientUUID = "11111111-2222-3333-4444-555555555555";
+
+    QSharedPointer<DicomDirectoryWatcher> m_directoryWatcher;
 
     QProcess m_process;
     QSqlDatabase m_db;

@@ -53,19 +53,7 @@ bool WatchBPTest::isValid() const
 
 QJsonObject WatchBPTest::toJsonObject() const
 {
-    QJsonObject testJson {};
-    QJsonArray measurementArray {};
-
-    foreach (const auto m, m_measurementList) {
-       measurementArray.append(m->toJsonObject());
-    }
-
-    QJsonObject valuesObject {};
-    valuesObject.insert("results", measurementArray);
-    valuesObject.insert("metadata", m_metaData.toJsonObject());
-    valuesObject.insert("manual_entry", getManualEntryMode());
-
-    return valuesObject;
+    return TestBase::toJsonObject();
 }
 
 void WatchBPTest::reset()

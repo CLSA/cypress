@@ -18,12 +18,12 @@
 
 #include "auxiliary/json_settings.h"
 #include "auxiliary/network_utils.h"
+#include "auxiliary/file_utils.h"
 
 ManagerBase::ManagerBase(QSharedPointer<CypressSession> session)
     : m_session(session)
     , m_inputData(JsonSettings::jsonObjectToVariantMap(m_session->getInputData()))
 {
-    m_debug = CypressSettings::isDebugMode();
 }
 
 ManagerBase::~ManagerBase()
@@ -33,12 +33,19 @@ ManagerBase::~ManagerBase()
 void ManagerBase::finish() {
     qDebug() << "ManagerBase::finish";
 
+    qDebug() << m_test->toJsonObject();
+
     int answer_id = m_session->getAnswerId();
     const QString pineOrigin = m_session->getOrigin();
     const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
     qDebug() <<  answerUrl;
 
     QJsonObject testJson = m_test->toJsonObject();
+
+    if (m_test->getFiles().keys().length() > 0) {
+        sendFiles();
+    }
+
     testJson.insert("session", m_session->getJsonObject());
 
     QJsonObject responseJson {};
@@ -102,7 +109,39 @@ bool ManagerBase::sendComplete(QString uuid)
     );
 }
 
-void ManagerBase::readOutput() {
+bool ManagerBase::sendFiles()
+{
+    QJsonObject files = m_test->getFiles();
+
+    const QString answerUrl = getAnswerUrl();
+
+    bool ok = true;
+
+    for (auto it = files.begin(); it != files.end(); ++it)
+    {
+        auto key = it.key();
+        auto file = it.value().toObject();
+
+        QString path = file.value("path").toString();
+        const QByteArray data = FileUtils::readFile(path);
+
+        QString name = file.value("name").toString();
+        QString size = file.value("size").toString();
+
+        const std::string uploadUrl = QString("%1?filename=%2").arg(answerUrl, name).toStdString();
+        ok = NetworkUtils::sendHTTPSRequest(
+            Poco::Net::HTTPRequest::HTTP_PATCH,
+            uploadUrl,
+            "application/octet-stream",
+            data
+        );
+    }
+
+    return ok;
+}
+
+void ManagerBase::readOutput()
+{
 
 }
 
@@ -116,6 +155,16 @@ void ManagerBase::setManualEntry(bool isManualEntry)
 void ManagerBase::addManualMeasurement()
 {
     return;
+}
+
+
+QString ManagerBase::getAnswerUrl()
+{
+    const int answerId = m_session->getAnswerId();
+    const QString pineOrigin = m_session->getOrigin();
+    const QString answerUrl = pineOrigin + "/answer/" + QString::number(answerId);
+
+    return answerUrl;
 }
 
 void ManagerBase::checkIfFinished()

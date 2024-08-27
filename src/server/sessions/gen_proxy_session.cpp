@@ -19,7 +19,7 @@ void GenProxySession::validate() const
 }
 
 void GenProxySession::isInstalled() const {
-    if (!GeneralProxyManager::isInstalled())
+    if (GeneralProxyManager::config.hasErrors())
         throw NotInstalledError("Not installed");
 }
 

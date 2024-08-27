@@ -24,6 +24,9 @@ public slots:
     void readOutput() override;
 
 private:
+    QSharedPointer<EasyoneTest> m_test;
+    QProcess m_process;
+
     QString m_processName;  // Name of process when running in Task Manager
     QString m_runnableName; // Full path to EasyConnect.exe
     QString m_runnablePath; // Path to EasyConnect.exe directory
@@ -36,9 +39,7 @@ private:
 
     QString getEMRInXmlName() const;
     QString getEMROutXmlName() const;
-
-    QProcess m_process;
-    QSharedPointer<EasyoneTest> m_test;
+    QString getOutputPdfPath() const;
 
     bool clearData() override { return true; } ;
     bool setUp() override { return true; };
@@ -47,9 +48,6 @@ private:
     bool restoreDatabase();
     bool writeEMRRequest();
     bool configureProcess();
-
-    QString getOutputPdfPath() const;
-    bool outputPdfExists() const;
 };
 
 #endif // EASYONE_MANAGER_H

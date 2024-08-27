@@ -21,7 +21,7 @@ void RetinalCameraSession::initializeDialog()
 }
 
 
-Side RetinalCameraSession::getSide()
+RetinalCameraSession::Side RetinalCameraSession::getSide()
 {
     return m_side;
 }

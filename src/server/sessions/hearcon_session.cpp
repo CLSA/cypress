@@ -1,10 +1,14 @@
 #include "hearcon_session.h"
 
 #include "dialogs/hearcon_dialog.h"
-#include "managers/hearcon_manager.h"
+#include "managers/audiometer/hearcon_manager.h"
+
+#include "auxiliary/json_settings.h"
 
 HearconSession::HearconSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
-    : CypressSession{parent, inputData, origin} {
+    : CypressSession{parent, inputData, origin}
+{
+    qDebug().noquote() << JsonSettings::prettyPrintJson(inputData);
 }
 
 void HearconSession::isInstalled() const {

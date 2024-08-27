@@ -3,6 +3,7 @@
 
 #include "managers/manager_base.h"
 #include "server/sessions/choice_reaction_session.h"
+#include "config/device_config.h"
 
 #include <QProcess>
 
@@ -29,12 +30,12 @@ public:
     static QString CCB_PREFIX;
     static QString CCB_CLINIC;
 
+    static DeviceConfig config;
+
     // is the passed string an executable file
     // with the correct path elements ?
     //
     bool isDefined(const QString&) const;
-
-    static bool isInstalled();
 
 public slots:
 
@@ -49,7 +50,7 @@ public slots:
 
     void finish() override;
 
-    void readOutput();
+    void readOutput() override;
 
 private:
     QString m_runnableName;   // full pathspec to CCB.exe

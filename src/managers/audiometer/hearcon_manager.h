@@ -1,7 +1,7 @@
 #ifndef HEARCON_MANAGER_H
 #define HEARCON_MANAGER_H
 
-#include "manager_base.h"
+#include "managers/manager_base.h"
 #include "config/device_config.h"
 
 #include <QProcess>

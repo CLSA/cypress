@@ -1,11 +1,12 @@
 #include "hearcon_status_request_handler.h"
 
-#include "managers/hearcon_manager.h"
+#include "managers/audiometer/hearcon_manager.h"
 #include "auxiliary/json_settings.h"
 
 void HearconStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
     Q_UNUSED(request)
+    qDebug() << "hearcon status request handler";
     try {
         QString responseData = JsonSettings::serializeJson(QJsonObject {{
             "status", !HearconManager::config.hasErrors() ? "available" : "unavailable"

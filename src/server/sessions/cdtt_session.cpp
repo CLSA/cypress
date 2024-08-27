@@ -2,9 +2,12 @@
 #include "managers/cdtt/cdtt_manager.h"
 #include "dialogs/cdtt_dialog.h"
 
+#include "auxiliary/json_settings.h"
+
 CDTTSession::CDTTSession(QObject *parent, const QJsonObject& inputData, const QString& origin)
     : CypressSession{parent, inputData, origin}
 {
+    qDebug().noquote() << JsonSettings::prettyPrintJson(inputData);
 }
 
 void CDTTSession::isInstalled() const {

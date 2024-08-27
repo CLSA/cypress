@@ -1,7 +1,7 @@
 #include "ora_session.h"
 
 #include "dialogs/ora_dialog.h"
-#include "managers/ora_manager.h"
+#include "managers/tonometer/ora_manager.h"
 
 ORASession::ORASession(QObject* parent, const QJsonObject& inputData, const QString& origin): CypressSession(parent, inputData, origin)
 {

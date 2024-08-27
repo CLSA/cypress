@@ -1,18 +1,13 @@
+#include "oct_right_request_handler.h"
 #include "cypress_application.h"
-#include "oct_request_handler.h"
 
 #include "auxiliary/json_settings.h"
 
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-
-
-void OCTRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
+void OCTRightRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response)
 {
-    qDebug() << "OCT request handler";
     try {
         QJsonObject requestData = getRequestData(request);
-        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::OCT, requestData);
+        QString sessionId = Cypress::getInstance().httpServer->requestDevice(Constants::MeasureType::OCT_Right, requestData);
 
         QJsonObject data = getResponseData(sessionId);
         QString responseData = JsonSettings::serializeJson(data);

@@ -4,6 +4,11 @@
 
 #include "auxiliary/windows_util.h"
 #include "auxiliary/file_utils.h"
+#include "auxiliary/network_utils.h"
+
+#include <QMessageBox>
+#include <QApplication>
+
 
 DeviceConfig VividIQManager::config {{
     { "runnableName", { "vivid_iq/dicom/runnableName", Exe  }},
@@ -45,25 +50,51 @@ VividIQManager::VividIQManager(QSharedPointer<CypressSession> session) : Manager
 bool VividIQManager::start()
 {
     qDebug() << "VividIQManager::start";
-    return true;
-}
 
-void VividIQManager::finish()
-{
-    qDebug() << "VividIQManager::finish";
+    m_dicomServer->start();
+
+    emit started(m_test);
+    emit dataChanged(m_test);
+    emit canMeasure();
+
+    return true;
 }
 
 void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
+    qDebug() << "VividIQManager::dicomFilesReceived";
+
+    bool foundInvalidParticipant = false;
+    QString invalidId;
+
     foreach (DicomFile file, dicomFiles)
     {
         QSharedPointer<VividIQMeasurement> measure(new VividIQMeasurement);
 
         if (m_session->getBarcode() != file.patientId) {
             qDebug() << "Received wrong id" << file.patientId;
+            foundInvalidParticipant = true;
+            invalidId = file.patientId;
             continue;
         }
 
+        auto measurements = m_test->getMeasurements();
+        bool foundDuplicate = false;
+
+        for (auto measurement : measurements) {
+            if (measurement->getAttribute("path").toString() == file.absFilePath) {
+                foundDuplicate = true;
+                qDebug() << "Found duplicate: " << file.absFilePath;
+                break;
+            }
+        }
+
+        if (foundDuplicate) {
+            continue;
+        }
+
+        QFileInfo fileInfo(file.absFilePath);
+        measure->setAttribute("name", 		fileInfo.fileName());
         measure->setAttribute("patient_id", file.patientId);
         measure->setAttribute("study_id", 	file.studyId);
         measure->setAttribute("path", 		file.absFilePath);
@@ -72,6 +103,59 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         m_test->addMeasurement(measure);
     }
 
+    if (foundInvalidParticipant)
+        QMessageBox::warning(nullptr, "Invalid participant", invalidId + " does not match " + m_session->getBarcode());
+
     emit dataChanged(m_test);
     checkIfFinished();
+}
+
+void VividIQManager::finish()
+{
+    qDebug() << "VividIQManager::finish";
+    const QString answerUrl = getAnswerUrl();
+
+    QJsonObject responseJson {};
+    QJsonObject filesJson {};
+
+    for (int i = 0; i < m_test->getMeasurementCount(); i++) {
+        Measurement& measure = m_test->get(i);
+        QByteArray data = FileUtils::readFile(measure.getAttribute("path").toString());
+
+        filesJson.insert(
+            measure.getAttribute("name").toString() + "_dcm",
+            FileUtils::getHumanReadableFileSize(measure.getAttribute("path").toString())
+        );
+
+        QApplication::processEvents();
+        bool ok = NetworkUtils::sendHTTPSRequest("PATCH",
+                                   (answerUrl
+                                                  + "?filename=" + measure.getAttribute("name").toString() + ".dcm").toStdString(),
+                                   "application/octet-stream",
+                                   data);
+        if (!ok) {
+            qDebug() << "could not send file: " << measure.getAttribute("name").toString();
+            emit error("Could not send file");
+            return;
+        }
+
+        measure.removeAttribute("PATH");
+    }
+
+    QJsonObject testJson = m_test->toJsonObject();
+    QJsonObject sessionObj = m_session->getJsonObject();
+
+    testJson.insert("session", sessionObj);
+    testJson.insert("files", filesJson);
+    responseJson.insert("value", testJson);
+
+    QJsonDocument jsonDoc(responseJson);
+    QByteArray serializedData = jsonDoc.toJson();
+
+    bool ok = NetworkUtils::sendHTTPSRequest("PATCH", answerUrl.toStdString(), "application/json", serializedData);
+    if (!ok) {
+        emit error("Could not send results");
+        return;
+    }
+    emit success("Sent measurements to Pine, you may now close this window");
 }

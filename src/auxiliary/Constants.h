@@ -56,7 +56,11 @@ public:
         Signature,
         Gen_Proxy_Consent,
         Participant_Report,
-        OCT
+        OCT_Left,
+        OCT_Right,
+        ORA,
+        VividIQ,
+        Mac5
     };
     Q_ENUM(MeasureType)
 

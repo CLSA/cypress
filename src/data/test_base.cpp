@@ -1,9 +1,71 @@
 #include "test_base.h"
 
+#include "auxiliary/file_utils.h"
+
+#include <QJsonObject>
+#include <QJsonArray>
+
+QJsonObject TestBase::toJsonObject() const
+{
+    QJsonObject result {};
+    QJsonArray measures {};
+
+    auto measurements { getMeasurements() };
+    foreach (auto measurement, measurements) {
+      measures << measurement->toJsonObject();
+    }
+
+
+    if (!m_files.empty()) {
+        QJsonObject filesJson;
+        for (auto it = m_files.begin(); it != m_files.end(); ++it)
+        {
+            filesJson.insert(it.key(), it.value().toObject().value("size"));
+        }
+
+        result.insert("files", filesJson);
+    }
+
+    result.insert("metadata", m_metaData.toJsonObject());
+    result.insert("results", measures);
+    result.insert("manual_entry", getManualEntryMode());
+
+    return result;
+}
+
+
+void TestBase::setFiles(const QStringList& filePaths)
+{
+    m_files = QJsonObject {};
+
+    foreach (const auto& path, filePaths) {
+        const QFileInfo info(path);
+
+        const QString fileKey = QString("%1_%2").arg(info.baseName().toLower(), info.suffix().toLower());
+        const QString fileName = QString("%1.%2").arg(info.baseName().toLower(), info.suffix().toLower());
+        const QString filePath = path;
+        const QString fileSize = FileUtils::getHumanReadableFileSize(filePath);
+
+        QJsonObject fileJson {
+            { "name", 		fileName },
+            { "path", 		filePath },
+            { "size", 		fileSize }
+        };
+
+        m_files.insert(fileKey, fileJson);
+    }
+}
+
+QJsonObject TestBase::getFiles()
+{
+    return m_files;
+}
+
 void TestBase::reset()
 {
     m_metaData.reset();
     m_measurementList.clear();
+    m_files = QJsonObject {};
 
     setManualEntryMode(false);
 }

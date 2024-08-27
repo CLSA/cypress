@@ -32,6 +32,9 @@
 #include "server/handlers/ecg/ecg_request_handler.h"
 #include "server/handlers/ecg/ecg_status_request_handler.h"
 
+#include "server/handlers/ecg/mac5_request_handler.h"
+#include "server/handlers/ecg/mac5_status_request_handler.h"
+
 #include "server/handlers/frax/frax_request_handler.h"
 #include "server/handlers/frax/frax_status_request_handler.h"
 
@@ -50,11 +53,10 @@
 #include "server/handlers/weigh_scale/weigh_scale_request_handler.h"
 #include "server/handlers/weigh_scale/weigh_scale_status_request_handler.h"
 
-#include "server/handlers/body_composition/body_composition_request_handler.h"
-#include "server/handlers/body_composition/body_composition_status_request_handler.h"
-
 #include "server/handlers/ultrasound/ultrasound_request_handler.h"
 #include "server/handlers/ultrasound/ultrasound_status_request_handler.h"
+#include "server/handlers/ultrasound/vivid_iq_request_handler.h"
+#include "server/handlers/ultrasound/vivid_iq_status_request_handler.h"
 
 #include "server/handlers/general_proxy_consent/general_proxy_consent_request_handler.h"
 #include "server/handlers/general_proxy_consent/general_proxy_consent_status_request_handler.h"
@@ -64,8 +66,10 @@
 #include "server/handlers/dxa/dxa_hip_session_request_handler.h"
 #include "server/handlers/dxa/dxa_session_request_handler.h"
 
-#include "server/handlers/oct_request_handler.h"
-#include "server/handlers/oct_status_request_handler.h"
+#include "server/handlers/retinal_camera/oct_left_request_handler.h"
+#include "server/handlers/retinal_camera/oct_left_status_request_handler.h"
+#include "server/handlers/retinal_camera/oct_right_request_handler.h"
+#include "server/handlers/retinal_camera/oct_right_status_request_handler.h"
 
 #include "server/default_request_handler.h"
 #include "server/default_delete_request_handler.h"
@@ -88,7 +92,7 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/audiometer/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
 
     { QString(R"(^/hearcon/?$)"),         &InstrumentRequestHandlerFactory::createHearconRequestHandler},
-    { QString(R"(^/hearcon/status/?$")"), &InstrumentRequestHandlerFactory::createHearconStatusRequestHandler},
+    { QString(R"(^/hearcon/status/?$)"), &InstrumentRequestHandlerFactory::createHearconStatusRequestHandler},
     { QString(R"(^/hearcon/delete/?$)"),  &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
     { QString(R"(^/blood_pressure/?$)"),        &InstrumentRequestHandlerFactory::createBloodPressureRequestHandler },
@@ -121,20 +125,23 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/ecg/status/?$)"), &InstrumentRequestHandlerFactory::createECGStatusRequestHandler },
     { QString(R"(^/ecg/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
 
+    { QString(R"(^/mac5/?$)"),        &InstrumentRequestHandlerFactory::createMac5RequestHandler},
+    { QString(R"(^/mac5/status/?$)"), &InstrumentRequestHandlerFactory::createMac5StatusRequestHandler},
+    { QString(R"(^/mac5/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
+
     { QString(R"(^/frax/?$)"),        &InstrumentRequestHandlerFactory::createFraxRequestHandler },
     { QString(R"(^/frax/status/?$)"), &InstrumentRequestHandlerFactory::createFraxStatusRequestHandler },
     { QString(R"(^/frax/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
 
     { QString(R"(^/hand_grip/?$)"),        &InstrumentRequestHandlerFactory::createGripStrengthRequestHandler },
     { QString(R"(^/hand_grip/status/?$)"), &InstrumentRequestHandlerFactory::createGripStrengthStatusRequestHandler },
-
     { QString(R"(^/hand_grip/delete/?$)"),    &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
+
     { QString(R"(^/retinal_camera_left/?$)"), &InstrumentRequestHandlerFactory::createRetinalCameraLeftRequestHandler },
+    { QString(R"(^/retinal_camera_left/status/?$)"), &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler },
+    { QString(R"(^/retinal_camera_left/delete/?$)"),  &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
 
     { QString(R"(^/retinal_camera_right/?$)"),       &InstrumentRequestHandlerFactory::createRetinalCameraRightRequestHandler },
-    { QString(R"(^/retinal_camera_left/status/?$)"), &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler },
-
-    { QString(R"(^/retinal_camera_left/delete/?$)"),  &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
     { QString(R"(^/retinal_camera_right/status/?$)"), &InstrumentRequestHandlerFactory::createRetinalCameraStatusRequestHandler },
     { QString(R"(^/retinal_camera_right/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
 
@@ -158,16 +165,25 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/carotid_intima/status/?$)"), &InstrumentRequestHandlerFactory::createUltrasoundStatusRequestHandler},
     { QString(R"(^/carotid_intima/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
-    { QString(R"(^/weight_scale/?$)"),        &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler },
-    { QString(R"(^/weight_scale/status/?$)"), &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler },
-    { QString(R"(^/weight_scale/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
+    { QString(R"(^/vivid_iq/?$)"),              &InstrumentRequestHandlerFactory::createVividIQRequestHandler },
+    { QString(R"(^/vivid_iq/status/?$)"),       &InstrumentRequestHandlerFactory::createVividIQStatusRequestHandler },
+    { QString(R"(^/vivid_iq/delete/?$)"),       &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler},
 
-    { QString(R"(^/general_proxy_consent/?$)"), &InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler },
+    { QString(R"(^/weight_scale/?$)"),                 &InstrumentRequestHandlerFactory::createWeighScaleRequestHandler },
+    { QString(R"(^/weight_scale/status/?$)"),          &InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler },
+    { QString(R"(^/weight_scale/delete/?$)"),          &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
+
+    { QString(R"(^/general_proxy_consent/?$)"), 	   &InstrumentRequestHandlerFactory::createGeneralProxyConsentRequestHandler },
     { QString(R"(^/general_proxy_consent/status/?$)"), &InstrumentRequestHandlerFactory::createGeneralProxyConsentStatusRequestHandler },
     { QString(R"(^/general_proxy_consent/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
 
-    { QString(R"(^/oct/?$)"), &InstrumentRequestHandlerFactory::createOCTSessionRequestHandler},
-    { QString(R"(^/oct/status/?$)"), &InstrumentRequestHandlerFactory::createOCTStatusRequestHandler}}
+    { QString(R"(^/oct_left/?$)"),                          &InstrumentRequestHandlerFactory::createOCTLeftSessionRequestHandler },
+    { QString(R"(^/oct_left/status/?$)"),                   &InstrumentRequestHandlerFactory::createOCTLeftStatusRequestHandler },
+    { QString(R"(^/oct_left/delete/?$)"),                   &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
+
+    { QString(R"(^/oct_right/?$)"),                          &InstrumentRequestHandlerFactory::createOCTRightSessionRequestHandler },
+    { QString(R"(^/oct_right/status/?$)"),                   &InstrumentRequestHandlerFactory::createOCTRightStatusRequestHandler },
+    { QString(R"(^/oct_right/delete/?$)"),                   &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler }}
 };
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
@@ -223,14 +239,24 @@ HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaSessionRequestHand
     return new DxaSessionRequestHandler;
 }
 
-HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTSessionRequestHandler()
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTLeftSessionRequestHandler()
 {
-    return new OCTRequestHandler;
+    return new OCTLeftRequestHandler;
 }
 
-HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTStatusRequestHandler()
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTLeftStatusRequestHandler()
 {
-    return new OCTStatusRequestHandler;
+    return new OCTLeftStatusRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTRightSessionRequestHandler()
+{
+    return new OCTRightRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createOCTRightStatusRequestHandler()
+{
+    return new OCTRightStatusRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler()
@@ -323,6 +349,16 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createUltrasoundStatusReque
    return new UltrasoundStatusRequestHandler;
 }
 
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createVividIQRequestHandler()
+{
+    return new VividIQRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createVividIQStatusRequestHandler()
+{
+    return new VividIQStatusRequestHandler;
+}
+
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createDxaRequestHandler()
 {
    return new DxaRequestHandler;
@@ -413,6 +449,16 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createEcgStatusRequestHandl
     return new ECGStatusRequestHandler;
 }
 
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createMac5RequestHandler()
+{
+    return new Mac5RequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createMac5StatusRequestHandler()
+{
+    return new Mac5StatusRequestHandler;
+}
+
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createChoiceReactionRequestHandler()
 {
     return new ChoiceReactionRequestHandler;
@@ -431,16 +477,6 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createWeighScaleRequestHand
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createWeighScaleStatusRequestHandler()
 {
     return new WeighScaleStatusRequestHandler;
-}
-
-HTTPRequestHandler* InstrumentRequestHandlerFactory::createBodyCompositionRequestHandler()
-{
-    return new BodyCompositionRequestHandler;
-}
-
-HTTPRequestHandler* InstrumentRequestHandlerFactory::createBodyCompositionStatusRequestHandler()
-{
-    return new BodyCompositionStatusRequestHandler;
 }
 
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createParticipantReportRequestHandler()
