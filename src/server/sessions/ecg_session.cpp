@@ -14,7 +14,7 @@ void ECGSession::initializeDialog()
 
 void ECGSession::isInstalled() const
 {
-    if (!ECGManager::isInstalled())
+    if (ECGManager::config.hasErrors())
         throw NotInstalledError("ECG is not installed on this workstation");
 }
 

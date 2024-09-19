@@ -7,7 +7,7 @@ void RetinalCameraStatusRequestHandler::handleRequest(Poco::Net::HTTPServerReque
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", RetinalCameraManager::isInstalled() ? "available" : "unavailable" }
+            {"status", !RetinalCameraManager::config.hasErrors() ? "available" : "unavailable" }
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

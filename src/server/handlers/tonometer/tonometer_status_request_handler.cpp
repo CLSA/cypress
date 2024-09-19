@@ -8,7 +8,7 @@ void TonometerStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", TonometerManager::isInstalled() ? "available" : "unavailable" }
+            {"status", !TonometerManager::config.hasErrors()  ? "available" : "unavailable" }
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

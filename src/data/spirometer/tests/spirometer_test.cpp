@@ -317,6 +317,7 @@ bool SpirometerTest::isValid() const
 //
 QJsonObject SpirometerTest::toJsonObject() const
 {
+    //return TestBase::toJsonObject();
     QJsonObject value {};
     QJsonArray trialJson {};
     QJsonObject bestJson{};
@@ -331,9 +332,21 @@ QJsonObject SpirometerTest::toJsonObject() const
        }
     }
 
+
+
     QJsonObject json;
     QJsonObject deviceJson {};
     QJsonObject metaJson = m_metaData.toJsonObject();
+
+    if (!m_files.empty()) {
+        QJsonObject filesJson;
+        for (auto it = m_files.begin(); it != m_files.end(); ++it)
+        {
+            filesJson.insert(it.key(), it.value().toObject().value("size"));
+        }
+
+        value.insert("files", filesJson);
+    }
 
     deviceJson.insert("device_type", metaJson.take("device_type"));
     deviceJson.insert("device_serial_number", metaJson.take("device_serial_number"));
@@ -514,6 +527,7 @@ void SpirometerTest::readTrials(const QDomNode& node)
           }
        }
       }
+      qDebug() << trial->toJsonObject();
       if (trial->isValid()) {
        addMeasurement(trial);
       } else {
@@ -531,12 +545,8 @@ void SpirometerTest::readBestValues(const QDomNode& node)
 
     qDebug() << "read best values";
 
-    //if (best->isValid()) {
     qDebug() << "OK best values";
     addMeasurement(best);
-    //} else {
-    //  qDebug() << "ERROR: failed to add best values";
-    //}
 }
 
 void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement* measure)
@@ -579,6 +589,7 @@ void SpirometerTest::readParameters(const QDomNode& node, SpirometerMeasurement*
             QDomElement celem = clist.item(j).toElement();
             QString ctag = celem.tagName();
             QString s = celem.text();
+
             if (SpirometerMeasurement::parameterList.contains(ctag) && !s.isEmpty() && "NaN" != s) {
                 if ("DataValue" == ctag) {
                     arr.insert("value", QJsonValue::fromVariant(s.toDouble()));

@@ -14,7 +14,7 @@ void UltrasoundSession::initializeDialog()
 
 void UltrasoundSession::isInstalled() const
 {
-    if (!VividiManager::isInstalled())
+    if (VividiManager::config.hasErrors())
         throw NotInstalledError("Ultrasound is not installed on this workstation");
 }
 

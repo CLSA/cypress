@@ -57,7 +57,7 @@ QJsonObject CypressMainWindow::getDebugInputData()
         {"gender", 			gender},
         {"height", 			height},
         {"weight", 			weight},
-        {"date_of_birth", 	date_of_birth},
+        {"dob", 	date_of_birth},
     };
 
     return inputData;
@@ -96,8 +96,8 @@ void CypressMainWindow::enableDebugParticipant()
     ui->barcodeValue->setText(iniInputData["barcode"].toString());
     ui->weightValue->setText(iniInputData["weight"].toString());
     ui->heightValue->setText(iniInputData["height"].toString());
-    ui->sexValue->setCurrentIndex(iniInputData["gender"] == "Female" ? 0 : 1);
-    ui->dateOfBirthValue->setDate(QDate::fromString(iniInputData["date_of_birth"].toString()));
+    ui->sexValue->setCurrentIndex(iniInputData["sex"] == "Female" ? 0 : 1);
+    ui->dateOfBirthValue->setDate(QDate::fromString(iniInputData["dob"].toString()));
 
     ui->barcodeValue->setEnabled(true);
     ui->weightValue->setEnabled(true);
@@ -118,11 +118,11 @@ void CypressMainWindow::enableDebugParticipant()
     });
 
     connect(ui->sexValue, &QComboBox::currentTextChanged, this, [=](const QString& sexValue) {
-        CypressSettings::writeSetting("debug/gender", sexValue);
+        CypressSettings::writeSetting("debug/sex", sexValue);
     });
 
     connect(ui->dateOfBirthValue, &QDateEdit::dateChanged, this, [=](const QDate& dateValue) {
-        CypressSettings::writeSetting("debug/date_of_birth", dateValue.toString(Qt::DateFormat::ISODate));
+        CypressSettings::writeSetting("debug/dob", dateValue.toString(Qt::DateFormat::ISODate));
     });
 }
 

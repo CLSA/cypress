@@ -14,8 +14,6 @@ RetinalCameraTest::RetinalCameraTest()
 
 bool RetinalCameraTest::fromDatabaseResults(const QJsonObject &results)
 {
-    qDebug() << "results: " << results;
-
     QSharedPointer<RetinalCameraMeasurement> eyeMeasure(new RetinalCameraMeasurement);
     if (results["side"] == "left") {
         eyeMeasure->setAttribute("EYE_PICT_VENDOR",
@@ -37,14 +35,12 @@ bool RetinalCameraTest::fromDatabaseResults(const QJsonObject &results)
 bool RetinalCameraTest::isValid() const
 {
     if (getMeasurementCount() != getExpectedMeasurementCount()) {
-        qDebug() << "measurement count" << getMeasurementCount() << "does not equal " << getExpectedMeasurementCount();
         return false;
     }
 
     const auto measurements = getMeasurements();
     foreach (auto measurement, measurements) {
         if (!measurement->isValid()) {
-            qDebug() << "measurement is invalid:" << measurement->toJsonObject();
             return false;
         }
     }

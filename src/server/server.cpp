@@ -32,6 +32,7 @@
 #include <QThread>
 #include <QSettings>
 #include <QDebug>
+#include <QJsonDocument>
 
 using namespace Poco::Net;
 
@@ -76,6 +77,8 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
         qDebug() << "No origin";
         throw QException();
     }
+
+    qDebug().noquote() << QJsonDocument(inputData).toJson(QJsonDocument::Indented);
 
     switch (type)
     {

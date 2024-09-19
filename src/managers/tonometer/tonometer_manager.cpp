@@ -18,17 +18,23 @@
 #include <QSqlError>
 #include <QStandardItemModel>
 
+DeviceConfig TonometerManager::config {{
+    {"runnableName",  {"tonometer/runnableName",  Exe  }},
+    {"runnablePath",  {"tonometer/runnablePath",  Dir  }},
+    {"databasePath",  {"tonometer/databasePath",  File }},
+    {"temporaryPath", {"tonometer/temporaryPath", Dir }},
+}};
+
 TonometerManager::TonometerManager(QSharedPointer<TonometerSession> session)
     : ManagerBase(session)
 {
     m_test.reset(new TonometerTest);
     m_test->setExpectedMeasurementCount(2);
 
-
-    m_runnableName = CypressSettings::readSetting("tonometer/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("tonometer/runnablePath").toString();
-    m_databasePath = CypressSettings::readSetting("tonometer/databasePath").toString();
-    m_temporaryPath = CypressSettings::readSetting("tonometer/temporaryPath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
+    m_databasePath = config.getSetting("databasePath");
+    m_temporaryPath = config.getSetting("temporaryPath");
 
     m_db = QSqlDatabase::addDatabase("QODBC");
     m_db.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + QDir::toNativeSeparators(m_databasePath));
@@ -61,72 +67,6 @@ bool TonometerManager::start()
     }
 
     measure();
-
-    return true;
-}
-
-
-bool TonometerManager::isInstalled()
-{
-    qInfo() << "TonometerManager::isInstalled";
-
-    const QString runnableName = CypressSettings::readSetting("tonometer/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("tonometer/runnablePath").toString();
-    const QString databasePath = CypressSettings::readSetting("tonometer/databasePath").toString();
-    const QString temporaryPath = CypressSettings::readSetting("tonometer/temporaryPath").toString();
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "TonometerManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "TonometerManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (databasePath.isNull() || databasePath.isEmpty()) {
-        qInfo() << "TonometerManager::isInstalled: databasePath is not defined";
-        return false;
-    }
-
-    if (temporaryPath.isNull() || temporaryPath.isEmpty()) {
-        qInfo() << "TonometerManager::isInstalled: temporaryPath is not defined";
-        return false;
-    }
-
-    const QDir runnablePathInfo(runnablePath);
-    if (!runnablePathInfo.exists()) {
-        qInfo() << "TonometerManager::isInstalled: runnable does not exist";
-        return false;
-    }
-
-    const QFileInfo runnableNameInfo(runnableName);
-    if (!runnableNameInfo.exists()) {
-        qInfo() << "TonometerManager::isInstalled: runnable does not exist";
-        return false;
-    }
-    if (!runnableNameInfo.isExecutable()) {
-        qInfo() << "TonometerManager::isInstalled: runnable is not executable";
-        return false;
-    }
-
-    const QFileInfo databaseFileInfo(databasePath);
-    if (!databaseFileInfo.isFile()) {
-        qInfo() << "TonometerManager::isInstalled: database is not a file";
-        return false;
-    }
-
-    if (!databaseFileInfo.isReadable()) {
-        qInfo() << "TonometerManager::isInstalled: database is not readable";
-        return false;
-    }
-
-    const QDir backupDir(temporaryPath);
-    if (!backupDir.exists()) {
-        qInfo() << "TonometerManager::isInstalled: backup dir does not exist";
-        return false;
-    }
 
     return true;
 }

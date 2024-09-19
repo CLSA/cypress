@@ -1,7 +1,6 @@
 #include "spirometer_manager.h"
 #include "managers/emr/emr_plugin_writer.h"
 
-#include "cypress_settings.h"
 #include "auxiliary/network_utils.h"
 #include "auxiliary/file_utils.h"
 
@@ -11,107 +10,33 @@
 #include <QSettings>
 #include <QStandardItemModel>
 
+DeviceConfig SpirometerManager::config {{
+    // Full path to EasyWarePro.exe
+    {"runnableName", {"spirometer/runnableName", Exe }},
+
+    // Full path to working directory
+    {"runnablePath", {"spirometer/runnablePath", Dir }},
+
+    // Path to the EMR plugin data transfer directory
+    {"dataPath",     {"spirometer/exchangePath", Dir }},
+
+    // EMR Input File (OnyxIn.xml)
+    {"inFileName",   {"spirometer/inFileName", NonEmptyString }},
+
+    // EMR Output File OnyxOut.xml
+    {"outFileName",   {"spirometer/outFileName", NonEmptyString }},
+}};
+
 SpirometerManager::SpirometerManager(QSharedPointer<SpirometerSession> session)
     : ManagerBase(session)
 {
-    // Full path to EasyWarePro.exe
-    m_runnableName = CypressSettings::readSetting("spirometer/runnableName").toString();
-
-    // Full path to working directory
-    m_runnablePath = CypressSettings::readSetting("spirometer/runnablePath").toString(); // path to EasyWarePro.exe directory
-
-    // Path to the EMR plugin data transfer directory
-    m_dataPath = CypressSettings::readSetting("spirometer/exchangePath").toString();
-
-    // EMR Input File (OnyxIn.xml)
-    m_inFileName = CypressSettings::readSetting("spirometer/inFileName").toString();
-
-    // EMR Output File OnyxOut.xml
-    m_outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
-
-    qInfo() << "SpirometerManager::SpirometerManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
-
-    qInfo() << m_runnableName;
-    qInfo() << m_runnablePath;
-    qInfo() << m_dataPath;
-    qInfo() << m_inFileName;
-    qInfo() << m_outFileName;
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
+    m_dataPath = config.getSetting("dataPath");
+    m_inFileName = config.getSetting("inFileName");
+    m_outFileName = config.getSetting("outFileName");
 
     m_test.reset(new SpirometerTest);
-}
-
-bool SpirometerManager::isInstalled()
-{
-    qInfo() << "SpirometerManager::isInstalled";
-
-    if (CypressSettings::isSimMode())
-        return false;
-
-    // path to EasyWarePro.exe
-    const QString runnableName = CypressSettings::readSetting("spirometer/runnableName").toString();
-
-    // full path to runnable directory
-    const QString runnablePath = CypressSettings::readSetting("spirometer/runnablePath").toString();
-
-    // Path to the EMR plugin data transfer directory
-    const QString dataPath = CypressSettings::readSetting("spirometer/exchangePath").toString();
-
-    // OnyxIn.xml
-    const QString inFileName = CypressSettings::readSetting("spirometer/inFileName").toString();
-
-    // OnyxOut.xml
-    const QString outFileName = CypressSettings::readSetting("spirometer/outFileName").toString();
-
-    if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "SpirometerManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "SpirometerManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (dataPath.isEmpty() || dataPath.isNull()) {
-        qInfo() << "SpirometerManager::isInstalled: dataPath is not defined";
-        return false;
-    }
-
-    if (inFileName.isEmpty() || inFileName.isNull()) {
-        qInfo() << "SpirometerManager::isInstalled: inFileName is not defined";
-        return false;
-    }
-
-    if (outFileName.isEmpty() || outFileName.isNull()) {
-        qInfo() << "SpirometerManager::isInstalled: outFileName is not defined";
-        return false;
-    }
-
-    const QFileInfo runnableInfo(runnableName);
-    if (!runnableInfo.exists()) {
-        qInfo() << "SpirometerManager::isInstalled: exe does not exist at" << runnableName;
-        return false;
-    }
-    if (!runnableInfo.isExecutable()) {
-        qInfo() << "SpirometerManager::isInstalled: exe is not executable at" << runnableName;
-        return false;
-    }
-
-    const QFileInfo runnableDir(runnablePath);
-    if (!runnableDir.isDir()) {
-        qInfo() << "SpirometerManager::isInstalled: directory does not exist at" << runnablePath;
-        return false;
-    }
-    if (!runnableDir.isReadable()) {
-        qInfo() << "SpirometerManager::isInstalled: directory is missing read permissions at" << runnableDir;
-        return false;
-    }
-
-    return true;
 }
 
 bool SpirometerManager::start()
@@ -246,7 +171,6 @@ void SpirometerManager::finish()
 bool SpirometerManager::clearData()
 {
     qInfo() << "SpirometerManager::clearData";
-
     m_test->reset();
 
     emit dataChanged(m_test);

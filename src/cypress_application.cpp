@@ -116,43 +116,68 @@ void Cypress::initialize()
 QJsonObject Cypress::getStatus()
 {
     QJsonObject statusJson = {};
-    statusJson["version"] = "v1.0.0";
+    QJsonObject cypress {
+        { "version", "v1.0.1" },
+        { "cwd", 	 QCoreApplication::applicationDirPath() },
+        { "http",
+            QJsonObject {
+                {"host", CypressSettings::readSetting("address").toString()},
+                {"port", CypressSettings::readSetting("port").toString()}
+            }
+        },
+        { "network", getNetworkAddresses() },
+        { "debug",   CypressSettings::isDebugMode() },
+        { "os",   QSysInfo::productType() + " "
+                + QSysInfo::productVersion() + " ("
+                + QSysInfo::kernelType() + " "
+                + QSysInfo::kernelVersion() + " "
+                + QSysInfo::currentCpuArchitecture() + ")" }
+    };
 
+    statusJson["cypress"] = cypress;
+    statusJson["devices"] = getDeviceStatus();
+
+    return statusJson;
+}
+
+QJsonArray Cypress::getNetworkAddresses()
+{
     const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
     QStringList addresses;
     for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
             addresses << address.toString();
     }
+    return QJsonArray::fromStringList(addresses);
+}
 
-    statusJson["addresses"] = QJsonArray::fromStringList(addresses);
-    statusJson["port"] = "8000";
-
-    statusJson["availableInstruments"] = QJsonObject {
-        {"general_proxy", 		!GeneralProxyManager::config.hasErrors() ? QJsonValue(true) : GeneralProxyManager::config.getErrors() },
+QJsonObject Cypress::getDeviceStatus()
+{
+    QJsonObject deviceStatusJson = {
+        {"general_proxy", 		GeneralProxyManager::config.getErrors() },
         {"audiometer", 			AudiometerManager::isInstalled()},
-        {"hearcon", 			!HearconManager::config.hasErrors() ? QJsonValue(true) : HearconManager::config.getErrors()},
-        {"blood_pressure", 		BloodPressureManager::isInstalled()},
-        {"watch_bp", 			!WatchBPManager::config.hasErrors() ? QJsonValue(true) : WatchBPManager::config.getErrors()},
-        {"cdtt", 				!CDTTManager::config.hasErrors() ? QJsonValue(true) : CDTTManager::config.getErrors()},
-        {"choice_reaction", 	!ChoiceReactionManager::config.hasErrors() ? QJsonValue(true) : ChoiceReactionManager::config.getErrors()},
-        {"dxa", 				!DxaHipManager::config.hasErrors() ? QJsonValue(true) : DxaHipManager::config.getErrors()},
-        {"ecg", 				ECGManager::isInstalled()},
-        {"mac5", 				!Mac5Manager::config.hasErrors() ? QJsonValue(true) : Mac5Manager::config.getErrors()},
-        {"frax", 				!FraxManager::config.hasErrors() ? QJsonValue(true) : FraxManager::config.getErrors()},
-        {"grip_strength", 		GripStrengthManager::isInstalled()},
-        {"retinal_camera", 		RetinalCameraManager::isInstalled()},
-        {"spirometer", 			SpirometerManager::isInstalled()},
-        {"easyone_connect", 	!EasyoneConnectManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
-        {"tonometer", 			TonometerManager::isInstalled()},
-        {"ora", 				!ORAManager::config.hasErrors() ? QJsonValue(true) : ORAManager::config.getErrors()},
-        {"cimt", 				VividiManager::isInstalled()},
-        {"ultrasound", 			!VividIQManager::config.hasErrors() ? QJsonValue(true) : VividIQManager::config.getErrors()},
-        {"weigh_scale", 		WeighScaleManager::isInstalled()},
-        {"oct", 				!OCTManager::config.hasErrors() ? QJsonValue(true) : OCTManager::config.getErrors()},
+        {"hearcon", 			HearconManager::config.getErrors()},
+        {"blood_pressure", 		QJsonObject {}},
+        {"watch_bp", 			WatchBPManager::config.getErrors()},
+        {"cdtt", 				CDTTManager::config.getErrors()},
+        {"choice_reaction", 	ChoiceReactionManager::config.getErrors()},
+        {"dxa", 				DxaHipManager::config.getErrors()},
+        {"ecg", 				ECGManager::config.getErrors()},
+        {"mac5", 				Mac5Manager::config.getErrors()},
+        {"frax", 				FraxManager::config.getErrors()},
+        {"grip_strength", 		GripStrengthManager::config.getErrors()},
+        {"retinal_camera", 		RetinalCameraManager::config.getErrors()},
+        {"spirometer", 			SpirometerManager::config.getErrors()},
+        {"easyone_connect", 	EasyoneConnectManager::config.getErrors()},
+        {"tonometer", 			TonometerManager::config.getErrors()},
+        {"ora", 				ORAManager::config.getErrors()},
+        {"cimt", 				VividiManager::config.getErrors()},
+        {"ultrasound", 			VividIQManager::config.getErrors()},
+        {"weigh_scale", 		WeighScaleManager::config.getErrors()},
+        {"oct", 				OCTManager::config.getErrors()},
     };
 
-    return statusJson;
+    return deviceStatusJson;
 }
 
 void Cypress::requestSession(QSharedPointer<CypressSession> session)

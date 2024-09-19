@@ -130,7 +130,8 @@ bool HearconManager::restoreDatabase()
 {
     QFile::remove(m_existingDatabasePath);
     /// Copy backup to the database location
-    if (!m_backupDatabaseFile.copy(m_existingDatabasePath)) {
+    if (!m_backupDatabaseFile.copy(m_existingDatabasePath))
+    {
         qCritical() << "HearconManager::start - could not copy backup database to data folder";
         QMessageBox::critical(nullptr, "Error", "Could not start HearCon, please contact support");
         return false;
@@ -141,8 +142,8 @@ bool HearconManager::restoreDatabase()
 
 bool HearconManager::processAlreadyRunning()
 {
-    if (WindowsUtil::isProcessRunning(m_processName.toStdWString())) {
-
+    if (WindowsUtil::isProcessRunning(m_processName.toStdWString()))
+    {
         return true;
     }
 

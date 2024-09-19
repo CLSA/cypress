@@ -7,7 +7,7 @@ void ECGStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reques
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", ECGManager::isInstalled() ? "available" : "unavailable"}
+            {"status", !ECGManager::config.hasErrors() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

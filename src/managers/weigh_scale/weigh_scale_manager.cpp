@@ -15,26 +15,17 @@
 #include <QJsonDocument>
 #include <QMessageBox>
 
+DeviceConfig WeighScaleManager::config {{
+    { "portName", { "weight_scale/portName", NonEmptyString }},
+}};
+
 WeighScaleManager::WeighScaleManager(QSharedPointer<WeighScaleSession> &session)
     : SerialPortManager(session)
 {
-    m_test.reset(new WeighScaleTest);
-    m_portName = CypressSettings::readSetting("weight_scale/portName").toString();
-
     qInfo() << "WeighScaleManager::WeighScaleManager";
+    m_portName = config.getSetting("portName");
 
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getOrigin();
-
-    qDebug() << session->getInputData();
-}
-
-bool WeighScaleManager::isInstalled() {
-    qInfo() << "WeighScaleManager::isInstalled";
-
-    return true;
+    m_test.reset(new WeighScaleTest);
 }
 
 bool WeighScaleManager::start() {

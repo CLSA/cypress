@@ -28,8 +28,8 @@ RetinalCameraSession::Side RetinalCameraSession::getSide()
 
 void RetinalCameraSession::isInstalled() const
 {
-    if (!RetinalCameraManager::isInstalled())
-        throw NotInstalledError("Retinal Camera is not installed on this workstation");
+    if (RetinalCameraManager::config.hasErrors())
+        throw NotInstalledError("Retinal camera is not installed on this workstation");
 }
 
 void RetinalCameraSession::isAvailable() const

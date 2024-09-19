@@ -1,9 +1,5 @@
 #include "network_utils.h"
-
-#include <sstream>
-
-#include <QDebug>
-#include <QException>
+#include "cypress_settings.h"
 
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -14,7 +10,10 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/URI.h"
 
-#include "cypress_settings.h"
+#include <QDebug>
+#include <QException>
+
+#include <sstream>
 
 bool NetworkUtils::sendHTTPRequest(
     const std::string &method,
@@ -73,21 +72,27 @@ bool NetworkUtils::sendHTTPSRequest(
         std::stringstream ss;
         Poco::StreamCopier::copyStream(is, ss);
 
-        qDebug() << res.getStatus() << ss.str().c_str();
         switch (res.getStatus()) {
         case Poco::Net::HTTPResponse::HTTP_OK:
+            qDebug() << "OK";
             return true;
         case Poco::Net::HTTPResponse::HTTP_BAD_REQUEST:
+            qWarning() << "Bad Request";
             return false;
         case Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR:
+            qWarning() << "Internal Server Error";
             return false;
         case Poco::Net::HTTPResponse::HTTP_FORBIDDEN:
+            qWarning() << "Forbidden";
             return false;
         case Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED:
+            qWarning() << "Unauthorized";
             return false;
         case Poco::Net::HTTPResponse::HTTP_GATEWAY_TIMEOUT:
+            qWarning() << "Gateway Timeout";
             return false;
         case Poco::Net::HTTPResponse::HTTP_NOT_FOUND:
+            qWarning() << "Not Found";
             return false;
         default:
             return false;

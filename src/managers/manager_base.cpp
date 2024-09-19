@@ -33,15 +33,11 @@ ManagerBase::~ManagerBase()
 void ManagerBase::finish() {
     qDebug() << "ManagerBase::finish";
 
-    qDebug() << m_test->toJsonObject();
-
     int answer_id = m_session->getAnswerId();
     const QString pineOrigin = m_session->getOrigin();
     const QString answerUrl = pineOrigin + "/answer/" + QString::number(answer_id);
-    qDebug() <<  answerUrl;
 
     QJsonObject testJson = m_test->toJsonObject();
-
     if (m_test->getFiles().keys().length() > 0) {
         sendFiles();
     }
@@ -121,6 +117,8 @@ bool ManagerBase::sendFiles()
     {
         auto key = it.key();
         auto file = it.value().toObject();
+
+        qDebug() << key;
 
         QString path = file.value("path").toString();
         const QByteArray data = FileUtils::readFile(path);

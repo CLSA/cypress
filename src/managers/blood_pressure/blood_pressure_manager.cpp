@@ -13,8 +13,6 @@
 #include <QStandardItemModel>
 #include <QtUsb/QHidDevice>
 
-const quint16 BloodPressureManager::vid{ 0x10b7 };
-const quint16 BloodPressureManager::pid{ 0x1234 };
 
 BloodPressureManager::BloodPressureManager(QSharedPointer<BPMSession> session)
     : ManagerBase(session)
@@ -57,14 +55,6 @@ BloodPressureManager::~BloodPressureManager()
         delete m_bpm200;
     }
 }
-
-bool BloodPressureManager::isInstalled()
-{
-    qInfo() << "BloodPressureManager::isInstalled";
-
-    return true;
-}
-
 
 void BloodPressureManager::receiveMessages(QQueue<BPMMessage> messages)
 {

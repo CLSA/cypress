@@ -34,16 +34,14 @@ QJsonObject TestBase::toJsonObject() const
 }
 
 
-void TestBase::setFiles(const QStringList& filePaths)
+void TestBase::setFiles(const QList<QJsonObject>& files)
 {
     m_files = QJsonObject {};
 
-    foreach (const auto& path, filePaths) {
-        const QFileInfo info(path);
-
-        const QString fileKey = QString("%1_%2").arg(info.baseName().toLower(), info.suffix().toLower());
-        const QString fileName = QString("%1.%2").arg(info.baseName().toLower(), info.suffix().toLower());
-        const QString filePath = path;
+    foreach (const auto& file, files) {
+        const QString fileKey =  file["name"].toString().replace(".","_");
+        const QString fileName = file["name"].toString();
+        const QString filePath = file["path"].toString();
         const QString fileSize = FileUtils::getHumanReadableFileSize(filePath);
 
         QJsonObject fileJson {

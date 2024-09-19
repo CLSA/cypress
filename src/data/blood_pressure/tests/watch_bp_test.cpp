@@ -32,6 +32,8 @@ void WatchBPTest::fromJson(const QJsonObject& data)
 
         addMeasurement(measure);
     }
+
+    updateAverage();
 }
 
 bool WatchBPTest::isValid() const
@@ -97,7 +99,6 @@ void WatchBPTest::updateAverage()
     addMetaData("first_pulse",      first.getAttribute("HR"));
     addMetaData("first_start_time", first.getAttribute("Date"));
     addMetaData("first_end_time",   first.getAttribute("Date"));
-
 
     int validMeasures = 0;
     int systolicTotal = 0;

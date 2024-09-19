@@ -14,6 +14,7 @@ DeviceConfig OCTManager::config {{
     { "runnableName",    { "oct/runnableName",    Exe }},
     { "runnablePath",    { "oct/runnablePath",    Dir }},
     { "exportPath",      { "oct/exportPath",      Dir }},
+    { "dataPath",        { "oct/dataPath",        Dir }},
     { "databaseName",    { "oct/database/name",   NonEmptyString }},
     { "databaseBackup",  { "oct/database/backup", File }},
 }};
@@ -24,6 +25,7 @@ OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { sessio
     m_runnableName   = config.getSetting("runnableName");
     m_runnablePath   = config.getSetting("runnablePath");
     m_exportPath     = config.getSetting("exportPath");
+    m_dataPath       = config.getSetting("dataPath");
     m_databaseName   = config.getSetting("databaseName");
     m_databaseBackup = config.getSetting("databaseBackup");
 
@@ -83,6 +85,12 @@ bool OCTManager::start()
     {
         qCritical() << "OCTManager::start - could not clear export directory";
         return false;
+    }
+
+    // Remove FDA files from Data
+    if (!FileUtils::clearDirectory(m_dataPath))
+    {
+        qCritical() << "OCTManager::start - could not clear data directory";
     }
 
     // Prepare database
@@ -148,14 +156,14 @@ void OCTManager::readOutput()
 
     QFileInfoList entries = exportDir.entryInfoList();
 
-    QStringList filePaths;
+    QList<QJsonObject> filePaths;
 
     foreach (auto entry, entries)
     {
         if (entry.suffix() == "dcm")
         {
             qDebug() << entry.absoluteFilePath();
-            filePaths.append(entry.absoluteFilePath());
+            filePaths.append({ { "path", entry.absoluteFilePath() }, { "name", entry.fileName() } });
         }
     }
 

@@ -10,8 +10,8 @@ GripStrengthSession::GripStrengthSession(QObject *parent, const QJsonObject& inp
 
 void GripStrengthSession::isInstalled() const
 {
-    if (!GripStrengthManager::isInstalled())
-        throw NotInstalledError("Grip Strength is not installed on this workstation");
+    if (GripStrengthManager::config.hasErrors())
+        throw NotInstalledError("Grip strength is not installed on this workstation");
 }
 
 

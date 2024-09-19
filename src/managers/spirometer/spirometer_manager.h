@@ -4,6 +4,7 @@
 #include "data/spirometer/tests/spirometer_test.h"
 #include "managers/manager_base.h"
 #include "server/sessions/spirometer_session.h"
+#include "config/device_config.h"
 
 #include <QProcess>
 
@@ -19,7 +20,7 @@ public:
     explicit SpirometerManager(QSharedPointer<SpirometerSession> session);
     ~SpirometerManager() = default;
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
 

@@ -83,7 +83,7 @@ void EMRPluginWriter::addPatientDataAtPresent(QXmlStreamWriter& stream) const
 
     // enforce capitalized gender: eg., male => Male
     //
-    QString gender = m_input["sex"].toString().toLower();
+    QString gender = m_input["sex"].toString();
     gender = gender.at(0).toUpper() + gender.mid(1);
 
     stream.writeTextElement("Gender", gender);
@@ -93,9 +93,10 @@ void EMRPluginWriter::addPatientDataAtPresent(QXmlStreamWriter& stream) const
     //
     stream.writeTextElement("Height", QString::number(m_input["height"].toDouble() / 100.0));
     stream.writeTextElement("Weight", QString::number(m_input["weight"].toDouble()));
-    stream.writeTextElement("Ethnicity", "Caucasian");
+    stream.writeTextElement("Ethnicity", m_input.contains("Ethnicity") ? m_input["Ethnicity"].toString() : "Caucasian");
 
-    //stream.writeTextElement("Ethnicity", m_ethnicity);
+    //stream.writeTextElement("Ethnicity", " ");
+
     stream.writeTextElement("Smoker", (m_input["smoker"].toBool() ? "Yes" : "No"));
     stream.writeTextElement("Asthma", "No");
     stream.writeTextElement("COPD", "No");

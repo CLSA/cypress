@@ -2,8 +2,8 @@
 #define VIVIDI_MANAGER_H
 
 #include "managers/manager_base.h"
+#include "config/device_config.h"
 #include "dicom/dcm_recv.h"
-
 #include "server/sessions/ultrasound_session.h"
 
 #include <QObject>
@@ -13,10 +13,9 @@ class VividiManager: public ManagerBase
     Q_OBJECT
 public:
     explicit VividiManager(QSharedPointer<UltrasoundSession> session);
-
     ~VividiManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 signals:
     void cannotFinish();

@@ -39,64 +39,117 @@ QJsonDocument Mac5Test::fromXmlFile(const QString& filePath)
 
     file.close();
 
-    QJsonObject root = dfs(doc.documentElement());
-    jsonDoc.setObject(root);
+    QJsonObject root = dfs(doc.documentElement()).toObject();
+    for (QJsonObject::const_iterator it = root.begin(); it != root.end(); ++it) {
+        QString key = it.key();
+        QJsonValue value = it.value();
 
-    //qDebug().noquote() << jsonDoc.toJson(QJsonDocument::Indented);
+        // Print the key and the value
+        addMetaData(key, value);
+    }
 
     return jsonDoc;
 }
 
 
-QJsonObject Mac5Test::dfs(QDomNode node)
+
+QJsonValue Mac5Test::dfs(const QDomNode& node)
 {
+    QSet<QString> excludedNodes { "wav" };
+    QSet<QString> excludedUnits { "{enum}", "{unitless}", "{bool}" };
+    QSet<QString> excludedAttributes { "BT", "INV" };
+
     QJsonObject result;
     QDomElement el = node.toElement();
-    QString tagName = el.tagName();
+    QString tagName = el.tagName().toLower();
 
-    if (tagName == "wav")
-        return result;
+    if (excludedNodes.contains(tagName))
+        return QJsonValue();
 
-    for (int i = 0; i < el.attributes().length(); i++)
-    {
-        auto attr = el.attributes().item(i).toAttr();
-        if (attr.name() == "V") {
-            result.insert("value", attr.value());
-        }
-        else if (attr.name() == "U") {
-            result.insert("unit", attr.value());
-        }
-        else {
-            result.insert(attr.name().toLower(), attr.value().toLower());
-        }
+    if ((el.hasAttribute("V") && !el.hasAttribute("U")) || excludedUnits.contains(el.attribute("U"))) {
+        if (el.attribute("V") == "false" || el.attribute("V") == "true")
+            return QJsonValue(el.attribute("V") == "true");
+
+        return QJsonValue(el.attribute("V"));
     }
 
-    QMap<QString, QJsonArray> seenTags;
-    if (node.hasChildNodes()) {
-        for (int i = 0; i < node.childNodes().length(); i++) {
-            QDomElement childEl = node.childNodes().at(i).toElement();
-            QString childTag = childEl.tagName();
-            QJsonObject childJson = dfs(node.childNodes().at(i));
+    QJsonObject attributeData;
+    for (int i = 0; i < el.attributes().count(); ++i) {
+        const QDomNode attrNode = el.attributes().item(i);
+        const QString attrName = attrNode.nodeName();
+        const QString attrValue = attrNode.nodeValue();
 
-            result.insert(childTag.toLower(), childJson);
+        if (excludedAttributes.contains(attrName))
+            continue;
+        else if (attrName == "U")
+            attributeData["unit"] = attrValue;
+        else if (attrName == "V")
+            attributeData["value"] = attrValue;
+        else
+            attributeData[attrName.toLower()] = attrValue;
+    }
 
-            if (!seenTags.contains(childTag)) {
-                seenTags.insert(childTag, QJsonArray {});
+    if (!node.hasChildNodes())
+        return QJsonValue(attributeData);
+
+    QMap<QString, QJsonArray> arrayTags;
+    for (int i = 0; i < node.childNodes().length(); i++) {
+        QDomElement childEl = node.childNodes().at(i).toElement();
+        QString childTag = childEl.tagName();
+        QJsonValue childJson = dfs(node.childNodes().at(i));
+
+        if (excludedNodes.contains(childTag))
+            continue;
+
+        if (hasMultipleChildrenOfSameType(node, childTag)) {
+            if (childJson.isObject()) {
+                for (int i = 0; i < childEl.attributes().count(); ++i) {
+                    const QDomNode attrNode = childEl.attributes().item(i);
+                    const QString attrName = attrNode.nodeName();
+                    const QString attrValue = attrNode.nodeValue();
+
+                    QJsonObject json = childJson.toObject();
+                    json[attrName] = attrValue;
+                    childJson = json;
+                }
+            }
+
+            if (!arrayTags.contains(childTag)) {
+                arrayTags.insert(childTag, QJsonArray { childJson });
             }
             else {
-                seenTags[childTag].append(childJson);
+                arrayTags[childTag].append(childJson);
             }
+        }
+        else {
+            result.insert(childTag, childJson);
         }
     }
 
-    for (auto it = seenTags.begin(); it != seenTags.end(); ++it) {
-        QString key = it.key();
-        QJsonArray arr = it.value();
+    for (auto it = arrayTags.constBegin(); it != arrayTags.constEnd(); ++it) {
+        const QString key = it.key().toLower();
+        const QJsonArray arr = it.value();
 
         if (!arr.empty()) {
-            result.insert(key.toLower(), it.value());
+            result.insert(key, it.value());
         }
     }
 
     return result;
+}
+
+bool Mac5Test::hasMultipleChildrenOfSameType(const QDomNode& parentNode, const QString& tagName) {
+    int count = 0;
+    QDomNodeList childNodes = parentNode.childNodes();
+
+    for (int i = 0; i < childNodes.size(); ++i) {
+        QDomNode child = childNodes.at(i);
+        if (child.isElement()) {
+            QDomElement element = child.toElement();
+            if (element.tagName() == tagName) {
+                count++;
+            }
+        }
+    }
+    return count > 1;
 }

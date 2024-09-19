@@ -13,7 +13,7 @@ void TonometerSession::initializeDialog()
 }
 
 void TonometerSession::isInstalled() const {
-    if (!TonometerManager::isInstalled())
+    if (!TonometerManager::config.hasErrors())
         throw NotInstalledError("Tonometer is not installed on this workstation");
 }
 

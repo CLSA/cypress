@@ -19,7 +19,9 @@ public:
 
     QJsonDocument fromXmlFile(const QString& filePath);
 private:
-    QJsonObject dfs(QDomNode node);
+    QJsonValue dfs(const QDomNode& node);
+
+    bool hasMultipleChildrenOfSameType(const QDomNode& parentNode, const QString& tagName);
 };
 
 #endif // MAC5_TEST_H

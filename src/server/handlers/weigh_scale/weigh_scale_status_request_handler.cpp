@@ -14,7 +14,7 @@ void WeighScaleStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest 
     Q_UNUSED(request)
     try {
         QJsonObject responseData {{
-            "status", WeighScaleManager::isInstalled() ? "available" : "unavailable"
+            "status", !WeighScaleManager::config.hasErrors() ? "available" : "unavailable"
         }};
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

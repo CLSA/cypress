@@ -8,7 +8,7 @@ void GripStrengthStatusRequestHandler::handleRequest(Poco::Net::HTTPServerReques
     Q_UNUSED(request)
     try {
         QJsonObject responseData {{
-            "status", GripStrengthManager::isInstalled() ? "available" : "unavailable"
+            "status", !GripStrengthManager::config.hasErrors() ? "available" : "unavailable"
         }};
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

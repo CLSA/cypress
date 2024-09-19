@@ -14,7 +14,7 @@ void SpirometerSession::initializeDialog()
 }
 
 void SpirometerSession::isInstalled() const {
-    if (!SpirometerManager::isInstalled())
+    if (SpirometerManager::config.hasErrors())
         throw NotInstalledError("Spirometer is not installed on this workstation");
 }
 

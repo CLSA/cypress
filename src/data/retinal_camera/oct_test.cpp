@@ -7,17 +7,17 @@ OCTTest::OCTTest()
 
 }
 
-QString OCTTest::toString()
+QString OCTTest::toString() const
 {
     return "";
 }
 
-bool OCTTest::isValid()
+bool OCTTest::isValid() const
 {
     return true;
 }
 
-QJsonObject OCTTest::toJsonObject()
+QJsonObject OCTTest::toJsonObject() const
 {
     return TestBase::toJsonObject();
 }

@@ -59,22 +59,29 @@ void Mac5Manager::readOutput()
         {
             m_rawFilePath = entry.absoluteFilePath();
         }
-        else
-        {
-            qDebug() << "Unknown file type: " << entry.absoluteFilePath();
-        }
     }
 
-    qDebug() << m_pdfFilePath << m_xmlFilePath << m_rawFilePath;
+    qDebug() << "pdf" << m_pdfFilePath;
+    qDebug() << "xml" << m_xmlFilePath;
+    qDebug() << "raw" << m_rawFilePath;
 
     if (m_pdfFilePath.isEmpty())
+    {
+        qCritical() << "pdf path missing";
         return;
+    }
 
     if (m_xmlFilePath.isEmpty())
+    {
+        qCritical() << "xml path missing";
         return;
+    }
 
     if (m_rawFilePath.isEmpty())
+    {
+        qCritical() << "raw path missing";
         return;
+    }
 
     finish();
 }
@@ -82,34 +89,29 @@ void Mac5Manager::readOutput()
 void Mac5Manager::finish()
 {
     qDebug() << "Finish";
-    //QDomDocument doc("ecg_xml");
-    //QFile file(m_exportPath);
-    //if (!file.open(QIODevice::ReadOnly)) {
-    //    qDebug() << "Can't open";
-    //    return;
-    //}
+    QDomDocument doc("ecg_xml");
+    QFile file(m_xmlFilePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Can't open";
+        return;
+    }
 
-    //if (!doc.setContent(&file)) {
-    //    file.close();
-    //    return;
-    //}
-    //file.close();
+    if (!doc.setContent(&file)) {
+        qCritical() << "Could not set XML file";
+        file.close();
+        return;
+    }
 
-    //QJsonObject root = dfs(doc.documentElement());
-    //QJsonDocument jsonDoc(root);
+    file.close();
 
-    //qDebug().noquote() << jsonDoc.toJson(QJsonDocument::Indented);
+    QJsonObject root = dfs(doc.documentElement());
+    QJsonDocument jsonDoc(root);
 
-    const QString answerUrl = getAnswerUrl();
-
-    QJsonObject fileJson {};
-
-    QStringList filePaths {
-        { m_xmlFilePath },
-        { m_pdfFilePath },
-        { m_rawFilePath },
+    QList<QJsonObject> filePaths {
+        { { "path", m_xmlFilePath }, { "name", "Ecg.xml" }},
+        { { "path", m_pdfFilePath }, { "name", "Ecg.pdf" }},
+        { { "path", m_rawFilePath }, { "name", "Ecg.ecg" }},
     };
-
     m_test->setFiles(filePaths);
 
     ManagerBase::finish();
@@ -122,6 +124,8 @@ void Mac5Manager::measure()
 
 QJsonObject Mac5Manager::dfs(QDomNode node)
 {
+
+    // The result object
     QJsonObject result;
     QDomElement el = node.toElement();
     QString tagName = el.tagName();

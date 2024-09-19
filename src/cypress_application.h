@@ -44,6 +44,9 @@ public:
 
     void printActiveSessions() const;
 
+    QJsonObject getDeviceStatus();
+
+    QJsonArray getNetworkAddresses();
 public slots:
     void requestSession(QSharedPointer<CypressSession> session);
     void forceSessionEnd(QString sessionId);

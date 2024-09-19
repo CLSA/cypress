@@ -4,7 +4,7 @@
 #include "managers/manager_base.h"
 #include "config/device_config.h"
 
-#include "data/spirometer/tests/easyone_test.h"
+#include "data/spirometer/tests/spirometer_test.h"
 #include "server/sessions/easyone_connect_session.h"
 #include <QProcess>
 
@@ -24,7 +24,6 @@ public slots:
     void readOutput() override;
 
 private:
-    QSharedPointer<EasyoneTest> m_test;
     QProcess m_process;
 
     QString m_processName;  // Name of process when running in Task Manager

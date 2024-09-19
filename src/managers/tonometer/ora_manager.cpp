@@ -136,7 +136,6 @@ QVariantMap ORAManager::extractMeasures(const QString& eye)
     }
 
     QSqlQuery query(m_database);
-
     query.prepare("SELECT PatientID from Patients where ID = :id");
     query.bindValue(":id", m_session->getBarcode().toInt());
 

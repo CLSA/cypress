@@ -115,7 +115,7 @@ public:
 
     void removeMetaData(const QString &key);
 
-    void setFiles(const QStringList& filePaths);
+    void setFiles(const QList<QJsonObject>& filePaths);
     QJsonObject getFiles();
 
 protected:

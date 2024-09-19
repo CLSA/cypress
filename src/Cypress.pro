@@ -173,7 +173,6 @@ HEADERS += \
     data/grip_strength/tests/grip_strength_test.h \
     data/hearing/measurements/hearing_measurement.h \
     data/hearing/tests/hearing_test.h \
-    data/oct_test.h \
     data/retinal_camera/database_manager.h \
     data/retinal_camera/oct_measurement.h \
     data/retinal_camera/oct_test.h \
@@ -368,6 +367,7 @@ HEADERS += \
     widgets/directory_picker_widget.h \
     widgets/file_picker_widget.h \
     widgets/measurement_table.h \
+    widgets/select_ethnicity_dialog.h \
     widgets/serial_port_picker_widget.h \
     widgets/serial_port_widget.h \
     widgets/settings_dialog.h \
@@ -432,7 +432,6 @@ SOURCES += \
     data/grip_strength/tests/grip_strength_test.cpp \
     data/hearing/measurements/hearing_measurement.cpp \
     data/hearing/tests/hearing_test.cpp \
-    data/oct_test.cpp \
     data/retinal_camera/database_manager.cpp \
     data/retinal_camera/oct_measurement.cpp \
     data/retinal_camera/oct_test.cpp \
@@ -628,6 +627,7 @@ SOURCES += \
     widgets/directory_picker_widget.cpp \
     widgets/file_picker_widget.cpp \
     widgets/measurement_table.cpp \
+    widgets/select_ethnicity_dialog.cpp \
     widgets/serial_port_picker_widget.cpp \
     widgets/serial_port_widget.cpp \
     widgets/settings_dialog.cpp \

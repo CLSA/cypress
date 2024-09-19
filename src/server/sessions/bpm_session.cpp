@@ -9,15 +9,13 @@ BPMSession::BPMSession(QObject *parent, const QJsonObject& inputData, const QStr
 }
 
 void BPMSession::isInstalled() const {
-    if (!BloodPressureManager::isInstalled())
-        throw NotInstalledError("");
+
 }
 
 void BPMSession::isAvailable() const
 {
 
 }
-
 
 void BPMSession::initializeDialog()
 {

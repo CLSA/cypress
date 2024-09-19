@@ -30,10 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const QString orgName = "CLSA";
-const QString orgDomain = "clsa-elcv.ca";
-const QString appName = "Cypress";
-const QString appVersion = "v0.1.0";
+
 
 // Custom message handler to write to a log file and stdout
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -100,87 +97,17 @@ void cleanupLogs()
     }
 }
 
-void restartApplication(const QStringList& arguments) {
-    QProcess process;
-    process.startDetached(arguments[0], arguments.mid(1));
-    QCoreApplication::quit();
-}
-
-void logSystemInfo()
-{
-    qInfo() << QHostInfo::localHostName();
-    qInfo() << QSysInfo::productType() + " "
-               + QSysInfo::productVersion() + " ("
-               + QSysInfo::kernelType() + " "
-               + QSysInfo::kernelVersion() + " "
-               + QSysInfo::currentCpuArchitecture() + ")";
-}
-
-void logNetworkInfo()
-{
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-    for(const QNetworkInterface &interface : interfaces) {
-        QList<QNetworkAddressEntry> entries = interface.addressEntries();
-        for(const QNetworkAddressEntry &entry : entries) {
-            if(entry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                qInfo() << entry.ip().toString();
-            }
-        }
-    }
-}
-
-void logAppInfo()
-{
-    qInfo() << "Name:" << QCoreApplication::applicationName();
-    qInfo() << "Version: " << QCoreApplication::applicationVersion();
-    qInfo() << "Working Directory: " << QCoreApplication::applicationDirPath();
-    qInfo() << "Debug Mode: " << CypressSettings::isDebugMode();
-    qInfo() << "Sim Mode: " << CypressSettings::isSimMode();
-
-    qInfo() << "Server: " << CypressSettings::readSetting("address").toString() << ":"
-            << CypressSettings::readSetting("port").toString();
-}
-
-QString getStatusCheckString(const QString& arg1, bool arg2)
-{
-    return QString("%1 %2")
-        .arg(arg1, -20, ' ')
-        .arg("[ " + (arg2 ? QString("true ") : QString("false")) + " ]", 20, ' ');
-}
-
-bool checkAlive()
-{
-    bool isAlive { true };
-    qInfo() << getStatusCheckString("pine available", isAlive);
-    return isAlive;
-}
-
-bool updateAvailable()
-{
-    bool isUpdateAvailable { false };
-
-    qInfo() << getStatusCheckString("update available", isUpdateAvailable);
-
-    return isUpdateAvailable;
-}
-
-bool downloadUpdate()
-{
-    return false;
-}
-
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(messageHandler);
     cleanupLogs();
 
     // Setup Qt and defaults
-    QGuiApplication::setOrganizationName(orgName);
-    QGuiApplication::setOrganizationDomain(orgDomain);
+    QGuiApplication::setOrganizationName("CLSA");
+    QGuiApplication::setOrganizationDomain("clsa-elcv.ca");
+    QGuiApplication::setApplicationName("Cypress");
+    QGuiApplication::setApplicationVersion("1.0.1");
 
-    QGuiApplication::setApplicationName(appName);
-    QGuiApplication::setApplicationVersion(appVersion);
-    QGuiApplication::setApplicationVersion("1.0.0");
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
     qRegisterMetaType<Constants::MeasureType>("Constants::MeasureType");
@@ -204,35 +131,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    logAppInfo();
-    logSystemInfo();
-    logNetworkInfo();
-
-    // Make sure the network is up and that the Pine server is alive
-    if (!checkAlive()) {
-        qCritical() << "Could not connect to the Pine server";
-        return -1;
-    }
-
-    // Check for and install any updates
-    if (updateAvailable()) {
-        if (downloadUpdate()) {
-            restartApplication(QCoreApplication::arguments());
-        } else {
-            qCritical() << "Could not download a new update";
-        }
-    }
-
     QJsonObject status = Cypress::getInstance().getStatus();
-    QJsonObject deviceStatus = status["availableInstruments"].toObject();
+    QJsonObject deviceStatus = status;
 
     qDebug().noquote() << JsonSettings::prettyPrintJson(deviceStatus);
-    //for (auto it = deviceStatus.constBegin(); it != deviceStatus.constEnd(); ++it) {
-    //    QString deviceName = it.key();
-    //    bool available = it.value().toBool();
-
-    //    qInfo() << getStatusCheckString(deviceName, available);
-    //}
 
     Cypress::getInstance();
 

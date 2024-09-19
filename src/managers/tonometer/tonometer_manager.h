@@ -5,6 +5,8 @@
 #include "managers/manager_base.h"
 #include "server/sessions/tonometer_session.h"
 
+#include "config/device_config.h"
+
 #include <QProcess>
 #include <QSqlDatabase>
 
@@ -35,7 +37,7 @@ public:
     explicit TonometerManager(QSharedPointer<TonometerSession> session);
     ~TonometerManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
 

@@ -6,6 +6,8 @@
 #include "auxiliary/network_utils.h"
 #include "auxiliary/file_utils.h"
 
+#include "widgets/select_ethnicity_dialog.h"
+
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -51,6 +53,22 @@ bool EasyoneConnectManager::start()
     if (!restoreDatabase())
         return false;
 
+    SelectEthnicityDialog dialog;
+    if (dialog.exec() == QDialog::Accepted) {
+        QString ethnicity = dialog.getSelectedValue();
+        qDebug() << "ethnicity selected: " << ethnicity;
+        m_test->addMetaData("ethnicity", ethnicity);
+    }
+    else {
+        qDebug() << "No ethnicity selected";
+        return false;
+    }
+
+    if (!setUp()) {
+        emit error("Something went wrong during setup");
+        return false;
+    }
+
     // Write EMR plugin
     qDebug() << "EasyoneConnectManager::start - writing plugin";
     if (!writeEMRRequest())
@@ -88,64 +106,34 @@ void EasyoneConnectManager::readOutput()
 
 void EasyoneConnectManager::finish()
 {
-    auto test = qSharedPointerCast<SpirometerTest>(m_test);
-
-    const QString answerUrl = getAnswerUrl();
-
-    QStringList filePaths = {
-        { getEMROutXmlName() },
-        { getOutputPdfPath() },
+    QList<QJsonObject> filePaths = {
+        { { "path", getEMROutXmlName() }, { "name", "data.xml" } },
+        { { "path", getOutputPdfPath() }, { "name", "report.pdf" } },
     };
 
     m_test->setFiles(filePaths);
 
-    QJsonObject testJson = m_test->toJsonObject();
-    testJson.insert("session", m_session->getJsonObject());
-
-    if (!ManagerBase::sendFiles())
-    {
-        qDebug() << "Sending files failed";
-    }
-
-    QJsonObject responseJson {};
-    responseJson.insert("value", testJson);
-
-    const QJsonDocument jsonDoc(responseJson);
-    const QByteArray serializedData = jsonDoc.toJson();
-
-    bool ok = NetworkUtils::sendHTTPSRequest(
-        Poco::Net::HTTPRequest::HTTP_PATCH,
-        answerUrl.toStdString(),
-        "application/json",
-        serializedData
-    );
-
-    if (ok) {
-        emit success("Save successful. You may close this window.");
-    }
-    else {
-        emit error("Something went wrong");
-    }
+    ManagerBase::finish();
 }
 
 bool EasyoneConnectManager::restoreDatabase()
 {
     // Clear out database
-    QFile::remove(m_databasePath + "/EasyOneConnect.sqlite");
-    QFile::remove(m_databasePath + "/EasyOneConnectOptions.mdb");
+    //QFile::remove(m_databasePath + "/EasyOneConnect.sqlite");
+    //QFile::remove(m_databasePath + "/EasyOneConnectOptions.mdb");
 
     // Restore database from backup
-    if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnect.sqlite", m_databasePath + "/EasyOneConnect.sqlite")) {
-        qCritical() << "EasyoneConnectManager::restoreDatabase - could not copy EasyOneConnect.sqlite";
-        QMessageBox::critical(nullptr, "Error", "Something went wrong");
-        return false;
-    }
+    //if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnect.sqlite", m_databasePath + "/EasyOneConnect.sqlite")) {
+    //    qCritical() << "EasyoneConnectManager::restoreDatabase - could not copy EasyOneConnect.sqlite";
+    //    QMessageBox::critical(nullptr, "Error", "Something went wrong");
+    //    return false;
+    //}
 
-    if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnectOptions.mdb", m_databasePath + "/EasyOneConnectOptions.mdb")) {
-        qCritical() << "EasyoneConnectManager::restoreDatabase - could not copy EasyOneConnectOptions.mdb";
-        QMessageBox::critical(nullptr, "Error", "Something went wrong");
-        return false;
-    }
+    //if (!FileUtils::copyFile(m_backupPath + "/EasyOneConnectOptions.mdb", m_databasePath + "/EasyOneConnectOptions.mdb")) {
+    //    qCritical() << "EasyoneConnectManager::restoreDatabase - could not copy EasyOneConnectOptions.mdb";
+    //    QMessageBox::critical(nullptr, "Error", "Something went wrong");
+    //    return false;
+    //}
 
     return true;
 }
@@ -155,7 +143,10 @@ bool EasyoneConnectManager::writeEMRRequest()
     EMRPluginWriter writer;
     const QDir xmlPath(m_exchangePath);
 
-    writer.setInputData(m_session->getInputData().toVariantMap());
+    QJsonObject inputData = m_session->getInputData();
+    inputData["Ethnicity"] = m_test->getMetaData("ethnicity").toString();
+
+    writer.setInputData(inputData.toVariantMap());
     writer.write(xmlPath.filePath(m_inFileName), m_session->getBarcode());
 
     return true;

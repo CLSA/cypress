@@ -14,8 +14,8 @@ void WeighScaleSession::initializeDialog()
 
 void WeighScaleSession::isInstalled() const
 {
-    if (!WeighScaleManager::isInstalled())
-        throw NotInstalledError("Weight Scale is not installed on this workstation.");
+    if (WeighScaleManager::config.hasErrors())
+        throw NotInstalledError("Weight scale is not installed on this workstation.");
 }
 
 void WeighScaleSession::isAvailable() const

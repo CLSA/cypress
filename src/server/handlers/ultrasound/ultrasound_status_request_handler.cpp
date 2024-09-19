@@ -7,7 +7,7 @@ void UltrasoundStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest 
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", VividiManager::isInstalled() ? "available" : "unavailable" }
+            {"status", !VividiManager::config.hasErrors() ? "available" : "unavailable" }
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

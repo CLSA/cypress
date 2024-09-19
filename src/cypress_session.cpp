@@ -1,9 +1,7 @@
 #include "cypress_session.h"
-
-#include <QException>
-
 #include "auxiliary/validators.h"
 
+#include <QException>
 
 CypressSession::CypressSession(QObject* parent, const QJsonObject& inputData, const QString& origin):
     QObject(parent), m_inputData(inputData)
@@ -28,6 +26,8 @@ void CypressSession::validate() const
         throw ValidationError("empty");
     if (m_origin.isEmpty())
         throw ValidationError("origin header");
+    if (m_uid.isEmpty())
+        throw ValidationError("uid");
     if (!isValidString("barcode"))
         throw ValidationError("barcode");
     if (!isValidInteger("answer_id"))
@@ -40,10 +40,8 @@ void CypressSession::validate() const
 
 void CypressSession::start()
 {
-    qDebug() << "start";
     if (m_dialog == nullptr)
         throw QException();
-    qDebug() << "dialog isn't null";
 
     m_startDateTime = QDateTime::currentDateTimeUtc();
     m_status = SessionStatus::Started;

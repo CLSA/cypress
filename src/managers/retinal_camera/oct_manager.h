@@ -43,6 +43,7 @@ private:
     QString m_runnablePath;
     QString m_runnableName;
     QString m_exportPath;
+    QString m_dataPath;
 
     QString m_databaseBackup;
     QString m_databaseName;

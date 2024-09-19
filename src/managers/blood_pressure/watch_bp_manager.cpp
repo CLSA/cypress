@@ -92,10 +92,13 @@ bool WatchBPManager::addPatient()
                   "(Name, ID, Gender, DOB, Physician) values "
                   "(:name, :id, :sex, :dob, :physician)");
 
+    QDate dob = QDate::fromString(m_session->getInputData().value("dob").toString(), Qt::DateFormat::ISODate);
+    QDateTime dobT = QDateTime(dob, QTime::currentTime());
+
     query.bindValue(":name",      "Participant");
     query.bindValue(":id",        m_session->getBarcode());
-    query.bindValue(":sex",       m_session->getInputData().value("sex").toString() == "F" ? 1 : 0);
-    query.bindValue(":dob",       m_session->getInputData().value("dob").toString());
+    query.bindValue(":sex",       m_session->getInputData().value("sex").toString() == "female" ? 1 : 0);
+    query.bindValue(":dob",       dobT.toSecsSinceEpoch());
     query.bindValue(":physician", "CLSA");
 
     if (!query.exec()) {
@@ -149,6 +152,7 @@ void WatchBPManager::measure()
 {
     qDebug() << "WatchBPManager::measure";
     m_test->reset();
+    emit dataChanged(m_test);
 
     QSqlQuery dataQuery;
     dataQuery.prepare("SELECT * FROM Data");
@@ -209,45 +213,6 @@ void WatchBPManager::measure()
             { "Spare20", 		dataQuery.value(44).toJsonValue() },
         };
 
-        //const int dataId = measurement.value("ID").toInt();
-
-        //QSqlQuery dataPVP {};
-
-        //dataPVP.prepare(
-        //    "SELECT "
-        //        "DataPVPWave.DataId, "
-        //        "DataPVPWave.PVPWaveId, "
-        //        "PVPWave.Index, "
-        //        "PVPWave.Part, "
-        //        "PVPWave.Type, "
-        //        "PVPWave.Resolution, "
-        //        "PVPWave.PointsBlobbed "
-        //    "FROM DataPVPWave INNER JOIN PVPWave ON DataPVPWave.PVPWaveId = PVPWave.Index "
-        //    "WHERE DataPVPWave.DataId = :dataId");
-
-        //dataPVP.bindValue(":dataId", dataId);
-        //if (!dataPVP.exec()) {
-        //    qCritical() << "Query 2 failed";
-        //    return;
-        //}
-
-        //QJsonArray pvp {};
-
-        //while (dataPVP.next()) {
-        //    QJsonObject data = {
-        //        { "DataId",        dataPVP.value(0).toJsonValue() },
-        //        { "PVPWaveId",     dataPVP.value(1).toJsonValue() },
-        //        { "Index",         dataPVP.value(2).toJsonValue() },
-        //        { "Part",          dataPVP.value(3).toJsonValue() },
-        //        { "Type",          dataPVP.value(4).toJsonValue() },
-        //        { "Resolution",    dataPVP.value(5).toJsonValue() },
-        //        { "PointsBlobbed", dataPVP.value(6).toJsonValue() },
-        //    };
-
-        //    pvp.append(data);
-        //}
-
-        //measurement.insert("pvp", pvp);
         measurements.append(measurement);
     }
 
@@ -274,8 +239,8 @@ void WatchBPManager::finish()
 
     if (test->getMeasurementCount() < 2) {
         qWarning() << "WatchBPManager::finish - invalid test, this should not occur";
-        m_test->reset();
-        QMessageBox::critical(nullptr, "Unexpected error", "An unexpected error occurred, please use manual entry or try again");
+        //m_test->reset();
+        QMessageBox::critical(nullptr, "Not enough measurements", "This stage requires at minimum of two measurements");
         return;
     }
 
@@ -288,11 +253,11 @@ void WatchBPManager::addManualEntry(const int systolic, const int diastolic, con
     auto test = qSharedPointerCast<WatchBPTest>(m_test);
 
     QSharedPointer<WatchBPMeasurement> bpm(new WatchBPMeasurement());
-    bpm->setAttribute("ID", m_test->getMeasurementCount() + 1);
-    bpm->setAttribute("SYS", systolic);
-    bpm->setAttribute("DIA", diastolic);
-    bpm->setAttribute("PP", pulse);
-    bpm->setAttribute("Date", QDateTime::currentDateTimeUtc());
+    bpm->setAttribute("id", m_test->getMeasurementCount() + 1);
+    bpm->setAttribute("systolic", systolic, "mmHg");
+    bpm->setAttribute("diastolic", diastolic, "mmHg");
+    bpm->setAttribute("pulse", pulse, "bpm");
+    bpm->setAttribute("date", QDateTime::currentDateTimeUtc());
 
     test->addMeasurement(bpm);
     test->updateAverage();

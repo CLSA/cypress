@@ -19,16 +19,24 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+DeviceConfig RetinalCameraManager::config {{
+    {"runnableName", {"retinal_camera/runnableName",      Exe }},
+    {"runnablePath", {"retinal_camera/runnablePath",      Dir }},
+    {"name",         {"retinal_camera/database/name",     NonEmptyString }},
+    {"port",         {"retinal_camera/database/port",     NonEmptyString }},
+}};
+
 RetinalCameraManager::RetinalCameraManager(QSharedPointer<RetinalCameraSession> session)
     : ManagerBase(session)
 {
-    m_runnableName = CypressSettings::readSetting("retinal_camera/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("retinal_camera/runnablePath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
 
-    m_databaseName = CypressSettings::readSetting("retinal_camera/database/name").toString();
-    m_databasePort = CypressSettings::readSetting("retinal_camera/database/port").toInt();
-    m_databaseUser = CypressSettings::readSetting("retinal_camera/database/user").toString();
-    m_databasePassword = CypressSettings::readSetting("retinal_camera/database/password").toString();
+    m_databaseName = config.getSetting("name");
+    m_databasePort = config.getSetting("port").toInt();
+
+    m_databaseUser = "";
+    m_databasePassword = "";
 
     m_test.reset(new RetinalCameraTest);
     m_test->setExpectedMeasurementCount(1); // one cypress session per eye
@@ -36,51 +44,6 @@ RetinalCameraManager::RetinalCameraManager(QSharedPointer<RetinalCameraSession> 
 
 RetinalCameraManager::~RetinalCameraManager()
 {
-}
-
-bool RetinalCameraManager::isInstalled()
-{
-    const QString runnableName = CypressSettings::readSetting("retinal_camera/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("retinal_camera/runnablePath").toString();
-
-    const QString databaseName = CypressSettings::readSetting("retinal_camera/database/name").toString();
-    const QString databasePort = CypressSettings::readSetting("retinal_camera/database/port").toString();
-    const QString databaseUser = CypressSettings::readSetting("retinal_camera/database/user").toString();
-
-    if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "RetinalCamera: runnable name is not defined";
-        return false;
-    }
-
-    if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "RetinalCamera: runnable path is not defined";
-        return false;
-    }
-
-    if (databaseName.isEmpty() || databaseName.isNull()) {
-        qInfo() << "RetinalCamera: database name is not defined";
-        return false;
-    }
-
-    if (databasePort.isEmpty() || databasePort.isNull()) {
-        qInfo() << "RetinalCamera: database port is not defined";
-        return false;
-    }
-
-    const QFileInfo runnableNameInfo(runnableName);
-    const QDir runnablePathInfo(runnablePath);
-
-    if (!runnableNameInfo.exists() || !runnableNameInfo.isExecutable()) {
-        qInfo() << "RetinalCamera: ImageNet exe is not defined";
-        return false;
-    }
-
-    if (!runnablePathInfo.exists()) {
-        qInfo() << "RetinalCamera: working directory does not exist";
-        return false;
-    }
-
-    return true;
 }
 
 bool RetinalCameraManager::start()

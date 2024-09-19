@@ -12,6 +12,17 @@
 #include <QApplication>
 
 
+DeviceConfig VividiManager::config {{
+    {"runnableName",    {"ultrasound/dicom/runnableName", Exe             }},
+    {"runnablePath",    {"ultrasound/dicom/runnablePath", Dir             }},
+    {"aeTitle",         {"ultrasound/dicom/aeTitle", 	  NonEmptyString  }},
+    {"host",            {"ultrasound/dicom/host",         NonEmptyString  }},
+    {"port", 			{"ultrasound/dicom/port",         NonEmptyString  }},
+    {"storagePath",     {"ultrasound/dicom/storagePath",  Dir             }},
+    {"logConfigPath",   {"ultrasound/dicom/log_config",   File            }},
+    {"ascConfigPath",   {"ultrasound/dicom/asc_config",   File            }},
+}};
+
 VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
     : ManagerBase(session)
 {
@@ -19,16 +30,16 @@ VividiManager::VividiManager(QSharedPointer<UltrasoundSession> session)
 
     m_test.reset(new CimtVividiTest);
 
-    m_runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
 
-    m_aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
-    m_host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
-    m_port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
+    m_aeTitle = config.getSetting("aeTitle");
+    m_host = config.getSetting("host");
+    m_port = config.getSetting("port");
 
-    m_storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
-    m_logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
-    m_ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
+    m_storageDirPath = config.getSetting("storagePath");
+    m_logConfigPath = config.getSetting("logConfigPath");
+    m_ascConfigPath = config.getSetting("ascConfigPath");
 
     m_dicomServer.reset(
         new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
@@ -139,90 +150,6 @@ void VividiManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     else {
         emit cannotFinish();
     }
-}
-
-bool VividiManager::isInstalled()
-{
-    qInfo() << "VividiManager::isInstalled";
-
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName = CypressSettings::readSetting("ultrasound/dicom/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("ultrasound/dicom/runnablePath").toString();
-    const QString aeTitle = CypressSettings::readSetting("ultrasound/dicom/aeTitle").toString();
-    const QString host = CypressSettings::readSetting("ultrasound/dicom/host").toString();
-    const QString port = CypressSettings::readSetting("ultrasound/dicom/port").toString();
-
-    const QString storageDirPath = CypressSettings::readSetting("ultrasound/dicom/storagePath").toString();
-    const QString logConfigPath = CypressSettings::readSetting("ultrasound/dicom/log_config").toString();
-    const QString ascConfigPath = CypressSettings::readSetting("ultrasound/dicom/asc_config").toString();
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: aeTitle is not defined";
-        return false;
-    }
-
-    if (host.isNull() || host.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: host is not defined";
-        return false;
-    }
-
-    if (port.isNull() || port.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: port is not defined";
-        return false;
-    }
-
-    if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: storageDirPath is not defined";
-        return false;
-    }
-
-    if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qInfo() << "VividiManager::isInstalled: logConfigPath is not defined";
-        return false;
-    }
-
-    if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qInfo() << "VividiManager::isInstalled: ascConfigPath is not defined";
-        return false;
-    }
-
-    const QFileInfo exeInfo(runnableName);
-    if (!exeInfo.exists()) {
-        qInfo() << "VividiManager::isInstalled: runnableName does not exist at" << runnableName;
-        return false;
-    }
-    if (!exeInfo.isExecutable()) {
-        qInfo() << "VividiManager::isInstalled: runnableName is not executable at" << runnableName;
-        return false;
-    }
-
-    const QFileInfo workingDir(runnablePath);
-    if (!workingDir.exists()) {
-        qInfo() << "VividiManager::isInstalled: working directory does not exist at" << workingDir;
-        return false;
-    }
-    if (!workingDir.isDir()) {
-        qInfo() << "VividiManager::isInstalled: working directory is not writable at" << workingDir;
-        return false;
-    }
-    if (!workingDir.isWritable()) {
-        qInfo() << "VividiManager::isInstalled: working directory is not writable at" << workingDir;
-        return false;
-    }
-
-    return true;
 }
 
 bool VividiManager::start()

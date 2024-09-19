@@ -13,74 +13,28 @@
 #include <QMessageBox>
 
 
+DeviceConfig ECGManager::config {{
+    // absolute path to exe
+    {"runnableName", {"ecg/runnableName", Exe }},
+
+    // absolute path to working directory
+    {"workingPath",  {"ecg/workingPath",  Dir }},
+
+    // absolute path to export directory
+    {"exportPath",   {"ecg/exportPath",   Dir }},
+}};
+
 ECGManager::ECGManager(QSharedPointer<ECGSession> session)
     : ManagerBase(session)
 {
-    // absolute path to exe
-    m_runnableName = CypressSettings::readSetting("ecg/runnableName").toString();
-
-    // absolute path to working directory
-    m_workingPath = CypressSettings::readSetting("ecg/workingPath").toString();
-
-    // absolute path to export directory
-    m_exportPath = CypressSettings::readSetting("ecg/exportPath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_workingPath = config.getSetting("workingPath");
+    m_exportPath = config.getSetting("exportPath");
 
     // xml file output
     m_outputFile = m_exportPath + "/" + session->getBarcode() + ".xml";
 
     m_test.reset(new ECGTest);
-}
-
-bool ECGManager::isInstalled()
-{
-    qInfo() << "ECGManager::isInstalled";
-
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName = CypressSettings::readSetting("ecg/runnableName").toString();
-    const QString workingPath = CypressSettings::readSetting("ecg/workingPath").toString();
-    const QString exportPath = CypressSettings::readSetting("ecg/exportPath").toString();
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "ECGManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (workingPath.isNull() || workingPath.isEmpty()) {
-        qInfo() << "ECGManager::isInstalled: workingPath is not defined";
-        return false;
-    }
-
-    if (exportPath.isNull() || exportPath.isEmpty()) {
-        qInfo() << "ECGManager::isInstalled: exportPath is not defined";
-        return false;
-    }
-
-    const QFileInfo runnableInfo(runnableName);
-    if (!runnableInfo.exists()) {
-        qInfo() << "ECGManager::isInstalled:" << runnableName << "does not exist";
-        return false;
-    }
-
-    if (!runnableInfo.isExecutable()) {
-        qInfo() << "ECGManager::isInstalled:" << runnableName << "is not executable";
-        return false;
-    }
-
-    const QDir workingInfo(workingPath);
-    if (!workingInfo.exists()) {
-        qInfo() << "ECGManager::isInstalled: workingPath could not be found";
-        return false;
-    }
-
-    const QDir exportInfo(exportPath);
-    if (!exportInfo.exists()) {
-        qInfo() << "ECGManager::isInstalled: exportPath could not be found";
-        return false;
-    }
-
-    return true;
 }
 
 bool ECGManager::start()

@@ -94,8 +94,6 @@ bool FileUtils::copyDirectory(QDir source, QDir destination, bool overwrite, boo
         QFile sourceFile(source.absoluteFilePath(file));
         QFile destinationFile(destination.absoluteFilePath(file));
 
-        qDebug() << "copying" << source.absoluteFilePath(file) << "to" << destination.absoluteFilePath(file);
-
         if (overwrite || !destinationFile.exists())
         {
             if (!destinationFile.remove())
@@ -136,7 +134,6 @@ bool FileUtils::clearDirectory(const QString &absoluteDirectoryPath)
     QDir dir(absoluteDirectoryPath);
     if (!dir.exists())
         return false;
-    ;
 
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList files = dir.entryInfoList();

@@ -3,6 +3,7 @@
 
 #include "managers/serial_port/serial_port_manager.h"
 #include "server/sessions/weigh_scale_session.h"
+#include "config/device_config.h"
 
 /*!
  * \class WeighScaleManager
@@ -23,8 +24,7 @@ class WeighScaleManager : public SerialPortManager
 
 public:
     explicit WeighScaleManager(QSharedPointer<WeighScaleSession> &session);
-
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
     // connect to the serial port
@@ -48,9 +48,6 @@ public slots:
 
     void addManualEntry(const double weight);
     void removeMeasurement(const int index);
-
-signals:
-    void cannotFinish();
 
 private slots:
 

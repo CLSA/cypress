@@ -12,102 +12,28 @@
 #include <QMessageBox>
 #include <QTemporaryDir>
 
+DeviceConfig GripStrengthManager::config {{
+   { "runnableName",     { "grip_strength/runnableName",     Exe  }},
+   { "runnablePath",     { "grip_strength/runnablePath",     Dir  }},
+   { "gripTestDB",       { "grip_strength/gripTestDB",       File }},
+   { "gripTestDataDB",   { "grip_strength/gripTestDataDB",   File }},
+   { "backupPath",   	 { "grip_strength/backupPath",   	 Dir  }},
+   { "databasePath",     { "grip_strength/databasePath",     Dir  }},
+}};
+
 GripStrengthManager::GripStrengthManager(QSharedPointer<GripStrengthSession> session)
     : ManagerBase(session) {
-    m_runnableName = CypressSettings::readSetting("grip_strength/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("grip_strength/runnablePath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
 
-    m_gripTestDBPath = CypressSettings::readSetting("grip_strength/gripTestDB").toString();
-    m_gripTestDataDBPath = CypressSettings::readSetting("grip_strength/gripTestDataDB").toString();
+    m_gripTestDBPath = config.getSetting("gripTestDB");
+    m_gripTestDataDBPath = config.getSetting("gripTestDataDB");
 
-    m_backupPath = CypressSettings::readSetting("grip_strength/backupPath").toString();
-    m_databasePath = CypressSettings::readSetting("grip_strength/databasePath").toString();
-
-    qInfo() << "GripStrengthManager::GripStrengthManager";
-    qInfo() << "runnableName:" 	<< m_runnableName;
-    qInfo() << "runnablePath:" 	<< m_runnablePath;
-    qInfo() << "gripTestDBPath:" << m_gripTestDBPath;
-    qInfo() << "gripTestDataDBPath:" << m_gripTestDBPath;
-
-    qInfo() << "sessionId:" 	<< session->getSessionId();
-    qInfo() << "barcode:" 		<< session->getBarcode();
-    qInfo() << "interviewer:" 	<< session->getInterviewer();
+    m_backupPath = config.getSetting("backupPath");
+    m_databasePath = config.getSetting("databasePath");
 
     m_test.reset(new GripStrengthTest);
 }
-
-bool GripStrengthManager::isInstalled() {
-    qInfo() << "GripStrengthManager::isInstalled";
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName = CypressSettings::readSetting("grip_strength/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("grip_strength/runnablePath").toString();
-
-    const QString gripTestDBPath = CypressSettings::readSetting("grip_strength/gripTestDB").toString();
-    const QString gripTestDataDBPath = CypressSettings::readSetting("grip_strength/gripTestDataDB").toString();
-
-    const QString databasePath = CypressSettings::readSetting("grip_strength/databasePath").toString();
-    const QString backupPath = CypressSettings::readSetting("grip_strength/backupPath").toString();
-
-    if (runnableName.isEmpty() || runnableName.isNull()) {
-        qInfo() << "GripStrengthManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isEmpty() || runnablePath.isNull()) {
-        qInfo() << "GripStrengthManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (databasePath.isEmpty() || databasePath.isNull()) {
-        qInfo() << "GripStrengthManager::isInstalled: databasePath is not defined";
-        return false;
-    }
-
-    if (gripTestDBPath.isEmpty() || gripTestDBPath.isNull()) {
-        qInfo() << "GripStrengthManager::isInstalled: gripTestDBPath is not defined";
-        return false;
-    }
-
-    if (gripTestDataDBPath.isEmpty() || gripTestDataDBPath.isNull()) {
-        qInfo() << "GripStrengthManager::isInstalled: gripTestDataDBPath is not defined";
-        return false;
-    }
-
-    if (backupPath.isEmpty() || backupPath.isNull()) {
-        qInfo() << "GripStrengthManager::isInstalled: backupPath is not defined";
-        return false;
-    }
-
-    // check if exe is present and executable
-    //
-    const QFileInfo executable(runnableName);
-    if (!executable.exists()) {
-        qInfo() << "GripStrengthManager::isInstalled: file does not exist at " << runnableName;
-        return false;
-    }
-
-    if (!executable.isExecutable()) {
-        qInfo() << "GripStrengthManager::isInstalled: file is not executable at " << runnableName;
-        return false;
-    }
-
-    const QFileInfo examDatabase(gripTestDBPath);
-    if (!examDatabase.exists() || !examDatabase.isReadable()) {
-        qInfo() << "GripStrengthManager::isInstalled: file is not readable at " << gripTestDBPath;
-        return false;
-    }
-
-    const QFileInfo examData(gripTestDataDBPath);
-    if (!examData.exists() || !examData.isReadable()) {
-        qInfo() << "GripStrengthManager::isInstalled: file is not readable at " << gripTestDBPath;
-        return false;
-    }
-
-    return true;
-}
-
 
 bool GripStrengthManager::start() {
     qInfo() << "GripStrengthManager::start";

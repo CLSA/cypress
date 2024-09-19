@@ -3,6 +3,7 @@
 
 #include "managers/manager_base.h"
 #include "server/sessions/retinal_camera_session.h"
+#include "config/device_config.h"
 
 #include <QObject>
 #include <QProcess>
@@ -17,7 +18,7 @@ public:
     explicit RetinalCameraManager(QSharedPointer<RetinalCameraSession> session);
     ~RetinalCameraManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
     bool start() override;
@@ -34,7 +35,6 @@ private:
     bool openDatabase();
     bool initializeDatabase();
     void configureProcess();
-
 
     bool clearData() override;
     bool cleanUp() override;

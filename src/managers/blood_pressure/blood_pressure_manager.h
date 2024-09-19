@@ -3,6 +3,7 @@
 
 #include "managers/manager_base.h"
 #include "server/sessions/bpm_session.h"
+#include "config/device_config.h"
 
 #include "bptru_200_driver.h"
 
@@ -51,14 +52,11 @@ public:
     explicit BloodPressureManager(QSharedPointer<BPMSession> session);
     ~BloodPressureManager();
 
-    static bool isDefined();
-    static bool isInstalled();
-
     void setCuffSize(const QString&);
     void setSide(const QString&);
 
-    static const quint16 vid;
-    static const quint16 pid;
+    const quint16 vid { 0x10b7 };
+    const quint16 pid { 0x1234 };
 
 signals:
     void canConnect();

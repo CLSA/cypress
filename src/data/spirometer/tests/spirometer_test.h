@@ -35,12 +35,12 @@ public:
 protected:
     QStringList m_outputKeyList;
 
-    void readPDFReportPath(const QDomNode&);
-    void readPatients(const QDomNode&);
-    void readTrials(const QDomNode&);
-    void readParameters(const QDomNode&, SpirometerMeasurement*);
-    void readChannel(const QDomNode&, SpirometerMeasurement*);
-    void readBestValues(const QDomNode&);
+    virtual void readPDFReportPath(const QDomNode&);
+    virtual void readPatients(const QDomNode&);
+    virtual void readTrials(const QDomNode&);
+    virtual void readParameters(const QDomNode&, SpirometerMeasurement*);
+    virtual void readChannel(const QDomNode&, SpirometerMeasurement*);
+    virtual void readBestValues(const QDomNode&);
 };
 
 Q_DECLARE_METATYPE(SpirometerTest);

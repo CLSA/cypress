@@ -1,11 +1,12 @@
 #ifndef ECG_MANAGER_H
 #define ECG_MANAGER_H
 
-#include <QProcess>
-
 #include "data/ecg/tests/ecg_test.h"
 #include "managers/manager_base.h"
 #include "server/sessions/ecg_session.h"
+#include "config/device_config.h"
+
+#include <QProcess>
 
 /*!
  * \class ECGManager
@@ -35,7 +36,7 @@ class ECGManager : public ManagerBase
 public:
     explicit ECGManager(QSharedPointer<ECGSession> session);
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
 

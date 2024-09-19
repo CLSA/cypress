@@ -3,6 +3,7 @@
 
 #include "managers/manager_base.h"
 #include "server/sessions/grip_strength_session.h"
+#include "config/device_config.h"
 
 #include <QJsonDocument>
 #include <QObject>
@@ -16,9 +17,9 @@ class GripStrengthManager : public ManagerBase
     Q_OBJECT
 
 public:
-    explicit GripStrengthManager(QSharedPointer<GripStrengthSession> session);
+    GripStrengthManager(QSharedPointer<GripStrengthSession> session);
 
-    static bool isInstalled();
+    static DeviceConfig config;
 
 public slots:
     bool start() override;

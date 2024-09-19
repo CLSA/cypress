@@ -16,15 +16,11 @@ public:
 
 public slots:
     bool start();
-    void measure();
+    void measure() {};
     void finish();
 
 protected:
-    void setInputData(const QVariantMap &);
-    bool setUp();
-    bool clearData();
     bool cleanUp();
-
     void readOutput();
 
 private:
