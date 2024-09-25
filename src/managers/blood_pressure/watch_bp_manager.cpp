@@ -253,7 +253,7 @@ void WatchBPManager::addManualEntry(const int systolic, const int diastolic, con
     auto test = qSharedPointerCast<WatchBPTest>(m_test);
 
     QSharedPointer<WatchBPMeasurement> bpm(new WatchBPMeasurement());
-    bpm->setAttribute("id", m_test->getMeasurementCount() + 1);
+    bpm->setAttribute("reading_number", m_test->getMeasurementCount() + 1);
     bpm->setAttribute("systolic", systolic, "mmHg");
     bpm->setAttribute("diastolic", diastolic, "mmHg");
     bpm->setAttribute("pulse", pulse, "bpm");

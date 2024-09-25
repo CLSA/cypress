@@ -30,9 +30,14 @@ bool GeneralProxyManager::start() {
     QString language = m_session->getInputData().value("language").toString();
     QDir currentDir = QDir::currentPath();
 
+    QString fdfPath = "general_proxy/gen_proxy_v1_1.fdf";
+    if (language == "fr") {
+        fdfPath = "general_proxy/gen_proxy_v1_1_fr.fdf";
+    }
+
     QString outputPath = filler.fillPDF(
         currentDir.filePath(QString("general_proxy/gen_proxy_v1_1_%1.pdf").arg(language)),
-        currentDir.filePath(QString("general_proxy/gen_proxy_v1_1.fdf")),
+        currentDir.filePath(fdfPath),
         inputData,
         m_outputFilePath
     );
