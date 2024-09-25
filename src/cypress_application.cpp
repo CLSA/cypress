@@ -173,7 +173,7 @@ QJsonObject Cypress::getDeviceStatus()
         {"ora", 				ORAManager::config.getErrors()},
         {"cimt", 				VividiManager::config.getErrors()},
         {"ultrasound", 			VividIQManager::config.getErrors()},
-        {"weigh_scale", 		WeighScaleManager::config.getErrors()},
+        {"weight_scale", 		WeighScaleManager::config.getErrors()},
         {"oct", 				OCTManager::config.getErrors()},
     };
 

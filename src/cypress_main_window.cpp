@@ -10,6 +10,7 @@
 #include "server/sessions/audiometer_session.h"
 #include "server/sessions/grip_strength_session.h"
 #include "server/sessions/retinal_camera_session.h"
+#include "server/sessions/gen_proxy_session.h"
 
 #include "server/sessions/watch_bp_session.h"
 #include "server/sessions/weigh_scale_session.h"
@@ -40,6 +41,7 @@ CypressMainWindow::CypressMainWindow(QWidget *parent) :
 QJsonObject CypressMainWindow::getDebugInputData()
 {
     QString origin = CypressSettings::readSetting("debug/origin").toString();
+    QString uid = CypressSettings::readSetting("debug/uid").toString();
     QString barcode = CypressSettings::readSetting("debug/barcode").toString();
     QString language = CypressSettings::readSetting("debug/language").toString();
     QString interviewer = CypressSettings::readSetting("debug/interviewer").toString();
@@ -52,6 +54,7 @@ QJsonObject CypressMainWindow::getDebugInputData()
     QJsonObject inputData {
         {"language", 		language},
         {"barcode", 		barcode},
+        {"uid",  			uid },
         {"interviewer", 	interviewer},
         {"smoker", 			smoker},
         {"gender", 			gender},
@@ -79,6 +82,7 @@ void CypressMainWindow::enableDevices(bool enabled)
     ui->launchChoiceReaction->setEnabled(enabled);
     ui->launchCDTT->setEnabled(enabled);
 
+    ui->launchGenProxy->setEnabled(enabled);
     //ui->launchDxa1->setEnabled(true);
     //ui->launchDxa2->setEnabled(true);
     //ui->launchFrax->setEnabled(enabled);
@@ -93,12 +97,18 @@ void CypressMainWindow::enableDebugParticipant()
 {
     QJsonObject iniInputData = getDebugInputData();
 
+    ui->languageValue->addItems({ "en", "fr" });
+
+    ui->uidValue->setText(iniInputData["uid"].toString());
+    ui->languageValue->setCurrentIndex(iniInputData["language"] == "en" ? 0 : 1);
     ui->barcodeValue->setText(iniInputData["barcode"].toString());
     ui->weightValue->setText(iniInputData["weight"].toString());
     ui->heightValue->setText(iniInputData["height"].toString());
     ui->sexValue->setCurrentIndex(iniInputData["sex"] == "Female" ? 0 : 1);
     ui->dateOfBirthValue->setDate(QDate::fromString(iniInputData["dob"].toString()));
 
+    ui->languageValue->setEnabled(true);
+    ui->uidValue->setEnabled(true);
     ui->barcodeValue->setEnabled(true);
     ui->weightValue->setEnabled(true);
     ui->heightValue->setEnabled(true);
@@ -107,6 +117,15 @@ void CypressMainWindow::enableDebugParticipant()
 
     connect(ui->barcodeValue, &QLineEdit::textChanged, this, [=](const QString& barcodeValue) {
         CypressSettings::writeSetting("debug/barcode", barcodeValue);
+    });
+
+    connect(ui->uidValue, &QLineEdit::textChanged, this, [=](const QString& uidValue) {
+        CypressSettings::writeSetting("debug/uid", uidValue);
+    });
+
+    connect(ui->languageValue, &QComboBox::currentTextChanged, this, [=](const QString& languageValue) {
+        qDebug() << "language" << languageValue;
+        CypressSettings::writeSetting("debug/language", languageValue);
     });
 
     connect(ui->weightValue, &QLineEdit::textChanged, this, [=](const QString& weightValue) {
@@ -131,6 +150,12 @@ void CypressMainWindow::enableDebugDevices()
     connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<WatchBPSession> session(new WatchBPSession(nullptr, inputData, inputData["origin"].toString()));
+        Cypress::getInstance().requestSession(session);
+    });
+
+    connect(ui->launchGenProxy, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<GenProxySession> session(new GenProxySession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
 
