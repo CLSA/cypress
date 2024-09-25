@@ -14,6 +14,8 @@ GeneralProxyFormDialog::GeneralProxyFormDialog(QWidget *parent, QSharedPointer<G
     setWindowTitle("General Proxy Consent Form");
     setWindowFlags(Qt::WindowFullscreenButtonHint);
 
+    ui->testInfoWidget->setSessionInformation(*session, "General Proxy Form");
+
     m_manager.reset(new GeneralProxyManager(session));
 
     auto manager = qSharedPointerCast<GeneralProxyManager>(m_manager);

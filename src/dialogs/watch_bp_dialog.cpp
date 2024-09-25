@@ -20,13 +20,12 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
     bpmManualEntryForm = new BpmManualEntryForm(this);
 
     QList<TableColumn> columns;
-    columns << TableColumn("id",
+    columns << TableColumn("reading_number",
                            "#",
                            new NumberDelegate(0, 1000, true, false, false, 2));
     columns << TableColumn("systolic", "Systolic (mmHg)", new NumberDelegate(0, 200, false));
     columns << TableColumn("diastolic", "Diastolic (mmHg)", new NumberDelegate(0, 200, false));
     columns << TableColumn("pulse", "Pulse (bpm)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("date", "Start time", new TextDelegate("", QRegExp(), true));
 
     connect(manager.get(), &WatchBPManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
