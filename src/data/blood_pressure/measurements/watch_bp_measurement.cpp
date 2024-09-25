@@ -45,8 +45,13 @@ void WatchBPMeasurement::fromJson(const QJsonObject& data)
         QString key = it.key();
         QJsonValue val = it.value();
 
-        if (key == "Date") {
-            setAttribute(key, QDateTime::fromSecsSinceEpoch(val.toInt()));
+
+        if (key == "UpdateTime") {
+            setAttribute("date", QDateTime::fromSecsSinceEpoch(val.toInt()));
+        }
+
+        else if (key == "Spare7") {
+            setAttribute("reading_number", val.toInt());
         }
 
         else if (key == "SYS") {

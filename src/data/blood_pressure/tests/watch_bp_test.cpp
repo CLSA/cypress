@@ -72,6 +72,8 @@ void WatchBPTest::updateAverage()
 {
     const int n = getMeasurementCount();
 
+    qDebug() << "measurement count: " << n;
+
     if (n <= 1) {
         removeMetaData("first_systolic");
         removeMetaData("first_diastolic");
@@ -94,11 +96,11 @@ void WatchBPTest::updateAverage()
 
     const auto first = *m_measurementList.constFirst();
 
-    addMetaData("first_systolic",   first.getAttribute("SYS"));
-    addMetaData("first_diastolic",  first.getAttribute("DIA"));
-    addMetaData("first_pulse",      first.getAttribute("HR"));
-    addMetaData("first_start_time", first.getAttribute("Date"));
-    addMetaData("first_end_time",   first.getAttribute("Date"));
+    addMetaData("first_systolic",   first.getAttribute("systolic"));
+    addMetaData("first_diastolic",  first.getAttribute("diastolic"));
+    addMetaData("first_pulse",      first.getAttribute("pulse"));
+    addMetaData("first_start_time", first.getAttribute("date"));
+    addMetaData("first_end_time",   first.getAttribute("date"));
 
     int validMeasures = 0;
     int systolicTotal = 0;
@@ -107,19 +109,22 @@ void WatchBPTest::updateAverage()
 
     for (int i = 1; i < n; i++) { // skip first measurement for avg, total_avg includes the first measure
         auto measure = get(i);
-        if (!measure.isValid())
-            continue;
+        //if (!measure.isValid())
+        //    continue;
 
         validMeasures++;
 
-        const int systolic = measure.getAttribute("SYS").value().toInt();
-        const int diastolic = measure.getAttribute("DIA").value().toInt();
-        const int pulse = measure.getAttribute("HR").value().toInt();
+        const int systolic = measure.getAttribute("systolic").value().toInt();
+        const int diastolic = measure.getAttribute("diastolic").value().toInt();
+        const int pulse = measure.getAttribute("pulse").value().toInt();
 
+        qDebug() << systolic << diastolic << pulse;
         systolicTotal += systolic;
         diastolicTotal += diastolic;
         pulseTotal += pulse;
     }
+
+    qDebug() << "valid measures: " << validMeasures;
 
     if (validMeasures >= 1) {
         const double avgSbpCalc = qRound(systolicTotal * 1.0f / (validMeasures));
@@ -142,7 +147,7 @@ void WatchBPTest::updateAverage()
         addMetaData("total_avg_systolic",  qRound(systolicTotal * 1.0f / validMeasures), "mmHg");
         addMetaData("total_avg_diastolic", qRound(diastolicTotal * 1.0f / validMeasures), "mmHg");
         addMetaData("total_avg_pulse",     qRound(pulseTotal * 1.0f / validMeasures), "bpm");
-        addMetaData("total_avg_count",     validMeasures + 1);
+        addMetaData("total_avg_count",     validMeasures);
     }
     else
     {
