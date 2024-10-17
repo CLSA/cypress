@@ -73,8 +73,13 @@ bool Cypress::endSession(const QString& sessionId, const CypressSession::Session
     if (!sessions.contains(sessionId))
         return true;
 
-    CypressSession& session = *sessions.value(sessionId);
-    session.end(status);
+    auto session = sessions.value(sessionId);
+    if (session) {
+        session->end(status);
+    }
+    else {
+        qDebug() << "Cypress::endSession - session not found";
+    }
 
     return true;
 }
@@ -82,8 +87,8 @@ bool Cypress::endSession(const QString& sessionId, const CypressSession::Session
 QList<QSharedPointer<CypressSession>> Cypress::getActiveSessions()
 {
     QList<QSharedPointer<CypressSession>> activeSessions;
-
     QMapIterator<QString, QSharedPointer<CypressSession>> it(sessions);
+
     while (it.hasNext())
     {
         it.next();

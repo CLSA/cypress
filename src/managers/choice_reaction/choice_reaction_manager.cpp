@@ -23,7 +23,7 @@ QString ChoiceReactionManager::CCB_CLINIC = "CYPRESS";
 
 DeviceConfig ChoiceReactionManager::config {{
     {"runnableName", {"choice_reaction/runnableName",  Exe }},
-    {"runnablePath", {"choice_reaction/runnablePath", Dir }},
+    {"runnablePath", {"choice_reaction/runnablePath",  Dir }},
     {"outputPath",   {"choice_reaction/outputPath",    Dir }},
 }};
 

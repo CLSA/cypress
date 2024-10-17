@@ -55,7 +55,6 @@ bool VividIQManager::start()
 
     emit started(m_test);
     emit dataChanged(m_test);
-    emit canMeasure();
 
     return true;
 }
@@ -94,11 +93,12 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         }
 
         QFileInfo fileInfo(file.absFilePath);
-        measure->setAttribute("name", 		fileInfo.fileName());
-        measure->setAttribute("patient_id", file.patientId);
-        measure->setAttribute("study_id", 	file.studyId);
-        measure->setAttribute("path", 		file.absFilePath);
-        measure->setAttribute("size", 		FileUtils::getHumanReadableFileSize(file.absFilePath));
+        measure->setAttribute("name", 		     fileInfo.fileName());
+        measure->setAttribute("patient_id",      file.patientId);
+        measure->setAttribute("instance_number", file.instanceNumber);
+        measure->setAttribute("study_id", 	     file.studyId);
+        measure->setAttribute("path", 		     file.absFilePath);
+        measure->setAttribute("size", 		     FileUtils::getHumanReadableFileSize(file.absFilePath));
 
         m_test->addMeasurement(measure);
     }
@@ -115,11 +115,24 @@ void VividIQManager::finish()
     qDebug() << "VividIQManager::finish";
 
     QList<QJsonObject> filePaths;
+
     for (int i = 0; i < m_test->getMeasurementCount(); i++) {
         Measurement& measure = m_test->get(i);
+
+        QString name = measure.getAttribute("name").toString();
+        //if (name.contains("SRc")) {
+        //    name = "SRc.dcm";
+        //}
+        //else if (name.contains("USm.")) {
+        //    name = QString("USm_%1.dcm").arg(measure.getAttribute("instance_number").toString().toInt());
+        //}
+        //else if (name.contains("US.")) {
+        //    name = QString("US_%1.dcm").arg(measure.getAttribute("instance_number").toString().toInt());
+        //}
+
         filePaths.append(QJsonObject {
             {
-             { "name", measure.getAttribute("name").toString() },
+             { "name", name },
              { "path", measure.getAttribute("path").toString() }
             },
         });

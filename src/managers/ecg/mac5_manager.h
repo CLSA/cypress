@@ -31,9 +31,6 @@ private:
     QString m_xmlFilePath;
     QString m_pdfFilePath;
     QString m_rawFilePath;
-
-
-    QJsonObject dfs(QDomNode node);
 };
 
 #endif // MAC5_MANAGER_H

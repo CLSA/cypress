@@ -38,8 +38,9 @@ void DialogBase::closeEvent(QCloseEvent* event)
     }
 
     if (m_session->getStatus() == CypressSession::SessionStatus::Cancelled) {
-        m_manager->cleanUp();
-        QDialog::closeEvent(event);
+        //m_manager->cleanUp();
+        //QDialog::closeEvent(event);
+        cancel("");
         return;
     }
 
@@ -73,8 +74,7 @@ void DialogBase::cancel(const QString& cancelMsg)
 
 void DialogBase::error(const QString& errorMsg)
 {
-    QMessageBox::critical(nullptr, "Error", errorMsg);
-
+    //QMessageBox::critical(nullptr, "Error", errorMsg);
     m_manager->sendCancellation(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::CriticalError);

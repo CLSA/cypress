@@ -15,7 +15,8 @@ VividIQDialog::VividIQDialog(QWidget *parent, QSharedPointer<CypressSession> ses
 
     ui->testInfoWidget->setSessionInformation(*session);
     ui->measurementTable->hideManualEntry();
-    ui->measurementTable->hideManualEntry();
+    ui->measurementTable->hideMeasureButton();
+    ui->measurementTable->disableFinishButton();
 
     auto manager = qSharedPointerCast<VividIQManager>(m_manager);
 
@@ -40,7 +41,11 @@ VividIQDialog::VividIQDialog(QWidget *parent, QSharedPointer<CypressSession> ses
     connect(manager.get(), &VividIQManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &VividIQManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
+        ui->measurementTable->disableFinishButton();
+        QApplication::processEvents();
+        manager->finish();
+    });
 }
 
 VividIQDialog::~VividIQDialog()

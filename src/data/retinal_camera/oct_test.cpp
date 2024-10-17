@@ -14,7 +14,11 @@ QString OCTTest::toString() const
 
 bool OCTTest::isValid() const
 {
-    return true;
+    if (m_measurementList.length() == 2) {
+        return true;
+    }
+
+    return false;
 }
 
 QJsonObject OCTTest::toJsonObject() const

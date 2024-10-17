@@ -6,6 +6,8 @@
 
 #include "dicom/dcm_recv.h"
 
+#include "config/device_config.h"
+
 #include <QMap>
 #include <QObject>
 #include <QString>
@@ -26,7 +28,7 @@ public:
     explicit DXAManager(QSharedPointer<DXASession> session);
     ~DXAManager();
 
-    static bool isInstalled();
+    static DeviceConfig config;
     static QString getWebpageContents(const DXASession &session);
 
 signals:

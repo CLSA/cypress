@@ -28,7 +28,7 @@ public slots:
     void readOutput() override;
     void finish() override;
 
-    void measure() override {};
+    void measure() override;
     bool cleanUp() override { return true; };
 
 private:

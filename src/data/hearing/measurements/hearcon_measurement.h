@@ -10,6 +10,8 @@ class HearconMeasurement : public Measurement
 public:
     HearconMeasurement();
 
+    HearconMeasurement(const QString &side, const QString &test, const int level, const bool pass);
+
     // Measurement interface
 public:
     bool isValid() const override;

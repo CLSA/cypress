@@ -21,6 +21,22 @@
 #include "server/sessions/frax_session.h"
 #include "server/sessions/cdtt_session.h"
 #include "server/sessions/choice_reaction_session.h"
+#include "server/sessions/oct_session.h"
+
+#include "managers/general_proxy_form/general_proxy_manager.h"
+#include "managers/weigh_scale/weigh_scale_manager.h"
+#include "managers/blood_pressure/watch_bp_manager.h"
+#include "managers/audiometer/hearcon_manager.h"
+#include "managers/ecg/mac5_manager.h"
+#include "managers/cdtt/cdtt_manager.h"
+#include "managers/choice_reaction/choice_reaction_manager.h"
+#include "managers/spirometer/easyone_manager.h"
+#include "managers/dxa/dxa_hip_manager.h"
+#include "managers/dxa/dxa_manager.h"
+#include "managers/ultrasound/vivid_iq_manager.h"
+#include "managers/retinal_camera/oct_manager.h"
+#include "managers/tonometer/ora_manager.h"
+#include "managers/grip_strength/grip_strength_manager.h"
 
 #include <QVBoxLayout>
 #include <QDebug>
@@ -68,29 +84,40 @@ QJsonObject CypressMainWindow::getDebugInputData()
 
 void CypressMainWindow::enableDevices(bool enabled)
 {
-    // 1
+    // Follow Up 4
+    ui->f4GenProxy->setEnabled(!GeneralProxyManager::config.hasErrors());
 
-    // New
-    ui->launchAudiometer->setEnabled(enabled);
-    ui->launchBpm->setEnabled(enabled);
-    ui->launchSpirometer->setEnabled(enabled);
-    ui->launchEcg->setEnabled(enabled);
-    ui->launchUltrasound->setEnabled(enabled);
+    ui->f4Weight->setEnabled(!WeighScaleManager::config.hasErrors());
+    ui->f4WatchBP->setEnabled(!WatchBPManager::config.hasErrors());
+    ui->f4EasyoneConnect->setEnabled(!EasyoneConnectManager::config.hasErrors());
+    ui->f4MAC5->setEnabled(!Mac5Manager::config.hasErrors());
+    ui->f4ECHO->setEnabled(!VividIQManager::config.hasErrors());
+    ui->f4DXA1->setEnabled(!DxaHipManager::config.hasErrors());
+    ui->f4DXA2->setEnabled(!DXAManager::config.hasErrors());
+    ui->f4FRAX->setEnabled(!GripStrengthManager::config.hasErrors());
 
-    // Old
-    ui->launchWeightScale->setEnabled(true);
-    ui->launchChoiceReaction->setEnabled(enabled);
-    ui->launchCDTT->setEnabled(enabled);
+    ui->f4Hearcon->setEnabled(!HearconManager::config.hasErrors());
+    ui->f4CDTT->setEnabled(!CDTTManager::config.hasErrors());
+    ui->f4ChoiceReaction->setEnabled(!ChoiceReactionManager::config.hasErrors());
 
-    ui->launchGenProxy->setEnabled(enabled);
-    //ui->launchDxa1->setEnabled(true);
-    //ui->launchDxa2->setEnabled(true);
-    //ui->launchFrax->setEnabled(enabled);
+    ui->f4GripStrength->setEnabled(!GripStrengthManager::config.hasErrors());
+    ui->f4Tonometer->setEnabled(!ORAManager::config.hasErrors());
+    ui->f4OCTLeft->setEnabled(!OCTManager::config.hasErrors());
+    ui->f4OCTRight->setEnabled(!OCTManager::config.hasErrors());
 
-    // 2
-    //ui->launchGripStrength->setEnabled(enabled);
-    //ui->launchRetinalCamera->setEnabled(enabled);
-    //ui->launchTonometer->setEnabled(enabled);
+    // Follow Up 3
+    ui->f3Weight->setEnabled(true);
+    ui->f3ChoiceReaction->setEnabled(enabled);
+    ui->f3CDTT->setEnabled(enabled);
+
+    ui->f3DXA1->setEnabled(true);
+    ui->f3DXA2->setEnabled(true);
+    ui->f3FRAX->setEnabled(enabled);
+
+    ui->f3GripStrength->setEnabled(enabled);
+    ui->f3RetinalLeft->setEnabled(enabled);
+    ui->f3RetinalRight->setEnabled(enabled);
+    ui->f3Tonometer->setEnabled(enabled);
 }
 
 void CypressMainWindow::enableDebugParticipant()
@@ -147,92 +174,82 @@ void CypressMainWindow::enableDebugParticipant()
 
 void CypressMainWindow::enableDebugDevices()
 {
-    connect(ui->launchBpm, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4WatchBP, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<WatchBPSession> session(new WatchBPSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchGenProxy, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4GenProxy, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<GenProxySession> session(new GenProxySession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchWeightScale, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4Weight, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<WeighScaleSession> session(new WeighScaleSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchSpirometer, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4EasyoneConnect, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
-        //QSharedPointer<SpirometerSession> session(new SpirometerSession(nullptr, inputData, origin));
         QSharedPointer<EasyoneConnectSession> session(new EasyoneConnectSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchDxa1, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4DXA1, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<DxaHipSession> session(new DxaHipSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchDxa2, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4DXA2, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<DXASession> session(new DXASession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchUltrasound, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4ECHO, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<VividIQSession> session(new VividIQSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchEcg, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4MAC5, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<Mac5Session> session(new Mac5Session(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchFrax, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4FRAX, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<FraxSession> session(new FraxSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchAudiometer, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4Hearcon, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<HearconSession> session(new HearconSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchGripStrength, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4GripStrength, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<GripStrengthSession> session(new GripStrengthSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchRetinalCamera, &QPushButton::clicked, this, [=]() {
-        QJsonObject inputData = getDebugInputData();
-        QSharedPointer<RetinalCameraSession> session(new RetinalCameraSession(nullptr, inputData, inputData["origin"].toString()));
-        Cypress::getInstance().requestSession(session);
-    });
-
-    connect(ui->launchChoiceReaction, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4ChoiceReaction, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<ChoiceReactionSession> session(new ChoiceReactionSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
-
-    connect(ui->launchCDTT, &QPushButton::clicked, this, [=]() {
+    connect(ui->f4CDTT, &QPushButton::clicked, this, [=]() {
         QJsonObject inputData = getDebugInputData();
         QSharedPointer<CDTTSession> session(new CDTTSession(nullptr, inputData, inputData["origin"].toString()));
         Cypress::getInstance().requestSession(session);
     });
+    connect(ui->f4OCTLeft, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<OCTSession> session(new OCTSession(nullptr, inputData, inputData["origin"].toString(), OCTSession::Left));
+        Cypress::getInstance().requestSession(session);
+    });
+    connect(ui->f4OCTRight, &QPushButton::clicked, this, [=]() {
+        QJsonObject inputData = getDebugInputData();
+        QSharedPointer<OCTSession> session(new OCTSession(nullptr, inputData, inputData["origin"].toString(), OCTSession::Right));
+        Cypress::getInstance().requestSession(session);
+    });
 }
-
 
 CypressMainWindow::~CypressMainWindow()
 {

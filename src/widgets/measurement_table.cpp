@@ -210,8 +210,10 @@ void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
                 ui->measurementTable->setItem(row, col++, item);
 
             }
+
             if (manualEntryMode || allowRemoval)
             {
+                qDebug() << "remove..";
                 QPushButton* btn = new QPushButton("Remove", this);
 
                 btn->setProperty("row_id", row);
@@ -319,8 +321,10 @@ void MeasurementTable::toggleManualEntry(bool saveChanges)
     Q_UNUSED(saveChanges);
     qDebug() << "toggle manual entry";
 
-    manualEntryMode = !manualEntryMode;
-    addRemoveMeasureButton();
+    if (!manualEntryMode) {
+        manualEntryMode = true;
+        addRemoveMeasureButton();
+    }
 }
 
 void MeasurementTable::addRemoveMeasureButton()

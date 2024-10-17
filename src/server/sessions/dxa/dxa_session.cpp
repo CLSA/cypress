@@ -85,7 +85,7 @@ QString DXASession::getWebpageContents() const {
 }
 
 void DXASession::isInstalled() const {
-    if (!DXAManager::isInstalled())
+    if (DXAManager::config.hasErrors())
         throw NotInstalledError("DXA is not installed on this workstation");
 }
 

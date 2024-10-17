@@ -88,24 +88,10 @@ void Mac5Manager::readOutput()
 
 void Mac5Manager::finish()
 {
-    qDebug() << "Finish";
-    QDomDocument doc("ecg_xml");
-    QFile file(m_xmlFilePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Can't open";
-        return;
-    }
+    qDebug() << "Mac5Manager::finish";
 
-    if (!doc.setContent(&file)) {
-        qCritical() << "Could not set XML file";
-        file.close();
-        return;
-    }
-
-    file.close();
-
-    QJsonObject root = dfs(doc.documentElement());
-    QJsonDocument jsonDoc(root);
+    auto mac5Test = qSharedPointerCast<Mac5Test>(m_test);
+    mac5Test->fromXmlFile(m_xmlFilePath);
 
     QList<QJsonObject> filePaths {
         { { "path", m_xmlFilePath }, { "name", "Ecg.xml" }},
@@ -120,66 +106,4 @@ void Mac5Manager::finish()
 void Mac5Manager::measure()
 {
 
-}
-
-QJsonObject Mac5Manager::dfs(QDomNode node)
-{
-
-    // The result object
-    QJsonObject result;
-    QDomElement el = node.toElement();
-    QString tagName = el.tagName();
-
-    // Put all the attributes into the result object
-    for (int i = 0; i < el.attributes().length(); i++)
-    {
-        auto attr = el.attributes().item(i).toAttr();
-
-        if (attr.name() == "V") {
-            result.insert("value", attr.value());
-        }
-        else if (attr.name() == "U") {
-            result.insert("unit", attr.value());
-        }
-        else {
-            result.insert(attr.name(), attr.value());
-        }
-    }
-
-
-    // Add children nodes to the object recursively,
-    // if it's a duplicate tag put all duplicates into QJsonArray child
-
-    QMap<QString, QJsonArray> seenTags;
-    if (node.hasChildNodes())
-    {
-        for (int i = 0; i < node.childNodes().length(); i++)
-        {
-            QDomElement childEl = node.childNodes().at(i).toElement();
-            QString childTag = childEl.tagName();
-            QJsonObject childJson = dfs(node.childNodes().at(i));
-
-            result.insert(childTag, childJson);
-
-            if (!seenTags.contains(childTag))
-            {
-                seenTags.insert(childTag, QJsonArray {});
-            }
-            else
-            {
-                seenTags[childTag].append(childJson);
-            }
-        }
-    }
-
-    for (auto it = seenTags.begin(); it != seenTags.end(); ++it)
-    {
-        QString key = it.key();
-        QJsonArray arr = it.value();
-
-        if (!arr.empty())
-            result.insert(key, it.value());
-    }
-
-    return result;
 }

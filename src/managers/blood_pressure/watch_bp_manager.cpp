@@ -45,11 +45,18 @@ bool WatchBPManager::start()
     if (!configureDatabase())
         return false;
 
+    if (!m_database.open()) {
+        qCritical() << "WatchBPManager::configureDatabase: " << m_database.lastError();
+        return false;
+    }
+
     if (!addPatient())
         return false;
 
     if (!configureProcess())
         return false;
+
+    m_database.close();
 
     m_process.start();
 
@@ -76,10 +83,7 @@ bool WatchBPManager::configureDatabase()
     m_database = QSqlDatabase::addDatabase("QSQLITE");
     m_database.setDatabaseName(m_databasePath);
 
-    if (!m_database.open()) {
-        qCritical() << "WatchBPManager::configureDatabase: " << m_database.lastError();
-        return false;
-    }
+
 
     return true;
 }
@@ -150,6 +154,11 @@ bool WatchBPManager::configureProcess()
 
 void WatchBPManager::measure()
 {
+    if (!m_database.open()) {
+        qCritical() << "WatchBPManager::configureDatabase: " << m_database.lastError();
+        return;
+    }
+
     qDebug() << "WatchBPManager::measure";
     m_test->reset();
     emit dataChanged(m_test);
@@ -228,6 +237,8 @@ void WatchBPManager::measure()
     checkIfFinished();
 
     qDebug().noquote() << JsonSettings::prettyPrintJson(test->toJsonObject());
+
+    m_database.close();
 }
 
 void WatchBPManager::finish()

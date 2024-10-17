@@ -17,6 +17,7 @@ struct DicomFile {
     QString mediaStorageUID {};
     QString studyDate {};
     QString seriesNumber {};
+    QString instanceNumber {};
     QString size {};
     QString name {};
     QString fileName {};

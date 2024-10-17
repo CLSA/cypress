@@ -58,8 +58,8 @@ void CypressSession::start()
 
 void CypressSession::end(const CypressSession::SessionStatus& status)
 {
-    if (m_dialog == nullptr)
-        return;
+    //if (m_dialog == nullptr)
+        //return;
 
     m_status = status;
     m_endDateTime = QDateTime::currentDateTimeUtc();

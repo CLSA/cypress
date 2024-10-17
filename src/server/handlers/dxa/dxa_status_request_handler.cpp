@@ -8,7 +8,7 @@ void DxaStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &reques
     Q_UNUSED(request)
     try {
         QJsonObject responseData {
-            {"status", DXAManager::isInstalled() ? "available" : "unavailable"}
+            {"status", !DXAManager::config.hasErrors() ? "available" : "unavailable"}
         };
 
         QString jsonResponse = JsonSettings::serializeJson(responseData);

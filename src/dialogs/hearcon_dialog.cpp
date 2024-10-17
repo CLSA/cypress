@@ -11,6 +11,8 @@ HearconDialog::HearconDialog(QWidget *parent, QSharedPointer<HearconSession> ses
     ui->measurementTable->disableFinishButton();
     ui->testInfoWidget->setSessionInformation(*session, "RA660");
 
+    audiometerManualEntryForm = new AudiometerManualEntryForm(this);
+
     m_manager.reset(new HearconManager(session));
     auto manager = qSharedPointerCast<HearconManager>(m_manager);
 
@@ -56,6 +58,21 @@ HearconDialog::HearconDialog(QWidget *parent, QSharedPointer<HearconSession> ses
 
     // request finish
     connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &HearconManager::finish);
+
+    connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
+        manager->setManualEntry(true);
+
+        audiometerManualEntryForm->clearForm();
+        audiometerManualEntryForm->show();
+    });
+
+    connect(audiometerManualEntryForm, &AudiometerManualEntryForm::manualAudiometerMeasurement, this, [=](const QString side, const QString test, const int level) {
+        manager->addManualEntry(side, test, level, level <= 40);
+    });
+
+    // request adding manual measurement
+    connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &HearconManager::addManualMeasurement);
+    connect(ui->measurementTable, &MeasurementTable::removeMeasurement, manager.get(), &HearconManager::removeMeasurement);
 }
 
 HearconDialog::~HearconDialog()

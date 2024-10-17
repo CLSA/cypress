@@ -30,11 +30,11 @@ DeviceConfig DxaHipManager::config {{
     {"aeTitle",        {"dxa/dicom/aeTitle",        NonEmptyString }},
     {"host",           {"dxa/dicom/host",           NonEmptyString }},
     {"port", 		   {"dxa/dicom/port",           NonEmptyString }},
-    {"storageDirPath", {"dxa/dicom/storagePath", Dir }},
+    {"storageDirPath", {"dxa/dicom/storagePath", 	Dir }},
     {"logConfigPath",  {"dxa/dicom/log_config",     File }},
     {"ascConfigPath",  {"dxa/dicom/asc_config",     File }},
-    {"patscanDbPath",  {"dxa/patscanDbPath",        File }},
-    {"refscanDbPath",  {"dxa/refscanDbPath",        File }},
+    {"patscanDbPath",  {"dxa/patscanDbPath",        NonEmptyString }},
+    {"refscanDbPath",  {"dxa/refscanDbPath",        NonEmptyString }},
 }};
 
 DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session)
@@ -49,7 +49,7 @@ DxaHipManager::DxaHipManager(QSharedPointer<DxaHipSession> session)
     m_host = config.getSetting("host");
     m_port = config.getSetting("port");
 
-    m_storageDirPath = config.getSetting("storagePath");
+    m_storageDirPath = config.getSetting("storageDirPath");
     m_logConfigPath = config.getSetting("logConfigPath");
     m_ascConfigPath = config.getSetting("ascConfigPath");
 
@@ -69,11 +69,10 @@ DxaHipManager::~DxaHipManager()
 //
 bool DxaHipManager::start()
 {
-    setUp();
+    if (!setUp())
+        return false;
 
     m_dicomServer->start();
-
-    //emit status("Ready");
 
     emit started(m_test);
     emit dataChanged(m_test);
@@ -84,6 +83,24 @@ bool DxaHipManager::start()
 // Set up device
 bool DxaHipManager::setUp()
 {
+    QDir exportDir(m_storageDirPath);
+    if (!exportDir.exists()) {
+        qDebug() << "export dir does not exist";
+        return false;
+    }
+
+    //QFile referenceDatabase(m_refscanDbPath);
+    //if (!referenceDatabase.exists()) {
+    //    QMessageBox::critical(nullptr, "APEX not available", "Please ensure the DXA computer is powered on and the shared folder is online");
+    //    return false;
+    //}
+
+    //QFile patientScanDatabase(m_patscanDbPath);
+    //if (!patientScanDatabase.exists()) {
+    //    QMessageBox::critical(nullptr, "APEX not available", "Please ensure the DXA computer is powered on and the shared folder is online");
+    //    return false;
+    //}
+
     m_dicomServer.reset(
         new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
 

@@ -210,6 +210,9 @@ QString HearconTest::toString() const
 
 bool HearconTest::isValid() const
 {
+    if (m_measurementList.length() < 1)
+        return false;
+
     for (auto it = m_measurementList.constBegin(); it != m_measurementList.constEnd(); ++it)
     {
         auto measure = *it;

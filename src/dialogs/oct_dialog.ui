@@ -19,6 +19,9 @@
      <item>
       <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
      </item>
+     <item>
+      <widget class="MeasurementTable" name="measurementTable" native="true"/>
+     </item>
     </layout>
    </item>
   </layout>
@@ -28,6 +31,12 @@
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MeasurementTable</class>
+   <extends>QWidget</extends>
+   <header>widgets/measurement_table.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

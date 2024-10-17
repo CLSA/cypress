@@ -1,5 +1,5 @@
 #include "oct_manager.h"
-#include "data/oct_test.h"
+#include "data/retinal_camera/oct_test.h"
 #include "server/sessions/oct_session.h"
 #include "auxiliary/file_utils.h"
 
@@ -8,11 +8,14 @@
 
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QJsonObject>
+
+#include "data/retinal_camera/oct_measurement.h"
 
 
 DeviceConfig OCTManager::config {{
-    { "runnableName",    { "oct/runnableName",    Exe }},
-    { "runnablePath",    { "oct/runnablePath",    Dir }},
+    //{ "runnableName",    { "oct/runnableName",    Exe }},
+    //{ "runnablePath",    { "oct/runnablePath",    Dir }},
     { "exportPath",      { "oct/exportPath",      Dir }},
     { "dataPath",        { "oct/dataPath",        Dir }},
     { "databaseName",    { "oct/database/name",   NonEmptyString }},
@@ -22,8 +25,8 @@ DeviceConfig OCTManager::config {{
 
 OCTManager::OCTManager(QSharedPointer<OCTSession> session): ManagerBase { session }
 {
-    m_runnableName   = config.getSetting("runnableName");
-    m_runnablePath   = config.getSetting("runnablePath");
+    //m_runnableName   = config.getSetting("runnableName");
+    //m_runnablePath   = config.getSetting("runnablePath");
     m_exportPath     = config.getSetting("exportPath");
     m_dataPath       = config.getSetting("dataPath");
     m_databaseName   = config.getSetting("databaseName");
@@ -42,7 +45,6 @@ bool OCTManager::start()
     // Check if chrome is already running
 
     qDebug() << "OCTManager::start - connect to database";
-
 
     m_db = QSqlDatabase::addDatabase("QODBC");
     m_db.setDatabaseName(m_databaseName);
@@ -91,6 +93,7 @@ bool OCTManager::start()
     if (!FileUtils::clearDirectory(m_dataPath))
     {
         qCritical() << "OCTManager::start - could not clear data directory";
+        return false;
     }
 
     // Prepare database
@@ -116,24 +119,15 @@ bool OCTManager::start()
     m_db.commit();
 
     // Setup process
-    configureProcess();
-    m_process.start();
+    //configureProcess();
+    //m_process.start();
 
-    if (!m_process.waitForStarted())
-        return false;
+    //if (!m_process.waitForStarted())
+    //    return false;
 
     emit started(m_test);
     emit dataChanged(m_test);
     emit canMeasure();
-
-    // Listen to directory changes
-    m_directoryWatcher.reset(new DicomDirectoryWatcher(m_exportPath));
-
-    // Whenever it changes, get the files
-    connect(m_directoryWatcher.get(),
-            &DicomDirectoryWatcher::dicomDirectoryChanged,
-            this,
-            &OCTManager::readOutput);
 
     return true;
 }
@@ -150,32 +144,92 @@ void OCTManager::configureProcess()
     });
 }
 
+void OCTManager::measure()
+{
+    qDebug() << "OCTManager::measure";
+
+    m_test->reset();
+    emit dataChanged(m_test);
+
+    readOutput();
+
+    emit dataChanged(m_test);
+
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
+}
+
 void OCTManager::readOutput()
 {
-    QDir exportDir(m_exportPath);
+    qDebug() << "OCTManager::readOutput";
 
+    QDir exportDir(m_exportPath);
     QFileInfoList entries = exportDir.entryInfoList();
 
-    QList<QJsonObject> filePaths;
+    auto session = qSharedPointerCast<OCTSession>(m_session);
 
     foreach (auto entry, entries)
     {
         if (entry.suffix() == "dcm")
         {
-            qDebug() << entry.absoluteFilePath();
-            filePaths.append({ { "path", entry.absoluteFilePath() }, { "name", entry.fileName() } });
+            QString name = entry.fileName();
+            QStringList fileNameValues = name.split("_");
+
+            if (fileNameValues.length() != 5) {
+                qInfo() << "Invalid file name";
+                continue;
+            }
+
+            if (fileNameValues[0] != m_session->getBarcode()) {
+                qInfo() << fileNameValues[0] << "does not equal" << m_session->getBarcode();
+                continue;
+            }
+
+            if (fileNameValues[1] == "L" && session->getSide() != OCTSession::Left) {
+                qInfo() << "Wrong side, expecting left";
+                continue;
+            }
+
+            if (fileNameValues[1] == "R" && session->getSide() != OCTSession::Right) {
+                qInfo() << "wrong side, expecting right";
+                continue;
+            }
+
+            if (name.contains("_OPT_")) {
+                name = QString("OCT_%1.dcm").arg(fileNameValues[1] == "L" ? "LEFT" : "RIGHT");
+            }
+            else if (name.contains("_OP_")) {
+                name = QString("EYE_%1.dcm").arg(fileNameValues[1] == "L" ? "LEFT" : "RIGHT");
+            }
+            else {
+                qInfo() << "Unknown file name";
+                continue;
+            }
+
+            QSharedPointer<OCTMeasurement> measure(new OCTMeasurement);
+            measure->setAttribute("name", name);
+            measure->setAttribute("path", entry.absoluteFilePath());
+            measure->setAttribute("size", FileUtils::getHumanReadableFileSize(entry.absoluteFilePath()));
+
+            m_test->addMeasurement(measure);
         }
-    }
-
-    m_test->setFiles(filePaths);
-
-    if (m_test->getFiles().keys().length() >= 2) {
-        finish();
     }
 }
 
 void OCTManager::finish()
 {
     qDebug() << "OCTManager::finish";
+    QList<QJsonObject> filePaths;
+
+    for (int i = 0; i < m_test->getMeasurementCount(); i++) {
+        Measurement& measure = m_test->get(i);
+        filePaths.append(QJsonObject {
+            {
+             {"name", measure.getAttribute("name").toString() },
+             {"path", measure.getAttribute("path").toString() }
+            },
+        });
+    }
+    m_test->setFiles(filePaths);
+
     ManagerBase::finish();
 }

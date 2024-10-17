@@ -16,7 +16,9 @@ public:
 
     static DeviceConfig config;
 
-    // ManagerBase interface
+    void addManualEntry(const QString side, const QString test, const int level, const bool pass);
+    void removeMeasurement(const int index);
+
 public slots:
     bool start();
     void measure();

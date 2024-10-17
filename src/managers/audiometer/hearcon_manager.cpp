@@ -1,5 +1,6 @@
 #include "hearcon_manager.h"
 #include "data/hearing/tests/hearcon_test.h"
+#include "data/hearing/measurements/hearcon_measurement.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -44,6 +45,26 @@ HearconManager::HearconManager(QSharedPointer<HearconSession> session): ManagerB
     m_readerOutputPath = config.getSetting("readerOutputPath");
 
     m_test.reset(new HearconTest);
+}
+
+void HearconManager::addManualEntry(const QString side, const QString test, const int level, const bool pass)
+{
+    auto audiometerTest = qSharedPointerCast<HearconTest>(m_test);
+    QSharedPointer<HearconMeasurement> measure(new HearconMeasurement(side, test, level, pass));
+
+    if (measure->isValid()) {
+        audiometerTest->addMeasurement(measure);
+        emit dataChanged(audiometerTest);
+    }
+
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
+}
+
+void HearconManager::removeMeasurement(const int index) {
+    m_test->removeMeasurement(index);
+    emit dataChanged(m_test);
+
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
 bool HearconManager::start()

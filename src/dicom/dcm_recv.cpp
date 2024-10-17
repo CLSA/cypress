@@ -120,6 +120,7 @@ void DcmRecv::onFilesReceived()
                 OFString bodyPartExamined;
                 OFString seriesNumber;
                 OFString laterality;
+                OFString instanceNumber;
 
                 DicomFile dicomFile;
                 dicomFile.absFilePath = fileInfo.absoluteFilePath();
@@ -159,15 +160,20 @@ void DcmRecv::onFilesReceived()
                     dicomFile.seriesNumber = seriesNumber.c_str();
                 }
 
+                if (dataset->findAndGetOFString(DCM_InstanceNumber, instanceNumber).good()) {
+                    dicomFile.instanceNumber = instanceNumber.c_str();
+                }
+
                 qDebug() << "DICOM file";
+                qDebug() << dicomFile.studyId;
+                qDebug() << dicomFile.seriesNumber;
+                qDebug() << dicomFile.instanceNumber;
                 qDebug() << dicomFile.mediaStorageUID;
                 qDebug() << dicomFile.laterality;
-                qDebug() << dicomFile.studyId;
                 qDebug() << dicomFile.patientId;
                 qDebug() << dicomFile.bodyPartExamined;
                 qDebug() << dicomFile.modality;
                 qDebug() << dicomFile.studyDate;
-                qDebug() << dicomFile.seriesNumber;
                 qDebug() << "\n";
 
                 receivedFiles.append(dicomFile);

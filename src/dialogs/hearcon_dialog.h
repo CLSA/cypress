@@ -7,6 +7,8 @@
 #include "server/sessions/hearcon_session.h"
 #include "ui_hearcon_dialog.h"
 
+#include "widgets/audiometer_manual_entry_form.h"
+
 
 class HearconDialog : public DialogBase, public Ui::HearconDialog
 {
@@ -18,6 +20,8 @@ public:
 
 private:
     Ui::HearconDialog *ui { Q_NULLPTR };
+
+    AudiometerManualEntryForm* audiometerManualEntryForm;
 };
 
 #endif // HEARCON_DIALOG_H

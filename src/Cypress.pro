@@ -240,7 +240,6 @@ HEADERS += \
     managers/frax/frax_manager.h \
     managers/general_proxy_form/general_proxy_manager.h \
     managers/grip_strength/grip_strength_manager.h \
-    managers/grip_strength/jtech_manager.h \
     managers/grip_strength/paradox_reader.h \
     managers/audiometer/hearcon_manager.h \
     managers/manager_base.h \
@@ -500,7 +499,6 @@ SOURCES += \
     managers/frax/frax_manager.cpp \
     managers/general_proxy_form/general_proxy_manager.cpp \
     managers/grip_strength/grip_strength_manager.cpp \
-    managers/grip_strength/jtech_manager.cpp \
     managers/grip_strength/paradox_reader.cpp \
     managers/audiometer/hearcon_manager.cpp \
     managers/manager_base.cpp \

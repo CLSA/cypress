@@ -25,179 +25,44 @@
 #include <QSqlQuery>
 
 
+DeviceConfig DXAManager::config {{
+    {"runnableName",   {"dxa/dicom/runnableName",   Exe }},
+    {"runnablePath",   {"dxa/dicom/runnablePath",   Dir }},
+    {"aeTitle",        {"dxa/dicom/aeTitle",        NonEmptyString }},
+    {"host",           {"dxa/dicom/host",           NonEmptyString }},
+    {"port", 		   {"dxa/dicom/port",           NonEmptyString }},
+    {"storageDirPath", {"dxa/dicom/storagePath", 	Dir }},
+    {"logConfigPath",  {"dxa/dicom/log_config",     File }},
+    {"ascConfigPath",  {"dxa/dicom/asc_config",     File }},
+    {"patscanDbPath",  {"dxa/patscanDbPath",        NonEmptyString }},
+    {"refscanDbPath",  {"dxa/refscanDbPath",        NonEmptyString }},
+}};
+
 DXAManager::DXAManager(QSharedPointer<DXASession> session)
     : ManagerBase(session)
 {
     m_test.reset(new DXATest);
 
-    m_runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    m_runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
+    m_runnableName = config.getSetting("runnableName");
+    m_runnablePath = config.getSetting("runnablePath");
 
-    m_aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    m_host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    m_port = CypressSettings::readSetting("dxa/dicom/port").toString();
+    m_aeTitle = config.getSetting("aeTitle");
+    m_host = config.getSetting("host");
+    m_port = config.getSetting("port");
 
-    m_storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    m_logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    m_ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
+    m_storageDirPath = config.getSetting("storageDirPath");
+    m_logConfigPath = config.getSetting("logConfigPath");
+    m_ascConfigPath = config.getSetting("ascConfigPath");
 
-    m_patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
-    m_refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
+    m_patscanDbPath = config.getSetting("patscanDbPath");
+    m_refscanDbPath = config.getSetting("refscanDbPath");
 
     WindowsUtil::killProcessByName(L"storescp.exe");
-
-    qInfo() << "DXAManager::DXAManager";
-    qInfo() << session->getSessionId();
-    qInfo() << session->getBarcode();
-    qInfo() << session->getInterviewer();
-    qInfo() << session->getInputData();
 }
 
 DXAManager::~DXAManager()
 {
     m_dicomServer->stop();
-}
-
-bool DXAManager::isInstalled() {
-    if (CypressSettings::isSimMode())
-        return true;
-
-    const QString runnableName = CypressSettings::readSetting("dxa/dicom/runnableName").toString();
-    const QString runnablePath = CypressSettings::readSetting("dxa/dicom/runnablePath").toString();
-    const QString aeTitle = CypressSettings::readSetting("dxa/dicom/aeTitle").toString();
-    const QString host = CypressSettings::readSetting("dxa/dicom/host").toString();
-    const QString port = CypressSettings::readSetting("dxa/dicom/port").toString();
-
-    const QString storageDirPath = CypressSettings::readSetting("dxa/dicom/storagePath").toString();
-    const QString logConfigPath = CypressSettings::readSetting("dxa/dicom/log_config").toString();
-    const QString ascConfigPath = CypressSettings::readSetting("dxa/dicom/asc_config").toString();
-
-    const QString patscanDbPath = CypressSettings::readSetting("dxa/patscanDbPath").toString();
-    const QString refscanDbPath = CypressSettings::readSetting("dxa/refscanDbPath").toString();
-
-    if (runnableName.isNull() || runnableName.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: runnableName is not defined";
-        return false;
-    }
-
-    if (runnablePath.isNull() || runnablePath.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: runnablePath is not defined";
-        return false;
-    }
-
-    if (aeTitle.isNull() || aeTitle.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: aeTitle is not defined";
-        return false;
-    }
-
-    if (host.isNull() || host.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: host is not defined";
-        return false;
-    }
-
-    if (port.isNull() || port.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: port is not defined";
-        return false;
-    }
-
-    if (storageDirPath.isNull() || storageDirPath.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: storageDirPath is not defined";
-        return false;
-    }
-
-    if (logConfigPath.isNull() || logConfigPath.isNull()) {
-        qInfo() << "DXAManager::isInstalled: logConfigPath is not defined";
-        return false;
-    }
-
-    if (ascConfigPath.isNull() || ascConfigPath.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: ascConfigPath is not defined";
-        return false;
-    }
-
-    if (patscanDbPath.isNull() || patscanDbPath.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: patscanDbPath is not defined";
-        return false;
-    }
-
-    const QFileInfo patscanFile(patscanDbPath);
-    if (!patscanFile.exists()) {
-        qInfo() << "DXAManager::isInstalled: patscan file does not exist: " << patscanDbPath;
-        return false;
-    }
-
-    if (!patscanFile.isFile()) {
-        qInfo() << "DXAManager::isInstalled: patscan file is not a file at" << patscanDbPath;
-        return false;
-    }
-
-    if (!patscanFile.isReadable()) {
-        qInfo() << "DXAManager::isInstalled: patscan file is not readable at" << patscanDbPath;
-        return false;
-    }
-
-    if (refscanDbPath.isNull() || refscanDbPath.isEmpty()) {
-        qInfo() << "DXAManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
-        return false;
-    }
-
-    const QFileInfo refscanFile(refscanDbPath);
-    if (!refscanFile.exists()) {
-        qInfo() << "DXAManager::isInstalled: refscanDbPath is not defined at" << refscanDbPath;
-        return false;
-    }
-    if (!refscanFile.isFile()) {
-        qInfo() << "DXAManager::isInstalled: refscanDbPath is not a file at" << refscanDbPath;
-        return false;
-    }
-    if (!refscanFile.isReadable()) {
-        qInfo() << "DXAManager::isInstalled: refscanDbPath is not readable at" << refscanDbPath;
-        return false;
-    }
-
-    const QFileInfo exeInfo(runnableName);
-    if (!exeInfo.exists()) {
-        qInfo() << "DXAManager::isInstalled: runnableName does not exist at" << runnableName;
-        return false;
-    }
-    if (!exeInfo.isExecutable()) {
-        qInfo() << "DXAManager::isInstalled: runnableName is not executable at" << runnableName;
-        return false;
-    }
-
-    const QFileInfo workingDir(runnablePath);
-    if (!workingDir.exists()) {
-        qInfo() << "DXAManager::isInstalled: working directory does not exist at" << workingDir;
-        return false;
-    }
-    if (!workingDir.isDir()) {
-        qInfo() << "DXAManager::isInstalled: working directory is not writable at" << workingDir;
-        return false;
-    }
-    if (!workingDir.isWritable()) {
-        qInfo() << "DXAManager::isInstalled: working directory is not writable at" << workingDir;
-        return false;
-    }
-
-    return true;
-}
-
-// Set up device
-bool DXAManager::setUp()
-{
-    m_dicomServer.reset(
-        new DcmRecv(m_runnableName, m_ascConfigPath, m_storageDirPath, m_aeTitle, m_port));
-
-    connect(m_dicomServer.get(), &DcmRecv::running, this, [=]() {
-        qDebug() << "DxaManager::running - DICOM server is running...";
-    });
-
-    connect(m_dicomServer.get(),
-            &DcmRecv::dicomFilesReceived,
-            this,
-            &DXAManager::dicomFilesReceived);
-
-    return true;
 }
 
 // what the manager does in response to the main application
@@ -212,6 +77,48 @@ bool DXAManager::start()
 
     emit started(m_test);
     emit dataChanged(m_test);
+
+    return true;
+}
+
+// Set up device
+bool DXAManager::setUp()
+{
+    QDir exportDir(m_storageDirPath);
+    if (!exportDir.exists()) {
+        qDebug() << "export dir does not exist";
+        return false;
+    }
+
+    //QFile referenceDatabase(m_refscanDbPath);
+    //if (!referenceDatabase.exists()) {
+    //    QMessageBox::critical(nullptr, "APEX not available", "Please ensure the DXA computer is powered on and the shared folder is online");
+    //    return false;
+    //}
+
+    //QFile patientScanDatabase(m_patscanDbPath);
+    //if (!patientScanDatabase.exists()) {
+    //    QMessageBox::critical(nullptr, "APEX not available", "Please ensure the DXA computer is powered on and the shared folder is online");
+    //    return false;
+    //}
+
+    m_dicomServer.reset(
+        new DcmRecv(
+            m_runnableName,
+            m_ascConfigPath,
+            m_storageDirPath,
+            m_aeTitle,
+            m_port
+    ));
+
+    connect(m_dicomServer.get(), &DcmRecv::running, this, [=]() {
+        qDebug() << "DxaManager::running - DICOM server is running...";
+    });
+
+    connect(m_dicomServer.get(),
+            &DcmRecv::dicomFilesReceived,
+            this,
+            &DXAManager::dicomFilesReceived);
 
     return true;
 }
