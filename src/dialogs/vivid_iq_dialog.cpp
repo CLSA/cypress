@@ -40,6 +40,11 @@ VividIQDialog::VividIQDialog(QWidget *parent, QSharedPointer<CypressSession> ses
     // data changed
     connect(manager.get(), &VividIQManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
+    connect(manager.get(), &VividIQManager::filesReceived, this, [=](int numFiles, QString totalSize) {
+        ui->numFilesValue->setText(QString::number(numFiles));
+        ui->totalSizeValue->setText(totalSize);
+    });
+
     // request finish
     connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
         ui->measurementTable->disableFinishButton();

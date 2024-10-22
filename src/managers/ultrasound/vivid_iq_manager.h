@@ -8,10 +8,14 @@
 
 class VividIQManager : public ManagerBase
 {
+    Q_OBJECT
 public:
     VividIQManager(QSharedPointer<CypressSession> session);
 
     static DeviceConfig config;
+
+signals:
+    void filesReceived(int numFiles, QString totalSize);
 
     // ManagerBase interface
 public slots:

@@ -6,37 +6,36 @@
 #include <QFile>
 #include <QDir>
 
-class FileUtils
+namespace FileUtils
 {
-public:
-    static QJsonObject readJson(const QString &filePath);
-    static QString getSha256Hash(const QByteArray &bytes);
+    QJsonObject readJson(const QString &filePath);
+    QString getSha256Hash(const QByteArray &bytes);
 
-    static bool createFile(const QString& destinationAbsolutePath, const QByteArray& bytes);
-    static QByteArray readFile(const QString& absolutefilePath);
-    static bool copyFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
-    static bool moveFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
-    static bool deleteFile(const QString& fileAbsolutePath);
+    bool createFile(const QString& destinationAbsolutePath, const QByteArray& bytes);
+    QByteArray readFile(const QString& absolutefilePath);
+    bool copyFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    bool moveFile(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    bool deleteFile(const QString& fileAbsolutePath);
 
-    static bool doesFileExist(const QString &absoluteFilePath);
-    static bool isFileReadable(const QString &absoluteFilePath);
-    static bool isFileWritable(const QString &absoluteFilePath);
-    static bool isFileExecutable(const QString &absoluteFilePath);
+    bool doesFileExist(const QString &absoluteFilePath);
+    bool isFileReadable(const QString &absoluteFilePath);
+    bool isFileWritable(const QString &absoluteFilePath);
+    bool isFileExecutable(const QString &absoluteFilePath);
 
-    static bool createDirectory(const QString& absoluteDirectoryPath);
-    static bool copyDirectory(QDir source, QDir destination, bool overwrite = true, bool includeDirs = true);
-    static bool moveDirectory(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
-    static bool removeDirectory(const QString& absoluteDirectoryPath);
+    bool createDirectory(const QString& absoluteDirectoryPath);
+    bool copyDirectory(QDir source, QDir destination, bool overwrite = true, bool includeDirs = true);
+    bool moveDirectory(const QString& sourceAbsolutePath, const QString& destinationAbsolutePath);
+    bool removeDirectory(const QString& absoluteDirectoryPath);
 
-    static bool doesDirectoryExist(const QString &absoluteDirectoryPath);
-    static bool isDirectoryReadable(const QString &absoluteDirectoryPath);
-    static bool isDirectoryWritable(const QString &absoluteDirectoryPath);
+    bool doesDirectoryExist(const QString &absoluteDirectoryPath);
+    bool isDirectoryReadable(const QString &absoluteDirectoryPath);
+    bool isDirectoryWritable(const QString &absoluteDirectoryPath);
 
-    static QString getHumanReadableFileSize(const QString& absoluteFilePath);
-    static bool clearDirectory(const QString &absoluteDirectoryPath);
+    bool clearDirectory(const QString &absoluteDirectoryPath);
 
-private:
-    FileUtils() = delete;
-};
+    QString getHumanReadableFileSize(const QString& absoluteFilePath);
+    QString bytesToHumanReadable(quint64 bytes);
+    QString getDirectorySize(const QString &dirPath);
+}
 
 #endif // FILEUTILS_H

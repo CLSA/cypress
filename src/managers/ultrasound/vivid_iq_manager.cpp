@@ -66,6 +66,8 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     //bool foundInvalidParticipant = false;
     QString invalidId;
 
+    qint64 totalSize { 0 };
+
     foreach (DicomFile file, dicomFiles)
     {
         QSharedPointer<VividIQMeasurement> measure(new VividIQMeasurement);
@@ -98,7 +100,9 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
         measure->setAttribute("instance_number", file.instanceNumber);
         measure->setAttribute("study_id", 	     file.studyId);
         measure->setAttribute("path", 		     file.absFilePath);
-        measure->setAttribute("size", 		     FileUtils::getHumanReadableFileSize(file.absFilePath));
+        measure->setAttribute("size", 		     FileUtils::bytesToHumanReadable(fileInfo.size()));
+
+        totalSize += fileInfo.size();
 
         m_test->addMeasurement(measure);
     }
@@ -106,6 +110,7 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
     //if (foundInvalidParticipant)
     //    QMessageBox::warning(nullptr, "Invalid participant", invalidId + " does not match " + m_session->getBarcode());
 
+    emit filesReceived(m_test->getMeasurementCount(), FileUtils::bytesToHumanReadable(totalSize));
     emit dataChanged(m_test);
     checkIfFinished();
 }

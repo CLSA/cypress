@@ -180,18 +180,39 @@ QString FileUtils::getSha256Hash(const QByteArray &bytes)
     return hash;
 }
 
+QString FileUtils::getDirectorySize(const QString& dirPath) {
+    quint64 totalSize { 0 };
+
+    QDir dir { dirPath };
+
+    if (!dir.exists()) {
+        return "";
+    }
+
+    for (QFileInfo fileInfo : dir.entryInfoList()) {
+        quint64 size = fileInfo.size();
+        totalSize += size;
+    }
+
+    return bytesToHumanReadable(totalSize);
+}
+
 QString FileUtils::getHumanReadableFileSize(const QString& absoluteFilePath) {
     QFileInfo fileInfo(absoluteFilePath);
     if (!fileInfo.exists())
         return "";
 
-    double size = fileInfo.size();
-    QStringList units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
-    int i;
+    quint64 size = fileInfo.size();
+    return bytesToHumanReadable(size);
+}
 
-    for (i = 0; i < units.size() && size >= 1024; i++) {
-        size /= 1024.0;
+QString FileUtils::bytesToHumanReadable(quint64 bytes) {
+    const QStringList units = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
+
+    int i;
+    for (i = 0; i < units.size() && bytes >= 1024; i++) {
+        bytes /= 1024.0;
     }
 
-    return QString::number(size, 'f', 2) + " " + units[i];
+    return QString::number(bytes, 'f', 2) + " " + units[i];
 }
