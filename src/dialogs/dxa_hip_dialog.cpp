@@ -76,7 +76,11 @@ void DxaHipDialog::initMeasurementTable() {
     connect(manager.get(), &DxaHipManager::dataChanged, ui->measurementTable, &MeasurementTable::handleTestUpdate);
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &DxaHipManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
+        ui->measurementTable->disableFinishButton();
+        QApplication::processEvents();
+        manager->finish();
+    });
 
     connect(manager.get(), &DxaHipManager::status, ui->testInfoWidget, &TestInfoWidget::setStatus);
 }
