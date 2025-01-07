@@ -57,7 +57,11 @@ HearconDialog::HearconDialog(QWidget *parent, QSharedPointer<HearconSession> ses
     connect(ui->measurementTable, &MeasurementTable::measure, manager.get(), &HearconManager::measure);
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &HearconManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
+        ui->measurementTable->disableFinishButton();
+        QApplication::processEvents();
+        manager->finish();
+    });
 
     connect(ui->measurementTable, &MeasurementTable::enterManualEntry, manager.get(), [=]() {
         manager->setManualEntry(true);

@@ -5,7 +5,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
-
 #include <QMessageBox>
 
 #include <windows.h>
@@ -13,6 +12,7 @@
 
 #include "auxiliary/windows_util.h"
 #include "auxiliary/json_settings.h"
+#include "auxiliary/file_utils.h"
 
 DeviceConfig HearconManager::config {{
     { "processName",             { "hearcon/processName",                NonEmptyString }},
@@ -109,6 +109,8 @@ void HearconManager::measure()
     m_test->reset();
     qDebug() << "HearconManager::measure";
 
+    FileUtils::deleteFile(m_readerOutputPath);
+
     if (!configurePlugin("get_results"))
         return;
 
@@ -123,8 +125,7 @@ void HearconManager::measure()
     // Read file from script
     QFileInfo output(m_readerOutputPath);
     if (!output.exists()) {
-        qCritical() << "HearconManager::readOutput - no results found";
-        emit error("Test incomplete");
+        QMessageBox::warning(nullptr, "No results found", "No data could be found, please save the test in Hearcon and try again.");
         return;
     }
 
@@ -134,7 +135,14 @@ void HearconManager::measure()
         return;
     }
 
-    qSharedPointerCast<HearconTest>(m_test)->fromJsonFile(m_readerOutputPath);
+    if (!qSharedPointerCast<HearconTest>(m_test)->fromJsonFile(m_readerOutputPath)) {
+        QMessageBox::warning(
+            nullptr,
+            "No results found",
+            "No results found, please save the test in the Hearcon app and try again"
+        );
+        return;
+    }
 
     qDebug().noquote() << JsonSettings::prettyPrintJson(m_test->toJsonObject());
     emit dataChanged(m_test);

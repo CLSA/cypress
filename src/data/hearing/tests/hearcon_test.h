@@ -13,7 +13,7 @@ public:
 
     // TestBase interface
 public:
-    void fromJsonFile(const QString& filePath);
+    bool fromJsonFile(const QString& filePath);
 
     QString toString() const override;
     bool isValid() const override;

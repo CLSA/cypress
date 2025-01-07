@@ -8,9 +8,67 @@ HearconTest::HearconTest()
 
 }
 
-void HearconTest::fromJsonFile(const QString &filePath)
+bool HearconTest::fromJsonFile(const QString &filePath)
 {
     QJsonObject json = JsonSettings::readJsonFromFile(filePath);
+
+    if (json.value("l500").isNull() || json.value("l500").isUndefined() || json.value("l500").toString() == "") {
+        return false;
+    }
+
+    if (json.value("l1000").isNull() || json.value("l1000").isUndefined() || json.value("l1000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("l2000").isNull() || json.value("l2000").isUndefined() || json.value("l2000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("l3000").isNull() || json.value("l3000").isUndefined() || json.value("l3000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("l4000").isNull() || json.value("l4000").isUndefined() || json.value("l4000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("l6000").isNull() || json.value("l6000").isUndefined() || json.value("l6000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("l8000").isNull() || json.value("l8000").isUndefined() || json.value("l8000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r500").isNull() || json.value("r500").isUndefined() || json.value("r500").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r1000").isNull() || json.value("r1000").isUndefined() || json.value("r1000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r2000").isNull() || json.value("r2000").isUndefined() || json.value("r2000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r3000").isNull() || json.value("r3000").isUndefined() || json.value("r3000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r4000").isNull() || json.value("r4000").isUndefined() || json.value("r4000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r6000").isNull() || json.value("r6000").isUndefined() || json.value("r6000").toString() == "") {
+        return false;
+    }
+
+    if (json.value("r8000").isNull() || json.value("r8000").isUndefined() || json.value("r8000").toString() == "") {
+        return false;
+    }
+
+    //qDebug() << "Plugin Output: " << JsonSettings::prettyPrintJson(json);
 
     addMetaData("test_id", 		json.value("test_id"));
     addMetaData("empl_num", 	json.value("empl_num"));
@@ -74,6 +132,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     addMetaData("twa", 			json.value("twa"));
     addMetaData("isReviewed", 	json.value("isReviewed"));
     addMetaData("revBatch", 	json.value("revBatch"));
+
+
 
     QSharedPointer<HearconMeasurement> l500(new HearconMeasurement);
     l500->setAttribute("side",     "Left");
@@ -201,6 +261,8 @@ void HearconTest::fromJsonFile(const QString &filePath)
     r8000->setAttribute("outcome",  "");
     r8000->setAttribute("error",    "");
     addMeasurement(r8000);
+
+    return true;
 }
 
 QString HearconTest::toString() const
