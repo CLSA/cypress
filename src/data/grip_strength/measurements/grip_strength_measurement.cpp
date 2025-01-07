@@ -7,21 +7,12 @@
 
 const q_stringMap GripStrengthMeasurement::trialMap =
 {
-    {"ExamID", "exam_id"},
-    {"TestID", "test_id"},
     {"Position", "position"},
-    {"Side","trial_side"},
-    {"Maximum","trial_max"},
-    {"Average","exam_average"},
-    {"CV","exam_cv"},
+    {"Side","side"},
 
     {"Rep1", "rep1"},
     {"Rep2", "rep2"},
     {"Rep3", "rep3"},
-
-    {"Rep1Exclude", "rep1Exclude"},
-    {"Rep2Exclude", "rep2Exclude"},
-    {"Rep3Exclude", "rep3Exclude"},
 };
 
 
@@ -40,6 +31,7 @@ bool GripStrengthMeasurement::isValid() const
     {
         if (!hasAttribute(key))
         {
+            qDebug() << "Does not have attribute" << key;
             return false;
         }
     }

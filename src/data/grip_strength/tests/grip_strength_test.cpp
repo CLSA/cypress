@@ -16,23 +16,19 @@
 const q_stringMap GripStrengthTest::testMetaMap = {
     {"Sequence", "sequence"},
     {"Comparison", "comparison"},
-    {"MMDescription", "mm_description"},
     {"MaxReps", "max_reps"},
     {"NormType", "norm_type"},
-    {"Notes", "notes"},
     {"PrimaryStat", "primary_stat"},
     {"Rate", "rate"},
-    {"RestTime", "rest_time"},
+    {"RestTime", "rest"},
     {"Rung", "rung"},
-    {"Side", "side"},
     {"Test", "test"},
     {"TestID", "test_id"},
+    {"ExamID", "exam_id"},
     {"Threshold", "threshold"},
     {"Units", "units"},
-    {"Position", "position"},
-    {"Rep", "rep"},
-    {"Max", "max"},
-    {"Avg", "avg"},
+    {"Max", "maximum"},
+    {"Avg", "average"},
     {"CV", "cv"},
 };
 
@@ -40,9 +36,8 @@ const q_stringMap GripStrengthTest::testMetaMap = {
 //
 GripStrengthTest::GripStrengthTest()
 {
-    m_outputKeyList << "participant_id";
     m_outputKeyList.append(testMetaMap.values());
-    setExpectedMeasurementCount(2);
+    setExpectedMeasurementCount(1);
 }
 
 bool GripStrengthTest::readMeasurements()
@@ -147,6 +142,7 @@ bool GripStrengthTest::isValid() const
     {
       if(!hasMetaData(key))
       {
+        qDebug() << "Does not have metadata key " << key;
          okMeta = false;
          break;
        }
@@ -155,6 +151,7 @@ bool GripStrengthTest::isValid() const
     if (okTest) {
        foreach (auto m, m_measurementList) {
          if (!m->isValid()) {
+               qDebug() << "measurement isn't valid";
                 okTest = false;
                 break;
          }
