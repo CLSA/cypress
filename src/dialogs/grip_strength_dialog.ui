@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
-    <height>50</height>
+    <width>585</width>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,17 +21,70 @@
     <widget class="TestInfoWidget" name="testInfoWidget" native="true"/>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QGroupBox" name="measurementInfo">
+     <property name="title">
+      <string>Summary</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="averageLabel">
+          <property name="text">
+           <string>Average</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignRight">
+         <widget class="QLabel" name="averageValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="maximumLabel">
+          <property name="text">
+           <string>Maximum</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignRight">
+         <widget class="QLabel" name="maximumValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="cvLabel">
+          <property name="text">
+           <string>CV</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignRight">
+         <widget class="QLabel" name="cvValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="MeasurementTable" name="measurementTable" native="true"/>
    </item>
   </layout>
  </widget>
@@ -40,6 +93,12 @@
    <class>TestInfoWidget</class>
    <extends>QWidget</extends>
    <header>widgets/test_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MeasurementTable</class>
+   <extends>QWidget</extends>
+   <header>widgets/measurement_table.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

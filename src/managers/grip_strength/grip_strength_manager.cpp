@@ -38,16 +38,31 @@ GripStrengthManager::GripStrengthManager(QSharedPointer<GripStrengthSession> ses
 bool GripStrengthManager::start() {
     qInfo() << "GripStrengthManager::start";
 
-    if (!setUp())
-        return false;
+    restoreData();
 
-    measure();
+    configureProcess();
+
+    if (m_process.state() != QProcess::NotRunning) {
+        emit error("Application is already running");
+        return false;
+    }
+
+    m_process.start();
+
+    if (!m_process.waitForStarted()) {
+        emit error("Could not start application");
+        return false;
+    }
+
+    emit started(m_test);
 
     return true;
 }
 
-void GripStrengthManager::readOutput() {
-    qInfo() << "GripStrengthManager::readOutput";
+void GripStrengthManager::measure() {
+    qInfo() << "GripStrengthManager::measure";
+    m_test->reset();
+    emit dataChanged(m_test);
 
     if (QProcess::NormalExit != m_process.exitStatus()) {
         emit error("Process failed to finish correctly, cannot read output");
@@ -133,48 +148,9 @@ void GripStrengthManager::readOutput() {
         m_test->addMeasurement(measurement);
     }
 
-    qDebug() << m_test->toJsonObject();
+    emit dataChanged(m_test);
 
-    QThread::sleep(5); // give time for tracker exe to cleanup
-    finish();
-}
-
-void GripStrengthManager::measure() {
-    qDebug() << "GripStrengthManager::measure";
-
-    if (m_process.state() != QProcess::NotRunning) {
-        emit error("Program is already running");
-        return;
-    }
-
-    m_process.start();
-
-    if (!m_process.waitForStarted()) {
-        emit error("Could not start application");
-        return;
-    }
-}
-
-bool GripStrengthManager::setUp() {
-    qInfo() << "GripStrengthManager::setUp";
-
-    if (!backupData())
-        return false;
-
-    configureProcess();
-
-    return true;
-}
-
-bool GripStrengthManager::backupData() {
-    qInfo() << "GripStrengthManager::backupData";
-
-    if (!FileUtils::copyDirectory(QDir(m_databasePath), QDir(m_backupPath), true, false)) {
-        qDebug() << "failed to backup data";
-        return false;
-    }
-
-    return true;
+    m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
 bool GripStrengthManager::restoreData() {
@@ -188,18 +164,6 @@ bool GripStrengthManager::restoreData() {
     return true;
 }
 
-
-bool GripStrengthManager::cleanUp() {
-    qInfo() << "GripStrengthManager::cleanUp";
-
-    if (QProcess::NotRunning != m_process.state())
-        m_process.close();
-
-    if (!restoreData())
-        return false;
-
-    return true;
-}
 
 void GripStrengthManager::configureProcess() {
     qInfo() << "GripStrengthManager::configureProcess" << m_runnableName << m_runnablePath;
@@ -227,17 +191,5 @@ void GripStrengthManager::configureProcess() {
     this, [=](QProcess::ProcessState state) {
         QStringList s = QVariant::fromValue(state).toString().split(QRegExp("(?=[A-Z])"), Qt::SkipEmptyParts);
         qInfo() << "GripStrengthManager::process state: " << s.join(" ").toLower();
-
     });
-
-    // read output after grip strength process ends
-    connect(&m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        this, &GripStrengthManager::readOutput);
 }
-
-bool GripStrengthManager::clearData() {
-    qInfo() << "GripStrengthManager::clearData";
-    m_test->reset();
-    return true;
-}
-

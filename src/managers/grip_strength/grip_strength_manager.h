@@ -24,7 +24,6 @@ public:
 public slots:
     bool start() override;
     void measure() override;
-    void readOutput() override;
 
 private:
     void configureProcess();
@@ -41,16 +40,8 @@ private:
     QString m_backupPath;
     QString m_databasePath;
 
-    // Set up device
-    bool setUp() override;
-    bool backupData();
-
-    // Clean up the device for next time
-    bool cleanUp() override;
+    // Reset the database
     bool restoreData();
-
-    // Reset the session
-    bool clearData() override;
 };
 
 #endif // GRIP_STRENGTH_MANAGER_H
