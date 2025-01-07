@@ -48,7 +48,6 @@ FORMS += \
   cypress_main_window.ui \
   dialogs/audiometer_dialog.ui \
   dialogs/blood_pressure_dialog.ui \
-  dialogs/body_composition_dialog.ui \
   dialogs/cdtt_dialog.ui \
   dialogs/choice_reaction_dialog.ui \
   dialogs/cimt_vivid_i_dialog.ui \
@@ -77,7 +76,6 @@ FORMS += \
   widgets/bpm_manual_entry_form.ui \
   widgets/device_settings/audiometer_settings_widget.ui \
   widgets/device_settings/blood_pressure_settings_widget.ui \
-  widgets/device_settings/body_composition_settings_widget.ui \
   widgets/device_settings/cdtt_settings_widget.ui \
   widgets/device_settings/choice_reaction_settings_widget.ui \
   widgets/device_settings/dexa_settings_widget.ui \
@@ -109,13 +107,8 @@ RESOURCES += \
 DISTFILES += \
     ../README.md \
     RunNetworkRequests.py \
-    clear.tif \
     favicon.ico \
-    ok.tif \
-    please.tif \
     server/pages/index.html \
-    sign.tif \
-    thankyou.tif
 
 HEADERS += \
     #auxiliary/bluetooth_util.h \
@@ -141,16 +134,12 @@ HEADERS += \
     data/ecg/measurements/mac5_measurement.h \
     data/ecg/tests/mac5_test.h \
     data/frax/frax_helper.h \
-    data/grip_strength/measurements/jtech_measurement.h \
-    data/grip_strength/tests/jtech_test.h \
     data/hearing/measurements/hearcon_measurement.h \
     data/hearing/tests/hearcon_test.h \
     data/measurement.h \
     data/access_query_helper.h \
     data/blood_pressure/measurements/blood_pressure_measurement.h \
     data/blood_pressure/tests/blood_pressure_test.h \
-    data/body_composition/measurements/body_composition_measurement.h \
-    data/body_composition/tests/body_composition_test.h \
     data/cdtt/measurements/cdtt_measurement.h \
     data/cdtt/tests/cdtt_test.h \
     data/choice_reaction/measurements/choice_reaction_measurement.h \
@@ -185,9 +174,7 @@ HEADERS += \
     data/temperature/measurements/temperature_measurement.h \
     data/temperature/tests/temperature_test.h \
     data/test_base.h \
-    data/tonometer/measurements/ora_measurement.h \
     data/tonometer/measurements/tonometer_measurement.h \
-    data/tonometer/tests/ora_test.h \
     data/tonometer/tests/tonometer_test.h \
     data/ultrasound/vivid_iq_measurement.h \
     data/ultrasound/vivid_iq_test.h \
@@ -195,7 +182,6 @@ HEADERS += \
     data/weigh_scale/tests/weigh_scale_test.h \
     dialogs/audiometer_dialog.h \
     dialogs/blood_pressure_dialog.h \
-    dialogs/body_composition_dialog.h \
     dialogs/cdtt_dialog.h \
     dialogs/choice_reaction_dialog.h \
     dialogs/cimt_vivid_i_dialog.h \
@@ -228,7 +214,6 @@ HEADERS += \
     managers/blood_pressure/bpm_message.h \
     #managers/bluetooth/bluetooth_le_manager.h \
     managers/blood_pressure/bptru_200_driver.h \
-    managers/body_composition/body_composition_manager.h \
     managers/cdtt/cdtt_manager.h \
     managers/choice_reaction/choice_reaction_manager.h \
     managers/dxa/apex_database_helper.h \
@@ -258,6 +243,8 @@ HEADERS += \
     managers/blood_pressure/watch_bp_manager.h \
     managers/weigh_scale/weigh_scale_manager.h \
     server/Server.h \
+    server/cypress_status_request_handler.h \
+    server/cypress_version_request_handler.h \
     server/default_delete_request_handler.h \
     server/default_request_handler.h \
     server/default_status_request_handler.h \
@@ -296,13 +283,10 @@ HEADERS += \
     server/handlers/audiometer/audiometer_status_request_handler.h \
     server/handlers/blood_pressure/blood_pressure_request_handler.h \
     server/handlers/blood_pressure/blood_pressure_status_request_handler.h \
-    server/handlers/body_composition/body_composition_request_handler.h \
-    server/handlers/body_composition/body_composition_status_request_handler.h \
     server/handlers/cdtt/cdtt_request_handler.h \
     server/handlers/cdtt/cdtt_status_request_handler.h \
     server/handlers/choice_reaction/choice_reaction_request_handler.h \
     server/handlers/choice_reaction/choice_reaction_status_request_handler.h \
-    server/handlers/cypress_status_request_handler.h \
     server/handlers/dxa/dxa_request_handler.h \
     server/handlers/dxa/dxa_status_request_handler.h \
     server/handlers/ecg/ecg_request_handler.h \
@@ -349,7 +333,6 @@ HEADERS += \
     widgets/bpm_manual_entry_form.h \
     widgets/device_settings/audiometer_settings_widget.h \
     widgets/device_settings/blood_pressure_settings_widget.h \
-    widgets/device_settings/body_composition_settings_widget.h \
     widgets/device_settings/cdtt_settings_widget.h \
     widgets/device_settings/choice_reaction_settings_widget.h \
     widgets/device_settings/dexa_settings_widget.h \
@@ -399,16 +382,12 @@ SOURCES += \
     data/ecg/measurements/mac5_measurement.cpp \
     data/ecg/tests/mac5_test.cpp \
     data/frax/frax_helper.cpp \
-    data/grip_strength/measurements/jtech_measurement.cpp \
-    data/grip_strength/tests/jtech_test.cpp \
     data/hearing/measurements/hearcon_measurement.cpp \
     data/hearing/tests/hearcon_test.cpp \
     data/measurement.cpp \
     data/access_query_helper.cpp \
     data/blood_pressure/measurements/blood_pressure_measurement.cpp \
     data/blood_pressure/tests/blood_pressure_test.cpp \
-    data/body_composition/measurements/body_composition_measurement.cpp \
-    data/body_composition/tests/body_composition_test.cpp \
     data/cdtt/measurements/cdtt_measurement.cpp \
     data/cdtt/tests/cdtt_test.cpp \
     data/choice_reaction/measurements/choice_reaction_measurement.cpp \
@@ -443,9 +422,7 @@ SOURCES += \
     data/temperature/measurements/temperature_measurement.cpp \
     data/temperature/tests/temperature_test.cpp \
     data/test_base.cpp \
-    data/tonometer/measurements/ora_measurement.cpp \
     data/tonometer/measurements/tonometer_measurement.cpp \
-    data/tonometer/tests/ora_test.cpp \
     data/tonometer/tests/tonometer_test.cpp \
     data/ultrasound/vivid_iq_measurement.cpp \
     data/ultrasound/vivid_iq_test.cpp \
@@ -453,7 +430,6 @@ SOURCES += \
     data/weigh_scale/tests/weigh_scale_test.cpp \
     dialogs/audiometer_dialog.cpp \
     dialogs/blood_pressure_dialog.cpp \
-    dialogs/body_composition_dialog.cpp \
     dialogs/cdtt_dialog.cpp \
     dialogs/choice_reaction_dialog.cpp \
     dialogs/cimt_vivid_i_dialog.cpp \
@@ -487,7 +463,6 @@ SOURCES += \
     managers/blood_pressure/bpm_message.cpp \
     #managers/bluetooth/bluetooth_le_manager.cpp \
     managers/blood_pressure/bptru_200_driver.cpp \
-    managers/body_composition/body_composition_manager.cpp \
     managers/cdtt/cdtt_manager.cpp \
     managers/choice_reaction/choice_reaction_manager.cpp \
     managers/dxa/apex_database_helper.cpp \
@@ -516,6 +491,8 @@ SOURCES += \
     managers/ultrasound/vividi_manager.cpp \
     managers/blood_pressure/watch_bp_manager.cpp \
     managers/weigh_scale/weigh_scale_manager.cpp \
+    server/cypress_status_request_handler.cpp \
+    server/cypress_version_request_handler.cpp \
     server/default_delete_request_handler.cpp \
     server/default_request_handler.cpp \
     server/default_status_request_handler.cpp \
@@ -554,13 +531,10 @@ SOURCES += \
     server/handlers/audiometer/audiometer_status_request_handler.cpp \
     server/handlers/blood_pressure/blood_pressure_request_handler.cpp \
     server/handlers/blood_pressure/blood_pressure_status_request_handler.cpp \
-    server/handlers/body_composition/body_composition_request_handler.cpp \
-    server/handlers/body_composition/body_composition_status_request_handler.cpp \
     server/handlers/cdtt/cdtt_request_handler.cpp \
     server/handlers/cdtt/cdtt_status_request_handler.cpp \
     server/handlers/choice_reaction/choice_reaction_request_handler.cpp \
     server/handlers/choice_reaction/choice_reaction_status_request_handler.cpp \
-    server/handlers/cypress_status_request_handler.cpp \
     server/handlers/dxa/dxa_request_handler.cpp \
     server/handlers/dxa/dxa_status_request_handler.cpp \
     server/handlers/ecg/ecg_request_handler.cpp \
@@ -608,7 +582,6 @@ SOURCES += \
     widgets/bpm_manual_entry_form.cpp \
     widgets/device_settings/audiometer_settings_widget.cpp \
     widgets/device_settings/blood_pressure_settings_widget.cpp \
-    widgets/device_settings/body_composition_settings_widget.cpp \
     widgets/device_settings/cdtt_settings_widget.cpp \
     widgets/device_settings/choice_reaction_settings_widget.cpp \
     widgets/device_settings/dexa_settings_widget.cpp \

@@ -7,6 +7,16 @@
 *.filters
 *.TMP
 *.hint
+*.ui
+*.qrc
+*.qss
+*.qml
+*.ts
+*.tsx
+*.json
+CDTTStereo*
+log.txt
+ui_*
 ~
 .*
 Makefile*
