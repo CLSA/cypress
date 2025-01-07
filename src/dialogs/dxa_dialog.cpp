@@ -65,7 +65,11 @@ DXADialog::DXADialog(QWidget *parent, QSharedPointer<DXASession> session)
     });
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &DXAManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
+        ui->measurementTable->disableFinishButton();
+        QApplication::processEvents();
+        manager->finish();
+    });
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &DXAManager::addManualMeasurement);
