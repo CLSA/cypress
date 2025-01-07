@@ -174,11 +174,6 @@ void OCTManager::readOutput()
             QString name = entry.fileName();
             QStringList fileNameValues = name.split("_");
 
-            if (fileNameValues.length() != 5) {
-                qInfo() << "Invalid file name";
-                continue;
-            }
-
             if (fileNameValues[0] != m_session->getBarcode()) {
                 qInfo() << fileNameValues[0] << "does not equal" << m_session->getBarcode();
                 continue;

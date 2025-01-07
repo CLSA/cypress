@@ -23,9 +23,9 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
     columns << TableColumn("reading_number",
                            "#",
                            new NumberDelegate(0, 1000, true, false, false, 2));
-    columns << TableColumn("systolic", "Systolic (mmHg)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("diastolic", "Diastolic (mmHg)", new NumberDelegate(0, 200, false));
-    columns << TableColumn("pulse", "Pulse (bpm)", new NumberDelegate(0, 200, false));
+    columns << TableColumn("systolic", "Systolic (mmHg)", new NumberDelegate(0, 200, false, true));
+    columns << TableColumn("diastolic", "Diastolic (mmHg)", new NumberDelegate(0, 200, false, true));
+    columns << TableColumn("pulse", "Pulse (bpm)", new NumberDelegate(0, 200, false, true));
 
     connect(manager.get(), &WatchBPManager::started, ui->measurementTable, [=](QSharedPointer<TestBase> test) {
         Q_UNUSED(test)
@@ -63,7 +63,11 @@ WatchBPDialog::WatchBPDialog(QWidget *parent, QSharedPointer<WatchBPSession> ses
     });
 
     // request finish
-    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), &WatchBPManager::finish);
+    connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
+        ui->measurementTable->disableFinishButton();
+        QApplication::processEvents();
+        manager->finish();
+    });
 
     // request adding manual measurement
     connect(ui->measurementTable, &MeasurementTable::addMeasurement, manager.get(), &WatchBPManager::addManualMeasurement);

@@ -58,11 +58,7 @@ bool DcmRecv::clearOutputDirectory()
     // Reset the output directory
     QDir outputDir(m_outputDir);
 
-    if (outputDir.exists())
-        outputDir.removeRecursively();
-
-    if (!outputDir.mkpath(m_outputDir)) {
-        qDebug() << "DCMRECV: could not create the output directory";
+    if (!FileUtils::clearDirectory(m_outputDir)) {
         return false;
     }
 
