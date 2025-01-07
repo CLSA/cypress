@@ -35,7 +35,10 @@ QString WatchBPMeasurement::toString() const
 
 bool WatchBPMeasurement::isValid() const
 {
-    return true;
+    return
+        hasAttribute("systolic") && getAttribute("systolic").value().toInt() > 0 &&
+        hasAttribute("diastolic") && getAttribute("diastolic").value().toInt() > 0 &&
+        hasAttribute("pulse") && getAttribute("pulse").value().toInt() > 0;
 }
 
 void WatchBPMeasurement::fromJson(const QJsonObject& data)

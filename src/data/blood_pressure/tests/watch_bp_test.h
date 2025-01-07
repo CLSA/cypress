@@ -12,9 +12,7 @@ public:
 
     // TestBase interface
 public:
-
     bool isValid() const;
-    void reset();
     void reinterpret();
 
     void updateAverage();

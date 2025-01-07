@@ -29,8 +29,8 @@ void WatchBPTest::fromJson(const QJsonObject& data)
         QSharedPointer<WatchBPMeasurement> measure(new WatchBPMeasurement);
 
         measure->fromJson(measureData);
-
-        addMeasurement(measure);
+        if (measure->isValid())
+            addMeasurement(measure);
     }
 
     updateAverage();
@@ -56,11 +56,6 @@ bool WatchBPTest::isValid() const
 QJsonObject WatchBPTest::toJsonObject() const
 {
     return TestBase::toJsonObject();
-}
-
-void WatchBPTest::reset()
-{
-
 }
 
 void WatchBPTest::reinterpret()
