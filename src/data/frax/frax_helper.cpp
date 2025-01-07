@@ -5,28 +5,51 @@
 void FraxHelper::calculateAdditionalVariables(QJsonObject &input)
 {
     const int age = input.value("age").toInt();
+    qDebug() << "Age: " << age;
     if (age <= 0)
         throw Validators::ValidationError("age must be greater than 0");
 
-    // Get variables
+    //// Get variables
     const double femoral_neck_bmd = input.value("femoral_neck_bmd").toDouble();
     const double weight = input.value("weight").toDouble();
     const double height = input.value("height").toDouble();
 
+    qDebug()
+        << "bmd"    << femoral_neck_bmd
+        << "weight" << weight
+        << "height" << height;
+
     const bool father_hip_fracture = input.value("father_hip_fracture").toBool();
     const bool mother_hip_fracture = input.value("mother_hip_fracture").toBool();
+
+    qDebug()
+        << "father_hip_fracture" << father_hip_fracture
+        << "mother_hip_fracture" << mother_hip_fracture;
 
     const int glucocorticoid_number = input.value("glucocorticoid_number").toInt();
     const int glucocorticoid_year = input.value("glucocorticoid_year").toInt();
     const int glucocorticoid_age = input.value("glucocorticoid_age").toInt();
 
+    qDebug() << "glucocorticoid_number:" << glucocorticoid_number;
+    qDebug() << "glucocorticoid_year:"   << glucocorticoid_year;
+    qDebug() << "glucocorticoid_age:"    << glucocorticoid_age;
+
     const QString ra_medications = input.value("ra_medications").toString();
 
-    // Calculate new variables
+    qDebug() << "ra_medications:" << ra_medications;
+
+    //// Calculate new variables
     const bool previous_fracture = father_hip_fracture || mother_hip_fracture;
+    qDebug() << "previos_fracture:" << previous_fracture;
+
     const double t_score = FraxHelper::calculateTScore(femoral_neck_bmd);
+    qDebug() << "t_score:" << t_score;
+
     const double bmi = FraxHelper::calculateBmi(weight, height);
+    qDebug() << "bmi:" << bmi;
+
     const bool rheumatoid_arthritis = ra_medications != "None" && !ra_medications.isEmpty();
+    qDebug() << "rheumatoid_arthritis:" << rheumatoid_arthritis;
 
     const bool glucocorticoid = FraxHelper::calculateGlucocorticoid(
         age,
@@ -34,6 +57,7 @@ void FraxHelper::calculateAdditionalVariables(QJsonObject &input)
         glucocorticoid_year,
         glucocorticoid_age
     );
+    qDebug() << "glucocorticoid: " << glucocorticoid;
 
     input.insert("rheumatoid_arthritis",   rheumatoid_arthritis);
     input.insert("previous_fracture",      previous_fracture);
@@ -45,6 +69,7 @@ void FraxHelper::calculateAdditionalVariables(QJsonObject &input)
     input.insert("type",                   "t");
     input.insert("country_code",           "19");
 
+    qDebug() << "Calculated additional variables";
     Utilities::prettyPrint(input);
 }
 
@@ -79,6 +104,7 @@ double FraxHelper::calculateGlucocorticoid(
         res = (age - glucocorticoid_number) <= 1 ? 1 : 0;
     else if (glucocorticoid_year)
         res = (QDate::currentDate().year() - glucocorticoid_year) <= 1 ? 1 : 0;
+
     if (res == 1)
         res = glucocorticoid_age >= 3 ? 1 : 0;
 

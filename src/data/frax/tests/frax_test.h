@@ -2,6 +2,8 @@
 #define FRAX_TEST_H
 
 #include "data/test_base.h"
+#include "server/sessions/frax_session.h"
+#include "config/device_config.h"
 
 class FraxTest : public TestBase
 {
@@ -9,7 +11,8 @@ public:
     FraxTest();
     ~FraxTest() = default;
 
-    void fromFile(const QString&);
+    bool writeInputFile(const QString &inputFilePath, const QJsonObject& inputData);
+    bool readOutputFile(const QString&);
 
     // String representation for debug and GUI display purposes
     //
@@ -21,11 +24,13 @@ public:
     //
     QJsonObject toJsonObject() const override;
 
+    QString getInputContents(const QJsonObject &inputData);
+    QString interpretResults(double p);
 private:
     QStringList m_outputKeyList;
-
-    QString interpretResults(double p);
-
+    QString m_workingDirectoryPath;
+    QString m_exePath;
+    QSharedPointer<FraxSession> m_session;
 };
 
 Q_DECLARE_METATYPE(FraxTest);

@@ -1,7 +1,10 @@
 #include "frax_test.h"
 #include "data/frax/measurements/frax_measurement.h"
 
+
 #include "auxiliary/Utilities.h"
+
+#include "config/device_config.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -9,6 +12,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QRandomGenerator>
+#include <QDir>
+#include <QFileInfo>
 
 
 /**
@@ -39,8 +44,6 @@
 
 FraxTest::FraxTest()
 {
-    setExpectedMeasurementCount(4);
-
     m_outputKeyList << "type";
     m_outputKeyList << "country_code";
     m_outputKeyList << "age";
@@ -54,15 +57,47 @@ FraxTest::FraxTest()
     m_outputKeyList << "secondary_osteoporosis";
     m_outputKeyList << "alcohol";
     m_outputKeyList << "femoral_neck_tscore";
+
+    setExpectedMeasurementCount(4);
+    qDebug() << "GetExpected" << getExpectedMeasurementCount();
 }
 
-void FraxTest::fromFile(const QString& fileName)
+bool FraxTest::writeInputFile(const QString& inputFilePath, const QJsonObject& inputData)
+{
+    QString inputContents = getInputContents(inputData);
+    qDebug() << "FraxTest::toFile - content = " << inputContents;
+
+    QFile inputFile(inputFilePath);
+    if (inputFile.exists()) {
+        if (!inputFile.remove()) {
+            qDebug() << "FraxTest::toFile - could not remove file";
+            return false;
+        }
+    }
+
+    if(inputFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream stream(&inputFile);
+        stream << inputContents << Qt::endl;
+        inputFile.close();
+
+        qDebug() << "populated input.txt file " << inputFilePath;
+    }
+    else {
+        qDebug() << "FraxTest::toFile - Could not open input file";
+        return false;
+    }
+
+    return true;
+}
+
+bool FraxTest::readOutputFile(const QString& fileName)
 {
     QFile ifile(fileName);
 
     if (!ifile.open(QIODevice::ReadOnly)) {
         qDebug() << "Could not read frax output";
-        return;
+        return false;
     }
 
     qDebug() << "OK, reading input file " << fileName;
@@ -72,6 +107,7 @@ void FraxTest::fromFile(const QString& fileName)
 
     if(!instream.atEnd()) {
         qDebug() << "Frax: More lines of content than expected";
+        return false;
     }
 
     ifile.close();
@@ -120,6 +156,47 @@ void FraxTest::fromFile(const QString& fileName)
         addMetaData("alcohol",                list.at(11).toUInt());
         addMetaData("femoral_neck_tscore",    list.at(12).toDouble());
     }
+    else {
+        return false;
+    }
+
+    return true;
+}
+
+
+
+QString FraxTest::getInputContents(const QJsonObject& inputData)
+{
+    QString type = inputData.value("type").toVariant().toString();
+    QString countryCode = inputData.value("country_code").toVariant().toString();
+    QString age = inputData.value("age").toVariant().toString();
+    QString sex = inputData.value("sex").toVariant().toString().toLower()[0] == 'm' ? "0" : "1";
+    QString bmi = inputData.value("body_mass_index").toVariant().toString();
+    QString previousFracture= QString::number(inputData.value("previous_fracture").toVariant().toInt());
+    QString parentHipFracture = QString::number(inputData.value("parent_hip_fracture").toVariant().toInt());
+    QString currentSmoker = QString::number(inputData.value("currentSmoker").toVariant().toInt());
+    QString glucocorticoid = QString::number(inputData.value("glucocorticoid").toVariant().toInt());
+    QString rheumatoidArthritis = QString::number(inputData.value("rheumatoid_arthritis").toVariant().toInt());
+    QString secondaryOsteoporosis = QString::number(inputData.value("secondary_osteoporosis").toVariant().toInt());
+    QString alcohol = QString::number(inputData.value("alcohol").toVariant().toInt());
+    QString femoralNeckBmd = QString::number(inputData.value("femoral_neck_bmd").toVariant().toDouble());
+
+    QStringList list;
+    list << type;
+    list << countryCode;
+    list << age;
+    list << sex;
+    list << bmi;
+    list << previousFracture;
+    list << parentHipFracture;
+    list << currentSmoker;
+    list << glucocorticoid;
+    list << rheumatoidArthritis;
+    list << secondaryOsteoporosis;
+    list << alcohol;
+    list << femoralNeckBmd;
+
+    return list.join(",");
 }
 
 QString FraxTest::interpretResults(double p)
@@ -162,11 +239,16 @@ bool FraxTest::isValid() const
     }
 
     bool okTest = getMeasurementCount() == getExpectedMeasurementCount();
+
+    qDebug() << "measurement count: " << getMeasurementCount();
+    qDebug() << "expected: " << getExpectedMeasurementCount();
+
     if(okTest) {
         foreach(const auto m, m_measurementList)
         {
             if (!m->isValid()) {
                 okTest = false;
+                qDebug() << "measurement is not valid:" << m->toJsonObject();
                 break;
             }
         }
