@@ -9,7 +9,6 @@ public:
     FraxSession(QObject* parent, const QJsonObject& inputData, const QString& origin);
 
 // CypressSession interface
-protected:
     void validate() const override;
     void calculateInputs() override;
     void isInstalled() const override;

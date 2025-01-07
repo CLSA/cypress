@@ -28,7 +28,7 @@ class FraxManager : public ManagerBase
 public:
     explicit FraxManager(QSharedPointer<FraxSession> session);
 
-    static DeviceConfig config;
+    static QSharedPointer<DeviceConfig> config;
 
 public slots:
     bool start() override;
@@ -38,15 +38,6 @@ public slots:
     void readOutput() override;
 
 private:
-    QString m_country_code;
-    QString m_type_code;
-
-    QString m_runnableName;		// full path to blackbox.exe
-    QString m_runnablePath; // path to blackbox.exe directory
-
-    QString m_outputFilePath;    		// full path to output.txt
-    QString m_inputFilePath;     		// full path to input.txt
-
     QProcess m_process;
 
     // Reset the session
@@ -57,8 +48,6 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
-
-    void configureProcess();
 };
 
 #endif // FRAX_MANAGER_H
