@@ -124,6 +124,7 @@ QJsonObject Cypress::getStatus()
     QJsonObject cypress {
         { "version", "v1.0.1" },
         { "cwd", 	 QCoreApplication::applicationDirPath() },
+        { "lastModified", lastInstalledDate().toString(Qt::DateFormat::ISODate) },
         { "http",
             QJsonObject {
                 {"host", CypressSettings::readSetting("address").toString()},
@@ -143,6 +144,14 @@ QJsonObject Cypress::getStatus()
     statusJson["devices"] = getDeviceStatus();
 
     return statusJson;
+}
+
+QDateTime Cypress::lastInstalledDate()
+{
+    QDir currentDir = QCoreApplication::applicationDirPath();
+    QFileInfo cypressExe(currentDir.absoluteFilePath("cypress.exe"));
+
+    return cypressExe.lastModified();
 }
 
 QJsonArray Cypress::getNetworkAddresses()
@@ -169,7 +178,7 @@ QJsonObject Cypress::getDeviceStatus()
         {"dxa", 				DxaHipManager::config.getErrors()},
         {"ecg", 				ECGManager::config.getErrors()},
         {"mac5", 				Mac5Manager::config.getErrors()},
-        {"frax", 				FraxManager::config.getErrors()},
+        {"frax", 				FraxManager::config->getErrors()},
         {"grip_strength", 		GripStrengthManager::config.getErrors()},
         {"retinal_camera", 		RetinalCameraManager::config.getErrors()},
         {"spirometer", 			SpirometerManager::config.getErrors()},

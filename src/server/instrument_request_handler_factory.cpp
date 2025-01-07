@@ -74,6 +74,9 @@
 #include "server/default_request_handler.h"
 #include "server/default_delete_request_handler.h"
 
+#include "server/cypress_status_request_handler.h"
+#include "server/cypress_version_request_handler.h"
+
 #include "server/instrument_request_handler_factory.h"
 
 #include <QRegularExpression>
@@ -87,6 +90,10 @@
 using namespace Poco::Net;
 
 QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap = {{
+
+    { QString(R"(^/status/?$)"),            &InstrumentRequestHandlerFactory::createCypressStatusRequestHandler },
+    { QString(R"(^/version/?$)"),           &InstrumentRequestHandlerFactory::createCypressVersionRequestHandler },
+
     { QString(R"(^/audiometer/?$)"),        &InstrumentRequestHandlerFactory::createAudiometerRequestHandler },
     { QString(R"(^/audiometer/status/?$)"), &InstrumentRequestHandlerFactory::createAudiometerStatusRequestHandler },
     { QString(R"(^/audiometer/delete/?$)"), &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler },
@@ -186,6 +193,8 @@ QMap<QString, createRequestHandlerImpl> InstrumentRequestHandlerFactory::urlMap 
     { QString(R"(^/oct_right/delete/?$)"),                   &InstrumentRequestHandlerFactory::defaultDeleteSessionRequestHandler }}
 };
 
+
+
 HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const HTTPServerRequest &request)
 {
     /*
@@ -216,6 +225,7 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
         return defaultDeleteSessionRequestHandler();
 
     while (handlerIter != urlMap.constEnd()) {
+        qDebug() << handlerIter.key();
         QRegularExpression regex(handlerIter.key());
         createRequestHandlerImpl requestHandlerFactoryFunc = handlerIter.value();
 
@@ -227,6 +237,16 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
     }
 
     return new DefaultRequestHandler;
+}
+
+HTTPRequestHandler *InstrumentRequestHandlerFactory::createCypressStatusRequestHandler()
+{
+    return new CypressStatusRequestHandler;
+}
+
+HTTPRequestHandler* InstrumentRequestHandlerFactory::createCypressVersionRequestHandler()
+{
+    return new CypressVersionRequestHandler;
 }
 
 HTTPRequestHandler *InstrumentRequestHandlerFactory::createDxaHipSessionRequestHandler()

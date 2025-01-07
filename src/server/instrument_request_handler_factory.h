@@ -21,6 +21,9 @@ public:
 
     static HTTPRequestHandler* defaultDeleteSessionRequestHandler();
 
+    static HTTPRequestHandler* createCypressStatusRequestHandler();
+    static HTTPRequestHandler* createCypressVersionRequestHandler();
+
     static HTTPRequestHandler* createGripStrengthRequestHandler();
     static HTTPRequestHandler* createGripStrengthStatusRequestHandler();
 

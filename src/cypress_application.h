@@ -47,6 +47,7 @@ public:
     QJsonObject getDeviceStatus();
 
     QJsonArray getNetworkAddresses();
+    QDateTime lastInstalledDate();
 public slots:
     void requestSession(QSharedPointer<CypressSession> session);
     void forceSessionEnd(QString sessionId);

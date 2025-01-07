@@ -1,5 +1,6 @@
 #include "cypress_settings.h"
 
+#include <QCoreApplication>
 #include <QSettings>
 #include <QException>
 #include <QString>
@@ -13,6 +14,12 @@ bool CypressSettings::isDebugMode()
     bool isDebugMode = m_settings->value("debug_mode", 1).toInt();
 
     return isDebugMode;
+}
+
+QString CypressSettings::getVersion()
+{
+    const QString version = QCoreApplication::applicationVersion();
+    return version;
 }
 
 QString CypressSettings::getFilePath()

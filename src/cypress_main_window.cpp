@@ -74,6 +74,7 @@ QJsonObject CypressMainWindow::getDebugInputData()
         {"interviewer", 	interviewer},
         {"smoker", 			smoker},
         {"gender", 			gender},
+        {"sex", 			gender},
         {"height", 			height},
         {"weight", 			weight},
         {"dob", 	date_of_birth},

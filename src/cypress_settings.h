@@ -15,6 +15,8 @@ public:
     CypressSettings(const CypressSettings&) = delete;
     CypressSettings &operator=(const CypressSettings &) = delete;
 
+    static QString getVersion();
+
     static bool isSimMode();
     static bool isDebugMode();
     static QString getFilePath();
