@@ -1,8 +1,0 @@
-{
-  "answer_id": 1,
-  "barcode": "string",
-  "language": "en | fr",
-  "interviewer": "string",
-  "cuff_size":"small",
-  "side":"left"
-}

@@ -1,7 +1,0 @@
-{
-    "audiometer": {
-        "client": {
-            "port": "ttyUSB0"
-        }
-    }
-}

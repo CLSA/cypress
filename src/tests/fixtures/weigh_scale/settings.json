@@ -1,7 +1,0 @@
-{
-    "weigh_scale": {
-        "client": {
-            "port": "ttyUSB0"
-        }
-    }
-}

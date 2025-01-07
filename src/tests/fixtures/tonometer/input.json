@@ -1,8 +1,0 @@
-{
-  "answer_id": null,
-  "barcode": "string",
-  "language": "en | fr",
-  "interviewer": "default",
-  "sex": "male",
-  "date_of_birth": "1958-05-21"
-}
