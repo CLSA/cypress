@@ -63,21 +63,15 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 {
     qDebug() << "VividIQManager::dicomFilesReceived";
 
-    //bool foundInvalidParticipant = false;
-    QString invalidId;
-
     qint64 totalSize { 0 };
 
     foreach (DicomFile file, dicomFiles)
     {
         QSharedPointer<VividIQMeasurement> measure(new VividIQMeasurement);
-
-        //if (m_session->getBarcode() != file.patientId) {
-        //    qDebug() << "Received wrong id" << file.patientId;
-        //    foundInvalidParticipant = true;
-        //    invalidId = file.patientId;
-        //    continue;
-        //}
+        if (m_session->getBarcode() != file.patientId) {
+            qDebug() << "Received wrong id" << file.patientId;
+            continue;
+        }
 
         auto measurements = m_test->getMeasurements();
         bool foundDuplicate = false;
@@ -90,9 +84,6 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
             }
         }
 
-        if (foundDuplicate) {
-            continue;
-        }
 
         QFileInfo fileInfo(file.absFilePath);
         measure->setAttribute("name", 		     fileInfo.fileName());
@@ -104,11 +95,13 @@ void VividIQManager::dicomFilesReceived(QList<DicomFile> dicomFiles)
 
         totalSize += fileInfo.size();
 
+        if (foundDuplicate) {
+            continue;
+        }
+
+
         m_test->addMeasurement(measure);
     }
-
-    //if (foundInvalidParticipant)
-    //    QMessageBox::warning(nullptr, "Invalid participant", invalidId + " does not match " + m_session->getBarcode());
 
     emit filesReceived(m_test->getMeasurementCount(), FileUtils::bytesToHumanReadable(totalSize));
     emit dataChanged(m_test);

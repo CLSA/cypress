@@ -45,6 +45,9 @@ public:
 
     virtual bool sendFiles();
 
+    QSharedPointer<CypressSession> m_session;
+    QSharedPointer<TestBase> m_test;
+
 public slots:
     // subclasses call methods after main initialization just prior
     // to running (eg., emit dataChanged signal)
@@ -73,12 +76,12 @@ public slots:
     virtual bool cleanUp() { return true; };
 
     virtual void checkIfFinished();
+
+
+
 protected:
     // Set up device
     virtual bool setUp() { return true; };
-
-    QSharedPointer<CypressSession> m_session;
-    QSharedPointer<TestBase> m_test;
 
     QVariantMap m_inputData;
     QList<QString> m_inputKeyList;
