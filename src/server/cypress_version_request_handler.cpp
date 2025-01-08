@@ -1,5 +1,6 @@
 #include "cypress_version_request_handler.h"
 
+#include "cypress_application.h"
 #include "auxiliary/json_settings.h"
 
 #include "Poco/Net/HTTPResponse.h"
@@ -16,9 +17,10 @@ void CypressVersionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &r
 
     QString cypressVersion = CypressSettings::getVersion();
 
-    QJsonObject responseData {{
-        "version", cypressVersion
-    }};
+    QJsonObject responseData {
+        { "version", cypressVersion },
+        { "lastModified", Cypress::getInstance().lastInstalledDate().toString() }
+    };
 
     out << JsonSettings::serializeJson(responseData).toStdString();
     out.flush();

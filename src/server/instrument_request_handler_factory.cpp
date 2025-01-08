@@ -225,7 +225,6 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
         return defaultDeleteSessionRequestHandler();
 
     while (handlerIter != urlMap.constEnd()) {
-        qDebug() << handlerIter.key();
         QRegularExpression regex(handlerIter.key());
         createRequestHandlerImpl requestHandlerFactoryFunc = handlerIter.value();
 
