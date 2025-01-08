@@ -251,7 +251,7 @@ void WatchBPManager::finish()
     if (test->getMeasurementCount() < 2) {
         qWarning() << "WatchBPManager::finish - invalid test, this should not occur";
         //m_test->reset();
-        QMessageBox::critical(nullptr, "Not enough measurements", "This stage requires at minimum of two measurements");
+        QMessageBox::critical(nullptr, "Not enough measurements", "This stage requires a minimum of two measurements");
         return;
     }
 
