@@ -1,5 +1,6 @@
 #include "ora_manager.h"
-#include "data/tonometer/tests/ora_test.h"
+//#include "data/tonometer/tests/ora_test.h"
+#include "data/tonometer/tests/tonometer_test.h"
 #include "auxiliary/file_utils.h"
 
 #include <QSqlQuery>
@@ -23,7 +24,7 @@ ORAManager::ORAManager(QSharedPointer<ORASession> session): ManagerBase { sessio
     //m_database = QSqlDatabase::addDatabase("QODBC");
     //m_database.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + QDir::toNativeSeparators(m_databasePath));
 
-    m_test.reset(new ORATest);
+    m_test.reset(new TonometerTest);
 }
 
 bool ORAManager::start()
@@ -116,7 +117,7 @@ void ORAManager::readOutput()
 
     const QList<QVariantMap> results { leftResults, rightResults };
 
-    auto test = qSharedPointerCast<ORATest>(m_test);
+    auto test = qSharedPointerCast<TonometerTest>(m_test);
     test->fromVariantMapList(results);
 
     m_database.close();
