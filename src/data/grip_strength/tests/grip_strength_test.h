@@ -20,8 +20,6 @@ public:
 
     void openDatabase();
 
-    bool readMeasurements();
-
     QString getTrackerDatabaseFolder();
     QJsonObject toJsonObject() const override;
 

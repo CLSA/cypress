@@ -122,7 +122,7 @@ QJsonObject Cypress::getStatus()
 {
     QJsonObject statusJson = {};
     QJsonObject cypress {
-        { "version", "v1.0.1" },
+        { "version", QCoreApplication::applicationVersion() },
         { "cwd", 	 QCoreApplication::applicationDirPath() },
         { "lastModified", lastInstalledDate().toString(Qt::DateFormat::ISODate) },
         { "http",

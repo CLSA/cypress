@@ -40,9 +40,6 @@ public:
 
     void addManualEntry(const QString side, const QString test, const int level, const bool pass);
 
-signals:
-    void cannotFinish();
-
 public slots:
     void removeMeasurement(const int index);
 

@@ -44,6 +44,15 @@ void TestBase::setFiles(const QList<QJsonObject>& files)
         const QString filePath = file["path"].toString();
         const QString fileSize = FileUtils::getHumanReadableFileSize(filePath);
 
+        QFileInfo fileInfo(filePath);
+        if (!fileInfo.exists()) {
+            qCritical() << filePath << "does not exist";
+        }
+
+        if (!fileInfo.isReadable()) {
+            qCritical() << filePath << "is not readable";
+        }
+
         QJsonObject fileJson {
             { "name", 		fileName },
             { "path", 		filePath },

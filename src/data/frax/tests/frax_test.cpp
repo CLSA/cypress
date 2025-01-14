@@ -117,48 +117,50 @@ bool FraxTest::readOutputFile(const QString& fileName)
 
     qDebug() << list << list.size();
 
-    if (17 == list.size()) {
-        QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
-        measure1->setAttribute("type", "osteoporotic_fracture");
-        measure1->setAttribute("probability", list.at(13).toDouble(), "%");
-        addMeasurement(measure1);
-
-        QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
-        measure2->setAttribute("type", "hip_fracture");
-        measure2->setAttribute("probability", list.at(14).toDouble(), "%");
-        addMeasurement(measure2);
-
-        QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
-        measure3->setAttribute("type", "osteoporotic_fracture_bmd");
-        measure3->setAttribute("probability", list.at(15).toDouble(), "%");
-        addMeasurement(measure3);
-
-        const double p = list.at(15).toDouble(); // interpretation of osteoporotic_fracture_bmd result for report
-        QString interp = interpretResults(p);
-        addMetaData("osteoporotic_fracture_bmd_interp", interp);
-
-        QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
-        measure4->setAttribute("type", "hip_fracture_bmd");
-        measure4->setAttribute("probability", list.at(16).toDouble(), "%");
-        addMeasurement(measure4);
-
-        addMetaData("type",                   list.at(0).toLower());
-        addMetaData("country_code",           list.at(1).toUInt());
-        addMetaData("age",                    list.at(2).toDouble(), "yr");
-        addMetaData("sex",                    list.at(3).toUInt());
-        addMetaData("body_mass_index",        list.at(4).toDouble(), "kg/m2");
-        addMetaData("previous_fracture",      list.at(5).toUInt());
-        addMetaData("parent_hip_fracture",    list.at(6).toUInt());
-        addMetaData("current_smoker",         list.at(7).toUInt());
-        addMetaData("glucocorticoid",         list.at(8).toUInt());
-        addMetaData("rheumatoid_arthritis",   list.at(9).toUInt());
-        addMetaData("secondary_osteoporosis", list.at(10).toUInt());
-        addMetaData("alcohol",                list.at(11).toUInt());
-        addMetaData("femoral_neck_tscore",    list.at(12).toDouble());
-    }
-    else {
+    if (list.size() != 17) {
+        qCritical() << "Results are invalid (!= 17)";
         return false;
     }
+
+    addMetaData("type",                   list.at(0).toLower());
+    addMetaData("country_code",           list.at(1).toUInt());
+    addMetaData("age",                    list.at(2).toDouble(), "yr");
+    addMetaData("sex",                    list.at(3).toUInt());
+    addMetaData("body_mass_index",        list.at(4).toDouble(), "kg/m2");
+    addMetaData("previous_fracture",      list.at(5).toUInt());
+    addMetaData("parent_hip_fracture",    list.at(6).toUInt());
+    addMetaData("current_smoker",         list.at(7).toUInt());
+    addMetaData("glucocorticoid",         list.at(8).toUInt());
+    addMetaData("rheumatoid_arthritis",   list.at(9).toUInt());
+    addMetaData("secondary_osteoporosis", list.at(10).toUInt());
+    addMetaData("alcohol",                list.at(11).toUInt());
+    addMetaData("femoral_neck_tscore",    list.at(12).toDouble());
+
+    QSharedPointer<FraxMeasurement> measure1(new FraxMeasurement);
+    measure1->setAttribute("type", "osteoporotic_fracture");
+    measure1->setAttribute("probability", list.at(13).toDouble(), "%");
+    addMeasurement(measure1);
+
+    QSharedPointer<FraxMeasurement> measure2(new FraxMeasurement);
+    measure2->setAttribute("type", "hip_fracture");
+    measure2->setAttribute("probability", list.at(14).toDouble(), "%");
+    addMeasurement(measure2);
+
+    QSharedPointer<FraxMeasurement> measure3(new FraxMeasurement);
+    measure3->setAttribute("type", "osteoporotic_fracture_bmd");
+    measure3->setAttribute("probability", list.at(15).toDouble(), "%");
+    addMeasurement(measure3);
+
+    const double p = list.at(15).toDouble(); // interpretation of osteoporotic_fracture_bmd result for report
+    QString interp = interpretResults(p);
+    addMetaData("osteoporotic_fracture_bmd_interp", interp);
+
+    QSharedPointer<FraxMeasurement> measure4(new FraxMeasurement);
+    measure4->setAttribute("type", "hip_fracture_bmd");
+    measure4->setAttribute("probability", list.at(16).toDouble(), "%");
+    addMeasurement(measure4);
+
+
 
     return true;
 }
