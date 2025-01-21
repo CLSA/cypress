@@ -58,7 +58,7 @@ void SpirometerManager::measure()
     qInfo() << "SpirometerManager::measure";
 
     if (m_process.state() != QProcess::NotRunning) {
-        emit error("CardioSoft is already running");
+        emit error("Spirometer is already running");
         return;
     }
 
@@ -66,7 +66,7 @@ void SpirometerManager::measure()
     m_process.start();
 
     if (!m_process.waitForStarted()) {
-        emit error("Could not launch the spirometer application (EasyOnPC)");
+        emit error("Could not launch the spirometer application");
         return;
     }
 }
@@ -106,42 +106,55 @@ void SpirometerManager::finish()
     QJsonObject fileJson {};
 
     const QFileInfo emrOutputXMLFile(getEMROutXmlName());
-    if (emrOutputXMLFile.exists()) {
-        const QString filePath = emrOutputXMLFile.absoluteFilePath();
-        const QString fileSize = FileUtils::getHumanReadableFileSize(filePath);
 
-        fileJson.insert("data_xml", fileSize);
-
-        NetworkUtils::sendHTTPSRequest(
-            Poco::Net::HTTPRequest::HTTP_PATCH,
-            (answerUrl + "?filename=data.xml").toStdString(),
-            "application/octet-stream",
-            FileUtils::readFile(filePath)
-        );
-    }
-    else {
-        qDebug() << "could not find emrOutputXMLFile" << getEMROutXmlName();
+    if (!emrOutputXMLFile.exists()) {
+        qCritical() << "XML output file does not exist";
+        emit error("XML output file does not exist");
+        return;
     }
 
-    if (outputPdfExists()) {
-        const QString pdfOutputFilePath = getOutputPdfPath();
-        const QFileInfo pdfOutputInfo(pdfOutputFilePath);
-
-        qDebug() << "sending pdf output file: " << pdfOutputInfo.absoluteFilePath();
-
-        const QString fileSize = FileUtils::getHumanReadableFileSize(pdfOutputFilePath);
-
-        fileJson.insert("report_pdf", fileSize);
-
-        NetworkUtils::sendHTTPSRequest(
-            Poco::Net::HTTPRequest::HTTP_PATCH,
-            (answerUrl + QString::number(answerId) + "?filename=report.pdf").toStdString(),
-            "application/octet-stream",
-            FileUtils::readFile(pdfOutputInfo.absoluteFilePath())
-        );
+    if (!outputPdfExists()) {
+        qCritical() << "PDF output file does not exist";
+        emit error("PDF output file does not exist");
+        return;
     }
-    else {
-        qDebug() << "could not find outputPDF: " << getOutputPdfPath();
+
+    QString filePath = emrOutputXMLFile.absoluteFilePath();
+    QString fileSize = FileUtils::getHumanReadableFileSize(filePath);
+
+    fileJson.insert("data_xml", fileSize);
+
+    bool ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        (answerUrl + "?filename=data.xml").toStdString(),
+        "application/octet-stream",
+        FileUtils::readFile(filePath)
+    );
+
+    if (!ok) {
+        qCritical() << "Could not send XML file";
+        emit error("Could not send XML file");
+        return;
+    }
+
+    QString pdfOutputFilePath = getOutputPdfPath();
+    QFileInfo pdfOutputInfo(pdfOutputFilePath);
+
+    qDebug() << "sending pdf output file: " << pdfOutputInfo.absoluteFilePath();
+
+    fileSize = FileUtils::getHumanReadableFileSize(pdfOutputFilePath);
+    fileJson.insert("report_pdf", fileSize);
+
+    ok = NetworkUtils::sendHTTPSRequest(
+        Poco::Net::HTTPRequest::HTTP_PATCH,
+        (answerUrl + QString::number(answerId) + "?filename=report.pdf").toStdString(),
+        "application/octet-stream",
+        FileUtils::readFile(pdfOutputInfo.absoluteFilePath())
+    );
+    if (!ok) {
+        qCritical() << "Could not send PDF file";
+        emit error("Could not send PDF file");
+        return;
     }
 
     testJson.insert("session", m_session->getJsonObject());
@@ -151,21 +164,22 @@ void SpirometerManager::finish()
     const QJsonDocument jsonDoc(responseJson);
     const QByteArray serializedData = jsonDoc.toJson();
 
-    bool ok = NetworkUtils::sendHTTPSRequest(
+    ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
         answerUrl.toStdString(),
         "application/json",
         serializedData
     );
 
+    if (!ok) {
+        qCritical() << "Could not send results to Pine";
+        emit error("Could not send results to Pine");
+        return;
+    }
+
     cleanUp();
 
-    if (ok) {
-        emit success("Save successful. You may close this window.");
-    }
-    else {
-        emit error("Something went wrong");
-    }
+    emit success("Save successful. You may close this window.");
 }
 
 bool SpirometerManager::clearData()

@@ -145,7 +145,9 @@ void HearconManager::measure()
     }
 
     qDebug().noquote() << JsonSettings::prettyPrintJson(m_test->toJsonObject());
+
     emit dataChanged(m_test);
+
     checkIfFinished();
 }
 

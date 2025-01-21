@@ -29,7 +29,7 @@ public:
     {
         if (EcgDialog->objectName().isEmpty())
             EcgDialog->setObjectName(QString::fromUtf8("EcgDialog"));
-        EcgDialog->resize(400, 300);
+        EcgDialog->resize(400, 39);
         verticalLayout = new QVBoxLayout(EcgDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         testInfoWidget = new TestInfoWidget(EcgDialog);
@@ -37,7 +37,7 @@ public:
 
         verticalLayout->addWidget(testInfoWidget);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         verticalLayout->addItem(verticalSpacer);
 

@@ -11,19 +11,30 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "widgets/test_info_widget.h"
 
 QT_BEGIN_NAMESPACE
 
 class Ui_GeneralProxyFormDialog
 {
 public:
+    QVBoxLayout *verticalLayout;
+    TestInfoWidget *testInfoWidget;
 
     void setupUi(QWidget *GeneralProxyFormDialog)
     {
         if (GeneralProxyFormDialog->objectName().isEmpty())
             GeneralProxyFormDialog->setObjectName(QString::fromUtf8("GeneralProxyFormDialog"));
-        GeneralProxyFormDialog->resize(400, 300);
+        GeneralProxyFormDialog->resize(400, 16);
+        verticalLayout = new QVBoxLayout(GeneralProxyFormDialog);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        testInfoWidget = new TestInfoWidget(GeneralProxyFormDialog);
+        testInfoWidget->setObjectName(QString::fromUtf8("testInfoWidget"));
+
+        verticalLayout->addWidget(testInfoWidget);
+
 
         retranslateUi(GeneralProxyFormDialog);
 

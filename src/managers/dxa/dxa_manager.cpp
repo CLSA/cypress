@@ -90,18 +90,6 @@ bool DXAManager::setUp()
         return false;
     }
 
-    //QFile referenceDatabase(m_refscanDbPath);
-    //if (!referenceDatabase.exists()) {
-    //    QMessageBox::critical(nullptr, "APEX not available", "Please ensure the DXA computer is powered on and the shared folder is online");
-    //    return false;
-    //}
-
-    //QFile patientScanDatabase(m_patscanDbPath);
-    //if (!patientScanDatabase.exists()) {
-    //    QMessageBox::critical(nullptr, "APEX not available", "Please ensure the DXA computer is powered on and the shared folder is online");
-    //    return false;
-    //}
-
     m_dicomServer.reset(
         new DcmRecv(
             m_runnableName,

@@ -111,6 +111,18 @@ void EasyoneConnectManager::finish()
         { { "path", getOutputPdfPath() }, { "name", "report.pdf" } },
     };
 
+    if (!QFile(getOutputPdfPath()).exists()) {
+        qDebug() << "PDF file does not exist";
+        emit error("PDF file does not exist");
+        return;
+    }
+
+    if (!QFile(getEMROutXmlName()).exists()) {
+        qDebug() << "XML file does not exist";
+        emit error("XML file does not exist");
+        return;
+    }
+
     m_test->setFiles(filePaths);
 
     ManagerBase::finish();
@@ -118,6 +130,21 @@ void EasyoneConnectManager::finish()
 
 bool EasyoneConnectManager::restoreDatabase()
 {
+    QDir exportDir(m_exchangePath);
+    QFileInfoList files = exportDir.entryInfoList();
+    for (auto file : files)
+    {
+        if (file.fileName().contains(".pdf")) {
+            qDebug() << "Removing " << file.fileName();
+            QFile::remove(file.absoluteFilePath());
+        }
+
+        if (file.fileName().contains(".xml")) {
+            qDebug() << "Removing " << file.fileName();
+            QFile::remove(file.absoluteFilePath());
+        }
+    }
+
     // Clear out database
     //QFile::remove(m_databasePath + "/EasyOneConnect.sqlite");
     //QFile::remove(m_databasePath + "/EasyOneConnectOptions.mdb");

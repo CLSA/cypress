@@ -29,7 +29,7 @@ public:
     {
         if (DXADialog->objectName().isEmpty())
             DXADialog->setObjectName(QString::fromUtf8("DXADialog"));
-        DXADialog->resize(719, 44);
+        DXADialog->resize(422, 44);
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
