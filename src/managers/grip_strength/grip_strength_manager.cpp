@@ -153,6 +153,12 @@ void GripStrengthManager::measure() {
     m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
+void GripStrengthManager::finish() {
+    this->restoreData();
+
+    ManagerBase::finish();
+}
+
 bool GripStrengthManager::restoreData() {
     qInfo() << "GripStrengthManager::restoreData";
 

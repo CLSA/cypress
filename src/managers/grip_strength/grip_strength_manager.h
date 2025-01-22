@@ -24,6 +24,7 @@ public:
 public slots:
     bool start() override;
     void measure() override;
+    void finish() override;
 
 private:
     void configureProcess();
