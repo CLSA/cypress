@@ -3,7 +3,7 @@ import logging
 
 def test_bpm(payload):
   try:
-      response = requests.post("http://127.0.0.1:9000/blood_pressure", json=payload)
+      response = requests.post("http://127.0.0.1:9000/watch_bp", json=payload, headers={'Origin': '127.0.0.1'})
       print(response.status_code)
       print(response.text)
 

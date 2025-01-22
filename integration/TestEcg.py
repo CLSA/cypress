@@ -4,20 +4,12 @@ import time
 
 def test_ecg(payload):
   try:
-      response = requests.post("http://127.0.0.1:9000/ecg", json=payload)
+      response = requests.post("http://127.0.0.1:9000/mac5", json=payload, headers={ "origin": "127.0.0.1" })
       print(response.status_code)
       print(response.text)
 
       data = response.json()
       session_id = data['sessionId']
-
-      print("Press Enter to continue...")
-      while input() != "":
-        pass
-
-      response = requests.delete(f"http://127.0.0.1:9000/ecg/${session_id}")
-      print(response.status_code)
-      print(response.text)
 
   except requests.exceptions.RequestException as e:
       logging.error(f"Exception: {e}")
