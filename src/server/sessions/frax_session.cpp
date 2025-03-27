@@ -19,7 +19,7 @@ void FraxSession::validate() const
 {
     CypressSession::validate();
 
-    qDebug() << m_inputData;
+    //qDebug() << m_inputData;
 
     if (!Validators::isValidInteger(m_inputData, "age"))
         throw ValidationError("age is not an integer");
@@ -112,6 +112,10 @@ void FraxSession::isInstalled() const
 void FraxSession::isAvailable() const
 {
 
+}
+
+void FraxSession::setInputData(const QString& key, const QJsonValue& val) {
+    m_inputData[key] = val;
 }
 
 //double FraxSession::calculateBMI(double weight_kg, double height_cm) const

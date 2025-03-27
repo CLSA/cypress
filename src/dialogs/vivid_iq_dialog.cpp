@@ -45,6 +45,8 @@ VividIQDialog::VividIQDialog(QWidget *parent, QSharedPointer<CypressSession> ses
         ui->totalSizeValue->setText(totalSize);
     });
 
+    connect(manager.get(), &VividIQManager::status, ui->testInfoWidget, &TestInfoWidget::setStatus);
+
     // request finish
     connect(ui->measurementTable, &MeasurementTable::finish, manager.get(), [=]() {
         ui->measurementTable->disableFinishButton();

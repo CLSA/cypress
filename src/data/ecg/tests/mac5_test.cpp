@@ -4,7 +4,10 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-Mac5Test::Mac5Test() {}
+Mac5Test::Mac5Test(QSharedPointer<Mac5Session> session): m_session(session)
+{
+
+}
 
 QString Mac5Test::toString() const
 {
@@ -13,6 +16,46 @@ QString Mac5Test::toString() const
 
 bool Mac5Test::isValid() const
 {
+    if (m_files.isEmpty()) {
+        qDebug() << "Mac5Test::isValid - files not set";
+        return false;
+    }
+
+    if (metaDataIsEmpty()) {
+        qDebug() << "Mac5Test::isValid - no metadata";
+        return false;
+    }
+
+    // Get the submitted patient id from the demographics object (nested json)
+    QJsonObject demographics = m_metaData.getAttributeValue("demographics").toJsonObject();
+    if (demographics.isEmpty()) {
+        qDebug() << "demographics is empty";
+        return false;
+    }
+    QJsonObject patientInfo = demographics.value("patientInfo").toObject();
+    if (patientInfo.isEmpty()) {
+        qDebug() << "patientInfo is empty";
+        return false;
+    }
+    QJsonArray identifier = patientInfo.value("identifier").toArray();
+    if (identifier.isEmpty()) {
+        qDebug() << "identifier array is empty";
+        return false;
+    }
+    if (identifier[0].toObject().isEmpty()) {
+        qDebug() << "identifier object is empty";
+        return false;
+    }
+    QString id = identifier[0].toObject().value("id").toString();
+    if (id.isEmpty() || id.isNull()) {
+        qDebug() << "id is empty";
+        return false;
+    }
+    if (id != m_session->getBarcode()) {
+        qCritical() << "id in xml does not match session barcode";
+        return false;
+    }
+
     return true;
 }
 

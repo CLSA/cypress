@@ -7,14 +7,14 @@
 
 const QStringList SpirometerMeasurement::parameterList = {"DataValue","Unit","PredictedValue","LLNormalValue"};
 
-const q_stringMap SpirometerMeasurement::channelMap = {
+const QMap<QString, QString> SpirometerMeasurement::channelMap = {
     {"SamplingInterval","sampling_interval"},
     //{"SamplingValues","values"},
     {"TimeZeroOffset","time_zero_offset"},
     {"DefaultVTPlotDrawEndIdx","default_vt_plot_draw_end_index"}
 };
 
-const q_stringMap SpirometerMeasurement::resultMap = {
+const QMap<QString, QString> SpirometerMeasurement::resultMap = {
     {"AmbHumidity","ambient_humidity"},
     {"AmbPressure","ambient_pressure"},
     {"AmbTemp","ambient_temperature"},
@@ -76,7 +76,7 @@ const q_stringMap SpirometerMeasurement::resultMap = {
     {"VCmax","vcmax"}
 };
 
-const q_stringMap SpirometerMeasurement::trialMap =
+const QMap<QString, QString> SpirometerMeasurement::trialMap =
 {
   {"Date","trial_date"},
   {"Number","trial_number"},

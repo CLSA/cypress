@@ -104,7 +104,7 @@ bool TonometerTest::isValid() const
     bool okMeta = true;
     foreach(const auto key, m_outputKeyList)
     {
-        if(!hasMetaData(key))
+        if(!m_metaData.hasKey(key))
         {
             qDebug() << "meta data is not valid" << key;
             okMeta = false;

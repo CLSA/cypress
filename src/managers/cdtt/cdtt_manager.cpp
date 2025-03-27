@@ -36,6 +36,10 @@ CDTTManager::CDTTManager(QSharedPointer<CDTTSession> session)
     QDir outputDir(m_outputPath);
     m_outputFile = outputDir.filePath(QString("Results-%0.xlsx").arg(m_session->getBarcode()));
 
+    m_settingsFilePath = config.getSetting("settingsFilePath");
+    m_enSettingsPath = config.getSetting("enSettingsPath");
+    m_frSettingsPath = config.getSetting("frSettingsPath");
+
     m_test.reset(new CDTTTest);
     m_test->setMinimumMeasurementCount(1);
 }
@@ -67,6 +71,15 @@ bool CDTTManager::setUp()
 
     if (!cleanUp())
         return false;
+
+    if (m_session->getLanguage() == "fr") {
+        if (!FileUtils::copyFile(m_frSettingsPath, m_settingsFilePath))
+            qCritical() << "couldn't copy fr settings";
+    }
+    else {
+        if (!FileUtils::copyFile(m_enSettingsPath, m_settingsFilePath))
+            qCritical() << "couldn't copy en settings";
+    }
 
     configureProcess();
 

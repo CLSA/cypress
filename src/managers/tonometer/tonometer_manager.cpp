@@ -100,7 +100,13 @@ void TonometerManager::readOutput()
     auto test = qSharedPointerCast<TonometerTest>(m_test);
     test->fromVariantMapList(results);
 
-    finish();
+    if (test->isValid()) {
+        qDebug() << "Test is valid";
+        finish();
+    }
+    else {
+        emit error("Test results were invalid");
+    }
 }
 
 void TonometerManager::configureProcess()

@@ -131,6 +131,11 @@ bool Measurement::hasAttribute(const QString &key) const
     return m_attributes.contains(key) && !m_attributes[key].isNull();
 }
 
+bool Measurement::hasKey(const QString &key) const
+{
+    return m_attributes.contains(key);
+}
+
 bool Measurement::hasUnits(const QString &key) const
 {
     return (hasAttribute(key) && m_attributes[key].hasUnits());

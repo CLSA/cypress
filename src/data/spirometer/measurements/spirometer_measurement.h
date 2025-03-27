@@ -10,8 +10,6 @@
 * \sa Measurement
 */
 
-typedef QMap<QString,QString> q_stringMap;
-
 class SpirometerMeasurement : public Measurement
 {
 public:
@@ -31,9 +29,9 @@ public:
     void simulate();
 
     static const QStringList parameterList;
-    static const q_stringMap channelMap;
-    static const q_stringMap resultMap;
-    static const q_stringMap trialMap;
+    static const QMap<QString, QString> channelMap;
+    static const QMap<QString, QString> resultMap;
+    static const QMap<QString, QString> trialMap;
 
 private:
 

@@ -32,7 +32,6 @@ public:
     static QString getWebpageContents(const DxaHipSession &session);
 
 signals:
-    void status(const QString newStatus);
     void transfer();
 
 public slots:

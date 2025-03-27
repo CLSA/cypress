@@ -113,7 +113,19 @@ void ORAManager::readOutput()
     }
 
     const QVariantMap leftResults = extractMeasures("L");
+    if (leftResults.empty()) {
+        qCritical() << "Left measurement not found";
+        emit error("Left measurement not found");
+        return;
+    }
+
     const QVariantMap rightResults = extractMeasures("R");
+    if (rightResults.empty()) {
+        qCritical() << "Right measurement not found";
+        emit error("Right measurement not found");
+        return;
+    }
+
 
     const QList<QVariantMap> results { leftResults, rightResults };
 
@@ -123,7 +135,14 @@ void ORAManager::readOutput()
     m_database.close();
 
     qDebug() << "ORAManager::readOutput" << results;
-    finish();
+
+    if (test->isValid()) {
+        finish();
+    }
+    else {
+        qCritical() << "Test is invalid";
+        emit error("Test results were invalid");
+    }
 }
 
 QVariantMap ORAManager::extractMeasures(const QString& eye)

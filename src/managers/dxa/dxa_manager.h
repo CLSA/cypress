@@ -31,9 +31,6 @@ public:
     static DeviceConfig config;
     static QString getWebpageContents(const DXASession &session);
 
-signals:
-    void status(const QString newStatus);
-
 public slots:
     bool start() override;
     void measure() override;

@@ -193,6 +193,8 @@ bool HearconManager::configurePlugin(const QString& operation)
         << m_session->getInputData()["dob"].toString()
         << m_session->getInputData()["sex"].toString()[0].toUpper();
 
+    qDebug() << "plugin args: " << pluginArguments;
+
     m_plugin.setProgram(m_readerPath);
     m_plugin.setArguments(pluginArguments);
     m_plugin.setWorkingDirectory(m_readerWorkingDirectory);

@@ -15,6 +15,8 @@ public:
     void isAvailable() const override;
     void initializeDialog() override;
 
+    void setInputData(const QString& key, const QJsonValue& val);
+
     //double calculateBMI(double weight_kg, double height_cm) const;
     //double calculateTScore(double femoral_neck_bmd) const;
     //bool calculateGlucocorticoid(int age);

@@ -202,7 +202,7 @@ TEST PDF REPORT:
 
 */
 
-const q_stringMap SpirometerTest::testMetaMap = {
+const QMap<QString, QString> SpirometerTest::testMetaMap = {
     {"LungAge","lung_age"},
     {"SWVersion","device_software_version"},
     {"QualityGradeOriginal","original_quality_grade"},
@@ -213,7 +213,7 @@ const q_stringMap SpirometerTest::testMetaMap = {
     {"DeviceType","device_type"}
 };
 
-const q_stringMap SpirometerTest::patientMetaMap = {
+const QMap<QString, QString> SpirometerTest::patientMetaMap = {
   {"Height","height"},
   {"Weight","weight"},
   {"Ethnicity","ethnicity"},

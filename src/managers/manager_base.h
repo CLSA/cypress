@@ -92,6 +92,9 @@ protected:
 
 signals:
 
+    // display message on UI
+    void status(const QString& newStatus);
+
     // the underlying test data has changed
     //
     void dataChanged(QSharedPointer<TestBase> test);
@@ -109,7 +112,6 @@ signals:
     // (update GUI enable write button and update the results display)
     //
     void canFinish();
-
     void cannotFinish();
 
     // Session successful, data sent to server

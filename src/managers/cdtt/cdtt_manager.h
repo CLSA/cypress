@@ -57,6 +57,10 @@ private:
     QString m_outputPath;
     QString m_outputFile;
 
+    QString m_settingsFilePath;
+    QString m_enSettingsPath;
+    QString m_frSettingsPath;
+
     // Reset the session
     bool clearData() override;
 
@@ -65,6 +69,7 @@ private:
 
     // Clean up the device for next time
     bool cleanUp() override;
+
 
     void configureProcess();
 

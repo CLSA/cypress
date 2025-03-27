@@ -20,7 +20,7 @@ DeviceConfig Mac5Manager::config {{
 Mac5Manager::Mac5Manager(QSharedPointer<Mac5Session> session) : ManagerBase(std::move(session))
 {
     m_exportPath = config.getSetting("exportPath");
-    m_test.reset(new Mac5Test);
+    m_test.reset(new Mac5Test(session));
 }
 
 bool Mac5Manager::start()
@@ -100,7 +100,12 @@ void Mac5Manager::finish()
     };
     m_test->setFiles(filePaths);
 
-    ManagerBase::finish();
+    if (m_test->isValid()) {
+        ManagerBase::finish();
+    }
+    else {
+        emit error("Test is not valid");
+    }
 }
 
 void Mac5Manager::measure()

@@ -37,7 +37,7 @@ public:
     QJsonObject getErrors() const;
 
 private:
-    bool m_hasErrors;
+    bool m_hasErrors { false };
     QMap<QString, Setting> settings {};
     QMap<QString, QString> errors {};
 

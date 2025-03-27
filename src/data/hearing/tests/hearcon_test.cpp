@@ -147,7 +147,10 @@ bool HearconTest::fromJsonFile(const QString &filePath)
 
     foreach (auto key, measurementKeys.keys()) {
         auto value = resultsJson.value(key);
-        if (value.isNull() || value.isUndefined() || value.toString() == "") {
+
+        qDebug() << value;
+
+        if (value.isNull() || value.isUndefined()) {
             qDebug() << "HearconTest::fromJsonFile - " << key << "is invalid";
             return false;
         }
@@ -155,8 +158,8 @@ bool HearconTest::fromJsonFile(const QString &filePath)
         QSharedPointer<HearconMeasurement> measure(new HearconMeasurement);
         measure->setAttribute("side",  measurementKeys.value(key).toObject().value("side").toString());
         measure->setAttribute("test",  measurementKeys.value(key).toObject().value("test").toString());
-        measure->setAttribute("level", measurementKeys.value(key).toObject().value("level").toString(), "db");
-        measure->setAttribute("pass",  value.toInt() <= 40);
+        measure->setAttribute("level", value.toDouble(), "db");
+        measure->setAttribute("pass",  value.toDouble() <= 40);
         measure->setAttribute("outcome", "");
         measure->setAttribute("error",   "");
 

@@ -714,7 +714,7 @@ public:
 
         retranslateUi(CypressMainWindow);
 
-        devices->setCurrentIndex(1);
+        devices->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(CypressMainWindow);

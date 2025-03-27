@@ -27,8 +27,8 @@ public:
     //
     QJsonObject toJsonObject() const override;
 
-    static const q_stringMap testMetaMap;
-    static const q_stringMap patientMetaMap;
+    static const QMap<QString, QString> testMetaMap;
+    static const QMap<QString, QString> patientMetaMap;
 
     std::unique_ptr<QJsonObject> toJsonObjectHeap();
 

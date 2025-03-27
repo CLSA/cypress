@@ -147,7 +147,7 @@ void SpirometerManager::finish()
 
     ok = NetworkUtils::sendHTTPSRequest(
         Poco::Net::HTTPRequest::HTTP_PATCH,
-        (answerUrl + QString::number(answerId) + "?filename=report.pdf").toStdString(),
+        (answerUrl + "?filename=report.pdf").toStdString(),
         "application/octet-stream",
         FileUtils::readFile(pdfOutputInfo.absoluteFilePath())
     );

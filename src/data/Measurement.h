@@ -117,6 +117,7 @@ public:
     const QList<QString> getAttributeKeys() const;
 
     bool hasAttribute(const QString &key) const;
+    bool hasKey(const QString &key) const;
 
     bool hasUnits(const QString &key) const;
 
