@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+
 Mac5Test::Mac5Test(QSharedPointer<Mac5Session> session): m_session(session)
 {
 
@@ -14,45 +15,67 @@ QString Mac5Test::toString() const
     return QString("");
 }
 
-bool Mac5Test::isValid() const
+void Mac5Test::validate() const
 {
     if (m_files.isEmpty()) {
-        qDebug() << "Mac5Test::isValid - files not set";
-        return false;
+        qCritical() << "Mac5Test::validate - files not set";
+        throw Mac5::FilesMissingError("Files are missing");
     }
 
     if (metaDataIsEmpty()) {
-        qDebug() << "Mac5Test::isValid - no metadata";
-        return false;
+        qCritical() << "Mac5Test::validate - no metadata";
+        throw QException();
     }
 
-    // Get the submitted patient id from the demographics object (nested json)
+    //// Get the submitted patient id from the demographics object (nested json)
     QJsonObject demographics = m_metaData.getAttributeValue("demographics").toJsonObject();
     if (demographics.isEmpty()) {
-        qDebug() << "demographics is empty";
-        return false;
+        qCritical() << "Mac5Test::validate - demographics is empty";
+        throw QException();
     }
+
     QJsonObject patientInfo = demographics.value("patientInfo").toObject();
     if (patientInfo.isEmpty()) {
-        qDebug() << "patientInfo is empty";
-        return false;
+        qCritical() << "Mac5Test::validate - patientInfo is empty";
+        throw QException();
     }
+
     QJsonArray identifier = patientInfo.value("identifier").toArray();
     if (identifier.isEmpty()) {
-        qDebug() << "identifier array is empty";
-        return false;
+        qCritical() << "Mac5Test::validate - identifier array is empty";
+        throw QException();
     }
-    if (identifier[0].toObject().isEmpty()) {
-        qDebug() << "identifier object is empty";
-        return false;
+
+    QJsonObject idContainer = identifier[0].toObject();
+    if (idContainer.isEmpty()) {
+        qCritical() << "Mac5Test::validate - identifier object is empty";
+        throw QException();
     }
-    QString id = identifier[0].toObject().value("id").toString();
+
+    QString id = idContainer.value("id").toString();
+
     if (id.isEmpty() || id.isNull()) {
-        qDebug() << "id is empty";
-        return false;
+        qCritical() << "id is empty";
+        throw QException();
     }
+
     if (id != m_session->getBarcode()) {
         qCritical() << "id in xml does not match session barcode";
+        throw Mac5::IncorrectBarcodeError(
+            QString("Barcode (%1) received does not match the participant (%2)")
+                .arg(id, m_session->getBarcode())
+                .toStdString()
+        );
+    }
+
+}
+
+bool Mac5Test::isValid() const
+{
+    try {
+        validate();
+    }
+    catch (...) {
         return false;
     }
 

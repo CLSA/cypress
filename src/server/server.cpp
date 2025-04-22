@@ -172,7 +172,6 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
     session->calculateInputs();
 
     emit startSession(session);
-
     return session->getSessionId();
 }
 
@@ -191,6 +190,4 @@ void Server::stop()
 {
     qDebug() << "Server::stop";
     server->stopAll(true);
-    serverThread.quit();
-    serverThread.wait();
 }

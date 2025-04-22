@@ -137,10 +137,11 @@ void ORAManager::readOutput()
     qDebug() << "ORAManager::readOutput" << results;
 
     if (test->isValid()) {
+        qDebug() << "ORAManager::readOutput - test is valid";
         finish();
     }
     else {
-        qCritical() << "Test is invalid";
+        qCritical() << "ORAManager::readOutput - Test is invalid";
         emit error("Test results were invalid");
     }
 }

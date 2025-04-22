@@ -31,6 +31,8 @@ private:
     QString m_xmlFilePath;
     QString m_pdfFilePath;
     QString m_rawFilePath;
+
+    bool clearData() override;
 };
 
 #endif // MAC5_MANAGER_H

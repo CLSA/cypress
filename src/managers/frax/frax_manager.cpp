@@ -60,13 +60,13 @@ void FraxManager::measure()
     process.start();
 
     if (!process.waitForStarted()) {
-        qDebug() << "FraxTest::run - no start";
+        qCritical() << "FraxTest::run - no start";
         emit error("FRAX failed to start");
         return;
     }
 
     if (!process.waitForFinished()) {
-        qDebug() << "FraxTest::run - no finish";
+        qCritical() << "FraxTest::run - no finish";
         emit error("FRAX failed to finish");
         return;
     }

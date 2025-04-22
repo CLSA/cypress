@@ -49,17 +49,13 @@ Cypress::Cypress(QObject *parent) :
     connect(httpServer.get(), &Server::startSession, this,  &Cypress::requestSession);
     connect(httpServer.get(), &Server::endSession,   this,  &Cypress::forceSessionEnd);
 
-    try {
-        httpServer->start();
-    }
-    catch (...) {
-        qDebug() << "couldn't start...";
-    }
+    httpServer->start();
 }
 
 
 Cypress::~Cypress()
 {
+    httpServer->stop();
     delete app;
 }
 

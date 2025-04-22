@@ -62,9 +62,9 @@ private:
 
     // The thread this class runs in, communication must be done with Qt's signals/slots to the main thread
     //
-    QThread serverThread;
+    //QThread serverThread;
 
-    QThread* mainThread;
+    //QThread* mainThread;
 };
 
 #endif // SERVER_H

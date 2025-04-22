@@ -1,23 +1,19 @@
 #include "mac5_manager.h"
 
 #include "auxiliary/file_utils.h"
-#include "auxiliary/network_utils.h"
-
 #include "data/ecg/tests/mac5_test.h"
-
-#include <QMessageBox>
-
-#include <QDomDocument>
 
 #include <QMap>
 #include <QPair>
 #include <QJsonArray>
+#include <QMessageBox>
+#include <QDomDocument>
 
 DeviceConfig Mac5Manager::config {{
     {"exportPath", {"mac5/exportPath", Dir }},
 }};
 
-Mac5Manager::Mac5Manager(QSharedPointer<Mac5Session> session) : ManagerBase(std::move(session))
+Mac5Manager::Mac5Manager(QSharedPointer<Mac5Session> session) : ManagerBase(session)
 {
     m_exportPath = config.getSetting("exportPath");
     m_test.reset(new Mac5Test(session));
@@ -25,13 +21,13 @@ Mac5Manager::Mac5Manager(QSharedPointer<Mac5Session> session) : ManagerBase(std:
 
 bool Mac5Manager::start()
 {
-    // Remove any existing data
-    FileUtils::clearDirectory(m_exportPath);
+    // Ensure the export directory is empty and the test instance is empty
+    clearData();
 
-    // Listen to directory changes
+    // Listen to export directory changes
     m_directoryWatcher.reset(new DicomDirectoryWatcher(m_exportPath));
 
-    // Whenever it changes, get the files
+    // Whenever export directory changes, check the files and submit (if required files are in directory)
     connect(m_directoryWatcher.get(),
             &DicomDirectoryWatcher::dicomDirectoryChanged,
             this,
@@ -61,25 +57,21 @@ void Mac5Manager::readOutput()
         }
     }
 
-    qDebug() << "pdf" << m_pdfFilePath;
-    qDebug() << "xml" << m_xmlFilePath;
-    qDebug() << "raw" << m_rawFilePath;
-
     if (m_pdfFilePath.isEmpty())
     {
-        qCritical() << "pdf path missing";
+        qDebug() << "Mac5Manager::readOutput - PDF path missing";
         return;
     }
 
     if (m_xmlFilePath.isEmpty())
     {
-        qCritical() << "xml path missing";
+        qDebug() << "Mac5Manager::readOutput - XML path missing";
         return;
     }
 
     if (m_rawFilePath.isEmpty())
     {
-        qCritical() << "raw path missing";
+        qDebug() << "Mac5Manager::readOutput - RAW path missing";
         return;
     }
 
@@ -94,18 +86,44 @@ void Mac5Manager::finish()
     mac5Test->fromXmlFile(m_xmlFilePath);
 
     QList<QJsonObject> filePaths {
-        { { "path", m_xmlFilePath }, { "name", "Ecg.xml" }},
-        { { "path", m_pdfFilePath }, { "name", "Ecg.pdf" }},
-        { { "path", m_rawFilePath }, { "name", "Ecg.ecg" }},
+        {{ "path", m_xmlFilePath }, { "name", "Ecg.xml" }},
+        {{ "path", m_pdfFilePath }, { "name", "Ecg.pdf" }},
+        {{ "path", m_rawFilePath }, { "name", "Ecg.ecg" }},
     };
-    m_test->setFiles(filePaths);
+    mac5Test->setFiles(filePaths);
 
-    if (m_test->isValid()) {
-        ManagerBase::finish();
+    try {
+        mac5Test->validate();
     }
-    else {
-        emit error("Test is not valid");
+    catch (const Mac5::FilesMissingError& e) {
+        emit error(e.what());
+        return;
     }
+    catch (const Mac5::IncorrectBarcodeError& e) {
+        emit error(e.what());
+        return;
+    }
+    catch (const QException& e) {
+        emit error(e.what());
+        return;
+    }
+
+    qInfo() << "Mac5Manager::finish - results are valid, sending to server";
+    ManagerBase::finish();
+
+    clearData();
+}
+
+bool Mac5Manager::clearData() {
+    // Clear any existing data
+    if (!FileUtils::clearDirectory(m_exportPath)) {
+        qCritical() << "Mac5Manager::start - Could not clear export directory";
+        return false;
+    }
+
+    m_test->reset();
+
+    return true;
 }
 
 void Mac5Manager::measure()

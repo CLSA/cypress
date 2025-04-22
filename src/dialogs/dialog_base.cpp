@@ -74,7 +74,8 @@ void DialogBase::cancel(const QString& cancelMsg)
 
 void DialogBase::error(const QString& errorMsg)
 {
-    //QMessageBox::critical(nullptr, "Error", errorMsg);
+    QMessageBox::critical(this, "Something went wrong", errorMsg);
+
     m_manager->sendCancellation(m_session->getSessionId());
 
     Cypress::getInstance().endSession(m_session->getSessionId(), CypressSession::CriticalError);

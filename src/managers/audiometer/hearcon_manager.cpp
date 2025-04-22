@@ -159,7 +159,12 @@ void HearconManager::finish()
 
 bool HearconManager::restoreDatabase()
 {
-    QFile::remove(m_existingDatabasePath);
+    if (!QFile::remove(m_existingDatabasePath)) {
+        qCritical() << "HearconManager::start - could not remove existing database";
+        QMessageBox::critical(nullptr, "Error", "Could not start HearCon, please contact support");
+        return false;
+    }
+
     /// Copy backup to the database location
     if (!m_backupDatabaseFile.copy(m_existingDatabasePath))
     {
@@ -173,12 +178,7 @@ bool HearconManager::restoreDatabase()
 
 bool HearconManager::processAlreadyRunning()
 {
-    if (WindowsUtil::isProcessRunning(m_processName.toStdWString()))
-    {
-        return true;
-    }
-
-    return false;
+    return WindowsUtil::isProcessRunning(m_processName.toStdWString());
 }
 
 bool HearconManager::configurePlugin(const QString& operation)

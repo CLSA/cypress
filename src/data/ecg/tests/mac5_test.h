@@ -19,6 +19,7 @@ public:
     QJsonObject toJsonObject() const;
 
     QJsonDocument fromXmlFile(const QString& filePath);
+    void validate() const;
 private:
     QJsonValue dfs(const QDomNode& node);
 
@@ -26,5 +27,47 @@ private:
 
     QSharedPointer<Mac5Session> m_session;
 };
+
+namespace Mac5 {
+    class FilesMissingError: public QException {
+        public:
+            FilesMissingError(std::string message) : message(message) {}
+
+            void raise() const override {
+            throw *this;
+            }
+
+            FilesMissingError* clone() const override {
+            return new FilesMissingError(*this);
+            }
+
+            const char* what() const noexcept override {
+            return message.c_str();
+            }
+
+        private:
+            std::string message;
+    };
+
+    class IncorrectBarcodeError: public QException {
+        public:
+            IncorrectBarcodeError(std::string message) : message(message) {}
+
+            void raise() const override {
+            throw *this;
+            }
+
+            IncorrectBarcodeError * clone() const override {
+            return new IncorrectBarcodeError(*this);
+            }
+
+            const char* what() const noexcept override {
+            return message.c_str();
+            }
+
+        private:
+            std::string message;
+    };
+}
 
 #endif // MAC5_TEST_H
