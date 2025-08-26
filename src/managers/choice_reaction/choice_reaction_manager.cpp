@@ -3,6 +3,7 @@
 
 #include "auxiliary/file_utils.h"
 #include "auxiliary/network_utils.h"
+#include "auxiliary/windows_util.h"
 
 #include "cypress_session.h"
 
@@ -45,6 +46,13 @@ ChoiceReactionManager::ChoiceReactionManager(QSharedPointer<ChoiceReactionSessio
 bool ChoiceReactionManager::start()
 {
     qDebug() << "ChoiceReactionManager::start";
+    std::wstring processName = QString("CCB.exe").toStdWString();
+    if (WindowsUtil::isProcessRunning(processName)) {
+        qDebug() << "ChoiceReactionManager::start - CCB.exe is already running";
+        //WindowsUtil::killProcessByName(processName);
+        emit error("Choice Reaction Program is already running");
+        return false;
+    }
 
     if (!setUp())
         return false;

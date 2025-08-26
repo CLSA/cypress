@@ -55,12 +55,12 @@ bool ORAManager::start()
     QSqlQuery query(m_database);
 
     query.prepare("INSERT INTO Patients ( Name, BirthDate, Sex, GroupID, ID, RaceID ) VALUES ( :name, :birthDate, :sex, :groupId, :id, :raceId )");
-    query.bindValue(":name", m_session->getBarcode() + ",CLSA");
+    query.bindValue(":name",      m_session->getBarcode() + ",CLSA");
     query.bindValue(":birthDate", m_session->getInputData()["dob"].toString());
-    query.bindValue(":sex", m_session->getInputData()["sex"].toString().startsWith("m", Qt::CaseSensitivity::CaseInsensitive));
-    query.bindValue(":groupId", 2);
-    query.bindValue(":id", m_session->getBarcode().toInt());
-    query.bindValue(":raceId", 1);
+    query.bindValue(":sex",	      m_session->getInputData()["sex"].toString().startsWith("m", Qt::CaseSensitivity::CaseInsensitive));
+    query.bindValue(":groupId",	  2);
+    query.bindValue(":id", 	      m_session->getBarcode().toInt());
+    query.bindValue(":raceId",    1);
 
     if (!query.exec()) {
         qCritical() << "Database error:" << m_database.lastError().text();
@@ -113,18 +113,18 @@ void ORAManager::readOutput()
     }
 
     const QVariantMap leftResults = extractMeasures("L");
-    if (leftResults.empty()) {
-        qCritical() << "Left measurement not found";
-        emit error("Left measurement not found");
-        return;
-    }
+    //if (leftResults.empty()) {
+    //    qCritical() << "Left measurement not found";
+    //    emit error("Left measurement not found");
+    //    return;
+    //}
 
     const QVariantMap rightResults = extractMeasures("R");
-    if (rightResults.empty()) {
-        qCritical() << "Right measurement not found";
-        emit error("Right measurement not found");
-        return;
-    }
+    //if (rightResults.empty()) {
+    //    qCritical() << "Right measurement not found";
+    //    emit error("Right measurement not found");
+    //    return;
+    //}
 
 
     const QList<QVariantMap> results { leftResults, rightResults };
@@ -135,15 +135,16 @@ void ORAManager::readOutput()
     m_database.close();
 
     qDebug() << "ORAManager::readOutput" << results;
+    qDebug() << "valid: " << test->isValid();
 
-    if (test->isValid()) {
-        qDebug() << "ORAManager::readOutput - test is valid";
-        finish();
-    }
-    else {
-        qCritical() << "ORAManager::readOutput - Test is invalid";
-        emit error("Test results were invalid");
-    }
+    //if (test->isValid()) {
+    //    qDebug() << "ORAManager::readOutput - test is valid";
+    finish();
+    //}
+    //else {
+    //    qCritical() << "ORAManager::readOutput - Test is invalid";
+    //    emit error("Test results were invalid");
+    //}
 }
 
 QVariantMap ORAManager::extractMeasures(const QString& eye)

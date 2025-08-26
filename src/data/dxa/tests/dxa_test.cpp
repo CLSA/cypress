@@ -165,10 +165,10 @@ void DXATest::getScanAnalysisData(
 
         QString fileName = dxaMeasure->getAttribute("NAME").toString();
 
-        QStringList doScanAnalysis { "WB_DICOM_1", "SP_DICOM_1", "FA_DICOM" };
+        //QStringList doScanAnalysis { "WB_DICOM_1", "SP_DICOM_1", "FA_L_DICOM", "FA_R_DICOM" };
 
-        if (doScanAnalysis.contains(fileName))
-            dxaMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
+        //if (doScanAnalysis.contains(fileName))
+        dxaMeasure->getScanAnalysisData(patscanDb, referenceDb, patientData);
     }
 }
 

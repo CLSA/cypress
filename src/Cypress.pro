@@ -326,7 +326,6 @@ HEADERS += \
     server/sessions/vivid_iq_session.h \
     server/sessions/watch_bp_session.h \
     server/sessions/weigh_scale_session.h \
-    server/utils.h \
     tray_application.h \
     widgets/apex_transfer_widget.h \
     widgets/audiometer_manual_entry_form.h \
@@ -575,7 +574,6 @@ SOURCES += \
     server/sessions/vivid_iq_session.cpp \
     server/sessions/watch_bp_session.cpp \
     server/sessions/weigh_scale_session.cpp \
-    server/utils.cpp \
     tray_application.cpp \
     widgets/apex_transfer_widget.cpp \
     widgets/audiometer_manual_entry_form.cpp \

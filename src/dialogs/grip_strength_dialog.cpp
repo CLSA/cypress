@@ -16,6 +16,8 @@ GripStrengthDialog::GripStrengthDialog(QWidget *parent, QSharedPointer<GripStren
 
     m_manager.reset(new GripStrengthManager(session));
     ui->measurementTable->hideManualEntry();
+    ui->measurementTable->disableFinishButton();
+    ui->measurementTable->disableMeasureButton();
 
     QSharedPointer<GripStrengthManager> manager = qSharedPointerCast<GripStrengthManager>(m_manager);
     ui->testInfoWidget->setSessionInformation(*session);

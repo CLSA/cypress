@@ -14,7 +14,7 @@ void CypressStatusRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &re
 {
     std::string uri = request.getURI();
 
-    response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
     response.setContentType("application/json");
     std::ostream& out = response.send();
 

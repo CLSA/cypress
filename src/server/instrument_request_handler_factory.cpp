@@ -211,12 +211,12 @@ HTTPRequestHandler* InstrumentRequestHandlerFactory::createRequestHandler(const 
 
     QString origin            = QString::fromStdString(request.get("Origin", "N/A").c_str());
 
-    qInfo() << uri;
-    qInfo() << method;
-    qInfo() << host;
-    qInfo() << clientAddress;
-    qInfo() << clientPort;
-    qInfo() << origin;
+    qDebug() << uri;
+    qDebug() << method;
+    qDebug() << host;
+    qDebug() << clientAddress;
+    qDebug() << clientPort;
+    qDebug() << origin;
 
     QRegularExpressionMatch match;
     QMap<QString, createRequestHandlerImpl>::const_iterator handlerIter = urlMap.constBegin();

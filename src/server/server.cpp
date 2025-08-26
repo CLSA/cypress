@@ -21,7 +21,6 @@
 #include "sessions/tonometer_session.h"
 #include "sessions/weigh_scale_session.h"
 #include "sessions/gen_proxy_session.h"
-#include "sessions/participant_report_session.h"
 #include "sessions/oct_session.h"
 #include "sessions/ora_session.h"
 #include "sessions/mac5_session.h"
@@ -162,7 +161,7 @@ QString Server::requestDevice(const Constants::MeasureType& type, const QJsonObj
     }
 
     if (!session) {
-        qDebug() << "No session";
+        qCritical() << "No session";
         throw QException();
     }
 

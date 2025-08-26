@@ -19,7 +19,7 @@ bool WeighScaleTest::isValid() const
     // with tests containing the minimum measurement count but
     // not the full expected count required for writing
     //
-    bool okTest = getMeasurementCount() > 0;
+    bool okTest = getMeasurementCount() > 1;
     if (okTest) {
         foreach (const auto m, m_measurementList) {
             if (!m->isValid()) {

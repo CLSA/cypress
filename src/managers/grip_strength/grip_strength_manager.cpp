@@ -64,13 +64,15 @@ void GripStrengthManager::measure() {
     m_test->reset();
     emit dataChanged(m_test);
 
-    if (QProcess::NormalExit != m_process.exitStatus()) {
-        emit error("Process failed to finish correctly, cannot read output");
-        return;
-    }
+    //if (m_process.state() == QProcess::Running) {
+    //    //emit error("Process failed to finish correctly, cannot read output");
+    //    QMessageBox::information(nullptr, "Tracker 5 still running", "Please close Tracker 5 and try again");
+    //    return;
+    //}
 
     ParadoxReader readerResults(m_gripTestDBPath);
     q_paradoxRecords results2 = readerResults.Read();
+
 
     ParadoxReader readerTest(m_gripTestDataDBPath);
     q_paradoxRecords results = readerTest.Read();
@@ -150,6 +152,14 @@ void GripStrengthManager::measure() {
 
     emit dataChanged(m_test);
 
+    qDebug() << "closing databases";
+
+    readerResults.closeDatabase();
+    readerTest.closeDatabase();
+
+    qDebug() << "test valid: " << m_test->isValid();
+    qDebug() << m_test->toJsonObject();
+
     m_test->isValid() ? emit canFinish() : emit cannotFinish();
 }
 
@@ -162,8 +172,39 @@ void GripStrengthManager::finish() {
 bool GripStrengthManager::restoreData() {
     qInfo() << "GripStrengthManager::restoreData";
 
-    if (!FileUtils::copyDirectory(QDir(m_backupPath), QDir(m_databasePath), true, false)) {
-        qWarning() << "failed to restore data";
+    // Copy over ZGripTest.DB from backup folder
+    if (!FileUtils::deleteFile(m_databasePath + "/ZGripTest.DB")) {
+        qDebug() << "couldn't remove " << m_gripTestDBPath;
+        return false;
+    }
+    if (!FileUtils::deleteFile(m_databasePath + "/ZGripTest.PX")) {
+        qDebug() << "couldn't remove " << m_gripTestDBPath;
+        return false;
+    }
+    if (!FileUtils::copyFile(m_backupPath + "/ZGripTest.DB", m_databasePath + "/ZGripTest.DB")) {
+        qDebug() << "couldn't restore grip test db";
+        return false;
+    }
+    if (!FileUtils::copyFile(m_backupPath + "/ZGripTest.PX", m_databasePath + "/ZGripTest.PX")) {
+        qDebug() << "couldn't restore grip test db";
+        return false;
+    }
+
+    // Copy over ZGripTestData.DB from backup folder
+    if (!FileUtils::deleteFile(m_databasePath + "/ZGripTestData.DB")) {
+        qDebug() << "couldn't remove" << m_gripTestDataDBPath;
+        return false;
+    }
+    if (!FileUtils::deleteFile(m_databasePath + "/ZGripTestData.PX")) {
+        qDebug() << "couldn't remove" << m_gripTestDataDBPath;
+        return false;
+    }
+    if (!FileUtils::copyFile(m_backupPath + "/ZGripTestData.DB", m_databasePath + "/ZGripTestData.DB")) {
+        qDebug() << "couldn't restore grip test data db";
+        return false;
+    }
+    if (!FileUtils::copyFile(m_backupPath + "/ZGripTestData.PX", m_databasePath + "/ZGripTestData.PX")) {
+        qDebug() << "couldn't restore grip test data db";
         return false;
     }
 
