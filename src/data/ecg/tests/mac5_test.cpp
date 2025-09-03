@@ -59,7 +59,7 @@ void Mac5Test::validate() const
         throw QException();
     }
 
-    if (id != ("0" + m_session->getBarcode())) {
+    if (id != m_session->getBarcode() && id != ("0" + m_session->getBarcode())) {
         qCritical() << "id in xml does not match session barcode";
         throw Mac5::IncorrectBarcodeError(
             QString("Barcode (%1) received does not match the participant (%2)")
@@ -67,7 +67,6 @@ void Mac5Test::validate() const
                 .toStdString()
         );
     }
-
 }
 
 bool Mac5Test::isValid() const
