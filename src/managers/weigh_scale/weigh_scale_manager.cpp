@@ -153,11 +153,8 @@ void WeighScaleManager::readDevice()
 
         if (m_test->isValid()) {
             qDebug() << "test is valid, can save results";
-
-            emit dataChanged(m_test);
             emit canFinish();
         }
-
     } else if ("z" == QString(m_request)) {
         WeightMeasurement m;
         m.fromArray(m_buffer);
@@ -167,6 +164,8 @@ void WeighScaleManager::readDevice()
         if (m.isZero())
             emit canMeasure();
     }
+
+    emit dataChanged(m_test);
 }
 
 void WeighScaleManager::writeDevice()
