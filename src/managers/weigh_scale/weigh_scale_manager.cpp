@@ -2,6 +2,7 @@
 #include "data/weigh_scale/measurements/weight_measurement.h"
 
 #include "weigh_scale_manager.h"
+#include "auxiliary/json_settings.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -134,11 +135,17 @@ void WeighScaleManager::readDevice()
     QByteArray data = m_port.readAll();
     m_buffer += data;
 
-    qDebug() << "WeighScaleManager::readDevice - read device received buffer "
-         << m_buffer.toHex();
-
     if (m_buffer.isEmpty())
         return;
+
+    // Complete responses from the device end in \r\n
+    if (!m_buffer.endsWith("\r\n"))
+        return;
+
+    // Now process the complete request
+    qDebug() << m_request;
+    qDebug() << m_buffer.toHex();
+    qDebug() << QString(m_buffer);
 
     if ("i" == QString(m_request)) {
         m_deviceData["software_id"] = QString(m_buffer.simplified());

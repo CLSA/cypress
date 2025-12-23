@@ -7,6 +7,14 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
+const double LBS_TO_KG = 0.453592;
+
+double WeighScaleTest::convertWeightToKg(const QSharedPointer<Measurement> measure) {
+    const double weight = measure->getAttributeValue("weight").toDouble();
+    const QString unit = measure->getAttribute("weight").units();
+    return unit == "kg" ? weight : weight * LBS_TO_KG;
+}
+
 WeighScaleTest::WeighScaleTest()
 {
     m_outputKeyList << "average_weight";
@@ -38,20 +46,24 @@ void WeighScaleTest::reinterpret()
 
 double WeighScaleTest::calculateAverage()
 {
+    //qDebug() << "WeighScaleTest::calculateAverage";
+    //qDebug() << toString();
+    //qDebug() << getMeasurements().length();
+
     auto &measurements = getMeasurements();
     double average = 0;
-    double totalWeight = 0;
+    double totalWeightKg = 0;
 
     if (measurements.length() < 1)
     {
-        reset();
+        //reset();
         return -1;
     }
 
     int validMeasures = 0;
     for (auto &measure : measurements) {
         if (measure->isValid()) {
-            totalWeight += measure->getAttributeValue("weight").toDouble();
+            totalWeightKg += convertWeightToKg(measure);
             validMeasures++;
         }
     }
@@ -59,9 +71,10 @@ double WeighScaleTest::calculateAverage()
     if (validMeasures == 0)
         return -1;
 
-    average = totalWeight / validMeasures;
+    average = totalWeightKg / validMeasures;
     addMetaData("average_weight", Utilities::round_to(average, 1), "kg");
-    qDebug() << "WeighScaleTest: new average" << average << "kg";
+
+    //qDebug() << "average" << average << "kg";
 
     return average;
 }
@@ -88,22 +101,8 @@ void WeighScaleTest::fromArray(const QByteArray &arr)
     QSharedPointer<WeightMeasurement> m(new WeightMeasurement);
     m->fromArray(arr);
 
-    if (m->isValid()) {
-        //addMeasurement(m);
-        bool ok = true;
-        if(0 < getMeasurementCount())
-        {
-            WeightMeasurement& last = (WeightMeasurement&) lastMeasurement();
-            QDateTime prev = last.getAttributeValue("timestamp").toDateTime();
-            QDateTime curr = m->getAttributeValue("timestamp").toDateTime();
-            ok =  DELAY < prev.secsTo(curr);
-
-            if (!ok) // resent measurement
-                last.fromArray(arr);
-        }
-        if(ok)
-            addMeasurement(m);
-    }
+    if (m->isValid())
+        addMeasurement(m);
 
     calculateAverage();
 }
@@ -125,3 +124,5 @@ QJsonObject WeighScaleTest::toJsonObject() const
 
     return testJson;
 }
+
+

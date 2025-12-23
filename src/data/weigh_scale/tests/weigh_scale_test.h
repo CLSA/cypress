@@ -49,6 +49,7 @@ public:
 private:
     QList<QString> m_outputKeyList;
 
+    double convertWeightToKg(const QSharedPointer<Measurement> measure);
 };
 
 Q_DECLARE_METATYPE(WeighScaleTest);

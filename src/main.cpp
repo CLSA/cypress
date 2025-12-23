@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setOrganizationName("CLSA");
     QGuiApplication::setOrganizationDomain("clsa-elcv.ca");
     QGuiApplication::setApplicationName("Cypress");
-    QGuiApplication::setApplicationVersion("1.1.2");
+    QGuiApplication::setApplicationVersion("1.1.3");
 
     QGuiApplication::setQuitOnLastWindowClosed(false);
 
@@ -131,12 +131,10 @@ int main(int argc, char *argv[])
 
     QJsonObject status = Cypress::getInstance().getStatus();
     QJsonObject deviceStatus = status;
-
     Cypress::getInstance();
+
     qDebug().noquote() << JsonSettings::prettyPrintJson(deviceStatus);
 
     qInfo() << CypressSettings::getVersion();
-
-
     return app.exec();
 }

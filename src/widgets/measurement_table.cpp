@@ -213,7 +213,6 @@ void MeasurementTable::updateModel(QSharedPointer<TestBase> test)
 
             if (manualEntryMode || allowRemoval)
             {
-                qDebug() << "remove..";
                 QPushButton* btn = new QPushButton("Remove", this);
 
                 btn->setProperty("row_id", row);
