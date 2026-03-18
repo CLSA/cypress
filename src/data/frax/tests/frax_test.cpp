@@ -176,7 +176,7 @@ QString FraxTest::getInputContents(const QJsonObject& inputData)
     QString bmi = inputData.value("body_mass_index").toVariant().toString();
     QString previousFracture = QString::number(inputData.value("previous_fracture").toVariant().toInt());
     QString parentHipFracture = QString::number(inputData.value("parent_hip_fracture").toVariant().toInt());
-    QString currentSmoker = QString::number(inputData.value("currentSmoker").toVariant().toInt());
+    QString currentSmoker = QString::number(inputData.value("current_smoker").toVariant().toInt());
     QString glucocorticoid = QString::number(inputData.value("glucocorticoid").toVariant().toInt());
     QString rheumatoidArthritis = QString::number(inputData.value("rheumatoid_arthritis").toVariant().toInt());
     QString secondaryOsteoporosis = QString::number(inputData.value("secondary_osteoporosis").toVariant().toInt());
