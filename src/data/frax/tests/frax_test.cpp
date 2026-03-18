@@ -65,6 +65,8 @@ FraxTest::FraxTest()
 bool FraxTest::writeInputFile(const QString& inputFilePath, const QJsonObject& inputData)
 {
     QString inputContents = getInputContents(inputData);
+    addMetaData("frax_input", inputContents);
+
     qDebug() << "FraxTest::toFile - content = " << inputContents;
 
     QFile inputFile(inputFilePath);
