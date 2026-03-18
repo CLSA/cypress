@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setOrganizationName("CLSA");
     QGuiApplication::setOrganizationDomain("clsa-elcv.ca");
     QGuiApplication::setApplicationName("Cypress");
-    QGuiApplication::setApplicationVersion("1.1.3");
+    QGuiApplication::setApplicationVersion("1.1.4");
 
     QGuiApplication::setQuitOnLastWindowClosed(false);
 

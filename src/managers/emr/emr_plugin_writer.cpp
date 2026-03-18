@@ -57,7 +57,7 @@ void EMRPluginWriter::addCommand(QXmlStreamWriter& stream) const
     stream.writeStartElement("Command");
     stream.writeAttribute("Type", "PerformTest");
     addParameter(stream, "OrderID", "1");
-    addParameter(stream, "TestType", "FVC");
+    addParameter(stream, "TestType", "FVL");
     stream.writeEndElement();
 }
 
