@@ -174,14 +174,14 @@ QString FraxTest::getInputContents(const QJsonObject& inputData)
     QString age = inputData.value("age").toVariant().toString();
     QString sex = inputData.value("sex").toVariant().toString().toLower()[0] == 'm' ? "0" : "1";
     QString bmi = inputData.value("body_mass_index").toVariant().toString();
-    QString previousFracture= QString::number(inputData.value("previous_fracture").toVariant().toInt());
+    QString previousFracture = QString::number(inputData.value("previous_fracture").toVariant().toInt());
     QString parentHipFracture = QString::number(inputData.value("parent_hip_fracture").toVariant().toInt());
     QString currentSmoker = QString::number(inputData.value("currentSmoker").toVariant().toInt());
     QString glucocorticoid = QString::number(inputData.value("glucocorticoid").toVariant().toInt());
     QString rheumatoidArthritis = QString::number(inputData.value("rheumatoid_arthritis").toVariant().toInt());
     QString secondaryOsteoporosis = QString::number(inputData.value("secondary_osteoporosis").toVariant().toInt());
     QString alcohol = QString::number(inputData.value("alcohol").toVariant().toInt());
-    QString femoralNeckBmd = QString::number(inputData.value("femoral_neck_bmd").toVariant().toDouble());
+    QString femoralNeckTScore = QString::number(inputData.value("femoral_neck_tscore").toVariant().toDouble());
 
     QStringList list;
     list << type;
@@ -196,7 +196,7 @@ QString FraxTest::getInputContents(const QJsonObject& inputData)
     list << rheumatoidArthritis;
     list << secondaryOsteoporosis;
     list << alcohol;
-    list << femoralNeckBmd;
+    list << femoralNeckTScore;
 
     return list.join(",");
 }
