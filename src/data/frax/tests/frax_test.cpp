@@ -208,9 +208,9 @@ QString FraxTest::interpretResults(double p)
     QString interp = "N/A";
     if (p > 20.0)
         interp = "High";
-    else if (p >= 10.0 && p <= 20.0)
+    else if ((p >= 10.0 && p <= 20.0) || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
         interp = "Moderate";
-    else if (p < 10 || m_metaData.getAttribute("femoral_neck_tscore").value().toDouble() <= -2.5)
+    else if (p < 10)
         interp = "Low";
     return interp;
 }

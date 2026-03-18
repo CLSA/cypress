@@ -118,8 +118,6 @@ bool ManagerBase::sendFiles()
         auto key = it.key();
         auto file = it.value().toObject();
 
-        qDebug() << key;
-
         QString path = file.value("path").toString();
         const QByteArray data = FileUtils::readFile(path);
 
