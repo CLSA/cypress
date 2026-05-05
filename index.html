@@ -1,0 +1,176 @@
+<head>
+  <title>Cypress 2.0.0</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: beige;
+    }
+
+    .devices-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .devices {
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      width: 100px;
+      height: 100px;
+      background-color: lightblue;
+      border: 1px solid lightcyan;
+      transition: transform 0.1s ease-in-out;
+    }
+
+    button:hover {
+      transform: scale(1.05, 1.05);
+    }
+
+    .header {
+      display: flex;
+      gap: 4px;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 50px;
+      width: 100%;
+      background-color: black;
+    }
+
+    p {
+      color: white;
+      padding: 4px;
+      margin: 0px;
+    }
+
+    .profile,
+    .settings,
+    .logout {
+      width: 24px;
+      height: 24px;
+      background-color: white;
+    }
+
+    .participant {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+  <script>
+    window.addEventListener('load', function () {
+      var pid = null;
+      function launchDevice(device_name) {
+        console.log(`launch ${device_name}`);
+        fetch(`http://127.0.0.1:8000/device/${device_name}`).then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        }).then(data => {
+          pid = data.pid;
+          console.log(data);
+          console.log(pid)
+        }).catch(error => {
+          console.error("There has been a problem", error);
+        })
+      }
+
+      document.querySelectorAll('button').forEach((button) => {
+        button.addEventListener('click', () => launchDevice(button.id))
+      });
+
+      let participantData = {};
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', (event) => {
+          participantData[event.target.id] = event.target.value;
+          console.log(participantData);
+        });
+      })
+    });
+  </script>
+
+</head>
+
+<body>
+  <div class="header">
+    <div>
+      <p>Cypress 2.0</p>
+    </div>
+    <div style="display: flex; padding: 4px; gap: 4px">
+      <div class="profile"></div>
+      <div class="settings"></div>
+      <div class="logout"></div>
+    </div>
+  </div>
+
+  <div class="devices-wrapper">
+    <div class="participant">
+      <div>
+        <label>UID</label>
+        <input id="uid" type="text" />
+      </div>
+      <div>
+        <label>Barcode</label>
+        <input id="barcode" type="text" />
+      </div>
+      <div>
+        <label>Language</label>
+        <input id="language" type="text" />
+      </div>
+      <div>
+        <label>Interviewer</label>
+        <input id="interviewer" type="text" />
+      </div>
+    </div>
+    <div class="devices" style="display: flex; gap: 4px;">
+      <button id="audiometer">
+        Audiometer
+      </button>
+      <button id="blood_pressure">
+        BPM
+      </button>
+      <button id="cdtt">
+        CDTT
+      </button>
+      <button id="choice_reaction">
+        Choice Reaction
+      </button>
+      <button id="ecg">
+        ECG
+      </button>
+      <button id="frax">
+        FRAX
+      </button>
+      <button id="grip_strength">
+        Grip Strength
+      </button>
+      <button id="retinal_camera">
+        Retinal Camera
+      </button>
+      <button id="spirometer">
+        Spirometer
+      </button>
+      <button id="tonometer">
+        Tonometer
+      </button>
+      <button id="ultrasound">
+        Ultrasound
+      </button>
+      <button id="weigh_scale">
+        Weigh Scale
+      </button>
+    </div>
+  </div>
+</body>
+
+</html>

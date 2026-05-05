@@ -1,4 +1,0 @@
-curl http://localhost:8000/dxa
-curl http://localhost:8000/retinal_camera
-curl http://localhost:8000/grip_strength
-curl http://localhost:8000/ultrasound

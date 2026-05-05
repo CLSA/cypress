@@ -1,0 +1,65 @@
+from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
+from PySide6.QtCore import Qt
+
+from instruments.view import View
+
+from instruments.crt.controller import CRTController
+from instruments.crt.session import CRTSession
+
+from typing import override
+
+
+class CRTView(View):
+    def __init__(
+        self,
+        controller: CRTController,
+        session: CRTSession,
+        parent=None,
+    ):
+        super().__init__(
+            parent=parent, controller=controller, session=session
+        )
+
+        self.resize(800, 600)
+        self.table = self.measurement_table_widget.measurementTable
+
+    @override
+    def _on_measured(self, output: dict):
+        # return super()._on_measured(results)
+        self.table.clear()
+
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setRowCount(len(output["results"]))
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(
+            [
+                "ID",
+                "Correct Position",
+                "Response Correct",
+                "Response Stimulus Interval",
+                "Elapsed Time",
+            ]
+        )
+
+        for index, result in enumerate(output["results"]):
+            screen_id = QTableWidgetItem(result["screen_id"])
+            correct_position = QTableWidgetItem(result["correct_position"].capitalize())
+            response_correct = QTableWidgetItem(
+                "Yes" if bool(result["response_correct"]) else "No"
+            )
+            response_stimulus_interval = QTableWidgetItem(
+                f"{result['response_stimulus_interval']['value']}{result['response_stimulus_interval']['unit']}"
+            )
+            elapsed_time = QTableWidgetItem(
+                f"{result['elapsed_time']['value']}{result['elapsed_time']['unit']}"
+            )
+
+            self.table.setItem(index, 0, screen_id)
+            self.table.setItem(index, 1, correct_position)
+            self.table.setItem(index, 2, response_correct)
+            self.table.setItem(index, 3, response_stimulus_interval)
+            self.table.setItem(index, 4, elapsed_time)
+
+        super()._on_measured(output)
