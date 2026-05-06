@@ -106,11 +106,7 @@ class DXASessionDialog(SessionDialog):
 def run_dxa(session: DXASession | None):
     app = QApplication()
 
-    try:
-        config = DXAConfig.from_ini()
-    except Exception as e:
-        print(e)
-        sys.exit(-1)
+    config = DXAConfig.from_ini()
 
     standalone = not session
     if standalone:
@@ -124,7 +120,12 @@ def run_dxa(session: DXASession | None):
 
     view.show()
 
-    sys.exit(app.exec())
+    return app.exec()
 
 if __name__ == '__main__':
-    run_dxa(session=None)
+    try:
+        sys.exit(run_dxa(session=None))
+    except Exception as e:
+        print(e)
+        input("Press enter to continue...")
+        sys.exit(-1)

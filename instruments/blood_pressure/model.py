@@ -3,17 +3,17 @@ from PySide6.QtSql import QSqlDatabase, QSqlQuery
 from pathlib import Path
 
 from instruments.model import Model
+from instruments.blood_pressure.session import BPSession
 
 class BPModel(Model):
-    def __init__(self, database_path: Path, session_data):
-        self.session_data = session_data.copy()
+    def __init__(self, session: BPSession):
+        self.session = session
         self.measurements = []
-        self.configure_database(database_path)
 
     def restore_backup():
         pass
 
-    def configure_database(self, database_path):
+    def configure_database(self, database_path: Path):
         self.database = QSqlDatabase.addDatabase("QSQLITE")
         self.database.setDatabaseName(str(database_path.resolve()))
 
@@ -24,7 +24,7 @@ class BPModel(Model):
         query.bindValue(':name', 'Participant')
         query.bindValue(':id', self.session_data.get('barcode'))
         query.bindValue(':sex', 1 if str(self.session_data.get('sex')) == "female" else 0)
-        #query.bindValue(':dob')
+        query.bindValue(':dob', self.session_data.get('dob'))
         query.bindValue(':physician', 'CLSA')
 
         return query.exec()

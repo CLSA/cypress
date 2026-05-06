@@ -24,11 +24,7 @@ class CRTSessionDialog(SessionDialog):
 def run_crt(session: CRTSession | None):
     app = QApplication()
 
-    try:
-        config = CRTConfig.from_ini()
-    except Exception as e:
-        print(e)
-        sys.exit(-1)
+    config = CRTConfig.from_ini()
 
     standalone = not session
     if standalone:
@@ -40,8 +36,13 @@ def run_crt(session: CRTSession | None):
 
     view.show()
 
-    sys.exit(app.exec())
+    return app.exec()
 
 
 if __name__ == "__main__":
-    run_crt(session=None)
+    try:
+        sys.exit(run_crt(session=None))
+    except Exception as e:
+        print(e)
+        input("Press enter to continue...")
+        sys.exit(-1)

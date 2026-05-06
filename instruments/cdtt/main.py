@@ -24,11 +24,7 @@ class CDTTSessionDialog(SessionDialog):
 def run_cdtt(session: CDTTSession | None):
     app = QApplication()
 
-    try:
-        config = CDTTConfig.from_ini()
-    except Exception as e:
-        print(e)
-        sys.exit(-1)
+    config = CDTTConfig.from_ini()
 
     standalone = not session
     if not standalone:
@@ -40,8 +36,14 @@ def run_cdtt(session: CDTTSession | None):
     )
     view = CDTTView(controller=controller, session=session)
     view.show()
-    sys.exit(app.exec())
+
+    return app.exec()
 
 
 if __name__ == "__main__":
-    run_cdtt(session=None)
+    try:
+        sys.exit(run_cdtt(session=None))
+    except Exception as e:
+        print(e)
+        input("Press enter to continue...")
+        sys.exit(-1)

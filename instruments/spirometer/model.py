@@ -1,4 +1,4 @@
 from instruments.model import Model
 
-class TonometerModel(Model):
+class SpirometerModel(Model):
     pass

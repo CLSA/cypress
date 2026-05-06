@@ -37,7 +37,7 @@ class View(QtWidgets.QDialog):
             self._on_measure_button_clicked
         )
 
-        self.test_info_widget.startedValue.setText(datetime.now().strftime("%H:%M:%S"))
+        self.test_info_widget.startedValue.setText(datetime.now().strftime("%I:%M %p"))
         self.test_info_widget.statusValue.setText("Press 'Start' to begin")
         self.test_info_widget.barcodeValue.setText(session.barcode)
         self.test_info_widget.interviewerValue.setText(session.interviewer)

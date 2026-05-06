@@ -144,11 +144,7 @@ class FRAXSessionDialog(SessionDialog):
 def run_frax(session: FRAXSession | None):
     app = QApplication()
 
-    try:
-        config = FRAXConfig.from_ini()
-    except Exception as e:
-        print(e)
-        sys.exit(-1)
+    config = FRAXConfig.from_ini()
 
     standalone = not session
     if standalone:

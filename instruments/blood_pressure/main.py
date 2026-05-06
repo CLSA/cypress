@@ -1,29 +1,25 @@
 import sys
 
 from PySide6.QtWidgets import QApplication, QFormLayout, QComboBox, QGroupBox, QDateEdit
-
 from PySide6.QtCore import QDate
 
 from session import SessionDialog
 
-from .config import AudiometerConfig
-from .session import AudiometerSession
-from .model import AudiometerModel
-from .view import AudiometerView
-from .controller import AudiometerController
+from instruments.blood_pressure.config import BPConfig
+from instruments.blood_pressure.session import BPSession
+from instruments.blood_pressure.model import BPModel
+from instruments.blood_pressure.controller import BPController
+from instruments.blood_pressure.view import BPView
 
 
-class AudiometerSessionDialog(SessionDialog):
+class BPSessionDialog(SessionDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Audiometer setup")
+        self.setWindowTitle("BP setup")
+        self.setMinimumSize(350, 350)
 
-        self.setFixedWidth(350)
-        self.setFixedHeight(350)
-
-        self.audiometer_group = QGroupBox()
-        self.audiometer_group.setTitle("Audiometer inputs")
+        self.bp_group = QGroupBox()
 
         self.dob = QDateEdit()
         self.dob.setMaximumDate(QDate.currentDate())
@@ -36,9 +32,9 @@ class AudiometerSessionDialog(SessionDialog):
         self.form_layout.addRow("Date of Birth", self.dob)
         self.form_layout.addRow("Sex", self.sex)
 
-        self.audiometer_group.setLayout(self.form_layout)
+        self.bp_group.setLayout(self.form_layout)
 
-        self.layout.insertWidget(1, self.audiometer_group)
+        self.layout.insertWidget(1, self.bp_group)
 
     def can_submit(self):
         has_acceptable_input = self.dob.hasAcceptableInput()
@@ -53,19 +49,20 @@ class AudiometerSessionDialog(SessionDialog):
         return session_values | audiometer_values
 
 
-def run_audiometer(session: AudiometerSession | None):
+def run_blood_pressure(session: BPSession | None):
     app = QApplication()
 
-    config = AudiometerConfig.from_ini()
+    config = BPConfig.from_ini()
 
     standalone = not session
     if standalone:
-        session = AudiometerSession(answer_id=1, **AudiometerSessionDialog().prompt())
+        session = BPSession(answer_id=1, **BPSessionDialog().prompt())
 
-    model = AudiometerModel(session=session)
-    controller = AudiometerController(config=config, session=session, model=model, standalone=standalone)
-    view = AudiometerView(controller=controller, session=session)
-
+    model = BPModel(session=session)
+    controller = BPController(
+        config=config, session=session, model=model, standalone=standalone
+    )
+    view = BPView(controller=controller, session=session)
     view.show()
 
     return app.exec()
@@ -73,8 +70,8 @@ def run_audiometer(session: AudiometerSession | None):
 
 if __name__ == "__main__":
     try:
-        sys.exit(run_audiometer(session=None))
+        sys.exit(run_blood_pressure(session=None))
     except Exception as e:
         print(e)
-        print("Press enter to continue...")
+        input("Press enter to continue...")
         sys.exit(-1)

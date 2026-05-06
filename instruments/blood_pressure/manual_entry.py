@@ -2,10 +2,9 @@
 from PySide6.QtWidgets import QDialog
 
 
-class BloodPressureManualEntryDialog(QDialog):
+class BPManualEntryDialog(QDialog):
     def __init__(self):
         super().__init__()
-        #self.setupUi(self)
 
         self.values = {
             'systolic': None,
@@ -26,4 +25,3 @@ class BloodPressureManualEntryDialog(QDialog):
         value = widget.value()
 
         self.values[name] = value
-        print(name, value)

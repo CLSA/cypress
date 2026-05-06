@@ -40,3 +40,7 @@ class DeviceConfig(BaseModel):
         raw_settings = dict(settings.items())
 
         return cls(**raw_settings)
+
+
+class CypressConfig:
+    pass

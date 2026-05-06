@@ -23,11 +23,7 @@ class ECHOSessionDialog(SessionDialog):
 def run_echo(session: ECHOSession | None):
     app = QApplication()
 
-    try:
-        config = ECHOConfig.from_ini()
-    except Exception as e:
-        print(e)
-        return -1
+    config = ECHOConfig.from_ini()
 
     standalone = not session
     if standalone:

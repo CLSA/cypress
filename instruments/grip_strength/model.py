@@ -3,8 +3,7 @@ from instruments.model import Model
 
 
 class GripStrengthModel(Model):
-    def __init__(self):
-        pass
+    pass
 
 
 class ParadoxReader:
