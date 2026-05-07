@@ -43,7 +43,7 @@ def run_ecg(session: ECGSession | None):
 
     model = ECGModel(session=session)
     controller = ECGController(
-        config=config, session=session, model=model, standalone=standalone
+        config=config, session=session, model=model, standalone=False
     )
     view = ECGView(controller=controller, session=session)
     view.show()
