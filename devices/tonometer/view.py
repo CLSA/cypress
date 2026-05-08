@@ -1,9 +1,9 @@
 from typing import override
-from instruments.view import View
+from devices.view import View
 
-from instruments.tonometer.controller import TonometerController
-from instruments.tonometer.session import TonometerSession
-from instruments.tonometer.config import TonometerConfig
+from devices.tonometer.controller import TonometerController
+from devices.tonometer.session import TonometerSession
+from devices.tonometer.config import TonometerConfig
 
 
 class TonometerView(View):

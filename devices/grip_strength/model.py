@@ -1,5 +1,5 @@
 from pathlib import Path
-from instruments.model import Model
+from devices.model import Model
 
 
 class GripStrengthModel(Model):

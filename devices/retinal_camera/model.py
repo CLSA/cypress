@@ -2,7 +2,7 @@ from PySide6.QtSql import QSqlDatabase, QSqlQuery
 
 from pathlib import Path
 
-from instruments.model import Model
+from devices.model import Model
 
 class RetinalCameraModel(Model):
     def __init__(self, session_data: dict):

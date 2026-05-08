@@ -2,12 +2,12 @@ from pathlib import Path
 from datetime import date
 from typing import override
 
-from instruments.controller import Controller
-from instruments.utils import is_process_running
+from devices.controller import Controller
+from devices.utils import is_process_running
 
-from instruments.crt.model import CRTModel
-from instruments.crt.config import CRTConfig
-from instruments.crt.session import CRTSession
+from devices.crt.model import CRTModel
+from devices.crt.config import CRTConfig
+from devices.crt.session import CRTSession
 
 
 class CRTController(Controller):

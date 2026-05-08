@@ -6,11 +6,11 @@ from PySide6.QtWidgets import (
 
 from session import SessionDialog
 
-from instruments.grip_strength.session import GripStrengthSession
-from instruments.grip_strength.config import GripStrengthConfig
-from instruments.grip_strength.model import GripStrengthModel
-from instruments.grip_strength.view import GripStrengthView
-from instruments.grip_strength.controller import GripStrengthController
+from devices.grip_strength.session import GripStrengthSession
+from devices.grip_strength.config import GripStrengthConfig
+from devices.grip_strength.model import GripStrengthModel
+from devices.grip_strength.view import GripStrengthView
+from devices.grip_strength.controller import GripStrengthController
 
 
 class GripStrengthSessionDialog(SessionDialog):

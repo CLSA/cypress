@@ -1,7 +1,7 @@
-from instruments.controller import Controller
-from instruments.weigh_scale.session import WeighScaleSession
-from instruments.weigh_scale.config import WeighScaleConfig
-from instruments.weigh_scale.model import WeighScaleModel
+from devices.controller import Controller
+from devices.weigh_scale.session import WeighScaleSession
+from devices.weigh_scale.config import WeighScaleConfig
+from devices.weigh_scale.model import WeighScaleModel
 
 class WeighScaleController(Controller):
     def __init__(

@@ -4,11 +4,11 @@ from PySide6.QtWidgets import QApplication
 
 from session import SessionDialog
 
-from instruments.crt.config import CRTConfig
-from instruments.crt.session import CRTSession
-from instruments.crt.controller import CRTController
-from instruments.crt.view import CRTView
-from instruments.crt.model import CRTModel
+from devices.crt.config import CRTConfig
+from devices.crt.session import CRTSession
+from devices.crt.controller import CRTController
+from devices.crt.view import CRTView
+from devices.crt.model import CRTModel
 
 
 class CRTSessionDialog(SessionDialog):

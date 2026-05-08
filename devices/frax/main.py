@@ -13,11 +13,11 @@ from PySide6.QtWidgets import (
 
 from session import SessionDialog
 
-from instruments.frax.config import FRAXConfig
-from instruments.frax.session import FRAXSession
-from instruments.frax.model import FRAXModel
-from instruments.frax.controller import FRAXController
-from instruments.frax.view import FRAXView
+from devices.frax.config import FRAXConfig
+from devices.frax.session import FRAXSession
+from devices.frax.model import FRAXModel
+from devices.frax.controller import FRAXController
+from devices.frax.view import FRAXView
 
 
 class FRAXSessionDialog(SessionDialog):

@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QFileDialog
 from session import Session
 from config import DeviceConfig
 
-from instruments.model import Model
+from devices.model import Model
 
 class Controller(QObject):
     started = Signal()

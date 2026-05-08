@@ -1,10 +1,10 @@
 from typing import override
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.grip_strength.controller import GripStrengthController
-from instruments.grip_strength.session import GripStrengthSession
+from devices.grip_strength.controller import GripStrengthController
+from devices.grip_strength.session import GripStrengthSession
 
 
 class GripStrengthView(View):

@@ -2,8 +2,8 @@ from PySide6.QtSql import QSqlDatabase, QSqlQuery
 
 from pathlib import Path
 
-from instruments.model import Model
-from instruments.blood_pressure.session import BPSession
+from devices.model import Model
+from devices.blood_pressure.session import BPSession
 
 class BPModel(Model):
     def __init__(self, session: BPSession):

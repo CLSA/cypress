@@ -3,11 +3,11 @@ from PySide6.QtCore import Signal
 from dicom.receiver import FileReceiver, FileInfo, ReceiverConfig
 from dicom.uploader import FileUploaderDialog
 
-from instruments.controller import Controller
+from devices.controller import Controller
 
-from instruments.echo.session import ECHOSession
-from instruments.echo.config import ECHOConfig
-from instruments.echo.model import ECHOModel
+from devices.echo.session import ECHOSession
+from devices.echo.config import ECHOConfig
+from devices.echo.model import ECHOModel
 
 
 class ECHOController(Controller):

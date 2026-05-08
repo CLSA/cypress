@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import override
 
-from instruments.controller import Controller
+from devices.controller import Controller
 
-from instruments.frax.model import FRAXModel
-from instruments.frax.session import FRAXSession
-from instruments.frax.config import FRAXConfig
+from devices.frax.model import FRAXModel
+from devices.frax.session import FRAXSession
+from devices.frax.config import FRAXConfig
 
 
 class FRAXController(Controller):

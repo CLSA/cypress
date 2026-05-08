@@ -1,7 +1,7 @@
 from typing import override
 
-from instruments.controller import Controller
-from instruments.utils import is_process_running
+from devices.controller import Controller
+from devices.utils import is_process_running
 
 from .model import AudiometerModel
 from .plugin import AudiometerPlugin

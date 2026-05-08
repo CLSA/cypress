@@ -5,11 +5,11 @@ from PySide6.QtWidgets import (
 )
 
 from session import SessionDialog
-from instruments.echo.config import ECHOConfig
-from instruments.echo.session import ECHOSession
-from instruments.echo.controller import ECHOController
-from instruments.echo.view import ECHOView
-from instruments.echo.model import ECHOModel
+from devices.echo.config import ECHOConfig
+from devices.echo.session import ECHOSession
+from devices.echo.controller import ECHOController
+from devices.echo.view import ECHOView
+from devices.echo.model import ECHOModel
 
 
 class ECHOSessionDialog(SessionDialog):

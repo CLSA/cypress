@@ -1,5 +1,5 @@
 from copy import deepcopy
-from instruments.model import Model
+from devices.model import Model
 
 class AudiometerModel(Model):
     def __init__(self, session):

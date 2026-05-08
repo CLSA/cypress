@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from openpyxl import load_workbook
 
-from instruments.model import Model
+from devices.model import Model
 
 NUM_TRIALS = 24
 

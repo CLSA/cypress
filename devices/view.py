@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QMessageBox
 from ui.measurement_table import MeasurementTableWidget
 from ui.test_info_widget import TestInfoWidget
 
-from instruments.controller import Controller
+from devices.controller import Controller
 
 from session import Session
 

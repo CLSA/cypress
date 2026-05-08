@@ -6,11 +6,11 @@ from PySide6.QtWidgets import (
 
 from session import SessionDialog
 
-from instruments.tonometer.session import TonometerSession
-from instruments.tonometer.config import TonometerConfig
-from instruments.tonometer.model import TonometerModel
-from instruments.tonometer.view import TonometerView
-from instruments.tonometer.controller import TonometerController
+from devices.tonometer.session import TonometerSession
+from devices.tonometer.config import TonometerConfig
+from devices.tonometer.model import TonometerModel
+from devices.tonometer.view import TonometerView
+from devices.tonometer.controller import TonometerController
 
 
 class TonometerSessionDialog(SessionDialog):

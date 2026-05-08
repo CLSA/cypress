@@ -1,10 +1,10 @@
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.crt.controller import CRTController
-from instruments.crt.session import CRTSession
+from devices.crt.controller import CRTController
+from devices.crt.session import CRTSession
 
 from typing import override
 

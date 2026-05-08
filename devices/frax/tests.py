@@ -1,6 +1,6 @@
 import unittest
 
-from instruments.frax.model import FraxModel
+from devices.frax.model import FraxModel
 
 from session import FRAXSession
 

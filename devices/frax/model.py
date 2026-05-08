@@ -2,8 +2,8 @@ from pathlib import Path
 
 from PySide6.QtCore import QProcess
 
-from instruments.model import Model
-from instruments.frax.session import FRAXSession
+from devices.model import Model
+from devices.frax.session import FRAXSession
 
 class FRAXModel(Model):
     def __init__(self, session: FRAXSession):

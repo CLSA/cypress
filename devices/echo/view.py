@@ -4,10 +4,10 @@ from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 
 from dicom.receiver import FileInfo
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.echo.controller import ECHOController
-from instruments.echo.session import ECHOSession
+from devices.echo.controller import ECHOController
+from devices.echo.session import ECHOSession
 
 
 class ECHOView(View):

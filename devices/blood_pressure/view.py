@@ -3,11 +3,11 @@ from typing import override
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView, QDialog
 from PySide6.QtCore import Qt
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.blood_pressure.controller import BPController
-from instruments.blood_pressure.session import BPSession
-from instruments.blood_pressure.manual_entry import BPManualEntryDialog
+from devices.blood_pressure.controller import BPController
+from devices.blood_pressure.session import BPSession
+from devices.blood_pressure.manual_entry import BPManualEntryDialog
 
 class BPView(View):
     def __init__(self, controller: BPController, session: BPSession, parent=None):

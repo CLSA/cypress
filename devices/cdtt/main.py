@@ -4,11 +4,11 @@ from PySide6.QtWidgets import QApplication
 
 from session import SessionDialog
 
-from instruments.cdtt.config import CDTTConfig
-from instruments.cdtt.session import CDTTSession
-from instruments.cdtt.model import CDTTModel
-from instruments.cdtt.controller import CDTTController
-from instruments.cdtt.view import CDTTView
+from devices.cdtt.config import CDTTConfig
+from devices.cdtt.session import CDTTSession
+from devices.cdtt.model import CDTTModel
+from devices.cdtt.controller import CDTTController
+from devices.cdtt.view import CDTTView
 
 
 class CDTTSessionDialog(SessionDialog):

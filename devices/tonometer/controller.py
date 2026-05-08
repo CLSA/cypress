@@ -1,7 +1,7 @@
-from instruments.controller import Controller
-from instruments.tonometer.session import TonometerSession
-from instruments.tonometer.config import TonometerConfig
-from instruments.tonometer.model import TonometerModel
+from devices.controller import Controller
+from devices.tonometer.session import TonometerSession
+from devices.tonometer.config import TonometerConfig
+from devices.tonometer.model import TonometerModel
 
 class TonometerController(Controller):
     def __init__(

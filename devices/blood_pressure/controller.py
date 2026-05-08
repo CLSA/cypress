@@ -1,8 +1,8 @@
-from instruments.controller import Controller
+from devices.controller import Controller
 
-from instruments.blood_pressure.model import BPModel
-from instruments.blood_pressure.config import BPConfig
-from instruments.blood_pressure.session import BPSession
+from devices.blood_pressure.model import BPModel
+from devices.blood_pressure.config import BPConfig
+from devices.blood_pressure.session import BPSession
 
 from typing import override
 

@@ -13,11 +13,11 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import QDate
 
 from session import SessionDialog
-from instruments.ecg.config import ECGConfig
-from instruments.ecg.session import ECGSession
-from instruments.ecg.controller import ECGController
-from instruments.ecg.view import ECGView
-from instruments.ecg.model import ECGModel
+from devices.ecg.config import ECGConfig
+from devices.ecg.session import ECGSession
+from devices.ecg.controller import ECGController
+from devices.ecg.view import ECGView
+from devices.ecg.model import ECGModel
 
 
 class ECGSessionDialog(SessionDialog):

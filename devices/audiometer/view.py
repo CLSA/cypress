@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView, QDialog
 from PySide6.QtCore import Qt
 
-from instruments.view import View
+from devices.view import View
 
 from typing import override
 

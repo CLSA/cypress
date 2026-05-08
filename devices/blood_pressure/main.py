@@ -5,11 +5,11 @@ from PySide6.QtCore import QDate
 
 from session import SessionDialog
 
-from instruments.blood_pressure.config import BPConfig
-from instruments.blood_pressure.session import BPSession
-from instruments.blood_pressure.model import BPModel
-from instruments.blood_pressure.controller import BPController
-from instruments.blood_pressure.view import BPView
+from devices.blood_pressure.config import BPConfig
+from devices.blood_pressure.session import BPSession
+from devices.blood_pressure.model import BPModel
+from devices.blood_pressure.controller import BPController
+from devices.blood_pressure.view import BPView
 
 
 class BPSessionDialog(SessionDialog):

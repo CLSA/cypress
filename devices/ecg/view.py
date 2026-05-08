@@ -3,10 +3,10 @@ from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 
 from dicom.receiver import FileInfo
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.ecg.controller import ECGController
-from instruments.ecg.session import ECGSession
+from devices.ecg.controller import ECGController
+from devices.ecg.session import ECGSession
 
 
 class ECGView(View):

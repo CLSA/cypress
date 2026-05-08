@@ -1,8 +1,8 @@
-from instruments.controller import Controller
+from devices.controller import Controller
 
-from instruments.retinal_camera.session import RetinalCameraSession
-from instruments.retinal_camera.config import RetinalCameraConfig
-from instruments.retinal_camera.model import RetinalCameraModel
+from devices.retinal_camera.session import RetinalCameraSession
+from devices.retinal_camera.config import RetinalCameraConfig
+from devices.retinal_camera.model import RetinalCameraModel
 
 
 class RetinalCameraController(Controller):

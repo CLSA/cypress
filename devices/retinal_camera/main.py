@@ -6,11 +6,11 @@ from PySide6.QtWidgets import (
 
 from session import SessionDialog
 
-from instruments.retinal_camera.session import RetinalCameraSession
-from instruments.retinal_camera.config import RetinalCameraConfig
-from instruments.retinal_camera.model import RetinalCameraModel
-from instruments.retinal_camera.view import RetinalCameraView
-from instruments.retinal_camera.controller import RetinalCameraController
+from devices.retinal_camera.session import RetinalCameraSession
+from devices.retinal_camera.config import RetinalCameraConfig
+from devices.retinal_camera.model import RetinalCameraModel
+from devices.retinal_camera.view import RetinalCameraView
+from devices.retinal_camera.controller import RetinalCameraController
 
 class RetinalCameraSessionDialog(SessionDialog):
     def __init__(self, parent=None):

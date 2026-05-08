@@ -5,7 +5,7 @@ from pathlib import Path
 
 from typing import override, List
 
-from instruments.utils import get_file_size
+from devices.utils import get_file_size
 
 
 @dataclass(kw_only=True)

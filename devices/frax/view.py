@@ -3,9 +3,9 @@ from typing import override
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
-from instruments.view import View
-from instruments.frax.controller import FRAXController
-from instruments.frax.session import FRAXSession
+from devices.view import View
+from devices.frax.controller import FRAXController
+from devices.frax.session import FRAXSession
 
 
 class FRAXView(View):

@@ -13,11 +13,11 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import QDate
 
 from session import SessionDialog
-from instruments.dxa.config import DXAConfig
-from instruments.dxa.session import DXASession
-from instruments.dxa.controller import DXAController
-from instruments.dxa.view import DXAView
-from instruments.dxa.model import DXAModel
+from devices.dxa.config import DXAConfig
+from devices.dxa.session import DXASession
+from devices.dxa.controller import DXAController
+from devices.dxa.view import DXAView
+from devices.dxa.model import DXAModel
 
 
 class DXASessionDialog(SessionDialog):

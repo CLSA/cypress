@@ -1,7 +1,7 @@
 
 from PySide6.QtWidgets import QDialog
 
-from instruments.audiometer.ui_audiometer_manual_entry import Ui_AudiometerManualEntryDialog
+from devices.audiometer.ui_audiometer_manual_entry import Ui_AudiometerManualEntryDialog
 
 class AudiometerManualEntryDialog(QDialog, Ui_AudiometerManualEntryDialog):
     def __init__(self):

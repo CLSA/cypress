@@ -1,15 +1,15 @@
 from PySide6.QtCore import Signal
 
-from instruments.controller import Controller
+from devices.controller import Controller
 
 from typing import override
 
 from dicom.receiver import FileReceiver, ReceiverConfig, DicomFileInfo
 
-from instruments.dxa.utils.validation import get_file_type
-from instruments.dxa.session import DXASession
-from instruments.dxa.config import DXAConfig
-from instruments.dxa.model import DXAModel
+from devices.dxa.utils.validation import get_file_type
+from devices.dxa.session import DXASession
+from devices.dxa.config import DXAConfig
+from devices.dxa.model import DXAModel
 
 
 class DXAController(Controller):

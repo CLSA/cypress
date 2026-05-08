@@ -6,11 +6,11 @@ from PySide6.QtWidgets import (
 
 from session import SessionDialog
 
-from instruments.weigh_scale.session import WeighScaleSession
-from instruments.weigh_scale.config import WeighScaleConfig
-from instruments.weigh_scale.model import WeighScaleModel
-from instruments.weigh_scale.view import WeighScaleView
-from instruments.weigh_scale.controller import WeighScaleController
+from devices.weigh_scale.session import WeighScaleSession
+from devices.weigh_scale.config import WeighScaleConfig
+from devices.weigh_scale.model import WeighScaleModel
+from devices.weigh_scale.view import WeighScaleView
+from devices.weigh_scale.controller import WeighScaleController
 
 
 class WeighScaleSessionDialog(SessionDialog):

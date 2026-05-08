@@ -3,10 +3,10 @@ from typing import override
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.cdtt.controller import CDTTController
-from instruments.cdtt.session import CDTTSession
+from devices.cdtt.controller import CDTTController
+from devices.cdtt.session import CDTTSession
 
 
 class CDTTView(View):

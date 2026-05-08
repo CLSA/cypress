@@ -1,10 +1,10 @@
 from typing import override
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 
-from instruments.view import View
+from devices.view import View
 
-from instruments.retinal_camera.controller import RetinalCameraController
-from instruments.retinal_camera.session import RetinalCameraSession
+from devices.retinal_camera.controller import RetinalCameraController
+from devices.retinal_camera.session import RetinalCameraSession
 
 
 class RetinalCameraView(View):

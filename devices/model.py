@@ -2,7 +2,7 @@ import copy
 
 from session import Session
 
-from instruments.utils import get_file_size
+from devices.utils import get_file_size
 from dicom.receiver import FileInfo
 
 

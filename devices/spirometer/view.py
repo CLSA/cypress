@@ -1,9 +1,9 @@
 from typing import override
-from instruments.view import View
+from devices.view import View
 
-from instruments.spirometer.controller import SpirometerController
-from instruments.spirometer.session import SpirometerSession
-from instruments.spirometer.config import SpirometerConfig
+from devices.spirometer.controller import SpirometerController
+from devices.spirometer.session import SpirometerSession
+from devices.spirometer.config import SpirometerConfig
 
 
 class SpirometerView(View):

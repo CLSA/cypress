@@ -2,10 +2,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 
 from dicom.receiver import FileInfo
-from instruments.view import View
+from devices.view import View
 
-from instruments.dxa.controller import DXAController
-from instruments.dxa.session import DXASession
+from devices.dxa.controller import DXAController
+from devices.dxa.session import DXASession
 
 
 class DXAView(View):

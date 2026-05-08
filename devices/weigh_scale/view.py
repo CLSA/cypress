@@ -1,9 +1,9 @@
 from typing import override
-from instruments.view import View
+from devices.view import View
 
-from instruments.weigh_scale.controller import WeighScaleController
-from instruments.weigh_scale.session import WeighScaleSession
-from instruments.weigh_scale.config import WeighScaleConfig
+from devices.weigh_scale.controller import WeighScaleController
+from devices.weigh_scale.session import WeighScaleSession
+from devices.weigh_scale.config import WeighScaleConfig
 
 
 class WeighScaleView(View):

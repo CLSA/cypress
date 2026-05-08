@@ -3,12 +3,12 @@ import json
 from pathlib import Path
 from typing import override
 
-from instruments.controller import Controller
-from instruments.utils import is_process_running
+from devices.controller import Controller
+from devices.utils import is_process_running
 
-from instruments.cdtt.model import CDTTModel
-from instruments.cdtt.config import CDTTConfig
-from instruments.cdtt.session import CDTTSession
+from devices.cdtt.model import CDTTModel
+from devices.cdtt.config import CDTTConfig
+from devices.cdtt.session import CDTTSession
 
 
 class CDTTController(Controller):

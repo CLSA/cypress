@@ -1,7 +1,7 @@
-from instruments.controller import Controller
-from instruments.spirometer.session import SpirometerSession
-from instruments.spirometer.config import SpirometerConfig
-from instruments.spirometer.model import SpirometerModel
+from devices.controller import Controller
+from devices.spirometer.session import SpirometerSession
+from devices.spirometer.config import SpirometerConfig
+from devices.spirometer.model import SpirometerModel
 
 class SpirometerController(Controller):
     def __init__(
