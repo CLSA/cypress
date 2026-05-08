@@ -14,6 +14,7 @@ output
 env
 pyvenv.cfg
 analysis/
+build/
 
 config.ini
 

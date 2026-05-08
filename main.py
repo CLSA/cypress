@@ -3,12 +3,11 @@ import uvicorn
 import multiprocessing
 import asyncio
 
-from pathlib import Path
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi import BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
+from config import CypressConfig
 from session import Session
 
 from devices.audiometer import run_audiometer, AudiometerSession, AudiometerConfig
@@ -26,10 +25,14 @@ from devices.grip_strength import (
     GripStrengthConfig,
 )
 
+print(f"Cypress v2.0.0")
+config = CypressConfig.from_ini("config.ini", "cypress")
+ALLOWED_IPS = [ip.strip() for ip in config.allowed_ips.split(",")]
+
 # The web server
 app = FastAPI()
 
-# The instrument currently opened
+# The device currently opened
 current_session: dict[str, multiprocessing.Process] | None = None
 
 devices = {
@@ -47,6 +50,17 @@ devices = {
     # "echo": run_echo,
     # "weigh_scale": run_weigh_scale,
 }
+
+
+@app.middleware("http")
+async def validate_ip(request: Request, call_next):
+    ip = str(request.client.host)
+
+    if ip not in ALLOWED_IPS:
+        data = {"message": f"IP {ip} is not allowed to access this resource."}
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=data)
+
+    return await call_next(request)
 
 
 async def monitor_session():
@@ -207,14 +221,9 @@ async def update():
 async def get_status():
     global current_session
     if not current_session:
-        return {
-            "status": "workstation available"
-        }
+        return {"status": "workstation available"}
 
-    return {
-        "device": current_session["device"],
-        "pid": current_session["process"].pid
-    }
+    return {"device": current_session["device"], "pid": current_session["process"].pid}
 
 
 @app.get("/update/")
@@ -223,7 +232,7 @@ async def update_cypress():
 
 
 if __name__ == "__main__":
-    test_path = Path(".")
-    print("current working directory", Path.cwd())
     multiprocessing.freeze_support()  # for ms windows to work
-    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
+    uvicorn.run(
+        app, host=str(config.host), port=config.port, log_level=config.log_level
+    )
