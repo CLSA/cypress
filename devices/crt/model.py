@@ -8,11 +8,10 @@ from instruments.model import Model
 from instruments.crt.session import CRTSession
 
 class CRTModel(Model):
-    def __init__(self, session: CRTSession):
-        self.session = session
-        self.metadata = {}
+
+    def __init__(self, session):
+        super().__init__(session)
         self.output = []
-        self.results = []
 
     def read_results(self, path: Path):
         self.clear()

@@ -20,6 +20,8 @@ class ECGView(View):
         self.resize(800, 600)
         self.table = self.measurement_table_widget.measurementTable
         self.controller.files_received.connect(self._on_files_received)
+        self.test_info_widget.startButton.setVisible(False)
+        self.test_info_widget.statusValue.setText("Waiting for transfer")
 
     def _on_files_received(self, files: list[FileInfo]):
         self.table.clear()

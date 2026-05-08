@@ -1,12 +1,12 @@
 from typing import override
 from PySide6.QtCore import Signal
-from instruments.controller import Controller
+from devices.controller import Controller
 
 from dicom.receiver import FileReceiver, FileInfo, ReceiverConfig
 
-from instruments.ecg.config import ECGConfig
-from instruments.ecg.session import ECGSession
-from instruments.ecg.model import ECGModel
+from devices.ecg.config import ECGConfig
+from devices.ecg.session import ECGSession
+from devices.ecg.model import ECGModel
 
 from dicom.uploader import FileUploaderDialog
 
@@ -33,7 +33,7 @@ class ECGController(Controller):
         self.file_receiver = FileReceiver(
             ReceiverConfig(
                 storage_dir=self.config.storage_path,
-                extensions=[".pdf"],
+                extensions=[".pdf", ".txt", ".dcm"],
             )
         )
         self.file_receiver.files_received.connect(self._on_files_received)
@@ -52,14 +52,13 @@ class ECGController(Controller):
     @override
     def submit(self):
         self.uploader.show()
-        self.uploader.start_batch_upload(files=self.files, url='http://127.0.0.1:5000/upload')
+        self.uploader.start_batch_upload(
+            files=self.files,
+            url=f"http://127.0.0.1:5000/upload/ecg/{self.session.barcode}",
+        )
 
     def _upload_succeeded(self):
         print("Upload success")
 
     def _upload_failed(self):
         print("Upload failed")
-
-
-
-

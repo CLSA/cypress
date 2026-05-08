@@ -22,6 +22,7 @@ class CRTView(View):
 
         self.resize(800, 600)
         self.table = self.measurement_table_widget.measurementTable
+        self.test_info_widget.deviceStatusValue.setText("Choice Reaction Test")
 
     @override
     def _on_measured(self, output: dict):

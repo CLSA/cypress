@@ -17,6 +17,8 @@ class FileUploaderThread(QThread):
         super().__init__()
         self.file_paths = file_paths
         self.url = url
+        self.chunk_size = 8192
+        self.sleep_time = 0.01
 
     def run(self):
         try:
@@ -29,22 +31,18 @@ class FileUploaderThread(QThread):
                     nonlocal bytes_sent
                     with open(file_path, "rb") as f:
                         while True:
-                            chunk = f.read(16384)
+                            chunk = f.read(self.chunk_size)
                             if not chunk:
                                 break
 
-                            time.sleep(0.01)
+                            time.sleep(self.sleep_time)
                             yield chunk
-                            bytes_sent += len(chunk)
 
-                            # Emit: which file, its name, and its progress
-                            percent = int((bytes_sent / file_size) * 100)
+                            bytes_sent += len(chunk)
+                            percent = int((bytes_sent / (max(file_size, 1))) * 100)
                             self.progress_updated.emit(index + 1, file_name, percent)
 
-                response = requests.post(
-                    self.url, data=file_generator()
-                )
-
+                response = requests.post(f"{self.url}?filename={file_name}", data=file_generator())
                 if response.status_code != 200:
                     self.all_finished.emit(False)
 
@@ -65,8 +63,6 @@ class FileUploaderDialog(QDialog):
 
         layout = QVBoxLayout()
         self.status_label = QLabel("Waiting..")
-
-        # Individual file progress
         self.progress_bar = QProgressBar()
 
         layout.addWidget(self.status_label)

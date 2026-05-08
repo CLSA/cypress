@@ -3,42 +3,28 @@ import uvicorn
 import multiprocessing
 import asyncio
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi import BackgroundTasks
 from fastapi.responses import FileResponse
 
-from pathlib import Path
-
 from session import Session
 
-from instruments.audiometer.main import run_audiometer
-from instruments.audiometer.session import AudiometerSession
-from instruments.audiometer.config import AudiometerConfig
+from devices.audiometer import run_audiometer, AudiometerSession, AudiometerConfig
+from devices.cdtt import run_cdtt, CDTTSession, CDTTConfig
+from devices.crt import run_crt, CRTSession, CRTConfig
+from devices.frax import run_frax, FRAXSession, FRAXConfig
+from devices.dxa import run_dxa, DXASession, DXAConfig
+from devices.ecg import run_ecg, ECGSession, ECGConfig
+from devices.echo import run_echo, ECHOSession, ECHOConfig
+from devices.blood_pressure import run_blood_pressure, BPSession, BPConfig
 
-from instruments.cdtt.main import run_cdtt
-from instruments.cdtt.session import CDTTSession
-from instruments.cdtt.config import CDTTConfig
-
-from instruments.crt.main import run_crt
-from instruments.crt.session import CRTSession
-from instruments.crt.config import CRTConfig
-
-from instruments.frax.main import run_frax
-from instruments.frax.session import FRAXSession
-from instruments.frax.config import FRAXConfig
-
-from instruments.dxa.main import run_dxa
-from instruments.dxa.session import DXASession
-from instruments.dxa.config import DXAConfig
-
-from instruments.ecg.main import run_ecg
-from instruments.ecg.session import ECGSession
-from instruments.ecg.config import ECGConfig
-
-from instruments.echo.main import run_echo
-from instruments.echo.session import ECHOSession
-from instruments.echo.config import ECHOConfig
-
+from devices.grip_strength import (
+    run_grip_strength,
+    GripStrengthSession,
+    GripStrengthConfig,
+)
 
 # The web server
 app = FastAPI()
@@ -47,19 +33,19 @@ app = FastAPI()
 current_session: dict[str, multiprocessing.Process] | None = None
 
 devices = {
-    "audiometer": run_audiometer,
-    "blood_pressure": run_blood_pressure,
+    # "audiometer": run_audiometer,
+    # "blood_pressure": run_blood_pressure,
     "cdtt": run_cdtt,
     "choice_reaction": run_crt,
     "ecg": run_ecg,
     "frax": run_frax,
     "dxa": run_dxa,
-    "grip_strength": run_grip_strength,
-    "retinal_camera": run_retinal_camera,
-    "spirometer": run_spirometer,
-    "tonometer": run_tonometer,
-    "echo": run_echo,
-    "weigh_scale": run_weigh_scale,
+    # "grip_strength": run_grip_strength,
+    # "retinal_camera": run_retinal_camera,
+    # "spirometer": run_spirometer,
+    # "tonometer": run_tonometer,
+    # "echo": run_echo,
+    # "weigh_scale": run_weigh_scale,
 }
 
 
@@ -162,6 +148,7 @@ async def launch(background_tasks: BackgroundTasks, session: DXASession):
 
     set_session("dxa", session)
     background_tasks.add_task(monitor_session)
+
     return {"device": "dxa1", "pid": current_session["process"].pid}
 
 
@@ -220,9 +207,14 @@ async def update():
 async def get_status():
     global current_session
     if not current_session:
-        return {"status": "workstation available"}
+        return {
+            "status": "workstation available"
+        }
 
-    return {"device": current_session["device"], "pid": current_session["process"].pid}
+    return {
+        "device": current_session["device"],
+        "pid": current_session["process"].pid
+    }
 
 
 @app.get("/update/")
@@ -234,4 +226,4 @@ if __name__ == "__main__":
     test_path = Path(".")
     print("current working directory", Path.cwd())
     multiprocessing.freeze_support()  # for ms windows to work
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
