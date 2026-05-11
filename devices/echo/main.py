@@ -25,13 +25,13 @@ def run_echo(session: ECHOSession | None):
 
     config = ECHOConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = ECHOSession(answer_id=1, **ECHOSessionDialog().prompt())
 
     model = ECHOModel(session=session)
     controller = ECHOController(
-        config=config, session=session, model=model, standalone=standalone
+        config=config, session=session, model=model, detached=detached
     )
     view = ECHOView(controller=controller, session=session)
     view.show()

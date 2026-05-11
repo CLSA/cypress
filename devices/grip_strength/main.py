@@ -24,9 +24,9 @@ class GripStrengthSessionDialog(SessionDialog):
 def run_grip_strength(session: GripStrengthSession | None):
     app = QApplication()
     config = GripStrengthConfig.from_ini()
-    standalone = not session
+    detached = not session
 
-    if standalone:
+    if detached:
         session = GripStrengthSession(
             answer_id=1, **GripStrengthSessionDialog().prompt()
         )
@@ -35,7 +35,7 @@ def run_grip_strength(session: GripStrengthSession | None):
         config=config,
         session=session,
         model=GripStrengthModel(session=session),
-        standalone=standalone
+        detached=detached
     )
 
     view = GripStrengthView(controller=controller, session=session)

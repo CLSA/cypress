@@ -18,7 +18,7 @@ class ECHOController(Controller):
         session: ECHOSession,
         config: ECHOConfig,
         model: ECHOModel,
-        standalone=False,
+        detached=False,
         parent=None,
     ):
         super().__init__(
@@ -26,7 +26,7 @@ class ECHOController(Controller):
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
         )
 
         self.file_receiver = FileReceiver(

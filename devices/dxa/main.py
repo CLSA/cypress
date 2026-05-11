@@ -108,13 +108,13 @@ def run_dxa(session: DXASession | None):
 
     config = DXAConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = DXASession(answer_id=1, **DXASessionDialog().prompt())
 
     model = DXAModel(session=session)
     controller = DXAController(
-        config=config, session=session, model=model, standalone=standalone
+        config=config, session=session, model=model, detached=detached
     )
     view = DXAView(controller=controller, session=session)
 

@@ -37,13 +37,13 @@ def run_ecg(session: ECGSession | None):
         print(e)
         return -1
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = ECGSession(answer_id=1, **ECGSessionDialog().prompt())
 
     model = ECGModel(session=session)
     controller = ECGController(
-        config=config, session=session, model=model, standalone=False
+        config=config, session=session, model=model, detached=False
     )
     view = ECGView(controller=controller, session=session)
     view.show()

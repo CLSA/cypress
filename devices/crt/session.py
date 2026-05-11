@@ -1,5 +1,15 @@
-from session import Session
+from session import Session, SessionDialog
 
 
 class CRTSession(Session):
     pass
+
+
+class CRTSessionDialog(SessionDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("CRT setup")
+
+        self.setFixedWidth(350)
+        self.setFixedHeight(350)

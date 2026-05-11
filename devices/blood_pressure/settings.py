@@ -1,0 +1,1 @@
+DEVICE_NAME = "blood_pressure"

@@ -5,6 +5,7 @@ from PySide6.QtCore import QProcess
 from devices.model import Model
 from devices.frax.session import FRAXSession
 
+
 class FRAXModel(Model):
     def __init__(self, session: FRAXSession):
         self.session = session
@@ -138,7 +139,9 @@ class FRAXModel(Model):
         )
         self.metadata["osteoporotic_fracture_bmd_interp"] = interpretation
 
-    def interpret_result(self, p: float, femoral_neck_tscore: float, previous_fracture: bool):
+    def interpret_result(
+        self, p: float, femoral_neck_tscore: float, previous_fracture: bool
+    ):
         interpretation = "N/A"
 
         if p > 20.0 or previous_fracture:

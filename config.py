@@ -2,9 +2,9 @@ import configparser
 import os
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, ClassVar
 
-from pydantic import BaseModel, IPvAnyAddress, PositiveInt
+from pydantic import BaseModel, IPvAnyAddress, PositiveInt, HttpUrl, FilePath
 
 
 def is_executable(path: Path):
@@ -14,54 +14,46 @@ def is_executable(path: Path):
     return path
 
 
-class CypressConfig(BaseModel):
-    host: IPvAnyAddress = "127.0.0.1"
-    port: Annotated[int, PositiveInt]
-    allowed_ips: str = "127.0.0.1" # comma delimited list
-    log_level: str = "info"
+class BaseConfig(BaseModel):
+    config_name: ClassVar[str] = "config.ini"
+    section_name: ClassVar[str] = ""
 
     @classmethod
-    def from_ini(cls, ini_file_path: Path | str, section: str):
+    def from_ini(cls):
         config = configparser.ConfigParser()
 
-        if not Path(ini_file_path).exists():
-            raise FileNotFoundError(f"Config file not found: {ini_file_path}")
+        if not Path(cls.config_name).exists():
+            raise FileNotFoundError(f"Config file not found: {cls.config_name}")
 
-        config.read(ini_file_path)
+        config.read(cls.config_name)
 
-        if section not in config:
-            raise ValueError(f"Section {section} not found in {ini_file_path}")
+        if cls.section_name not in config:
+            raise ValueError(f"Section {cls.section_name} not found in {cls.config_name}")
 
-        settings = config[section]
+        settings = config[cls.section_name]
         raw_settings = dict(settings.items())
 
         return cls(**raw_settings)
 
 
-class DeviceConfig(BaseModel):
+class CypressConfig(BaseConfig):
+    host: IPvAnyAddress = "127.0.0.1"
+    port: Annotated[int, PositiveInt]
+    allowed_ips: str = "127.0.0.1,"  # comma delimited list
+    log_level: str = "info"
+    pine: HttpUrl
 
+    section_name: ClassVar[str] = "cypress"
+
+
+class DeviceConfig(BaseConfig):
     @classmethod
-    def is_device_installed(cls, config_name, device_name):
+    def is_device_installed(cls):
         try:
-            cls.from_ini(config_name, device_name)
+            cls.from_ini()
             return True
         except Exception as e:
             print(e)
             return False
 
-    @classmethod
-    def from_ini(cls, ini_file_path: Path | str, section: str):
-        config = configparser.ConfigParser()
-
-        if not Path(ini_file_path).exists():
-            raise FileNotFoundError(f"Config file not found: {ini_file_path}")
-
-        config.read(ini_file_path)
-
-        if section not in config:
-            raise ValueError(f"Section {section} not found in {ini_file_path}")
-
-        settings = config[section]
-        raw_settings = dict(settings.items())
-
-        return cls(**raw_settings)
+config = CypressConfig.from_ini()

@@ -11,13 +11,13 @@ class RetinalCameraController(Controller):
         session: RetinalCameraSession,
         config: RetinalCameraConfig,
         model: RetinalCameraModel,
-        standalone: bool = False,
+        detached: bool = False,
         parent=None,
     ):
         super().__init__(
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
             parent=parent,
         )

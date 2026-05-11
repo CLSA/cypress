@@ -19,7 +19,7 @@ class ECGController(Controller):
         session: ECGSession,
         config: ECGConfig,
         model: ECGModel,
-        standalone=False,
+        detached=False,
         parent=None,
     ):
         super().__init__(
@@ -27,7 +27,7 @@ class ECGController(Controller):
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
         )
 
         self.file_receiver = FileReceiver(

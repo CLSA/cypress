@@ -10,13 +10,13 @@ class GripStrengthController(Controller):
         session: GripStrengthSession,
         config: GripStrengthConfig,
         model: GripStrengthModel,
-        standalone: bool = False,
+        detached: bool = False,
         parent=None,
     ):
         super().__init__(
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
             parent=parent,
         )

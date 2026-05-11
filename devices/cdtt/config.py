@@ -1,6 +1,4 @@
-from pathlib import Path
-
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from pydantic import (
     Field,
@@ -11,8 +9,12 @@ from pydantic import (
 
 from config import DeviceConfig, is_executable
 
+from devices.cdtt.settings import DEVICE_NAME
+
 
 class CDTTConfig(DeviceConfig):
+    section_name: ClassVar[str] = DEVICE_NAME
+
     # The name of the process as it appears in Task Manager
     process_name: Annotated[str, Field(min_length=1, frozen=True)]
 
@@ -27,11 +29,3 @@ class CDTTConfig(DeviceConfig):
 
     # Where the instrument results are stored
     output: Annotated[DirectoryPath, Field(frozen=True)]
-
-    @classmethod
-    def is_device_installed(cls, config_name='config.ini', device_name='cdtt'):
-        return super().is_device_installed(config_name, device_name)
-
-    @classmethod
-    def from_ini(cls, ini_file_path='config.ini', section='cdtt'):
-        return super().from_ini(ini_file_path, section)

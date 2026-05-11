@@ -15,7 +15,7 @@ class AudiometerController(Controller):
         session: AudiometerSession,
         config: AudiometerConfig,
         model: AudiometerModel,
-        standalone: bool = False,
+        detached: bool = False,
         parent=None,
     ):
         super().__init__(
@@ -23,7 +23,7 @@ class AudiometerController(Controller):
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
         )
         self.plugin = AudiometerPlugin(session=self.session, config=self.config)
 

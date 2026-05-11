@@ -26,15 +26,15 @@ def run_weigh_scale(session: WeighScaleSession | None):
 
     config = WeighScaleConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = WeighScaleSession(answer_id=1, **WeighScaleSessionDialog().prompt())
 
     controller = WeighScaleController(
         config=config,
         session=session,
         model=WeighScaleModel(session),
-        standalone=standalone,
+        detached=detached,
     )
 
     view = WeighScaleView(controller=controller, session=session)

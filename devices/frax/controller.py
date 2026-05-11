@@ -14,7 +14,7 @@ class FRAXController(Controller):
         session: FRAXSession,
         config: FRAXConfig,
         model: FRAXModel,
-        standalone=False,
+        detached=False,
         parent=None,
     ):
         super().__init__(
@@ -22,7 +22,7 @@ class FRAXController(Controller):
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
         )
 
     @override

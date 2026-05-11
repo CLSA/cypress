@@ -5,7 +5,6 @@ import json
 import sys
 
 from devices.model import Model
-from devices.crt.session import CRTSession
 
 class CRTModel(Model):
 

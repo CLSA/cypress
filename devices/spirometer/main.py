@@ -26,15 +26,15 @@ def run_spirometer(session: SpirometerSession | None):
 
     config = SpirometerConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = SpirometerSession(answer_id=1, **SpirometerSessionDialog().prompt())
 
     controller = SpirometerController(
         config=config,
         session=session,
         model=SpirometerModel(session),
-        standalone=standalone,
+        detached=detached,
     )
 
     view = SpirometerView(controller=controller, session=session)

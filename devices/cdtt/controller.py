@@ -17,14 +17,14 @@ class CDTTController(Controller):
         session: CDTTSession,
         config: CDTTConfig,
         model: CDTTModel,
-        standalone=False,
+        detached=False,
         parent=None,
     ):
         super().__init__(
             session=session,
             config=config,
             model=model,
-            standalone=standalone,
+            detached=detached,
             parent=parent
         )
 
@@ -56,7 +56,6 @@ class CDTTController(Controller):
 
     @override
     def measure(self) -> dict:
-        print("CDTT measure..")
         if not self.model.read_output(
             self.config.output / f"Results-{self.session.barcode}.xlsx",
             self.session.language,

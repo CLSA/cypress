@@ -1,48 +1,28 @@
 import sys
 
-from PySide6.QtWidgets import QApplication
-
-from session import SessionDialog
+from devices.device import Device
 
 from devices.cdtt.config import CDTTConfig
-from devices.cdtt.session import CDTTSession
+from devices.cdtt.session import CDTTSession, CDTTSessionDialog
 from devices.cdtt.model import CDTTModel
 from devices.cdtt.controller import CDTTController
 from devices.cdtt.view import CDTTView
 
 
-class CDTTSessionDialog(SessionDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
 
-        self.setWindowTitle("CDTT")
+class CDTT(Device):
+    config = CDTTConfig
+    session = CDTTSession
+    session_dialog = CDTTSessionDialog
+    model = CDTTModel
+    view = CDTTView
+    controller = CDTTController
 
-        self.setFixedWidth(350)
-        self.setFixedHeight(350)
-
-
-def run_cdtt(session: CDTTSession | None):
-    app = QApplication()
-
-    config = CDTTConfig.from_ini()
-
-    standalone = not session
-    if not standalone:
-        session = CDTTSession(answer_id=1, **CDTTSessionDialog().prompt())
-
-    model = CDTTModel(session=session)
-    controller = CDTTController(
-        config=config, session=session, model=model, standalone=standalone
-    )
-    view = CDTTView(controller=controller, session=session)
-    view.show()
-
-    return app.exec()
 
 
 if __name__ == "__main__":
     try:
-        sys.exit(run_cdtt(session=None))
+        sys.exit(CDTT.run(session=None))
     except Exception as e:
         print(e)
         input("Press enter to continue...")

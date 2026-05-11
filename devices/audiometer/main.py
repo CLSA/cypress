@@ -58,12 +58,12 @@ def run_audiometer(session: AudiometerSession | None):
 
     config = AudiometerConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = AudiometerSession(answer_id=1, **AudiometerSessionDialog().prompt())
 
     model = AudiometerModel(session=session)
-    controller = AudiometerController(config=config, session=session, model=model, standalone=standalone)
+    controller = AudiometerController(config=config, session=session, model=model, detached=detached)
     view = AudiometerView(controller=controller, session=session)
 
     view.show()

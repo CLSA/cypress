@@ -25,8 +25,8 @@ def run_retinal_camera(session: RetinalCameraSession | None):
 
     config = RetinalCameraConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = RetinalCameraSession(
             answer_id=1, **RetinalCameraSessionDialog().prompt()
         )
@@ -35,7 +35,7 @@ def run_retinal_camera(session: RetinalCameraSession | None):
         config=config,
         session=session,
         model=RetinalCameraModel(session),
-        standalone=standalone
+        detached=detached
     )
 
     view = RetinalCameraView(controller=controller, session=session)

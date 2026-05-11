@@ -14,8 +14,9 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtGui import QRegularExpressionValidator
+from PySide6.QtCore import QUuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, computed_field
 from pydantic.types import StringConstraints, PositiveInt, PositiveFloat, PastDate
 
 
@@ -118,11 +119,16 @@ class LanguageOptions(str, Enum):
 
 
 class Session(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
     barcode: Annotated[str, StringConstraints(min_length=8, max_length=8)]
     uid: Annotated[str, StringConstraints(min_length=7, max_length=8)]
     language: LanguageOptions
     interviewer: Annotated[str, StringConstraints(min_length=1, max_length=50)]
     answer_id: PositiveInt
+
+    @computed_field
+    def session_id(self) -> str:
+        return QUuid.createUuid().toString(QUuid.StringFormat.WithoutBraces)
 
 
 class TonometerSession(Session):

@@ -29,8 +29,6 @@ class BPView(View):
         if result == QDialog.Accepted:
             data = self.manual_entry_form.get_data()
             self.controller.manual_entry(data)
-        else:
-            print("user cancelled the dialog.")
 
     @override
     def _on_measured(self, output: dict):

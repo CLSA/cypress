@@ -20,7 +20,7 @@ class DXAController(Controller):
         session: DXASession,
         config: DXAConfig,
         model: DXAModel,
-        standalone=False,
+        detached=False,
         parent=None
     ):
         super().__init__(
@@ -28,7 +28,7 @@ class DXAController(Controller):
             session=session,
             config=config,
             model=model,
-            standalone=standalone
+            detached=detached
         )
 
         self.files: list[DicomFileInfo] = []

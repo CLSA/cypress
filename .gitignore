@@ -15,6 +15,7 @@ env
 pyvenv.cfg
 analysis/
 build/
+logs/
 
 config.ini
 

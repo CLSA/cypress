@@ -26,15 +26,15 @@ def run_tonometer(session: TonometerSession | None):
 
     config = TonometerConfig.from_ini()
 
-    standalone = not session
-    if standalone:
+    detached = not session
+    if detached:
         session = TonometerSession(answer_id=1, **TonometerSessionDialog().prompt())
 
     controller = TonometerController(
         config=config,
         session=session,
         model=TonometerModel(session),
-        standalone=standalone,
+        detached=detached,
     )
 
     view = TonometerView(controller=controller, session=session)

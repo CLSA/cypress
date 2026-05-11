@@ -2,9 +2,9 @@ from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
 from devices.view import View
-
 from devices.crt.controller import CRTController
 from devices.crt.session import CRTSession
+from devices.crt.settings import logger
 
 from typing import override
 
@@ -26,7 +26,6 @@ class CRTView(View):
 
     @override
     def _on_measured(self, output: dict):
-        # return super()._on_measured(results)
         self.table.clear()
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)

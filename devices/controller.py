@@ -21,14 +21,14 @@ class Controller(QObject):
                  session: Session,
                  config: DeviceConfig,
                  model: Model,
-                 standalone: bool = False,
+                 detached: bool = False,
                  parent = None):
         super().__init__(parent)
 
         self.session = session
         self.config = config
         self.model = model
-        self.standalone = standalone
+        self.detached = detached
 
         self.process = QProcess(self)
         self.process.started.connect(self._on_process_started)
@@ -40,17 +40,14 @@ class Controller(QObject):
         self.manually_entered = False
 
     def start(self) -> bool:
-        print("Controller start..")
         return True
 
     def measure(self) -> dict:
-        print("Controller measure..")
         self.measured.emit()
         return self.data
 
     def submit(self):
-        print("Controller submitted..")
-        if self.standalone:
+        if self.detached:
             file_path, selected_filter = QFileDialog.getSaveFileName(
                 None,
                 "Select output file",
@@ -66,17 +63,13 @@ class Controller(QObject):
         self.submitted.emit()
 
     def _on_process_started(self, *args):
-        print("on process started")
         self.started.emit()
 
     def _on_process_finished(self, *args):
-        print("on process finished")
         self.finished.emit()
 
     def _on_process_destroyed(self, *args):
-        print("on process destroyed")
         self.error.emit()
 
     def _on_process_error(self, *args):
-        print("on process error", args)
         self.error.emit()
