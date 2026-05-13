@@ -8,27 +8,46 @@ from PySide6.QtWidgets import QFileDialog
 from session import Session
 from config import DeviceConfig
 
+from devices.crt.settings import logger
 from devices.model import Model
+from devices.view import View
+
+from files.uploader import DataUploaderDialog
+
 
 class Controller(QObject):
     started = Signal()
-    finished = Signal()
+    ready_to_measure = Signal()
     measured = Signal(dict)
     submitted = Signal()
     error = Signal(str, str)
 
-    def __init__(self,
-                 session: Session,
-                 config: DeviceConfig,
-                 model: Model,
-                 detached: bool = False,
-                 parent = None):
+    def __init__(
+        self,
+        session: Session,
+        config: DeviceConfig,
+        model: Model,
+        view: View,
+        detached: bool = False,
+        parent=None,
+    ):
         super().__init__(parent)
 
         self.session = session
         self.config = config
         self.model = model
         self.detached = detached
+
+        self.view = view
+        self.view.start.connect(self.start)
+        self.view.measure.connect(self.measure)
+        self.view.submit.connect(self.submit)
+
+        self.started.connect(self.view.on_started)
+        self.ready_to_measure.connect(self.view.on_ready_to_measure)
+        self.measured.connect(self.view.on_measured)
+        self.submitted.connect(self.view.on_submitted)
+        self.error.connect(self.view.on_error)
 
         self.process = QProcess(self)
         self.process.started.connect(self._on_process_started)
@@ -39,37 +58,63 @@ class Controller(QObject):
         self.data = {}
         self.manually_entered = False
 
-    def start(self) -> bool:
-        return True
+        self.uploader = DataUploaderDialog(model=self.model, session=self.session, parent=self.view)
+        self.uploader.upload_successful.connect(self._upload_succeeded)
+        self.uploader.upload_failed.connect(self._upload_failed)
 
-    def measure(self) -> dict:
+    def start(self):
+        self.started.emit()
+
+
+    def measure(self):
         self.measured.emit()
-        return self.data
 
     def submit(self):
-        if self.detached:
+        saved = False
+        if not self.detached:
+            self.uploader.reset()
+            self.uploader.show()
+            self.uploader.start_upload()
+        else:
+            saved = self.save_to_file()
+            if saved:
+                self.submitted.emit()
+
+    def save_to_file(self):
+        try:
             file_path, selected_filter = QFileDialog.getSaveFileName(
                 None,
                 "Select output file",
-                str((Path.home() / 'Documents' / f'{self.session.barcode}.json').resolve()),
-                'JSON files (*.json)'
+                str(
+                    (
+                        Path.home() / "Documents" / f"{self.session.barcode}.json"
+                    ).resolve()
+                ),
+                "JSON files (*.json)",
             )
             if file_path:
                 with open(file_path, "w") as file:
                     json.dump(self.model.to_response(), file, indent=4)
-            else:
-                print("User closed dialog")
+        except Exception as e:
+            logger.error(e)
+            return False
 
-        self.submitted.emit()
+        return True
 
     def _on_process_started(self, *args):
         self.started.emit()
 
     def _on_process_finished(self, *args):
-        self.finished.emit()
+        self.ready_to_measure.emit()
 
     def _on_process_destroyed(self, *args):
         self.error.emit()
 
     def _on_process_error(self, *args):
         self.error.emit()
+
+    def _upload_succeeded(self):
+        self.submitted.emit()
+
+    def _upload_failed(self):
+        self.error.emit("Error", "Failed to upload the data")

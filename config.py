@@ -37,13 +37,14 @@ class BaseConfig(BaseModel):
 
 
 class CypressConfig(BaseConfig):
-    host: IPvAnyAddress = "127.0.0.1"
+    section_name: ClassVar[str] = "cypress"
+
+    host: str
     port: Annotated[int, PositiveInt]
-    allowed_ips: str = "127.0.0.1,"  # comma delimited list
+    allowed_hosts: str # comma delimited list
     log_level: str = "info"
     pine: HttpUrl
-
-    section_name: ClassVar[str] = "cypress"
+    auth: str
 
 
 class DeviceConfig(BaseConfig):

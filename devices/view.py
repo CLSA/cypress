@@ -1,30 +1,42 @@
+from enum import Enum
+
 from PySide6 import QtWidgets
 from PySide6.QtWidgets import QMessageBox
+from PySide6.QtCore import Signal
 
 from ui.measurement_table import MeasurementTableWidget
 from ui.test_info_widget import TestInfoWidget
-
-from devices.controller import Controller
 
 from session import Session
 
 from datetime import datetime
 
+from files.uploader import PineAPI
+
+import settings
+
+
+class State(Enum):
+    BEGIN = 0
+    STARTED = 1
+    READY_TO_MEASURE = 3
+    MEASURED = 2
+    SUBMITTED = 4
+    ERROR = 5
+
 
 class View(QtWidgets.QDialog):
-    def __init__(
-        self, controller: Controller, session: Session, parent=None, title="Cypress"
-    ):
+    start = Signal()
+    measure = Signal()
+    submit = Signal()
+
+    def __init__(self, session: Session, parent=None, title="Cypress"):
         super().__init__(parent)
 
-        self.setWindowTitle(title)
+        self.state = State.BEGIN
+        self.session = session
 
-        self.controller = controller
-        self.controller.started.connect(self._on_started)
-        self.controller.finished.connect(self._on_finished)
-        self.controller.measured.connect(self._on_measured)
-        self.controller.submitted.connect(self._on_submitted)
-        self.controller.error.connect(self._on_error)
+        self.setWindowTitle(title)
 
         self.test_info_widget = TestInfoWidget(self)
         self.test_info_widget.startButton.clicked.connect(self._on_start_button_clicked)
@@ -61,57 +73,69 @@ class View(QtWidgets.QDialog):
 
     # slots
     def _on_start_button_clicked(self):
-        self.controller.start()
+        self.start.emit()
 
     def _on_measure_button_clicked(self):
-        self.controller.measure()
+        self.measurement_table_widget.measureButton.setEnabled(False)
+        self.measure.emit()
 
     def _on_submit_button_clicked(self):
         self.measurement_table_widget.submitButton.setEnabled(False)
-        submitted = self.controller.submit()
-
-        if not submitted:
-            self.measurement_table_widget.submitButton.setEnabled(True)
+        self.submit.emit()
 
     def _on_manual_entry_clicked(self):
-        print("manual entry clicked")
+        pass
 
-    def _on_started(self):
-        self._set_started()
-
-    def _on_finished(self):
-        self._set_finished()
-
-    def _on_measured(self, results):
-        self._set_measured()
-
-    def _on_submitted(self):
-        self._set_complete()
-
-    def _on_error(self, title: str = "Error", message: str = "Unknown error"):
-        self._set_error(message)
-        msg = QMessageBox()
-        msg.critical(self, title, message)
-
-    def _set_started(self):
+    def on_started(self):
         self.test_info_widget.statusValue.setText("Waiting...")
         self.test_info_widget.startButton.setEnabled(False)
         self.measurement_table_widget.measureButton.setEnabled(False)
         self.measurement_table_widget.submitButton.setEnabled(False)
+        self.state = State.STARTED
 
-    def _set_finished(self):
+    def on_ready_to_measure(self):
         self.test_info_widget.statusValue.setText("Ready to measure")
         self.measurement_table_widget.measureButton.setEnabled(True)
+        self.state = State.READY_TO_MEASURE
 
-    def _set_error(self, message):
-        self.test_info_widget.statusValue.setText(f"Error: {message}")
-        self.measurement_table_widget.measureButton.setEnabled(False)
-        self.measurement_table_widget.submitButton.setEnabled(False)
-
-    def _set_measured(self):
+    def on_measured(self, results):
+        self.measurement_table_widget.measureButton.setEnabled(True)
         self.test_info_widget.statusValue.setText("Ready to submit")
         self.measurement_table_widget.submitButton.setEnabled(True)
         self.measurement_table_widget.measureButton.setEnabled(False)
+        self.state = State.MEASURED
 
-    def _set_complete(self):
-        self.test_info_widget.statusValue.setText("Finished")
+    def on_submitted(self):
+        self.measurement_table_widget.submitButton.setEnabled(True)
+        self.test_info_widget.statusValue.setText("Complete")
+        self.state = State.SUBMITTED
+
+    def on_error(self, title: str = "Error", message: str = "Unknown error"):
+        self.test_info_widget.statusValue.setText(f"Error: {message}")
+        self.measurement_table_widget.measureButton.setEnabled(False)
+        self.measurement_table_widget.submitButton.setEnabled(False)
+        self.state = State.ERROR
+
+        msg = QMessageBox()
+        msg.critical(self, title, message)
+
+    def closeEvent(self, event):
+        if self.state == State.SUBMITTED:
+            event.accept()
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Confirm Close",
+            "Are you sure you want to close? Any unsaved results will be lost.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            PineAPI(
+                base_url=settings.config.pine, auth_token=settings.PINE_AUTH_TOKEN
+            ).send_cancel(session_id=self.session.session_id)
+            event.accept()
+        else:
+            event.ignore()

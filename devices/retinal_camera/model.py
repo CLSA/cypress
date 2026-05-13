@@ -5,8 +5,8 @@ from pathlib import Path
 from devices.model import Model
 
 class RetinalCameraModel(Model):
-    def __init__(self, session_data: dict):
-        self.session_data = session_data.copy()
+    def __init__(self, session, config):
+        super().__init__(session, config)
         self.measurements = []
 
     def restore_database(self, database_name: str) -> bool:
@@ -82,10 +82,10 @@ class RetinalCameraModel(Model):
                 name = file_path.name
                 name_parts = name.strip().split('_')
 
-                if name_parts[0] != self.session_data.get('barcode'):
+                if name_parts[0] != self.session.barcode:
                     continue
 
-                if name_parts[1] != self.session_data.get('side'):
+                if name_parts[1] != self.session.side:
                     continue
 
                 if '_OPT_' in name:

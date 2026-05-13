@@ -13,6 +13,7 @@ from devices.cdtt.settings import DEVICE_NAME
 
 
 class CDTTConfig(DeviceConfig):
+    # ini section
     section_name: ClassVar[str] = DEVICE_NAME
 
     # The name of the process as it appears in Task Manager

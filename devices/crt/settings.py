@@ -1,7 +1,12 @@
+import logging
 import logging.config
 
-DEVICE_NAME = "choice_reaction"
-LOG_FILENAME = "logs/crt.log"
+from settings import LOG_LEVEL
+
+DEVICE_NAME = "crt"
+LOG_LOCATION = "logs/crt.log"
+LOG_MAX_SIZE_MB = 10 * 1024 * 1024
+LOG_BACKUPS = 1
 
 logging.config.dictConfig({
     "version": 1,
@@ -14,15 +19,20 @@ logging.config.dictConfig({
     },
     "handlers": {
         "file_handler": {
-            "class": "logging.FileHandler",
-            "filename": LOG_FILENAME,
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOG_LOCATION,
+            "formatter": "default",
+            'maxBytes': LOG_MAX_SIZE_MB,
+            'backupCount': LOG_BACKUPS,
+        },
+        "console": {
+            "class": "logging.StreamHandler",
             "formatter": "default",
         },
-
     },
     "loggers": {
         DEVICE_NAME: {
-            "handlers": ["file_handler"], "level": "INFO"
+            "handlers": ["console", "file_handler"], "level": LOG_LEVEL
         }
     },
 })

@@ -2,9 +2,7 @@ from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
 from devices.view import View
-from devices.crt.controller import CRTController
 from devices.crt.session import CRTSession
-from devices.crt.settings import logger
 
 from typing import override
 
@@ -12,12 +10,11 @@ from typing import override
 class CRTView(View):
     def __init__(
         self,
-        controller: CRTController,
         session: CRTSession,
         parent=None,
     ):
         super().__init__(
-            parent=parent, controller=controller, session=session
+            parent=parent, session=session
         )
 
         self.resize(800, 600)
@@ -25,13 +22,13 @@ class CRTView(View):
         self.test_info_widget.deviceStatusValue.setText("Choice Reaction Test")
 
     @override
-    def _on_measured(self, output: dict):
+    def on_measured(self, output: dict):
         self.table.clear()
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setRowCount(len(output["results"]))
+        self.table.setRowCount(len(output["value"]["results"]))
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels(
             [
@@ -43,7 +40,7 @@ class CRTView(View):
             ]
         )
 
-        for index, result in enumerate(output["results"]):
+        for index, result in enumerate(output["value"]["results"]):
             screen_id = QTableWidgetItem(result["screen_id"])
             correct_position = QTableWidgetItem(result["correct_position"].capitalize())
             response_correct = QTableWidgetItem(
@@ -62,4 +59,4 @@ class CRTView(View):
             self.table.setItem(index, 3, response_stimulus_interval)
             self.table.setItem(index, 4, elapsed_time)
 
-        super()._on_measured(output)
+        super().on_measured(output)

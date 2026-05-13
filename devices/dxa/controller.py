@@ -1,15 +1,15 @@
 from PySide6.QtCore import Signal
 
-from devices.controller import Controller
-
 from typing import override
 
-from dicom.receiver import FileReceiver, ReceiverConfig, DicomFileInfo
-
+from devices.controller import Controller
+from devices.utils import DicomFileInfo
 from devices.dxa.utils.validation import get_file_type
 from devices.dxa.session import DXASession
 from devices.dxa.config import DXAConfig
 from devices.dxa.model import DXAModel
+
+from files.receiver import FileReceiver, ReceiverConfig
 
 
 class DXAController(Controller):
@@ -21,14 +21,14 @@ class DXAController(Controller):
         config: DXAConfig,
         model: DXAModel,
         detached=False,
-        parent=None
+        parent=None,
     ):
         super().__init__(
             parent=parent,
             session=session,
             config=config,
             model=model,
-            detached=detached
+            detached=detached,
         )
 
         self.files: list[DicomFileInfo] = []

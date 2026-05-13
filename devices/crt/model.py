@@ -1,21 +1,34 @@
-from pathlib import Path
-
 import csv
 import json
 import sys
 
+from pathlib import Path
+from datetime import date
+
+from devices.utils import get_file_info
 from devices.model import Model
+from devices.crt.settings import logger
+
 
 class CRTModel(Model):
-
-    def __init__(self, session):
-        super().__init__(session)
+    def __init__(self, session, config):
+        super().__init__(session, config)
         self.output = []
 
-    def read_results(self, path: Path):
-        self.clear()
+    def read_results(self):
+        # find the file
+        # parse the file
+
+        logger.debug(f"CRTModel::read_results")
+
+        self.reset()
 
         try:
+            path: Path = self._find_result_file()
+            if not path:
+                logger.critical("output filepath not found")
+                return False
+
             with open(path, "r") as f:
                 reader = csv.reader(f)
                 for row in reader:
@@ -23,18 +36,39 @@ class CRTModel(Model):
 
             self._parse_results()
 
-        except Exception as e:
-            print(f"error: {e}")
+        except Exception as error:
+            logger.critical(error)
             return False
 
         return True
 
+    def _find_result_file(self) -> Path | None:
+        logger.debug("CRTModel::_find_result_file")
+
+        results_filename = f"{self.config.prefix}_{self.config.clinic}_{date.today().strftime('%Y%m%d')}.csv"
+        result_filepath = None
+        for path in self.config.output.iterdir():
+            if path.is_file():
+                if path.name == results_filename:
+                    result_filepath = path
+
+        if not result_filepath:
+            return None
+
+        logger.debug(f"found {str(result_filepath.resolve())}")
+
+        file_info = get_file_info(result_filepath)
+        file_info.send_name = "data"
+
+        self._add_file(file_info)
+
+        return result_filepath
+
     def _parse_results(self):
+        logger.debug("CRTModel::_parse_results")
+
         if not self.output:
             return False
-
-        self.results.clear()
-        self.metadata.clear()
 
         try:
             clinic_index = -1
@@ -92,16 +126,11 @@ class CRTModel(Model):
                 else:
                     raise Exception("unknown line code")
 
-        except Exception as e:
-            print(f"error on row {index}: {e}")
+        except Exception as error:
+            logger.critical(error)
             return False
 
         return True
-
-    def clear(self):
-        self.output.clear()
-        self.results.clear()
-        self.metadata.clear()
 
 
 if __name__ == "__main__":

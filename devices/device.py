@@ -28,14 +28,16 @@ class Device:
         config = cls.config.from_ini()
 
         detached = not session
-        if not detached:
+        if detached:
             session = cls.session(answer_id=1, **cls.session_dialog().prompt())
 
-        model = cls.model(session=session)
+        model = cls.model(session=session, config=config)
+        view = cls.view(session=session)
+
         controller = cls.controller(
-            config=config, session=session, model=model, detached=detached
+            config=config, session=session, model=model, view=view, detached=detached
         )
-        view = cls.view(controller=controller, session=session)
+
         view.show()
 
         return app.exec()

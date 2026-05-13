@@ -9,6 +9,7 @@ build
 *.db
 *.sql
 *.spec
+*.pem
 
 output
 env

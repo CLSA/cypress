@@ -1,6 +1,21 @@
+import base64
+import logging
+import logging.config
+
 from config import config
 
-ALLOWED_IPS = [ip.strip() for ip in config.allowed_ips.split(",")]
+CYPRESS_VERSION = "2.0.0"
+
+ALLOWED_HOSTS = [host.strip() for host in config.allowed_hosts.split(",")]
+
+PINE_AUTH_TOKEN = f"Basic {base64.b64encode(config.auth.encode("utf-8")).decode("utf-8")}"
+TRANSFER_CHUNK_SIZE = 8192
+TRANSFER_SLEEP_TIME = 0.01
+
+LOG_MAX_SIZE_MB = 10 * 1024 * 1024
+LOG_NUM_BACKUPS = 1
+LOG_LEVEL = "DEBUG"
+
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -16,12 +31,17 @@ LOGGING_CONFIG = {
             "formatter": "default",
         },
         "file_handler": {
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "logs/server.log",
             "formatter": "default",
+            'maxBytes': LOG_MAX_SIZE_MB,
+            'backupCount': LOG_NUM_BACKUPS,
         },
     },
     "loggers": {
-        "uvicorn": {"handlers": ["console", "file_handler"], "level": "INFO"},
+        "uvicorn": {"handlers": ["file_handler", "console"], "level": LOG_LEVEL},
     },
 }
+
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger("cypress")

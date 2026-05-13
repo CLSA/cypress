@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 
-from dicom.receiver import FileInfo
+from files.receiver import FileInfo
 from devices.view import View
 
 from devices.dxa.controller import DXAController
@@ -33,7 +33,7 @@ class DXAView(View):
 
         for index, file_info in enumerate(files):
             name = QTableWidgetItem(file_info.name)
-            size = QTableWidgetItem(file_info.size)
+            size = QTableWidgetItem(file_info.readable_size)
             file_path = QTableWidgetItem(str(file_info.file_path.resolve()))
 
             self.table.setItem(index, 0, name)

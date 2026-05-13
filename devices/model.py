@@ -1,17 +1,24 @@
 import copy
+from pathlib import Path
 
 from session import Session
 
-from devices.utils import get_file_size
-from dicom.receiver import FileInfo
+from devices.utils import get_file_size, get_file_info
+
+from files.receiver import FileInfo
+
+from config import DeviceConfig
 
 
 class Model:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, config: DeviceConfig):
         self.session = session
+        self.config = config
+
         self.metadata = {}
         self.results = []
-        self.files = []
+        self.files: list[FileInfo] = []
+
         self.manual_entry = False
 
     def reset(self):
@@ -20,24 +27,23 @@ class Model:
         self.results = []
         self.files = []
 
-    def add_file(self, file_info: FileInfo):
-        if not file_info:
-            return
+        self.manual_entry = False
 
+    def _add_file(self, file_info: FileInfo):
         self.files.append(file_info)
 
     def to_response(self):
         response = {
-            "session": self.session.model_dump(mode="json"),
-            "manual_entry": self.manual_entry,
-            "metadata": copy.deepcopy(self.metadata),
-            "results": copy.deepcopy(self.results),
-        }
-
-        if self.files:
-            response["files"] = {
-                file_info.name: get_file_size(file_info.file_path)
-                for file_info in self.files
+            "value": {
+                "session": self.session.model_dump(mode="json"),
+                "manual_entry": self.manual_entry,
+                "metadata": copy.deepcopy(self.metadata),
+                "results": copy.deepcopy(self.results),
+                "files": {
+                    f"{file_info.send_name}_{file_info.extension}": file_info.readable_size
+                    for file_info in self.files
+                },
             }
+        }
 
         return response

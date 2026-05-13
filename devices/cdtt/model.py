@@ -12,8 +12,8 @@ NUM_TRIALS = 24
 class CDTTModel(Model):
     output_file_xlsx_path: Path | None = None
 
-    def __init__(self, session):
-        super().__init__(session)
+    def __init__(self, session, config):
+        super().__init__(session, config)
         self.trials = []
 
     def is_valid(self, barcode: str) -> bool:

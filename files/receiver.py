@@ -1,33 +1,10 @@
-from PySide6.QtCore import QObject, QProcess, Signal, QFileSystemWatcher
-
+from typing import override
 from dataclasses import dataclass
 from pathlib import Path
 
-from typing import override, List
+from PySide6.QtCore import QObject, Signal, QFileSystemWatcher
 
-from devices.utils import get_file_size
-
-
-@dataclass(kw_only=True)
-class FileInfo:
-    name: str
-    size: str
-    file_name: str
-    file_path: Path
-    extension: str
-
-
-@dataclass(kw_only=True)
-class DicomFileInfo(FileInfo):
-    patient_id: str
-    body_part_examined: str
-    modality: str
-    laterality: str
-    study_id: str
-    media_storage_uid: str
-    study_date: str
-    series_number: str
-    instance_number: str
+from devices.utils import FileInfo, DicomFileInfo, get_file_size
 
 
 @dataclass(frozen=True, kw_only=True)

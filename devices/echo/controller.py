@@ -1,7 +1,7 @@
 from PySide6.QtCore import Signal
 
-from dicom.receiver import FileReceiver, FileInfo, ReceiverConfig
-from dicom.uploader import FileUploaderDialog
+from files.receiver import FileReceiver, FileInfo, ReceiverConfig
+from files.uploader import DataUploaderDialog
 
 from devices.controller import Controller
 
@@ -36,7 +36,7 @@ class ECHOController(Controller):
         self.file_receiver.files_received.connect(self._on_files_received)
         self.file_receiver.start()
 
-        self.file_uploader = FileUploaderDialog()
+        self.file_uploader = DataUploaderDialog()
 
     def _on_files_received(self, dicom_files: list[FileInfo]):
         self.files_received.emit(dicom_files)

@@ -7,7 +7,9 @@ from devices.frax.session import FRAXSession
 
 
 class FRAXModel(Model):
-    def __init__(self, session: FRAXSession):
+    def __init__(self, session: FRAXSession, config):
+        super().__init__(config)
+
         self.session = session
         self.input_line = ""
         self.output_line = ""

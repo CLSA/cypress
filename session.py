@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from enum import Enum
 from typing import Annotated
 
@@ -16,8 +18,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtCore import QUuid
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict, computed_field, Field
 from pydantic.types import StringConstraints, PositiveInt, PositiveFloat, PastDate
+
+from settings import CYPRESS_VERSION
 
 
 class SessionDialog(QDialog):
@@ -57,7 +61,6 @@ class SessionDialog(QDialog):
             QRegularExpressionValidator(r"^.+$")
         )  # accept 8 numeric values
         self.interviewer.textChanged.connect(self.can_submit)
-
 
         self.inputs = {
             "barcode": self.barcode,
@@ -120,15 +123,29 @@ class LanguageOptions(str, Enum):
 
 class Session(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
-    barcode: Annotated[str, StringConstraints(min_length=8, max_length=8)]
-    uid: Annotated[str, StringConstraints(min_length=7, max_length=8)]
-    language: LanguageOptions
-    interviewer: Annotated[str, StringConstraints(min_length=1, max_length=50)]
-    answer_id: PositiveInt
+
+    session_id: str = Field(
+        default_factory=lambda: QUuid.createUuid().toString(
+            QUuid.StringFormat.WithoutBraces
+        ),
+        frozen=True,
+    )
+
+    answer_id: Annotated[PositiveInt, Field(frozen=True)]
+    barcode: Annotated[str, StringConstraints(min_length=8, max_length=8), Field(frozen=True)]
+    uid: Annotated[str, StringConstraints(min_length=7, max_length=8), Field(frozen=True)]
+    language: Annotated[LanguageOptions, Field(frozen=True)]
+    interviewer: Annotated[str, StringConstraints(min_length=1, max_length=50), Field(frozen=True)]
+    start_time: str = Field(default_factory=lambda: str(datetime.now()), frozen=True)
+
+    # optional
+    interviewer_name: str | None = None
+    date: str | None = None
 
     @computed_field
-    def session_id(self) -> str:
-        return QUuid.createUuid().toString(QUuid.StringFormat.WithoutBraces)
+    @property
+    def cypress_version(self) -> str:
+        return CYPRESS_VERSION
 
 
 class TonometerSession(Session):

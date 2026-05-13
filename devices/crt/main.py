@@ -8,7 +8,7 @@ from devices.crt.view import CRTView
 from devices.crt.model import CRTModel
 
 
-class ChoiceReactionTest(Device):
+class CRT(Device):
     config = CRTConfig
     model = CRTModel
     view = CRTView
@@ -19,7 +19,7 @@ class ChoiceReactionTest(Device):
 
 if __name__ == "__main__":
     try:
-        sys.exit(ChoiceReactionTest.run(session=None))
+        sys.exit(CRT.run(session=None))
     except Exception as e:
         print(e)
         input("Press enter to continue...")
