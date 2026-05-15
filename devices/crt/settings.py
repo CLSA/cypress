@@ -1,14 +1,10 @@
-import logging
-import logging.config
-
-from settings import LOG_LEVEL
-
 DEVICE_NAME = "crt"
 LOG_LOCATION = "logs/crt.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
+LOG_LEVEL = "INFO"
 
-logging.config.dictConfig({
+LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
@@ -22,8 +18,8 @@ logging.config.dictConfig({
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOG_LOCATION,
             "formatter": "default",
-            'maxBytes': LOG_MAX_SIZE_MB,
-            'backupCount': LOG_BACKUPS,
+            "maxBytes": LOG_MAX_SIZE_MB,
+            "backupCount": LOG_BACKUPS,
         },
         "console": {
             "class": "logging.StreamHandler",
@@ -31,10 +27,6 @@ logging.config.dictConfig({
         },
     },
     "loggers": {
-        DEVICE_NAME: {
-            "handlers": ["console", "file_handler"], "level": LOG_LEVEL
-        }
+        DEVICE_NAME: {"handlers": ["console", "file_handler"], "level": LOG_LEVEL}
     },
-})
-
-logger = logging.getLogger(DEVICE_NAME)
+}

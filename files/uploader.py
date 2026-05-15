@@ -16,15 +16,20 @@ from devices.utils import FileInfo
 
 from session import Session
 
-logger = logging.getLogger()
 
 class PineAPI(QObject):
     all_finished = Signal(bool)
-    progress_updated = Signal(int, str, int) # current_file_index, current_file_name, percentage
+    progress_updated = Signal(
+        int, str, int
+    )  # current_file_index, current_file_name, percentage
 
-    def __init__(self, base_url, auth_token):
+    def __init__(self, base_url, auth_token, logger_name):
         super().__init__()
+
         self.base_url = base_url
+        self.logger = logging.getLogger(logger_name)
+        self.logger.debug(f"PineAPI - base_url {base_url}")
+
         self.auth_token = auth_token
         self.chunk_size = settings.TRANSFER_CHUNK_SIZE
         self.sleep_time = settings.TRANSFER_SLEEP_TIME
@@ -32,27 +37,33 @@ class PineAPI(QObject):
     def send_device_response(
         self, session_id: str, answer_id: str, json: dict, files: list[FileInfo]
     ):
+        self.logger.info(f"sending cypress response")
+
         if not self._send_json(url=f"{self.base_url}/answer/{answer_id}", json=json):
-            logger.error("failed to send json response")
+            self.logger.error("failed to send json response")
             return self.all_finished.emit(False)
 
         if not self._send_files(url=f"{self.base_url}/answer/{answer_id}", files=files):
-            logger.error("failed to send files")
+            self.logger.error("failed to send files")
             return self.all_finished.emit(False)
 
         if not self._send_complete(session_id=session_id):
-            logger.error("failed to send complete status")
+            self.logger.error("failed to send complete status")
             return self.all_finished.emit(False)
 
         return self.all_finished.emit(True)
 
     def send_cancel(self, session_id: str) -> bool:
+        self.logger.debug(f"sending cancel status: {session_id}")
+
         return self._send_json(
             url=f"{self.base_url}/answer_device/uuid={session_id}",
             json={"status": "cancelled"},
         )
 
     def _send_complete(self, session_id: str) -> bool:
+        self.logger.debug(f"sending complete status: {session_id}")
+
         return self._send_json(
             url=f"{self.base_url}/answer_device/uuid={session_id}",
             json={"status": "completed"},
@@ -67,19 +78,19 @@ class PineAPI(QObject):
             )
             response.raise_for_status()
         except HTTPError as e:
-            print(e)
+            self.logger.error(e)
             return False
         except ConnectionError as e:
-            print(e)
+            self.logger.error(e)
             return False
         except Timeout as e:
-            print(e)
+            self.logger.error(e)
             return False
         except TooManyRedirects as e:
-            print(e)
+            self.logger.error(e)
             return False
         except Exception as e:
-            print(e)
+            self.logger.error(e)
             return False
         return True
 
@@ -105,6 +116,7 @@ class PineAPI(QObject):
                             percent = int((bytes_sent / (max(file_size, 1))) * 100)
                             self.progress_updated.emit(index + 1, file_name, percent)
 
+                self.logger.info(f"sending {file_name}.{file_info.extension} ({index + 1} / {len(files)})")
                 response = requests.patch(
                     f"{url}?filename={file_name}.{file_info.extension}",
                     data=file_generator(),
@@ -115,31 +127,29 @@ class PineAPI(QObject):
                 )
                 response.raise_for_status()
         except HTTPError as e:
-            print(e)
+            self.logger.error(e)
             return False
         except ConnectionError as e:
-            print(e)
+            self.logger.error(e)
             return False
         except Timeout as e:
-            print(e)
+            self.logger.error(e)
             return False
         except TooManyRedirects as e:
-            print(e)
+            self.logger.error(e)
             return False
         except Exception as e:
-            print(e)
+            self.logger.error(e)
             return False
         return True
 
 
 class DataUploader(QThread):
-    def __init__(self, session: Session, model: Model):
+    def __init__(self, session: Session, model: Model, api: PineAPI):
         super().__init__()
         self.session = session
         self.model = model
-        self.api = PineAPI(
-            base_url=settings.config.pine, auth_token=settings.PINE_AUTH_TOKEN
-        )
+        self.api = api
 
     def run(self):
         self.api.send_device_response(
@@ -154,7 +164,7 @@ class DataUploaderDialog(QDialog):
     upload_successful = Signal()
     upload_failed = Signal()
 
-    def __init__(self, session: Session, model: Model, parent=None):
+    def __init__(self, session: Session, model: Model, device_name: str, parent=None):
         super().__init__(parent=parent)
 
         self.session = session
@@ -172,7 +182,15 @@ class DataUploaderDialog(QDialog):
 
         self.setLayout(layout)
 
-        self.thread = DataUploader(session=session, model=model)
+        self.thread = DataUploader(
+            session=session,
+            model=model,
+            api=PineAPI(
+                base_url=session.origin,
+                auth_token=settings.PINE_AUTH_TOKEN,
+                logger_name=device_name,
+            ),
+        )
         self.thread.api.progress_updated.connect(self.update_ui)
         self.thread.api.all_finished.connect(self.on_finished)
 
@@ -184,7 +202,9 @@ class DataUploaderDialog(QDialog):
         self.thread.start()
 
     def update_ui(self, file_num, name, percent):
-        self.status_label.setText(f"Uploading {name} ({file_num} / {len(self.model.files)})")
+        self.status_label.setText(
+            f"Uploading {name} ({file_num} / {len(self.model.files)})"
+        )
         self.progress_bar.setValue(percent)
 
     def on_finished(self, success):

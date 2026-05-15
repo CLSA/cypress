@@ -1,20 +1,23 @@
+from typing import override
+
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
 from devices.view import View
 from devices.crt.session import CRTSession
-
-from typing import override
+from devices.crt.config import CRTConfig
 
 
 class CRTView(View):
     def __init__(
         self,
         session: CRTSession,
+        config: CRTConfig,
+        detached: bool = False,
         parent=None,
     ):
         super().__init__(
-            parent=parent, session=session
+            parent=parent, session=session, config=config, detached=detached
         )
 
         self.resize(800, 600)

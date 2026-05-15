@@ -30,3 +30,12 @@ class CDTTConfig(DeviceConfig):
 
     # Where the instrument results are stored
     output: Annotated[DirectoryPath, Field(frozen=True)]
+
+    # Settings directory
+    settings_dir: Annotated[DirectoryPath, Field(frozen=True)]
+
+    # English specific settings
+    en_settings: Annotated[FilePath, Field(frozen=True)]
+
+    # French specific settings
+    fr_settings: Annotated[FilePath, Field(frozen=True)]

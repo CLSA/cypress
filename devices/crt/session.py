@@ -1,4 +1,5 @@
 from session import Session, SessionDialog
+from devices.crt.settings import DEVICE_NAME
 
 
 class CRTSession(Session):

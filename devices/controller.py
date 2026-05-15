@@ -1,4 +1,5 @@
 import json
+import logging
 
 from pathlib import Path
 
@@ -8,12 +9,12 @@ from PySide6.QtWidgets import QFileDialog
 from session import Session
 from config import DeviceConfig
 
-from devices.crt.settings import logger
 from devices.model import Model
 from devices.view import View
 
 from files.uploader import DataUploaderDialog
 
+logger = logging.Logger(__name__)
 
 class Controller(QObject):
     started = Signal()
@@ -31,12 +32,14 @@ class Controller(QObject):
         detached: bool = False,
         parent=None,
     ):
+
         super().__init__(parent)
 
         self.session = session
         self.config = config
         self.model = model
         self.detached = detached
+        self.logger = logging.getLogger(self.config.section_name)
 
         self.view = view
         self.view.start.connect(self.start)
@@ -58,15 +61,17 @@ class Controller(QObject):
         self.data = {}
         self.manually_entered = False
 
-        self.uploader = DataUploaderDialog(model=self.model, session=self.session, parent=self.view)
+        self.uploader = DataUploaderDialog(model=self.model, session=self.session, device_name=self.config.section_name, parent=self.view)
         self.uploader.upload_successful.connect(self._upload_succeeded)
         self.uploader.upload_failed.connect(self._upload_failed)
 
     def start(self):
+        self.logger.debug("start")
         self.started.emit()
 
 
     def measure(self):
+        self.logger.debug("measure")
         self.measured.emit()
 
     def submit(self):

@@ -6,26 +6,28 @@ import multiprocessing
 import asyncio
 
 from typing import Annotated
+from enum import Enum
 
-from fastapi import FastAPI, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, Request
 from fastapi import BackgroundTasks
-from fastapi.responses import FileResponse
 
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
-from settings import ALLOWED_HOSTS, logger
+from settings import CYPRESS_VERSION, ALLOWED_HOSTS, LOGGING_CONFIG, LOG_LEVEL
 
 from config import config
 from session import Session
 
 from devices.device import Device
-from devices.audiometer.main import Audiometer, AudiometerSession
-from devices.blood_pressure.main import BloodPressure, BPSession
+
+# from devices.audiometer.main import Audiometer, AudiometerSession
+# from devices.blood_pressure.main import BloodPressure, BPSession
 from devices.crt.main import CRT, CRTSession
 from devices.cdtt.main import CDTT, CDTTSession
-from devices.frax.main import FRAX, FRAXSession
-from devices.dxa.main import DXA, DXASession
+
+# from devices.frax.main import FRAX, FRAXSession
+# from devices.dxa.main import DXA, DXASession
 
 app = FastAPI()
 app.add_middleware(HTTPSRedirectMiddleware)
@@ -34,13 +36,30 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
 # The device currently opened
 current_session: dict[str, multiprocessing.Process] | None = None
 
-devices: dict[str, Device] = {
-    #"hearcon": Audiometer,
-    #"watch_bp": BloodPressure,
-    #"cdtt": CDTT,
-    "choice_reaction_test": CRT,
-    #"dxa1": DXA,
-    #"dxa2": DXA,
+
+class DeviceEnum(str, Enum):
+    CRT = "choice_reaction_test"
+    CDTT = "cdtt"
+    HR = "hearing"
+    GRIP = "hand_grip"
+    DXA1 = "dxa1"
+    DXA2 = "dxa2"
+    FRAX = "frax"
+    ECG = "mac5"
+    ECHO = "echo"
+    BP = "blood_pressure"
+    RET_L = "oct_left"
+    RET_R = "oct_right"
+    ORA = "ora"
+
+
+devices: dict[DeviceEnum, Device] = {
+    # "hearcon": Audiometer,
+    # "watch_bp": BloodPressure,
+    DeviceEnum.CDTT: CDTT,
+    DeviceEnum.CRT: CRT,
+    # "dxa1": DXA,
+    # "dxa2": DXA,
     # "mac5": "",
     # "vivid_iq": "",
     # "frax": FRAX,
@@ -56,11 +75,11 @@ devices: dict[str, Device] = {
 
 async def monitor_session():
     global current_session
-    while True:
-        if not psutil.pid_exists(current_session["process"].pid):
-            current_session = None
-            break
+
+    while current_session and psutil.pid_exists(current_session["process"].pid):
         await asyncio.sleep(1)
+
+    current_session = None
 
 
 def set_session(device: str, session: Session):
@@ -107,10 +126,6 @@ def launch_device(
     set_session(device_name, session)
     background_tasks.add_task(monitor_session)
 
-    print("sending session id", session.session_id)
-    print("sending session id", session.session_id)
-    print("sending session id", session.session_id)
-
     return {"sessionId": session.session_id}
 
 
@@ -119,14 +134,21 @@ def launch_device(
 #     return FileResponse(path="./index.html", media_type="text/html")
 
 
-# @app.post("/cdtt")
-# async def cdtt(background_tasks: BackgroundTasks, session: CDTTSession):
-#     return launch_device("cdtt", background_tasks, session)
+@app.post("/cdtt")
+async def cdtt(
+    background_tasks: BackgroundTasks, session: CDTTSession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("cdtt", background_tasks, session)
 
 
 @app.post("/choice_reaction_test")
-async def crt(background_tasks: BackgroundTasks, session: CRTSession):
-    logger.info("launch", session.session_id)
+async def launch(
+    background_tasks: BackgroundTasks,
+    session: CRTSession,
+    request: Request,
+):
+    session.origin = request.headers.get("origin", None)
     return launch_device("choice_reaction_test", background_tasks, session)
 
 
@@ -157,8 +179,8 @@ async def crt(background_tasks: BackgroundTasks, session: CRTSession):
 
 
 @app.get("/{device}/status")
-async def get_status(device: str):
-    if device not in devices:
+async def get_status(device: DeviceEnum):
+    if device.value not in devices:
         raise HTTPException(status=400, detail={"error": "unsupported device"})
 
     global current_session
@@ -174,44 +196,52 @@ async def get_status(device: str):
 
 @app.delete("/{device}/{session_id}")
 async def end_session(
-    device: str,
+    device: DeviceEnum,
     session_id: Annotated[
         str,
         Path(pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"),
     ],
 ):
-    print(f"ending session {session_id}")
     if device not in devices:
         raise HTTPException(status=400, detail={"error": "unsupported device"})
-
-    print(f"ending session {session_id}")
 
     global current_session
     if not current_session:
         return
 
-    print(current_session['id'], session_id)
     if current_session["id"] != session_id:
         return
 
-    print(f"ending session {session_id}")
     pid = current_session["process"].pid
     os.kill(pid, signal.SIGTERM)
 
 
-@app.get("/update/")
-async def update_cypress():
-    return {"updating": True}
+# @app.get("/update/")
+# async def update_cypress():
+#     return {"updating": True}
 
 
 if __name__ == "__main__":
-    multiprocessing.freeze_support()  # for ms windows to work
-    uvicorn.run(
-        app,
-        host=config.host,
-        port=config.port,
-        #log_level="info",
-        #log_config=LOGGING_CONFIG,
-        ssl_certfile="build/server.crt",
-        ssl_keyfile="build/server.key",
-    )
+    try:
+        print(f"Cypress {CYPRESS_VERSION}\n")
+
+        for key, value in devices.items():
+            try:
+                value.config.from_ini()
+                print(f"[y] {key.value}")
+            except Exception as e:
+                print(e)
+                print(f"[n] {key.value}")
+
+        multiprocessing.freeze_support()  # for ms windows to work
+        uvicorn.run(
+            app=app,
+            host=config.host,
+            port=config.port,
+            log_config=LOGGING_CONFIG,
+            ssl_certfile="build/server.crt",
+            ssl_keyfile="build/server.key",
+        )
+    except Exception as e:
+        print(e)
+        input("Press enter to continue..")

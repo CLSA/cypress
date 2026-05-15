@@ -1,22 +1,22 @@
 import sys
 
 from devices.device import Device
-
 from devices.cdtt.config import CDTTConfig
 from devices.cdtt.session import CDTTSession, CDTTSessionDialog
 from devices.cdtt.model import CDTTModel
 from devices.cdtt.controller import CDTTController
 from devices.cdtt.view import CDTTView
-
+from devices.cdtt.settings import LOG_CONFIG
 
 
 class CDTT(Device):
+    logging_config = LOG_CONFIG
     config = CDTTConfig
-    session = CDTTSession
-    session_dialog = CDTTSessionDialog
     model = CDTTModel
     view = CDTTView
     controller = CDTTController
+    session = CDTTSession
+    session_dialog = CDTTSessionDialog
 
 
 

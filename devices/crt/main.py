@@ -6,9 +6,12 @@ from devices.crt.session import CRTSession, CRTSessionDialog
 from devices.crt.controller import CRTController
 from devices.crt.view import CRTView
 from devices.crt.model import CRTModel
+from devices.crt.settings import LOG_CONFIG
+
 
 
 class CRT(Device):
+    logging_config = LOG_CONFIG
     config = CRTConfig
     model = CRTModel
     view = CRTView

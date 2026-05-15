@@ -1,3 +1,6 @@
+import logging
+import logging.config
+
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 
@@ -10,7 +13,9 @@ from devices.controller import Controller
 
 
 class Device:
+    name: str
     config: DeviceConfig
+    logging_config: dict
     model: Model
     view: View
     controller: Controller
@@ -26,14 +31,23 @@ class Device:
         app = QApplication()
 
         config = cls.config.from_ini()
+        logging.config.dictConfig(cls.logging_config)
+        logger = logging.getLogger(config.section_name)
 
         detached = not session
         if detached:
-            session = cls.session(answer_id=1, **cls.session_dialog().prompt())
+            try:
+                session = cls.session(answer_id=1, **cls.session_dialog().prompt())
+            except Exception as e:
+                logger.info("session info not entered, exiting")
+                return 1
+
+        logger.info(
+            f"launching ({f"{session.origin}" if not detached else "detached"})"
+        )
 
         model = cls.model(session=session, config=config)
-        view = cls.view(session=session)
-
+        view = cls.view(session=session, config=config, detached=detached)
         controller = cls.controller(
             config=config, session=session, model=model, view=view, detached=detached
         )

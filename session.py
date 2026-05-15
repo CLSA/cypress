@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from enum import Enum
 from typing import Annotated
@@ -18,10 +18,75 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtCore import QUuid
 
-from pydantic import BaseModel, ConfigDict, computed_field, Field
+from pydantic import BaseModel, ConfigDict, computed_field, Field, HttpUrl, PrivateAttr
 from pydantic.types import StringConstraints, PositiveInt, PositiveFloat, PastDate
 
 from settings import CYPRESS_VERSION
+
+
+class LanguageOptions(str, Enum):
+    english = "en"
+    french = "fr"
+
+
+class SexEnum(Enum):
+    MALE = "male"
+    FEMALE = "female"
+
+
+class Session(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+
+    session_id: str = Field(
+        default_factory=lambda: QUuid.createUuid().toString(
+            QUuid.StringFormat.WithoutBraces
+        ),
+        frozen=True,
+    )
+
+    answer_id: Annotated[PositiveInt, Field(frozen=True)]
+    barcode: Annotated[
+        str, StringConstraints(min_length=8, max_length=8), Field(frozen=True)
+    ]
+    uid: Annotated[
+        str, StringConstraints(min_length=7, max_length=8), Field(frozen=True)
+    ]
+    language: Annotated[LanguageOptions, Field(frozen=True)]
+    interviewer: Annotated[
+        str, StringConstraints(min_length=1, max_length=50), Field(frozen=True)
+    ]
+    start_time: str = Field(
+        default_factory=lambda: str(
+            datetime.now(timezone.utc)
+            .isoformat(timespec="milliseconds")
+            .replace("+00:00", "Z")
+        ),
+        frozen=True,
+    )
+
+    # optional
+    interviewer_name: str | None = None
+    date: str | None = None
+
+    origin: str | None = None
+
+    @computed_field
+    @property
+    def cypress_version(self) -> str:
+        return CYPRESS_VERSION
+
+
+class TonometerSession(Session):
+    dob: PastDate
+    sex: SexEnum
+
+
+class SpirometerSession(Session):
+    dob: PastDate
+    smoker: bool
+    sex: SexEnum
+    height: PositiveFloat
+    weight: PositiveFloat
 
 
 class SessionDialog(QDialog):
@@ -41,7 +106,7 @@ class SessionDialog(QDialog):
             QRegularExpressionValidator(r"^[0-9]{8}$")
         )  # accept 8 numeric values
         self.barcode.setMaxLength(8)
-        self.barcode.setPlaceholderText("50000000")
+        self.barcode.setPlaceholderText("00000000")
         self.barcode.textChanged.connect(self.can_submit)
 
         self.uid = QLineEdit(self)
@@ -49,14 +114,15 @@ class SessionDialog(QDialog):
             QRegularExpressionValidator(r"^[A-Za-z0-9]{8}$")
         )  # accept 8 numeric values
         self.uid.setMaxLength(8)
-        self.uid.setPlaceholderText("A0000000")
+        self.uid.setPlaceholderText("00000000")
         self.uid.textChanged.connect(self.can_submit)
 
         self.language = QComboBox(self)
-        self.language.addItems({"en", "fr"})
+        self.language.addItems(["en", "fr"])
+        self.language.setCurrentIndex(0)
 
         self.interviewer = QLineEdit(self)
-        self.interviewer.setText("CLSA")
+        self.interviewer.setText("")
         self.interviewer.setValidator(
             QRegularExpressionValidator(r"^.+$")
         )  # accept 8 numeric values
@@ -70,6 +136,10 @@ class SessionDialog(QDialog):
         }
 
         for label, widgets in self.inputs.items():
+            if label == "uid":
+                self.form_layout.addRow(label.upper(), widgets)
+                continue
+
             self.form_layout.addRow(label.replace("_", " ").title(), widgets)
 
         self.session_group.setLayout(self.form_layout)
@@ -114,53 +184,3 @@ class SessionDialog(QDialog):
         if result == QDialog.DialogCode.Accepted:
             return dialog.get_values()
         return None
-
-
-class LanguageOptions(str, Enum):
-    english = "en"
-    french = "fr"
-
-
-class Session(BaseModel):
-    model_config = ConfigDict(use_enum_values=True)
-
-    session_id: str = Field(
-        default_factory=lambda: QUuid.createUuid().toString(
-            QUuid.StringFormat.WithoutBraces
-        ),
-        frozen=True,
-    )
-
-    answer_id: Annotated[PositiveInt, Field(frozen=True)]
-    barcode: Annotated[str, StringConstraints(min_length=8, max_length=8), Field(frozen=True)]
-    uid: Annotated[str, StringConstraints(min_length=7, max_length=8), Field(frozen=True)]
-    language: Annotated[LanguageOptions, Field(frozen=True)]
-    interviewer: Annotated[str, StringConstraints(min_length=1, max_length=50), Field(frozen=True)]
-    start_time: str = Field(default_factory=lambda: str(datetime.now()), frozen=True)
-
-    # optional
-    interviewer_name: str | None = None
-    date: str | None = None
-
-    @computed_field
-    @property
-    def cypress_version(self) -> str:
-        return CYPRESS_VERSION
-
-
-class TonometerSession(Session):
-    dob: PastDate
-    sex: SexEnum
-
-
-class SpirometerSession(Session):
-    dob: PastDate
-    smoker: bool
-    sex: SexEnum
-    height: PositiveFloat
-    weight: PositiveFloat
-
-
-class SexEnum(Enum):
-    MALE = "male"
-    FEMALE = "female"

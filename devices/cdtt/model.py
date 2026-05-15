@@ -1,6 +1,6 @@
 import json
-import copy
 import sys
+import logging
 
 from pathlib import Path
 from openpyxl import load_workbook
@@ -9,59 +9,54 @@ from devices.model import Model
 
 NUM_TRIALS = 24
 
-class CDTTModel(Model):
-    output_file_xlsx_path: Path | None = None
+logger = logging.getLogger("cdtt")
 
+
+class CDTTModel(Model):
     def __init__(self, session, config):
         super().__init__(session, config)
-        self.trials = []
+        self.output_filepath: Path | None = None
 
     def is_valid(self, barcode: str) -> bool:
-        if len(self.trials) < NUM_TRIALS:
+        if len(self.results) < NUM_TRIALS:
             return False
 
         if self.metadata["Subject ID:"] != barcode:
-            print(
+            logger.error(
                 f"subject id {self.metadata['Subject ID:']} does not match {barcode}",
-                self.metadata["Subject ID"],
-                barcode,
             )
             return False
 
         return True
 
-    def clear(self) -> None:
-        self.metadata.clear()
-        self.trials.clear()
-
     def read_output(self, output_file: Path, language: str) -> bool:
-        self.clear()
+        self.reset()
 
         try:
             wb = load_workbook(str(output_file.resolve()))
             if not self._read_barcode(wb):
-                print(f"could not read barcode..")
+                logger.error(f"could not read barcode..")
                 return False
             if not self._read_metadata(wb):
-                print(f"could not read metadata..")
+                logger.error(f"could not read metadata..")
                 return False
             if not self._read_summary(wb):
-                print(f"could not read summary..")
+                logger.error(f"could not read summary..")
                 return False
             if not self._read_trial_data(wb, language):
-                print(f"could not read trials..")
+                logger.error(f"could not read trials..")
                 return False
         except FileNotFoundError as e:
-            print(e)
+            logger.error(e)
             return False
         except PermissionError as e:
-            print(e)
+            logger.error(e)
             return False
         except (ValueError, IndexError) as e:
-            print(e)
+            logger.error(e)
             return False
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False
 
         return True
@@ -131,34 +126,35 @@ class CDTTModel(Model):
             stimulus_digits = [int(cell.value) for cell in row[1:4]]
             response_digits = [int(cell.value) for cell in row[4:7]]
 
-            self.trials.append(
+            self.results.append(
                 {
                     "trial": trial,
                     "stimulus_digits": stimulus_digits,
                     "response_digits": response_digits,
                 }
             )
-            # print(trial, stimulus_digits, response_digits)
 
         return True
 
-    def get_response(self):
-        output = {"metadata": {}, "results": []}
+    def to_response(self):
+        return super().to_response()
+        #response =
+        # output = {"metadata": {}, "results": []}
 
-        for key, value in self.metadata.items():
-            key_cleaned = (
-                key.lower()
-                .strip()
-                .replace(" ", "_")
-                .replace(".", "")
-                .replace("&", "and")
-                .replace("#", "number")
-                .replace(":", "")
-            )
+        # for key, value in self.metadata.items():
+        #     key_cleaned = (
+        #         key.lower()
+        #         .strip()
+        #         .replace(" ", "_")
+        #         .replace(".", "")
+        #         .replace("&", "and")
+        #         .replace("#", "number")
+        #         .replace(":", "")
+        #     )
 
-            output["metadata"][key_cleaned] = value
+        #     output["metadata"][key_cleaned] = value
 
-        output["results"] = copy.deepcopy(self.trials)
+        # output["results"] = copy.deepcopy(self.output)
 
         return output
 
@@ -179,8 +175,8 @@ if __name__ == "__main__":
 
             model = CDTTModel()
 
-            ok = model.read_output(uid_dir_path / 'cdtt.xlsx')
+            ok = model.read_output(uid_dir_path / "cdtt.xlsx")
 
-            assert len(model.trials) == 24
+            assert len(model.output) == 24
 
             print(json.dumps(model.get_response(), indent=2))

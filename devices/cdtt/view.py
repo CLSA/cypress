@@ -4,33 +4,34 @@ from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
 from devices.view import View
-
-from devices.cdtt.controller import CDTTController
 from devices.cdtt.session import CDTTSession
+from devices.cdtt.config import CDTTConfig
 
 
 class CDTTView(View):
     def __init__(
         self,
-        controller: CDTTController,
+        config: CDTTConfig,
         session: CDTTSession,
+        detached: bool = False,
         parent=None,
     ):
         super().__init__(
-            parent=parent, controller=controller, session=session
+            parent=parent, session=session, config=config, detached=detached
         )
 
         self.resize(800, 600)
         self.table = self.measurement_table_widget.measurementTable
+        self.test_info_widget.deviceStatusValue.setText("CDTT")
 
     @override
-    def _on_measured(self, output: dict):
+    def on_measured(self, output: dict):
         self.table.clear()
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setRowCount(len(output["results"]))
+        self.table.setRowCount(len(output["value"]["results"]))
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(
             [
@@ -39,7 +40,7 @@ class CDTTView(View):
             ]
         )
 
-        for index, result in enumerate(output["results"]):
+        for index, result in enumerate(output["value"]["results"]):
             stimulus_digits = QTableWidgetItem(
                 f"{','.join(str(digit) for digit in result['stimulus_digits'])}"
             )
@@ -50,4 +51,4 @@ class CDTTView(View):
             self.table.setItem(index, 0, stimulus_digits)
             self.table.setItem(index, 1, response_digits)
 
-        super()._on_measured(output)
+        super().on_measured(output)
