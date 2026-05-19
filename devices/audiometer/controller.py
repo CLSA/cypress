@@ -1,12 +1,15 @@
+import json
+
 from typing import override
 
 from devices.controller import Controller
 from devices.utils import is_process_running
 
-from .model import AudiometerModel
-from .plugin import AudiometerPlugin
-from .session import AudiometerSession
-from .config import AudiometerConfig
+from devices.audiometer.model import AudiometerModel
+from devices.audiometer.view import AudiometerView
+from devices.audiometer.plugin import AudiometerPlugin
+from devices.audiometer.session import AudiometerSession
+from devices.audiometer.config import AudiometerConfig
 
 
 class AudiometerController(Controller):
@@ -15,6 +18,7 @@ class AudiometerController(Controller):
         session: AudiometerSession,
         config: AudiometerConfig,
         model: AudiometerModel,
+        view: AudiometerView,
         detached: bool = False,
         parent=None,
     ):
@@ -23,16 +27,15 @@ class AudiometerController(Controller):
             session=session,
             config=config,
             model=model,
+            view=view,
             detached=detached,
         )
         self.plugin = AudiometerPlugin(session=self.session, config=self.config)
+        self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
 
-    def manual_entry(self, data_received: dict):
-        if self.model.set_manual_entry(data_received):
-            self.manually_entered = True
-            self.measured.emit(self.model.get_response())
-        else:
-            self.manually_entered = False
+    def handle_manual_entry(self, data_received: dict):
+        self.model.set_manual_values(data_received)
+        #self.measured.emit(self.model.to_response())
 
     @override
     def start(self) -> bool:
@@ -46,28 +49,32 @@ class AudiometerController(Controller):
         Return
 
         """
-        # TODO check process running
+        self.logger.debug(f"{self.class_name()}::start")
+
         if is_process_running(self.config.process_name):
+            self.logger.warning(f"{self.config.process_name} is open")
             self.error.emit("Error:", f"{self.config.process_name} is already open")
             return False
 
         # Remove the app database and restore from clean backup
         if not self._restore_database():
+            self.logger.error(f"could not restore database from backup")
             self.error.emit("Error:", f"could not restore database")
             return False
 
         # Insert the participant information into the app database
         if not self.plugin.initialize():
+            self.logger.error(f"could not initialize plugin")
             self.error.emit("Error:", f"could not initialize plugin")
             return False
 
         # Run the app
         if not self._prepare_process():
+            self.logger.error(f"could not prepare hearcon")
             self.error.emit("Error:", f"could not prepare process")
             return False
 
         self.process.start()
-        self.process.waitForStarted()
 
         return True
 
@@ -77,6 +84,7 @@ class AudiometerController(Controller):
         Retrieve the results from the app database and validate it, then inform the view with the data
 
         """
+        self.logger.debug(f"{self.class_name()}::measure")
         self._clean_output_dir()
 
         # Read the app database and parse the results
@@ -89,6 +97,7 @@ class AudiometerController(Controller):
         Remove the output file that gets generated from the plugin
 
         """
+        self.logger.debug(f"{self.class_name()}::_clean_output_dir")
         self.config.plugin_output_path.unlink(missing_ok=True)
 
     def _restore_database(self) -> bool:
@@ -98,6 +107,7 @@ class AudiometerController(Controller):
         Returns whether the operation was successful
 
         """
+        self.logger.debug(f"{self.class_name()}::_restore_database")
 
         return False
 
@@ -106,6 +116,7 @@ class AudiometerController(Controller):
         Configures QProcess that handles the Hearcon app
 
         """
+        self.logger.debug(f"{self.class_name()}::_prepare_process")
 
         self.process.setProgram(self.config.process_path)
         self.process.setArguments([])

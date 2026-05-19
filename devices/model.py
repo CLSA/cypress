@@ -11,6 +11,7 @@ from config import DeviceConfig
 
 
 class Model:
+
     def __init__(self, session: Session, config: DeviceConfig):
         self.session = session
         self.config = config
@@ -47,3 +48,7 @@ class Model:
         }
 
         return response
+
+    @classmethod
+    def class_name(cls):
+        return cls.__name__

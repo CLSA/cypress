@@ -1,54 +1,91 @@
+import logging
+from typing import override
 from copy import deepcopy
+
 from devices.model import Model
 
+from devices.audiometer.session import AudiometerSession
+from devices.audiometer.config import AudiometerConfig
+
+logger = logging.getLogger("audiometer")
+
+
 class AudiometerModel(Model):
-    def __init__(self, session):
-        super().__init__(session)
+    def __init__(self, session: AudiometerSession, config: AudiometerConfig):
+        super().__init__(session=session, config=config)
 
     def is_valid(self, data) -> bool:
+        logger.debug(f"{self.class_name()}::is_valid")
         if len(data) < 14:
-            print("invalid length")
             return False
 
         return True
 
-    def clear(self) -> None:
-        self.metadata.clear()
-        self.results.clear()
-
     def read_output(self) -> bool:
-        self.clear()
+        logger.debug(f"{self.class_name()}::read_output")
+        self.reset()
 
-    def set_manual_entry(self, data_entered: dict) -> bool:
+    def set_manual_values(self, data_entered: dict) -> bool:
         """
         Expects data entered to be a dictionary:
-            [Left|Right][500 | 1000 | 2000 | 3000 | 4000 | 6000 | 8000]HzSpinBox: int
+        {
+            "left": {
+                "[Freq]Hz": int
+                ...
+            },
+            "right": {
+                "[Freq]Hz": int
+                ...
+            }
+        }
         """
-        self.clear()
+        logger.debug(f"{self.class_name()}::set_manual_entry")
+        self.reset()
 
-        for key, value in data_entered.items():
-            clean_key = key.lower().replace('spinbox', '').replace('hz', '')
+        self.manual_entry = True
 
-            test = clean_key[4:] if 'Left' in key else clean_key[5:]
-            side = clean_key[:4] if 'Left' in key else clean_key[:5]
-            db = value
-            passed = value <= 40
+        def read_manual_values(side: str):
+            for name, value in data_entered[side].items():
+                self.results.append(
+                    {
+                        "side": side,
+                        "test": f"{name.lower().replace("hz", "")} Hz",
+                        "error": "",
+                        "level": {
+                            "value": value,
+                            "units": "db",
+                        },
+                        "passed": value <= 40,
+                    }
+                )
 
-            print(test, side, db, passed)
+        read_manual_values("left")
+        read_manual_values("right")
 
-            self.results.append({
-                'side': side,
-                'error': "",
-                'level': {
-                    'units': 'db',
-                    'value': value
-                },
-                'outcome': '',
-                'pass': passed,
-                'test': f'{test} Hz'
-            })
+    @override
+    def to_response(self):
+        response = deepcopy(super().to_response())
 
-        return True
+        results = deepcopy(response["value"]["results"])
 
-    def get_response(self):
-        return { 'results': deepcopy(self.results) }
+        del response["value"]["results"]
+
+        left_results = []
+        right_results = []
+
+        for result in results:
+            side = result["side"]
+            del result["side"]
+            if side == "left":
+                left_results.append(result)
+            elif side == "right":
+                right_results.append(result)
+            else:
+                raise Exception(f"invalid side '{result.side}' for result")
+
+        response["value"]["results"] = {
+            "left": deepcopy(left_results),
+            "right": deepcopy(right_results),
+        }
+
+        return response

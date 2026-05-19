@@ -1,78 +1,66 @@
-from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView, QDialog
-from PySide6.QtCore import Qt
-
-from devices.view import View
-
 from typing import override
 
-from .controller import AudiometerController
-from .session import AudiometerSession
+from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView, QDialog
+from PySide6.QtCore import Qt, Signal
 
-from .manual_entry import AudiometerManualEntryDialog
+
+from devices.view import View
+from devices.audiometer.hearing_measurements import HearingMeasurementsWidget
+from devices.audiometer.session import AudiometerSession
+from devices.audiometer.config import AudiometerConfig
+from devices.audiometer.manual_entry import AudiometerManualEntryDialog
 
 
 class AudiometerView(View):
+    manual_entry = Signal(dict)
+
     def __init__(
         self,
-        controller: AudiometerController,
         session: AudiometerSession,
-        parent=None
+        config: AudiometerConfig,
+        detached: bool = False,
+        parent=None,
     ):
+        self.measurement_form = HearingMeasurementsWidget()
+
         super().__init__(
-            controller=controller, session=session, parent=parent
+            parent=parent, session=session, config=config, detached=detached
         )
 
-        self.measurement_table_widget.manualEntryToggle.setEnabled(True)
-        self.measurement_table_widget.manualEntryToggle.setVisible(True)
+        self.resize(600, 500)
 
-        self.table = self.measurement_table_widget.measurementTable
+        # Deleting default measure table to replace with widget below
+        self.measurement_table_widget.deleteLater()
+        self.measurement_form.set_enabled(False)
 
-        self.resize(800, 600)
+        self.measure_button.setVisible(True)
+        self.manual_entry_button.setVisible(True)
+        self.manual_entry_button.setEnabled(True)
 
-        self.manual_entry_form = AudiometerManualEntryDialog()
+        self.layout().addWidget(self.measurement_form)
+
+
+    @override
+    def _get_button_references(self):
+        super()._get_button_references()
+
+        self.measure_button = self.measurement_form.measureButton
+        self.submit_button = self.measurement_form.submitButton
+        self.manual_entry_button = self.measurement_form.manualEntryButton
+
+    @override
+    def _connect_signals(self):
+        self.session_widget.startButton.clicked.connect(self._on_start_button_clicked)
+        self.submit_button.clicked.connect(self._on_submit_button_clicked)
+        self.measure_button.clicked.connect(self._on_measure_button_clicked)
+        self.manual_entry_button.clicked.connect(self._on_manual_entry_clicked)
 
     @override
     def _on_manual_entry_clicked(self):
-        result = self.manual_entry_form.exec()
-
-        if result == QDialog.Accepted:
-            data = self.manual_entry_form.get_data()
-            self.controller.manual_entry(data)
-
+        super()._on_manual_entry_clicked()
+        self.measurement_form.set_enabled(True)
 
     @override
-    def _on_measured(self, output: dict):
-        # return super()._on_measured(results)
-        self.results = output
-
-        self.table.clear()
-
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setRowCount(len(output["results"]))
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(
-            [
-                "Side",
-                "Test",
-                "Level",
-                "Passed",
-                "Error",
-            ]
-        )
-
-        for index, result in enumerate(output["results"]):
-            side = QTableWidgetItem(result["side"].capitalize())
-            test = QTableWidgetItem(result["test"])
-            level = QTableWidgetItem(f'{result['level']['value']} {result['level']['units']}')
-            outcome = QTableWidgetItem('Yes' if result['pass'] else 'No')
-            error = QTableWidgetItem(result['error'])
-
-            self.table.setItem(index, 0, side)
-            self.table.setItem(index, 1, test)
-            self.table.setItem(index, 2, level)
-            self.table.setItem(index, 3, outcome)
-            self.table.setItem(index, 4, error)
-
-        super()._on_measured(output)
+    def on_measured(self, output: dict):
+        super().on_measured(output)
+        # self.measurement_form.set_values(output)

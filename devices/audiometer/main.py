@@ -2,6 +2,7 @@ import sys
 
 from devices.device import Device
 
+from devices.audiometer.settings import LOG_CONFIG
 from devices.audiometer.config import AudiometerConfig
 from devices.audiometer.session import AudiometerSession, AudiometerSessionDialog
 from devices.audiometer.model import AudiometerModel
@@ -10,6 +11,7 @@ from devices.audiometer.controller import AudiometerController
 
 
 class Audiometer(Device):
+    logging_config = LOG_CONFIG
     config = AudiometerConfig
     model = AudiometerModel
     view = AudiometerView

@@ -14,7 +14,7 @@ from fastapi import BackgroundTasks
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
-from settings import CYPRESS_VERSION, ALLOWED_HOSTS, LOGGING_CONFIG, LOG_LEVEL
+from settings import CYPRESS_VERSION, ALLOWED_HOSTS, LOGGING_CONFIG
 
 from config import config
 from session import Session
@@ -25,6 +25,7 @@ from devices.device import Device
 # from devices.blood_pressure.main import BloodPressure, BPSession
 from devices.crt.main import CRT, CRTSession
 from devices.cdtt.main import CDTT, CDTTSession
+from devices.audiometer.main import Audiometer, AudiometerSession
 
 # from devices.frax.main import FRAX, FRAXSession
 # from devices.dxa.main import DXA, DXASession
@@ -40,7 +41,7 @@ current_session: dict[str, multiprocessing.Process] | None = None
 class DeviceEnum(str, Enum):
     CRT = "choice_reaction_test"
     CDTT = "cdtt"
-    HR = "hearing"
+    HR = "hearcon"
     GRIP = "hand_grip"
     DXA1 = "dxa1"
     DXA2 = "dxa2"
@@ -54,10 +55,10 @@ class DeviceEnum(str, Enum):
 
 
 devices: dict[DeviceEnum, Device] = {
-    # "hearcon": Audiometer,
-    # "watch_bp": BloodPressure,
+    DeviceEnum.HR: Audiometer,
     DeviceEnum.CDTT: CDTT,
     DeviceEnum.CRT: CRT,
+    # "watch_bp": BloodPressure,
     # "dxa1": DXA,
     # "dxa2": DXA,
     # "mac5": "",
@@ -143,7 +144,7 @@ async def cdtt(
 
 
 @app.post("/choice_reaction_test")
-async def launch(
+async def choice_reaction_test(
     background_tasks: BackgroundTasks,
     session: CRTSession,
     request: Request,
@@ -151,15 +152,18 @@ async def launch(
     session.origin = request.headers.get("origin", None)
     return launch_device("choice_reaction_test", background_tasks, session)
 
+@app.post("/hearcon")
+async def hearing(
+    background_tasks: BackgroundTasks,
+    session: AudiometerSession,
+    request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("hearcon", background_tasks, session)
 
 # @app.post("/frax")
 # async def frax(background_tasks: BackgroundTasks, session: FRAXSession):
 #     return launch_device("frax", background_tasks, session)
-
-
-# @app.post("/hearcon")
-# async def audiometer(background_tasks: BackgroundTasks, session: AudiometerSession):
-#     return launch_device("audiometer", background_tasks, session)
 
 
 # @app.post("/dxa1")

@@ -14,7 +14,6 @@ from devices.view import View
 
 from files.uploader import DataUploaderDialog
 
-logger = logging.Logger(__name__)
 
 class Controller(QObject):
     started = Signal()
@@ -61,14 +60,18 @@ class Controller(QObject):
         self.data = {}
         self.manually_entered = False
 
-        self.uploader = DataUploaderDialog(model=self.model, session=self.session, device_name=self.config.section_name, parent=self.view)
+        self.uploader = DataUploaderDialog(
+            model=self.model,
+            session=self.session,
+            device_name=self.config.section_name,
+            parent=self.view,
+        )
         self.uploader.upload_successful.connect(self._upload_succeeded)
         self.uploader.upload_failed.connect(self._upload_failed)
 
     def start(self):
         self.logger.debug("start")
         self.started.emit()
-
 
     def measure(self):
         self.logger.debug("measure")
@@ -100,8 +103,11 @@ class Controller(QObject):
             if file_path:
                 with open(file_path, "w") as file:
                     json.dump(self.model.to_response(), file, indent=4)
+            else:
+                return False
+
         except Exception as e:
-            logger.error(e)
+            self.logger.error(e)
             return False
 
         return True
@@ -123,3 +129,7 @@ class Controller(QObject):
 
     def _upload_failed(self):
         self.error.emit("Error", "Failed to upload the data")
+
+    @classmethod
+    def class_name(cls):
+        return cls.__name__

@@ -21,7 +21,7 @@ class AudiometerSessionDialog(SessionDialog):
         self.setFixedHeight(350)
 
         self.audiometer_group = QGroupBox()
-        self.audiometer_group.setTitle("Audiometer inputs")
+        self.audiometer_group.setTitle("Participant")
 
         self.dob = QDateEdit()
         self.dob.setMaximumDate(QDate.currentDate())

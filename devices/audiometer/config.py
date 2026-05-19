@@ -1,6 +1,7 @@
+from typing import Annotated, ClassVar
+
 from pathlib import Path
 
-from typing import Annotated
 from pydantic import (
     Field,
     DirectoryPath,
@@ -10,8 +11,12 @@ from pydantic import (
 
 from config import DeviceConfig, is_executable
 
+from devices.audiometer.settings import DEVICE_NAME
+
 
 class AudiometerConfig(DeviceConfig):
+    section_name: ClassVar[str] = DEVICE_NAME
+
     # The name of the process as it appears in Task Manager
     process_name: Annotated[str, Field(min_length=1, frozen=True)]
 
@@ -35,7 +40,3 @@ class AudiometerConfig(DeviceConfig):
 
     # The path to where the output json file should be stored
     plugin_output_path: Annotated[Path, Field(frozen=True)]
-
-    @classmethod
-    def is_device_installed(cls, config_name='config.ini', device_name='audiometer'):
-        return super().is_device_installed(config_name, device_name)

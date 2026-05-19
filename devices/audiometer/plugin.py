@@ -3,6 +3,7 @@ from PySide6.QtCore import QProcess, QObject
 from .session import AudiometerSession
 from .config import AudiometerConfig
 
+
 class AudiometerPlugin(QObject):
     def __init__(
         self, session: AudiometerSession, config: AudiometerConfig, parent=None
