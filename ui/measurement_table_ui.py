@@ -49,11 +49,6 @@ class Ui_MeasurementTable(object):
 
         self.horizontalLayout_3.addWidget(self.measureButton)
 
-        self.addMeasureButton = QPushButton(self.measurementsInfo)
-        self.addMeasureButton.setObjectName(u"addMeasureButton")
-
-        self.horizontalLayout_3.addWidget(self.addMeasureButton)
-
         self.submitButton = QPushButton(self.measurementsInfo)
         self.submitButton.setObjectName(u"submitButton")
         self.submitButton.setEnabled(True)
@@ -65,9 +60,9 @@ class Ui_MeasurementTable(object):
 
         self.measurementTable = QTableWidget(self.measurementsInfo)
         self.measurementTable.setObjectName(u"measurementTable")
-        self.measurementTable.setFrameShape(QFrame.NoFrame)
-        self.measurementTable.setFrameShadow(QFrame.Plain)
-        self.measurementTable.setGridStyle(Qt.SolidLine)
+        self.measurementTable.setFrameShape(QFrame.Shape.NoFrame)
+        self.measurementTable.setFrameShadow(QFrame.Shadow.Plain)
+        self.measurementTable.setGridStyle(Qt.PenStyle.SolidLine)
 
         self.verticalLayout_2.addWidget(self.measurementTable)
 
@@ -85,7 +80,6 @@ class Ui_MeasurementTable(object):
         self.measurementsInfo.setTitle(QCoreApplication.translate("MeasurementTable", u"Measurements", None))
         self.manualEntryToggle.setText(QCoreApplication.translate("MeasurementTable", u"Manual Entry", None))
         self.measureButton.setText(QCoreApplication.translate("MeasurementTable", u"Measure", None))
-        self.addMeasureButton.setText(QCoreApplication.translate("MeasurementTable", u"Add Measure", None))
         self.submitButton.setText(QCoreApplication.translate("MeasurementTable", u"Submit", None))
     # retranslateUi
 

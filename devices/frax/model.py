@@ -4,13 +4,13 @@ from PySide6.QtCore import QProcess
 
 from devices.model import Model
 from devices.frax.session import FRAXSession
+from devices.frax.config import FRAXConfig
 
 
 class FRAXModel(Model):
-    def __init__(self, session: FRAXSession, config):
-        super().__init__(config)
+    def __init__(self, session: FRAXSession, config: FRAXConfig):
+        super().__init__(session=session, config=config)
 
-        self.session = session
         self.input_line = ""
         self.output_line = ""
         self.output = []

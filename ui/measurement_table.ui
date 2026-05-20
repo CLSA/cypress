@@ -47,7 +47,7 @@
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Orientation::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -68,13 +68,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="addMeasureButton">
-          <property name="text">
-           <string>Add Measure</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="submitButton">
           <property name="enabled">
            <bool>true</bool>
@@ -89,13 +82,13 @@
       <item>
        <widget class="QTableWidget" name="measurementTable">
         <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
+         <enum>QFrame::Shape::NoFrame</enum>
         </property>
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="gridStyle">
-         <enum>Qt::SolidLine</enum>
+         <enum>Qt::PenStyle::SolidLine</enum>
         </property>
        </widget>
       </item>

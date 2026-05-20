@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 
 from PySide6 import QtWidgets
-from PySide6.QtWidgets import QMessageBox, QSizePolicy
+from PySide6.QtWidgets import QMessageBox
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal
 
@@ -23,8 +23,8 @@ import settings
 class State(Enum):
     BEGIN = 0
     STARTED = 1
-    READY_TO_MEASURE = 3
-    MEASURED = 2
+    READY_TO_MEASURE = 2
+    MEASURED = 3
     SUBMITTED = 4
     MANUAL_ENTRY = 5
     ERROR = 6
@@ -60,7 +60,6 @@ class View(QtWidgets.QDialog):
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.session_widget)
         layout.addWidget(self.measurement_table_widget)
-
         self.setLayout(layout)
 
         self._get_button_references()
@@ -143,6 +142,8 @@ class View(QtWidgets.QDialog):
         self.state = State.SUBMITTED
 
     def on_error(self, title: str = "Error", message: str = "Unknown error"):
+        self.logger.error(f"{title} - {message}")
+
         self.session_widget.statusValue.setText(f"Error: {message}")
         self.measure_button.setEnabled(False)
         self.submit_button.setEnabled(False)

@@ -26,6 +26,7 @@ from devices.device import Device
 from devices.crt.main import CRT, CRTSession
 from devices.cdtt.main import CDTT, CDTTSession
 from devices.audiometer.main import Audiometer, AudiometerSession
+from devices.frax.main import FRAX, FRAXSession
 
 # from devices.frax.main import FRAX, FRAXSession
 # from devices.dxa.main import DXA, DXASession
@@ -58,12 +59,12 @@ devices: dict[DeviceEnum, Device] = {
     DeviceEnum.HR: Audiometer,
     DeviceEnum.CDTT: CDTT,
     DeviceEnum.CRT: CRT,
+    DeviceEnum.FRAX: FRAX,
     # "watch_bp": BloodPressure,
     # "dxa1": DXA,
     # "dxa2": DXA,
     # "mac5": "",
     # "vivid_iq": "",
-    # "frax": FRAX,
     # "general_proxy_consent": "",
     # "hand_grip": "",
     # "oct_left": "",
@@ -152,18 +153,19 @@ async def choice_reaction_test(
     session.origin = request.headers.get("origin", None)
     return launch_device("choice_reaction_test", background_tasks, session)
 
+
 @app.post("/hearcon")
 async def hearing(
-    background_tasks: BackgroundTasks,
-    session: AudiometerSession,
-    request: Request
+    background_tasks: BackgroundTasks, session: AudiometerSession, request: Request
 ):
     session.origin = request.headers.get("origin", None)
     return launch_device("hearcon", background_tasks, session)
 
-# @app.post("/frax")
-# async def frax(background_tasks: BackgroundTasks, session: FRAXSession):
-#     return launch_device("frax", background_tasks, session)
+
+@app.post("/frax")
+async def frax(background_tasks: BackgroundTasks, session: FRAXSession, request: Request):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("frax", background_tasks, session)
 
 
 # @app.post("/dxa1")
@@ -227,24 +229,15 @@ async def end_session(
 
 if __name__ == "__main__":
     try:
-        print(f"Cypress {CYPRESS_VERSION}\n")
-
-        for key, value in devices.items():
-            try:
-                value.config.from_ini()
-                print(f"[y] {key.value}")
-            except Exception as e:
-                print(e)
-                print(f"[n] {key.value}")
-
+        print(f"Cypress {CYPRESS_VERSION} -- {config.host}:{config.port}")
         multiprocessing.freeze_support()  # for ms windows to work
         uvicorn.run(
             app=app,
             host=config.host,
             port=config.port,
             log_config=LOGGING_CONFIG,
-            ssl_certfile="build/server.crt",
-            ssl_keyfile="build/server.key",
+            ssl_certfile=config.ssl_certfile,
+            ssl_keyfile=config.ssl_keyfile,
         )
     except Exception as e:
         print(e)

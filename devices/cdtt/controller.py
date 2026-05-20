@@ -36,7 +36,6 @@ class CDTTController(Controller):
         self.logger.debug("CDTTController::start")
 
         if is_process_running(self.config.process_name):
-            self.logger.warning(f"{self.config.process_name} is already open")
             self.error.emit(
                 "Error",
                 f"{self.config.process_name} is already open, please close and try again",
@@ -44,12 +43,10 @@ class CDTTController(Controller):
             return False
 
         if not self._clean_output_dir(self.config.output):
-            self.logger.error(f"could not prepare device")
             self.error.emit("Error:", f"could not prepare device")
             return False
 
         if not self._prepare_settings_files():
-            self.logger.error(f"could not prepare settings")
             self.error.emit("Error:", f"could not prepare settings")
             return False
 
@@ -72,12 +69,10 @@ class CDTTController(Controller):
             self.config.output / f"Results-{self.session.barcode}.xlsx",
             self.session.language,
         ):
-            self.logger.error("result file could not be read")
             self.error.emit("File not read", "error reading CDTT results")
             return
 
         if not self.model.is_valid(self.session.barcode):
-            self.logger.error("results are invalid and cannot be saved")
             self.error.emit(
                 "Invalid results", "the results are invalid and cannot be saved"
             )
@@ -98,7 +93,7 @@ class CDTTController(Controller):
                 try:
                     path.unlink()
                 except Exception as e:
-                    print(f"error: {e}")
+                    self.logger.error(e)
                     return False
         return True
 

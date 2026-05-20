@@ -38,13 +38,14 @@ class BaseConfig(BaseModel):
 
 class CypressConfig(BaseConfig):
     section_name: ClassVar[str] = "cypress"
-
     host: str
     port: Annotated[int, PositiveInt]
     allowed_hosts: str # comma delimited list
     log_level: str = "info"
     pine: HttpUrl
     auth: str
+    ssl_certfile: FilePath | None
+    ssl_keyfile: FilePath | None
 
 
 class DeviceConfig(BaseConfig):

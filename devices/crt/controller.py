@@ -36,14 +36,12 @@ class CRTController(Controller):
         self.logger.debug("CRTController::start")
 
         if is_process_running(self.config.process_name):
-            self.logger.warning(f"{self.config.process_name} is open")
             msg = f"{self.config.process_name} is already open, please close and try again"
             self.error.emit("Error", msg)
             return False
 
         if not self._clean_output_dir(self.config.output):
             msg = f"could not prepare device"
-            self.logger.error(msg)
             self.error.emit("Error", msg)
             return False
 
@@ -57,11 +55,10 @@ class CRTController(Controller):
         self.logger.debug("CRTController::measure")
 
         if not self.model.read_results():
-            self.logger.error("result file could not be read")
             self.error.emit("File not read", "could not read results")
             return
 
-        self.logger.debug(json.dumps(self.model.get_repsonse(), indent=2))
+        self.logger.debug(json.dumps(self.model.to_response(), indent=2))
         self.measured.emit(self.model.to_response())
 
     @override

@@ -77,7 +77,7 @@ class CRTModel(Model):
             userid_index = -1
             interviewer_id_index = -1
 
-            for index, row in enumerate(self.output):
+            for row in self.output:
                 if not row:
                     raise Exception(f"row is empty")
 

@@ -4,26 +4,27 @@ from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
 from PySide6.QtCore import Qt
 
 from devices.view import View
-from devices.frax.controller import FRAXController
 from devices.frax.session import FRAXSession
+from devices.frax.config import FRAXConfig
 
 
 class FRAXView(View):
     def __init__(
         self,
-        controller: FRAXController,
         session: FRAXSession,
+        config: FRAXConfig,
+        detached: bool = False,
         parent=None
     ):
         super().__init__(
-            parent=parent, controller=controller, session=session
+            parent=parent, session=session, config=config, detached=detached
         )
 
         self.resize(800, 600)
         self.table = self.measurement_table_widget.measurementTable
 
     @override
-    def _on_measured(self, output: dict):
+    def on_measured(self, output: dict):
         self.table.clear()
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -32,7 +33,7 @@ class FRAXView(View):
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(["Type", "Probability"])
 
-        for index, result in enumerate(output["results"]):
+        for index, result in enumerate(output["value"]["results"]):
             risk = QTableWidgetItem(" ".join(result["type"].split("_")).capitalize())
             risk.setTextAlignment(
                 Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft
@@ -48,4 +49,4 @@ class FRAXView(View):
             self.table.setItem(index, 0, risk)
             self.table.setItem(index, 1, probability)
 
-        super()._on_measured(output)
+        super().on_measured()

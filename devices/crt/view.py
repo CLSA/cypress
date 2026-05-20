@@ -24,6 +24,8 @@ class CRTView(View):
         self.table = self.measurement_table_widget.measurementTable
         self.session_widget.deviceStatusValue.setText("Choice Reaction Test")
 
+        self.measure_button.setVisible(True)
+
     @override
     def on_measured(self, output: dict):
         self.table.clear()
@@ -62,4 +64,4 @@ class CRTView(View):
             self.table.setItem(index, 3, response_stimulus_interval)
             self.table.setItem(index, 4, elapsed_time)
 
-        super().on_measured(output)
+        super().on_measured()

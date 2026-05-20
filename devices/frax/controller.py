@@ -1,9 +1,12 @@
+import json
+
 from pathlib import Path
 from typing import override
 
 from devices.controller import Controller
 
 from devices.frax.model import FRAXModel
+from devices.frax.view import FRAXView
 from devices.frax.session import FRAXSession
 from devices.frax.config import FRAXConfig
 
@@ -14,6 +17,7 @@ class FRAXController(Controller):
         session: FRAXSession,
         config: FRAXConfig,
         model: FRAXModel,
+        view: FRAXView,
         detached=False,
         parent=None,
     ):
@@ -22,13 +26,13 @@ class FRAXController(Controller):
             session=session,
             config=config,
             model=model,
+            view=view,
             detached=detached,
         )
 
     @override
     def start(self):
-        self.started.emit()
-
+        self.logger.debug("FRAXController::start")
         if not self._clean():
             self.error.emit("error", "could not prepare instrument")
             return False
@@ -37,22 +41,23 @@ class FRAXController(Controller):
             self.error.emit("error", "could not write input file")
             return False
 
-        if not self.model.run(
-            executable=self.config.executable, working_directory=self.config.directory
-        ):
-            self.error.emit("error", "could not run FRAX")
-            return False
-
-        self.finished.emit()
+        self.measure()
 
         return True
 
     @override
     def measure(self):
+        if not self.model.run(
+            executable=self.config.executable, working_directory=self.config.directory
+        ):
+            self.error.emit("error", "could not run FRAX")
+            return
+
         if not self.model.read_output_file(self.config.output_file):
             self.error.emit("error", "could not read output file")
             return
 
+        self.logger.debug(json.dumps(self.model.to_response(), indent=2))
         self.measured.emit(self.model.to_response())
 
     def _clean(self) -> bool:

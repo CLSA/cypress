@@ -52,25 +52,21 @@ class AudiometerController(Controller):
         self.logger.debug(f"{self.class_name()}::start")
 
         if is_process_running(self.config.process_name):
-            self.logger.warning(f"{self.config.process_name} is open")
             self.error.emit("Error:", f"{self.config.process_name} is already open")
             return False
 
         # Remove the app database and restore from clean backup
         if not self._restore_database():
-            self.logger.error(f"could not restore database from backup")
             self.error.emit("Error:", f"could not restore database")
             return False
 
         # Insert the participant information into the app database
         if not self.plugin.initialize():
-            self.logger.error(f"could not initialize plugin")
             self.error.emit("Error:", f"could not initialize plugin")
             return False
 
         # Run the app
         if not self._prepare_process():
-            self.logger.error(f"could not prepare hearcon")
             self.error.emit("Error:", f"could not prepare process")
             return False
 
@@ -109,7 +105,10 @@ class AudiometerController(Controller):
         """
         self.logger.debug(f"{self.class_name()}::_restore_database")
 
-        return False
+        self.config.existing_database_path.unlink(missing_ok=True)
+        self.config.backup_database_path.copy(self.config.existing_database_path)
+
+        return True
 
     def _prepare_process(self) -> None:
         """
