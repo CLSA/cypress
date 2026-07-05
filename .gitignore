@@ -7,20 +7,24 @@ build
 
 *.json
 *.db
+*.mdb
 *.sql
 *.spec
 *.pem
+*.txt
 
 output
 env
 pyvenv.cfg
 analysis/
+
 build/
 logs/
 
 config.ini
 
-devices/*/commands/
+**/fixtures/
+**/commands/
 
 __pycache__
 
