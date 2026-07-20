@@ -31,8 +31,8 @@ class FRAXModel(Model):
     def _get_input_file_values(self) -> str:
         arguments = []
 
-        arguments.append(self.session.test_type)
-        arguments.append(self.session.country_code)
+        arguments.append(str(self.session.test_type))
+        arguments.append(str(self.session.country_code))
         arguments.append(str(self.session.age))
 
         arguments.append("0" if self.session.sex == "male" else "1")

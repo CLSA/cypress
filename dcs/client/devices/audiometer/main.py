@@ -25,5 +25,5 @@ if __name__ == "__main__":
         sys.exit(Audiometer.run(session=None))
     except Exception as e:
         print(e)
-        print("Press enter to continue...")
+        input("Press enter to continue...")
         sys.exit(-1)

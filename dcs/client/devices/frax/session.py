@@ -72,7 +72,7 @@ class FRAXSession(Session):
     ra_medications: str | None
 
     test_type: str = "t"
-    country_code: str = "19"
+    country_code: int = 19
 
     @computed_field
     @property

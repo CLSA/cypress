@@ -1,96 +1,114 @@
-"""
- // connect to database
-    m_database = QSqlDatabase::addDatabase("QODBC");
-    m_database.setDatabaseName("Driver={Microsoft Access Driver (*.mdb)};DBQ=" + QDir::toNativeSeparators(m_databasePath));
-
-
-    if (!m_database.open()) {
-        qCritical() << "ORAManager::start - could not open database";
-        return false;
-    }
-
-    QSqlQuery query(m_database);
-
-    query.prepare("INSERT INTO Patients ( Name, BirthDate, Sex, GroupID, ID, RaceID ) VALUES ( :name, :birthDate, :sex, :groupId, :id, :raceId )");
-    query.bindValue(":name",      m_session->getBarcode() + ",CLSA");
-    query.bindValue(":birthDate", m_session->getInputData()["dob"].toString());
-    query.bindValue(":sex",	      m_session->getInputData()["sex"].toString().startsWith("m", Qt::CaseSensitivity::CaseInsensitive));
-    query.bindValue(":groupId",	  2);
-    query.bindValue(":id", 	      m_session->getBarcode().toInt());
-    query.bindValue(":raceId",    1);
-
-    if (!query.exec()) {
-        qCritical() << "Database error:" << m_database.lastError().text();
-        return false;
-    }
-
-    m_database.close();
-
-    qInfo() << "TonometerManager::extractMeasures";
-
-    if (!m_database.isOpen()) {
-        if (!m_database.open()) {
-            throw QException();
-        }
-    }
-
-    QSqlQuery query(m_database);
-    query.prepare("SELECT PatientID from Patients where ID = :id");
-    query.bindValue(":id", m_session->getBarcode().toInt());
-
-    if (!query.exec()) {
-        qWarning() << "Database error:" << m_database.lastError().text();
-    }
-
-    query.prepare("SELECT * from Measures where Eye = :eye ORDER BY MeasureDate desc");
-    query.bindValue(":eye", QString(eye));
-
-    QVariantMap resultMap;
-    if (!query.exec()) {
-        qWarning() << "Database error:" << m_database.lastError().text();
-        return resultMap;
-    }
-
-    while (query.next()) {
-        for (int i = 0; i < query.record().count(); ++i) {
-            resultMap.insert(query.record().fieldName(i), query.value(i));
-        }
-    }
-
-    return resultMap;
-
-"""
-
 from pathlib import Path
+from typing import Literal
 
+from PySide6.QtCore import QDateTime, Qt
 from PySide6.QtSql import QSqlDatabase, QSqlQuery
 
 import logging
 
-from retinal_camera.settings import DEVICE_NAME
+from devices.tonometer.settings import DEVICE_NAME
+from devices.tonometer.session import TonometerSession
 
 logger = logging.getLogger(DEVICE_NAME)
 
 
 class TonometerDatabase:
-    def __init__(self, db_name: str):
-        logger.debug(f"TonometerDatabase::__init__ - {db_name}")
+    def __init__(self, db_path: Path):
+        logger.debug(f"TonometerDatabase::__init__ - {str(db_path.resolve())}")
 
-        if not db_name:
-            raise ValueError("db_name must exist")
+        if not db_path.exists() or not db_path.is_file():
+            raise FileNotFoundError(f"{str(db_path.resolve())} is not a file")
 
         self.db = QSqlDatabase.addDatabase("QODBC")
-        self.db.setDatabaseName(db_name)
+        self.db.setDatabaseName(
+            "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="
+            + str(db_path.resolve())
+        )
 
+    # Attempt to open database, return 0 if
+    def open(self) -> bool:
         if not self.db.open():
-            logger.error("database failed to open")
-            raise Exception()
+            logger.critical(self.db.lastError().text())
+            return False
+        return True
 
-    def restore_database(self):
-        pass
+    def close(self):
+        self.db.close()
 
-    def insert_participant(self, person_uid: str, first_name: str, last_name: str):
-        pass
+    def insert_participant(self, session: TonometerSession):
+        query: QSqlQuery = QSqlQuery()
 
-    def read_results(self):
-        pass
+        query.prepare(
+            "INSERT INTO Patients "
+            "( Name, BirthDate, Sex, GroupID, ID, RaceID ) "
+            "VALUES ( :name, :birthDate, :sex, :groupId, :id, :raceId )"
+        )
+        query.bindValue(":name", f"{session.barcode},CLSA")
+        query.bindValue(":birthDate", str(session.dob))
+        query.bindValue(":sex", session.sex.lower()[0] == "m")
+        query.bindValue(":groupId", 2)
+        query.bindValue(":id", int(session.barcode))
+        query.bindValue(":raceId", 1)
+
+        if not query.exec():
+            print(query.lastError().text())
+            return False
+
+        return True
+
+    def get_patient_id(self, barcode):
+        query: QSqlQuery = QSqlQuery()
+
+        query.prepare("SELECT PatientID from Patients WHERE ID = :id")
+        query.bindValue(":id", int(barcode))
+
+        if not query.exec():
+            logger.error(query.lastError().text())
+            return None
+
+        if query.size() > 1:
+            logger.error(f"More than one patient found with ID {barcode}")
+            return None
+
+        if not query.first():
+            logger.error(query.lastError().text())
+            return None
+
+        return query.record().value(0)
+
+    def get_measures(self, patient_id: int, eye: Literal["L", "R"]) -> dict | None:
+        query: QSqlQuery = QSqlQuery()
+
+        query.prepare(
+            "SELECT * from Measures where Eye = :eye AND PatientID ORDER BY MeasureDate DESC"
+        )
+        query.bindValue(":eye", eye)
+        query.bindValue(":patient_id", patient_id)
+
+        measurements = []
+
+        if not query.exec():
+            logger.error(query.lastError().text())
+            return None
+
+        if not query.last():
+            logger.error(f"No {eye} measures found for {str(patient_id)}")
+            return None
+
+        while query.next():
+            record = query.record()
+
+            measure = {}
+
+            for i in range(record.count()):
+                field_name = record.fieldName(i)
+                field_value = record.value(field_name)
+
+                if type(field_value) == QDateTime:
+                    measure[field_name.lower()] = field_value.toString(Qt.DateFormat.ISODate)
+                else:
+                    measure[field_name.lower()] = field_value
+
+            measurements.append(measure)
+
+        return measurements

@@ -55,8 +55,6 @@ class AudiometerPlugin(QObject):
             sex,
         ]
 
-        print(json.dumps(args, indent=4))
-
         self.process.setProgram(str(self.config.plugin_path.resolve()))
         self.process.setArguments(args)
         self.process.setWorkingDirectory(str(self.config.plugin_working_directory.resolve()))

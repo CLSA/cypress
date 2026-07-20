@@ -165,7 +165,7 @@ def launch_device(
     set_session(device_name, session)
     background_tasks.add_task(monitor_session)
 
-    return {"session_id": session.session_id if session else "detached"}
+    return {"sessionId": session.session_id if session else "detached"}
 
 
 @app.post("/cdtt")
@@ -203,18 +203,49 @@ async def frax(
 
 
 @app.post("/dxa")
-async def dxa(background_tasks: BackgroundTasks, session: DXASession):
+async def dxa(background_tasks: BackgroundTasks, session: DXASession, request: Request):
+    session.origin = request.headers.get("origin", None)
     return launch_device("dxa", background_tasks, session)
 
 
 @app.post("/dxa1")
-async def dxa1(background_tasks: BackgroundTasks, session: DXASession):
+async def dxa1(
+    background_tasks: BackgroundTasks, session: DXASession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
     return launch_device("dxa", background_tasks, session)
 
 
 @app.post("/dxa2")
-async def dxa2(background_tasks: BackgroundTasks, session: DXASession):
+async def dxa2(
+    background_tasks: BackgroundTasks, session: DXASession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
     return launch_device("dxa", background_tasks, session)
+
+
+@app.post("/blood_pressure")
+async def blood_pressure(
+    background_tasks: BackgroundTasks, session: BPSession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("blood_pressure", background_tasks, session)
+
+
+@app.post("/spirometer")
+async def spirometer(
+    background_tasks: BackgroundTasks, session: SpirometerSession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("spirometer", background_tasks, session)
+
+
+@app.post("/tonometer")
+async def tonometer(
+    background_tasks: BackgroundTasks, session: TonometerSession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("tonometer", background_tasks, session)
 
 
 @app.get("/{device}/status")
@@ -318,18 +349,13 @@ async def standalone(device: str, background_tasks: BackgroundTasks):
 
 
 if __name__ == "__main__":
-    try:
-        print(f"Cypress {CYPRESS_VERSION} -- {config.host}:{config.port}")
-        multiprocessing.freeze_support()  # for ms windows to work
-        start_cypress_manager()
-        uvicorn.run(
-            app=app,
-            host=config.host,
-            port=config.port,
-            log_config=LOGGING_CONFIG,
-            ssl_certfile=config.ssl_certfile,
-            ssl_keyfile=config.ssl_keyfile,
-        )
-    except Exception as e:
-        print(e)
-        input("Press enter to continue..")
+    multiprocessing.freeze_support()  # for ms windows to work
+    start_cypress_manager()
+    uvicorn.run(
+        app=app,
+        host=config.host,
+        port=config.port,
+        log_config=LOGGING_CONFIG,
+        ssl_certfile=config.ssl_certfile,
+        ssl_keyfile=config.ssl_keyfile,
+    )

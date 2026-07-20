@@ -1,3 +1,5 @@
+import logging
+
 DEVICE_NAME = "tonometer"
 LOG_LOCATION = "logs/tonometer.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
@@ -30,3 +32,5 @@ LOG_CONFIG = {
         DEVICE_NAME: {"handlers": ["console", "file_handler"], "level": LOG_LEVEL}
     },
 }
+
+logger = logging.getLogger(DEVICE_NAME)

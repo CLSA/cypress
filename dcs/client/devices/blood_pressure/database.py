@@ -1,8 +1,10 @@
+import sys
 import logging
 
 from pathlib import Path
 from datetime import datetime
 
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtSql import QSqlDatabase, QSqlQuery
 
 from typing import Literal
@@ -11,24 +13,35 @@ from devices.blood_pressure.settings import DEVICE_NAME
 logger = logging.getLogger(DEVICE_NAME)
 
 
+def datestring_to_epoch_s(date_str: str) -> int:
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+    seconds_since_epoch = dt.timestamp()
+    return int(seconds_since_epoch)
+
+
 class BPDatabase:
     def __init__(self, db_path: Path):
         logger.debug(f"BPDatabase::__init__ - {db_path}")
 
         if not db_path.exists():
             logger.error(f"{db_path} does not exist")
-            raise ValueError()
+            raise ValueError(f"{db_path} does not exist")
 
         if not db_path.is_file():
             logger.error(f"{db_path} is not a file")
-            raise ValueError()
+            raise ValueError(f"{db_path} is not a file")
 
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         self.db.setDatabaseName(str(db_path.resolve()))
 
+    def open(self):
         if not self.db.open():
-            logger.error("database failed to open")
-            raise Exception()
+            logger.error(self.db.lastError().text())
+            return False
+        return True
+
+    def close(self):
+        self.db.close()
 
     def insert_patient(
         self,
@@ -58,26 +71,54 @@ class BPDatabase:
         query.bindValue(":name", name)
         query.bindValue(":id", barcode)
         query.bindValue(":gender", 1 if gender == "female" else 0)
-        query.bindValue(":dob", dob)
+        query.bindValue(
+            ":dob", datestring_to_epoch_s(datetime.strftime(dob, format="%Y-%m-%d"))
+        )
         query.bindValue(":physician", physician)
 
-        return query.exec()
+        if not query.exec():
+            logger.critical(query.lastError().text())
+            return False, None
 
-    def get_measurements(self, barcode):
+        return True, query.lastInsertId()
+
+    def get_patient_key(self, barcode: str) -> tuple[bool, int | None]:
+        query = QSqlQuery()
+        query.prepare("SELECT [Index] FROM Patient WHERE ID = :barcode")
+
+        query.bindValue(":barcode", barcode)
+
+        if not query.exec():
+            logger.critical(f"exec: {query.lastError().text()}")
+            return None
+
+        if query.size() > 1:
+            logger.critical(
+                f"query returned multiple patient keys for barcode {barcode}"
+            )
+            return None
+
+        if not query.first():
+            logger.error(f"no records for barcode {barcode}")
+            return None
+
+        return query.record().value(0)
+
+    def get_measurements(self, patient_key: int):
         ###
         # SELECT * FROM data WHERE ID = barcode;
         ###
 
-        logger.debug(f"BPDatabase::get_measurements - {barcode}")
+        logger.debug(f"BPDatabase::get_measurements - {patient_key}")
+
+        query = QSqlQuery()
+        query.prepare("SELECT * FROM Data WHERE Patient = :patient_key")
+        query.bindValue(":patient_key", patient_key)
 
         results = []
 
-        query = QSqlQuery()
-        query.prepare("SELECT * FROM data WHERE ID = :barcode")
-        query.bindValue(":barcode", barcode)
-
         if not query.exec():
-            logger.error("failed to get measurements from database")
+            logger.critical(query.lastError().text())
             return None
 
         while query.next():
@@ -89,3 +130,44 @@ class BPDatabase:
             results.append(row)
 
         return results
+
+
+if __name__ == "__main__":
+    app = QCoreApplication()
+
+    print(Path.cwd())
+    db = BPDatabase(Path(Path.cwd() / "devices/blood_pressure/tests/DataBase.db"))
+
+    try:
+        if db.open():
+            # inserted, patient_id = db.insert_patient("", "", "", "", "")
+            # if not inserted:
+            #    print("not inserted")
+            # elif patient_id:
+            #    print(patient_id)
+            # else:
+            #    print("no key")
+
+            # patient_key, error = db.get_patient_key("00000000")
+            # if not patient_key or error:
+            #     print(error)
+            # data = db.get_measurements("")
+            # if data:
+            #    print(data)
+            # else:
+            #    print("oops")
+            patient_key = db.get_patient_key(barcode="")
+            if patient_key is not None:
+                print(patient_key)
+
+            records = db.get_measurements(patient_key=patient_key)
+
+            for row in records:
+                print(row)
+        else:
+            print("error")
+
+    except Exception as e:
+        print(e)
+    finally:
+        db.close()

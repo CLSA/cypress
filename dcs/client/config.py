@@ -76,4 +76,5 @@ class DeviceConfig(BaseConfig):
         return True
 
 config, errors = CypressConfig.from_ini()
-print(errors)
+if errors:
+    print(errors)

@@ -1,10 +1,11 @@
 import json
+import tarfile
 
 from pathlib import Path
 from typing import override
 
 from controller import Controller
-from utils import is_process_running
+from utils import is_process_running, get_file_info, FileInfo
 
 from devices.crt.model import CRTModel
 from devices.crt.view import CRTView
@@ -59,6 +60,7 @@ class CRTController(Controller):
             return
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
+
         self.measured.emit(self.model.to_response())
 
     @override
@@ -113,3 +115,14 @@ class CRTController(Controller):
 
         self.logger.debug(arguments)
         return arguments
+
+    def _create_backup_tar(self) -> str | None:
+        try:
+            backup_path = Path("./config.tar.gz")
+            backup_path.unlink(missing_ok=True)
+            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
+                backup_tar.add(self.config.directory, arcname="ccb")
+            return str(backup_path.resolve())
+        except Exception as e:
+            self.logger.critical(e)
+            return None

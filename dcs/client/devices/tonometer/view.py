@@ -18,7 +18,8 @@ class TonometerView(View):
         )
 
         self.session_widget.deviceStatusValue.setText("ORA")
+        self.measure_button.setVisible(True)
 
     @override
-    def on_measured(self, output: dict):
+    def on_measured(self):
         super().on_measured()

@@ -52,11 +52,11 @@ def get_file_info(file_path: Path):
         raise Exception(f"{file_path.name} is not a file")
 
     return FileInfo(
-        name=file_path.stem,
+        name=file_path.name.partition(".")[0],
         raw_size=file_path.stat().st_size,
         readable_size=get_file_size(file_path),
         file_name=file_path.name,
-        extension=file_path.suffix[1:], # ignore period
+        extension="".join(file_path.suffixes), # ignore period
         file_path=file_path,
         send_name=None
     )

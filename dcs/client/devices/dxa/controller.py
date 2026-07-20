@@ -1,4 +1,4 @@
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QCoreApplication
 from PySide6.QtSql import QSqlDatabase
 
 import pydicom
@@ -92,8 +92,12 @@ class DXAController(Controller):
         self.logger.debug("Copying patscan")
         self.config.patscan_db_path.copy_into(Path.cwd())
 
+        QCoreApplication.processEvents()
+
         self.logger.debug("Copying reference")
         self.config.reference_db_path.copy_into(Path.cwd())
+
+        QCoreApplication.processEvents()
 
         self.model.set_apex_db_paths(
             Path.cwd() / "PatScan.mdb", Path.cwd() / "reference.mdb"

@@ -33,7 +33,6 @@ def restart():
     return response.text.strip('"')
 
 def launch_device_detached(device: str):
-    print("device: ", device)
     response = requests.post(f"https://{host}:{port}/detached/{device}", verify=False)
     response.raise_for_status()
     return response.text.strip('"')
@@ -113,10 +112,8 @@ class CypressManagerWindow(QMainWindow):
         try:
             self.status = get_status()
             version = self.status.get("version", "Unknown")
-            #print(json.dumps(self.status, indent=4))
 
             if "session" in self.status:
-                #print(self.status["session"])
                 self.ui.statusValue.setText(f"device in progress")
                 self.enable_device_buttons(False)
             else:

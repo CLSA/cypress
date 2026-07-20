@@ -52,4 +52,4 @@ class CDTTView(View):
             self.table.setItem(index, 0, stimulus_digits)
             self.table.setItem(index, 1, response_digits)
 
-        super().on_measured(output)
+        super().on_measured()

@@ -1,4 +1,5 @@
 import json
+import tarfile
 
 from pathlib import Path
 from typing import override
@@ -64,3 +65,14 @@ class FRAXController(Controller):
         Path(self.config.input_file).unlink(missing_ok=True)
         Path(self.config.output_file).unlink(missing_ok=True)
         return True
+
+    def _create_backup_tar(self) -> str | None:
+        try:
+            backup_path = Path("./frax_backup.tar.gz")
+            backup_path.unlink(missing_ok=True)
+            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
+                backup_tar.add(self.config.directory, arcname="frax")
+            return str(backup_path.resolve())
+        except Exception as e:
+            self.logger.critical(e)
+            return None

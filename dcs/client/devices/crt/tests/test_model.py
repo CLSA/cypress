@@ -13,7 +13,7 @@ class TestCRTModel(unittest.TestCase):
     def setUp(self):
         self.config = CRTConfig.from_ini()
 
-        fixtures = sorted(Path("./devices/crt/tests/fixtures").glob("*.csv"))
+        fixtures = sorted(Path("./fixtures").glob("*.csv"))
         if not fixtures:
             raise Exception("Fixtures directory is empty")
         fixture = fixtures[0]

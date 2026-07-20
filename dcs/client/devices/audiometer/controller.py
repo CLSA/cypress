@@ -1,4 +1,5 @@
 import json
+import tarfile
 
 from pathlib import Path
 from typing import override
@@ -131,3 +132,17 @@ class AudiometerController(Controller):
         self.process.setProgram(str(self.config.process_path.resolve()))
         self.process.setArguments([])
         self.process.setWorkingDirectory(str(self.config.working_path.resolve()))
+
+
+    def _create_backup_tar(self) -> str | None:
+        try:
+            backup_path = Path("./audiometer_backup.tar.gz")
+            backup_path.unlink(missing_ok=True)
+            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
+                backup_tar.add("C:/ProgramData/Ra660", arcname="Ra660")
+                backup_tar.add(self.config.plugin_working_directory, arcname="plugin")
+            return str(backup_path.resolve())
+        except Exception as e:
+            self.logger.critical(e)
+            return None
+

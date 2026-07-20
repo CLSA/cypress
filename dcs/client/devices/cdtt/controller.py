@@ -1,4 +1,5 @@
 import json
+import tarfile
 
 from pathlib import Path
 from typing import override
@@ -41,6 +42,9 @@ class CDTTController(Controller):
                 f"{self.config.process_name} is already open, please close and try again",
             )
             return False
+
+        if not self.pre_backup_tar():
+            self.error.emit("Error:", f"could not prepare device")
 
         if not self._clean_output_dir(self.config.output):
             self.error.emit("Error:", f"could not prepare device")
@@ -121,3 +125,14 @@ class CDTTController(Controller):
         self.process.setProgram(jre)
         self.process.setArguments(["-jar", jar, barcode])
         self.process.setWorkingDirectory(directory)
+
+    def _create_backup_tar(self, filepath):
+        try:
+            backup_path = Path(filepath)
+            backup_path.unlink(missing_ok=True)
+            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
+                backup_tar.add(self.config.directory, arcname="CDTTStereo")
+            return str(backup_path.resolve())
+        except Exception as e:
+            self.logger.critical(e)
+            return None

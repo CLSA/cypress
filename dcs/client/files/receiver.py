@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal, QFileSystemWatcher, QProcess
 
-from utils import FileInfo, DicomFileInfo, get_file_size, clear_directory
+from utils import FileInfo, get_file_size, clear_directory
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -16,16 +16,12 @@ class ReceiverConfig:
     extensions: list[str]
 
 
-
-
-
-
 class FileReceiver(QObject):
     files_received = Signal(object)
     started = Signal
     finished = Signal
 
-    def __init__(self, config: ReceiverConfig, parent = None):
+    def __init__(self, config: ReceiverConfig, parent=None):
         super().__init__(parent)
         self.config = config
 
@@ -49,19 +45,25 @@ class FileReceiver(QObject):
         self.directory_listener.directoryChanged.connect(self._on_directory_changed)
 
     def _on_directory_changed(self) -> None:
-        files: list[FileInfo] = []
+        self.files: list[FileInfo] = []
         for file_path in self.config.storage_dir.iterdir():
-            if file_path.is_file() and file_path.exists() and file_path.suffix in self.config.extensions:
+            if (
+                file_path.is_file()
+                and file_path.exists()
+                and file_path.suffix in self.config.extensions
+            ):
                 file_info = FileInfo(
                     name=file_path.stem,
-                    size=get_file_size(file_path),
+                    raw_size=file_path.stat().st_size,
+                    readable_size=get_file_size(file_path),
                     file_name=file_path.name,
                     extension=file_path.suffix,
-                    file_path=file_path
+                    file_path=file_path,
+                    send_name=None
                 )
-                files.append(file_info)
+                self.files.append(file_info)
 
-        self.files_received.emit(files)
+        self.files_received.emit(self.files)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -81,6 +83,7 @@ class DicomReceiverConfig(ReceiverConfig):
     # port to bind
     port: str
 
+
 class DicomReceiver(FileReceiver):
     files_received = Signal(object)
 
@@ -93,6 +96,7 @@ class DicomReceiver(FileReceiver):
 
     def close(self):
         self.dicom_process.close()
+        self.dicom_process.waitForFinished()
 
     def _configure_server(self) -> None:
         self.dicom_process = QProcess(self)
@@ -103,10 +107,15 @@ class DicomReceiver(FileReceiver):
 
         arguments = [
             str(self.config.port),
-            "--config-file", str(self.config.config_path.resolve()), "default",
-            "--aetitle", str(self.config.ae_title),
-            "--output-directory", str(self.config.storage_dir.resolve()),
-            "--filename-extension", str(self.config.extensions[0])
+            "--config-file",
+            str(self.config.config_path.resolve()),
+            "default",
+            "--aetitle",
+            str(self.config.ae_title),
+            "--output-directory",
+            str(self.config.storage_dir.resolve()),
+            "--filename-extension",
+            str(self.config.extensions[0]),
         ]
 
         self.dicom_process.setProgram(str(self.config.executable_path))
@@ -117,7 +126,7 @@ class DicomReceiver(FileReceiver):
     def _on_directory_changed(self) -> None:
         files = []
         for file_path in self.config.storage_dir.iterdir():
-            if file_path.is_file() and file_path.suffix == '.dcm':
+            if file_path.is_file() and file_path.suffix == ".dcm":
                 file_info = FileInfo(
                     name=file_path.stem,
                     raw_size=file_path.stat().st_size,
@@ -125,20 +134,19 @@ class DicomReceiver(FileReceiver):
                     file_name=file_path.name,
                     file_path=file_path,
                     extension=file_path.suffix,
-                    send_name=file_path.name
+                    send_name=file_path.name,
                 )
                 files.append(file_info)
         self.files_received.emit(files)
 
     def _on_process_started(self):
-        print("dicom: process started")
+        pass
 
     def _on_process_finished(self):
-        print("dicom: finished")
+        pass
 
     def _on_process_destroyed(self):
-        print("dicom: destroyed")
+        pass
 
     def _on_process_error(self, error):
-        print("dicom: ", error)
-
+        pass

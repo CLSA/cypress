@@ -1,3 +1,5 @@
+import logging
+
 DEVICE_NAME = "retinal_camera"
 
 LOG_LOCATION = f"logs/{DEVICE_NAME}.log"
@@ -31,3 +33,5 @@ LOG_CONFIG = {
         DEVICE_NAME: {"handlers": ["console", "file_handler"], "level": LOG_LEVEL}
     },
 }
+
+logger = logging.getLogger(DEVICE_NAME)

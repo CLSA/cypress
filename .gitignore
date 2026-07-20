@@ -12,8 +12,10 @@ build
 *.spec
 *.pem
 *.txt
+*.zip
+*.xml
 
-output
+#output
 env
 pyvenv.cfg
 analysis/

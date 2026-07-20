@@ -16,8 +16,8 @@ class TestGripStrengthModel(unittest.TestCase):
                 "answer_id": 1,
                 "interviewer": "test",
                 "language": "en",
-                "sex": "male",
-                "dob": "1995-12-06"
+                "sex": "",
+                "dob": ""
             }
         )
         self.model = GripStrengthModel(session=self.session, config=self.config)

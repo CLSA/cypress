@@ -1,3 +1,4 @@
+import json
 from typing import override
 from view import View
 
@@ -20,5 +21,5 @@ class GeneralProxyView(View):
         self.session_widget.deviceStatusValue.setText("General Proxy")
 
     @override
-    def on_measured(self, output: dict):
-        super().on_measured(output)
+    def on_measured(self):
+        super().on_measured()

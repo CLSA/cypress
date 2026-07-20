@@ -60,8 +60,6 @@ class HearingMeasurementsWidget(QWidget, Ui_HearingMeasurements):
         self.values_changed.emit(self.get_data())
 
     def set_values(self, response_json):
-        print(json.dumps(response_json, indent=4))
-
         if self.inputs_enabled:
             self.set_enabled(False)
 

@@ -9,8 +9,6 @@ from devices.ecg.session import ECGSession
 from devices.ecg.model import ECGModel
 from devices.ecg.view import ECGView
 
-from files.uploader import DataUploaderDialog
-
 
 class ECGController(Controller):
     files_received = Signal(object)
@@ -44,12 +42,20 @@ class ECGController(Controller):
 
         self.view.measure_button.setVisible(True)
 
+        self.start()
+
     def _on_files_received(self, files: list[FileInfo]):
-        self.files = [f.file_path for f in files]
-        self.files_received.emit(files)
-        self.measured.emit(files)
+        self.ready_to_measure.emit()
 
     @override
-    def submit(self):
-        self.uploader.show()
-        self.uploader.start_upload()
+    def measure(self):
+        success, error = self.model.read_results(self.config.storage_path)
+        if not success:
+            self.logger.error(error)
+            self.error.emit("error", error)
+            return
+
+        for ecg_file in self.model.files:
+            print(ecg_file)
+
+        self.measured.emit(self.model.to_response())

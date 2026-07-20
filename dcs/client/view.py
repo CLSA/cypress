@@ -2,9 +2,15 @@ import logging
 
 from enum import Enum
 
-from PySide6.QtWidgets import QMessageBox, QDialog, QVBoxLayout
+from PySide6.QtWidgets import (
+    QMessageBox,
+    QDialog,
+    QVBoxLayout,
+    QSpacerItem,
+    QSizePolicy,
+)
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Qt
 
 from ui.measurement_table import MeasurementTableWidget
 from ui.test_info_widget import TestInfoWidget
@@ -48,7 +54,6 @@ class View(QDialog):
         self.setWindowTitle(title)
         self.setWindowIcon(QIcon("favicon.ico"))
 
-
         self.session = session
         self.logger = logging.getLogger(config.section_name)
         self.config = config
@@ -57,10 +62,16 @@ class View(QDialog):
 
         self.session_widget = TestInfoWidget(self)
         self.measurement_table_widget = MeasurementTableWidget(self)
+        self.measurement_table_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
 
         layout = QVBoxLayout()
         layout.addWidget(self.session_widget)
         layout.addWidget(self.measurement_table_widget)
+        #layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        # layout.addStretch()
 
         self.setLayout(layout)
         self.resize(config.width, config.height)
@@ -164,6 +175,9 @@ class View(QDialog):
 
         self.state = State.MANUAL_ENTRY
 
+    def set_status(self, text: str):
+        self.session_widget.statusValue.setText(text)
+
     def closeEvent(self, event):
         self.logger.info("close requested")
 
@@ -186,8 +200,7 @@ class View(QDialog):
             if not self.detached:
                 cancelled = PineAPI(
                     base_url=self.session.origin,
-                    auth_token=settings.PINE_AUTH_TOKEN,
-                    logger_name=self.config.section_name,
+                    logger=self.logger,
                 ).send_cancel(session_id=self.session.session_id)
 
                 if not cancelled:

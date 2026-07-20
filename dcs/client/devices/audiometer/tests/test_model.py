@@ -32,7 +32,7 @@ class TestAudiometerModel(unittest.TestCase):
         return super().tearDown()
 
     def test_read_results(self):
-        with open(Path("./devices/audiometer/tests/output.json")) as output_json_file:
+        with open(Path("")) as output_json_file:
             output_json = json.load(output_json_file)
             self.model.parse_output_json(output_json)
             self.assertTrue(self.model.is_valid())

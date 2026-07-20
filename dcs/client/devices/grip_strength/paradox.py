@@ -6,37 +6,45 @@ from enum import Enum
 ONE_POUND_FORCE_IN_NEWTONS = 4.4482216152605
 ONE_POUND_FORCE_IN_KILOGRAMS = ONE_POUND_FORCE_IN_NEWTONS / 9.80665
 
+
 def as_newtons(thousanthsPounds: int):
     return float(thousanthsPounds) * ONE_POUND_FORCE_IN_NEWTONS / 1000.0
+
 
 def as_kg(thousanthsPounds: int):
     return float(thousanthsPounds) * ONE_POUND_FORCE_IN_KILOGRAMS / 1000.0
 
+
 def read_short(data: bytes, offset: int) -> int:
-    return int.from_bytes(data[offset:offset + 2], byteorder='little', signed=True)
+    return int.from_bytes(data[offset : offset + 2], byteorder="little", signed=True)
+
 
 def read_ushort(data: bytes, offset: int) -> int:
-    return int.from_bytes(data[offset:offset + 2], byteorder='little', signed=False)
+    return int.from_bytes(data[offset : offset + 2], byteorder="little", signed=False)
+
 
 def read_ubyte(data: bytes, offset: int) -> int:
-    return int.from_bytes(data[offset:offset + 1], byteorder='little', signed=False)
+    return int.from_bytes(data[offset : offset + 1], byteorder="little", signed=False)
+
 
 def read_int(data: bytes, offset: int) -> int:
-    return int.from_bytes(data[offset:offset + 4], byteorder='little', signed=True)
+    return int.from_bytes(data[offset : offset + 4], byteorder="little", signed=False)
+
 
 def read_ptr(data: bytes, offset: int) -> int:
-    return int.from_bytes(data[offset:offset + 4], byteorder='little', signed=True)
+    return int.from_bytes(data[offset : offset + 4], byteorder="little", signed=True)
 
 
 def read_alpha(data: bytes) -> str:
-    print('read alpha')
+    print("read alpha")
 
-    val = ''
+    val = ""
 
     for b in data:
         val += chr(b)
 
     return val
+
 
 class ParadoxFieldType(Enum):
     Alpha = 0x01
@@ -57,14 +65,18 @@ class ParadoxFieldType(Enum):
     Bcd = 0x17
     Bytes = 0x18
 
+
 class ParadoxFieldInfo:
-    def __init__(self, name: str = None, size: int = None, field_type: ParadoxFieldType = None):
+    def __init__(
+        self, name: str = None, size: int = None, field_type: ParadoxFieldType = None
+    ):
         self.name = name
         self.size = size
         self.field_type = field_type
 
     def __str__(self):
-        return f'{self.name} {self.field_type} of size {self.size}B '
+        return f"{self.name} {self.field_type} of size {self.size}B "
+
 
 class ParadoxDbHeader:
     def __init__(self, data: bytes):
@@ -110,7 +122,7 @@ class ParadoxDbHeader:
         offset = 0x0056
 
         if self.file_version_id > 0x04:
-            print('file_version_id is greater than 4')
+            print("file_version_id is greater than 4")
             offset = 0x0078
 
         for i in range(self.num_fields):
@@ -132,7 +144,7 @@ class ParadoxDbHeader:
         offset += 261 if self.file_version_id > 4 else 79
 
         for field in self.field_info:
-            name = ''
+            name = ""
             char = data[offset]
 
             while char > 0:
@@ -145,14 +157,16 @@ class ParadoxDbHeader:
 
 
 class ParadoxDbBlock:
-    def __init__(self,
-                 header: ParadoxDbHeader,
-                 data: bytes,
-                 block_number: int,
-                 next_block: int,
-                 prev_block: int,
-                 offset_to_last_record: int,
-                 file_offset: int):
+    def __init__(
+        self,
+        header: ParadoxDbHeader,
+        data: bytes,
+        block_number: int,
+        next_block: int,
+        prev_block: int,
+        offset_to_last_record: int,
+        file_offset: int,
+    ):
 
         self.header = header
         self.data = data
@@ -162,28 +176,58 @@ class ParadoxDbBlock:
         self.offset_to_last_record = offset_to_last_record
         self.file_offset = file_offset
 
-        self.records = []
-
-        self._read_records()
-
     def num_records(self):
         return int(self.offset_to_last_record / self.header.record_size + 1)
 
-    def _read_records(self):
+    def read_records(self):
         offset = self.file_offset
-
+        print(chr(0x00))
         length = 0
         for field_info in self.header.field_info:
             length += field_info.size
+
+        def fix_sign(data):
+            data = bytearray(data)
+            if data[0] & 0x80:
+                data[0] &= 0x7F
+
+            return data
 
         for field_info in self.header.field_info:
             name = field_info.name
             size = field_info.size
             field_type = field_info.field_type
+            print(name, field_type, size)
 
-            data_bytes = self.data[offset:offset + size]
-            print(name, size, field_type, data_bytes)
+            if field_type == ParadoxFieldType.LongInteger:
+                integer = int.from_bytes(fix_sign(self.data[offset : offset + size]), byteorder='big', signed=True)
+                if "Rep" in name or "Average" in name or "Maximum" in name:
+                    print(as_kg(integer))
+                else:
+                    print(integer)
+
+            elif field_type == ParadoxFieldType.Alpha:
+                data = self.data[offset:]
+                res = ""
+                i = 0
+
+                while data[i] != chr(0x00) and i < size:
+                    res += chr(data[i])
+                    i += 1
+
+                print(res)
+
+            elif field_type == ParadoxFieldType.Logical:
+                data = bytearray(self.data[offset : offset + size])
+                if data[0] & 0x80:
+                    print(bool(data[0] & 0x7F))
+                elif data[0] == 0:
+                    print(bool(data[0] | 0x80))
+
+            offset += field_info.size
+
             #print(name, size, field_type, data_bytes)
+            # print(name, size, field_type, data_bytes)
 
             # if name == 'Position':
             #     print(self.data[offset - size : offset + size + 5])
@@ -191,9 +235,10 @@ class ParadoxDbBlock:
             # if field_type == ParadoxFieldType.Alpha:
             #     print(read_alpha(data_bytes))
 
+
 class ParadoxDb:
     def __init__(self, database_path: Path):
-        with open(database_path, 'rb') as file:
+        with open(database_path, "rb") as file:
             self.data = file.read()
             self.header = ParadoxDbHeader(self.data)
             self.blocks = self._read_blocks()
@@ -206,10 +251,30 @@ class ParadoxDb:
         for i in range(self.header.file_blocks):
             next_block = read_ushort(self.data, offset)
             prev_block = read_ushort(self.data, offset + 2)
-            offset_to_last_record = read_short(self.data, offset + 2)
+            offset_to_last_record = read_ushort(self.data, offset + 4)
             offset += 6
 
-            block = ParadoxDbBlock(self.header, self.data, i + 1, next_block, prev_block, offset_to_last_record, offset)
+            block = ParadoxDbBlock(
+                header=self.header,
+                data=self.data,
+                block_number=i + 1,
+                next_block=next_block,
+                prev_block=prev_block,
+                offset_to_last_record=offset_to_last_record,
+                file_offset=offset,
+            )
             blocks.append(block)
 
             print("num records: ", block.num_records())
+
+        return blocks
+
+    def read_records(self):
+        records = []
+        for block in self.blocks:
+            block_records = block.read_records()
+            for record in block_records:
+                records.append(record)
+        return records
+
+

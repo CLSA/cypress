@@ -2,7 +2,9 @@ from PySide6.QtCore import Signal
 
 from typing import override
 
-from files.receiver import FileReceiver, FileInfo, ReceiverConfig
+from files.receiver import DicomReceiver, DicomReceiverConfig
+
+from utils import DicomFileInfo
 
 from controller import Controller
 
@@ -33,20 +35,47 @@ class ECHOController(Controller):
             detached=detached,
         )
 
-        self.file_receiver = FileReceiver(
-            ReceiverConfig(storage_dir=self.config.storage_path, extensions=[".dcm"])
+        self.files: list[DicomFileInfo] = []
+        self.file_receiver = DicomReceiver(
+            DicomReceiverConfig(
+                executable_path=self.config.executable,
+                ae_title=self.config.ae_title,
+                host=self.config.host,
+                port=self.config.port,
+                storage_dir=self.config.storage_path,
+                config_path=self.config.storescp_config,
+                extensions=[".dcm"],
+            )
         )
-
         self.file_receiver.files_received.connect(self._on_files_received)
         self.file_receiver.start()
-        self.files_received.connect(self.view.on_files_received)
 
         self.view.measure_button.setVisible(True)
 
+        self.view.close.connect(self.close)
+        self.view.destroyed.connect(self.close)
+
+        self.view.measure_button.setVisible(True)
+        self.start()
+
     @override
     def close(self):
-        #self.file_receiver.close()
-        pass
+        self.file_receiver.close()
 
-    def _on_files_received(self, dicom_files: list[FileInfo]):
-        self.files_received.emit(dicom_files)
+    def _on_files_received(self, files: list[DicomFileInfo]):
+        self.ready_to_measure.emit()
+
+        file_count = sum(1 for path in self.config.storage_path.iterdir() if path.is_file())
+        print(file_count)
+
+    @override
+    def measure(self):
+        success, error = self.model.read_results(self.config.storage_path)
+        if not success:
+            self.logger.error(error)
+            self.error.emit("error", error)
+            return
+
+        self.measured.emit(self.model.to_response())
+
+

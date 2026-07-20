@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from openpyxl import load_workbook
 
+from utils import get_file_info
 from model import Model
 
 NUM_TRIALS = 24
@@ -33,6 +34,10 @@ class CDTTModel(Model):
         self.reset()
 
         try:
+            file_info = get_file_info(output_file)
+            file_info.send_name = "cdtt"
+            self._add_file(file_info)
+
             wb = load_workbook(str(output_file.resolve()))
             if not self._read_barcode(wb):
                 logger.error(f"could not read barcode..")
