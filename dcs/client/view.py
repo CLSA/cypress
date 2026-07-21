@@ -96,6 +96,7 @@ class View(QDialog):
     # slots
     def _on_start_button_clicked(self):
         self.logger.info("start requested")
+        self.start_button.setEnabled(False)
         self.start.emit()
 
     def _on_measure_button_clicked(self):
