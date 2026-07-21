@@ -42,6 +42,7 @@ class Model:
         file_info.send_name = send_name
 
         self.files.append(file_info)
+        return True
 
     def _add_file(self, file_info: FileInfo):
         self.files.append(file_info)

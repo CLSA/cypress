@@ -20,6 +20,22 @@ class GeneralProxyView(View):
 
         self.session_widget.deviceStatusValue.setText("General Proxy")
 
+        self.start_button.setVisible(False)
+        self.measurement_table_widget.setVisible(False)
+
+        self.setFixedSize(400, 257)
+
+    @override
+    def on_ready_to_measure(self):
+        super().on_ready_to_measure()
+        self.measure.emit()
+
     @override
     def on_measured(self):
         super().on_measured()
+        self.submit.emit()
+
+    @override
+    def on_submitted(self):
+        super().on_submitted()
+        self.close()

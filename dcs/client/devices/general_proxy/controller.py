@@ -30,7 +30,9 @@ class GeneralProxyController(Controller):
             detached=detached,
         )
 
-        self.form_output_path: Path = Path(self.config.output_base_dir / f"{self.session.barcode}.pdf")
+        self.form_output_path: Path = Path(
+            self.config.output_base_dir / f"{self.session.barcode}.pdf"
+        )
 
         self.start()
 
@@ -38,20 +40,26 @@ class GeneralProxyController(Controller):
     def start(self):
         self.logger.debug("GeneralProxyController::start")
 
+        self._clear_results_dir()
+
         generator = PDFGenerator(pdftk_exe_path=self.config.pdftk_executable)
         if not generator.prepare_form(
             form_path=self.config.form_en,
             fdf_path=self.config.fdf_en,
-            input_data={ "enrollmentId": self.session.barcode },
-            output_path=self.form_output_path
+            input_data={"enrollmentId": self.session.barcode},
+            output_path=self.form_output_path,
         ):
-            self.logger.critical("GeneralProxyController::start - failed to generate proxy form")
-            self.error.emit("Error: failed to generate proxy form")
+            self.logger.critical(
+                "GeneralProxyController::start - failed to generate proxy form"
+            )
+            self.error.emit("Failed to generate proxy form")
             return False
 
         if not self.form_output_path.exists():
-            self.logger.critical("GeneralProxyController::start - failed to find generated proxy form")
-            self.error.emit("Error: failed to find generated proxy form")
+            self.logger.critical(
+                "GeneralProxyController::start - failed to find generated proxy form"
+            )
+            self.error.emit("Failed to find generated proxy form")
             return False
 
         self.process.setProgram(str(self.config.adobe_executable.resolve()))
@@ -64,8 +72,11 @@ class GeneralProxyController(Controller):
     @override
     def measure(self):
         if not self.model.read_results(self.form_output_path):
-            self.logger.critical("could not read results")
-            self.error.emit("Error: something went wrong")
+            self.error.emit("Something went wrong")
+            return False
+
+        if not self.model.has_signature():
+            self.error.emit("The form was not signed")
             return False
 
         self.measured.emit(self.model.to_response())
@@ -75,4 +86,9 @@ class GeneralProxyController(Controller):
     @override
     def _on_process_finished(self, *args):
         self.ready_to_measure.emit()
-        self.measure()
+
+
+    def _clear_results_dir(self):
+        for path in self.config.output_base_dir.iterdir():
+            if path.is_file():
+                path.unlink(missing_ok=True)

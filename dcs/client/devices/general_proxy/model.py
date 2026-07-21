@@ -1,23 +1,36 @@
 from pathlib import Path
 
+from pyhanko.pdf_utils.reader import PdfFileReader
+
 from model import Model
 
-from devices.general_proxy.session import GeneralProxySession
-from devices.general_proxy.config import GeneralProxyConfig
 
-from utils import get_file_info
+from devices.general_proxy.settings import logger
+
 
 class GeneralProxyModel(Model):
-    def __init__(self, session: GeneralProxySession, config: GeneralProxyConfig):
-        super().__init__(session=session, config=config)
+    def __init__(self, session, config):
+        super().__init__(session, config)
 
-    def read_results(self, file_path: Path) -> bool:
-        if not file_path.exists():
+    def has_signature(self) -> bool:
+        if not len(self.files):
+            logger.critical("No files found")
             return False
 
-        file_info = get_file_info(file_path)
-        file_info.send_name = "general_proxy"
+        form_pdf_info = self.files[0]
+        num_signatures = 0
 
-        self._add_file(file_info)
+        with open(form_pdf_info.file_path, 'rb') as form:
+            reader = PdfFileReader(form)
+            num_signatures = len(reader.embedded_signatures)
+
+        return num_signatures > 0
+
+
+    def read_results(self, file_path: Path) -> bool:
+        added = self.add_file(file_path=file_path, send_name="general_proxy")
+        if not added:
+            logger.critical("Error adding file")
+            return False
 
         return True

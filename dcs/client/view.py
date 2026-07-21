@@ -155,16 +155,16 @@ class View(QDialog):
         self.session_widget.statusValue.setText("Complete")
         self.state = State.SUBMITTED
 
-    def on_error(self, title: str = "Error", message: str = "Unknown error"):
-        self.logger.error(f"{title} - {message}")
+    def on_error(self, message: str = "Unknown error"):
+        self.logger.error(message.lower())
+        self.session_widget.statusValue.setText("Error")
 
-        self.session_widget.statusValue.setText(f"Error: {message}")
         self.measure_button.setEnabled(False)
         self.submit_button.setEnabled(False)
         self.state = State.ERROR
 
         msg = QMessageBox()
-        msg.critical(self, title, message)
+        msg.critical(self, "An error occurred", message.ljust(50))
 
     def on_manual_entry(self):
         self.session_widget.statusValue.setText(f"Manual entry")
@@ -184,6 +184,13 @@ class View(QDialog):
 
         if self.state == State.SUBMITTED:
             self.logger.info("done")
+            self.close.emit()
+
+            event.accept()
+            return
+
+        if self.state == State.ERROR:
+            self.logger.info("exiting from error")
             self.close.emit()
 
             event.accept()
