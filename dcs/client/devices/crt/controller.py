@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import override
 
 from controller import Controller
-from utils import is_process_running, get_file_info, FileInfo
+from utils import is_process_running
 
 from devices.crt.model import CRTModel
 from devices.crt.view import CRTView
@@ -32,18 +32,18 @@ class CRTController(Controller):
             detached=detached,
         )
 
+        self.start()
+
     @override
     def start(self) -> bool:
         self.logger.debug("CRTController::start")
 
         if is_process_running(self.config.process_name):
-            msg = f"{self.config.process_name} is already open, please close and try again"
-            self.error.emit("Error", msg)
+            self.error.emit(f"{self.config.process_name} is already open, please close and try again")
             return False
 
         if not self._clean_output_dir(self.config.output):
-            msg = f"could not prepare device"
-            self.error.emit("Error", msg)
+            self.error.emit(f"Could not prepare device")
             return False
 
         self._prepare_process()
@@ -56,7 +56,7 @@ class CRTController(Controller):
         self.logger.debug("CRTController::measure")
 
         if not self.model.read_results():
-            self.error.emit("File not read", "could not read results")
+            self.error.emit("Could not read results")
             return
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
@@ -81,12 +81,12 @@ class CRTController(Controller):
     @override
     def _on_process_destroyed(self, *args):
         self.logger.debug(f"CRTController::_on_process_destroyed")
-        self.error.emit()
+        self.error.emit("")
 
     @override
     def _on_process_error(self, *args):
         self.logger.debug(f"CRTController::_on_process_error")
-        self.error.emit()
+        self.error.emit("")
 
     def _clean_output_dir(self, output_dir: Path) -> bool:
         self.logger.debug("CRTController::_clean_output_dir")

@@ -24,6 +24,7 @@ class CRTView(View):
         self.session_widget.deviceStatusValue.setText("Choice Reaction Test")
 
         self.measure_button.setVisible(True)
+        self.start_button.setEnabled(False)
 
     @override
     def on_measured(self, output: dict):

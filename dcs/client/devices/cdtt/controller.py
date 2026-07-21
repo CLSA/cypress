@@ -40,17 +40,16 @@ class CDTTController(Controller):
 
         if is_process_running(self.config.process_name):
             self.error.emit(
-                "Error",
                 f"{self.config.process_name} is already open, please close and try again",
             )
             return False
 
         if not self._clean_output_dir(self.config.output):
-            self.error.emit("Error:", f"could not prepare device")
+            self.error.emit(f"Could not prepare device")
             return False
 
         if not self._prepare_settings_files():
-            self.error.emit("Error:", f"could not prepare settings")
+            self.error.emit(f"Could not prepare settings")
             return False
 
         self._prepare_process(
@@ -72,17 +71,17 @@ class CDTTController(Controller):
             self.config.output / f"Results-{self.session.barcode}.xlsx",
             self.session.language,
         ):
-            self.error.emit("File not read", "error reading CDTT results")
-            return
+            self.error.emit("Failed to read CDTT results")
+            return False
 
         if not self.model.is_valid(self.session.barcode):
-            self.error.emit(
-                "Invalid results", "the results are invalid and cannot be saved"
-            )
-            return
+            self.error.emit("The results are invalid and cannot be saved")
+            return False
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
         self.measured.emit(self.model.to_response())
+
+        return True
 
     @override
     def submit(self):
@@ -108,7 +107,7 @@ class CDTTController(Controller):
             current_settings = Path(self.config.settings_dir / "Settings.xlsx")
             current_settings.unlink(missing_ok=True)
 
-            if self.session.language == 'en':
+            if self.session.language == "en":
                 en_settings_file.copy(current_settings)
             else:
                 fr_settings_file.copy(current_settings)
