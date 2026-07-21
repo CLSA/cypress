@@ -32,6 +32,8 @@ class CDTTController(Controller):
             detached=detached,
         )
 
+        self.start()
+
     @override
     def start(self) -> bool:
         self.logger.debug("CDTTController::start")
@@ -42,9 +44,6 @@ class CDTTController(Controller):
                 f"{self.config.process_name} is already open, please close and try again",
             )
             return False
-
-        if not self.pre_backup_tar():
-            self.error.emit("Error:", f"could not prepare device")
 
         if not self._clean_output_dir(self.config.output):
             self.error.emit("Error:", f"could not prepare device")

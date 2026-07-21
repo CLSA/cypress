@@ -21,6 +21,7 @@ class CDTTView(View):
         )
 
         self.session_widget.deviceStatusValue.setText("CDTT")
+        #self.start_button.setVisible(False)
 
         self.table = self.measurement_table_widget.measurementTable
         self.measure_button.setVisible(True)
