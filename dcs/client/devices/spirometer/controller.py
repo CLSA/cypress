@@ -40,7 +40,7 @@ class SpirometerController(Controller):
     @override
     def start(self) -> bool:
         if is_process_running(self.config.process_name):
-            self.error.emit("Error", f"{self.config.process_name} is already open")
+            self.error.emit(f"{self.config.process_name} is already open")
             return False
 
         self._restore_database()
@@ -69,12 +69,12 @@ class SpirometerController(Controller):
             )
         except FileNotFoundError as e:
             self.logger.critical(e)
-            self.error.emit("error", "File not found")
+            self.error.emit("File not found")
         except ValueError as e:
             self.logger.critical(e)
-            self.error.emit("error", "File is invalid")
+            self.error.emit("File is invalid")
         except Exception as e:
-            self.error.emit("error", "Unknown error")
+            self.error.emit("Unknown error")
             self.logger.critical(e)
 
         self.measured.emit(self.model.to_response())

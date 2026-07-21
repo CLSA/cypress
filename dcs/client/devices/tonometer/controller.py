@@ -40,11 +40,11 @@ class TonometerController(Controller):
             return False
 
         if not self._restore_database():
-            self.error.emit("Error", f"could not restore database")
+            self.error.emit(f"Could not restore database")
             return False
 
         if not self._insert_participant():
-            self.error.emit("Error", f"could not setup database")
+            self.error.emit(f"Could not setup database")
             return False
 
         self._prepare_process()
@@ -55,7 +55,7 @@ class TonometerController(Controller):
         self.logger.debug(f"{self.class_name()}.measure()")
 
         if not self.model.read_results():
-            self.error.emit("Error", f"error reading results")
+            self.error.emit(f"Failed to read results")
             return False
 
         response = self.model.to_response()

@@ -51,8 +51,7 @@ class ECGController(Controller):
     def measure(self):
         success, error = self.model.read_results(self.config.storage_path)
         if not success:
-            self.logger.error(error)
-            self.error.emit("error", error)
+            self.error.emit(error)
             return
 
         for ecg_file in self.model.files:

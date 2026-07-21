@@ -20,7 +20,7 @@ class TestRetinalCameraDB(unittest.TestCase):
                 "interviewer": "test",
                 "language": "en",
                 "sex": "male",
-                "dob": "1995-12-06",
+                "dob": "",
             }
         )
 

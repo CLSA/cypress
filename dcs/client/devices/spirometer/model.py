@@ -101,11 +101,11 @@ if __name__ == "__main__":
     session = SpirometerSession(
         **{
             "answer_id": 1,
-            "barcode": "50012797",
-            "interviewer": "ant",
-            "uid": "A303056",
+            "barcode": "",
+            "interviewer": "",
+            "uid": "",
             "language": "en",
-            "dob": "1995-12-06",
+            "dob": "",
             "sex": "male",
             "weight": 50.0,
             "height": 140.0,

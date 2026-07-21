@@ -24,7 +24,7 @@ class Controller(QObject):
     ready_to_measure = Signal()
     measured = Signal(dict)
     submitted = Signal()
-    error = Signal(str, str)
+    error = Signal(str)
 
     start_upload = Signal()
 
@@ -156,16 +156,16 @@ class Controller(QObject):
         self.ready_to_measure.emit()
 
     def _on_process_destroyed(self, *args):
-        self.error.emit()
+        self.error.emit("")
 
     def _on_process_error(self, *args):
-        self.error.emit()
+        self.error.emit("")
 
     def _upload_succeeded(self):
         self.submitted.emit()
 
     def _upload_failed(self):
-        self.error.emit("Error", "Failed to upload the data")
+        self.error.emit("Failed to upload the data")
 
     @classmethod
     def class_name(cls):

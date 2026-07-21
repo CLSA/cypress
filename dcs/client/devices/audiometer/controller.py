@@ -54,18 +54,18 @@ class AudiometerController(Controller):
         self.logger.debug(f"{self.class_name()}::start")
 
         if is_process_running(self.config.process_name):
-            self.error.emit("Error:", f"{self.config.process_name} is already open")
+            self.error.emit(f"{self.config.process_name} is already open")
             return False
 
         # Remove the app database and restore from clean backup
         if not self._restore_database():
-            self.error.emit("Error:", f"could not restore database")
+            self.error.emit(f"Could not restore database")
             return False
 
         # Insert the participant information into the app database
         output, errors = self.plugin.initialize()
         if not output or len(errors):
-            self.error.emit("Error:", f"could not setup hearcon")
+            self.error.emit(f"Could not setup hearcon")
             return False
 
         # Run the app
@@ -86,7 +86,7 @@ class AudiometerController(Controller):
         # Read the app database and parse the results
         results, errors = self.plugin.get_results()
         if not results or len(errors):
-            self.error.emit("Error", "could not retrieve hearcon results")
+            self.error.emit("Could not retrieve hearcon results")
             return False
 
         try:

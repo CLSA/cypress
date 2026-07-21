@@ -43,7 +43,7 @@ class BPController(Controller):
 
         try:
             if not self.db.open():
-                self.error.emit("error", "Failed to open database")
+                self.error.emit("Failed to open database")
                 return False
 
             self.patient_key = self.db.insert_patient(
@@ -54,7 +54,7 @@ class BPController(Controller):
                 "CLSA",
             )
         except:
-            self.error.emit("Error", "Failed to load results")
+            self.error.emit("Failed to load results")
             return False
         finally:
             self.db.close()
@@ -67,13 +67,13 @@ class BPController(Controller):
         self.logger.debug("BPController::measure")
         try:
             if not self.db.open():
-                self.error.emit("error", "Failed to open database")
+                self.error.emit("Failed to open database")
                 return False
 
             self.raw_results = self.db.get_measurements(patient_key=self.patient_key)
             self.model.read_results(self.raw_results)
         except:
-            self.error.emit("Error", "Failed to load results")
+            self.error.emit("Failed to load results")
             return False
         finally:
             self.db.close()

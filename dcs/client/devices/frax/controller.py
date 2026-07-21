@@ -35,11 +35,11 @@ class FRAXController(Controller):
     def start(self):
         self.logger.debug("FRAXController::start")
         if not self._clean():
-            self.error.emit("error", "could not prepare instrument")
+            self.error.emit("Could not prepare instrument")
             return False
 
         if not self.model.write_input_file(self.config.input_file):
-            self.error.emit("error", "could not write input file")
+            self.error.emit("Could not write input file")
             return False
 
         self.measure()
@@ -51,11 +51,11 @@ class FRAXController(Controller):
         if not self.model.run(
             executable=self.config.executable, working_directory=self.config.directory
         ):
-            self.error.emit("error", "could not run FRAX")
+            self.error.emit("Could not run FRAX")
             return
 
         if not self.model.read_output_file(self.config.output_file):
-            self.error.emit("error", "could not read output file")
+            self.error.emit("Could not read output file")
             return
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
