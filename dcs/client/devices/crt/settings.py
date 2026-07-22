@@ -2,7 +2,7 @@ DEVICE_NAME = "crt"
 LOG_LOCATION = "logs/crt.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
 
 LOG_CONFIG = {
     "version": 1,
@@ -27,6 +27,6 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
-        DEVICE_NAME: {"handlers": ["console", "file_handler"], "level": LOG_LEVEL}
+        DEVICE_NAME: {"handlers": ["file_handler"], "level": LOG_LEVEL}
     },
 }

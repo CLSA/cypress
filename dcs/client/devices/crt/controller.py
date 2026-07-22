@@ -42,22 +42,29 @@ class CRTController(Controller):
             self.error.emit(f"{self.config.process_name} is already open, please close and try again")
             return False
 
+        self.logger.info("cleaning output directory")
+
         if not self._clean_output_dir(self.config.output):
             self.error.emit(f"Could not prepare device")
             return False
 
+        self.logger.info("preparing crt process")
         self._prepare_process()
+
+        self.logger.info("starting crt process")
         self.process.start()
 
         return True
 
     @override
     def measure(self):
-        self.logger.debug("CRTController::measure")
+        self.logger.info("reading results")
 
         if not self.model.read_results():
             self.error.emit("Could not read results")
             return
+
+        self.logger.info("reading results")
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
 

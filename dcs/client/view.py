@@ -107,6 +107,7 @@ class View(QDialog):
         self.logger.info("submit requested")
         if not self.detached:
             self.submit_button.setEnabled(False)
+        self.manual_entry_button.setEnabled(False)
         self.submit.emit()
 
     def _on_manual_entry_clicked(self):
@@ -144,6 +145,7 @@ class View(QDialog):
     def on_measured(self):
         self.logger.info("measured, ready to submit..")
         self.measure_button.setEnabled(True)
+        self.manual_entry_button.setEnabled(False)
         self.session_widget.statusValue.setText("Ready to submit")
         self.submit_button.setEnabled(True)
         self.measure_button.setEnabled(False)
@@ -155,12 +157,18 @@ class View(QDialog):
         self.session_widget.statusValue.setText("Complete")
         self.state = State.SUBMITTED
 
+        self.manual_entry_button.setEnabled(False)
+        self.start_button.setEnabled(False)
+        self.submit_button.setEnabled(False)
+
     def on_error(self, message: str = "Unknown error"):
         self.logger.error(message.lower())
         self.session_widget.statusValue.setText("Error")
 
         self.measure_button.setEnabled(False)
         self.submit_button.setEnabled(False)
+        self.manual_entry_button.setEnabled(False)
+
         self.state = State.ERROR
 
         msg = QMessageBox()
@@ -190,8 +198,13 @@ class View(QDialog):
             return
 
         if self.state == State.ERROR:
-            self.logger.info("exiting from error")
+            self.logger.info("closing with error")
             self.close.emit()
+
+            cancelled = PineAPI(
+                base_url=self.session.origin,
+                logger=self.logger,
+            ).send_cancel(session_id=self.session.session_id)
 
             event.accept()
             return
@@ -214,7 +227,7 @@ class View(QDialog):
                 if not cancelled:
                     self.logger.warning("pine did not accept cancel request")
 
-            self.close.emit()
+            self.logger.info("close accepted")
 
             event.accept()
         else:

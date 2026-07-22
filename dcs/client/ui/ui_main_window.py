@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(436, 448)
+        MainWindow.resize(436, 544)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -39,13 +39,35 @@ class Ui_MainWindow(object):
         self.tab.setObjectName(u"tab")
         self.verticalLayout_5 = QVBoxLayout(self.tab)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.statusLabel = QLabel(self.tab)
+        self.statusLabel.setObjectName(u"statusLabel")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
+        self.statusLabel.setSizePolicy(sizePolicy1)
+
+        self.horizontalLayout_2.addWidget(self.statusLabel)
+
+        self.statusValue = QLabel(self.tab)
+        self.statusValue.setObjectName(u"statusValue")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.statusValue.sizePolicy().hasHeightForWidth())
+        self.statusValue.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_2.addWidget(self.statusValue)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_2)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.versionLabel = QLabel(self.tab)
         self.versionLabel.setObjectName(u"versionLabel")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.versionLabel.sizePolicy().hasHeightForWidth())
         self.versionLabel.setSizePolicy(sizePolicy1)
 
@@ -53,9 +75,6 @@ class Ui_MainWindow(object):
 
         self.versionValue = QLabel(self.tab)
         self.versionValue.setObjectName(u"versionValue")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.versionValue.sizePolicy().hasHeightForWidth())
         self.versionValue.setSizePolicy(sizePolicy2)
 
@@ -101,25 +120,6 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_3)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.statusLabel = QLabel(self.tab)
-        self.statusLabel.setObjectName(u"statusLabel")
-        sizePolicy1.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
-        self.statusLabel.setSizePolicy(sizePolicy1)
-
-        self.horizontalLayout_2.addWidget(self.statusLabel)
-
-        self.statusValue = QLabel(self.tab)
-        self.statusValue.setObjectName(u"statusValue")
-        sizePolicy2.setHeightForWidth(self.statusValue.sizePolicy().hasHeightForWidth())
-        self.statusValue.setSizePolicy(sizePolicy2)
-
-        self.horizontalLayout_2.addWidget(self.statusValue)
-
-
-        self.verticalLayout_5.addLayout(self.horizontalLayout_2)
 
         self.restartCypress = QPushButton(self.tab)
         self.restartCypress.setObjectName(u"restartCypress")
@@ -214,7 +214,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -222,14 +222,14 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Cypress", None))
+        self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"Status", None))
+        self.statusValue.setText("")
         self.versionLabel.setText(QCoreApplication.translate("MainWindow", u"Version", None))
         self.versionValue.setText("")
         self.lastUpdatedLabel.setText(QCoreApplication.translate("MainWindow", u"Last updated", None))
         self.lastUpdatedValue.setText("")
         self.hostLabel.setText(QCoreApplication.translate("MainWindow", u"Host", None))
         self.hostValue.setText("")
-        self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"Status", None))
-        self.statusValue.setText("")
         self.restartCypress.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Server", None))
         self.launchCRT.setText(QCoreApplication.translate("MainWindow", u"Choice Reaction Test", None))

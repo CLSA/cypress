@@ -44,13 +44,19 @@ class CDTTController(Controller):
             )
             return False
 
+        self.logger.info("cleaning output directory")
+
         if not self._clean_output_dir(self.config.output):
             self.error.emit(f"Could not prepare device")
             return False
 
+        self.logger.info("preparing settings")
+
         if not self._prepare_settings_files():
             self.error.emit(f"Could not prepare settings")
             return False
+
+        self.logger.info("preparing cdtt process")
 
         self._prepare_process(
             str(self.config.directory.resolve()),
@@ -58,6 +64,8 @@ class CDTTController(Controller):
             str(self.config.jar.resolve()),
             self.session.barcode,
         )
+
+        self.logger.info("starting cdtt process")
 
         self.process.start()
 

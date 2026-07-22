@@ -28,12 +28,12 @@ class AudiometerPlugin(QObject):
 
         return output, errors
 
-    def get_results(self):
+    def get_results(self) -> tuple[str | None, str | None]:
         self._configure_plugin("get_results")
         self.process.start()
 
         if not self.process.waitForFinished():
-            return None, ["plugin did not finish"]
+            return None, "Hearcon plugin failed"
 
         output = str(self.process.readAllStandardOutput().toStdString())
         errors = str(self.process.readAllStandardError().toStdString())

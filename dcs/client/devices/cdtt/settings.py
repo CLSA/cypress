@@ -27,6 +27,6 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
-        DEVICE_NAME: {"handlers": ["console", "file_handler"], "level": LOG_LEVEL}
+        DEVICE_NAME: {"handlers": ["file_handler"], "level": LOG_LEVEL}
     },
 }

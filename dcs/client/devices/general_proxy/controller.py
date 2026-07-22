@@ -38,9 +38,11 @@ class GeneralProxyController(Controller):
 
     @override
     def start(self):
-        self.logger.debug("GeneralProxyController::start")
+        self.logger.info("clearing output directory")
 
         self._clear_results_dir()
+
+        self.logger.info("generating proxy form")
 
         generator = PDFGenerator(pdftk_exe_path=self.config.pdftk_executable)
         if not generator.prepare_form(
@@ -49,35 +51,38 @@ class GeneralProxyController(Controller):
             input_data={"enrollmentId": self.session.barcode},
             output_path=self.form_output_path,
         ):
-            self.logger.critical(
-                "GeneralProxyController::start - failed to generate proxy form"
-            )
             self.error.emit("Failed to generate proxy form")
             return False
 
         if not self.form_output_path.exists():
-            self.logger.critical(
-                "GeneralProxyController::start - failed to find generated proxy form"
-            )
             self.error.emit("Failed to find generated proxy form")
             return False
+
+        self.logger.info("preparing adobe")
 
         self.process.setProgram(str(self.config.adobe_executable.resolve()))
         self.process.setArguments([str(self.form_output_path.resolve())])
         self.process.setWorkingDirectory(str(self.config.adobe_working_dir.resolve()))
+
+
+        self.logger.info("starting adobe")
         self.process.start()
 
         return True
 
     @override
     def measure(self):
+        self.logger.info("reading pdf")
         if not self.model.read_results(self.form_output_path):
             self.error.emit("Something went wrong")
             return False
 
+        self.logger.info("checking for signature")
         if not self.model.has_signature():
             self.error.emit("The form was not signed")
             return False
+
+        self.logger.info("has signature")
 
         self.measured.emit(self.model.to_response())
 

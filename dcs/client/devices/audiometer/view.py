@@ -3,7 +3,7 @@ from typing import override
 from PySide6.QtCore import Signal
 
 
-from view import View
+from view import View, State
 
 from devices.audiometer.hearing_measurements import HearingMeasurementsWidget
 from devices.audiometer.session import AudiometerSession
@@ -27,6 +27,8 @@ class AudiometerView(View):
         )
 
         # Deleting default measure table to replace with widget below
+        self.session_widget.deviceStatusValue.setText("Hearcon")
+
         self.measurement_table_widget.deleteLater()
         self.measurement_form.set_enabled(False)
 
@@ -35,12 +37,7 @@ class AudiometerView(View):
         self.manual_entry_button.setEnabled(True)
 
         self.layout().addWidget(self.measurement_form)
-        self.resize(config.width, config.height)
-
-    @override
-    def resizeEvent(self, arg__1):
-        print(arg__1)
-        return super().resizeEvent(arg__1)
+        self.setFixedSize(560, 581)
 
     @override
     def _get_button_references(self):
@@ -66,3 +63,14 @@ class AudiometerView(View):
     def on_measured(self, output: dict):
         super().on_measured()
         self.measurement_form.set_values(output)
+
+    @override
+    def on_ready_to_measure(self):
+        self.session_widget.statusValue.setText("Waiting...")
+        self.measure_button.setEnabled(True)
+        self.state = State.READY_TO_MEASURE
+
+    @override
+    def on_submitted(self):
+        super().on_submitted()
+        self.measurement_form.setEnabled(False)

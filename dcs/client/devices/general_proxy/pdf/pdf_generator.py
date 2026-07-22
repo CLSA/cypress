@@ -57,7 +57,6 @@ class PDFGenerator:
             return False
 
         finally:
-            print("removing temp file")
             if fdf_temp_file:
                 fdf_temp_file.close()
                 Path(fdf_temp_file.name).unlink(missing_ok=True)

@@ -51,25 +51,30 @@ class AudiometerController(Controller):
         Return
 
         """
-        self.logger.debug(f"{self.class_name()}::start")
+        self.logger.info(f"starting")
 
         if is_process_running(self.config.process_name):
             self.error.emit(f"{self.config.process_name} is already open")
             return False
 
-        # Remove the app database and restore from clean backup
+        self.logger.info(f"restoring database")
+
         if not self._restore_database():
             self.error.emit(f"Could not restore database")
             return False
 
-        # Insert the participant information into the app database
+        self.logger.info(f"inserting participant")
+
         output, errors = self.plugin.initialize()
         if not output or len(errors):
             self.error.emit(f"Could not setup hearcon")
             return False
 
-        # Run the app
+        self.logger.info(f"preparing hearcon app")
+
         self._prepare_process()
+
+        self.logger.info(f"starting hearcon")
         self.process.start()
 
         return True
@@ -80,13 +85,14 @@ class AudiometerController(Controller):
         Retrieve the results from the app database and validate it, then inform the view with the data
 
         """
-        self.logger.debug(f"{self.class_name()}::measure")
+        self.logger.info("measuring")
+
         self._clean_output_dir()
 
         # Read the app database and parse the results
-        results, errors = self.plugin.get_results()
-        if not results or len(errors):
-            self.error.emit("Could not retrieve hearcon results")
+        results, error = self.plugin.get_results()
+        if not results or error:
+            self.error.emit(error)
             return False
 
         try:
@@ -94,8 +100,11 @@ class AudiometerController(Controller):
                 json_data = json.load(output_json_file)
                 self.model.parse_output_json(json_data)
                 self.measured.emit(self.model.to_response())
+        except FileNotFoundError:
+            self.logger.warning(f"{self.config.plugin_output_path} not found")
         except Exception as e:
-            print(e)
+            self.logger.critical(e)
+            self.error.emit("Something went wrong")
             return False
 
         return True

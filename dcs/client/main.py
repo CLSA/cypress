@@ -11,8 +11,6 @@ import datetime
 from typing import Annotated
 from enum import Enum
 
-from PySide6.QtWidgets import QApplication
-
 from fastapi import FastAPI, Path, HTTPException, Request
 from fastapi import BackgroundTasks
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
@@ -22,8 +20,6 @@ from settings import CYPRESS_VERSION, ALLOWED_HOSTS, LOGGING_CONFIG
 
 from config import config
 from session import Session
-
-from cypress_manager import CypressManagerWindow
 
 from device import Device
 
@@ -48,8 +44,6 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
 # The device currently opened
 current_session: dict[str, multiprocessing.Process] | None = None
 
-main_window: multiprocessing.Process | None = None
-
 
 class DeviceEndpoints(str, Enum):
     CRT = "choice_reaction_test"
@@ -69,7 +63,7 @@ class DeviceEndpoints(str, Enum):
     TON = "tonometer"
     SPIRO = "spirometer"
     WT = "weigh_scale"
-    GP = "general_proxy"
+    GP = "general_proxy_consent"
 
 
 devices: dict[DeviceEndpoints, Device] = {
@@ -102,22 +96,6 @@ async def monitor_session():
         await asyncio.sleep(1)
 
     current_session = None
-
-
-def start_cypress_manager():
-    main_process = multiprocessing.Process(target=cypress_manager)
-    main_process.start()
-
-
-def cypress_manager():
-    app = QApplication()
-
-    app.setQuitOnLastWindowClosed(False)
-
-    main_window = CypressManagerWindow()
-    main_window.show()
-
-    sys.exit(app.exec())
 
 
 def set_session(device: str, session: Session | None):
@@ -248,6 +226,14 @@ async def tonometer(
     return launch_device("tonometer", background_tasks, session)
 
 
+@app.post("/general_proxy_consent")
+async def general_proxy_consent(
+    background_tasks: BackgroundTasks, session: GeneralProxySession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("general_proxy_consent", background_tasks, session)
+
+
 @app.get("/{device}/status")
 async def get_status(device: DeviceEndpoints):
     if device.value not in devices:
@@ -334,7 +320,6 @@ def restart_app():
     time.sleep(1)
 
     os.kill(os.getpid(), signal.SIGINT)
-    os.kill(main_window.pid, signal.SIGINT)
 
 
 @app.post("/restart")
@@ -350,7 +335,6 @@ async def standalone(device: str, background_tasks: BackgroundTasks):
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()  # for ms windows to work
-    start_cypress_manager()
     uvicorn.run(
         app=app,
         host=config.host,
