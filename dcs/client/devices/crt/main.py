@@ -9,7 +9,6 @@ from devices.crt.model import CRTModel
 from devices.crt.settings import LOG_CONFIG
 
 
-
 class CRT(Device):
     logging_config = LOG_CONFIG
     config = CRTConfig

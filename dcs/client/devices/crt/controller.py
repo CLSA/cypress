@@ -32,39 +32,40 @@ class CRTController(Controller):
             detached=detached,
         )
 
-        self.start()
+        self.backup_paths = [
+            { "path": self.config.directory, "arcname": "ccb" }
+        ]
 
     @override
     def start(self) -> bool:
-        self.logger.debug("CRTController::start")
-
+        self.logger.info("starting")
         if is_process_running(self.config.process_name):
-            self.error.emit(f"{self.config.process_name} is already open, please close and try again")
+            self.logger.error("process is already running")
+            self._handle_error(f"{self.config.process_name} is already open, please close and try again")
             return False
 
-        self.logger.info("cleaning output directory")
-
+        self.logger.info("clearing output")
         if not self._clean_output_dir(self.config.output):
-            self.error.emit(f"Could not prepare device")
+            self._handle_error("Something went wrong", store_backup=True)
             return False
 
-        self.logger.info("preparing crt process")
-        self._prepare_process()
+        self.logger.info("preparing process")
+        if not self._prepare_process():
+            self._handle_error("Something went wrong", store_backup=True)
+            return False
 
-        self.logger.info("starting crt process")
+        self.logger.info("starting process")
         self.process.start()
 
         return True
 
     @override
     def measure(self):
-        self.logger.info("reading results")
+        self.logger.info("measure")
 
         if not self.model.read_results():
-            self.error.emit("Could not read results")
+            self._handle_error("Something went wrong", store_backup=True)
             return
-
-        self.logger.info("reading results")
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
 
@@ -72,46 +73,37 @@ class CRTController(Controller):
 
     @override
     def submit(self):
-        self.logger.debug("CRTController::submit")
+        self.logger.info("submit")
         return super().submit()
 
-    @override
-    def _on_process_started(self, *args):
-        self.logger.debug(f"CRTController::_on_process_started")
-        self.started.emit()
-
-    @override
-    def _on_process_finished(self, *args):
-        self.logger.debug(f"CRTController::_on_process_finished")
-        self.ready_to_measure.emit()
-
-    @override
-    def _on_process_destroyed(self, *args):
-        self.logger.debug(f"CRTController::_on_process_destroyed")
-        self.error.emit("")
-
-    @override
-    def _on_process_error(self, *args):
-        self.logger.debug(f"CRTController::_on_process_error")
-        self.error.emit("")
-
     def _clean_output_dir(self, output_dir: Path) -> bool:
-        self.logger.debug("CRTController::_clean_output_dir")
+        self.logger.debug("_clean_output_dir")
 
-        for path in output_dir.iterdir():
-            if path.is_file():
-                path.unlink(missing_ok=True)
+        try:
+            for path in output_dir.iterdir():
+                if path.is_file():
+                    path.unlink(missing_ok=True)
+
+        except Exception as e:
+            self.logger.critical(e)
+            return False
+
         return True
 
     def _prepare_process(self) -> None:
-        self.logger.debug("CRTController::_prepare_process")
+        self.logger.debug("_prepare_process")
 
-        self.process.setProgram(str(self.config.executable.resolve()))
-        self.process.setArguments(self._prepare_arguments())
-        self.process.setWorkingDirectory(str(self.config.directory.resolve()))
+        try:
+            self.process.setProgram(str(self.config.executable.resolve()))
+            self.process.setArguments(self._prepare_arguments())
+            self.process.setWorkingDirectory(str(self.config.directory.resolve()))
+        except Exception as e:
+            self.logger.critical(e)
+            return False
+        return True
 
     def _prepare_arguments(self) -> list[str]:
-        self.logger.debug("CRTController::_prepare_arguments")
+        self.logger.debug("_prepare_arguments")
 
         arguments = [
             f"/i{self.session.interviewer}",
@@ -121,15 +113,6 @@ class CRTController(Controller):
         ]
 
         self.logger.debug(arguments)
+
         return arguments
 
-    def _create_backup_tar(self) -> str | None:
-        try:
-            backup_path = Path("./config.tar.gz")
-            backup_path.unlink(missing_ok=True)
-            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
-                backup_tar.add(self.config.directory, arcname="ccb")
-            return str(backup_path.resolve())
-        except Exception as e:
-            self.logger.critical(e)
-            return None
