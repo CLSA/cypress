@@ -7,7 +7,7 @@ from pathlib import Path
 
 from session import Session
 
-from utils import get_file_size, get_file_info
+from utils import get_file_info
 
 from files.receiver import FileInfo
 
