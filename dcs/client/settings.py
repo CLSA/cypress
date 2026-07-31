@@ -37,6 +37,6 @@ LOGGING_CONFIG = {
         },
     },
     "loggers": {
-        "uvicorn": {"handlers": ["file_handler"], "level": LOG_LEVEL},
+        "uvicorn": {"handlers": ["file_handler", "console"], "level": LOG_LEVEL},
     },
 }
