@@ -69,10 +69,10 @@ class SpirometerController(Controller):
             )
         except FileNotFoundError as e:
             self.logger.critical(e)
-            self.error.emit("File not found")
+            self.error.emit("Results not found")
         except ValueError as e:
             self.logger.critical(e)
-            self.error.emit("File is invalid")
+            self.error.emit("Results are invalid")
         except Exception as e:
             self.error.emit("Unknown error")
             self.logger.critical(e)

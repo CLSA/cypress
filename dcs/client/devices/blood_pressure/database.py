@@ -90,21 +90,21 @@ class BPDatabase:
 
         if not query.exec():
             logger.critical(f"exec: {query.lastError().text()}")
-            return None
+            return False, None
 
         if query.size() > 1:
             logger.critical(
                 f"query returned multiple patient keys for barcode {barcode}"
             )
-            return None
+            return False, None
 
         if not query.first():
             logger.error(f"no records for barcode {barcode}")
-            return None
+            return False, None
 
-        return query.record().value(0)
+        return True, query.record().value(0)
 
-    def get_measurements(self, patient_key: int):
+    def get_measurements(self, patient_key: int) -> tuple[bool, list[dict]]:
         ###
         # SELECT * FROM data WHERE ID = barcode;
         ###
@@ -119,7 +119,7 @@ class BPDatabase:
 
         if not query.exec():
             logger.critical(query.lastError().text())
-            return None
+            return False, []
 
         while query.next():
             row = {}
@@ -129,45 +129,4 @@ class BPDatabase:
 
             results.append(row)
 
-        return results
-
-
-if __name__ == "__main__":
-    app = QCoreApplication()
-
-    print(Path.cwd())
-    db = BPDatabase(Path(Path.cwd() / "devices/blood_pressure/tests/DataBase.db"))
-
-    try:
-        if db.open():
-            # inserted, patient_id = db.insert_patient("", "", "", "", "")
-            # if not inserted:
-            #    print("not inserted")
-            # elif patient_id:
-            #    print(patient_id)
-            # else:
-            #    print("no key")
-
-            # patient_key, error = db.get_patient_key("00000000")
-            # if not patient_key or error:
-            #     print(error)
-            # data = db.get_measurements("")
-            # if data:
-            #    print(data)
-            # else:
-            #    print("oops")
-            patient_key = db.get_patient_key(barcode="")
-            if patient_key is not None:
-                print(patient_key)
-
-            records = db.get_measurements(patient_key=patient_key)
-
-            for row in records:
-                print(row)
-        else:
-            print("error")
-
-    except Exception as e:
-        print(e)
-    finally:
-        db.close()
+        return True, results

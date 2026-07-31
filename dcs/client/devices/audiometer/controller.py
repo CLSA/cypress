@@ -1,5 +1,4 @@
 import json
-import tarfile
 
 from pathlib import Path
 from typing import override
@@ -35,6 +34,11 @@ class AudiometerController(Controller):
         self.plugin = AudiometerPlugin(session=self.session, config=self.config)
         self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
 
+        self.backup_paths = [
+            { "path": Path("C:/ProgramData/Ra660/"), "arcname": "Ra660" },
+            { "path": self.config.plugin_output_path, "arcname": "output.json" },
+        ]
+
     def handle_manual_entry(self, data_received: dict):
         self.model.set_manual_values(data_received)
         #self.measured.emit(self.model.to_response())
@@ -52,29 +56,27 @@ class AudiometerController(Controller):
 
         """
         self.logger.info(f"starting")
-
         if is_process_running(self.config.process_name):
-            self.error.emit(f"{self.config.process_name} is already open")
+            self.logger.error(f"{self.config.process_name} is already open")
+            self._handle_error(f"HearCon is already open, please close and try again")
             return False
 
         self.logger.info(f"restoring database")
-
         if not self._restore_database():
-            self.error.emit(f"Could not restore database")
+            self._handle_error("Something went wrong", store_backup=True)
             return False
 
         self.logger.info(f"inserting participant")
-
         output, errors = self.plugin.initialize()
         if not output or len(errors):
-            self.error.emit(f"Could not setup hearcon")
+            self.logger.error(errors)
+            self._handle_error(f"Something went wrong", store_backup=True)
             return False
 
-        self.logger.info(f"preparing hearcon app")
-
+        self.logger.info(f"preparing process")
         self._prepare_process()
 
-        self.logger.info(f"starting hearcon")
+        self.logger.info(f"starting process")
         self.process.start()
 
         return True
@@ -87,35 +89,45 @@ class AudiometerController(Controller):
         """
         self.logger.info("measuring")
 
-        self._clean_output_dir()
+        if not self._clean_output_dir():
+            self.logger.error("failed to clean output directory")
+            self._handle_error("Could not read results", store_backup=True)
 
         # Read the app database and parse the results
         results, error = self.plugin.get_results()
         if not results or error:
-            self.error.emit(error)
+            self.logger.error(error)
+            self._handle_error("Could not read database", store_backup=True)
             return False
 
         try:
-            with open(Path(self.config.plugin_output_path), "r") as output_json_file:
+            with open(self.config.plugin_output_path, "r") as output_json_file:
                 json_data = json.load(output_json_file)
                 self.model.parse_output_json(json_data)
                 self.measured.emit(self.model.to_response())
         except FileNotFoundError:
-            self.logger.warning(f"{self.config.plugin_output_path} not found")
+            self.logger.error("results file not found")
+            self._handle_error(f"Results file not found", store_backup=True)
         except Exception as e:
             self.logger.critical(e)
-            self.error.emit("Something went wrong")
+            self._handle_error("Something went wrong", store_backup=True)
             return False
 
         return True
 
-    def _clean_output_dir(self) -> None:
+    def _clean_output_dir(self) -> bool:
         """
         Remove the output file that gets generated from the plugin
 
         """
-        self.logger.debug(f"{self.class_name()}::_clean_output_dir")
-        self.config.plugin_output_path.unlink(missing_ok=True)
+        self.logger.debug("_clean_output_dir")
+
+        try:
+            self.config.plugin_output_path.unlink(missing_ok=True)
+            return True
+        except Exception as e:
+            self.logger.critical(e)
+            return False
 
     def _restore_database(self) -> bool:
         """
@@ -124,11 +136,14 @@ class AudiometerController(Controller):
         Returns whether the operation was successful
 
         """
-        self.logger.debug(f"{self.class_name()}::_restore_database")
+        self.logger.debug("_restore_database")
 
-        self.config.existing_database_path.unlink(missing_ok=True)
-        self.config.backup_database_path.copy(self.config.existing_database_path)
-
+        try:
+            self.config.existing_database_path.unlink(missing_ok=True)
+            self.config.backup_database_path.copy(self.config.existing_database_path)
+        except Exception as e:
+            self.logger.critical(e)
+            return False
         return True
 
     def _prepare_process(self) -> None:
@@ -136,22 +151,8 @@ class AudiometerController(Controller):
         Configures QProcess that handles the Hearcon app
 
         """
-        self.logger.debug(f"{self.class_name()}::_prepare_process")
+        self.logger.debug("_prepare_process")
 
         self.process.setProgram(str(self.config.process_path.resolve()))
         self.process.setArguments([])
         self.process.setWorkingDirectory(str(self.config.working_path.resolve()))
-
-
-    def _create_backup_tar(self) -> str | None:
-        try:
-            backup_path = Path("./audiometer_backup.tar.gz")
-            backup_path.unlink(missing_ok=True)
-            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
-                backup_tar.add("C:/ProgramData/Ra660", arcname="Ra660")
-                backup_tar.add(self.config.plugin_working_directory, arcname="plugin")
-            return str(backup_path.resolve())
-        except Exception as e:
-            self.logger.critical(e)
-            return None
-

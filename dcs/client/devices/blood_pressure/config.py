@@ -21,6 +21,6 @@ class BPConfig(DeviceConfig):
 
     directory: Annotated[DirectoryPath, Field(frozen=True)]
 
-    database_path: Annotated[FilePath, Field(frozen=True)]
+    database: Annotated[FilePath, Field(frozen=True)]
 
-    backup_database_path: Annotated[FilePath, Field(frozen=True)]
+    backup_database: Annotated[FilePath, Field(frozen=True)]

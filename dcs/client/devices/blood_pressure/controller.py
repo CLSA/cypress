@@ -32,30 +32,47 @@ class BPController(Controller):
             view=view,
             detached=detached,
         )
-        self.logger.debug("BPController::__init__")
 
-        self.db = BPDatabase(self.config.database_path)
-        self.view.measurement_table_widget.measureButton.setVisible(True)
+        self.db = BPDatabase(self.config.database)
+
+        self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
+
+        self.backup_paths = [
+            {"path": "C:/Microlife", "arcname": "Microlife"}
+        ]
 
     @override
     def start(self) -> bool:
-        self.logger.debug("BPController::start")
+        self.logger.info("start")
 
         try:
-            if not self.db.open():
-                self.error.emit("Failed to open database")
+            if not self._restore_database():
+                self._handle_error("Something went wrong", store_backup=True)
                 return False
 
-            self.patient_key = self.db.insert_patient(
-                "Participant",
-                self.session.barcode,
-                self.session.sex,
-                self.session.dob,
-                "CLSA",
-            )
-        except:
+            if not self.db.open():
+                self._handle_error("Something went wrong", store_backup=True)
+                return False
+
+            # success, patient_key = self.db.insert_patient(
+            #     name="Participant",
+            #     barcode=self.session.barcode,
+            #     gender=self.session.sex,
+            #     dob=self.session.dob,
+            #     physician="CLSA",
+            # )
+
+            # if not success:
+            #     self.error.emit("Failed to initialize database")
+            #     return False
+
+            self.patient_key = 6
+
+        except Exception as e:
+            self.logger.error(e)
             self.error.emit("Failed to load results")
             return False
+
         finally:
             self.db.close()
 
@@ -64,35 +81,62 @@ class BPController(Controller):
 
     @override
     def measure(self):
-        self.logger.debug("BPController::measure")
+        self.logger.info("measure")
+
         try:
             if not self.db.open():
-                self.error.emit("Failed to open database")
+                self._handle_error(store_backup=True)
                 return False
 
-            self.raw_results = self.db.get_measurements(patient_key=self.patient_key)
-            self.model.read_results(self.raw_results)
-        except:
-            self.error.emit("Failed to load results")
+            if not self.patient_key:
+                self.logger.error("no patient key found")
+                self._handle_error(store_backup=True)
+                return False
+
+            success, records = self.db.get_measurements(patient_key=self.patient_key)
+            if not success:
+                self._handle_error(store_backup=True)
+                return False
+
+            success, error = self.model.read_results(records)
+            if not success:
+                self.logger.error(error)
+                self._handle_error(store_backup=True)
+                return False
+
+        except Exception as e:
+            self.logger.critical(e)
+            self._handle_error(store_backup=True)
             return False
         finally:
             self.db.close()
 
         self.measured.emit(self.model.to_response())
 
-    def _prepare_process(self) -> None:
-        self.logger.debug("BPController::_prepare_process")
+    def handle_manual_entry(self, data_received: dict):
+        self.logger.info("manual entry")
+        self.model.set_manual_values(data_received)
 
-        self.process.setProgram(str(self.config.executable.resolve()))
-        self.process.setWorkingDirectory(str(self.config.directory.resolve()))
+    def _restore_database(self):
+        self.logger.debug("_restore_database")
 
-    def _create_backup_tar(self) -> str | None:
         try:
-            backup_path = Path("./config.tar.gz")
-            backup_path.unlink(missing_ok=True)
-            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
-                backup_tar.add("C:/Microlife")
-            return str(backup_path.resolve())
+            self.config.database.unlink(missing_ok=True)
+            self.config.backup_database.copy(self.config.database)
         except Exception as e:
             self.logger.critical(e)
-            return None
+            return False
+
+        return True
+
+    def _prepare_process(self) -> None:
+        self.logger.debug("_prepare_process")
+
+        try:
+            self.process.setProgram(str(self.config.executable.resolve()))
+            self.process.setWorkingDirectory(str(self.config.directory.resolve()))
+        except Exception as e:
+            self.logger.critical(e)
+            return False
+
+        return True

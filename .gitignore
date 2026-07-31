@@ -15,6 +15,10 @@ build
 *.zip
 *.xml
 *.pdf
+*.xlsx
+*.tar
+*.tar.gz
+*.PX
 
 #output
 env

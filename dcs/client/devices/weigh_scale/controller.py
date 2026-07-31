@@ -1,3 +1,4 @@
+from PySide6.QtCore import Signal
 from PySide6.QtSerialPort import QSerialPort, QSerialPortInfo
 
 from controller import Controller
@@ -9,6 +10,8 @@ from devices.weigh_scale.view import WeighScaleView
 
 
 class WeighScaleController(Controller):
+    devices_scanned = Signal()
+
     def __init__(
         self,
         session: WeighScaleSession,
@@ -37,8 +40,24 @@ class WeighScaleController(Controller):
             pass
             #print(port_info.portName(), port_info.)
 
-    def _select_device(self, port_info: QSerialPortInfo):
+    def _device_selected(self, port_info: QSerialPortInfo):
         self.device_selected = port_info
+
+    def _connect_device(self):
+        pass
+
+    def _disconnect_device(self):
+        pass
+
+    def _read_device(self):
+        pass
+
+    def _write_device(self):
+        pass
+
+
+
+
 
 
 

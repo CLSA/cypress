@@ -26,9 +26,9 @@ class AudiometerView(View):
             parent=parent, session=session, config=config, detached=detached
         )
 
-        # Deleting default measure table to replace with widget below
-        self.session_widget.deviceStatusValue.setText("Hearcon")
+        self.session_widget.deviceStatusValue.setText("Audiometer")
 
+        # Deleting default measure table to replace with widget below
         self.measurement_table_widget.deleteLater()
         self.measurement_form.set_enabled(False)
 

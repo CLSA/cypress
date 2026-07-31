@@ -1,9 +1,17 @@
 import pydicom
 
 from typing import Literal, List, Any
+from enum import Enum
+
 from pydantic import BaseModel, Field, ValidationError
+
 import pydicom
 
+
+class Side(Enum):
+    LEFT = 0
+    RIGHT = 1
+    BOTH = 2
 
 ###
 #  These are the key/value pairs that are expected to be found in the DICOM files metadata

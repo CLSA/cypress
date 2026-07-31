@@ -26,7 +26,7 @@ class DXASession(Session):
     include_lfa: bool = False
     include_rfa: bool = False
     include_spine: bool = False
-    include_whole_body: bool = False
+    include_wholebody: bool = False
 
 
 class DXASessionDialog(SessionDialog):
@@ -106,6 +106,6 @@ class DXASessionDialog(SessionDialog):
             "include_lfa": self.include_lfa.isChecked(),
             "include_rfa": self.include_rfa.isChecked(),
             "include_spine": self.include_spine.isChecked(),
-            "include_whole_body": self.include_whole_body.isChecked(),
+            "include_wholebody": self.include_whole_body.isChecked(),
         }
         return session_values | dxa_values

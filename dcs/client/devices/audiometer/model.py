@@ -37,14 +37,14 @@ class AudiometerModel(Model):
         super().__init__(session=session, config=config)
 
     def is_valid(self) -> bool:
-        logger.debug(f"{self.class_name()}::is_valid")
+        logger.debug(f"is_valid")
+
         if len(self.results) < 14:
             return False
 
         return True
 
     def parse_output_json(self, output_json: dict) -> bool:
-        logger.debug(f"{self.class_name()}::read_output")
         self.reset()
 
         logger.debug(json.dumps(output_json, indent=4))
@@ -93,7 +93,7 @@ class AudiometerModel(Model):
             }
         }
         """
-        logger.debug(f"{self.class_name()}::set_manual_entry")
+        logger.debug(f"set_manual_entry")
         self.reset()
 
         self.manual_entry = True
@@ -118,7 +118,7 @@ class AudiometerModel(Model):
 
     @override
     def to_response(self):
-        response = deepcopy(super().to_response())
+        response = super().to_response()
 
         results = deepcopy(response["value"]["results"])
 

@@ -41,7 +41,6 @@ class AudiometerPlugin(QObject):
         return output, errors
 
     def _configure_plugin(self, operation="initialize"):
-
         barcode = self.session.barcode
         dob = self.session.dob
         sex = self.session.sex[0].upper()

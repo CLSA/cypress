@@ -17,7 +17,7 @@ from devices.dxa.config import DXAConfig
 from devices.dxa.model import DXAModel
 from devices.dxa.view import DXAView
 
-from devices.dxa.utils.apex import ApexDatabaseReader
+#from devices.dxa.utils.apex import ApexDatabaseReader
 
 from files.receiver import DicomReceiver, DicomReceiverConfig
 

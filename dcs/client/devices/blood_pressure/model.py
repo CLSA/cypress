@@ -1,131 +1,120 @@
-import traceback
-import json
-
 from typing import override
-from pathlib import Path
-
-from PySide6.QtCore import QCoreApplication
 
 from model import Model
+from measure import Record
 
 from devices.blood_pressure.session import BPSession
 from devices.blood_pressure.config import BPConfig
-from devices.blood_pressure.database import BPDatabase
 
 
-class Trial:
-    def __init__(self, db_row):
-        self._parse_db_row(db_row)
-
-    def _parse_db_row(self, db_row):
-        res = {}
-
-        for key, value in db_row.items():
-            if key == "SYS":
-                res["systolic"] = {"value": value, "units": "mmHg"}
-            elif key == "DIA":
-                res["diastolic"] = {"value": value, "units": "mmHg"}
-            elif key == "HR":
-                res["pulse"] = {"value": value, "units": "bpm"}
-            elif key == "Spare7":
-                res["reading_number"] = value
-
-            res[key] = value
-
-        self.data = res
-
-    def get_reading_number(self):
-        return self.data["reading_number"]
-
-    def get_systolic(self):
-        return self.data["systolic"]
-
-    def get_diastolic(self):
-        return self.data["diastolic"]
-
-    def get_pulse(self):
-        return self.data["pulse"]
-
-    def get_start_time(self):
-        pass
-
-    def get_end_time(self):
-        pass
-
-    def to_dict(self):
-        return self.__dict__()
-
-    def __dict__(self):
-        return {**self.data}
+class BPMeasurement(Record):
+    field_map = {
+        "SYS": {"attr": "systolic", "data_type": int, "units": "mmHg"},
+        "DIA": {"attr": "diastolic", "data_type": int, "units": "mmHg"},
+        "HR": {"attr": "pulse", "data_type": int, "units": "bpm"},
+        "Spare7": {"attr": "reading_number", "data_type": int, "units": None},
+    }
 
 
-class Test:
-    def __init__(self, trials: list[Trial]):
-        self.trials = trials
+class BPTest:
+    def __init__(self, measures: list[BPMeasurement]):
+        self.measures = measures
 
-    def get_average(self) -> dict | None:
-        avg_count = len(self.trials) - 1
-        if avg_count < 1:
-            return None
+    def get_average(self) -> dict:
+        n = len(self.measures) - 1
+        if n < 1:
+            return {}
 
-        avg_systolic = 0
-        avg_diastolic = 0
-        avg_pulse = 0
+        systolic_sum = 0
+        diastolic_sum = 0
+        pulse_sum = 0
 
-        for trial in self.trials[1:]:
-            avg_systolic += trial.get_systolic()["value"] / avg_count
-            avg_diastolic += trial.get_diastolic()["value"] / avg_count
-            avg_pulse += trial.get_pulse()["value"] / avg_count
+        for measure in self.measures[1:]:
+            systolic_sum += measure.systolic["value"]
+            diastolic_sum += measure.diastolic["value"]
+            pulse_sum += measure.pulse["value"]
+
+        avg_systolic = systolic_sum / n
+        avg_diastolic = diastolic_sum / n
+        avg_pulse = pulse_sum / n
 
         return {
-            "avg_count": avg_count,
-            "avg_systolic": { "value": avg_systolic, "units": "mmHg" },
-            "avg_diastolic": { "value": avg_diastolic, "units": "mmHg" },
-            "avg_pulse": { "value": avg_pulse, "units": "bpm" }
+            "avg_count": n,
+            "avg_systolic": {"value": avg_systolic, "units": "mmHg"},
+            "avg_diastolic": {"value": avg_diastolic, "units": "mmHg"},
+            "avg_pulse": {"value": avg_pulse, "units": "bpm"},
         }
 
     def get_total_average(self) -> dict:
-        avg_count = len(self.trials)
+        n = len(self.measures)
+        if n < 1:
+            return {}
 
-        avg_systolic = 0
-        avg_diastolic = 0
-        avg_pulse = 0
+        systolic_sum = 0
+        diastolic_sum = 0
+        pulse_sum = 0
 
-        for trial in self.trials[1:]:
-            avg_systolic += trial.get_systolic()["value"] / avg_count
-            avg_diastolic += trial.get_diastolic()["value"] / avg_count
-            avg_pulse += trial.get_pulse()["value"] / avg_count
+        for measure in self.measures:
+            systolic_sum += measure.systolic["value"]
+            diastolic_sum += measure.diastolic["value"]
+            pulse_sum += measure.pulse["value"]
+
+        avg_systolic = systolic_sum / n
+        avg_diastolic = diastolic_sum / n
+        avg_pulse = pulse_sum / n
 
         return {
-            "total_avg_count": avg_count,
-            "total_avg_systolic": { "value": avg_systolic, "units": "mmHg" },
-            "total_avg_diastolic": { "value": avg_diastolic, "units": "mmHg" },
-            "total_avg_pulse": { "value": avg_pulse, "units": "bpm" }
+            "total_avg_count": n,
+            "total_avg_systolic": {"value": avg_systolic, "units": "mmHg"},
+            "total_avg_diastolic": {"value": avg_diastolic, "units": "mmHg"},
+            "total_avg_pulse": {"value": avg_pulse, "units": "bpm"},
         }
 
     def get_first(self) -> dict:
         return {
-            "first_systolic": self.trials[0].get_systolic(),
-            "first_diastolic": self.trials[0].get_diastolic(),
-            "first_pulse": self.trials[0].get_pulse(),
-            "first_end_time": self.trials[0].get_start_time(),
-            "first_start_time": self.trials[0].get_end_time(),
+            "first_systolic": self.measures[0].systolic,
+            "first_diastolic": self.measures[0].diastolic,
+            "first_pulse": self.measures[0].pulse,
+            # "first_end_time": self.measures[0].start_time,
+            # "first_start_time": self.measures[0].end_time,
         }
+
+    @override
+    def to_dict(self):
+        return {**self.get_first(), **self.get_average(), **self.get_total_average()}
 
 
 class BPModel(Model):
     def __init__(self, session: BPSession, config: BPConfig):
         super().__init__(session, config)
 
-    def read_results(self, db_rows) -> None:
+    def read_results(self, db_rows) -> tuple[bool, str | None]:
         self.reset()
 
-        trials = []
-
+        measures = []
         for db_row in db_rows:
-            trials.append(Trial(db_row))
+            measures.append(BPMeasurement(db_row))
 
-        self.test = Test(trials=trials)
+        self.test = BPTest(measures=measures)
+
+        return True, None
+
+    def set_manual_values(self, data_received: list[dict]):
+        self.reset()
+
+        self.manual_entry = True
+
+        measures = []
+        for manual_measure in data_received:
+            measures.append(BPMeasurement(manual_measure))
+
+        self.test = BPTest(measures=measures)
+
+    @override
+    def reset(self):
+        super().reset()
+        self.test = None
+        self.manual_entry = False
 
     @override
     def to_response(self) -> dict:
@@ -133,33 +122,8 @@ class BPModel(Model):
             return None
 
         res = super().to_response()
-        res["value"]["metadata"] = {
-            **self.test.get_first(),
-            **self.test.get_average(),
-            **self.test.get_total_average(),
-        }
 
-        res["value"]["results"] = [trial.to_dict() for trial in self.test.trials]
+        res["value"]["metadata"] = self.test.to_dict()
+        res["value"]["results"] = [measure.to_dict() for measure in self.test.measures]
 
         return res
-
-
-if __name__ == "__main__":
-    app = QCoreApplication()
-
-    model = BPModel(session=None, config=None)
-
-    db = BPDatabase(Path(Path.cwd() / "devices/blood_pressure/tests/DataBase.db"))
-
-    try:
-        if db.open():
-            records = db.get_measurements(patient_key=6)
-            model.read_results(records)
-
-            print(json.dumps(model.to_response(), indent=4))
-    except Exception as e:
-        print(e)
-        print(traceback.print_exc())
-        pass
-    finally:
-        db.close()
