@@ -1,0 +1,14 @@
+pyinstaller main.py `
+--name "cypress" `
+--paths="." `
+--icon=favicon.ico `
+--add-data="favicon.ico:favicon.ico" `
+--hidden-import=uvicorn `
+--hidden-import=fastapi `
+--hidden-import=server `
+--hidden-import=config `
+--hidden-import=routes `
+--collect-submodules=server `
+--hidden-import=settings `
+--noconsole `
+--onefile
