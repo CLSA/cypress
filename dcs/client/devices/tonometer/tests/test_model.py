@@ -18,7 +18,7 @@ class TestTonometerModel(unittest.TestCase):
 
         self.session = TonometerSession(
             **{
-                "barcode": "50012116",
+                "barcode": "12345678",
                 "uid": "00000000",
                 "answer_id": 1,
                 "interviewer": "test",
@@ -37,6 +37,9 @@ class TestTonometerModel(unittest.TestCase):
 
 
     def test_read_results(self):
-        self.assertTrue(self.model.read_results())
+        success, error = self.model.read_results()
+        print(error)
+        self.assertTrue(success)
+        self.assertIsNone(error)
 
         print(json.dumps(self.model.to_response(), indent=4))

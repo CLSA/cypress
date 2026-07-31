@@ -13,6 +13,8 @@ class TonometerConfig(DeviceConfig):
 
     executable: Annotated[FilePath, Field(frozen=True), AfterValidator(is_executable)]
 
+    working_directory: Annotated[DirectoryPath, Field(frozen=True)]
+
     directory: Annotated[DirectoryPath, Field(frozen=True)]
 
     database: Annotated[FilePath, Field(frozen=True)]

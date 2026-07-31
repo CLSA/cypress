@@ -25,7 +25,6 @@ class TonometerDatabase:
             + str(db_path.resolve())
         )
 
-    # Attempt to open database, return 0 if
     def open(self) -> bool:
         if not self.db.open():
             logger.critical(self.db.lastError().text())
@@ -35,9 +34,8 @@ class TonometerDatabase:
     def close(self):
         self.db.close()
 
-    def insert_participant(self, session: TonometerSession):
-        query: QSqlQuery = QSqlQuery()
-
+    def insert_participant(self, session: TonometerSession) -> tuple[bool, str | None]:
+        query: QSqlQuery = QSqlQuery(self.db)
         query.prepare(
             "INSERT INTO Patients "
             "( Name, BirthDate, Sex, GroupID, ID, RaceID ) "
@@ -51,49 +49,77 @@ class TonometerDatabase:
         query.bindValue(":raceId", 1)
 
         if not query.exec():
-            print(query.lastError().text())
-            return False
+            logger.error(query.lastError().text())
+            return False, "could not initialize database"
 
-        return True
+        return True, None
 
-    def get_patient_id(self, barcode):
-        query: QSqlQuery = QSqlQuery()
+    def get_patient_id(self, barcode) -> tuple[bool, int]:
+        query: QSqlQuery = QSqlQuery(self.db)
 
         query.prepare("SELECT PatientID from Patients WHERE ID = :id")
         query.bindValue(":id", int(barcode))
 
         if not query.exec():
             logger.error(query.lastError().text())
-            return None
+            return False, "unable to execute query"
 
         if query.size() > 1:
-            logger.error(f"More than one patient found with ID {barcode}")
-            return None
+            logger.error(f"{query.size()} results found")
+            return False, "more than one patient found"
 
         if not query.first():
             logger.error(query.lastError().text())
-            return None
+            return False, "no results found"
 
-        return query.record().value(0)
+        return True, int(query.record().value(0))
 
-    def get_measures(self, patient_id: int, eye: Literal["L", "R"]) -> dict | None:
-        query: QSqlQuery = QSqlQuery()
+    def get_participant(self, barcode) -> tuple[bool, dict | str]:
+        query: QSqlQuery = QSqlQuery(self.db)
+
+        query.prepare("SELECT * from Patients WHERE ID = :id")
+        query.bindValue(":id", int(barcode))
+
+        if not query.exec():
+            logger.error(query.lastError().text())
+            return False, "unable load results from database"
+
+        if query.size() > 1:
+            logger.error(f"{query.size()} results found")
+            return False, "more than one patient found"
+
+        if not query.first():
+            logger.error(query.lastError().text())
+            return False, "no results found"
+
+        record = query.record()
+
+        participant = {}
+
+        for i in range(record.count()):
+            field_name = record.fieldName(i)
+            field_value = record.value(field_name)
+
+            if type(field_value) == QDateTime:
+                participant[field_name.lower()] = field_value.toString(Qt.DateFormat.ISODate)
+            else:
+                participant[field_name.lower()] = field_value
+
+        return True, participant
+
+    def get_measures(self, patient_id: int) -> tuple[bool, list[dict] | str]:
+        query: QSqlQuery = QSqlQuery(self.db)
 
         query.prepare(
-            "SELECT * from Measures where Eye = :eye AND PatientID ORDER BY MeasureDate DESC"
+            "SELECT * from Measures WHERE PatientID = :patient_id ORDER BY MeasureID ASC"
         )
-        query.bindValue(":eye", eye)
         query.bindValue(":patient_id", patient_id)
 
         measurements = []
 
         if not query.exec():
             logger.error(query.lastError().text())
-            return None
-
-        if not query.last():
-            logger.error(f"No {eye} measures found for {str(patient_id)}")
-            return None
+            return False, "could not retrieve measurements"
 
         while query.next():
             record = query.record()
@@ -111,4 +137,4 @@ class TonometerDatabase:
 
             measurements.append(measure)
 
-        return measurements
+        return True, measurements

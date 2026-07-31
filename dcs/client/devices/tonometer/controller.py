@@ -12,6 +12,7 @@ from devices.tonometer.model import TonometerModel
 from devices.tonometer.view import TonometerView
 from devices.tonometer.database import TonometerDatabase
 
+
 class TonometerController(Controller):
     def __init__(
         self,
@@ -31,43 +32,57 @@ class TonometerController(Controller):
             detached=detached,
         )
 
+        self.backup_paths = [
+            {"path": self.config.directory, "arcname": "ORAG3"},
+        ]
+
     @override
     def start(self):
-        self.logger.debug(f"{self.class_name()}.start()")
-
+        self.logger.info("start")
         if is_process_running(self.config.process_name):
-            self.error.emit(f"{self.config.process_name} already running")
+            self._show_message_box(
+                title="Tonometer already running",
+                msg=f"{self.config.process_name} already running, please close the app and try again",
+                level="warning",
+            )
             return False
 
+        self.logger.info(f"restoring")
         if not self._restore_database():
-            self.error.emit(f"Could not restore database")
+            self._handle_error(f"Could not restore database", store_backup=True)
             return False
 
+        self.logger.info(f"initializing db")
         if not self._insert_participant():
-            self.error.emit(f"Could not setup database")
+            self._handle_error(f"Could not setup database", store_backup=True)
             return False
 
+        self.logger.info(f"preparing db")
         self._prepare_process()
+
+        self.logger.info(f"starting process")
         self.process.start()
 
     @override
     def measure(self):
-        self.logger.debug(f"{self.class_name()}.measure()")
+        self.logger.info(f"measure")
 
-        if not self.model.read_results():
-            self.error.emit(f"Failed to read results")
+        success, error = self.model.read_results()
+        if not success:
+            self.logger.error(error)
+            self._handle_error(error.capitalize(), store_backup=True)
             return False
 
         response = self.model.to_response()
 
         self.logger.debug(json.dumps(response, indent=4))
-        print(json.dumps(response, indent=4))
+
         self.measured.emit(response)
 
         return True
 
     def _restore_database(self) -> bool:
-        self.logger.debug(f"{self.class_name()}._restore_database()")
+        self.logger.debug("_restore_database")
 
         try:
             self.config.database.unlink(missing_ok=True)
@@ -79,23 +94,28 @@ class TonometerController(Controller):
         return True
 
     def _insert_participant(self) -> bool:
-        self.logger.debug(f"{self.class_name()}._insert_participant()")
+        self.logger.debug(f"_insert_participant")
 
         try:
             database = TonometerDatabase(self.config.database)
-            if database.open():
-                inserted = database.insert_participant(self.session)
-                return inserted
-            else:
+            if not database.open():
                 return False
+
+            success, error = database.insert_participant(self.session)
+            if not success:
+                self.logger.critical(error)
+                return False
+            return True
+
         except Exception as e:
             self.logger.critical(e)
             return False
+
         finally:
             database.close()
 
     def _prepare_process(self):
-        self.logger.debug(f"{self.class_name()}._prepare_process()")
+        self.logger.debug("_prepare_process")
 
         self.process.setProgram(str(self.config.executable.resolve()))
-        self.process.setWorkingDirectory(str(self.config.directory.resolve()))
+        self.process.setWorkingDirectory(str(self.config.working_directory.resolve()))

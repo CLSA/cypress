@@ -1,6 +1,8 @@
 import unittest
 import json
 
+from pathlib import Path
+
 from PySide6.QtCore import QCoreApplication
 
 from devices.tonometer.config import TonometerConfig
@@ -9,12 +11,15 @@ from devices.tonometer.database import TonometerDatabase
 
 
 class TestTonometerDB(unittest.TestCase):
-    config, errors = TonometerConfig.from_ini()
+
     app = QCoreApplication()
 
     def setUp(self):
-        self.config.database.unlink(missing_ok=True)
-        self.config.backup_database.copy(self.config.database)
+        self.database_path = Path(__file__).parent / "ora.mdb"
+        self.backup_path = Path(__file__).parent / "fixtures" / "ora.mdb"
+
+        self.database_path.unlink(missing_ok=True)
+        self.backup_path.copy(self.database_path)
 
         self.session = TonometerSession(
             **{
@@ -34,7 +39,7 @@ class TestTonometerDB(unittest.TestCase):
         pass
 
     def test_insert_participant(self):
-        database = TonometerDatabase(self.config.database)
+        database = TonometerDatabase(self.database_path)
 
         try:
             self.assertTrue(database.open())
@@ -47,22 +52,25 @@ class TestTonometerDB(unittest.TestCase):
             database.close()
 
     def test_get_left_measures(self):
-        database = TonometerDatabase(self.config.database)
+        database = TonometerDatabase(self.database_path)
 
         try:
             self.assertTrue(database.open())
 
-            inserted = database.insert_participant(self.session)
-            self.assertTrue(inserted)
-            self.assertEqual(type(inserted), bool)
+            result, error = database.insert_participant(self.session)
+            self.assertTrue(result)
+            self.assertIsNone(error)
+            self.assertEqual(type(result), bool)
 
-            patient_id = database.get_patient_id(barcode=self.session.barcode)
+            success, result = database.get_patient_id(barcode="12345678")
+            self.assertTrue(success)
+            self.assertEqual(type(result), int)
 
-            self.assertIsNotNone(patient_id)
-            self.assertEqual(type(patient_id), int)
+            success, result = database.get_measures(result, eye="L")
+            self.assertTrue(success)
+            self.assertEqual(type(result), list)
 
-            left_eye_measures = database.get_measures(patient_id, eye="L")
-            print(json.dumps(left_eye_measures, indent=4))
+            print(json.dumps(result, indent=4))
 
         except Exception as e:
             print(e)
@@ -71,26 +79,28 @@ class TestTonometerDB(unittest.TestCase):
             database.close()
 
     def test_get_right_measures(self):
-        database = TonometerDatabase(self.config.database)
+        database = TonometerDatabase(self.database_path)
 
         try:
             self.assertTrue(database.open())
 
-            inserted = database.insert_participant(self.session)
-            self.assertTrue(inserted)
-            self.assertEqual(type(inserted), bool)
+            success, error = database.insert_participant(self.session)
+            self.assertTrue(success)
+            self.assertIsNone(error)
+            self.assertEqual(type(success), bool)
 
-            patient_id = database.get_patient_id(barcode=self.session.barcode)
+            success, result = database.get_patient_id(barcode="12345678")
+            self.assertTrue(success)
+            self.assertEqual(type(result), int)
 
-            self.assertIsNotNone(patient_id)
-            self.assertEqual(type(patient_id), int)
+            success, result = database.get_measures(result, eye="R")
+            self.assertTrue(success)
+            self.assertEqual(type(result), list)
 
-            right_eye_measures = database.get_measures(patient_id, eye="R")
-            print(json.dumps(right_eye_measures, indent=4))
+            print(json.dumps(result, indent=4))
 
         except Exception as e:
             print(e)
             raise e
-
         finally:
             database.close()
