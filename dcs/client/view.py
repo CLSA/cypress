@@ -54,32 +54,43 @@ class View(QDialog):
         self.setWindowTitle(title)
         self.setWindowIcon(QIcon("favicon.ico"))
 
+        self.setWindowFlags(
+            self.windowFlags()
+            | Qt.Window
+            | Qt.WindowMaximizeButtonHint
+            | Qt.WindowMinimizeButtonHint
+        )
+
         self.session = session
         self.logger = logging.getLogger(config.section_name)
         self.config = config
         self.detached = detached
         self.title = title
 
-        self.session_widget = TestInfoWidget(self)
-        self.measurement_table_widget = MeasurementTableWidget(self)
-        self.measurement_table_widget.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-
         layout = QVBoxLayout()
-        layout.addWidget(self.session_widget)
-        layout.addWidget(self.measurement_table_widget)
-        #layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        # layout.addStretch()
-
         self.setLayout(layout)
+
+        self._add_session_widget()
+        self._add_measurement_table_widget()
+
         self.resize(config.width, config.height)
 
         self._get_button_references()
         self._connect_signals()
 
         self.on_begin()
+
+    def _add_session_widget(self):
+        self.session_widget = TestInfoWidget(self)
+        self.layout().addWidget(self.session_widget)
+
+    def _add_measurement_table_widget(self):
+        self.measurement_table_widget = MeasurementTableWidget(self)
+        self.measurement_table_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.layout().addWidget(self.measurement_table_widget)
 
     def _get_button_references(self):
         self.start_button = self.session_widget.startButton
@@ -140,16 +151,20 @@ class View(QDialog):
         self.logger.info("ready to measure")
         self.session_widget.statusValue.setText("Ready to measure")
         self.measure_button.setEnabled(True)
+        self.submit_button.setEnabled(False)
         self.state = State.READY_TO_MEASURE
 
     def on_measured(self):
         self.logger.info("measured, ready to submit..")
-        self.measure_button.setEnabled(True)
         self.manual_entry_button.setEnabled(False)
+        self.measure_button.setEnabled(False)
         self.session_widget.statusValue.setText("Ready to submit")
         self.submit_button.setEnabled(True)
-        self.measure_button.setEnabled(False)
         self.state = State.MEASURED
+
+    def on_submitting(self):
+        self.measure_button.setEnabled(False)
+        self.manual_entry_button.setEnabled(False)
 
     def on_submitted(self):
         self.logger.info("submitted, ready to close")
@@ -161,8 +176,7 @@ class View(QDialog):
         self.start_button.setEnabled(False)
         self.submit_button.setEnabled(False)
 
-    def on_error(self, message: str = "Unknown error"):
-        self.logger.error(message.lower())
+    def on_error(self, message: str = "Something went wrong"):
         self.session_widget.statusValue.setText("Error")
 
         self.measure_button.setEnabled(False)
@@ -201,10 +215,11 @@ class View(QDialog):
             self.logger.info("closing with error")
             self.close.emit()
 
-            cancelled = PineAPI(
-                base_url=self.session.origin,
-                logger=self.logger,
-            ).send_cancel(session_id=self.session.session_id)
+            if not self.detached:
+                cancelled = PineAPI(
+                    base_url=self.session.origin,
+                    logger=self.logger,
+                ).send_cancel(session_id=self.session.session_id)
 
             event.accept()
             return
