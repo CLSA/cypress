@@ -1,5 +1,6 @@
+from typing import Literal
 from session import Session
 
 
 class RetinalCameraSession(Session):
-    pass
+    side: Literal['L', 'R'] | None = None

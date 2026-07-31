@@ -1,63 +1,77 @@
-from devices.retinal_camera.session import RetinalCameraSession
+import json
+import unittest
+
+from devices.retinal_camera.model import RetinalCameraModel
 from devices.retinal_camera.config import RetinalCameraConfig
 
-from devices.retinal_camera.settings import logger
+from devices.retinal_camera.session import RetinalCameraSessionLeft
+from devices.retinal_camera.session import RetinalCameraSessionRight
 
-from utils import FileInfo, get_file_info
-
-
-class OCTMeasure:
-    def __init__(self, name: str, path: str, size: str):
-        self.name = name
-        self.path = path
-        self.size = size
-
-    def __dict__(self):
-        return {
-            "name": self.name,
-            "path": self.path,
-            "size": self.size,
-        }
+from devices.retinal_camera.tests.fixtures.generate_dicom import (
+    generate_fake_dicom_files,
+)
 
 
-class RetinalCameraModel:
-    def __init__(session: RetinalCameraSession, config: RetinalCameraConfig):
-        super().__init__(session=session, config=config)
+class TestModel(unittest.TestCase):
 
-    def read_results(self) -> bool:
-        self.measures = []
-        for path in self.config.export_path.iterdir():
-            if not path.is_file():
-                continue
+    def setUp(self):
+        config, errors = RetinalCameraConfig.from_ini()
+        if errors:
+            raise Exception(errors)
 
-            file_info: FileInfo = get_file_info(path)
+        self.config = config
 
-            filename = path.name
-            filename_parts = filename.split("_")
-            if len(filename_parts) < 2:
-                logger.warning(f"{filename} file name is an invalid format")
+        return super().setUp()
 
-            barcode = filename_parts[0]
-            if barcode != self.session.barcode:
-                continue
+    def test_left(self):
+        session = RetinalCameraSessionLeft(
+            **{
+                "barcode": "12345678",
+                "uid": "00000000",
+                "answer_id": 1,
+                "interviewer": "test",
+                "language": "en",
+                "side": "L",
+            }
+        )
 
-            side = filename_parts[1]
-            if side != self.session.side:
-                continue
+        generate_fake_dicom_files(
+            directory=self.config.export_path, patient_id="12345678", side="L", n=10
+        )
 
-            name = None
-            if "_OPT_" in filename:
-                name = f"OCT_{"LEFT" if side == "L" else "RIGHT"}.dcm"
-            elif "_OP_" in filename:
-                name = f"EYE_{"LEFT" if side == "L" else "RIGHT"}.dcm"
-            else:
-                continue
+        model = RetinalCameraModel(session=session, config=self.config)
 
-            measure = OCTMeasure(
-                name=name, path=str(path.resolve()), size=file_info.readable_size
-            )
+        success, error = model.read_results(self.config.export_path)
 
-            file_info.send_name = name
+        self.assertTrue(success)
+        self.assertIsNone(error)
 
-            self.measures.append(measure)
-            self.add_file(file_info)
+        print(json.dumps(model.to_response(), indent=4))
+
+    def test_right(self):
+        session = RetinalCameraSessionRight(
+            **{
+                "barcode": "12345678",
+                "uid": "00000000",
+                "answer_id": 1,
+                "interviewer": "test",
+                "language": "en",
+                "side": "R",
+            }
+        )
+
+        generate_fake_dicom_files(
+            directory=self.config.export_path,
+            patient_id="12345678",
+            side="R",
+            n=10
+        )
+
+        model = RetinalCameraModel(session=session, config=self.config)
+
+        success, error = model.read_results(self.config.export_path)
+
+        self.assertTrue(success)
+        self.assertIsNone(error)
+
+        print(json.dumps(model.to_response(), indent=4))

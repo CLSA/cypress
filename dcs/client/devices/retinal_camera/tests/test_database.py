@@ -26,28 +26,19 @@ class TestRetinalCameraDB(unittest.TestCase):
 
         return super().setUp()
 
-    def tearDown(self):
-        pass
-
-    #def test_restore_database(self):
-    #    database = RetinalCameraDatabase(self.config.database_name)
-
-    #    try:
-    #        self.assertTrue(database.open())
-    #        #self.assertTrue(database.restore_database(self.config.database_backup))
-    #    except Exception as e:
-    #        print(e)
-    #        raise e
-    #    finally:
-    #        database.close()
-
-    def test_insert_participant(self):
+    def test_database(self):
         database = RetinalCameraDatabase(self.config.database_name)
 
         try:
             self.assertTrue(database.open())
-            self.assertTrue(database.restore_database(self.config.database_backup))
-            self.assertTrue(database.insert_participant(self.session))
+            success, error = database.restore_database(self.config.database_backup)
+            self.assertTrue(success)
+            self.assertIsNone(error)
+
+            success, error = database.insert_participant(self.session)
+            self.assertTrue(success)
+            self.assertIsNone(error)
+
         except Exception as e:
             print(e)
             raise e

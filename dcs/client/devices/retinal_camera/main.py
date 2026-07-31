@@ -1,5 +1,7 @@
 import sys
 
+from PySide6.QtWidgets import QComboBox, QGroupBox, QFormLayout
+
 from session import SessionDialog
 from device import Device
 
@@ -16,7 +18,29 @@ class RetinalCameraSessionDialog(SessionDialog):
         super().__init__(parent=parent)
 
         self.setWindowTitle("Retinal camera setup")
-        self.setMinimumSize(350, 350)
+        self.setFixedSize(350, 350)
+
+        self.camera_group = QGroupBox()
+        self.camera_group.setTitle("Camera")
+
+        self.side = QComboBox(self)
+        self.side.addItems(["Left", "Right"])
+        self.side.setCurrentIndex(0)
+
+        self.form_layout = QFormLayout()
+        self.form_layout.addRow("Eye", self.side)
+
+        self.camera_group.setLayout(self.form_layout)
+
+        self.layout.insertWidget(1, self.camera_group)
+
+    def get_values(self):
+        session_values = super().get_values()
+        camera_values = {
+            "side": self.side.currentText()[0],
+        }
+
+        return session_values | camera_values
 
 
 class RetinalCamera(Device):

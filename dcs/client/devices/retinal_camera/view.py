@@ -19,25 +19,45 @@ class RetinalCameraView(View):
             parent=parent, session=session, config=config, detached=detached
         )
 
-        self.session_widget.deviceStatusValue.setText("OCT")
+
         self.table = self.measurement_table_widget.measurementTable
+
+        self.session_widget.deviceStatusValue.setText(
+            f"OCT {'(Left)' if self.session.side == "L" else '(Right)'}"
+        )
+
+        self.measure_button.setVisible(True)
+        self.start_button.setVisible(False)
+
+        self.columns = ["#", "Name", "Size"]
+
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setColumnCount(len(self.columns))
+        self.table.setHorizontalHeaderLabels(self.columns)
+
+    @override
+    def on_ready_to_measure(self):
+        super().on_ready_to_measure()
+        self.session_widget.statusValue.setText("Press measure once exported")
 
     @override
     def on_measured(self, output: dict):
         self.table.clear()
 
-        columns = ["File", "Size"]
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setRowCount(4)
-        self.table.setColumnCount(len(columns))
-        self.table.setHorizontalHeaderLabels(columns)
+        self.table.setRowCount(len(output["value"]["results"]))
+        self.table.setColumnCount(len(self.columns))
+        self.table.setHorizontalHeaderLabels(self.columns)
 
-        for index, result in enumerate(output["results"]):
-            file_item = QTableWidgetItem(result["file"])
+        for index, result in enumerate(output["value"]["results"]):
+            sequence_item = QTableWidgetItem(str(result["sequence_number"]))
+            file_item = QTableWidgetItem(result["name"])
             size_item = QTableWidgetItem(result["size"])
 
-            self.table.setItem(index, 0, file_item)
-            self.table.setItem(index, 1, size_item)
+            self.table.setItem(index, 0, sequence_item)
+            self.table.setItem(index, 1, file_item)
+            self.table.setItem(index, 2, size_item)
 
-        super().on_measured(output)
+        super().on_measured()

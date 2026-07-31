@@ -9,9 +9,13 @@ from devices.retinal_camera.settings import DEVICE_NAME
 class RetinalCameraConfig(DeviceConfig):
     section_name: ClassVar[str] = DEVICE_NAME
 
-    process_name: Annotated[str, Field(min_length=5, frozen=True)]
+    #process_name: Annotated[str, Field(min_length=5, frozen=True)]
+
+    #executable: Annotated[FilePath, AfterValidator(is_executable), Field(frozen=True)]
 
     data_path: Annotated[DirectoryPath, Field(frozen=True)]
+
+    export_path: Annotated[DirectoryPath, Field(frozen=True)]
 
     database_name: Annotated[str, Field(frozen=True)]
 

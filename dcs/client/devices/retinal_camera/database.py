@@ -28,7 +28,7 @@ class RetinalCameraDatabase:
     def close(self):
         self.db.close()
 
-    def restore_database(self, backup_path: Path):
+    def restore_database(self, backup_path: Path) -> tuple[bool, str | None]:
         if not backup_path.exists() or not backup_path.is_file():
             logger.critical(f"{str(backup_path.resolve())} is not a file")
             return False
@@ -37,7 +37,7 @@ class RetinalCameraDatabase:
 
         if not self.db.transaction():
             logger.critical(self.db.lastError().text())
-            return False
+            return False, "Could not restore database"
 
         query.prepare(
             "ALTER DATABASE [IMAGEnet] SET single_user with rollback immediate"
@@ -45,7 +45,7 @@ class RetinalCameraDatabase:
 
         if not query.exec():
             logger.critical(query.lastError().text())
-            return False
+            return False, "Could not restore database"
 
         query.prepare(
             "RESTORE DATABASE [IMAGEnet] FROM DISK = :disk WITH FILE = 1, NOUNLOAD, STATS = 5"
@@ -54,27 +54,26 @@ class RetinalCameraDatabase:
 
         if not query.exec():
             logger.critical(query.lastError().text())
-
-            return False
+            return False, "Could not restore database"
 
         query.prepare("ALTER DATABASE [IMAGEnet] SET multi_user")
 
         if not query.exec():
             logger.critical(query.lastError().text())
-            return False
+            return False, "Could not restore database"
 
         if not self.db.commit():
             logger.critical(query.lastError().text())
-            return False
+            return False, "Could not restore database"
 
-        return True
+        return True, None
 
-    def insert_participant(self, session: RetinalCameraSession):
+    def insert_participant(self, session: RetinalCameraSession) -> tuple[bool, str | None]:
         query = QSqlQuery()
 
         if not self.db.transaction():
             logger.critical("could not start transaction")
-            return False
+            return False, "Could not restore database"
 
         query.prepare(
             "INSERT INTO IMAGEnet.dbo.Persons (PersonUid, SurName, ForeName) VALUES (:personUid, :firstName, :lastName)"
@@ -85,7 +84,7 @@ class RetinalCameraDatabase:
 
         if not query.exec():
             logger.critical(query.lastError().text())
-            return False
+            return False, "Could not restore database"
 
         query.prepare(
             "INSERT INTO IMAGEnet.dbo.Patients (PatientUid, PatientIdentifier, PersonUid) VALUES (:patientUid, :participantId, :personUUID)"
@@ -96,10 +95,10 @@ class RetinalCameraDatabase:
 
         if not query.exec():
             logger.critical(query.lastError().text())
-            return False
+            return False, "Could not restore database"
 
         if not self.db.commit():
             logger.critical(self.db.lastError().text())
-            return False
+            return False, "Could not restore database"
 
-        return True
+        return True, None
