@@ -85,6 +85,13 @@ def is_process_running(process_name: str):
             return True
     return False
 
+def stop_process(process_name: str) -> bool:
+    for process in psutil.process_iter(["name"]):
+        if process_name.lower() == process.info["name"].lower():
+            process.kill()
+            return True
+    return False
+
 
 def clear_directory(directory: Path):
     if not directory:
