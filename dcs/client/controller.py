@@ -1,13 +1,15 @@
 import logging
+import tarfile
 
 from datetime import datetime
+from typing import Literal
 
 from abc import abstractmethod
 from pathlib import Path
 from copy import deepcopy
 
 from PySide6.QtCore import QObject, QProcess, Signal, QThread
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog, QMessageBox
 
 from session import Session
 from config import DeviceConfig
@@ -23,6 +25,7 @@ class Controller(QObject):
     started = Signal()
     ready_to_measure = Signal()
     measured = Signal(dict)
+    submitting = Signal()
     submitted = Signal()
     error = Signal(str)
 
@@ -53,6 +56,7 @@ class Controller(QObject):
         self.started.connect(self.view.on_started)
         self.ready_to_measure.connect(self.view.on_ready_to_measure)
         self.measured.connect(self.view.on_measured)
+        self.submitting.connect(self.view.on_submitting)
         self.submitted.connect(self.view.on_submitted)
         self.error.connect(self.view.on_error)
 
@@ -65,6 +69,7 @@ class Controller(QObject):
         self.data = {}
         self.manually_entered = False
 
+        self.backup_paths = []
         self.backup = None
 
     def start(self):
@@ -76,6 +81,8 @@ class Controller(QObject):
         self.measured.emit()
 
     def submit(self):
+        self.submitting.emit()
+
         if self.detached:
             if self.save_to_file():
                 self.submitted.emit()
@@ -84,10 +91,14 @@ class Controller(QObject):
 
     def upload_to_server(self):
         self.files_to_transfer = deepcopy(self.model.files)
-        backup_path = self._create_backup_tar()
+
+        backup_path = self._create_backup_tar(
+            directory=Path.cwd(), filename="config.tar.gz"
+        )
+
         if backup_path:
             backup_file_info = get_file_info(Path(backup_path))
-            backup_file_info.send_name = "backup"
+            backup_file_info.send_name = "config"
             self.files_to_transfer.append(backup_file_info)
 
         self.api = PineAPI(
@@ -119,7 +130,7 @@ class Controller(QObject):
 
     def upload_status(self, file_index, file_name, percentage):
         self.view.set_status(
-            f"Uploading ({percentage}%) {file_name} ({file_index} / {len(self.files_to_transfer)})"
+            f"Uploading {file_index} / {len(self.files_to_transfer)} ({percentage}%) "
         )
 
     def save_to_file(self):
@@ -129,7 +140,9 @@ class Controller(QObject):
                 "Select output file",
                 str(
                     (
-                        Path.home() / "Documents" / f"{self.session.barcode}_{datetime.now().strftime("%Y%m%d%H%M%S")}.zip"
+                        Path.home()
+                        / "Documents"
+                        / f"{self.session.barcode}_{datetime.now().strftime("%Y%m%d%H%M%S")}.zip"
                     ).resolve()
                 ),
                 "ZIP files (*.zip)",
@@ -144,10 +157,6 @@ class Controller(QObject):
             return False
 
         return True
-
-    @abstractmethod
-    def _create_backup_tar(self) -> FileInfo | None:
-        pass
 
     def _on_process_started(self, *args):
         self.started.emit()
@@ -166,6 +175,57 @@ class Controller(QObject):
 
     def _upload_failed(self):
         self.error.emit("Failed to upload the data")
+
+    def _handle_error(
+        self, msg: str = "Something went wrong", store_backup: bool = False
+    ) -> None:
+        self.error.emit(msg)
+
+        if store_backup:
+            backup_path = (
+                Path.cwd()
+                / "errors"
+                / self.session.barcode
+                / self.config.section_name
+                / self.session.session_id
+            )
+            backup_path.mkdir(parents=True, exist_ok=False)
+
+            store_path = self._create_backup_tar(
+                directory=backup_path, filename="backup.tar.gz"
+            )
+            if not store_path:
+                self.logger.error("failed to store error backup")
+            else:
+                self.logger.info(f"stored backup at {store_path}")
+
+    def _show_message_box(self, title: str, msg: str, level: Literal["info", "warning", "critical"]):
+        if level == "info":
+            QMessageBox.information(None, title, msg)
+        elif level == "warning":
+            QMessageBox.warning(None, title, msg)
+        elif level == "critical":
+            QMessageBox.critical(None, title, msg)
+        else:
+            self.logger.warning(f"failed to show message box: incorrect level {level}")
+
+
+    def _create_backup_tar(self, directory: Path, filename: str) -> str | None:
+        try:
+            (directory / filename).unlink(missing_ok=True)
+
+            with tarfile.open(directory / filename, mode="x:gz") as backup_tar:
+                for backup_path in self.backup_paths:
+                    if not backup_path["path"].exists():
+                        self.logger.warning(
+                            f"{backup_path["path"]} does not exist.. could not add to backup"
+                        )
+                        continue
+                    backup_tar.add(backup_path["path"], arcname=backup_path["arcname"])
+            return str((directory / filename).resolve())
+        except Exception as e:
+            self.logger.critical(e)
+            return None
 
     @classmethod
     def class_name(cls):
