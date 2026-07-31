@@ -48,7 +48,7 @@ class GeneralProxyController(Controller):
         if not generator.prepare_form(
             form_path=self.config.form_en,
             fdf_path=self.config.fdf_en,
-            input_data={"enrollmentId": self.session.barcode},
+            input_data={"enrollmentId": self.session.uid},
             output_path=self.form_output_path,
         ):
             self.error.emit("Failed to generate proxy form")
@@ -77,12 +77,12 @@ class GeneralProxyController(Controller):
             self.error.emit("Something went wrong")
             return False
 
-        self.logger.info("checking for signature")
-        if not self.model.has_signature():
-            self.error.emit("The form was not signed")
-            return False
+        #self.logger.info("checking for signature")
+        #if not self.model.has_signature():
+        #    self.error.emit("The form was not signed")
+        #    return False
 
-        self.logger.info("has signature")
+        #self.logger.info("has signature")
 
         self.measured.emit(self.model.to_response())
 

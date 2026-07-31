@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'test_info_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -175,7 +175,7 @@ class Ui_TestInfoWidget(object):
 
     def retranslateUi(self, TestInfoWidget):
         TestInfoWidget.setWindowTitle(QCoreApplication.translate("TestInfoWidget", u"Form", None))
-        self.groupBox.setTitle(QCoreApplication.translate("TestInfoWidget", u"Test Information", None))
+        self.groupBox.setTitle(QCoreApplication.translate("TestInfoWidget", u"Stage", None))
         self.barcodeLabel.setText(QCoreApplication.translate("TestInfoWidget", u"Participant ID", None))
         self.barcodeValue.setText(QCoreApplication.translate("TestInfoWidget", u"---", None))
         self.interviewerLabel.setText(QCoreApplication.translate("TestInfoWidget", u"Interviewer", None))

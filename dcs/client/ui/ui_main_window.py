@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(436, 544)
+        MainWindow.resize(436, 498)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -121,87 +121,28 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_3)
 
-        self.restartCypress = QPushButton(self.tab)
-        self.restartCypress.setObjectName(u"restartCypress")
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.startCypress = QPushButton(self.tab)
+        self.startCypress.setObjectName(u"startCypress")
 
-        self.verticalLayout_5.addWidget(self.restartCypress)
+        self.horizontalLayout_5.addWidget(self.startCypress)
+
+        self.stopCypress = QPushButton(self.tab)
+        self.stopCypress.setObjectName(u"stopCypress")
+
+        self.horizontalLayout_5.addWidget(self.stopCypress)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer)
 
         self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QWidget()
-        self.tab_2.setObjectName(u"tab_2")
-        self.verticalLayout_4 = QVBoxLayout(self.tab_2)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.launchCRT = QPushButton(self.tab_2)
-        self.launchCRT.setObjectName(u"launchCRT")
-
-        self.verticalLayout_4.addWidget(self.launchCRT)
-
-        self.launchFRAX = QPushButton(self.tab_2)
-        self.launchFRAX.setObjectName(u"launchFRAX")
-
-        self.verticalLayout_4.addWidget(self.launchFRAX)
-
-        self.launchAudiometer = QPushButton(self.tab_2)
-        self.launchAudiometer.setObjectName(u"launchAudiometer")
-
-        self.verticalLayout_4.addWidget(self.launchAudiometer)
-
-        self.launchCDTT = QPushButton(self.tab_2)
-        self.launchCDTT.setObjectName(u"launchCDTT")
-
-        self.verticalLayout_4.addWidget(self.launchCDTT)
-
-        self.launchDEXA = QPushButton(self.tab_2)
-        self.launchDEXA.setObjectName(u"launchDEXA")
-
-        self.verticalLayout_4.addWidget(self.launchDEXA)
-
-        self.launchGripStrength = QPushButton(self.tab_2)
-        self.launchGripStrength.setObjectName(u"launchGripStrength")
-
-        self.verticalLayout_4.addWidget(self.launchGripStrength)
-
-        self.launchECG = QPushButton(self.tab_2)
-        self.launchECG.setObjectName(u"launchECG")
-
-        self.verticalLayout_4.addWidget(self.launchECG)
-
-        self.launchTonometer = QPushButton(self.tab_2)
-        self.launchTonometer.setObjectName(u"launchTonometer")
-
-        self.verticalLayout_4.addWidget(self.launchTonometer)
-
-        self.launchSpirometer = QPushButton(self.tab_2)
-        self.launchSpirometer.setObjectName(u"launchSpirometer")
-
-        self.verticalLayout_4.addWidget(self.launchSpirometer)
-
-        self.launchECHO = QPushButton(self.tab_2)
-        self.launchECHO.setObjectName(u"launchECHO")
-
-        self.verticalLayout_4.addWidget(self.launchECHO)
-
-        self.launchWeighScale = QPushButton(self.tab_2)
-        self.launchWeighScale.setObjectName(u"launchWeighScale")
-
-        self.verticalLayout_4.addWidget(self.launchWeighScale)
-
-        self.launchGeneralProxy = QPushButton(self.tab_2)
-        self.launchGeneralProxy.setObjectName(u"launchGeneralProxy")
-
-        self.verticalLayout_4.addWidget(self.launchGeneralProxy)
-
-        self.tabWidget.addTab(self.tab_2, "")
 
         self.verticalLayout_2.addWidget(self.tabWidget)
-
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_2.addItem(self.verticalSpacer_3)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -230,20 +171,8 @@ class Ui_MainWindow(object):
         self.lastUpdatedValue.setText("")
         self.hostLabel.setText(QCoreApplication.translate("MainWindow", u"Host", None))
         self.hostValue.setText("")
-        self.restartCypress.setText(QCoreApplication.translate("MainWindow", u"Restart", None))
+        self.startCypress.setText(QCoreApplication.translate("MainWindow", u"Start Server", None))
+        self.stopCypress.setText(QCoreApplication.translate("MainWindow", u"Stop Server", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Server", None))
-        self.launchCRT.setText(QCoreApplication.translate("MainWindow", u"Choice Reaction Test", None))
-        self.launchFRAX.setText(QCoreApplication.translate("MainWindow", u"FRAX", None))
-        self.launchAudiometer.setText(QCoreApplication.translate("MainWindow", u"Audiometer", None))
-        self.launchCDTT.setText(QCoreApplication.translate("MainWindow", u"CDTT", None))
-        self.launchDEXA.setText(QCoreApplication.translate("MainWindow", u"DEXA", None))
-        self.launchGripStrength.setText(QCoreApplication.translate("MainWindow", u"Grip Strength", None))
-        self.launchECG.setText(QCoreApplication.translate("MainWindow", u"ECG", None))
-        self.launchTonometer.setText(QCoreApplication.translate("MainWindow", u"Tonometer", None))
-        self.launchSpirometer.setText(QCoreApplication.translate("MainWindow", u"Spirometer", None))
-        self.launchECHO.setText(QCoreApplication.translate("MainWindow", u"ECHO", None))
-        self.launchWeighScale.setText(QCoreApplication.translate("MainWindow", u"Weigh Scale", None))
-        self.launchGeneralProxy.setText(QCoreApplication.translate("MainWindow", u"General Proxy", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Devices", None))
     # retranslateUi
 
