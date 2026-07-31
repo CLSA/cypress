@@ -32,58 +32,57 @@ class CDTTController(Controller):
             detached=detached,
         )
 
-        self.start()
+        self.backup_paths = [
+            { "path": self.config.directory, "arcname": "CDTTStereo" }
+        ]
 
     @override
     def start(self) -> bool:
-        self.logger.debug("CDTTController::start")
+        self.logger.info("start")
 
         if is_process_running(self.config.process_name):
+            self.logger.error("process is already running")
             self.error.emit(
                 f"{self.config.process_name} is already open, please close and try again",
             )
             return False
 
         self.logger.info("cleaning output directory")
-
         if not self._clean_output_dir(self.config.output):
-            self.error.emit(f"Could not prepare device")
+            self._handle_error("Something went wrong", store_backup=True)
             return False
 
         self.logger.info("preparing settings")
-
         if not self._prepare_settings_files():
-            self.error.emit(f"Could not prepare settings")
+            self._handle_error("Something went wrong", store_backup=True)
             return False
 
-        self.logger.info("preparing cdtt process")
+        self.logger.info("preparing process")
+        if not self._prepare_process():
+            self._handle_error("Something went wrong", store_backup=True)
+            return False
 
-        self._prepare_process(
-            str(self.config.directory.resolve()),
-            str(self.config.jre.resolve()),
-            str(self.config.jar.resolve()),
-            self.session.barcode,
-        )
-
-        self.logger.info("starting cdtt process")
-
+        self.logger.info("starting process")
         self.process.start()
 
         return True
 
     @override
     def measure(self):
-        self.logger.debug("CDTTController::measure")
+        self.logger.info("measure")
 
-        if not self.model.read_output(
+        success, error = self.model.read_output(
             self.config.output / f"Results-{self.session.barcode}.xlsx",
-            self.session.language,
-        ):
-            self.error.emit("Failed to read CDTT results")
+        )
+        if not success:
+            self.logger.error(error)
+            self._handle_error("Something went wrong", store_backup=True)
             return False
 
-        if not self.model.is_valid(self.session.barcode):
-            self.error.emit("The results are invalid and cannot be saved")
+        valid, error = self.model.is_valid()
+        if not valid:
+            self.logger.error(error)
+            self._handle_error(error, store_backup=True)
             return False
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
@@ -93,21 +92,25 @@ class CDTTController(Controller):
 
     @override
     def submit(self):
-        self.logger.debug("CDTTController::submit")
+        self.logger.info("submit")
         return super().submit()
 
     def _clean_output_dir(self, output_dir: Path) -> bool:
-        self.logger.debug("CDTTController::_clean_output_dir")
-        for path in output_dir.iterdir():
-            if path.is_file() and path.name != "Results-Template.xlsx":
-                try:
+        self.logger.debug("_clean_output_dir")
+
+        try:
+            for path in output_dir.iterdir():
+                if path.is_file() and path.name != "Results-Template.xlsx":
                     path.unlink()
-                except Exception as e:
-                    self.logger.error(e)
-                    return False
+        except Exception as e:
+            self.logger.critical(e)
+            return False
+
         return True
 
     def _prepare_settings_files(self):
+        self.logger.debug("_prepare_settings_files")
+
         try:
             en_settings_file = self.config.en_settings
             fr_settings_file = self.config.fr_settings
@@ -121,24 +124,19 @@ class CDTTController(Controller):
                 fr_settings_file.copy(current_settings)
 
         except Exception as e:
-            self.logger.error(e)
+            self.logger.critical(e)
             return False
 
         return True
 
-    def _prepare_process(self, directory: str, jre: str, jar: str, barcode: str):
-        self.logger.debug("CDTTController::_prepare_process")
-        self.process.setProgram(jre)
-        self.process.setArguments(["-jar", jar, barcode])
-        self.process.setWorkingDirectory(directory)
-
-    def _create_backup_tar(self, filepath):
+    def _prepare_process(self) -> bool:
+        self.logger.debug("_prepare_process")
         try:
-            backup_path = Path(filepath)
-            backup_path.unlink(missing_ok=True)
-            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
-                backup_tar.add(self.config.directory, arcname="CDTTStereo")
-            return str(backup_path.resolve())
+            self.process.setProgram(str(self.config.jre.resolve()))
+            self.process.setArguments(["-jar", str(self.config.jar.resolve()), self.session.barcode])
+            self.process.setWorkingDirectory(str(self.config.directory.resolve()))
         except Exception as e:
             self.logger.critical(e)
-            return None
+            return False
+
+        return True

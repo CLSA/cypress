@@ -44,10 +44,10 @@ class CDTTView(View):
 
         for index, result in enumerate(output["value"]["results"]):
             stimulus_digits = QTableWidgetItem(
-                f"{','.join(str(digit) for digit in result['stimulus_digits'])}"
+                f"{','.join(str(digit) for digit in result['stimulus'])}"
             )
             response_digits = QTableWidgetItem(
-                f"{','.join(str(digit) for digit in result['response_digits'])}"
+                f"{','.join(str(digit) for digit in result['response'])}"
             )
 
             self.table.setItem(index, 0, stimulus_digits)

@@ -19,7 +19,6 @@ class CDTT(Device):
     session_dialog = CDTTSessionDialog
 
 
-
 if __name__ == "__main__":
     try:
         sys.exit(CDTT.run(session=None))
