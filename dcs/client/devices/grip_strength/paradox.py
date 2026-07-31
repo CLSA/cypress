@@ -122,7 +122,7 @@ class ParadoxDbHeader:
         offset = 0x0056
 
         if self.file_version_id > 0x04:
-            print("file_version_id is greater than 4")
+            #print("file_version_id is greater than 4")
             offset = 0x0078
 
         for i in range(self.num_fields):
@@ -180,8 +180,12 @@ class ParadoxDbBlock:
         return int(self.offset_to_last_record / self.header.record_size + 1)
 
     def read_records(self):
+        records = []
+
         offset = self.file_offset
-        print(chr(0x00))
+
+        #print(chr(0x00))
+
         length = 0
         for field_info in self.header.field_info:
             length += field_info.size
@@ -193,18 +197,24 @@ class ParadoxDbBlock:
 
             return data
 
+        record = {}
+
         for field_info in self.header.field_info:
             name = field_info.name
             size = field_info.size
             field_type = field_info.field_type
-            print(name, field_type, size)
+
+            #print(name, field_type, size)
 
             if field_type == ParadoxFieldType.LongInteger:
                 integer = int.from_bytes(fix_sign(self.data[offset : offset + size]), byteorder='big', signed=True)
-                if "Rep" in name or "Average" in name or "Maximum" in name:
-                    print(as_kg(integer))
-                else:
-                    print(integer)
+
+                #if "Rep" in name or "Average" in name or "Maximum" in name:
+                #    print(as_kg(integer))
+                #else:
+                #    print(integer)
+
+                record[name] = integer
 
             elif field_type == ParadoxFieldType.Alpha:
                 data = self.data[offset:]
@@ -215,16 +225,23 @@ class ParadoxDbBlock:
                     res += chr(data[i])
                     i += 1
 
-                print(res)
+                #print(res)
+                record[name] = res.replace('\x00', "").strip()
 
             elif field_type == ParadoxFieldType.Logical:
                 data = bytearray(self.data[offset : offset + size])
+                val = None
                 if data[0] & 0x80:
-                    print(bool(data[0] & 0x7F))
+                    val = bool(data[0] & 0x7F)
                 elif data[0] == 0:
-                    print(bool(data[0] | 0x80))
+                    val = bool(data[0] & 0x7F)
+
+                #print(val)
+                record[name] = val
 
             offset += field_info.size
+
+        records.append(record)
 
             #print(name, size, field_type, data_bytes)
             # print(name, size, field_type, data_bytes)
@@ -234,6 +251,8 @@ class ParadoxDbBlock:
 
             # if field_type == ParadoxFieldType.Alpha:
             #     print(read_alpha(data_bytes))
+
+        return records
 
 
 class ParadoxDb:
@@ -265,7 +284,7 @@ class ParadoxDb:
             )
             blocks.append(block)
 
-            print("num records: ", block.num_records())
+            #print("num records: ", block.num_records())
 
         return blocks
 
@@ -274,6 +293,7 @@ class ParadoxDb:
         for block in self.blocks:
             block_records = block.read_records()
             for record in block_records:
+                print(record)
                 records.append(record)
         return records
 

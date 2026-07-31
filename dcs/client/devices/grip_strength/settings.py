@@ -4,6 +4,13 @@ LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
 LOG_LEVEL = "INFO"
 
+GRIP_TEST_DB = "ZGripTest.DB"
+GRIP_TEST_PX = "ZGripTest.PX"
+
+GRIP_TEST_DATA_DB = "ZGripTestData.DB"
+GRIP_TEST_DATA_PX = "ZGripTestData.PX"
+
+
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,

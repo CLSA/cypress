@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from devices.grip_strength.config import GripStrengthConfig
@@ -8,7 +9,12 @@ class TestGripStrengthModel(unittest.TestCase):
     def setUp(self):
         super().setUp()
 
-        self.config = GripStrengthConfig.from_ini()
+        config, errors = GripStrengthConfig.from_ini()
+        if errors:
+            raise Exception(errors)
+
+        self.config = config
+
         self.session = GripStrengthSession(
             **{
                 "barcode": "00000000",
@@ -26,6 +32,9 @@ class TestGripStrengthModel(unittest.TestCase):
         super().tearDown()
 
     def test_read_results(self):
-        #with open()
-        pass
+        success, error = self.model.read_results()
+        self.assertTrue(success)
+        self.assertIsNone(error)
+
+        print(json.dumps(self.model.to_response(), indent=4))
 
