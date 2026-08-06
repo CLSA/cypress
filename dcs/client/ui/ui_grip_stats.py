@@ -71,7 +71,7 @@ class Ui_GripInfo(object):
 
         self.test_value = QLabel(self.summary)
         self.test_value.setObjectName(u"test_value")
-        self.test_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.test_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.test.addWidget(self.test_value)
 
@@ -87,7 +87,7 @@ class Ui_GripInfo(object):
 
         self.primary_stat_value = QLabel(self.summary)
         self.primary_stat_value.setObjectName(u"primary_stat_value")
-        self.primary_stat_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.primary_stat_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.primary_stat.addWidget(self.primary_stat_value)
 
@@ -103,7 +103,7 @@ class Ui_GripInfo(object):
 
         self.sequence_value = QLabel(self.summary)
         self.sequence_value.setObjectName(u"sequence_value")
-        self.sequence_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.sequence_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.sequence.addWidget(self.sequence_value)
 
@@ -119,7 +119,7 @@ class Ui_GripInfo(object):
 
         self.rung_value = QLabel(self.summary)
         self.rung_value.setObjectName(u"rung_value")
-        self.rung_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.rung_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.rung.addWidget(self.rung_value)
 
@@ -135,7 +135,7 @@ class Ui_GripInfo(object):
 
         self.max_reps_value = QLabel(self.summary)
         self.max_reps_value.setObjectName(u"max_reps_value")
-        self.max_reps_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.max_reps_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.max_reps.addWidget(self.max_reps_value)
 
@@ -151,7 +151,7 @@ class Ui_GripInfo(object):
 
         self.rep1_value = QLabel(self.summary)
         self.rep1_value.setObjectName(u"rep1_value")
-        self.rep1_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.rep1_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.rep1.addWidget(self.rep1_value)
 
@@ -167,7 +167,7 @@ class Ui_GripInfo(object):
 
         self.rep2_value = QLabel(self.summary)
         self.rep2_value.setObjectName(u"rep2_value")
-        self.rep2_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.rep2_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.rep2.addWidget(self.rep2_value)
 
@@ -183,7 +183,7 @@ class Ui_GripInfo(object):
 
         self.rep3_value = QLabel(self.summary)
         self.rep3_value.setObjectName(u"rep3_value")
-        self.rep3_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.rep3_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.rep3.addWidget(self.rep3_value)
 
@@ -199,7 +199,7 @@ class Ui_GripInfo(object):
 
         self.avg_value = QLabel(self.summary)
         self.avg_value.setObjectName(u"avg_value")
-        self.avg_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.avg_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.avg.addWidget(self.avg_value)
 
@@ -215,7 +215,7 @@ class Ui_GripInfo(object):
 
         self.max_value = QLabel(self.summary)
         self.max_value.setObjectName(u"max_value")
-        self.max_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.max_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.max.addWidget(self.max_value)
 
@@ -231,7 +231,7 @@ class Ui_GripInfo(object):
 
         self.cv_value = QLabel(self.summary)
         self.cv_value.setObjectName(u"cv_value")
-        self.cv_value.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
+        self.cv_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.cv.addWidget(self.cv_value)
 
