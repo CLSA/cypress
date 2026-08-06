@@ -79,7 +79,7 @@ class Device:
                 return 1
 
         logger.info(
-            f"launching ({f"{session.origin}" if not detached else "detached"})"
+            f"launching {config.section_name} ({f"{session.origin}" if not detached else "detached"})"
         )
 
         model = cls.model(session=session, config=config)
