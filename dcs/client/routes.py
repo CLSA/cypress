@@ -123,13 +123,11 @@ def is_available() -> tuple[bool, (dict | None)]:
 def launch_device(
     device_name: str, background_tasks: BackgroundTasks, session: Session
 ):
-    start = time.perf_counter()
     if device_name not in devices:
         return {"error": "unsupported device"}
 
     available, error = is_available()
     if not available:
-        print(error)
         return error
 
     device = devices[device_name]
@@ -139,10 +137,6 @@ def launch_device(
     set_session(device_name, session)
     background_tasks.add_task(monitor_session)
 
-    end = time.perf_counter()
-
-    print(f"launch_device: {end - start}s")
-    print(session.session_id)
     return {"sessionId": session.session_id if session else "detached"}
 
 
