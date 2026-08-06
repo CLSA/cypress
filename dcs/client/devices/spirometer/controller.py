@@ -50,11 +50,13 @@ class SpirometerController(Controller):
             self.logger.info("ethnicity selection cancelled")
             return False
 
-        EMRPlugin.write(
+        if not EMRPlugin.write(
             session=self.session,
             ethnicity=ethnicity,
             output_path=self.config.exchange_path / self.config.in_file_name,
-        )
+        ):
+            self._handle_error(store_backup=False)
+            return False
 
         self._prepare_process()
         self.process.start()

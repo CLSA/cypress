@@ -1,4 +1,5 @@
 import sys
+import logging
 
 from pathlib import Path
 
@@ -6,71 +7,79 @@ from PySide6.QtWidgets import QApplication
 
 import xml.etree.ElementTree as ET
 
+from devices.spirometer.config import DEVICE_NAME
 from devices.spirometer.session import SpirometerSession, SpirometerSessionDialog
+
+logger = logging.getLogger(DEVICE_NAME)
 
 
 class EMRPlugin:
     @staticmethod
     def write(session: SpirometerSession, ethnicity: str, output_path: Path):
-        root = ET.Element("ndd")
 
-        # add command
-        command = ET.SubElement(root, "Command")
-        command.set("Type", "PerformTest")
+        try:
+            root = ET.Element("ndd")
 
-        order_param = ET.SubElement(command, "Parameter")
-        order_param.set("Name", "OrderID")
-        order_param.text = "1"
+            # add command
+            command = ET.SubElement(root, "Command")
+            command.set("Type", "PerformTest")
 
-        test_param = ET.SubElement(command, "Parameter")
-        test_param.set("Name", "TestType")
-        test_param.text = "FVL"
+            order_param = ET.SubElement(command, "Parameter")
+            order_param.set("Name", "OrderID")
+            order_param.text = "1"
 
-        patients = ET.SubElement(root, "Patients")
-        patient = ET.SubElement(patients, "Patient")
-        patient.set("ID", session.barcode)
+            test_param = ET.SubElement(command, "Parameter")
+            test_param.set("Name", "TestType")
+            test_param.text = "FVL"
 
-        last_name = ET.SubElement(patient, "LastName")
-        last_name.text = ""
+            patients = ET.SubElement(root, "Patients")
+            patient = ET.SubElement(patients, "Patient")
+            patient.set("ID", session.barcode)
 
-        first_name = ET.SubElement(patient, "FirstName")
-        first_name.text = ""
+            last_name = ET.SubElement(patient, "LastName")
+            last_name.text = ""
 
-        is_bio_cal = ET.SubElement(patient, "IsBioCal")
-        is_bio_cal.text = "false"
+            first_name = ET.SubElement(patient, "FirstName")
+            first_name.text = ""
 
-        patient_data = ET.SubElement(patient, "PatientDataAtPresent")
+            is_bio_cal = ET.SubElement(patient, "IsBioCal")
+            is_bio_cal.text = "false"
 
-        gender = ET.SubElement(patient_data, "Gender")
-        gender.text = session.sex.capitalize()
+            patient_data = ET.SubElement(patient, "PatientDataAtPresent")
 
-        dob = ET.SubElement(patient_data, "DateOfBirth")
-        dob.text = str(session.dob)
+            gender = ET.SubElement(patient_data, "Gender")
+            gender.text = session.sex.capitalize()
 
-        height = ET.SubElement(patient_data, "Height")
-        height.text = str(session.height / 100.0)
+            dob = ET.SubElement(patient_data, "DateOfBirth")
+            dob.text = str(session.dob)
 
-        weight = ET.SubElement(patient_data, "Weight")
-        weight.text = str(session.weight)
+            height = ET.SubElement(patient_data, "Height")
+            height.text = str(session.height / 100.0)
 
-        ethnicity_el = ET.SubElement(patient_data, "Ethnicity")
-        ethnicity_el.text = ethnicity
+            weight = ET.SubElement(patient_data, "Weight")
+            weight.text = str(session.weight)
 
-        smoker = ET.SubElement(patient_data, "Smoker")
-        smoker.text = "Yes" if session.smoker else "No"
+            ethnicity_el = ET.SubElement(patient_data, "Ethnicity")
+            ethnicity_el.text = ethnicity
 
-        asthma = ET.SubElement(patient_data, "Asthma")
-        asthma.text = "No"
+            smoker = ET.SubElement(patient_data, "Smoker")
+            smoker.text = "Yes" if session.smoker else "No"
 
-        copd = ET.SubElement(patient_data, "COPD")
-        copd.text = "No"
+            asthma = ET.SubElement(patient_data, "Asthma")
+            asthma.text = "No"
 
-        tree = ET.ElementTree(root)
-        ET.indent(tree)
-        tree.write(output_path, encoding="utf-8", xml_declaration=True)
+            copd = ET.SubElement(patient_data, "COPD")
+            copd.text = "No"
+
+            tree = ET.ElementTree(root)
+            ET.indent(tree)
+            tree.write(output_path, encoding="utf-8", xml_declaration=True)
+
+        except Exception as e:
+            logger.error(e)
+            return False
 
         return True
-        # add patients
 
 
 if __name__ == "__main__":
