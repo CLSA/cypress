@@ -6,7 +6,7 @@ import win32api
 
 from typing import override
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon, QMenu
+from PySide6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon, QMenu, QTabWidget
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtCore import QTimer
 
@@ -15,6 +15,8 @@ from ui.ui_main_window import Ui_MainWindow
 from config import CypressConfig
 
 from utils import stop_process, is_process_running
+
+from log import LogWidget
 
 cypress_config, errors = CypressConfig.from_ini()
 if errors:
@@ -109,6 +111,13 @@ class CypressManagerWindow(QMainWindow):
         self.status_timer = QTimer(self)
         self.status_timer.timeout.connect(self.get_status)
         self.status_timer.start(1000)  # ms
+
+        self.log_widget = LogWidget(self)
+
+        tabs = self.findChild(QTabWidget, "tabWidget")
+        current_tab = tabs.currentWidget()
+        current_tab.layout().insertWidget(4, self.log_widget)
+        current_tab.layout().setStretch(4, 1)
 
     @override
     def show(self):
