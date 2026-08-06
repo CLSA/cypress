@@ -14,6 +14,13 @@ LOG_CONFIG = {
         },
     },
     "handlers": {
+        "main_log": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/main.log",
+            "formatter": "default",
+            "maxBytes": LOG_MAX_SIZE_MB,
+            "backupCount": LOG_BACKUPS,
+        },
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOG_LOCATION,

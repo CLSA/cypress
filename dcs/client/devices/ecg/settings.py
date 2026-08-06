@@ -14,7 +14,14 @@ LOG_CONFIG = {
         },
     },
     "handlers": {
-        "file_handler": {
+        "main_log": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/main.log",
+            "formatter": "default",
+            "maxBytes": LOG_MAX_SIZE_MB,
+            "backupCount": LOG_BACKUPS,
+        },
+        "device_log": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": LOG_LOCATION,
             "formatter": "default",
@@ -27,6 +34,6 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
-        DEVICE_NAME: {"handlers": ["console", "file_handler"], "level": LOG_LEVEL}
+        DEVICE_NAME: {"handlers": ["main_log", "device_log"], "level": LOG_LEVEL}
     },
 }
