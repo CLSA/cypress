@@ -57,7 +57,7 @@ class CRTController(Controller):
         self.logger.info("starting process")
         self.process.start()
 
-        return True
+        return self.process.waitForStarted(msecs=5000)
 
     @override
     def measure(self):
@@ -75,6 +75,18 @@ class CRTController(Controller):
     def submit(self):
         self.logger.info("submit")
         return super().submit()
+
+    @override
+    def restore(self):
+        super().restore()
+        try:
+            if not self._clean_output_dir(self.config.output):
+                self.logger.error("restore: could not clean output directory")
+                return False
+            return True
+        except Exception as e:
+            self.logger.error(e)
+            return False
 
     def _clean_output_dir(self, output_dir: Path) -> bool:
         self.logger.debug("_clean_output_dir")

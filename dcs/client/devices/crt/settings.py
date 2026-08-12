@@ -9,7 +9,7 @@ LOG_CONFIG = {
     "disable_existing_loggers": False,
     "formatters": {
         "default": {
-            "format": f"[%(asctime)s] %(levelname)s - %(message)s",
+            "format": f"[%(asctime)s] %(levelname)s - {DEVICE_NAME} - %(message)s",
             "datefmt": "%d/%m/%Y %I:%M:%S",
         },
     },
