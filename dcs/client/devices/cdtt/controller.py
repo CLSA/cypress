@@ -32,9 +32,7 @@ class CDTTController(Controller):
             detached=detached,
         )
 
-        self.backup_paths = [
-            { "path": self.config.directory, "arcname": "CDTTStereo" }
-        ]
+        self.backup_paths = [{"path": self.config.directory, "arcname": "CDTTStereo"}]
 
     @override
     def start(self) -> bool:
@@ -42,8 +40,9 @@ class CDTTController(Controller):
 
         if is_process_running(self.config.process_name):
             self.logger.error("process is already running")
-            self.error.emit(
-                f"{self.config.process_name} is already open, please close and try again",
+            self._handle_error(
+                "CDTT app is already running, please close and try again",
+                store_backup=False,
             )
             return False
 
@@ -65,7 +64,7 @@ class CDTTController(Controller):
         self.logger.info("starting process")
         self.process.start()
 
-        return True
+        return self.process.waitForStarted(msecs=5000)
 
     @override
     def measure(self):
@@ -95,6 +94,18 @@ class CDTTController(Controller):
         self.logger.info("submit")
         return super().submit()
 
+    @override
+    def restore(self):
+        super().restore()
+        try:
+            if not self._clean_output_dir(self.config.output):
+                self.logger.error("restore: could not clean output directory")
+                return False
+            return True
+        except Exception as e:
+            self.logger.error(e)
+            return False
+
     def _clean_output_dir(self, output_dir: Path) -> bool:
         self.logger.debug("_clean_output_dir")
 
@@ -102,11 +113,10 @@ class CDTTController(Controller):
             for path in output_dir.iterdir():
                 if path.is_file() and path.name != "Results-Template.xlsx":
                     path.unlink()
+            return True
         except Exception as e:
             self.logger.critical(e)
             return False
-
-        return True
 
     def _prepare_settings_files(self):
         self.logger.debug("_prepare_settings_files")
@@ -133,7 +143,9 @@ class CDTTController(Controller):
         self.logger.debug("_prepare_process")
         try:
             self.process.setProgram(str(self.config.jre.resolve()))
-            self.process.setArguments(["-jar", str(self.config.jar.resolve()), self.session.barcode])
+            self.process.setArguments(
+                ["-jar", str(self.config.jar.resolve()), self.session.barcode]
+            )
             self.process.setWorkingDirectory(str(self.config.directory.resolve()))
         except Exception as e:
             self.logger.critical(e)
