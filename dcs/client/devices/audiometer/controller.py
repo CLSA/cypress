@@ -32,16 +32,19 @@ class AudiometerController(Controller):
             detached=detached,
         )
         self.plugin = AudiometerPlugin(session=self.session, config=self.config)
-        self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
+        self.view.manual_entry.connect(self.handle_manual_entry)
 
         self.backup_paths = [
-            { "path": Path("C:/ProgramData/Ra660/"), "arcname": "Ra660" },
-            { "path": self.config.plugin_output_path, "arcname": "output.json" },
+            {"path": Path("C:/ProgramData/Ra660/"), "arcname": "Ra660"},
+            {"path": self.config.plugin_output_path, "arcname": "output.json"},
         ]
 
     def handle_manual_entry(self, data_received: dict):
+        self.logger.info("handle_manual_entry")
         self.model.set_manual_values(data_received)
-        #self.measured.emit(self.model.to_response())
+
+        self.ready_to_submit.emit(self.model.is_valid())
+        # self.measured.emit(self.model.to_response())
 
     @override
     def start(self) -> bool:
@@ -58,7 +61,10 @@ class AudiometerController(Controller):
         self.logger.info(f"starting")
         if is_process_running(self.config.process_name):
             self.logger.error(f"{self.config.process_name} is already open")
-            self._handle_error(f"HearCon is already open, please close and try again")
+            self._handle_error(
+                f"Hearcon is already open, please close and try again",
+                store_backup=False,
+            )
             return False
 
         self.logger.info(f"restoring database")
@@ -79,7 +85,7 @@ class AudiometerController(Controller):
         self.logger.info(f"starting process")
         self.process.start()
 
-        return True
+        return self.process.waitForStarted(msecs=5000)
 
     @override
     def measure(self):
@@ -104,16 +110,41 @@ class AudiometerController(Controller):
             with open(self.config.plugin_output_path, "r") as output_json_file:
                 json_data = json.load(output_json_file)
                 self.model.parse_output_json(json_data)
+
                 self.measured.emit(self.model.to_response())
+                self.ready_to_submit.emit(self.model.is_valid())
+
         except FileNotFoundError:
             self.logger.error("results file not found")
-            self._handle_error(f"Results file not found", store_backup=True)
+            self._show_message_box(
+                title="Results file not found",
+                msg="Save test results in Hearcon app and try again",
+                level="warning",
+            )
+            self._store_backup()
+            # self._handle_error(f"Results not found", store_backup=True)
         except Exception as e:
-            self.logger.critical(e)
+            self.logger.error(e)
             self._handle_error("Something went wrong", store_backup=True)
             return False
 
         return True
+
+    @override
+    def restore(self):
+        super().restore()
+
+        try:
+            if not self._clean_output_dir():
+                self.logger.error("restore: could not clean output directory")
+                return False
+            if not self._restore_database():
+                self.logger.error("restore: could not copy database")
+                return False
+            return True
+        except Exception as e:
+            self.logger.error(e)
+            return False
 
     def _clean_output_dir(self) -> bool:
         """
@@ -121,13 +152,12 @@ class AudiometerController(Controller):
 
         """
         self.logger.debug("_clean_output_dir")
-
         try:
             self.config.plugin_output_path.unlink(missing_ok=True)
-            return True
         except Exception as e:
-            self.logger.critical(e)
+            self.logger.error(e)
             return False
+        return True
 
     def _restore_database(self) -> bool:
         """
@@ -137,7 +167,6 @@ class AudiometerController(Controller):
 
         """
         self.logger.debug("_restore_database")
-
         try:
             self.config.existing_database_path.unlink(missing_ok=True)
             self.config.backup_database_path.copy(self.config.existing_database_path)

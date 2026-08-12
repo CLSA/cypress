@@ -1,7 +1,8 @@
+import json
+
 from typing import override
 
 from PySide6.QtCore import Signal
-
 
 from view import View, State
 
@@ -28,16 +29,18 @@ class AudiometerView(View):
 
         self.session_widget.deviceStatusValue.setText("Audiometer")
 
-        # Deleting default measure table to replace with widget below
-        self.measurement_table_widget.deleteLater()
         self.measurement_form.set_enabled(False)
-
         self.measure_button.setVisible(True)
         self.manual_entry_button.setVisible(True)
         self.manual_entry_button.setEnabled(True)
 
+        self.layout().replaceWidget(
+            self.measurement_table_widget, self.measurement_form
+        )
         self.layout().addWidget(self.measurement_form)
-        self.setFixedSize(560, 581)
+        self.measurement_table_widget.deleteLater()
+
+        self.measurement_form.values_changed.connect(self.on_manual_entry_saved)
 
     @override
     def _get_button_references(self):
@@ -60,9 +63,13 @@ class AudiometerView(View):
         self.measurement_form.set_enabled(True)
 
     @override
-    def on_measured(self, output: dict):
-        super().on_measured()
-        self.measurement_form.set_values(output)
+    def on_started(self):
+        self.state = State.STARTED
+        self.logger.info("started, waiting..")
+        self.session_widget.statusValue.setText("Waiting...")
+        self.session_widget.startButton.setEnabled(False)
+        self.measure_button.setEnabled(False)
+        self.submit_button.setEnabled(False)
 
     @override
     def on_ready_to_measure(self):
@@ -71,6 +78,52 @@ class AudiometerView(View):
         self.state = State.READY_TO_MEASURE
 
     @override
+    def on_measured(self, output: dict):
+        super().on_measured()
+        self.measurement_form.set_values(output)
+        self.submit_button.setEnabled(False)
+
+    def on_ready_to_submit(self, ready: bool):
+        if ready:
+            self.state = State.READY_TO_SUBMIT
+            self.logger.info("ready to submit")
+            self.session_widget.statusValue.setText("Ready to submit")
+            self.submit_button.setEnabled(True)
+        else:
+            self.submit_button.setEnabled(False)
+
+    @override
+    def on_submitting(self):
+        self.logger.info("submitting")
+        self.measure_button.setEnabled(False)
+        self.manual_entry_button.setEnabled(False)
+
+    @override
     def on_submitted(self):
         super().on_submitted()
         self.measurement_form.setEnabled(False)
+
+    @override
+    def on_error(self, message: str = "Something went wrong"):
+        super().on_error(message)
+
+    @override
+    def on_manual_entry(self):
+        self.logger.info("enter manual entry")
+        self.session_widget.statusValue.setText(f"Manual entry")
+        self.session_widget.startButton.setEnabled(False)
+
+        self.measure_button.setEnabled(False)
+        self.manual_entry_button.setEnabled(False)
+        self.submit_button.setEnabled(False)
+
+        self.state = State.MANUAL_ENTRY
+
+    def on_manual_entry_saved(self, data: dict):
+        self.logger.info("saved manual entry")
+        self.logger.debug(json.dumps(data, indent=4))
+        self.manual_entry_button.setEnabled(True)
+        self.manual_entry.emit(data)
+
+
+

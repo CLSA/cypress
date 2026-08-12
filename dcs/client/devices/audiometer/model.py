@@ -39,10 +39,7 @@ class AudiometerModel(Model):
     def is_valid(self) -> bool:
         logger.debug(f"is_valid")
 
-        if len(self.results) < 14:
-            return False
-
-        return True
+        return len(self.results) == 14
 
     def parse_output_json(self, output_json: dict) -> bool:
         self.reset()

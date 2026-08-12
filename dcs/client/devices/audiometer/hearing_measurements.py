@@ -9,11 +9,9 @@ class HearingMeasurementsWidget(QWidget, Ui_HearingMeasurements):
     values_changed = Signal(dict)
 
     def __init__(self, parent=None):
-        super().__init__()
+        super().__init__(parent)
+
         self.setupUi(self)
-        self.setSizePolicy(
-            QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum
-        )
 
         self.inputs_enabled = False
 
@@ -38,26 +36,19 @@ class HearingMeasurementsWidget(QWidget, Ui_HearingMeasurements):
             },
         }
 
-        for spin_box in self.inputs["left"].values():
-            spin_box.valueChanged.connect(self._value_changed)
-
-        for spin_box in self.inputs["right"].values():
-            spin_box.valueChanged.connect(self._value_changed)
+        self.save_button = self.saveButton
+        self.save_button.pressed.connect(self.on_save_manual_entry)
 
     def get_data(self):
         return {
             "left": {
-                name: spin_box.value()
-                for name, spin_box in self.inputs["left"].items()
+                name: spin_box.value() for name, spin_box in self.inputs["left"].items()
             },
             "right": {
                 name: spin_box.value()
                 for name, spin_box in self.inputs["right"].items()
             },
         }
-
-    def _value_changed(self):
-        self.values_changed.emit(self.get_data())
 
     def set_values(self, response_json):
         if self.inputs_enabled:
@@ -75,19 +66,24 @@ class HearingMeasurementsWidget(QWidget, Ui_HearingMeasurements):
 
             self.inputs["right"][test_key].setValue(right_result["level"]["value"])
 
-
     def set_enabled(self, enabled: bool):
         self.inputs_enabled = enabled
+        self.save_button.setEnabled(enabled)
+        self.save_button.setVisible(enabled)
 
-        def enable_inputs(side: str):
-            for spin_box in self.inputs[side].values():
-                spin_box.setEnabled(enabled)
-                if enabled:
-                    spin_box.valueChanged.connect(self._value_changed)
-                else:
-                    spin_box.valueChanged.disconnect(self._value_changed)
+        self.enable_inputs("left", enabled)
+        self.enable_inputs("right", enabled)
 
-        enable_inputs("left")
-        enable_inputs("right")
+    def enable_inputs(self, side: str, enabled: bool):
+        if side == "left":
+            self.leftGroup.setEnabled(enabled)
 
+        if side == "right":
+            self.rightGroup.setEnabled(enabled)
+
+        # for spin_box in self.inputs[side].values():
+        #     spin_box.setEnabled(enabled)
+
+    def on_save_manual_entry(self):
         self.values_changed.emit(self.get_data())
+        self.set_enabled(False)
