@@ -117,6 +117,20 @@ class BPController(Controller):
         self.logger.info("manual entry")
         self.model.set_manual_values(data_received)
 
+        self.measured.emit(self.model.to_response())
+
+    @override
+    def restore(self):
+        super().restore()
+        try:
+            if not self._restore_database():
+                self.logger.error("restore: could not restore database")
+                return False
+            return True
+        except Exception as e:
+            self.logger.error(e)
+            return False
+
     def _restore_database(self):
         self.logger.debug("_restore_database")
 

@@ -56,7 +56,7 @@ class BPDatabase:
         ###
 
         logger.debug(
-            f"BPDatabase::insert_patient - {name} {barcode} {gender} {dob} {physician}"
+            f"database - inserting patient - {name} {barcode} {gender} {dob} {physician}"
         )
 
         query: QSqlQuery = QSqlQuery()
@@ -77,7 +77,7 @@ class BPDatabase:
         query.bindValue(":physician", physician)
 
         if not query.exec():
-            logger.critical(query.lastError().text())
+            logger.error(query.lastError().text())
             return False, None
 
         return True, query.lastInsertId()
@@ -89,17 +89,17 @@ class BPDatabase:
         query.bindValue(":barcode", barcode)
 
         if not query.exec():
-            logger.critical(f"exec: {query.lastError().text()}")
+            logger.error(f"get_patient_key: {query.lastError().text()}")
             return False, None
 
         if query.size() > 1:
-            logger.critical(
+            logger.error(
                 f"query returned multiple patient keys for barcode {barcode}"
             )
             return False, None
 
         if not query.first():
-            logger.error(f"no records for barcode {barcode}")
+            logger.error(f"get_patient_key: no records for barcode {barcode}")
             return False, None
 
         return True, query.record().value(0)
@@ -118,7 +118,7 @@ class BPDatabase:
         results = []
 
         if not query.exec():
-            logger.critical(query.lastError().text())
+            logger.error(query.lastError().text())
             return False, []
 
         while query.next():

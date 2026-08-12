@@ -25,8 +25,8 @@ class BPView(View):
         self.measurement_table_widget.deleteLater()
 
         self.measure_button.setVisible(True)
-        self.manual_entry_button.setVisible(True)
-        self.manual_entry_button.setEnabled(True)
+        self.manual_entry_button.setVisible(False)
+        self.manual_entry_button.setEnabled(False)
 
         self.layout().addWidget(self.measurement_form)
 
@@ -53,4 +53,5 @@ class BPView(View):
     @override
     def on_measured(self, output: dict):
         super().on_measured()
+        self.manual_entry_button.setEnabled(True)
         self.measurement_form.on_measured(output)

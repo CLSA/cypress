@@ -1,3 +1,5 @@
+from typing import override
+
 from PySide6.QtCore import Qt, Signal
 
 from PySide6.QtWidgets import (
@@ -5,65 +7,12 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QAbstractItemView,
     QTableWidgetItem,
-    QStyledItemDelegate,
-    QSpinBox,
-    QDoubleSpinBox,
+    QPushButton,
 )
 
 from ui.ui_blood_pressure_measurements import Ui_BloodPressureMeasurements
 
-
-class IntegerSpinBoxDelegate(QStyledItemDelegate):
-
-    def __init__(self, min_val, max_val, parent=None):
-        super().__init__(parent)
-        self.min_val = min_val
-        self.max_val = max_val
-
-    def createEditor(self, parent, option, index):
-        editor = QSpinBox(parent)
-        editor.setRange(self.min_val, self.max_val)
-        return editor
-
-    def setEditorData(self, editor, index):
-        value = index.model().data(index, Qt.EditRole)
-        editor.setValue(int(value) if value else self.min_val)
-
-    def setModelData(self, editor, model, index):
-        editor.interpretText()
-        value = editor.value()
-        model.setData(index, value, Qt.EditRole)
-
-    def updateEditorGeometry(self, editor, option, index):
-        editor.setGeometry(option.rect)
-
-
-class DoubleSpinBoxDelegate(QStyledItemDelegate):
-
-    def __init__(self, min_val, max_val, decimals=2, parent=None):
-        super().__init__(parent)
-        self.min_val = min_val
-        self.max_val = max_val
-        self.decimals = decimals
-
-    def createEditor(self, parent, option, index):
-        editor = QDoubleSpinBox(parent)
-        editor.setRange(self.min_val, self.max_val)
-        editor.setDecimals(self.decimals)
-        return editor
-
-    def setEditorData(self, editor, index):
-        value = index.model().data(index, Qt.EditRole)
-        editor.setValue(float(value) if value else self.min_val)
-
-    def setModelData(self, editor, model, index):
-        editor.interpretText()
-        value = editor.value()
-        model.setData(index, value, Qt.EditRole)
-
-    def updateEditorGeometry(self, editor, option, index):
-        editor.setGeometry(option.rect)
-
+from utils import IntegerSpinBoxDelegate
 
 class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
     values_changed = Signal(list)
@@ -78,13 +27,50 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         self._set_table()
 
         self.table.setEnabled(False)
+        self.table.itemSelectionChanged.connect(self._on_row_selected)
+
+        self.addRow.pressed.connect(self.add_row)
+        self.deleteRow.pressed.connect(self.delete_row)
+
+        self.save_manual_entry = QPushButton()
+        self.save_manual_entry.setText("Save")
+        self.save_manual_entry.setObjectName("save_manual_entry")
+        self.save_manual_entry.pressed.connect(self.on_save_manual_entry)
+        self.testControls.insertWidget(1, self.save_manual_entry)
+
+        self.save_manual_entry.setVisible(False)
+        self.save_manual_entry.setEnabled(False)
+
+        self.addRow.setEnabled(False)
+        self.addRow.setVisible(False)
+
+        self.deleteRow.setEnabled(False)
+        self.deleteRow.setVisible(False)
 
     def set_enabled(self, enabled: bool) -> None:
-        self.table.cellChanged.connect(self.on_cell_changed)
+        self.save_manual_entry.setVisible(enabled)
+        self.save_manual_entry.setEnabled(enabled)
+        self.addRow.setEnabled(enabled)
+        self.addRow.setVisible(enabled)
+        self.deleteRow.setVisible(enabled)
+        self.submitButton.setEnabled(not enabled)
 
-        self.measures = []
+        self.table.setEnabled(enabled)
+
+        if self.table.rowCount() < 1:
+            self.add_row()
+
+    def on_save_manual_entry(self):
+        self.table.clearSelection()
+        self.row_selected = None
+        self.deleteRow.setEnabled(False)
+        self.set_enabled(False)
+        self.manualEntryButton.setEnabled(True)
+        self.submitButton.setEnabled(False)
+
+        measures = []
         for row in range(self.table.rowCount()):
-            self.measures.append(
+            measures.append(
                 {
                     "Spare7": int(self.table.item(row, 0).text()),
                     "SYS": int(self.table.item(row, 1).text()),
@@ -93,16 +79,7 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
                 }
             )
 
-        self.table.setEnabled(enabled)
-
-    def on_cell_changed(self, row, column):
-        self.measures[row] = {
-            "Spare7": int(self.table.item(row, 0).text()),
-            "SYS": int(self.table.item(row, 1).text()),
-            "DIA": int(self.table.item(row, 2).text()),
-            "HR": int(self.table.item(row, 3).text()),
-        }
-        self.values_changed.emit(self.measures)
+        self.values_changed.emit(measures)
 
     def on_measured(self, output: dict):
         self.table.clear()
@@ -113,9 +90,7 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         for index, result in enumerate(output["value"]["results"]):
             reading_number = QTableWidgetItem(str(result["reading_number"]))
             reading_number.setFlags(
-                reading_number.flags()
-                & ~Qt.ItemFlag.ItemIsEditable
-                & ~Qt.ItemFlag.ItemIsSelectable
+                reading_number.flags() & ~Qt.ItemFlag.ItemIsEditable
             )
 
             systolic = QTableWidgetItem(str(result["systolic"].get("value")))
@@ -127,19 +102,63 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
             self.table.setItem(index, 2, diastolic)
             self.table.setItem(index, 3, pulse)
 
+    def add_row(self):
+        self.table.clearSelection()
+        self.deleteRow.setEnabled(False)
+
+        row_count = self.table.rowCount()
+        if row_count > 5:
+            return False
+
+        last_row_index = row_count - 1
+
+        new_reading_number = 1
+        if last_row_index > -1:
+            new_reading_number = int(self.table.item(last_row_index, 0).text()) + 1
+
+        reading_number_item = QTableWidgetItem(str(new_reading_number))
+        reading_number_item.setFlags(
+            reading_number_item.flags() & ~Qt.ItemFlag.ItemIsEditable
+        )
+
+        systolic_item = QTableWidgetItem()
+        diastolic_item = QTableWidgetItem()
+        pulse_item = QTableWidgetItem()
+
+        self.table.insertRow(row_count)
+        self.table.setItem(row_count, 0, reading_number_item)
+        self.table.setItem(row_count, 1, systolic_item)
+        self.table.setItem(row_count, 2, diastolic_item)
+        self.table.setItem(row_count, 3, pulse_item)
+
+    def _on_row_selected(self):
+        self.row_selected = self.table.currentRow()
+        self.deleteRow.setEnabled(True)
+
+    def delete_row(self):
+        if self.row_selected is None:
+            return
+
+        self.table.removeRow(self.row_selected)
+        self.table.clearSelection()
+        self.row_selected = None
+        self.deleteRow.setEnabled(False)
+
+        for i in range(self.table.rowCount()):
+            self.table.item(i, 0).setText(str(i + 1))
+
+
     def _set_table(self):
         # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        self.table.setStyleSheet(
-            """
+        self.table.setStyleSheet("""
             QTableWidget { outline: 0; }
             QTableWidget::item:focus, QTableWidget::item:selected {
                 background-color: #2a82da;
                 color: white;
             }
-            """
-        )
+            """)
 
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
         self.table.setColumnCount(len(self.columns))
@@ -161,9 +180,9 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
 
         self.header.setSectionResizeMode(3, QHeaderView.Stretch)
 
-        self.table.setItemDelegateForColumn(1, IntegerSpinBoxDelegate(1, 999))
-        self.table.setItemDelegateForColumn(2, IntegerSpinBoxDelegate(1, 999))
-        self.table.setItemDelegateForColumn(3, IntegerSpinBoxDelegate(1, 999))
+        self.table.setItemDelegateForColumn(1, IntegerSpinBoxDelegate(0, 999))
+        self.table.setItemDelegateForColumn(2, IntegerSpinBoxDelegate(0, 999))
+        self.table.setItemDelegateForColumn(3, IntegerSpinBoxDelegate(0, 999))
 
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
