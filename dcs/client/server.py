@@ -13,7 +13,7 @@ def run_server():
 
     app = FastAPI()
     #app.add_middleware(HTTPSRedirectMiddleware)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
+    #app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
 
     app.include_router(router=router)
 
@@ -22,6 +22,6 @@ def run_server():
         host=config.host,
         port=config.port,
         log_config=LOGGING_CONFIG,
-        ssl_certfile=config.ssl_certfile,
-        ssl_keyfile=config.ssl_keyfile,
+        #ssl_certfile=config.ssl_certfile,
+        #ssl_keyfile=config.ssl_keyfile,
     )

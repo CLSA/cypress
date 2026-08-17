@@ -4,7 +4,14 @@ import json
 from pathlib import Path
 from dataclasses import dataclass
 
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtCore import Qt, QLocale
+from PySide6.QtWidgets import (
+    QFileDialog,
+    QStyledItemDelegate,
+    QSpinBox,
+    QDoubleSpinBox,
+    QComboBox
+)
 
 @dataclass(kw_only=True)
 class FileInfo:
@@ -106,3 +113,85 @@ def clear_directory(directory: Path):
     for path in directory.iterdir():
         if path.is_file():
             path.unlink(missing_ok=True)
+
+class IntegerSpinBoxDelegate(QStyledItemDelegate):
+
+    def __init__(self, min_val, max_val, parent=None):
+        super().__init__(parent)
+        self.min_val = min_val
+        self.max_val = max_val
+
+    def createEditor(self, parent, option, index):
+        editor = QSpinBox(parent)
+        editor.setRange(self.min_val, self.max_val)
+        editor.setAutoFillBackground(True)
+
+        return editor
+
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, Qt.EditRole)
+        editor.setValue(int(value) if value else self.min_val)
+
+    def setModelData(self, editor, model, index):
+        editor.interpretText()
+        value = editor.value()
+        model.setData(index, value, Qt.EditRole)
+
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)
+
+class ComboBoxDelegate(QStyledItemDelegate):
+
+    def __init__(self, options, parent=None):
+        super().__init__(parent)
+        self.options = options
+
+    def createEditor(self, parent, option, index):
+        editor = QComboBox(parent)
+        editor.addItems(self.options)
+        editor.setAutoFillBackground(True)
+
+        return editor
+
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, Qt.EditRole)
+        editor.setCurrentText(value)
+
+    def setModelData(self, editor, model, index):
+        value = editor.currentText()
+        model.setData(index, value, Qt.EditRole)
+
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)
+
+
+class DoubleSpinBoxDelegate(QStyledItemDelegate):
+
+    def __init__(self, min_val, max_val, decimals=2, locale: str = False, parent=None):
+        super().__init__(parent)
+        self.min_val = min_val
+        self.max_val = max_val
+        self.decimals = decimals
+        self.locale = locale
+
+    def createEditor(self, parent, option, index):
+        editor = QDoubleSpinBox(parent)
+        if self.locale == 'fr':
+            editor.setLocale(QLocale(QLocale.French, QLocale.Canada))
+        editor.setRange(self.min_val, self.max_val)
+        editor.setDecimals(self.decimals)
+        editor.setAutoFillBackground(True)
+
+        return editor
+
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, Qt.EditRole)
+        editor.setValue(float(value) if value else self.min_val)
+
+    def setModelData(self, editor, model, index):
+        editor.interpretText()
+        value = editor.value()
+        model.setData(index, value, Qt.EditRole)
+
+    def updateEditorGeometry(self, editor, option, index):
+        editor.setGeometry(option.rect)

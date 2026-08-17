@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtCore import Signal, Qt, QCoreApplication
 
 from ui.measurement_table import MeasurementTableWidget
 from ui.test_info_widget import TestInfoWidget
@@ -30,9 +30,10 @@ class State(Enum):
     STARTED = 1
     READY_TO_MEASURE = 2
     MEASURED = 3
-    SUBMITTED = 4
-    MANUAL_ENTRY = 5
-    ERROR = 6
+    READY_TO_SUBMIT = 4
+    SUBMITTED = 5
+    MANUAL_ENTRY = 6
+    ERROR = 7
 
 
 class View(QDialog):
@@ -40,6 +41,7 @@ class View(QDialog):
     measure = Signal()
     submit = Signal()
     close = Signal()
+    manual_entry = Signal(list)
 
     def __init__(
         self,
@@ -60,6 +62,15 @@ class View(QDialog):
             | Qt.WindowMaximizeButtonHint
             | Qt.WindowMinimizeButtonHint
         )
+
+        size_policy = QSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum
+        )
+        size_policy.setHorizontalStretch(0)
+        size_policy.setVerticalStretch(0)
+        size_policy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+
+        self.setSizePolicy(size_policy)
 
         self.session = session
         self.logger = logging.getLogger(config.section_name)
@@ -116,9 +127,10 @@ class View(QDialog):
 
     def _on_submit_button_clicked(self):
         self.logger.info("submit requested")
-        if not self.detached:
-            self.submit_button.setEnabled(False)
+        self.submit_button.setEnabled(False)
         self.manual_entry_button.setEnabled(False)
+
+        QCoreApplication.processEvents()
         self.submit.emit()
 
     def _on_manual_entry_clicked(self):
@@ -126,6 +138,8 @@ class View(QDialog):
         self.on_manual_entry()
 
     def on_begin(self):
+        self.state = State.BEGIN
+
         self.session_widget.startedValue.setText(datetime.now().strftime("%I:%M %p"))
         self.session_widget.statusValue.setText("Press 'Start' to begin")
         self.session_widget.barcodeValue.setText(self.session.barcode)
@@ -137,44 +151,64 @@ class View(QDialog):
         self.manual_entry_button.setVisible(False)
         self.submit_button.setEnabled(False)
 
-        self.state = State.BEGIN
-
     def on_started(self):
+        self.state = State.STARTED
         self.logger.info("started, waiting..")
         self.session_widget.statusValue.setText("Waiting...")
         self.session_widget.startButton.setEnabled(False)
         self.measure_button.setEnabled(False)
         self.submit_button.setEnabled(False)
-        self.state = State.STARTED
 
     def on_ready_to_measure(self):
+        self.state = State.READY_TO_MEASURE
         self.logger.info("ready to measure")
         self.session_widget.statusValue.setText("Ready to measure")
         self.measure_button.setEnabled(True)
         self.submit_button.setEnabled(False)
-        self.state = State.READY_TO_MEASURE
 
     def on_measured(self):
-        self.logger.info("measured, ready to submit..")
+        self.state = State.MEASURED
+        self.logger.info("measured")
         self.manual_entry_button.setEnabled(False)
         self.measure_button.setEnabled(False)
-        self.session_widget.statusValue.setText("Ready to submit")
+        # self.session_widget.statusValue.setText("Ready to submit")
         self.submit_button.setEnabled(True)
-        self.state = State.MEASURED
+
+    def on_ready_to_submit(self, ready: bool):
+        if ready:
+            self.state = State.READY_TO_SUBMIT
+            self.logger.info("is valid, ready to submit")
+            self.session_widget.statusValue.setText("Ready to submit")
+            self.submit_button.setEnabled(True)
+        else:
+            self.logger.warning("is not valid")
+            self.submit_button.setEnabled(False)
 
     def on_submitting(self):
+        self.logger.info("submitting")
         self.measure_button.setEnabled(False)
+        self.submit_button.setEnabled(False)
         self.manual_entry_button.setEnabled(False)
 
+        QCoreApplication.processEvents()
+
     def on_submitted(self):
-        self.logger.info("submitted, ready to close")
-        self.submit_button.setEnabled(True)
         self.session_widget.statusValue.setText("Complete")
         self.state = State.SUBMITTED
 
         self.manual_entry_button.setEnabled(False)
         self.start_button.setEnabled(False)
-        self.submit_button.setEnabled(False)
+        self.submit_button.setEnabled(True)
+
+        if not self.detached:
+            btn = QMessageBox.information(
+                self,
+                "Success",
+                "Data was saved to Pine, press OK to close this window",
+            )
+
+            if btn == QMessageBox.StandardButton.Ok:
+                self.close()
 
     def on_error(self, message: str = "Something went wrong"):
         self.session_widget.statusValue.setText("Error")

@@ -13,6 +13,9 @@ class Record:
     field_map: dict[str, Field] = {}
 
     def __init__(self, raw_data: dict):
+        self._set_fields(raw_data)
+
+    def _set_fields(self, raw_data):
         for field in list(self.field_map.values()):
             self._set_field(field, None)
 

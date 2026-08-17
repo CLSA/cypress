@@ -7,9 +7,8 @@ from pathlib import Path
 
 from session import Session
 
-from utils import get_file_info
+from utils import get_file_info, FileInfo
 
-from files.receiver import FileInfo
 
 from config import DeviceConfig
 
@@ -37,11 +36,14 @@ class Model:
     def add_file(self, file_path: Path, send_name: str) -> bool:
         if not file_path.exists() or not file_path.is_file():
             return False
-
-        file_info = get_file_info(file_path)
-        file_info.send_name = send_name
-
-        self.files.append(file_info)
+        try:
+            file_info = get_file_info(file_path)
+            file_info.send_name = send_name
+            self.files.append(file_info)
+        except (FileNotFoundError, PermissionError):
+            return False
+        except Exception as e:
+            return False
         return True
 
     def _add_file(self, file_info: FileInfo):
@@ -65,15 +67,19 @@ class Model:
 
     def to_zip(self, file_path) -> bool:
         try:
-            with tempfile.TemporaryFile(mode='w+', delete=False) as temp_file:
+            with tempfile.TemporaryFile(mode="w+", delete=False) as temp_file:
                 json.dump(self.to_response(), temp_file, indent=4)
 
             with zipfile.ZipFile(file_path, "w", zipfile.ZIP_DEFLATED) as backup_zip:
                 backup_zip.write(temp_file.name, arcname="response.json")
                 for data_file in self.files:
-                    backup_zip.write(data_file.file_path, arcname=f"{data_file.send_name}{data_file.extension}")
+                    backup_zip.write(
+                        data_file.file_path,
+                        arcname=f"{data_file.send_name}{data_file.extension}",
+                    )
 
         except Exception as e:
+            print(e)
             return False
 
         finally:

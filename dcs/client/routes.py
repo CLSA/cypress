@@ -18,17 +18,17 @@ from session import Session
 from device import Device
 
 from devices.audiometer.main import Audiometer, AudiometerSession
+from devices.weigh_scale.main import WeighScale, WeighScaleSession
 from devices.blood_pressure.main import BloodPressure, BPSession
 from devices.grip_strength.main import GripStrength, GripStrengthSession
 from devices.crt.main import CRT, CRTSession
 from devices.cdtt.main import CDTT, CDTTSession
 from devices.frax.main import FRAX, FRAXSession
 from devices.dxa.main import DXA, DXASession
-from devices.ecg.main import ECG
+from devices.ecg.main import ECG, ECGSession
 from devices.spirometer.main import Spirometer, SpirometerSession
 from devices.tonometer.main import Tonometer, TonometerSession
 from devices.retinal_camera.main import RetinalCamera, RetinalCameraSession
-from devices.weigh_scale.main import WeighScale
 from devices.echo.main import ECHO, ECHOSession
 from devices.general_proxy.main import GeneralProxy, GeneralProxySession
 
@@ -43,18 +43,17 @@ class DeviceEndpoints(str, Enum):
     CDTT = "cdtt"
     HR = "hearcon"
     GRIP = "hand_grip"
-    DXA = "dxa"
     DXA1 = "dxa1"
     DXA2 = "dxa2"
     FRAX = "frax"
     ECG = "mac5"
     ECHO = "vivid_iq"
-    BP = "blood_pressure"
+    BP = "watch_bp"
     RET_L = "oct_left"
     RET_R = "oct_right"
     TON = "ora"
-    SPIRO = "spirometer"
-    WT = "weigh_scale"
+    SPIRO = "easyone_connect"
+    WT = "weight_scale"
     GP = "general_proxy_consent"
 
 
@@ -69,7 +68,6 @@ devices: dict[DeviceEndpoints, Device] = {
     DeviceEndpoints.WT: WeighScale,
     DeviceEndpoints.BP: BloodPressure,
     DeviceEndpoints.SPIRO: Spirometer,
-    DeviceEndpoints.DXA: DXA,
     DeviceEndpoints.DXA1: DXA,
     DeviceEndpoints.DXA2: DXA,
     DeviceEndpoints.FRAX: FRAX,
@@ -128,10 +126,12 @@ def launch_device(
 
     available, error = is_available()
     if not available:
+        print(error)
         return error
 
     device = devices[device_name]
     if not device.is_installed():
+        print("not installed")
         return {"error": f"{device_name} is not installed on this workstation"}
 
     set_session(device_name, session)
@@ -173,13 +173,19 @@ async def frax(
     session.origin = request.headers.get("origin", None)
     return launch_device("frax", background_tasks, session)
 
+@router.post("/mac5")
+async def mac5(
+    background_tasks: BackgroundTasks, session: ECGSession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("mac5", background_tasks, session)
 
 @router.post("/dxa1")
 async def dxa1(
     background_tasks: BackgroundTasks, session: DXASession, request: Request
 ):
     session.origin = request.headers.get("origin", None)
-    return launch_device("dxa", background_tasks, session)
+    return launch_device("dxa1", background_tasks, session)
 
 
 @router.post("/dxa2")
@@ -187,23 +193,30 @@ async def dxa2(
     background_tasks: BackgroundTasks, session: DXASession, request: Request
 ):
     session.origin = request.headers.get("origin", None)
-    return launch_device("dxa", background_tasks, session)
+    return launch_device("dxa2", background_tasks, session)
 
 
-@router.post("/blood_pressure")
+@router.post("/weight_scale")
+async def weight_scale(
+    background_tasks: BackgroundTasks, session: WeighScaleSession, request: Request
+):
+    session.origin = request.headers.get("origin", None)
+    return launch_device("weight_scale", background_tasks, session)
+
+@router.post("/watch_bp")
 async def blood_pressure(
     background_tasks: BackgroundTasks, session: BPSession, request: Request
 ):
     session.origin = request.headers.get("origin", None)
-    return launch_device("blood_pressure", background_tasks, session)
+    return launch_device("watch_bp", background_tasks, session)
 
 
-@router.post("/spirometer")
+@router.post("/easyone_connect")
 async def spirometer(
     background_tasks: BackgroundTasks, session: SpirometerSession, request: Request
 ):
     session.origin = request.headers.get("origin", None)
-    return launch_device("spirometer", background_tasks, session)
+    return launch_device("easyone_connect", background_tasks, session)
 
 
 @router.post("/ora")
@@ -219,7 +232,7 @@ async def echo(
     background_tasks: BackgroundTasks, session: ECHOSession, request: Request
 ):
     session.origin = request.headers.get("origin", None)
-    return launch_device("echo", background_tasks, session)
+    return launch_device("vivid_iq", background_tasks, session)
 
 
 @router.post("/general_proxy_consent")
@@ -258,6 +271,7 @@ async def oct_right(
 
 @router.get("/{device}/status")
 async def get_status(device: DeviceEndpoints):
+    print(device)
     if device.value not in devices:
         raise HTTPException(status=400, detail={"error": "unsupported device"})
 
@@ -335,7 +349,6 @@ async def status():
 
 def stop_app():
     time.sleep(1)
-
     os.kill(os.getpid(), signal.SIGINT)
 
 
