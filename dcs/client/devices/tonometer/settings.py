@@ -4,7 +4,7 @@ DEVICE_NAME = "tonometer"
 LOG_LOCATION = "logs/tonometer.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 LOG_CONFIG = {
     "version": 1,

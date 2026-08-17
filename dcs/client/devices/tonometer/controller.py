@@ -78,6 +78,7 @@ class TonometerController(Controller):
         self.logger.debug(json.dumps(response, indent=4))
 
         self.measured.emit(response)
+        self.ready_to_submit.emit(True)
 
         return True
 
