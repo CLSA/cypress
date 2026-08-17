@@ -1,13 +1,10 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
+from typing import override
 
-
-from files.receiver import FileInfo
-
-from view import View
+from view import View, State
 
 from devices.echo.session import ECHOSession
 from devices.echo.config import ECHOConfig
+from devices.echo.echo_scans_widget import ECHOScansWidget
 
 
 class ECHOView(View):
@@ -22,25 +19,50 @@ class ECHOView(View):
             parent=parent, session=session, config=config, detached=detached
         )
 
-        self.resize(800, 600)
         self.session_widget.deviceStatusValue.setText("ECHO")
-        self.table = self.measurement_table_widget.measurementTable
 
-    def on_files_received(self, files: list[FileInfo]):
-        self.table.clear()
+    @override
+    def _get_button_references(self):
+        self.measure_button = self.echo_scans_widget.measure_button
+        self.submit_button = self.echo_scans_widget.submit_button
+        self.manual_entry_button = self.echo_scans_widget.manual_entry_button
+        self.start_button = self.session_widget.startButton
 
-        columns = ["Name", "Size"]
+    @override
+    def _add_measurement_table_widget(self):
+        self.echo_scans_widget = ECHOScansWidget(
+            log_path=self.config.log_path, parent=self
+        )
+        self.layout().addWidget(self.echo_scans_widget)
 
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table.setRowCount(len(files))
-        self.table.setColumnCount(len(columns))
-        self.table.setHorizontalHeaderLabels(columns)
+    def on_files_received(self, totals: dict):
+        self.echo_scans_widget.set_totals(totals)
 
-        for index, file_info in enumerate(files):
-            name = QTableWidgetItem(file_info.name)
-            size = QTableWidgetItem(file_info.readable_size)
+    @override
+    def on_submitting(self):
+        self.logger.info("submitting")
+        if self.detached:
+            self.session_widget.statusValue.setText("Saving..")
 
-            self.table.setItem(index, 0, name)
-            self.table.setItem(index, 1, size)
+        self.measure_button.setEnabled(False)
+
+        if not self.detached:
+            self.submit_button.setEnabled(False)
+
+        self.manual_entry_button.setEnabled(False)
+
+    @override
+    def on_ready_to_measure(self):
+        super().on_ready_to_measure()
+        self.session_widget.statusValue.setText("Press measure once all files received")
+
+    @override
+    def on_submitted(self):
+        super().on_submitted()
+        # self.submit_button.setEnabled(True)
+        # self.session_widget.statusValue.setText("Complete")
+        # self.state = State.SUBMITTED
+
+        # self.manual_entry_button.setEnabled(False)
+        # self.start_button.setEnabled(False)
+        # self.submit_button.setEnabled(False)

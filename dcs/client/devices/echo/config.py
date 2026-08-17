@@ -10,7 +10,6 @@ from devices.echo.settings import DEVICE_NAME
 class ECHOConfig(DeviceConfig):
     section_name: ClassVar[str] = DEVICE_NAME
 
-    # DICOM receiver settings
     executable: Annotated[FilePath, Field(frozen=True), AfterValidator(is_executable)]
 
     directory: Annotated[DirectoryPath, Field(frozen=True)]
@@ -22,5 +21,9 @@ class ECHOConfig(DeviceConfig):
     port: Annotated[int, Field(min=0)]
 
     storescp_config: Annotated[FilePath, Field(frozen=True)]
+
+    logging_config: Annotated[FilePath, Field(frozen=True)]
+
+    log_path: Annotated[FilePath, Field(frozen=True)]
 
     storage_path: Annotated[DirectoryPath, Field(frozen=True)]

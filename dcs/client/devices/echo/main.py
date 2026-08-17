@@ -30,9 +30,4 @@ class ECHO(Device):
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(ECHO.run(session=None))
-    except Exception as e:
-        print(e)
-        input("Press enter to continue...")
-        sys.exit(-1)
+    sys.exit(ECHO.run(session=None))
