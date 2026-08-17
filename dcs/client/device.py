@@ -42,24 +42,24 @@ class Device:
 
         color_scheme = app.styleHints().colorScheme()
 
-        #if color_scheme == Qt.ColorScheme.Light:
-        #app.setStyle("windowsvista")
+        if color_scheme == Qt.ColorScheme.Light:
+            app.setStyle("windowsvista")
 
 
         #app.styleHints().setColorScheme(Qt.ColorScheme.Light)
 
-        if color_scheme == Qt.ColorScheme.Light:
-            app.setStyleSheet(
-                """
-                QGroupBox {
-                    border-color: lightgray;
-                }
+        # if color_scheme == Qt.ColorScheme.Light:
+        #     app.setStyleSheet(
+        #         """
+        #         QGroupBox {
+        #             border-color: lightgray;
+        #         }
 
-                QWidget {
-                    outline: none;
-                }
-                """
-            )
+        #         QWidget {
+        #             outline: none;
+        #         }
+        #         """
+        #     )
 
         config, errors = cls.config.from_ini()
         if not config or errors:
@@ -79,7 +79,7 @@ class Device:
                 return 1
 
         logger.info(
-            f"launching {config.section_name} ({f"{session.origin}" if not detached else "detached"})"
+            f"launching {session.answer_id} ({f"{session.origin}" if not detached else "detached"})"
         )
 
         model = cls.model(session=session, config=config)
