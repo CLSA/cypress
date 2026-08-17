@@ -37,8 +37,20 @@ class GripStrengthController(Controller):
 
         self.backup_paths = [
             {
-                "path": (self.config.database_path),
-                "arcname": "tracker5",
+                "path": (self.config.database_path / GRIP_TEST_DB),
+                "arcname": GRIP_TEST_DB,
+            },
+            {
+                "path": (self.config.database_path / GRIP_TEST_PX),
+                "arcname": GRIP_TEST_PX,
+            },
+            {
+                "path": (self.config.database_path / GRIP_TEST_DATA_DB),
+                "arcname": GRIP_TEST_DATA_DB,
+            },
+            {
+                "path": (self.config.database_path / GRIP_TEST_DATA_PX),
+                "arcname": GRIP_TEST_DATA_PX,
             },
         ]
 
@@ -55,7 +67,6 @@ class GripStrengthController(Controller):
             return False
 
         self.process.start()
-        self.ready_to_measure.emit()
 
     @override
     def measure(self):
@@ -72,6 +83,8 @@ class GripStrengthController(Controller):
         self.logger.debug(json.dumps(response, indent=4))
         self.measured.emit(response)
 
+        self.ready_to_submit.emit(True)
+
         return True
 
     def _prepare_process(self) -> bool:
@@ -81,7 +94,7 @@ class GripStrengthController(Controller):
             self.process.setProgram(str(self.config.executable.resolve()))
             self.process.setWorkingDirectory(str(self.config.directory.resolve()))
         except Exception as e:
-            self.logger.critical(e)
+            self.logger.error(e)
             return False
 
         return True
@@ -115,11 +128,7 @@ class GripStrengthController(Controller):
             grip_test_db_data_backup.copy(grip_test_data_db)
 
         except Exception as e:
-            self.logger.critical(e)
+            self.logger.error(e)
             return False
 
         return True
-
-    @override
-    def _on_process_finished(self):
-        pass

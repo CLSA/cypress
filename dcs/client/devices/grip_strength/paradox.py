@@ -1,7 +1,10 @@
 import json
+import logging
 
 from pathlib import Path
 from enum import Enum
+
+logger = logging.getLogger("grip_strength")
 
 ONE_POUND_FORCE_IN_NEWTONS = 4.4482216152605
 ONE_POUND_FORCE_IN_KILOGRAMS = ONE_POUND_FORCE_IN_NEWTONS / 9.80665
@@ -293,7 +296,7 @@ class ParadoxDb:
         for block in self.blocks:
             block_records = block.read_records()
             for record in block_records:
-                print(record)
+                logger.debug(record)
                 records.append(record)
         return records
 

@@ -24,6 +24,7 @@ class GripStrengthView(View):
         self.measure_button.setVisible(True)
         self.start_button.setVisible(True)
 
+        self.hide()
 
     @override
     def _get_button_references(self):
@@ -53,28 +54,11 @@ class GripStrengthView(View):
         self.grip_widget.sequence_value.setText(output["metadata"]["sequence"])
         self.grip_widget.rung_value.setText(str(output["metadata"]["rung"]))
         self.grip_widget.max_reps_value.setText(str(output["metadata"]["max_reps"]))
-        self.grip_widget.avg_value.setText(f"{round(output["metadata"]["average"], 2)} {unit}")
-        self.grip_widget.max_value.setText(f"{round(output["metadata"]["maximum"], 2)} {unit}")
-        self.grip_widget.cv_value.setText(str(output["metadata"]["cv"]))
-        self.grip_widget.rep1_value.setText(f"{round(output["results"][0]["rep1"]["value"], 2)} {unit}")
-        self.grip_widget.rep2_value.setText(f"{round(output["results"][0]["rep2"]["value"], 2)} {unit}")
-        self.grip_widget.rep3_value.setText(f"{round(output["results"][0]["rep3"]["value"], 2)} {unit}")
-
-        # self.table.clear()
-
-        # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # self.table.setRowCount(len(output["value"]["results"]))
-        # self.table.setColumnCount(len(self.columns))
-        # self.table.setHorizontalHeaderLabels(self.columns)
-
-        # for index, result in enumerate(output["value"]["results"]):
-        #     rep1 = QTableWidgetItem(f"{round(result["rep1"]["value"], 2)} {result["rep1"]["units"]}")
-        #     rep2 = QTableWidgetItem(f"{round(result["rep2"]["value"], 2)} {result["rep2"]["units"]}")
-        #     rep3 = QTableWidgetItem(f"{round(result["rep3"]["value"], 2)} {result["rep3"]["units"]}")
-
-        #     self.table.setItem(index, 0, rep1)
-        #     self.table.setItem(index, 1, rep2)
-        #     self.table.setItem(index, 2, rep3)
+        self.grip_widget.avg_value.setText(f"{round(output["metadata"]["average"], 1)} {unit}")
+        self.grip_widget.max_value.setText(f"{round(output["metadata"]["maximum"], 1)} {unit}")
+        self.grip_widget.cv_value.setText(f"{str(output["metadata"]["cv"])}%")
+        self.grip_widget.rep1_value.setText(f"{round(output["results"][0]["rep1"]["value"], 1)} {unit}")
+        self.grip_widget.rep2_value.setText(f"{round(output["results"][0]["rep2"]["value"], 1)} {unit}")
+        self.grip_widget.rep3_value.setText(f"{round(output["results"][0]["rep3"]["value"], 1)} {unit}")
 
         super().on_measured()

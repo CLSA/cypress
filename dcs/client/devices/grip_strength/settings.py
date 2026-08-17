@@ -2,7 +2,7 @@ DEVICE_NAME = "grip_strength"
 LOG_LOCATION = "logs/grip_strength.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 GRIP_TEST_DB = "ZGripTest.DB"
 GRIP_TEST_PX = "ZGripTest.PX"

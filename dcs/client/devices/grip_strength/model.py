@@ -1,4 +1,5 @@
 import json
+import logging
 
 from pathlib import Path
 from typing import override
@@ -10,6 +11,7 @@ from devices.grip_strength.session import GripStrengthSession
 from devices.grip_strength.config import GripStrengthConfig
 from devices.grip_strength.paradox import ParadoxDb, as_kg, as_newtons
 
+logger = logging.getLogger("grip_strength")
 
 class GripStrengthTest(Record):
     field_map = {
@@ -85,19 +87,17 @@ class GripStrengthModel(Model):
                 tests[0], measure=GripStrengthMeasure(measures[0])
             )
 
-            print(self.test.to_dict())
-
         except FileNotFoundError as e:
-            print(e)
+            logger.error(e)
             return False, f"{self.config.grip_test_db} not found"
         except ValueError:
-            print(e)
+            logger.error(e)
             return (
                 False,
                 f"Something went wrong when loading {self.config.grip_test_db}",
             )
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False, f"Unknown error: {e}"
 
         return True, None
