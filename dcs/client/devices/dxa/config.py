@@ -8,7 +8,6 @@ from devices.dxa.settings import DEVICE_NAME
 class DXAConfig(DeviceConfig):
     section_name: ClassVar[str] = DEVICE_NAME
 
-    # DICOM receiver settings
     executable: Annotated[
         FilePath, Field(frozen=True), AfterValidator(is_executable)
     ]
@@ -23,8 +22,12 @@ class DXAConfig(DeviceConfig):
 
     storescp_config: Annotated[FilePath, Field(frozen=True)]
 
+    logger_config: Annotated[FilePath, Field(frozen=True)]
+
+    log_path: Annotated[FilePath, Field(frozen=True)]
+
     storage_path: Annotated[DirectoryPath, Field(frozen=True)]
 
-    # Apex
     patscan_db_path: Annotated[FilePath, Field(frozen=True)]
+
     reference_db_path: Annotated[FilePath, Field(frozen=True)]

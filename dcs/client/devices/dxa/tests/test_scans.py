@@ -62,11 +62,9 @@ class TestScans(unittest.TestCase):
             scan_id=scan_analysis[0].get("SCANID"),
         )
         self.assertTrue(success)
-        #print(json.dumps({**hip_scan_data, **hip_hsa_scan_data}, indent=4))
 
         left_hip = LeftHip(raw_data={**hip_scan_data, **hip_hsa_scan_data})
         print(left_hip.get_bmd_data())
-        #print(json.dumps(left_hip.to_dict(), indent=4))
 
     def test_right_hip(self):
         success, patient_info = self.patscan_db.get_patient_info(barcode="30003304")

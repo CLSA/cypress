@@ -2,16 +2,16 @@ import pydicom
 
 from typing import Literal, List, Any
 from enum import Enum
+from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
-
-import pydicom
 
 
 class Side(Enum):
     LEFT = 0
     RIGHT = 1
     BOTH = 2
+
 
 ###
 #  These are the key/value pairs that are expected to be found in the DICOM files metadata
@@ -127,6 +127,7 @@ class IvaOTDicom(BaseModel):
     PhotometricInterpretation: Literal["MONOCHROME2"]
     SamplesPerPixel: Literal[1]
 
+
 class StructuredReportDicom(BaseModel):
     MediaStorageSOPClassUID: Literal["1.2.840.10008.5.1.4.1.1.88.22"]
     Modality: Literal["SR"]
@@ -143,7 +144,7 @@ dxa_validation_rules = {
     "SEL_DICOM_MEASURE": IvaMeasureDicom,
     "SEL_DICOM_OT": IvaOTDicom,
     "SEL_DICOM_PR": IvaPRDicom,
-    "SR_DICOM": StructuredReportDicom
+    "SR_DICOM": StructuredReportDicom,
 }
 
 
@@ -152,6 +153,7 @@ def get_dicom_dict(ds):
         "MediaStorageSOPClassUID": getattr(
             ds.file_meta, "MediaStorageSOPClassUID", None
         ),
+        "PatientID": getattr(ds, "PatientID", None),
         "Modality": getattr(ds, "Modality", None),
         "Laterality": getattr(ds, "Laterality", None),
         "BodyPartExamined": getattr(ds, "BodyPartExamined", None),
@@ -185,7 +187,12 @@ def print_file_meta(path):
     print("-" * 80, "\n")
 
 
-def get_file_type(ds) -> str:
+def get_file_type(ds) -> str | None:
     for file_name, pydantic_model in dxa_validation_rules.items():
         if valid(ds=ds, model=pydantic_model):
             return file_name
+
+
+def get_scan_type(path: Path) -> str:
+    ds = pydicom.dcmread(path)
+    return get_file_type(ds)

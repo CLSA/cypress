@@ -1,15 +1,15 @@
-import time
-import json
+import logging
+import pydicom
+
+from pathlib import Path
 
 from measure import Record
 from devices.dxa.utils.validation import Side
 
-
+logger = logging.getLogger("dxa")
 
 class WholeBody(Record):
-    ranges = {
-        "wbtot_bmd": "NULL"
-    }
+    ranges = {"wbtot_bmd": "NULL"}
 
     field_map = {
         "NAME": {"attr": "name", "data_type": str, "units": None},
@@ -337,6 +337,57 @@ class WholeBody(Record):
             "units": None,
         },
     }
+
+    def __init__(
+        self,
+        raw_data: dict,
+        wb1_scan_path: Path | None = None,
+        wb2_scan_path: Path | None = None,
+    ):
+        super().__init__(raw_data)
+
+        self.set_wb1_scan_path(wb1_scan_path)
+        self.set_wb2_scan_path(wb2_scan_path)
+
+    def set_wb1_scan_path(self, wb1_scan_path: Path | None):
+        self.wb1_scan_path = wb1_scan_path
+
+    def set_wb2_scan_path(self, wb2_scan_path: Path | None):
+        self.wb2_scan_path = wb2_scan_path
+
+    def is_valid(self):
+        if not self.wb1_scan_path:
+            return False
+
+        if not self.wb2_scan_path:
+            return False
+
+        if not self.wb1_scan_path.exists():
+            return False
+
+        if not self.wb1_scan_path.is_file():
+            return False
+
+        if not self.wb2_scan_path.exists():
+            return False
+
+        if not self.wb2_scan_path.is_file():
+            return False
+
+        try:
+            pydicom.dcmread(self.wb1_scan_path)
+        except Exception as e:
+            logger.error(e)
+            return False
+
+        try:
+            pydicom.dcmread(self.wb2_scan_path)
+        except Exception as e:
+            logger.error(e)
+            return False
+
+        return True
+
 
     @staticmethod
     def get_side():

@@ -1,3 +1,7 @@
+import pydicom
+
+from pathlib import Path
+
 from measure import Record
 from devices.dxa.utils.validation import Side
 
@@ -65,8 +69,12 @@ class ForearmMeasure(Record):
         "ARM_LENGTH": {"attr": "arm_length", "data_type": float, "units": None},
     }
 
-    def __init__(self, raw_data):
+    def __init__(self, raw_data: dict, scan_path: Path = None):
         super().__init__(raw_data)
+        self.set_scan(scan_path)
+
+    def set_scan(self, scan_path: Path | None):
+        self.scan_path = scan_path
 
     @staticmethod
     def get_body_part_name():
@@ -79,6 +87,24 @@ class ForearmMeasure(Record):
     @staticmethod
     def get_ref_source():
         return "Hologic"
+
+    def is_valid(self):
+        if not self.scan_path:
+            return False
+
+        if not self.scan_path.exists():
+            return False
+
+        if not self.scan_path.is_file():
+            return False
+
+        try:
+            pydicom.dcmread(self.scan_path)
+        except Exception as e:
+            print(e)
+            return False
+
+        return True
 
     def get_bmd_data(self):
         bmd_data = {}

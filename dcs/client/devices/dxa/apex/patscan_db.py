@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 
 from pathlib import Path
 
-logger = logging.getLogger("DXA")
+logger = logging.getLogger("dxa")
 
 
 class PatScanDB:
@@ -23,7 +23,7 @@ class PatScanDB:
     def open(self) -> bool:
         logger.debug("opening patscan.mdb")
         if not self.db.open():
-            logger.critical(f"Error: {self.db.lastError().text()}")
+            logger.error(f"Error: {self.db.lastError().text()}")
             return False
         return True
 
@@ -43,7 +43,7 @@ class PatScanDB:
 
         query.bindValue(":barcode", barcode)
         if not query.exec():
-            logger.critical(f"get_patient_info: {query.lastError().text()}")
+            logger.error(f"get_patient_info: {query.lastError().text()}")
             return False, "Could not retrieve patient info"
 
         if query.size() > 1:
@@ -76,11 +76,13 @@ class PatScanDB:
             "ORDER BY SCAN_DATE DESC"
         )
 
+        logger.error(patient_key, scan_type)
+
         query.bindValue(":patient_key", patient_key)
         query.bindValue(":scan_type", scan_type)
 
         if not query.exec():
-            logger.critical(f"get_scan_analysis: {query.lastError().text()}")
+            logger.error(f"get_scan_analysis: {query.lastError().text()}")
             return False, "Could not retrieve scan analysis"
 
         if query.size() > 1:
@@ -127,11 +129,11 @@ class PatScanDB:
         query.bindValue(":scanId", scan_id)
 
         if not query.exec():
-            logger.critical(f"get_scan_data: {query.lastError().text()}")
+            logger.error(f"get_scan_data: {query.lastError().text()}")
             return False, "Could not retrieve scan data"
 
         if query.size() == 0:
-            logger.critical(
+            logger.error(
                 f"get_scan_data: could not find a result for {patient_key} {scan_id}"
             )
             return False, "No results found"

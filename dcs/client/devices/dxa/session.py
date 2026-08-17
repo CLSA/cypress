@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QDoubleSpinBox,
     QCheckBox,
-    QDateEdit
+    QDateEdit,
 )
 
 from PySide6.QtCore import QDate
@@ -89,6 +89,15 @@ class DXASessionDialog(SessionDialog):
                 self.dob.hasAcceptableInput(),
                 self.height.hasAcceptableInput(),
                 self.weight.hasAcceptableInput(),
+                any([
+                    self.include_lhip.isChecked(),
+                    self.include_rhip.isChecked(),
+                    self.include_apspine.isChecked(),
+                    self.include_spine.isChecked(),
+                    self.include_lfa.isChecked(),
+                    self.include_rfa.isChecked(),
+                    self.include_whole_body.isChecked(),
+                ]),
             ]
         )
         return super().can_submit() and has_acceptable_input

@@ -1,7 +1,13 @@
+import logging
+from typing import override
+
+import pydicom
+
+from pathlib import Path
+
 from measure import Record
 
-from utils import DicomFileInfo
-
+logger = logging.getLogger("dxa")
 
 class HipMeasurement(Record):
     ranges = {
@@ -74,8 +80,36 @@ class HipMeasurement(Record):
         },
     }
 
-    def __init__(self, raw_data):
+    def __init__(self, raw_data, scan_path: Path = None):
         super().__init__(raw_data)
+        self.set_scan(scan_path)
+
+    def set_scan(self, scan_path: Path | None):
+        self.scan_path = scan_path
+
+
+
+    def is_valid(self):
+        if not self.scan_path:
+            return False
+
+        if not self.scan_path.exists():
+            return False
+
+        if not self.scan_path.is_file():
+            return False
+
+        try:
+            pydicom.dcmread(self.scan_path)
+        except Exception as e:
+            print(e)
+            return False
+
+        return True
+
+    @staticmethod
+    def get_scan_type():
+        pass
 
     @staticmethod
     def get_ref_type():
@@ -88,9 +122,6 @@ class HipMeasurement(Record):
     @staticmethod
     def get_body_part_name():
         return "HIP"
-
-    def set_hip_file(self, file_info: DicomFileInfo):
-        self.hip_file_info = file_info
 
     def get_bmd_data(self):
         bmd_data = {}
@@ -109,12 +140,63 @@ class LeftHip(HipMeasurement):
     def get_name():
         return "L_HIP"
 
+    @staticmethod
+    def get_send_name():
+        return "L_HIP_DICOM"
+
+    def analyze(self, patient_info, patscan_db, reference_db):
+        try:
+            if self.scan_path is not None:
+                logging.debug(patient_info, patscan_db, reference_db)
+
+                ok, scan_analysis = patscan_db.get_scan_analysis(patient_info["PATIENT_KEY"], LeftHip.get_scan_type())
+                scan_analysis = scan_analysis[0]
+                logging.debug(scan_analysis)
+
+                ok, hip_data = patscan_db.get_scan_data("Hip", patient_info["PATIENT_KEY"], scan_analysis["SCANID"])
+                logging.debug(hip_data)
+
+                ok, hip_hsa_data = patscan_db.get_scan_data("HipHSA", patient_info["PATIENT_KEY"], scan_analysis["SCANID"])
+                logging.debug(hip_hsa_data)
+
+                all_hip_data = hip_data | hip_hsa_data
+                self._set_fields(all_hip_data)
+        except Exception as e:
+            logger.error(e)
+
 
 class RightHip(HipMeasurement):
     @staticmethod
+    @override
     def get_scan_type():
         return 3
 
     @staticmethod
+    @override
     def get_name():
         return "R_HIP"
+
+    @staticmethod
+    @override
+    def get_send_name():
+        return "R_HIP_DICOM"
+
+    def analyze(self, patient_info, patscan_db, reference_db):
+        try:
+            if self.scan_path is not None:
+                logging.debug(patient_info, patscan_db, reference_db)
+
+                ok, scan_analysis = patscan_db.get_scan_analysis(patient_info["PATIENT_KEY"], RightHip.get_scan_type())
+                scan_analysis = scan_analysis[0]
+                logging.debug(scan_analysis)
+
+                ok, hip_data = patscan_db.get_scan_data("Hip", patient_info["PATIENT_KEY"], scan_analysis["SCANID"])
+                logging.debug(hip_data)
+
+                ok, hip_hsa_data = patscan_db.get_scan_data("HipHSA", patient_info["PATIENT_KEY"], scan_analysis["SCANID"])
+                logging.debug(hip_hsa_data)
+
+                all_hip_data = hip_data | hip_hsa_data
+                self._set_fields(all_hip_data)
+        except Exception as e:
+            logger.error(e)
