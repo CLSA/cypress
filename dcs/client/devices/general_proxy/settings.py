@@ -4,7 +4,7 @@ DEVICE_NAME = "general_proxy"
 LOG_LOCATION = "logs/general_proxy.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 logger = logging.getLogger(DEVICE_NAME)
 
@@ -13,7 +13,7 @@ LOG_CONFIG = {
     "disable_existing_loggers": False,
     "formatters": {
         "default": {
-            "format": f"[%(asctime)s] %(levelname)s - %(message)s",
+            "format": f"[%(asctime)s] %(levelname)s - {DEVICE_NAME} - %(message)s",
             "datefmt": "%d/%m/%Y %I:%M:%S",
         },
     },

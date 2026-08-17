@@ -23,7 +23,7 @@ class GeneralProxyView(View):
         self.start_button.setVisible(False)
         self.measurement_table_widget.setVisible(False)
 
-        self.setFixedSize(400, 257)
+        self.setFixedSize(400, 225)
 
     @override
     def on_ready_to_measure(self):
