@@ -13,50 +13,49 @@ class ECGModel(Model):
         self.xml_path = None
         self.ecg_path = None
 
-    def read_results(self, storage_path: Path) -> tuple[bool, str | None]:
+    def add_files(
+        self, ecg_path: Path, xml_path: Path, pdf_path: Path
+    ) -> tuple[bool, str | None]:
         self.reset()
 
-        if not storage_path.exists() or not storage_path.is_dir():
-            return False, "Storage directory does not exist"
+        if not self.add_file(ecg_path, send_name="Ecg"):
+            return False, "Could not add ecg file"
 
-        file_count = sum(1 for path in storage_path.iterdir() if path.is_file())
+        if not self.add_file(xml_path, send_name="Ecg"):
+            return False, "Could not add xml file"
 
-        if file_count > 3:
-            return False, "Too many files received"
+        if not self.add_file(pdf_path, send_name="Ecg"):
+            return False, "Could not add pdf file"
 
-        ecg_path = None
-        pdf_path = None
-        xml_path = None
-
-        for file_path in storage_path.iterdir():
-            if file_path.is_file() and file_path.exists():
-                if file_path.suffix.lower() == '.ecg':
-                    ecg_path = file_path
-                elif file_path.suffix.lower() == '.pdf':
-                    pdf_path = file_path
-                elif file_path.suffix.lower() == '.xml':
-                    xml_path = file_path
-                else:
-                    return False, "Unknown file"
-
-        if not xml_path or not xml_path.exists() or not xml_path.is_file():
-            return False, "XML file not found"
-
-        if not pdf_path or not pdf_path.exists() or not pdf_path.is_file():
-            return False, "PDF file not found"
-
-        if not ecg_path or not ecg_path.exists() or not ecg_path.is_file():
-            return False, "ECG file not found"
-
-        self.add_file(file_path=pdf_path, send_name="Ecg")
-        self.add_file(file_path=xml_path, send_name="Ecg")
-        self.add_file(file_path=ecg_path, send_name="Ecg")
+        self.ecg_path = ecg_path
+        self.xml_path = xml_path
+        self.pdf_path = pdf_path
 
         return True, None
 
-    def _parse_xml_file(self, xml_path: Path):
-        with open(xml_path) as xml_file:
-            tree = ET.parse(xml_file)
-            root = tree.getroot()
-            for child in root:
-                self.metadata[child.tag] = child.attrib
+    def read_results(self) -> tuple[bool, str | None]:
+        if not self.xml_path:
+            return False, "No XML file"
+
+        parsed = self._parse_xml_file()
+        if not parsed:
+            return False, "Failed to parse XML file"
+
+        return True, None
+
+    def _parse_xml_file(self):
+        if not self.xml_path:
+            return False
+
+        try:
+            with open(self.xml_path) as xml_file:
+                tree = ET.parse(xml_file)
+                root = tree.getroot()
+                for child in root:
+                    self.metadata[child.tag] = child.attrib
+        except (FileNotFoundError, PermissionError):
+            return False
+        except Exception as e:
+            return False
+
+        return True

@@ -1,7 +1,7 @@
+from pathlib import Path
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidgetItem, QHeaderView, QAbstractItemView
-
-from files.receiver import FileInfo
 
 from view import View
 
@@ -19,8 +19,11 @@ class ECGView(View):
 
         self.session_widget.deviceStatusValue.setText("ECG")
         self.table = self.measurement_table_widget.measurementTable
+        self.table.setVisible(False)
+        self.start_button.setVisible(False)
+        self.setFixedSize(400, 250)
 
-    def _on_files_received(self, files: list[FileInfo]):
+    def _on_files_received(self, files: list[Path]):
         self.table.clear()
 
         columns = ["Name", "Size"]
