@@ -2,6 +2,7 @@ import json
 import tarfile
 
 from pathlib import Path
+import traceback
 
 from controller import Controller
 
@@ -54,23 +55,24 @@ class BPController(Controller):
                 self._handle_error("Something went wrong", store_backup=True)
                 return False
 
-            # success, patient_key = self.db.insert_patient(
-            #     name="Participant",
-            #     barcode=self.session.barcode,
-            #     gender=self.session.sex,
-            #     dob=self.session.dob,
-            #     physician="CLSA",
-            # )
+            success, patient_key = self.db.insert_patient(
+                name="Participant",
+                barcode=self.session.barcode,
+                gender=self.session.sex,
+                dob=self.session.dob,
+                physician="CLSA",
+            )
 
-            # if not success:
-            #     self.error.emit("Failed to initialize database")
-            #     return False
+            if not success:
+                self.error.emit("Failed to initialize database")
+                return False
 
-            self.patient_key = 6
+            self.patient_key = patient_key
 
         except Exception as e:
+            traceback.print_exc()
             self.logger.error(e)
-            self.error.emit("Failed to load results")
+            self.error.emit("Something went wrong")
             return False
 
         finally:
