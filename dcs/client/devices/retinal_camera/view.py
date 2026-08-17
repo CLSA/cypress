@@ -27,7 +27,7 @@ class RetinalCameraView(View):
         )
 
         self.measure_button.setVisible(True)
-        self.start_button.setVisible(False)
+        self.start_button.setVisible(True)
 
         self.columns = ["#", "Name", "Size"]
 
