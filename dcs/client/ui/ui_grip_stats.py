@@ -23,10 +23,10 @@ class Ui_GripInfo(object):
     def setupUi(self, GripInfo):
         if not GripInfo.objectName():
             GripInfo.setObjectName(u"GripInfo")
-        GripInfo.resize(465, 345)
+        GripInfo.resize(337, 312)
         self.verticalLayout = QVBoxLayout(GripInfo)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(-1, 0, -1, -1)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.controls = QHBoxLayout()
         self.controls.setObjectName(u"controls")
         self.manual_entry_button = QPushButton(GripInfo)
@@ -61,7 +61,7 @@ class Ui_GripInfo(object):
         self.summary.setFlat(False)
         self.verticalLayout_3 = QVBoxLayout(self.summary)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(-1, 9, -1, -1)
+        self.verticalLayout_3.setContentsMargins(-1, 0, 0, 0)
         self.test = QHBoxLayout()
         self.test.setObjectName(u"test")
         self.test_label = QLabel(self.summary)
@@ -241,10 +241,7 @@ class Ui_GripInfo(object):
 
         self.verticalLayout.addWidget(self.summary)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout.addItem(self.verticalSpacer)
-
+        self.verticalLayout.setStretch(1, 1)
 
         self.retranslateUi(GripInfo)
 

@@ -34,7 +34,7 @@ class LogMonitor(QObject):
         self._running = False
 
 class LogWidget(QWidget, Ui_LogWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, log_path: Path):
         super().__init__(parent)
 
         self.setupUi(self)
@@ -43,7 +43,7 @@ class LogWidget(QWidget, Ui_LogWidget):
 
         self.thread = QThread()
 
-        self.log_monitor = LogMonitor(Path.cwd() / "logs" / "server.log")
+        self.log_monitor = LogMonitor(log_path)
         self.log_monitor.moveToThread(self.thread)
 
         self.thread.started.connect(self.log_monitor.run)
@@ -65,6 +65,7 @@ class LogWidget(QWidget, Ui_LogWidget):
         self.log_monitor.stop()
         self.thread.quit()
         self.thread.wait()
+        self.thread = None
         super().closeEvent(event)
 
 

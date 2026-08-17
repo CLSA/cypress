@@ -1,4 +1,4 @@
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, Literal
 
 from pydantic import Field
 
@@ -10,4 +10,6 @@ from devices.weigh_scale.settings import DEVICE_NAME
 class WeighScaleConfig(DeviceConfig):
     section_name: ClassVar[str] = DEVICE_NAME
 
-    port_name: Annotated[str, Field(min_length=4)]
+    port_name: str
+
+    locale: Literal["en", "fr"]

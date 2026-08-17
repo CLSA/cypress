@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
-    <height>257</height>
+    <width>430</width>
+    <height>199</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,6 +28,18 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="sizeConstraint">
     <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item alignment="Qt::AlignmentFlag::AlignTop">
     <widget class="QGroupBox" name="groupBox">
@@ -79,7 +91,7 @@
            <string>Participant ID</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -98,7 +110,7 @@
            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -121,7 +133,7 @@
            <string>Interviewer</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -140,7 +152,7 @@
            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -160,7 +172,7 @@
            <string>Started</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -176,7 +188,7 @@
            <string>---</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -199,7 +211,7 @@
            <string>Device</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -218,7 +230,7 @@
            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -238,7 +250,7 @@
            <string>Status</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>
@@ -254,7 +266,7 @@
            <string>---</string>
           </property>
           <property name="margin">
-           <number>4</number>
+           <number>2</number>
           </property>
          </widget>
         </item>

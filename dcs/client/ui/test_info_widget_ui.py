@@ -23,7 +23,7 @@ class Ui_TestInfoWidget(object):
     def setupUi(self, TestInfoWidget):
         if not TestInfoWidget.objectName():
             TestInfoWidget.setObjectName(u"TestInfoWidget")
-        TestInfoWidget.resize(511, 257)
+        TestInfoWidget.resize(430, 199)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -33,6 +33,7 @@ class Ui_TestInfoWidget(object):
         self.verticalLayout = QVBoxLayout(TestInfoWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.groupBox = QGroupBox(TestInfoWidget)
         self.groupBox.setObjectName(u"groupBox")
         sizePolicy.setHeightForWidth(self.groupBox.sizePolicy().hasHeightForWidth())
@@ -55,7 +56,7 @@ class Ui_TestInfoWidget(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.barcodeLabel.sizePolicy().hasHeightForWidth())
         self.barcodeLabel.setSizePolicy(sizePolicy1)
-        self.barcodeLabel.setMargin(4)
+        self.barcodeLabel.setMargin(2)
 
         self.barcode.addWidget(self.barcodeLabel)
 
@@ -64,7 +65,7 @@ class Ui_TestInfoWidget(object):
         sizePolicy1.setHeightForWidth(self.barcodeValue.sizePolicy().hasHeightForWidth())
         self.barcodeValue.setSizePolicy(sizePolicy1)
         self.barcodeValue.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
-        self.barcodeValue.setMargin(4)
+        self.barcodeValue.setMargin(2)
 
         self.barcode.addWidget(self.barcodeValue)
 
@@ -78,7 +79,7 @@ class Ui_TestInfoWidget(object):
         self.interviewerLabel.setObjectName(u"interviewerLabel")
         sizePolicy1.setHeightForWidth(self.interviewerLabel.sizePolicy().hasHeightForWidth())
         self.interviewerLabel.setSizePolicy(sizePolicy1)
-        self.interviewerLabel.setMargin(4)
+        self.interviewerLabel.setMargin(2)
 
         self.interviewer.addWidget(self.interviewerLabel)
 
@@ -87,7 +88,7 @@ class Ui_TestInfoWidget(object):
         sizePolicy1.setHeightForWidth(self.interviewerValue.sizePolicy().hasHeightForWidth())
         self.interviewerValue.setSizePolicy(sizePolicy1)
         self.interviewerValue.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
-        self.interviewerValue.setMargin(4)
+        self.interviewerValue.setMargin(2)
 
         self.interviewer.addWidget(self.interviewerValue)
 
@@ -100,7 +101,7 @@ class Ui_TestInfoWidget(object):
         self.startedLabel.setObjectName(u"startedLabel")
         sizePolicy1.setHeightForWidth(self.startedLabel.sizePolicy().hasHeightForWidth())
         self.startedLabel.setSizePolicy(sizePolicy1)
-        self.startedLabel.setMargin(4)
+        self.startedLabel.setMargin(2)
 
         self.horizontalLayout.addWidget(self.startedLabel)
 
@@ -108,7 +109,7 @@ class Ui_TestInfoWidget(object):
         self.startedValue.setObjectName(u"startedValue")
         sizePolicy1.setHeightForWidth(self.startedValue.sizePolicy().hasHeightForWidth())
         self.startedValue.setSizePolicy(sizePolicy1)
-        self.startedValue.setMargin(4)
+        self.startedValue.setMargin(2)
 
         self.horizontalLayout.addWidget(self.startedValue)
 
@@ -122,7 +123,7 @@ class Ui_TestInfoWidget(object):
         self.deviceStatusLabel.setObjectName(u"deviceStatusLabel")
         sizePolicy1.setHeightForWidth(self.deviceStatusLabel.sizePolicy().hasHeightForWidth())
         self.deviceStatusLabel.setSizePolicy(sizePolicy1)
-        self.deviceStatusLabel.setMargin(4)
+        self.deviceStatusLabel.setMargin(2)
 
         self.deviceStatus.addWidget(self.deviceStatusLabel)
 
@@ -131,7 +132,7 @@ class Ui_TestInfoWidget(object):
         sizePolicy1.setHeightForWidth(self.deviceStatusValue.sizePolicy().hasHeightForWidth())
         self.deviceStatusValue.setSizePolicy(sizePolicy1)
         self.deviceStatusValue.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
-        self.deviceStatusValue.setMargin(4)
+        self.deviceStatusValue.setMargin(2)
 
         self.deviceStatus.addWidget(self.deviceStatusValue)
 
@@ -144,7 +145,7 @@ class Ui_TestInfoWidget(object):
         self.statusLabel.setObjectName(u"statusLabel")
         sizePolicy1.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
         self.statusLabel.setSizePolicy(sizePolicy1)
-        self.statusLabel.setMargin(4)
+        self.statusLabel.setMargin(2)
 
         self.horizontalLayout_2.addWidget(self.statusLabel)
 
@@ -152,7 +153,7 @@ class Ui_TestInfoWidget(object):
         self.statusValue.setObjectName(u"statusValue")
         sizePolicy1.setHeightForWidth(self.statusValue.sizePolicy().hasHeightForWidth())
         self.statusValue.setSizePolicy(sizePolicy1)
-        self.statusValue.setMargin(4)
+        self.statusValue.setMargin(2)
 
         self.horizontalLayout_2.addWidget(self.statusValue)
 

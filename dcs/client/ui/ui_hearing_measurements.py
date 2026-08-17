@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'hearing_measurements.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -23,7 +23,7 @@ class Ui_HearingMeasurements(object):
     def setupUi(self, HearingMeasurements):
         if not HearingMeasurements.objectName():
             HearingMeasurements.setObjectName(u"HearingMeasurements")
-        HearingMeasurements.resize(427, 382)
+        HearingMeasurements.resize(492, 294)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -32,13 +32,19 @@ class Ui_HearingMeasurements(object):
         HearingMeasurements.setMaximumSize(QSize(16777215, 16777215))
         self.verticalLayout = QVBoxLayout(HearingMeasurements)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.horizontalLayout_2.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
         self.manualEntryButton = QPushButton(HearingMeasurements)
         self.manualEntryButton.setObjectName(u"manualEntryButton")
 
         self.horizontalLayout_2.addWidget(self.manualEntryButton)
+
+        self.saveButton = QPushButton(HearingMeasurements)
+        self.saveButton.setObjectName(u"saveButton")
+
+        self.horizontalLayout_2.addWidget(self.saveButton)
 
         self.horizontalSpacer = QSpacerItem(40, 10, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -66,6 +72,7 @@ class Ui_HearingMeasurements(object):
         self.leftGroup.setSizePolicy(sizePolicy)
         self.leftGroup.setMinimumSize(QSize(0, 0))
         self.leftGroup.setMaximumSize(QSize(16777215, 16777215))
+        self.leftGroup.setFlat(False)
         self.verticalLayout_2 = QVBoxLayout(self.leftGroup)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.leftFormLayout = QFormLayout()
@@ -236,6 +243,7 @@ class Ui_HearingMeasurements(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
+        self.verticalLayout.setStretch(1, 1)
 
         self.retranslateUi(HearingMeasurements)
 
@@ -245,6 +253,7 @@ class Ui_HearingMeasurements(object):
     def retranslateUi(self, HearingMeasurements):
         HearingMeasurements.setWindowTitle(QCoreApplication.translate("HearingMeasurements", u"Form", None))
         self.manualEntryButton.setText(QCoreApplication.translate("HearingMeasurements", u"Manual Entry", None))
+        self.saveButton.setText(QCoreApplication.translate("HearingMeasurements", u"Save", None))
         self.measureButton.setText(QCoreApplication.translate("HearingMeasurements", u"Measure", None))
         self.submitButton.setText(QCoreApplication.translate("HearingMeasurements", u"Submit", None))
         self.leftGroup.setTitle(QCoreApplication.translate("HearingMeasurements", u"Left Ear", None))

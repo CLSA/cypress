@@ -14,6 +14,18 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QGroupBox" name="measurementsInfo">
      <property name="sizePolicy">
@@ -25,7 +37,19 @@
      <property name="title">
       <string>Measurements</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="spacing">
@@ -87,8 +111,14 @@
         <property name="frameShadow">
          <enum>QFrame::Shadow::Plain</enum>
         </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
         <property name="gridStyle">
-         <enum>Qt::PenStyle::SolidLine</enum>
+         <enum>Qt::PenStyle::NoPen</enum>
+        </property>
+        <property name="cornerButtonEnabled">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'measurement_table.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -26,6 +26,7 @@ class Ui_MeasurementTable(object):
         MeasurementTable.resize(445, 293)
         self.verticalLayout = QVBoxLayout(MeasurementTable)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.measurementsInfo = QGroupBox(MeasurementTable)
         self.measurementsInfo.setObjectName(u"measurementsInfo")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
@@ -35,6 +36,7 @@ class Ui_MeasurementTable(object):
         self.measurementsInfo.setSizePolicy(sizePolicy)
         self.verticalLayout_2 = QVBoxLayout(self.measurementsInfo)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(6, 4, 6, 4)
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setSpacing(6)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
@@ -71,10 +73,13 @@ class Ui_MeasurementTable(object):
         self.measurementTable.setSizePolicy(sizePolicy1)
         self.measurementTable.setFrameShape(QFrame.Shape.NoFrame)
         self.measurementTable.setFrameShadow(QFrame.Shadow.Plain)
-        self.measurementTable.setGridStyle(Qt.PenStyle.SolidLine)
+        self.measurementTable.setLineWidth(0)
+        self.measurementTable.setGridStyle(Qt.PenStyle.NoPen)
+        self.measurementTable.setCornerButtonEnabled(False)
 
         self.verticalLayout_2.addWidget(self.measurementTable)
 
+        self.verticalLayout_2.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.measurementsInfo)
 
