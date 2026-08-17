@@ -5,6 +5,7 @@ import datetime
 import win32api
 
 from typing import override
+from pathlib import Path
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon, QMenu, QTabWidget
 from PySide6.QtGui import QIcon, QAction
@@ -112,7 +113,7 @@ class CypressManagerWindow(QMainWindow):
         self.status_timer.timeout.connect(self.get_status)
         self.status_timer.start(1000)  # ms
 
-        self.log_widget = LogWidget(self)
+        self.log_widget = LogWidget(self, Path.cwd() / "logs" / "server.log")
 
         tabs = self.findChild(QTabWidget, "tabWidget")
         current_tab = tabs.currentWidget()
@@ -157,6 +158,7 @@ class CypressManagerWindow(QMainWindow):
             self.ui.stopCypress.setEnabled(False)
 
     def closeEvent(self, event):
+        self.log_widget.close()
         event.accept()  # Closes the window
 
 
