@@ -58,7 +58,7 @@ class AudiometerModel(Model):
                         "value": output_json[key],
                         "units": "db",
                     },
-                    "passed": output_json[key] <= 40,
+                    "pass": output_json[key] <= 40,
                 }
             )
 
@@ -72,7 +72,7 @@ class AudiometerModel(Model):
                         "value": output_json[key],
                         "units": "db",
                     },
-                    "passed": output_json[key] <= 40,
+                    "pass": output_json[key] <= 40,
                 }
             )
 
@@ -106,7 +106,7 @@ class AudiometerModel(Model):
                             "value": value,
                             "units": "db",
                         },
-                        "passed": value <= 40,
+                        "pass": value <= 40,
                     }
                 )
 
