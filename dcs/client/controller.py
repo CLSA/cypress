@@ -25,6 +25,7 @@ class Controller(QObject):
     started = Signal()
     ready_to_measure = Signal()
     measured = Signal(dict)
+    ready_to_submit = Signal(bool)
     submitting = Signal()
     submitted = Signal()
     error = Signal(str)
@@ -56,6 +57,7 @@ class Controller(QObject):
         self.started.connect(self.view.on_started)
         self.ready_to_measure.connect(self.view.on_ready_to_measure)
         self.measured.connect(self.view.on_measured)
+        self.ready_to_submit.connect(self.view.on_ready_to_submit)
         self.submitting.connect(self.view.on_submitting)
         self.submitted.connect(self.view.on_submitted)
         self.error.connect(self.view.on_error)
@@ -85,48 +87,60 @@ class Controller(QObject):
 
         if self.detached:
             if self.save_to_file():
+                self.restore()
                 self.submitted.emit()
+                self.logger.info("submitted")
         else:
             self.upload_to_server()
 
+    def restore(self):
+        self.logger.info("restore device")
+
     def upload_to_server(self):
-        self.files_to_transfer = deepcopy(self.model.files)
+        self.logger.debug("upload_to_server")
+        try:
+            self.files_to_transfer = deepcopy(self.model.files)
+            backup_path = self._create_backup_tar(
+                directory=Path.cwd(), filename="config.tar.gz"
+            )
+            if backup_path:
+                backup_file_info = get_file_info(Path(backup_path))
+                backup_file_info.send_name = "config"
+                self.files_to_transfer.append(backup_file_info)
 
-        backup_path = self._create_backup_tar(
-            directory=Path.cwd(), filename="config.tar.gz"
-        )
+            self.api = PineAPI(
+                base_url=self.session.origin,
+                logger=self.logger,
+                session=self.session,
+                json=self.model.to_response(),
+                files=self.files_to_transfer,
+            )
 
-        if backup_path:
-            backup_file_info = get_file_info(Path(backup_path))
-            backup_file_info.send_name = "config"
-            self.files_to_transfer.append(backup_file_info)
+            self.start_upload.connect(self.api.send_device_response)
+            self.api.progress_updated.connect(self.upload_status)
+            self.api.all_finished.connect(self.upload_finished)
 
-        self.api = PineAPI(
-            base_url=self.session.origin,
-            logger=self.logger,
-            session=self.session,
-            json=self.model.to_response(),
-            files=self.files_to_transfer,
-        )
+            self.thread = QThread()
+            self.thread.finished.connect(self.thread.deleteLater)
 
-        self.start_upload.connect(self.api.send_device_response)
-        self.api.progress_updated.connect(self.upload_status)
-        self.api.all_finished.connect(self.upload_finished)
+            self.api.moveToThread(self.thread)
+            self.thread.start()
 
-        self.thread = QThread()
-        self.thread.finished.connect(self.thread.deleteLater)
-
-        self.api.moveToThread(self.thread)
-        self.thread.start()
-
-        self.start_upload.emit()
+            self.start_upload.emit()
+        except Exception as e:
+            self.logger.error(e)
+            self._handle_error()
 
     def upload_finished(self, successful: bool):
         self.logger.debug(f"upload finished: {"Yes" if successful else "No"}")
         self.thread.quit()
 
         if successful:
+            self.logger.info("submitted")
+            self.restore()
             self.submitted.emit()
+        else:
+            self.logger.info("failed to submit")
 
     def upload_status(self, file_index, file_name, percentage):
         self.view.set_status(
@@ -153,6 +167,7 @@ class Controller(QObject):
                 return False
 
         except Exception as e:
+            print(e)
             self.logger.error(e)
             return False
 
@@ -180,35 +195,57 @@ class Controller(QObject):
         self, msg: str = "Something went wrong", store_backup: bool = False
     ) -> None:
         self.error.emit(msg)
-
         if store_backup:
-            backup_path = (
-                Path.cwd()
-                / "errors"
-                / self.session.barcode
-                / self.config.section_name
-                / self.session.session_id
-            )
-            backup_path.mkdir(parents=True, exist_ok=False)
+            self._store_backup()
 
-            store_path = self._create_backup_tar(
-                directory=backup_path, filename="backup.tar.gz"
-            )
-            if not store_path:
-                self.logger.error("failed to store error backup")
-            else:
-                self.logger.info(f"stored backup at {store_path}")
-
-    def _show_message_box(self, title: str, msg: str, level: Literal["info", "warning", "critical"]):
+    def _show_message_box(
+        self,
+        title: str,
+        msg: str,
+        level: Literal["info", "warning", "critical"],
+        allow_cancel=False,
+    ):
         if level == "info":
-            QMessageBox.information(None, title, msg)
+            return QMessageBox.information(None, title, msg)
         elif level == "warning":
-            QMessageBox.warning(None, title, msg)
+            return QMessageBox.warning(
+                None,
+                title,
+                msg,
+                buttons=(
+                    QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel
+                    if allow_cancel
+                    else QMessageBox.StandardButton.Ok
+                ),
+                defaultButton=(
+                    QMessageBox.StandardButton.Cancel
+                    if allow_cancel
+                    else QMessageBox.StandardButton.Ok
+                ),
+            )
         elif level == "critical":
-            QMessageBox.critical(None, title, msg)
+            return QMessageBox.critical(None, title, msg)
         else:
             self.logger.warning(f"failed to show message box: incorrect level {level}")
 
+    def _store_backup(self):
+        backup_path = (
+            Path.cwd()
+            / "errors"
+            / self.session.barcode
+            / self.config.section_name
+            / self.session.session_id
+        )
+
+        backup_path.mkdir(parents=True, exist_ok=True)
+
+        store_path = self._create_backup_tar(
+            directory=backup_path, filename="backup.tar.gz"
+        )
+        if not store_path:
+            self.logger.error("failed to store error backup")
+        else:
+            self.logger.info(f"stored backup at {store_path}")
 
     def _create_backup_tar(self, directory: Path, filename: str) -> str | None:
         try:

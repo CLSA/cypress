@@ -7,7 +7,6 @@ from devices.spirometer.emr.output.trial import Trial
 
 class Test(SpirometerXML):
     field_map = {
-        "LungAge": {"key": "lung_age", "type": int},
         "SWVersion": {"key": "device_software_version", "type": str},
         "QualityGradeOriginal": {"key": "original_quality_grade", "type": str},
         "QualityGrade": {"key": "quality_grade", "type": str},
@@ -49,6 +48,16 @@ class Test(SpirometerXML):
                 for sub_child in child:
                     if sub_child.tag == "ResultParameter":
                         self.best_values.append(ResultParameter(sub_child))
+
+    def get_best_values(self):
+        best_values = self.root.find("BestValues", None)
+        results = []
+        for child in best_values:
+            result_parameter = ResultParameter(child)
+            results.append(result_parameter)
+        return results
+
+
 
     def get_trials(self) -> list[Trial]:
         trial_els = self.root.find(".//Trials")

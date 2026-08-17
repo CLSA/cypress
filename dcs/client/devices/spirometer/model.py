@@ -41,6 +41,8 @@ class SpirometerModel(Model):
         if len(patients_el) > 1:
             raise ValueError("More than one patient exists")
 
+        lung_age = root.find(".//LungAge")
+        self.metadata["lung_age"] = { "value": int(lung_age.text), "units": "yr" }
         self.patient = Patient(patients_el[0])
 
         self.add_file(output_file, "data")
@@ -53,46 +55,85 @@ class SpirometerModel(Model):
         patient_dict = self.patient.to_dict()
         patient_dict["tests"] = []
 
-        for test in self.patient.get_tests():
-            test_dict = test.to_dict()
-            test_dict["trials"] = []
+        tests = self.patient.get_tests()
+        test = sorted(tests, key=lambda test: test.quality_grade)[0]
 
-            for trial in test.get_trials():
-                trial_dict = trial.to_dict()
+        test_dict = test.to_dict()
+        test_dict["trials"] = []
 
-                for result in trial.get_results():
-                    name = result.id
-                    data_value = result.data_value
-                    unit = result.unit
-                    predicted_value = result.predicted_value
-                    ll_normal_value = result.ll_normal_value
-                    z_score = result.z_score
+        best_values = test.get_best_values()
+        best_values_dict = {}
+        for result in best_values:
+            name = result.id
+            data_value = result.data_value
+            unit = result.unit
+            predicted_value = result.predicted_value
+            ll_normal_value = result.ll_normal_value
+            z_score = result.z_score
 
+            if unit:
+                best_values_dict[name] = { "units": unit, "value": data_value }
+            else:
+                best_values_dict[name] = data_value
+
+            if predicted_value:
+                if unit:
+                    best_values_dict[f"{name}_predicted"] = { "units": unit, "value": predicted_value }
+                else:
+                    best_values_dict[f"{name}_predicted"] = predicted_value
+
+            if ll_normal_value:
+                if unit:
+                    best_values_dict[f"{name}_ll_normal"] = { "units": unit, "value": ll_normal_value }
+                else:
+                    best_values_dict[f"{name}_ll_normal"] = ll_normal_value
+
+            if z_score:
+                best_values_dict[f"{name}_z_score"] = z_score
+
+
+        res["value"]["metadata"]["original_quality_grade"] = test.original_quality_grade
+        res["value"]["metadata"]["quality_grade"] = test.quality_grade
+
+        res["value"]["best_values"] = best_values_dict
+
+        trials = []
+        for trial in test.get_trials():
+            trial_dict = trial.to_dict()
+
+            for result in trial.get_results():
+                name = result.id
+                data_value = result.data_value
+                unit = result.unit
+                predicted_value = result.predicted_value
+                ll_normal_value = result.ll_normal_value
+                z_score = result.z_score
+
+                if unit:
+                    trial_dict[name] = { "units": unit, "value": data_value }
+                else:
+                    trial_dict[name] = data_value
+
+                if predicted_value:
                     if unit:
-                        trial_dict[name] = { "units": unit, "value": data_value }
+                        trial_dict[f"{name}_predicted"] = { "units": unit, "value": predicted_value }
                     else:
-                        trial_dict[name] = data_value
+                        trial_dict[f"{name}_predicted"] = predicted_value
 
-                    if predicted_value:
-                        if unit:
-                            trial_dict[f"{name}_predicted"] = { "units": unit, "value": predicted_value }
-                        else:
-                            trial_dict[f"{name}_predicted"] = predicted_value
+                if ll_normal_value:
+                    if unit:
+                        trial_dict[f"{name}_ll_normal"] = { "units": unit, "value": ll_normal_value }
+                    else:
+                        trial_dict[f"{name}_ll_normal"] = ll_normal_value
 
-                    if ll_normal_value:
-                        if unit:
-                            trial_dict[f"{name}_ll_normal"] = { "units": unit, "value": ll_normal_value }
-                        else:
-                            trial_dict[f"{name}_ll_normal"] = ll_normal_value
+                if z_score:
+                    trial_dict[f"{name}_z_score"] = z_score
 
-                    if z_score:
-                        trial_dict[f"{name}_z_score"] = z_score
+            trials.append(trial_dict)
 
-                test_dict["trials"].append(trial_dict)
+            #patient_dict["tests"].append(test_dict)
 
-            patient_dict["tests"].append(test_dict)
-
-        res["value"]["results"] = patient_dict
+        res["value"]["results"] = trials
 
         return res
 

@@ -1,10 +1,13 @@
+import logging
+
 from typing import override
 from dataclasses import dataclass
+
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Signal, QFileSystemWatcher, QProcess
+from PySide6.QtCore import QObject, Signal, QFileSystemWatcher, QProcess, QTimer
 
-from utils import FileInfo, get_file_size, clear_directory
+from utils import stop_process, is_process_running
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -16,63 +19,16 @@ class ReceiverConfig:
     extensions: list[str]
 
 
-class FileReceiver(QObject):
-    files_received = Signal(object)
-    started = Signal
-    finished = Signal
-
-    def __init__(self, config: ReceiverConfig, parent=None):
-        super().__init__(parent)
-        self.config = config
-
-        self._clear_files()
-        self._configure_listener()
-
-    def _clear_files(self) -> bool:
-        try:
-            clear_directory(self.config.storage_dir)
-        except ValueError as e:
-            print(e)
-
-    def start(self):
-        self.directory_listener.addPath(str(self.config.storage_dir.resolve()))
-
-    def stop(self):
-        self.directory_listener.removePath(str(self.config.storage_dir.resolve()))
-
-    def _configure_listener(self) -> None:
-        self.directory_listener = QFileSystemWatcher()
-        self.directory_listener.directoryChanged.connect(self._on_directory_changed)
-
-    def _on_directory_changed(self) -> None:
-        self.files: list[FileInfo] = []
-        for file_path in self.config.storage_dir.iterdir():
-            if (
-                file_path.is_file()
-                and file_path.exists()
-                and file_path.suffix in self.config.extensions
-            ):
-                file_info = FileInfo(
-                    name=file_path.stem,
-                    raw_size=file_path.stat().st_size,
-                    readable_size=get_file_size(file_path),
-                    file_name=file_path.name,
-                    extension=file_path.suffix,
-                    file_path=file_path,
-                    send_name=None
-                )
-                self.files.append(file_info)
-
-        self.files_received.emit(self.files)
-
-
 @dataclass(frozen=True, kw_only=True)
 class DicomReceiverConfig(ReceiverConfig):
     # path to storescp.exe
     executable_path: Path
 
-    # path to storescp.exe config
+    # path to storescp.cfg
     config_path: Path
+
+    # path to logger.cfg
+    logger_path: Path
 
     # name of server
     ae_title: str
@@ -84,21 +40,110 @@ class DicomReceiverConfig(ReceiverConfig):
     port: str
 
 
+class FileReceiver(QObject):
+    files_received = Signal(list)
+    started = Signal
+    finished = Signal
+
+    def __init__(self, config: ReceiverConfig, parent=None):
+        super().__init__(parent)
+
+        self.config = config
+        self.directory_listener = QFileSystemWatcher()
+
+        # Prevents checking everytime the directory changes
+        self.debounce_timer = QTimer(self)
+        self.debounce_timer.setSingleShot(True)
+        self.debounce_timer.setInterval(250)  # ms
+
+        self.directory_listener.directoryChanged.connect(self._on_directory_changed)
+        self.debounce_timer.timeout.connect(self._check_files)
+
+        # Checks on an interval that all received files are finished uploading
+        self.processed_timer = QTimer(self)
+        self.processed_timer.setInterval(500)
+        self.processed_timer.setSingleShot(False)
+        self.processed_timer.timeout.connect(self._check_stability)
+
+        # Tracks received files and their current size
+        self.pending_files: dict[Path, int] = {}
+
+        # Tracks received files that have a stable size (i.e finished uploading)
+        self.processed_files: set[Path] = set()
+
+    def start(self) -> bool:
+        return self.directory_listener.addPath(str(self.config.storage_dir.resolve()))
+
+    def stop(self) -> bool:
+        return self.directory_listener.removePath(
+            str(self.config.storage_dir.resolve())
+        )
+
+    def close(self) -> bool:
+        return self.stop()
+
+    def _on_directory_changed(self) -> None:
+        print("directory changed")
+        self.debounce_timer.start()
+
+    def _check_files(self) -> None:
+        print("check files")
+        for path in self.config.storage_dir.iterdir():
+            if path.suffix not in self.config.extensions:
+                continue
+
+            if path in self.processed_files:
+                continue
+
+            try:
+                size = path.stat().st_size
+            except (FileNotFoundError, PermissionError):
+                continue
+
+            self.pending_files[path] = size
+
+        if self.pending_files and not self.processed_timer.isActive():
+            self.processed_timer.start()
+
+    def _check_stability(self):
+        print("checking stability")
+        for path, previous_size in list(self.pending_files.items()):
+            try:
+                current_size = path.stat().st_size
+            except (FileNotFoundError, PermissionError):
+                del self.pending_files[path]
+                continue
+
+            if current_size == previous_size:
+                del self.pending_files[path]
+                self.processed_files.add(path)
+            else:
+                self.pending_files[path] = current_size
+
+        if not self.pending_files:
+            self.processed_timer.stop()
+            self._process_files()
+
+    def _process_files(self):
+        self.files_received.emit(list(self.processed_files))
+
+
 class DicomReceiver(FileReceiver):
     files_received = Signal(object)
 
     started = Signal
     finished = Signal
 
-    def __init__(self, config: DicomReceiverConfig, parent=None):
+    def __init__(self, config: DicomReceiverConfig, logger, parent=None):
         super().__init__(config, parent)
-        self._configure_server()
 
-    def close(self):
-        self.dicom_process.close()
-        self.dicom_process.waitForFinished()
+        self.logger = logger
 
-    def _configure_server(self) -> None:
+        if is_process_running("storescp.exe"):
+            stopped = stop_process("storescp.exe")
+            if not stopped:
+                self.logger.error("could not stop storescp.exe")
+
         self.dicom_process = QProcess(self)
         self.dicom_process.started.connect(self._on_process_started)
         self.dicom_process.finished.connect(self._on_process_finished)
@@ -110,6 +155,8 @@ class DicomReceiver(FileReceiver):
             "--config-file",
             str(self.config.config_path.resolve()),
             "default",
+            "--log-config",
+            str(self.config.logger_path.resolve()),
             "--aetitle",
             str(self.config.ae_title),
             "--output-directory",
@@ -120,33 +167,39 @@ class DicomReceiver(FileReceiver):
 
         self.dicom_process.setProgram(str(self.config.executable_path))
         self.dicom_process.setArguments(arguments)
-        self.dicom_process.start()
 
     @override
-    def _on_directory_changed(self) -> None:
-        files = []
-        for file_path in self.config.storage_dir.iterdir():
-            if file_path.is_file() and file_path.suffix == ".dcm":
-                file_info = FileInfo(
-                    name=file_path.stem,
-                    raw_size=file_path.stat().st_size,
-                    readable_size=get_file_size(file_path),
-                    file_name=file_path.name,
-                    file_path=file_path,
-                    extension=file_path.suffix,
-                    send_name=file_path.name,
-                )
-                files.append(file_info)
-        self.files_received.emit(files)
+    def start(self) -> bool:
+        self.logger.info("dicom receiver start")
+
+        if not super().start():
+            self.logger.error("could not start directory watcher")
+            return False
+
+        self.dicom_process.start()
+        return self.dicom_process.waitForStarted(msecs=5000)
+
+    @override
+    def stop(self):
+        self.logger.info("dicom receiver stop")
+
+        if not super().stop():
+            self.logger.error("could not stop directory watcher")
+            return False
+
+        self.dicom_process.close()
+        return self.dicom_process.waitForFinished(msecs=5000)
 
     def _on_process_started(self):
-        pass
+        self.logger.info("dicom server process started")
 
     def _on_process_finished(self):
-        pass
+        self.logger.info("dicom server process finished")
+        self.process = None
 
     def _on_process_destroyed(self):
-        pass
+        self.logger.info("dicom server process destroyed")
+        self.process = None
 
     def _on_process_error(self, error):
-        pass
+        self.logger.error(f"dicom server process error: {error}")

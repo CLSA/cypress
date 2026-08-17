@@ -1,3 +1,4 @@
+import json
 import tarfile
 
 from typing import override
@@ -35,6 +36,11 @@ class SpirometerController(Controller):
             detached=detached,
         )
 
+        self.backup_paths = [
+            {"path": self.config.exchange_path, "arcname": "exchange"},
+            {"path": self.config.database_path, "arcname": "database"},
+        ]
+
         self.start()
 
     @override
@@ -48,6 +54,7 @@ class SpirometerController(Controller):
         ethnicity = self._select_ethnicity()
         if not ethnicity:
             self.logger.info("ethnicity selection cancelled")
+            self.view.close()
             return False
 
         if not EMRPlugin.write(
@@ -80,6 +87,8 @@ class SpirometerController(Controller):
             self.logger.critical(e)
 
         self.measured.emit(self.model.to_response())
+        self.logger.debug(json.dumps(self.model.to_response(), indent=4))
+        self.ready_to_submit.emit(True)
 
     def _restore_database(self):
         self.config.database_path.unlink(missing_ok=True)
@@ -98,14 +107,3 @@ class SpirometerController(Controller):
         self.process.setProgram(str(self.config.executable.resolve()))
         self.process.setArguments([])
         self.process.setWorkingDirectory(str(self.config.working_directory.resolve()))
-
-    def _create_backup_tar(self) -> str | None:
-        try:
-            backup_path = Path("./config.tar.gz")
-            backup_path.unlink(missing_ok=True)
-            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
-                backup_tar.add(self.config.database_path, arcname="database")
-                backup_tar.add(self.config.exchange_path, arcname="emr")
-            return str(backup_path.resolve())
-        except Exception as e:
-            return None

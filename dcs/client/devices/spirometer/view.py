@@ -83,8 +83,12 @@ class SpirometerView(View):
 
         self.session_widget.deviceStatusValue.setText("Spirometer")
         self.table = self.measurement_table_widget.measurementTable
+        self.table.setVisible(False)
 
         self.measure_button.setVisible(True)
+        self.start_button.setVisible(False)
+
+        self.setFixedSize(400, 250)
 
     @override
     def _on_measured(self, output: dict):
