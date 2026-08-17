@@ -2,7 +2,7 @@ DEVICE_NAME = "frax"
 LOG_LOCATION = "logs/frax.log"
 LOG_MAX_SIZE_MB = 10 * 1024 * 1024
 LOG_BACKUPS = 1
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 LOG_CONFIG = {
     "version": 1,
@@ -34,6 +34,6 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
-        DEVICE_NAME: {"handlers": ["device_log", "main_log"], "level": LOG_LEVEL}
+        DEVICE_NAME: {"handlers": ["device_log", "main_log", "console"], "level": LOG_LEVEL}
     },
 }

@@ -24,9 +24,3 @@ class FRAXConfig(DeviceConfig):
 
     # Where to read the output
     output_file: Annotated[str, Field(min_length=1, frozen=True)]
-
-    # Program argument
-    country_code: Annotated[str, Field(min_length=2, max_length=2, frozen=True)]
-
-    # Program argument
-    type_code: Annotated[str, Field(min_length=1, max_length=1, frozen=True)]

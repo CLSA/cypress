@@ -140,10 +140,11 @@ class FRAXModel(Model):
             femoral_neck_tscore=float(self.metadata["femoral_neck_tscore"]),
         )
         self.metadata["osteoporotic_fracture_bmd_interp"] = interpretation
+        self.metadata["fracture_risk"] = f"{float(self.output[15])}%"
 
     def interpret_result(
         self, p: float, femoral_neck_tscore: float, previous_fracture: bool
-    ):
+    ) -> str:
         interpretation = "N/A"
 
         if p > 20.0 or previous_fracture:

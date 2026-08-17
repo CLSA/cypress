@@ -1,3 +1,6 @@
+import datetime
+import logging
+
 from PySide6.QtWidgets import (
     QFormLayout,
     QComboBox,
@@ -9,17 +12,19 @@ from PySide6.QtWidgets import (
 )
 
 from pydantic import computed_field
-from pydantic.types import PositiveInt, PositiveFloat
+from pydantic.types import PositiveInt, PositiveFloat, NonNegativeInt, NonNegativeFloat
 
 from session import Session, SessionDialog, SexEnum
 
+logger = logging.getLogger("frax")
 
-def calculate_bmi(weight_kg: float, height_cm: float):
+
+def calculate_bmi(weight_kg: float, height_cm: float) -> float:
     height_m = height_cm / 100.0
     return weight_kg / (height_m * height_m)
 
 
-def calculate_t_score(bmd: float):
+def calculate_t_score(bmd: float) -> float:
     """
     Calculate the Femoral Neck BMD t-score using NHANES III reference values for women age 20-29 years
 
@@ -29,22 +34,43 @@ def calculate_t_score(bmd: float):
 
 def calculate_glucocorticoid(
     age: int,
-    gluco_number: int | None,
-    gluco_year: int | None,
-    gluco_age: int | None,
-) -> int:
+    months_used: int | None,
+    year_last_used: int | None,
+    age_last_used: int | None,
+) -> bool:
     """
     age: in years
     gluco_number: Months used
     gluco_year: Year last used
     gluco_age: Age last used
     """
-    if age and gluco_age:
-        if age - gluco_age <= 1 and gluco_number >= 3:
+
+    logger.debug(
+        f"age: {age}, gluco_age: {age_last_used}, gluco_year: {year_last_used} gluco_number: {months_used}"
+    )
+    current_year = datetime.datetime.now().year
+
+    if months_used is None:
+        return False
+
+    if age_last_used is None and year_last_used is None:  # no info
+        logger.debug("no glucocorticoid information")
+        return False
+
+    if age_last_used is not None and age_last_used > age:  # invalid input
+        logger.warning("gluco_age is greater than participant age")
+        return False
+
+    if year_last_used is not None and year_last_used > current_year:  # invalid input
+        logger.warning("gluco_year is greater than current year")
+        return False
+
+    if year_last_used is not None:
+        if current_year - year_last_used <= 1 and months_used >= 3:
             return True
 
-    if age and gluco_year:
-        if age - gluco_year <= 1 and gluco_number >= 3:
+    if age_last_used is not None:
+        if age - age_last_used <= 1 and months_used >= 3:
             return True
 
     return False
@@ -63,11 +89,11 @@ class FRAXSession(Session):
     weight: PositiveFloat
     height: PositiveFloat
 
-    femoral_neck_bmd: PositiveFloat
+    femoral_neck_bmd: NonNegativeFloat
 
-    glucocorticoid_age: int | float | None
-    glucocorticoid_number: int | float | None
-    glucocorticoid_year: int | float | None
+    glucocorticoid_age: NonNegativeInt | PositiveFloat | None
+    glucocorticoid_number: PositiveInt | PositiveFloat | None
+    glucocorticoid_year: PositiveInt | PositiveFloat | None
 
     ra_medications: str | None
 
@@ -89,9 +115,9 @@ class FRAXSession(Session):
     def glucocorticoid(self) -> int:
         return calculate_glucocorticoid(
             age=self.age,
-            gluco_number=self.glucocorticoid_number,
-            gluco_year=self.glucocorticoid_year,
-            gluco_age=self.glucocorticoid_age,
+            months_used=self.glucocorticoid_number,
+            year_last_used=self.glucocorticoid_year,
+            age_last_used=self.glucocorticoid_age,
         )
 
     @computed_field

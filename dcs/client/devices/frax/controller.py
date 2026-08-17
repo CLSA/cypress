@@ -31,6 +31,8 @@ class FRAXController(Controller):
             detached=detached,
         )
 
+        self.backup_paths = [{"path": self.config.directory, "arcname": "frax"}]
+
     @override
     def start(self):
         self.logger.debug("FRAXController::start")
@@ -60,19 +62,20 @@ class FRAXController(Controller):
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
         self.measured.emit(self.model.to_response())
+        self.ready_to_submit.emit(True)
 
-    def _clean(self) -> bool:
-        Path(self.config.input_file).unlink(missing_ok=True)
-        Path(self.config.output_file).unlink(missing_ok=True)
+    @override
+    def restore(self) -> bool:
+        super().restore()
+        if not self._clean():
+            return False
         return True
 
-    def _create_backup_tar(self) -> str | None:
+    def _clean(self) -> bool:
         try:
-            backup_path = Path("./frax_backup.tar.gz")
-            backup_path.unlink(missing_ok=True)
-            with tarfile.open(backup_path, mode="x:gz") as backup_tar:
-                backup_tar.add(self.config.directory, arcname="frax")
-            return str(backup_path.resolve())
+            Path(self.config.input_file).unlink(missing_ok=True)
+            Path(self.config.output_file).unlink(missing_ok=True)
         except Exception as e:
-            self.logger.critical(e)
-            return None
+            self.logger.error(e)
+            return False
+        return True
