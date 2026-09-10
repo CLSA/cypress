@@ -10,7 +10,7 @@ LOG_CONFIG = {
     "formatters": {
         "default": {
             "format": f"[%(asctime)s] %(levelname)s - {DEVICE_NAME} - %(message)s",
-            "datefmt": "%d/%m/%Y %I:%M:%S",
+            "datefmt": "%d/%m/%Y %H:%M:%S",
         },
     },
     "handlers": {
@@ -34,6 +34,6 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
-        DEVICE_NAME: {"handlers": ["main_log", "device_log", "console"], "level": LOG_LEVEL}
+        DEVICE_NAME: {"handlers": ["main_log", "device_log"], "level": LOG_LEVEL}
     },
 }

@@ -9,14 +9,14 @@ import xml.etree.ElementTree as ET
 
 from devices.spirometer.config import DEVICE_NAME
 from devices.spirometer.session import SpirometerSession, SpirometerSessionDialog
+from devices.spirometer.config import SpirometerConfig
 
 logger = logging.getLogger(DEVICE_NAME)
 
 
 class EMRPlugin:
     @staticmethod
-    def write(session: SpirometerSession, ethnicity: str, output_path: Path):
-
+    def write(session: SpirometerSession, config: SpirometerConfig, ethnicity: str, output_path: Path):
         try:
             root = ET.Element("ndd")
 
@@ -30,7 +30,7 @@ class EMRPlugin:
 
             test_param = ET.SubElement(command, "Parameter")
             test_param.set("Name", "TestType")
-            test_param.text = "FVL"
+            test_param.text = config.test_type
 
             patients = ET.SubElement(root, "Patients")
             patient = ET.SubElement(patients, "Patient")

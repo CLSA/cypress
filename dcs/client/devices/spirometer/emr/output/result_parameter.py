@@ -107,3 +107,37 @@ class ResultParameter(SpirometerXML):
         for child in root:
             if child.tag in self.field_map:
                 self.set_attribute(child.tag, child.text)
+
+
+    @override
+    def to_dict(self):
+        name = self.id
+        value = self.data_value
+        unit = self.unit
+        predicted_value = self.predicted_value
+        ll_normal_value = self.ll_normal_value
+        z_score = self.z_score
+
+        res = {}
+
+        if unit:
+            res[name] = { "value": value, "units": unit }
+        else:
+            res[name] = value
+
+        key = f"{name}_predicted"
+        if unit:
+            res[key] = { "value": predicted_value, "units": unit }
+        else:
+            res[key] = predicted_value
+
+        key = f"{name}_ll_normal"
+        if unit:
+            res[key] = { "value": ll_normal_value, "units": unit }
+        else:
+            res[key] = ll_normal_value
+
+        key = f"{name}_z_score"
+        res[key] = z_score
+
+        return res

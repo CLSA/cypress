@@ -62,13 +62,11 @@ class CRTController(Controller):
     @override
     def measure(self):
         self.logger.info("measure")
-
         if not self.model.read_results():
             self._handle_error("Something went wrong", store_backup=True)
             return
 
         self.logger.debug(json.dumps(self.model.to_response(), indent=2))
-
         self.measured.emit(self.model.to_response())
 
     @override
@@ -79,28 +77,18 @@ class CRTController(Controller):
     @override
     def restore(self):
         super().restore()
-        try:
-            if not self._clean_output_dir(self.config.output):
-                self.logger.error("restore: could not clean output directory")
-                return False
-            return True
-        except Exception as e:
-            self.logger.error(e)
-            return False
+        return self._clean_output_dir(self.config.output)
 
     def _clean_output_dir(self, output_dir: Path) -> bool:
         self.logger.debug("_clean_output_dir")
-
         try:
             for path in output_dir.iterdir():
                 if path.is_file():
                     path.unlink(missing_ok=True)
-
+            return True
         except Exception as e:
-            self.logger.critical(e)
+            self.logger.error(e)
             return False
-
-        return True
 
     def _prepare_process(self) -> None:
         self.logger.debug("_prepare_process")

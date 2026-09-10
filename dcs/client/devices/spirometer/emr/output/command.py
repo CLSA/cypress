@@ -16,6 +16,6 @@ class Command(SpirometerXML):
     def _parse_xml(self, root):
         parameters = root.findall("Parameter")
         for parameter in parameters:
-            name = parameter.attrib.get("Name", None)
+            name = parameter.attrib.get("Name")
             if name in self.field_map:
                 self.set_attribute(name, parameter.text)

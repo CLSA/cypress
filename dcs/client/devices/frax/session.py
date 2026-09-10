@@ -194,7 +194,7 @@ class FRAXSessionDialog(SessionDialog):
 
         # femoral_neck_bmd
         self.femoral_neck_bmd = QDoubleSpinBox()
-        self.femoral_neck_bmd.setRange(0.0, 1.0)
+        self.femoral_neck_bmd.setRange(0.0, 999.0)
         self.form_layout.addRow("Femoral neck BMD", self.femoral_neck_bmd)
 
         # glucocorticoid_age

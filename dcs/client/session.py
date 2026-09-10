@@ -64,6 +64,8 @@ class Session(BaseModel):
         frozen=True,
     )
 
+    end_time: str | None = None
+
     # optional
     interviewer_name: str | None = None
     date: str | None = None
@@ -74,6 +76,13 @@ class Session(BaseModel):
     @property
     def cypress_version(self) -> str:
         return CYPRESS_VERSION
+
+    def set_end_time(self) -> None:
+        self.end_time = (
+            datetime.now(timezone.utc)
+            .isoformat(timespec="milliseconds")
+            .replace("+00:00", "Z")
+        )
 
 
 class TonometerSession(Session):

@@ -59,28 +59,28 @@ class TonometerView(View):
 
             iopcc = QTableWidgetItem(
                 str(round(result["iopcc"]["value"], 1))
-                if result.get("iopcc", None) is not None
+                if result.get("iopcc") is not None
                 else "---"
             )
 
             iopg = QTableWidgetItem(
                 str(round(result["iopg"]["value"], 1))
-                if result.get("iopg", None) is not None
+                if result.get("iopg") is not None
                 else "---"
             )
             ch = QTableWidgetItem(
                 str(round(result["ch"], 1))
-                if result.get("ch", None) is not None
+                if result.get("ch") is not None
                 else "---"
             )
             crf = QTableWidgetItem(
                 str(round(result["crf"]["value"], 1))
-                if result.get("crf", None) is not None
+                if result.get("crf") is not None
                 else "---"
             )
             ws = QTableWidgetItem(
                 str(round(result["sa_ws"], 1))
-                if result.get("sa_ws", None) is not None
+                if result.get("sa_ws") is not None
                 else "---"
             )
 

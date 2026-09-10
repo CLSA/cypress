@@ -67,15 +67,13 @@ class FRAXController(Controller):
     @override
     def restore(self) -> bool:
         super().restore()
-        if not self._clean():
-            return False
-        return True
+        return self._clean()
 
     def _clean(self) -> bool:
         try:
             Path(self.config.input_file).unlink(missing_ok=True)
             Path(self.config.output_file).unlink(missing_ok=True)
+            return True
         except Exception as e:
             self.logger.error(e)
             return False
-        return True

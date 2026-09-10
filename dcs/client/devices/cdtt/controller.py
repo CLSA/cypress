@@ -32,7 +32,10 @@ class CDTTController(Controller):
             detached=detached,
         )
 
-        self.backup_paths = [{"path": self.config.directory, "arcname": "CDTTStereo"}]
+        self.backup_paths = [
+            {"path": Path(self.config.directory / "applicationFiles/Results" ), "arcname": "Results" },
+            {"path": Path(self.config.directory / "applicationFiles/Settings" ), "arcname": "Settings" }
+        ]
 
     @override
     def start(self) -> bool:
@@ -97,18 +100,10 @@ class CDTTController(Controller):
     @override
     def restore(self):
         super().restore()
-        try:
-            if not self._clean_output_dir(self.config.output):
-                self.logger.error("restore: could not clean output directory")
-                return False
-            return True
-        except Exception as e:
-            self.logger.error(e)
-            return False
+        return self._clean_output_dir(self.config.output)
 
     def _clean_output_dir(self, output_dir: Path) -> bool:
         self.logger.debug("_clean_output_dir")
-
         try:
             for path in output_dir.iterdir():
                 if path.is_file() and path.name != "Results-Template.xlsx":

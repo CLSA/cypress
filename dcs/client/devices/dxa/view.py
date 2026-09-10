@@ -42,6 +42,12 @@ class DXAView(View):
         self.layout().addWidget(self.dxa_scans_widget)
 
     @override
+    def _on_measure_button_clicked(self):
+        self.logger.info("measure requested")
+        self.measure_button.setEnabled(False)
+        self.measure.emit()
+
+    @override
     def on_ready_to_measure(self):
         super().on_ready_to_measure()
         self.session_widget.statusValue.setText(

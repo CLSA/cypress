@@ -13,24 +13,25 @@ logger = logging.getLogger("audiometer")
 
 
 left_keys = {
-    "l500": "500 Hz",
     "l1000": "1000 Hz",
     "l2000": "2000 Hz",
     "l3000": "3000 Hz",
     "l4000": "4000 Hz",
+    "l500": "500 Hz",
     "l6000": "6000 Hz",
-    "l8000": "8000 Hz"
+    "l8000": "8000 Hz",
 }
 
 right_keys = {
-    "r500": "500 Hz",
     "r1000": "1000 Hz",
     "r2000": "2000 Hz",
     "r3000": "3000 Hz",
     "r4000": "4000 Hz",
+    "r500": "500 Hz",
     "r6000": "6000 Hz",
-    "r8000": "8000 Hz"
+    "r8000": "8000 Hz",
 }
+
 
 class AudiometerModel(Model):
     def __init__(self, session: AudiometerSession, config: AudiometerConfig):
@@ -46,7 +47,7 @@ class AudiometerModel(Model):
 
         logger.debug(json.dumps(output_json, indent=4))
 
-        self.metadata = output_json
+        self.metadata = {key.lower(): value for key, value in output_json.items()}
 
         for key, name in left_keys.items():
             self.results.append(

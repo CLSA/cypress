@@ -62,6 +62,8 @@ class DXAController(Controller):
         self.view.close.connect(self.close)
         self.view.destroyed.connect(self.close)
 
+        self.has_error = False
+
         self.start()
 
     @override
@@ -78,30 +80,13 @@ class DXAController(Controller):
 
         self.started.emit()
 
-    @override
-    def close(self):
-        self.file_receiver.stop()
-
-    @override
-    def restore(self):
-        try:
-            if not self._clean_output_dir(self.config.storage_path):
-                self.logger.error("restore: could not clear storage directory")
-                return False
-            return True
-        except Exception as e:
-            self.logger.error(e)
-            return False
-
     def _on_files_received(self, dicom_files: list[Path]):
         self.logger.debug("_on_files_received")
+        if self.has_error:
+            return
 
         valid_files = {}
         for file_path in dicom_files:
-            if ".dcm" != file_path.suffix:
-                self.logger.warning(f"unknown file extension: {file_path.suffix}")
-                continue
-
             file_type = get_scan_type(file_path)
             if file_type is None:
                 self.logger.warning(f"received unknown file type: {file_path.name}")
@@ -110,7 +95,9 @@ class DXAController(Controller):
             ds = pydicom.dcmread(file_path, stop_before_pixels=True)
             if ds.PatientID != self.session.barcode:
                 self.logger.warning(f"received incorrect patient id: {ds.PatientID}")
-                # continue
+                self.has_error = True
+                self._handle_error(f"Invalid barcode received {ds.PatientID}", store_backup=False)
+                return
 
             valid_files[file_type] = file_path
 
@@ -163,50 +150,57 @@ class DXAController(Controller):
         self.logger.info("copying reference.mdb from apex (2/2)")
         self.config.reference_db_path.copy_into(Path.cwd())
 
+        patscan_db = PatScanDB(Path.cwd() / "PatScan.mdb")
+        if not patscan_db.open():
+            self.logger.error("couldn't open patscan")
+            return
+
+        reference_db = ReferenceDB(Path.cwd() / "reference.mdb")
+        if not reference_db.open():
+            self.logger.error("couldn't open reference")
+            return
+
         try:
-            patscan_db = PatScanDB(Path.cwd() / "PatScan.mdb")
-            if not patscan_db.open():
-                self.logger.error("couldn't open patscan")
-                return
-
-            reference_db = ReferenceDB(Path.cwd() / "reference.mdb")
-            if not reference_db.open():
-                self.logger.error("couldn't open reference")
-                return
-
             ok, patient_info = patscan_db.get_patient_info(barcode=self.session.barcode)
             if not ok:
                 self.logger.error("failed to get patient info")
-                self._handle_error(store_backup=True)
+                self._handle_error(store_backup=False)
+                return
 
-            self.logger.debug(patient_info)
+            self.logger.debug(json.dumps(patient_info, indent=4))
 
             self.model.analyze(patient_info, patscan_db, reference_db)
+
             self.ready_to_submit.emit(True)
-
-            self.logger.debug(json.dumps(self.model.to_response(), indent=4))
-
-            patscan_db.close()
-            reference_db.close()
 
         except Exception as e:
             self.logger.error(e)
             self._handle_error(e)
 
+        finally:
+            patscan_db.close()
+            reference_db.close()
+
+    @override
+    def close(self):
+        self.file_receiver.stop()
+
+    @override
+    def restore(self):
+        super().restore()
+        return self._clean_output_dir(self.config.storage_path)
 
     def _clean_output_dir(self, output_dir: Path):
         self.logger.debug("_clean_output_dir")
 
-        (Path.cwd() / "PatScan.mdb").unlink(missing_ok=True)
-        (Path.cwd() / "reference.mdb").unlink(missing_ok=True)
-
         try:
+            (Path.cwd() / "PatScan.mdb").unlink(missing_ok=True)
+            (Path.cwd() / "reference.mdb").unlink(missing_ok=True)
             for path in output_dir.iterdir():
                 if path.is_file():
                     path.unlink(missing_ok=True)
+            return True
 
         except Exception as e:
             self.logger.error(e)
             return False
-
-        return True

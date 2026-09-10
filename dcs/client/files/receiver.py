@@ -83,11 +83,9 @@ class FileReceiver(QObject):
         return self.stop()
 
     def _on_directory_changed(self) -> None:
-        print("directory changed")
         self.debounce_timer.start()
 
     def _check_files(self) -> None:
-        print("check files")
         for path in self.config.storage_dir.iterdir():
             if path.suffix not in self.config.extensions:
                 continue
@@ -106,7 +104,6 @@ class FileReceiver(QObject):
             self.processed_timer.start()
 
     def _check_stability(self):
-        print("checking stability")
         for path, previous_size in list(self.pending_files.items()):
             try:
                 current_size = path.stat().st_size

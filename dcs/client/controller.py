@@ -1,3 +1,4 @@
+import json
 import logging
 import tarfile
 
@@ -85,6 +86,12 @@ class Controller(QObject):
     def submit(self):
         self.submitting.emit()
 
+        self.session.set_end_time()
+
+        self.backup_path = self._create_backup_tar(
+            directory=Path.cwd(), filename="config.tar.gz"
+        )
+
         if self.detached:
             if self.save_to_file():
                 self.restore()
@@ -95,16 +102,15 @@ class Controller(QObject):
 
     def restore(self):
         self.logger.info("restore device")
+        if self.backup_path and not self.detached:
+            self.backup_path.unlink(missing_ok=True)
 
     def upload_to_server(self):
         self.logger.debug("upload_to_server")
         try:
             self.files_to_transfer = deepcopy(self.model.files)
-            backup_path = self._create_backup_tar(
-                directory=Path.cwd(), filename="config.tar.gz"
-            )
-            if backup_path:
-                backup_file_info = get_file_info(Path(backup_path))
+            if self.backup_path:
+                backup_file_info = get_file_info(Path(self.backup_path))
                 backup_file_info.send_name = "config"
                 self.files_to_transfer.append(backup_file_info)
 
@@ -129,7 +135,7 @@ class Controller(QObject):
             self.start_upload.emit()
         except Exception as e:
             self.logger.error(e)
-            self._handle_error()
+            self._handle_error(store_backup=True)
 
     def upload_finished(self, successful: bool):
         self.logger.debug(f"upload finished: {"Yes" if successful else "No"}")
@@ -137,10 +143,12 @@ class Controller(QObject):
 
         if successful:
             self.logger.info("submitted")
-            self.restore()
             self.submitted.emit()
         else:
-            self.logger.info("failed to submit")
+            self.logger.error("failed to submit")
+            self._handle_error(store_backup=True)
+
+        self.restore()
 
     def upload_status(self, file_index, file_name, percentage):
         self.view.set_status(
@@ -245,9 +253,11 @@ class Controller(QObject):
         if not store_path:
             self.logger.error("failed to store error backup")
         else:
-            self.logger.info(f"stored backup at {store_path}")
+            self.logger.info(f"stored backup at {str(store_path.resolve())}")
 
-    def _create_backup_tar(self, directory: Path, filename: str) -> str | None:
+    def _create_backup_tar(self, directory: Path, filename: str) -> Path | None:
+        if not self.backup_paths:
+            return None
         try:
             (directory / filename).unlink(missing_ok=True)
 
@@ -259,7 +269,7 @@ class Controller(QObject):
                         )
                         continue
                     backup_tar.add(backup_path["path"], arcname=backup_path["arcname"])
-            return str((directory / filename).resolve())
+            return (directory / filename)
         except Exception as e:
             self.logger.critical(e)
             return None

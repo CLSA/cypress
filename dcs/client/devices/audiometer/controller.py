@@ -133,7 +133,6 @@ class AudiometerController(Controller):
     @override
     def restore(self):
         super().restore()
-
         try:
             if not self._clean_output_dir():
                 self.logger.error("restore: could not clean output directory")
@@ -154,10 +153,10 @@ class AudiometerController(Controller):
         self.logger.debug("_clean_output_dir")
         try:
             self.config.plugin_output_path.unlink(missing_ok=True)
+            return True
         except Exception as e:
             self.logger.error(e)
             return False
-        return True
 
     def _restore_database(self) -> bool:
         """

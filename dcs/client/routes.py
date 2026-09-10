@@ -126,12 +126,10 @@ def launch_device(
 
     available, error = is_available()
     if not available:
-        print(error)
         return error
 
     device = devices[device_name]
     if not device.is_installed():
-        print("not installed")
         return {"error": f"{device_name} is not installed on this workstation"}
 
     set_session(device_name, session)
@@ -144,7 +142,7 @@ def launch_device(
 async def cdtt(
     background_tasks: BackgroundTasks, session: CDTTSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("cdtt", background_tasks, session)
 
 
@@ -154,7 +152,7 @@ async def choice_reaction_test(
     session: CRTSession,
     request: Request,
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("choice_reaction_test", background_tasks, session)
 
 
@@ -162,7 +160,7 @@ async def choice_reaction_test(
 async def hearing(
     background_tasks: BackgroundTasks, session: AudiometerSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("hearcon", background_tasks, session)
 
 
@@ -170,21 +168,21 @@ async def hearing(
 async def frax(
     background_tasks: BackgroundTasks, session: FRAXSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("frax", background_tasks, session)
 
 @router.post("/mac5")
 async def mac5(
     background_tasks: BackgroundTasks, session: ECGSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("mac5", background_tasks, session)
 
 @router.post("/dxa1")
 async def dxa1(
     background_tasks: BackgroundTasks, session: DXASession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("dxa1", background_tasks, session)
 
 
@@ -192,7 +190,7 @@ async def dxa1(
 async def dxa2(
     background_tasks: BackgroundTasks, session: DXASession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("dxa2", background_tasks, session)
 
 
@@ -200,14 +198,14 @@ async def dxa2(
 async def weight_scale(
     background_tasks: BackgroundTasks, session: WeighScaleSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("weight_scale", background_tasks, session)
 
 @router.post("/watch_bp")
 async def blood_pressure(
     background_tasks: BackgroundTasks, session: BPSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("watch_bp", background_tasks, session)
 
 
@@ -215,7 +213,7 @@ async def blood_pressure(
 async def spirometer(
     background_tasks: BackgroundTasks, session: SpirometerSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("easyone_connect", background_tasks, session)
 
 
@@ -223,7 +221,7 @@ async def spirometer(
 async def tonometer(
     background_tasks: BackgroundTasks, session: TonometerSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("ora", background_tasks, session)
 
 
@@ -231,7 +229,7 @@ async def tonometer(
 async def echo(
     background_tasks: BackgroundTasks, session: ECHOSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("vivid_iq", background_tasks, session)
 
 
@@ -239,7 +237,7 @@ async def echo(
 async def general_proxy_consent(
     background_tasks: BackgroundTasks, session: GeneralProxySession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("general_proxy_consent", background_tasks, session)
 
 
@@ -247,7 +245,7 @@ async def general_proxy_consent(
 async def grip_strength(
     background_tasks: BackgroundTasks, session: GripStrengthSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     return launch_device("hand_grip", background_tasks, session)
 
 
@@ -255,7 +253,7 @@ async def grip_strength(
 async def oct_left(
     background_tasks: BackgroundTasks, session: RetinalCameraSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     session.side = "L"
     return launch_device("oct_left", background_tasks, session)
 
@@ -264,14 +262,13 @@ async def oct_left(
 async def oct_right(
     background_tasks: BackgroundTasks, session: RetinalCameraSession, request: Request
 ):
-    session.origin = request.headers.get("origin", None)
+    session.origin = request.headers.get("origin")
     session.side = "R"
     return launch_device("oct_right", background_tasks, session)
 
 
 @router.get("/{device}/status")
 async def get_status(device: DeviceEndpoints):
-    print(device)
     if device.value not in devices:
         raise HTTPException(status=400, detail={"error": "unsupported device"})
 
@@ -315,26 +312,19 @@ def get_last_modified():
     return last_modified.strftime("%Y-%m-%d %H:%M:%S")
 
 
+@router.get("/health")
+async def health():
+    return {
+        "status": "ok"
+    }
+
 @router.get("/status")
 async def status():
     global current_session
-    global standalone_session
 
     response = {
         "version": CYPRESS_VERSION,
         "last_updated": get_last_modified(),
-        "installed": set(
-            {
-                device_name
-                for device_name, device in devices.items()
-                if device.is_installed()
-            }
-        ),
-        "not_installed": {
-            device_name: device.get_install_errors()
-            for device_name, device in devices.items()
-            if not device.is_installed()
-        },
     }
 
     if current_session:
@@ -355,7 +345,9 @@ def stop_app():
 @router.post("/stop")
 async def restart(background_tasks: BackgroundTasks):
     background_tasks.add_task(stop_app)
-    return "stopping"
+    return {
+        "status": "stopped"
+    }
 
 
 @router.post("/detached/{device}")

@@ -38,12 +38,14 @@ class GeneralProxyController(Controller):
 
     @override
     def start(self):
-        self.logger.info("clearing output directory")
+        self.logger.info("start")
 
-        self._clear_results_dir()
+        self.logger.info("clear results directory")
+        if not self._clear_results_dir():
+            self._handle_error(store_backup=True)
+            return False
 
         self.logger.info("generating proxy form")
-
         generator = PDFGenerator(pdftk_exe_path=self.config.pdftk_executable)
         if not generator.prepare_form(
             form_path=self.config.form_en,
@@ -59,11 +61,9 @@ class GeneralProxyController(Controller):
             return False
 
         self.logger.info("preparing adobe")
-
         self.process.setProgram(str(self.config.adobe_executable.resolve()))
         self.process.setArguments([str(self.form_output_path.resolve())])
         self.process.setWorkingDirectory(str(self.config.adobe_working_dir.resolve()))
-
 
         self.logger.info("starting adobe")
         self.process.start()
@@ -73,16 +73,16 @@ class GeneralProxyController(Controller):
     @override
     def measure(self):
         self.logger.info("reading pdf")
-        if not self.model.read_results(self.form_output_path):
-            self.error.emit("Something went wrong")
+
+        if not self.form_output_path.exists():
+            self.logger.error("form output path does not exist")
+            self._handle_error(store_backup=True)
             return False
 
-        #self.logger.info("checking for signature")
-        #if not self.model.has_signature():
-        #    self.error.emit("The form was not signed")
-        #    return False
-
-        #self.logger.info("has signature")
+        if not self.model.read_results(self.form_output_path):
+            self.logger.error("failed to read results")
+            self._handle_error(store_backup=True)
+            return False
 
         self.measured.emit(self.model.to_response())
 
@@ -92,8 +92,17 @@ class GeneralProxyController(Controller):
     def _on_process_finished(self, *args):
         self.ready_to_measure.emit()
 
+    @override
+    def restore(self):
+        super().restore()
+        return self._clear_results_dir()
 
     def _clear_results_dir(self):
-        for path in self.config.output_base_dir.iterdir():
-            if path.is_file():
-                path.unlink(missing_ok=True)
+        try:
+            for path in self.config.output_base_dir.iterdir():
+                if path.is_file():
+                    path.unlink(missing_ok=True)
+            return True
+        except Exception as e:
+            self.logger.error(e)
+            return False

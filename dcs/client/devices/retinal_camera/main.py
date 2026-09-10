@@ -51,12 +51,3 @@ class RetinalCamera(Device):
     controller = RetinalCameraController
     session = RetinalCameraSession
     session_dialog = RetinalCameraSessionDialog
-
-
-if __name__ == "__main__":
-    try:
-        sys.exit(RetinalCamera.run(session=None))
-    except Exception as e:
-        print(e)
-        input("Press enter to continue...")
-        sys.exit(-1)

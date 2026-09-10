@@ -69,30 +69,29 @@ class PatScanDB:
         query = QSqlQuery(self.db)
 
         query.prepare(
-            "SELECT SCANID, SCAN_TYPE, SCAN_MODE, SCAN_DATE "
+            "SELECT PATIENT_KEY, SCANID, SERIAL_NUMBER, SCAN_TYPE, SCAN_MODE, SCAN_DATE "
             "FROM ScanAnalysis "
             "WHERE PATIENT_KEY = :patient_key "
             "AND SCAN_TYPE = :scan_type "
             "ORDER BY SCAN_DATE DESC"
         )
 
-        logger.error(patient_key, scan_type)
+        logger.debug(f"{patient_key}, {scan_type}")
 
         query.bindValue(":patient_key", patient_key)
         query.bindValue(":scan_type", scan_type)
 
         if not query.exec():
             logger.error(f"get_scan_analysis: {query.lastError().text()}")
-            return False, "Could not retrieve scan analysis"
-
-        if query.size() > 1:
-            logger.warning(f"found multiple scan analysis for {patient_key}")
+            return False, "couldn't retrieve scan analysis"
 
         scans = []
         while query.next():
             scans.append(
                 {
+                    "PATIENT_KEY": query.value("PATIENT_KEY"),
                     "SCANID": query.value("SCANID"),
+                    "SERIAL_NUMBER": query.value("SERIAL_NUMBER"),
                     "SCAN_TYPE": query.value("SCAN_TYPE"),
                     "SCAN_MODE": query.value("SCAN_MODE"),
                     "SCAN_DATE": query.value("SCAN_DATE").toString(
@@ -100,6 +99,13 @@ class PatScanDB:
                     ),
                 }
             )
+
+        if len(scans) > 1:
+            logger.warning(f"found {len(scans)} scan analysis for {patient_key} {scan_type}")
+
+        if not scans:
+            logger.error(f"did not find any scan analysis for {patient_key} {scan_type}")
+            return False, "no scan analysis"
 
         return True, scans
 
@@ -131,15 +137,6 @@ class PatScanDB:
         if not query.exec():
             logger.error(f"get_scan_data: {query.lastError().text()}")
             return False, "Could not retrieve scan data"
-
-        if query.size() == 0:
-            logger.error(
-                f"get_scan_data: could not find a result for {patient_key} {scan_id}"
-            )
-            return False, "No results found"
-
-        if query.size() > 1:
-            logger.warning(f"more than one result found for {patient_key} {scan_id}")
 
         res = {}
         while query.next():

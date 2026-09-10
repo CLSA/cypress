@@ -21,66 +21,62 @@ class DXAModel(Model):
         super().__init__(session, config)
         self.reset()
 
-    def analyze(self, patient_info, patscan_db, reference_db):
-        self.left_hip.analyze(patient_info, patscan_db, reference_db)
-        self.right_hip.analyze(patient_info, patscan_db, reference_db)
-
     def update_scans(self, scans: dict) -> tuple[bool, dict]:
         self.reset()
 
         for scan_type, scan_path in scans.items():
             if scan_type == "L_HIP_DICOM":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.left_hip.set_scan(scan_path)
 
             elif scan_type == "R_HIP_DICOM":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.right_hip.set_scan(scan_path)
 
             elif scan_type == "WB_DICOM_1":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.whole_body.set_wb1_scan_path(scan_path)
 
             elif scan_type == "WB_DICOM_2":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.whole_body.set_wb2_scan_path(scan_path)
 
             elif scan_type == "FA_L_DICOM":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.left_forearm.set_scan(scan_path)
 
             elif scan_type == "FA_R_DICOM":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.right_forearm.set_scan(scan_path)
 
             elif scan_type == "SP_DICOM_1":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.ap_lumbar_spine.set_scan(scan_path)
 
             elif scan_type == "SEL_DICOM_MEASURE":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.lateral_spine.set_measure_scan(scan_path)
 
             elif scan_type == "SEL_DICOM_OT":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.lateral_spine.set_ot_scan(scan_path)
 
             elif scan_type == "SEL_DICOM_PR":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
                 self.lateral_spine.set_pr_scan(scan_path)
 
             elif scan_type == "SR_DICOM":
-                if not self.add_file(scan_path, send_name=scan_type):
+                if not self.add_file(scan_path, send_name=scan_type, ext=".dcm"):
                     return False, None
 
             else:
@@ -88,6 +84,22 @@ class DXAModel(Model):
                 return False, None
 
         return True, self._get_scans_count()
+
+    def analyze(self, patient_info, patscan_db, reference_db):
+        self.metadata["patient_key"] = patient_info.get("PATIENT_KEY")
+        self.metadata["birthdate"] = patient_info.get("BIRTHDATE")
+        self.metadata["sex"] = patient_info.get("SEX")
+        self.metadata["ethnicity"] = patient_info.get("ETHNICITY")
+        self.metadata["weight"] = patient_info.get("WEIGHT")
+        self.metadata["height"] = patient_info.get("HEIGHT")
+
+        self.left_hip.analyze(patient_info, patscan_db, reference_db)
+        self.right_hip.analyze(patient_info, patscan_db, reference_db)
+        self.ap_lumbar_spine.analyze(patient_info, patscan_db, reference_db)
+        self.left_forearm.analyze(patient_info, patscan_db, reference_db)
+        self.right_forearm.analyze(patient_info, patscan_db, reference_db)
+        self.lateral_spine.analyze(patient_info, patscan_db, reference_db)
+        self.whole_body.analyze(patient_info, patscan_db, reference_db)
 
     def _get_scans_count(self) -> dict:
         wbody = len(
@@ -126,12 +138,14 @@ class DXAModel(Model):
 
     @override
     def reset(self):
+        super().reset()
+
         self.left_hip = LeftHip(raw_data={}, scan_path=None)
         self.right_hip = RightHip(raw_data={}, scan_path=None)
         self.left_forearm = LeftForearm(raw_data={}, scan_path=None)
         self.right_forearm = RightForearm(raw_data={}, scan_path=None)
         self.lateral_spine = IVAImagingMeasurement(
-            ot_scan_path=None, pr_scan_path=None, measure_scan_path=None
+            raw_data={}, ot_scan_path=None, pr_scan_path=None, measure_scan_path=None
         )
         self.ap_lumbar_spine = APLumbarSpine(raw_data={}, scan_path=None)
         self.whole_body = WholeBody(raw_data={}, wb1_scan_path=None, wb2_scan_path=None)
@@ -159,7 +173,6 @@ class DXAModel(Model):
             return False, "Missing whole body scan"
 
         return True
-
 
     @override
     def to_response(self):
@@ -199,6 +212,6 @@ class DXAModel(Model):
             response["value"]["results"]["forearm_right"] = self.right_forearm.to_dict()
 
         if self.lateral_spine.is_valid():
-            response["value"]["results"]["iva"] = {}
+            response["value"]["results"]["iva"] = self.lateral_spine.to_dict()
 
         return response

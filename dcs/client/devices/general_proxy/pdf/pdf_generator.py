@@ -41,12 +41,13 @@ class PDFGenerator:
                 str(output_path.resolve())
             ])
 
-
             if not pdftk_process.waitForStarted():
                 print("pdftk failed to start")
+                return False
 
             if not pdftk_process.waitForFinished():
                 print("pdftk failed to finish")
+                return False
 
             errors = pdftk_process.readAllStandardError().data().decode('utf-8')
             if errors:
@@ -68,6 +69,16 @@ class PDFGenerator:
         replacement = f"/V ({value}) /T ({key})"
 
         return re.sub(pattern, replacement, fdf_contents)
+
+    def dump_fields(self, pdf_path) -> dict | None:
+        pdftk_process = QProcess()
+        arguments = [str(pdf_path.resolve()), "dump_data_fields"]
+
+        pdftk_process.start(str(self.pdftk_exe_path.resolve()), arguments)
+        if not pdftk_process.waitForFinished(msecs=5000):
+            return None
+
+        return str(pdftk_process.readAllStandardOutput(), 'utf-8')
 
 
 if __name__ == "__main__":

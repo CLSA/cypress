@@ -99,6 +99,11 @@ class GripStrengthController(Controller):
 
         return True
 
+    @override
+    def restore(self):
+        super().restore()
+        return self._restore_database()
+
     def _restore_database(self) -> bool:
         self.logger.debug("_restore_database")
 
@@ -127,8 +132,8 @@ class GripStrengthController(Controller):
             grip_test_db_data_backup = self.config.backup_path / GRIP_TEST_DATA_DB
             grip_test_db_data_backup.copy(grip_test_data_db)
 
+            return True
+
         except Exception as e:
             self.logger.error(e)
             return False
-
-        return True

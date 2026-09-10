@@ -19,9 +19,17 @@ class Record:
         for field in list(self.field_map.values()):
             self._set_field(field, None)
 
+        if not raw_data:
+            return
+
         for raw_name, value in raw_data.items():
             if raw_name in self.field_map:
                 self._set_field(self.field_map[raw_name], value)
+
+    def _update_fields(self, raw_data):
+        for key, value in raw_data.items():
+            if key in self.field_map:
+                self._set_field(self.field_map[key], value)
 
     def _set_field(self, field: Field, value: any):
         if "units" in field and field["units"] is not None:

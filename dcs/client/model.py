@@ -9,7 +9,6 @@ from session import Session
 
 from utils import get_file_info, FileInfo
 
-
 from config import DeviceConfig
 
 
@@ -33,12 +32,13 @@ class Model:
 
         self.manual_entry = False
 
-    def add_file(self, file_path: Path, send_name: str) -> bool:
+    def add_file(self, file_path: Path, send_name: str, ext: str) -> bool:
         if not file_path.exists() or not file_path.is_file():
             return False
         try:
             file_info = get_file_info(file_path)
             file_info.send_name = send_name
+            file_info.extension = ext
             self.files.append(file_info)
         except (FileNotFoundError, PermissionError):
             return False
@@ -52,16 +52,18 @@ class Model:
     def to_response(self):
         response = {
             "value": {
-                "session": self.session.model_dump(mode="json") if self.session else {},
                 "manual_entry": self.manual_entry,
                 "metadata": copy.deepcopy(self.metadata),
                 "results": copy.deepcopy(self.results),
-                "files": {
-                    f"{file_info.send_name}{file_info.extension.replace(".", "_")}": file_info.readable_size
-                    for file_info in self.files
-                },
+                "session": self.session.model_dump(mode="json") if self.session else {},
             }
         }
+
+        if self.files:
+            response["value"]["files"] = {
+                f"{file_info.send_name.replace(".", "_")}{file_info.extension.replace(".", "_")}": file_info.readable_size
+                for file_info in self.files
+            }
 
         return response
 

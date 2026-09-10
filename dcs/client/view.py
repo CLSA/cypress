@@ -1,6 +1,7 @@
 import logging
 
 from enum import Enum
+from typing import override
 
 from PySide6.QtWidgets import (
     QMessageBox,
@@ -136,6 +137,13 @@ class View(QDialog):
     def _on_manual_entry_clicked(self):
         self.logger.info("manual entry requested")
         self.on_manual_entry()
+
+    @override
+    def show(self):
+        self.setWindowState(self.windowState() & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
+        self.raise_()
+        self.activateWindow()
+        return super().show()
 
     def on_begin(self):
         self.state = State.BEGIN

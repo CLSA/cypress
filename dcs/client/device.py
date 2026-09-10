@@ -45,8 +45,7 @@ class Device:
         if color_scheme == Qt.ColorScheme.Light:
             app.setStyle("windowsvista")
 
-
-        #app.styleHints().setColorScheme(Qt.ColorScheme.Light)
+        # app.styleHints().setColorScheme(Qt.ColorScheme.Light)
 
         # if color_scheme == Qt.ColorScheme.Light:
         #     app.setStyleSheet(
@@ -74,13 +73,18 @@ class Device:
             try:
                 session = cls.session(answer_id=1, **cls.session_dialog().prompt())
             except Exception as e:
-                print(e)
-                logger.info("session info not entered, exiting")
+                logger.error(e)
                 return 1
 
-        logger.info(
-            f"launching {session.answer_id} ({f"{session.origin}" if not detached else "detached"})"
-        )
+        if not detached:
+            session_origin = (
+                "ghost"
+                if "ghost" in session.origin
+                else "live" if "live" in session.origin else "detached"
+            )
+            logger.info(f"launching {session.barcode} ({session_origin})")
+        else:
+            logger.info(f"launching {session.barcode} (detached)")
 
         model = cls.model(session=session, config=config)
         view = cls.view(session=session, config=config, detached=detached)

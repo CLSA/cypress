@@ -1,3 +1,17 @@
+import logging
+
+block_endpoints = ['/status', '/health']
+
+class EndpointFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        if record.args and len(record.args) >= 3:
+            if record.args[2] in block_endpoints:
+                return False
+        return True
+
+
+logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+
 def run_server():
     import uvicorn
 
@@ -16,6 +30,7 @@ def run_server():
     #app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
 
     app.include_router(router=router)
+
 
     uvicorn.run(
         app=app,

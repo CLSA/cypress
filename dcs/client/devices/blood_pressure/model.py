@@ -1,3 +1,8 @@
+import json
+import logging
+import datetime
+
+from collections import OrderedDict
 from typing import override
 
 from model import Model
@@ -5,6 +10,9 @@ from measure import Record
 
 from devices.blood_pressure.session import BPSession
 from devices.blood_pressure.config import BPConfig
+
+
+logger = logging.getLogger("blood_pressure")
 
 
 class BPMeasurement(Record):
@@ -15,6 +23,47 @@ class BPMeasurement(Record):
         "Spare7": {"attr": "reading_number", "data_type": int, "units": None},
     }
 
+    def __init__(self, raw_data):
+        super().__init__(raw_data)
+        self.raw_data = raw_data
+
+    def is_valid(self):
+        if not self.raw_data:
+            return False
+
+        if self.raw_data.get("CODE"):
+            logger.warning(f"code: '{self.raw_data.get("CODE")}'")
+            return False
+
+        if not self.systolic:
+            return False
+
+        if not self.diastolic:
+            return False
+
+        if not self.pulse:
+            return False
+
+        return all(
+            [
+                self.systolic.get("value", 0) > 0,
+                self.diastolic.get("value", 0) > 0,
+                self.pulse.get("value", 0) > 0,
+            ]
+        )
+
+    @override
+    def to_dict(self):
+        res = super().to_dict()
+
+        for key, value in self.raw_data.items():
+            if key == "Date":
+                res["date"] = datetime.datetime.fromtimestamp(value).isoformat()
+
+            res[key] = value
+
+        return dict(sorted(res.items()))
+
 
 class BPTest:
     def __init__(self, measures: list[BPMeasurement]):
@@ -23,6 +72,7 @@ class BPTest:
     def get_average(self) -> dict:
         n = len(self.measures) - 1
         if n < 1:
+            logger.debug(f"get_average: {n} < 1")
             return {}
 
         systolic_sum = 0
@@ -38,6 +88,13 @@ class BPTest:
         avg_diastolic = diastolic_sum / n
         avg_pulse = pulse_sum / n
 
+        logger.debug(
+            f"avg_count: {n} "
+            f"avg_systolic: {avg_systolic} "
+            f"avg_diastolic: {avg_diastolic} "
+            f"avg_pulse: {avg_pulse}"
+        )
+
         return {
             "avg_count": n,
             "avg_systolic": {"value": avg_systolic, "units": "mmHg"},
@@ -48,6 +105,7 @@ class BPTest:
     def get_total_average(self) -> dict:
         n = len(self.measures)
         if n < 1:
+            logger.debug(f"get_total_average: {n} < 1")
             return {}
 
         systolic_sum = 0
@@ -62,6 +120,13 @@ class BPTest:
         avg_systolic = systolic_sum / n
         avg_diastolic = diastolic_sum / n
         avg_pulse = pulse_sum / n
+
+        logger.debug(
+            f"total_avg_count: {n} "
+            f"total_avg_systolic: {avg_systolic} "
+            f"total_avg_diastolic: {avg_diastolic} "
+            f"total_avg_pulse: {avg_pulse}"
+        )
 
         return {
             "total_avg_count": n,
@@ -88,20 +153,34 @@ class BPModel(Model):
     def __init__(self, session: BPSession, config: BPConfig):
         super().__init__(session, config)
 
-    def read_results(self, db_rows) -> tuple[bool, str | None]:
+    def read_results(self, db_rows: list[dict]) -> tuple[bool, str | None]:
+        logger.debug(f"read_results: {json.dumps(db_rows, indent=4)}")
         self.reset()
+        try:
+            measures = []
+            if not db_rows:
+                logger.error("no db rows found")
+                return False, None
 
-        measures = []
-        for db_row in db_rows:
-            measures.append(BPMeasurement(db_row))
+            for db_row in db_rows:
+                measure = BPMeasurement(db_row)
+                if measure.is_valid():
+                    measures.append(measure)
+                else:
+                    logger.warning("invalid measure")
 
-        self.test = BPTest(measures=measures)
+            self.test = BPTest(measures=measures)
 
-        return True, None
+            return True, None
 
-    def set_manual_values(self, data_received: list[dict]):
+        except Exception as e:
+            logger.error(f"bp_model - read results: {e}")
+            return False, None
+
+    def set_manual_entry_data(self, data_received: list[dict]):
+        logger.debug(f"set_manual_entry_data: {json.dumps(data_received, indent=4)}")
+
         self.reset()
-
         self.manual_entry = True
 
         measures = []
@@ -109,6 +188,12 @@ class BPModel(Model):
             measures.append(BPMeasurement(manual_measure))
 
         self.test = BPTest(measures=measures)
+
+    def set_manual_entry(self):
+        if not self.manual_entry:
+            self.reset()
+
+        self.manual_entry = True
 
     @override
     def reset(self):

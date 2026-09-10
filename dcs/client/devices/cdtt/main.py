@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 from device import Device
 from devices.cdtt.config import CDTTConfig
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     try:
         sys.exit(CDTT.run(session=None))
     except Exception as e:
+        traceback.print_exc()
         print(e)
         input("Press enter to continue...")
         sys.exit(-1)

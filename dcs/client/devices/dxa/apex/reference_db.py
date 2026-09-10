@@ -33,21 +33,27 @@ class ReferenceDB:
 
         self.db.close()
 
-    def select_curve(
+    def select_reference_curve(
         self,
         method: Literal["NULL", "APEX"],
+        sex: Literal["F", "M"],
+        ethnicity: str | None,
         ref_type: str,
         ref_source: str,
         bone_range: str | None,
-    ):
+    ) -> tuple[bool, dict | None]:
         logger.debug(
-            f"reference_db: select_curve - method {method} ref_type {ref_type} source {ref_source} bone_range {bone_range}"
+            f"reference_db: select_curve - method {method} \n sex {sex} \n ethnicity {ethnicity} \n ref_type {ref_type} \n source {ref_source} \n bone_range {bone_range} \n"
         )
 
-        sex = "AND SEX = 'F'"
-        ethnic = "AND ETHNIC IS NULL"
+        sex = f"AND SEX = '{sex}'"
+        ethnicity = "AND ETHNIC IS NULL" if ethnicity is None else f"AND ETHNIC = '{ethnicity}'"
         method = "AND METHOD IS NULL" if method == "NULL" else "AND METHOD = 'APEX'"
-        bonerange = "AND BONERANGE IS NULL" if bone_range is None else f"AND BONERANGE = '{bone_range}'"
+        bone_range = (
+            "AND BONERANGE IS NULL"
+            if bone_range is None
+            else f"AND BONERANGE = '{bone_range}'"
+        )
 
         query: QSqlQuery = QSqlQuery(db=self.db)
         if not query.exec(
@@ -55,77 +61,82 @@ class ReferenceDB:
             f"WHERE REFTYPE = '{ref_type}' "
             "AND IF_CURRENT = 1 "
             f"{sex} "
-            f"{ethnic} "
+            f"{ethnicity} "
             f"{method} "
             f"AND SOURCE LIKE '%{ref_source}%' "
             "AND Y_LABEL = 'IDS_REF_LBL_BMD' "
-            f"{bonerange} "
+            f"{bone_range} "
         ):
-            logger.critical(f"select_curve: {query.lastError().text()}")
-            return False, "Could not complete analysis"
+            logger.error(f"select_curve: {query.lastError().text()}")
+            return False, None
 
-        print(query.lastQuery())
+        logger.debug(query.lastQuery())
 
         if not query.first():
-            logger.critical("select_curve: no results found")
-            return False, "Could not complete analysis"
-
-        logger.debug("size: ", query.size())
+            logger.error("select_curve: no results found")
+            return False, None
 
         return True, {
             "UNIQUE_ID": str(query.value("UNIQUE_ID")),
             "AGE_YOUNG": float(query.value("AGE_YOUNG")),
         }
 
-    # def other_curve(self, patient_data, ref_type):
-    #    sex = str(patient_data["SEX"])
-    #    sex = sex.upper()
+    def select_point_from_curve(self, curve_id: str, age: float):
+        logger.debug(
+            f"select x_values from {curve_id}"
+        )
 
-    #    if 0 == len(sex) or sex.startsWith("F"):
-    #        sex = " AND SEX = 'F'"
-    #    elif sex.startsWith("M") {
-    #        if (bmdBoneRangeKey == "U_UD_BMD") {
-    #            setAttribute(varName, 0.0);
-    #            continue;
-    #        }
-    #        sex = " AND SEX = 'M'";
-    #    }
+        query: QSqlQuery = QSqlQuery(db=self.db)
 
-    #    ethnicity = str(patient_data["ETHNICITY"])
-    #    if ethnicity.isNull():
-    #        ethnicity = "";
-    #    ethnicity = ethnicity.toUpper();
+        query.prepare(
+            "SELECT Y_VALUE, L_VALUE, STD FROM Points WHERE UNIQUE_ID = :curve_id AND X_VALUE = :age"
+        )
+        query.bindValue(":curve_id", curve_id)
+        query.bindValue(":age", age)
 
-    #    if 0 == len(ethnicity) or ethnicity == "W" or ethnicity == "O" or ethnicity == "P" or ethnicity == "I" or (ref_type == "R" and (ethnicity == "H" or ethnicity == "B")):
-    #        ethnicity = " AND ETHNIC IS NULL"
-    #    else:
-    #        ethnicity = " AND ETHNIC = '" + ethnicity + "'"
+        if not query.exec():
+            logger.error(f"select_point_from_curve: {curve_id} {age} {query.lastError().text()}")
+            return False, None
 
-    #    sql = "SELECT UNIQUE_ID, AGE_YOUNG FROM ReferenceCurve";
-    #    sql += " WHERE REFTYPE = '" + getRefType() + "'";
-    #    sql += " AND IF_CURRENT = 1";
-    #    sql += sex;
-    #    sql += ethnicity;
-    #    sql += method;
-    #    sql += " AND SOURCE LIKE '%" + getRefSource() + "%'";
-    #    sql += " AND Y_LABEL = 'IDS_REF_LBL_BMD'";
-    #    sql += " AND BONERANGE ";
-    #    sql += (ranges.value(bmdBoneRangeKey).toString() == "NULL" ? ("IS NULL") : ("= '" + ranges.value(bmdBoneRangeKey).toString() + "'"));
+        #logger.debug(query.lastQuery())
 
-    #    qDebug() << "first query (z score): " + sql;
+        if not query.first():
+            logger.error("select_point_from_curve: {curve_id} {age_young} no results found")
+            return False, None
 
-    #    query.prepare(sql);
-    #    if (!query.exec()) {
-    #        qDebug() << query.lastError().text();
-    #        continue;
-    #    }
+        return True, {
+            "Y_VALUE": float(query.value("Y_VALUE")),
+            "L_VALUE": float(query.value("L_VALUE")),
+            "STD": float(query.value("STD"))
+        }
 
-    #    if (!query.first()) {
-    #        qWarning() << "no results for first z score query..";
-    #        continue;
-    #    }
 
-    def select_points(self, unique_id: str, age_young: str):
+    def select_x_values_from_curve(self, curve_id: str) -> tuple[bool, dict | None]:
+        logger.debug(
+            f"select_x_values_from_curve: curve_id = {curve_id}"
+        )
+
+        query: QSqlQuery = QSqlQuery(db=self.db)
+
+        query.prepare(
+            "SELECT X_VALUE FROM Points WHERE UNIQUE_ID = :curve_id"
+        )
+        query.bindValue(":curve_id", curve_id)
+
+        if not query.exec():
+            logger.error(query.lastError().text())
+            return False, None
+
+        logger.debug(query.lastQuery())
+
+        res = []
+        while query.next():
+            res.append(float(query.value("X_VALUE")))
+
+        return True, res
+
+
+    def select_points(self, unique_id: str, age_young: str) -> tuple[bool, dict | None]:
         logger.debug(
             f"reference_db::select_points - unique_id {unique_id} age_young {age_young}"
         )
@@ -143,9 +154,11 @@ class ReferenceDB:
         query.bindValue(":x_value", age_young)
 
         if not query.exec():
-            logger.critical(f"select_points: {query.lastError().text()}")
-            return False, "Could not perform analysis"
+            logger.error(f"select_points: {query.lastError().text()}")
+            return False, None
+
+        logger.debug(query.lastQuery())
 
         if not query.first():
-            logger.critical(f"select_points: no results found")
-            return False, "Could not perform analysis"
+            logger.error(f"select_points: no results found")
+            return False, None

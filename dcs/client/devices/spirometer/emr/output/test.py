@@ -5,6 +5,28 @@ from devices.spirometer.emr.output.result_parameter import ResultParameter
 from devices.spirometer.emr.output.trial import Trial
 
 
+class PatientDataAtTestTime(SpirometerXML):
+    field_map = {
+        "Height": {"key": "height", "type": float},
+        "Weight": {"key": "weight", "type": float},
+        "Ethnicity": {"key": "ethnicity", "type": str},
+        "Smoker": {"key": "smoker", "type": bool},
+        "Asthma": {"key": "asthma", "type": bool},
+        "Gender": {"key": "gender", "type": str},
+        "DateOfBirth": {"key": "date_of_birth", "type": str},
+        "ComputedDateOfBirth": {"key": "computed_date_of_birth", "type": str},
+        "COPD": {"key": "copd", "type": bool},
+    }
+
+    @override
+    def _parse_xml(self, root):
+        super()._parse_xml(root)
+
+        for child in root:
+            if child.tag in self.field_map:
+                self.set_attribute(child.tag, child.text)
+
+
 class Test(SpirometerXML):
     field_map = {
         "SWVersion": {"key": "device_software_version", "type": str},
@@ -19,10 +41,10 @@ class Test(SpirometerXML):
 
     @override
     def _parse_xml(self, root):
-        type_of_test = root.attrib.get("TypeOfTest", None)
+        type_of_test = root.attrib.get("TypeOfTest")
         self.set_attribute("Test", type_of_test)
 
-        stage_type = root.attrib.get("StageType", None)
+        stage_type = root.attrib.get("StageType")
         self.set_attribute("StageType", stage_type)
 
         for child in root:
@@ -39,9 +61,7 @@ class Test(SpirometerXML):
                         self.set_attribute(sub_child.tag, sub_child.text)
 
             elif child.tag == "PatientDataAtTestTime":
-                self.patient_data_at_test_time = {}
-                for sub_child in child:
-                    self.patient_data_at_test_time[sub_child.tag] = sub_child.text
+                self.patient_data_at_test_time = PatientDataAtTestTime(child)
 
             elif child.tag == "BestValues":
                 self.best_values = []
@@ -57,7 +77,8 @@ class Test(SpirometerXML):
             results.append(result_parameter)
         return results
 
-
+    def get_patient_data_at_test_time(self) -> dict:
+        return self.patient_data_at_test_time.to_dict()
 
     def get_trials(self) -> list[Trial]:
         trial_els = self.root.find(".//Trials")
@@ -68,3 +89,10 @@ class Test(SpirometerXML):
             res.append(trial)
 
         return res
+
+    def get_device(self):
+        return {
+            "device_serial_number": self.device_serial_number,
+            "device_software_version": self.device_software_version,
+            "device_type": self.device_type,
+        }

@@ -1,4 +1,4 @@
-pyinstaller cypress_manager.py `
+pyinstaller manager.py `
 --name "manager" `
 --paths="." `
 --icon=favicon.ico `

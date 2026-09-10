@@ -85,18 +85,6 @@ class ECHOController(Controller):
 
         self.scans_received = set([])
         for file_path in files_received:
-            if ".dcm" != file_path.suffix:
-                self.logger.warning(f"received invalid file ext {file_path.name}")
-                continue
-
-            # ds = pydicom.dcmread(file_path, stop_before_pixels=True)
-            # if ds["PatientID"].value != self.session.barcode:
-            #     # self._handle_error(
-            #     #     f"PatientID: {ds["PatientID"].value} does not match Participant ID: {self.session.barcode}",
-            #     #     store_backup=True,
-            #     # )
-            #     return False
-
             self.scans_received.add(file_path)
 
         us_count = len([x for x in self.scans_received if x.name.split(".")[0] == "US"])
@@ -112,19 +100,14 @@ class ECHOController(Controller):
             {"us": us_count, "usm": usm_count, "src": src_count, "total": total}
         )
 
-        self.model.reset()
-        for file_path in self.scans_received:
-            added, error = self.model.add_file(file_path, send_name=file_path.name)
-            if not added:
-                self._handle_error(error, store_backup=True)
-                return False
+        try:
+            self.model.set_scans(self.scans_received)
+        except Exception as e:
+            self.logger.error(e)
+            self._handle_error(store_backup=True)
 
         if us_count >= 1 and usm_count >= 1 and src_count >= 1:
-            print("Ready to measure")
             self.ready_to_measure.emit()
-
-        #self.measured.emit(self.model.to_response())
-        #self.ready_to_measure.emit()
 
         return True
 
@@ -132,27 +115,34 @@ class ECHOController(Controller):
     def measure(self):
         self.logger.info("measure")
 
-        if not self.model.is_valid():
-            self.logger.error("results are not valid")
-            self._handle_error(store_backup=True)
+        success, error = self.model.is_valid()
+        if not success:
+            self.logger.error(error)
+            self._handle_error(error, store_backup=True)
+            return False
 
-        self.logger.debug(json.dumps(self.model.to_response(), indent=4))
-        self.measured.emit(self.model.to_response())
+        response = self.model.to_response()
+
+        self.logger.debug(json.dumps(response, indent=2))
+
+        self.measured.emit(response)
         self.ready_to_submit.emit(True)
 
     @override
-    def restore(self):
-        self.file_receiver.stop()
+    def submit(self):
+        valid, error = self.model.is_valid()
+        if not valid:
+            self.logger.error(error)
+            self._handle_error(error, store_backup=True)
+            return
 
+        super().submit()
+
+    @override
+    def restore(self):
         super().restore()
-        try:
-            if not self._clear_output_dir(self.config.storage_path):
-                self.logger.error("restore: could not clear storage directory")
-                return False
-            return True
-        except Exception as e:
-            self.logger.error(e)
-            return False
+        self.file_receiver.stop()
+        return self._clear_output_dir(self.config.storage_path)
 
     def _clear_output_dir(self, output_dir: Path) -> bool:
         self.logger.debug("_clean_output_dir")

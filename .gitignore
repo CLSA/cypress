@@ -4,6 +4,7 @@ Scripts
 Include
 dist
 build
+local
 
 *.json
 *.db

@@ -52,9 +52,15 @@ class ECHOView(View):
         self.manual_entry_button.setEnabled(False)
 
     @override
+    def _on_measure_button_clicked(self):
+        self.logger.info("measure requested")
+        self.measure_button.setEnabled(False)
+        self.measure.emit()
+
+    @override
     def on_ready_to_measure(self):
         super().on_ready_to_measure()
-        self.session_widget.statusValue.setText("Press measure once all files received")
+        self.session_widget.statusValue.setText("Press measure once all scans are transferred")
 
     @override
     def on_submitted(self):

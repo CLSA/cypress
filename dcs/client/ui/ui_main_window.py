@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.11.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,14 +16,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMainWindow,
-    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(436, 498)
+        MainWindow.resize(464, 336)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -31,33 +31,50 @@ class Ui_MainWindow(object):
         MainWindow.setSizePolicy(sizePolicy)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
+        self.centralwidget.setSizePolicy(sizePolicy1)
         self.verticalLayout_2 = QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
+        self.tabWidget.setSizePolicy(sizePolicy2)
         self.tab = QWidget()
         self.tab.setObjectName(u"tab")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.tab.sizePolicy().hasHeightForWidth())
+        self.tab.setSizePolicy(sizePolicy3)
         self.verticalLayout_5 = QVBoxLayout(self.tab)
+        self.verticalLayout_5.setSpacing(8)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(8, 8, 8, 8)
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.statusLabel = QLabel(self.tab)
         self.statusLabel.setObjectName(u"statusLabel")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
-        self.statusLabel.setSizePolicy(sizePolicy1)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
+        self.statusLabel.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout_2.addWidget(self.statusLabel)
 
         self.statusValue = QLabel(self.tab)
         self.statusValue.setObjectName(u"statusValue")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.statusValue.sizePolicy().hasHeightForWidth())
-        self.statusValue.setSizePolicy(sizePolicy2)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.statusValue.sizePolicy().hasHeightForWidth())
+        self.statusValue.setSizePolicy(sizePolicy5)
 
         self.horizontalLayout_2.addWidget(self.statusValue)
 
@@ -68,15 +85,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.versionLabel = QLabel(self.tab)
         self.versionLabel.setObjectName(u"versionLabel")
-        sizePolicy1.setHeightForWidth(self.versionLabel.sizePolicy().hasHeightForWidth())
-        self.versionLabel.setSizePolicy(sizePolicy1)
+        sizePolicy4.setHeightForWidth(self.versionLabel.sizePolicy().hasHeightForWidth())
+        self.versionLabel.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout.addWidget(self.versionLabel)
 
         self.versionValue = QLabel(self.tab)
         self.versionValue.setObjectName(u"versionValue")
-        sizePolicy2.setHeightForWidth(self.versionValue.sizePolicy().hasHeightForWidth())
-        self.versionValue.setSizePolicy(sizePolicy2)
+        sizePolicy5.setHeightForWidth(self.versionValue.sizePolicy().hasHeightForWidth())
+        self.versionValue.setSizePolicy(sizePolicy5)
 
         self.horizontalLayout.addWidget(self.versionValue)
 
@@ -87,15 +104,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.lastUpdatedLabel = QLabel(self.tab)
         self.lastUpdatedLabel.setObjectName(u"lastUpdatedLabel")
-        sizePolicy2.setHeightForWidth(self.lastUpdatedLabel.sizePolicy().hasHeightForWidth())
-        self.lastUpdatedLabel.setSizePolicy(sizePolicy2)
+        sizePolicy5.setHeightForWidth(self.lastUpdatedLabel.sizePolicy().hasHeightForWidth())
+        self.lastUpdatedLabel.setSizePolicy(sizePolicy5)
 
         self.horizontalLayout_4.addWidget(self.lastUpdatedLabel)
 
         self.lastUpdatedValue = QLabel(self.tab)
         self.lastUpdatedValue.setObjectName(u"lastUpdatedValue")
-        sizePolicy2.setHeightForWidth(self.lastUpdatedValue.sizePolicy().hasHeightForWidth())
-        self.lastUpdatedValue.setSizePolicy(sizePolicy2)
+        sizePolicy5.setHeightForWidth(self.lastUpdatedValue.sizePolicy().hasHeightForWidth())
+        self.lastUpdatedValue.setSizePolicy(sizePolicy5)
 
         self.horizontalLayout_4.addWidget(self.lastUpdatedValue)
 
@@ -106,15 +123,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.hostLabel = QLabel(self.tab)
         self.hostLabel.setObjectName(u"hostLabel")
-        sizePolicy1.setHeightForWidth(self.hostLabel.sizePolicy().hasHeightForWidth())
-        self.hostLabel.setSizePolicy(sizePolicy1)
+        sizePolicy4.setHeightForWidth(self.hostLabel.sizePolicy().hasHeightForWidth())
+        self.hostLabel.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout_3.addWidget(self.hostLabel)
 
         self.hostValue = QLabel(self.tab)
         self.hostValue.setObjectName(u"hostValue")
-        sizePolicy2.setHeightForWidth(self.hostValue.sizePolicy().hasHeightForWidth())
-        self.hostValue.setSizePolicy(sizePolicy2)
+        sizePolicy5.setHeightForWidth(self.hostValue.sizePolicy().hasHeightForWidth())
+        self.hostValue.setSizePolicy(sizePolicy5)
 
         self.horizontalLayout_3.addWidget(self.hostValue)
 
@@ -136,10 +153,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_5.addItem(self.verticalSpacer)
-
         self.tabWidget.addTab(self.tab, "")
 
         self.verticalLayout_2.addWidget(self.tabWidget)
@@ -147,7 +160,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 436, 33))
+        self.menubar.setGeometry(QRect(0, 0, 464, 33))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")

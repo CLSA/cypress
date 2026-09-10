@@ -28,7 +28,7 @@ class TestSpine(unittest.TestCase):
         if not cls.reference_db.open():
             raise Exception("Cannot open reference.mdb")
 
-        success, patient_info = cls.patscan_db.get_patient_info(barcode="20052908")
+        success, patient_info = cls.patscan_db.get_patient_info(barcode="")
         if not success:
             raise Exception("Couldn't get patient info")
 

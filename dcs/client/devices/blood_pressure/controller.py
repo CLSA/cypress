@@ -4,6 +4,8 @@ import tarfile
 from pathlib import Path
 import traceback
 
+from PySide6.QtWidgets import QMessageBox
+
 from controller import Controller
 
 from devices.blood_pressure.model import BPModel
@@ -36,10 +38,10 @@ class BPController(Controller):
 
         self.db = BPDatabase(self.config.database)
 
-        self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
+        #self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
 
         self.backup_paths = [
-            {"path": "C:/Microlife", "arcname": "Microlife"}
+            {"path": Path("C:/Microlife"), "arcname": "Microlife"}
         ]
 
     @override
@@ -67,12 +69,11 @@ class BPController(Controller):
                 self.error.emit("Failed to initialize database")
                 return False
 
+            self.logger.debug(patient_key)
             self.patient_key = patient_key
-
         except Exception as e:
-            traceback.print_exc()
             self.logger.error(e)
-            self.error.emit("Something went wrong")
+            self._handle_error(store_backup=True)
             return False
 
         finally:
@@ -95,12 +96,12 @@ class BPController(Controller):
                 self._handle_error(store_backup=True)
                 return False
 
-            success, records = self.db.get_measurements(patient_key=self.patient_key)
+            success, result = self.db.get_measurements(patient_key=self.patient_key)
             if not success:
-                self._handle_error(store_backup=True)
+                self._handle_error(result, store_backup=True)
                 return False
 
-            success, error = self.model.read_results(records)
+            success, error = self.model.read_results(result)
             if not success:
                 self.logger.error(error)
                 self._handle_error(store_backup=True)
@@ -115,23 +116,31 @@ class BPController(Controller):
 
         self.measured.emit(self.model.to_response())
 
-    def handle_manual_entry(self, data_received: dict):
-        self.logger.info("manual entry")
-        self.model.set_manual_values(data_received)
-
-        self.measured.emit(self.model.to_response())
-
     @override
     def restore(self):
         super().restore()
-        try:
-            if not self._restore_database():
-                self.logger.error("restore: could not restore database")
-                return False
-            return True
-        except Exception as e:
-            self.logger.error(e)
-            return False
+        return self._restore_database()
+
+    def _on_manual_entry(self):
+        if (
+            not self.model.manual_entry
+            and self.model.test
+            and len(self.model.test.measures)
+        ):
+            btn = self._show_message_box(
+                title="Entering manual entry mode",
+                msg="Automatic measurements exist, are you sure you'd like to enter manual entry? This will remove existing measurements",
+                level="warning",
+                allow_cancel=True
+            )
+
+            if btn == QMessageBox.StandardButton.Ok:
+                self.model.set_manual_entry()
+                self.view.on_manual_entry()
+                self.measured.emit(self.model.to_response())
+        else:
+            self.view.on_manual_entry()
+            self.measured.emit(self.model.to_response())
 
     def _restore_database(self):
         self.logger.debug("_restore_database")

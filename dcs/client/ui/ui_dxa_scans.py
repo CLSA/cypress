@@ -23,7 +23,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(596, 385)
+        Form.resize(563, 412)
         self.verticalLayout = QVBoxLayout(Form)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -64,25 +64,6 @@ class Ui_Form(object):
 
         self.verticalLayout_10.addLayout(self.controls)
 
-        self.total = QHBoxLayout()
-        self.total.setObjectName(u"total")
-        self.total.setContentsMargins(4, 4, 4, 4)
-        self.scans_received_label = QLabel(self.tab)
-        self.scans_received_label.setObjectName(u"scans_received_label")
-        self.scans_received_label.setMargin(4)
-
-        self.total.addWidget(self.scans_received_label)
-
-        self.scans_received_value = QLabel(self.tab)
-        self.scans_received_value.setObjectName(u"scans_received_value")
-        self.scans_received_value.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
-        self.scans_received_value.setMargin(4)
-
-        self.total.addWidget(self.scans_received_value)
-
-
-        self.verticalLayout_10.addLayout(self.total)
-
         self.left_hip = QHBoxLayout()
         self.left_hip.setObjectName(u"left_hip")
         self.left_hip.setContentsMargins(4, 4, 4, 4)
@@ -100,60 +81,6 @@ class Ui_Form(object):
 
 
         self.verticalLayout_10.addLayout(self.left_hip)
-
-        self.right_hip = QHBoxLayout()
-        self.right_hip.setObjectName(u"right_hip")
-        self.right_hip.setContentsMargins(4, 4, 4, 4)
-        self.right_hip_label = QLabel(self.tab)
-        self.right_hip_label.setObjectName(u"right_hip_label")
-        self.right_hip_label.setMargin(4)
-
-        self.right_hip.addWidget(self.right_hip_label)
-
-        self.right_hip_value = QLabel(self.tab)
-        self.right_hip_value.setObjectName(u"right_hip_value")
-        self.right_hip_value.setMargin(4)
-
-        self.right_hip.addWidget(self.right_hip_value)
-
-
-        self.verticalLayout_10.addLayout(self.right_hip)
-
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
-        self.left_forearm_label = QLabel(self.tab)
-        self.left_forearm_label.setObjectName(u"left_forearm_label")
-        self.left_forearm_label.setMargin(4)
-
-        self.horizontalLayout_2.addWidget(self.left_forearm_label)
-
-        self.left_forearm_value = QLabel(self.tab)
-        self.left_forearm_value.setObjectName(u"left_forearm_value")
-        self.left_forearm_value.setMargin(4)
-
-        self.horizontalLayout_2.addWidget(self.left_forearm_value)
-
-
-        self.verticalLayout_10.addLayout(self.horizontalLayout_2)
-
-        self.right_forearm = QHBoxLayout()
-        self.right_forearm.setObjectName(u"right_forearm")
-        self.right_forearm.setContentsMargins(4, 4, 4, 4)
-        self.right_forearm_label = QLabel(self.tab)
-        self.right_forearm_label.setObjectName(u"right_forearm_label")
-        self.right_forearm_label.setMargin(4)
-
-        self.right_forearm.addWidget(self.right_forearm_label)
-
-        self.right_forearm_value = QLabel(self.tab)
-        self.right_forearm_value.setObjectName(u"right_forearm_value")
-        self.right_forearm_value.setMargin(4)
-
-        self.right_forearm.addWidget(self.right_forearm_value)
-
-
-        self.verticalLayout_10.addLayout(self.right_forearm)
 
         self.spine = QHBoxLayout()
         self.spine.setObjectName(u"spine")
@@ -209,6 +136,60 @@ class Ui_Form(object):
 
         self.verticalLayout_10.addLayout(self.whole_body)
 
+        self.right_hip = QHBoxLayout()
+        self.right_hip.setObjectName(u"right_hip")
+        self.right_hip.setContentsMargins(4, 4, 4, 4)
+        self.right_hip_label = QLabel(self.tab)
+        self.right_hip_label.setObjectName(u"right_hip_label")
+        self.right_hip_label.setMargin(4)
+
+        self.right_hip.addWidget(self.right_hip_label)
+
+        self.right_hip_value = QLabel(self.tab)
+        self.right_hip_value.setObjectName(u"right_hip_value")
+        self.right_hip_value.setMargin(4)
+
+        self.right_hip.addWidget(self.right_hip_value)
+
+
+        self.verticalLayout_10.addLayout(self.right_hip)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
+        self.left_forearm_label = QLabel(self.tab)
+        self.left_forearm_label.setObjectName(u"left_forearm_label")
+        self.left_forearm_label.setMargin(4)
+
+        self.horizontalLayout_2.addWidget(self.left_forearm_label)
+
+        self.left_forearm_value = QLabel(self.tab)
+        self.left_forearm_value.setObjectName(u"left_forearm_value")
+        self.left_forearm_value.setMargin(4)
+
+        self.horizontalLayout_2.addWidget(self.left_forearm_value)
+
+
+        self.verticalLayout_10.addLayout(self.horizontalLayout_2)
+
+        self.right_forearm = QHBoxLayout()
+        self.right_forearm.setObjectName(u"right_forearm")
+        self.right_forearm.setContentsMargins(4, 4, 4, 4)
+        self.right_forearm_label = QLabel(self.tab)
+        self.right_forearm_label.setObjectName(u"right_forearm_label")
+        self.right_forearm_label.setMargin(4)
+
+        self.right_forearm.addWidget(self.right_forearm_label)
+
+        self.right_forearm_value = QLabel(self.tab)
+        self.right_forearm_value.setObjectName(u"right_forearm_value")
+        self.right_forearm_value.setMargin(4)
+
+        self.right_forearm.addWidget(self.right_forearm_value)
+
+
+        self.verticalLayout_10.addLayout(self.right_forearm)
+
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_10.addItem(self.verticalSpacer)
@@ -237,22 +218,20 @@ class Ui_Form(object):
         self.manual_entry_button.setText(QCoreApplication.translate("Form", u"Manual Entry", None))
         self.measure_button.setText(QCoreApplication.translate("Form", u"Measure", None))
         self.submit_button.setText(QCoreApplication.translate("Form", u"Submit", None))
-        self.scans_received_label.setText(QCoreApplication.translate("Form", u"Total", None))
-        self.scans_received_value.setText(QCoreApplication.translate("Form", u"---", None))
         self.left_hip_label.setText(QCoreApplication.translate("Form", u"Left hip", None))
         self.left_hip_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
-        self.right_hip_label.setText(QCoreApplication.translate("Form", u"Right hip", None))
-        self.right_hip_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
-        self.left_forearm_label.setText(QCoreApplication.translate("Form", u"Left forearm", None))
-        self.left_forearm_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
-        self.right_forearm_label.setText(QCoreApplication.translate("Form", u"Right forearm", None))
-        self.right_forearm_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
         self.spine_label.setText(QCoreApplication.translate("Form", u"Spine", None))
         self.spine_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
         self.lateral_spine_label.setText(QCoreApplication.translate("Form", u"Lateral spine", None))
         self.lateral_spine_value.setText(QCoreApplication.translate("Form", u"0 / 3", None))
         self.whole_body_label.setText(QCoreApplication.translate("Form", u"Whole body", None))
         self.whole_body_value.setText(QCoreApplication.translate("Form", u"0 / 2", None))
+        self.right_hip_label.setText(QCoreApplication.translate("Form", u"Right hip", None))
+        self.right_hip_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
+        self.left_forearm_label.setText(QCoreApplication.translate("Form", u"Left forearm", None))
+        self.left_forearm_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
+        self.right_forearm_label.setText(QCoreApplication.translate("Form", u"Right forearm", None))
+        self.right_forearm_value.setText(QCoreApplication.translate("Form", u"0 / 1", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("Form", u"Scans", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QCoreApplication.translate("Form", u"Log", None))
     # retranslateUi

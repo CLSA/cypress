@@ -33,6 +33,8 @@ class RetinalCameraController(Controller):
         self.backup_paths = [{"path": self.config.database_backup, "arcname": "oct"}]
         self.db = RetinalCameraDatabase(self.config.database_name)
 
+        self.start()
+
     @override
     def start(self):
         self.logger.info("start")

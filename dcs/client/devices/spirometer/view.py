@@ -92,4 +92,5 @@ class SpirometerView(View):
 
     @override
     def _on_measured(self, output: dict):
+        print(output)
         self.table.clear()

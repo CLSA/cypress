@@ -44,7 +44,7 @@ class CDTTTest(Record):
 
 class CDTTMeasure(Record):
     def __init__(self, raw_data):
-        self.trial = raw_data.get("trial", None)
+        self.trial = raw_data.get("trial")
         self.stimulus = raw_data.get("stimulus_digits", [])
         self.response = raw_data.get("response_digits", [])
 

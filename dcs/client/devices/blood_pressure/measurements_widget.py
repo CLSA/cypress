@@ -92,6 +92,7 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
             reading_number.setFlags(
                 reading_number.flags() & ~Qt.ItemFlag.ItemIsEditable
             )
+            reading_number.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
             systolic = QTableWidgetItem(str(result["systolic"].get("value")))
             diastolic = QTableWidgetItem(str(result["diastolic"].get("value")))
@@ -120,6 +121,7 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         reading_number_item.setFlags(
             reading_number_item.flags() & ~Qt.ItemFlag.ItemIsEditable
         )
+        reading_number_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
         systolic_item = QTableWidgetItem()
         diastolic_item = QTableWidgetItem()

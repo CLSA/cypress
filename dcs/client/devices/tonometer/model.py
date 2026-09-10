@@ -119,7 +119,7 @@ class TonometerTest(Record):
         for key in list(self.metadata_attrs_from_measure):
             for measure in self.measures:
                 measure_dict = measure.to_dict()
-                value = measure_dict.get(key, None)
+                value = measure_dict.get(key)
 
                 if key in measure_metadata and measure_metadata[key] != value:
                     logger.warning(f"{key}: {value} does not match")

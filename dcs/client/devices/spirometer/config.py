@@ -1,6 +1,6 @@
 import json
 
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, Literal
 
 from pydantic import Field, DirectoryPath, FilePath, AfterValidator
 
@@ -11,7 +11,6 @@ from devices.spirometer.settings import DEVICE_NAME
 
 class SpirometerConfig(DeviceConfig):
     section_name: ClassVar[str] = DEVICE_NAME
-
     process_name: Annotated[str, Field(min_length=5)]
 
     executable: Annotated[FilePath, Field(frozen=True), AfterValidator(is_executable)]
@@ -26,6 +25,8 @@ class SpirometerConfig(DeviceConfig):
 
     in_file_name: Annotated[str, Field(min_length=3)]
     out_file_name: Annotated[str, Field(min_length=3)]
+
+    test_type: Literal["FVC", "FVL"] = "FVL"
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ class Patient(SpirometerXML):
 
     @override
     def _parse_xml(self, root):
-        self.patient_id = root.attrib.get("ID", None)
+        self.patient_id = root.attrib.get("ID")
 
         patient_data_at_present = root.find("PatientDataAtPresent")
         if patient_data_at_present is None:
@@ -42,8 +42,8 @@ class Patient(SpirometerXML):
         if interval_el is None:
             raise ValueError("Patient: <Interval/> not found")
 
-        self.set_attribute("PftStandard", interval_el.attrib.get("PftStandard", None))
-        self.set_attribute("Modified", interval_el.attrib.get("Modified", None))
+        self.set_attribute("PftStandard", interval_el.attrib.get("PftStandard"))
+        self.set_attribute("Modified", interval_el.attrib.get("Modified"))
 
         for child in interval_el:
             if child.tag in self.field_map:

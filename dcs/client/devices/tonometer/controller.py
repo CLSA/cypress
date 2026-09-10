@@ -70,7 +70,7 @@ class TonometerController(Controller):
         success, error = self.model.read_results()
         if not success:
             self.logger.error(error)
-            self._handle_error(error.capitalize(), store_backup=True)
+            self._handle_error(store_backup=True)
             return False
 
         response = self.model.to_response()
@@ -81,6 +81,11 @@ class TonometerController(Controller):
         self.ready_to_submit.emit(True)
 
         return True
+
+    @override
+    def restore(self):
+        super().restore()
+        return self._restore_database()
 
     def _restore_database(self) -> bool:
         self.logger.debug("_restore_database")

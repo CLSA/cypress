@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>596</width>
-    <height>385</height>
+    <width>563</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@
       <attribute name="title">
        <string>Scans</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0,0,0,0,0,0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_10" stretch="0,0,0,0,0,0,0,0,0">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -105,45 +105,6 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="total">
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>4</number>
-         </property>
-         <property name="rightMargin">
-          <number>4</number>
-         </property>
-         <property name="bottomMargin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="scans_received_label">
-           <property name="text">
-            <string>Total</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="scans_received_value">
-           <property name="text">
-            <string>---</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
         <layout class="QHBoxLayout" name="left_hip" stretch="0,0">
          <property name="leftMargin">
           <number>4</number>
@@ -169,114 +130,6 @@
          </item>
          <item>
           <widget class="QLabel" name="left_hip_value">
-           <property name="text">
-            <string>0 / 1</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="right_hip">
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>4</number>
-         </property>
-         <property name="rightMargin">
-          <number>4</number>
-         </property>
-         <property name="bottomMargin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="right_hip_label">
-           <property name="text">
-            <string>Right hip</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="right_hip_value">
-           <property name="text">
-            <string>0 / 1</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>4</number>
-         </property>
-         <property name="rightMargin">
-          <number>4</number>
-         </property>
-         <property name="bottomMargin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="left_forearm_label">
-           <property name="text">
-            <string>Left forearm</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="left_forearm_value">
-           <property name="text">
-            <string>0 / 1</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="right_forearm">
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>4</number>
-         </property>
-         <property name="rightMargin">
-          <number>4</number>
-         </property>
-         <property name="bottomMargin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="right_forearm_label">
-           <property name="text">
-            <string>Right forearm</string>
-           </property>
-           <property name="margin">
-            <number>4</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="right_forearm_value">
            <property name="text">
             <string>0 / 1</string>
            </property>
@@ -387,6 +240,114 @@
           <widget class="QLabel" name="whole_body_value">
            <property name="text">
             <string>0 / 2</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="right_hip">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="right_hip_label">
+           <property name="text">
+            <string>Right hip</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="right_hip_value">
+           <property name="text">
+            <string>0 / 1</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="left_forearm_label">
+           <property name="text">
+            <string>Left forearm</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="left_forearm_value">
+           <property name="text">
+            <string>0 / 1</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="right_forearm">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="right_forearm_label">
+           <property name="text">
+            <string>Right forearm</string>
+           </property>
+           <property name="margin">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="right_forearm_value">
+           <property name="text">
+            <string>0 / 1</string>
            </property>
            <property name="margin">
             <number>4</number>

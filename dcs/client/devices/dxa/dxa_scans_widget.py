@@ -29,6 +29,7 @@ class DXAScansWidget(QWidget, Ui_Form):
         self.scans_received_value.setText(str(len(files)))
 
     def update_status(self, status: dict):
+        print(status)
         if "left_forearm" in status and self.session.include_lfa:
             self.left_forearm_value.setText(f"{str(status["left_forearm"])} / 1")
 

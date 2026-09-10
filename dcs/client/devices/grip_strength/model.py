@@ -146,32 +146,3 @@ class GripStrengthModel(Model):
             return as_newtons(value)
         else:
             return value
-
-
-if __name__ == "__main__":
-    config, errors = GripStrengthConfig.from_ini()
-    if errors:
-        print(errors)
-
-    model = GripStrengthModel(
-        session=GripStrengthSession(
-            **{
-                "barcode": "00000000",
-                "uid": "00000000",
-                "answer_id": 1,
-                "interviewer": "test",
-                "language": "en",
-            }
-        ),
-        config=config,
-    )
-
-    success, error = model.parse_database()
-
-    if not success:
-        print(error)
-    else:
-        print("OK")
-        print(model.test)
-        print(model.measure)
-        print(json.dumps(model.to_response(), indent=4))

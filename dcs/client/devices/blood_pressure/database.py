@@ -21,16 +21,6 @@ def datestring_to_epoch_s(date_str: str) -> int:
 
 class BPDatabase:
     def __init__(self, db_path: Path):
-        logger.debug(f"BPDatabase::__init__ - {db_path}")
-
-        if not db_path.exists():
-            logger.error(f"{db_path} does not exist")
-            raise ValueError(f"{db_path} does not exist")
-
-        if not db_path.is_file():
-            logger.error(f"{db_path} is not a file")
-            raise ValueError(f"{db_path} is not a file")
-
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         self.db.setDatabaseName(str(db_path.resolve()))
 
@@ -104,7 +94,7 @@ class BPDatabase:
 
         return True, query.record().value(0)
 
-    def get_measurements(self, patient_key: int) -> tuple[bool, list[dict]]:
+    def get_measurements(self, patient_key: int) -> tuple[bool, list[dict] | str]:
         ###
         # SELECT * FROM data WHERE ID = barcode;
         ###
@@ -119,7 +109,7 @@ class BPDatabase:
 
         if not query.exec():
             logger.error(query.lastError().text())
-            return False, []
+            return False, "Something went wrong"
 
         while query.next():
             row = {}
@@ -128,5 +118,8 @@ class BPDatabase:
                 row[query.record().fieldName(i)] = query.value(i)
 
             results.append(row)
+
+        if not results:
+            return False, "No results found"
 
         return True, results

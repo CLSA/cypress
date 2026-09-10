@@ -65,17 +65,17 @@ class RetinalCameraModel(Model):
 
             barcode = name_parts[0]
             if barcode != self.session.barcode:
-                logger.warning(
+                logger.error(
                     f"filename: barcode {barcode} does not match session {self.session.barcode}"
                 )
-                continue
+                return False, f"invalid barcode: {barcode}"
 
             side = name_parts[1]
             if side != self.session.side:
                 logger.warning(
                     f"filename: side ({side}) does not match session {self.session.side}"
                 )
-                continue
+                return False, f"incorrect eye captured: {side}"
 
             image_type = name_parts[2]
             if image_type != "OP" and image_type != "OPT":
@@ -89,10 +89,10 @@ class RetinalCameraModel(Model):
 
             name = None
             if image_type == "OPT":
-                name = f"OCT_LEFT_{sequence_number}" if side == "L" else f"OCT_RIGHT_{int(sequence_number)}"
+                name = f"OCT_LEFT" if side == "L" else f"OCT_RIGHT"
 
             if image_type == "OP":
-                name = f"EYE_LEFT_{sequence_number}" if side == "L" else f"EYE_RIGHT_{int(sequence_number)}"
+                name = f"EYE_LEFT" if side == "L" else f"EYE_RIGHT"
 
             self.measures.append(
                 OCTMeasure(
@@ -103,7 +103,53 @@ class RetinalCameraModel(Model):
                     file_path=file_path,
                 )
             )
-            self.add_file(file_path=file_path, send_name=name)
+
+        if not self.measures or len(self.measures) < 2:
+            return False, "no measures found"
+
+        self.measures = sorted(
+            self.measures,
+            key=lambda measure: (measure.create_time, measure.sequence_number),
+        )
+
+        last_created = self.measures[-1].create_time
+        last_sequence = self.measures[-1].sequence_number
+
+        eye_measure = None
+        for measure in self.measures:
+            if (
+                measure.create_time == last_created
+                and measure.sequence_number == last_sequence
+                and measure.image_type == "OP"
+            ):
+                eye_measure = measure
+                break
+        if eye_measure is None:
+            return False, "could not find OP file"
+
+        self.add_file(file_path=eye_measure.file_path, send_name=eye_measure.name, ext=".dcm")
+        self.metadata["eye_sent"] = eye_measure.file_path.name
+
+        logger.debug(f"last_op: {eye_measure.file_path.name}")
+
+        oct_measure = None
+        for measure in self.measures:
+            if (
+                measure.create_time == last_created
+                and measure.sequence_number == last_sequence
+                and measure.image_type == "OPT"
+            ):
+                oct_measure = measure
+                break
+
+        if oct_measure is None:
+            return False, "could not find OPT file"
+
+        self.add_file(file_path=oct_measure.file_path, send_name=oct_measure.name, ext=".dcm")
+        self.metadata["oct_sent"] = oct_measure.file_path.name
+
+        logger.debug(f"last_oct: {oct_measure.file_path.name}")
+
 
         return True, None
 
@@ -116,8 +162,6 @@ class RetinalCameraModel(Model):
     def to_response(self):
         res = super().to_response()
 
-        results = sorted(self.measures, key=lambda measure: measure.sequence_number)
-
-        res["value"]["results"] = [measure.to_dict() for measure in results]
+        res["value"]["results"] = [measure.to_dict() for measure in self.measures]
 
         return res

@@ -38,7 +38,7 @@ class TestScans(unittest.TestCase):
         return super().tearDownClass()
 
     def test_left_hip(self):
-        success, patient_info = self.patscan_db.get_patient_info(barcode="30008187")
+        success, patient_info = self.patscan_db.get_patient_info(barcode="")
 
         self.assertTrue(success)
 
@@ -67,7 +67,7 @@ class TestScans(unittest.TestCase):
         print(left_hip.get_bmd_data())
 
     def test_right_hip(self):
-        success, patient_info = self.patscan_db.get_patient_info(barcode="30003304")
+        success, patient_info = self.patscan_db.get_patient_info(barcode="")
 
         self.assertTrue(success)
 
@@ -98,7 +98,7 @@ class TestScans(unittest.TestCase):
         #print(json.dumps(left_hip.to_dict(), indent=4))
 
     def test_whole_body(self):
-        success, patient_info = self.patscan_db.get_patient_info(barcode="30008187")
+        success, patient_info = self.patscan_db.get_patient_info(barcode="")
         self.assertTrue(success)
 
         success, scan_analysis = self.patscan_db.get_scan_analysis(
@@ -165,7 +165,7 @@ class TestScans(unittest.TestCase):
         #print(json.dumps(wbody_measure.to_dict(), indent=4))
 
     def test_left_forearm(self):
-        success, patient_info = self.patscan_db.get_patient_info(barcode="40015524")
+        success, patient_info = self.patscan_db.get_patient_info(barcode="")
         self.assertTrue(success)
 
         success, scan_analysis = self.patscan_db.get_scan_analysis(
@@ -187,7 +187,7 @@ class TestScans(unittest.TestCase):
         #print(json.dumps(left_forearm.to_dict(), indent=4))
 
     def test_right_forearm(self):
-        success, patient_info = self.patscan_db.get_patient_info(barcode="20052908")
+        success, patient_info = self.patscan_db.get_patient_info(barcode="")
 
         self.assertTrue(success)
 
@@ -211,7 +211,7 @@ class TestScans(unittest.TestCase):
         print(json.dumps(right_forearm.to_dict(), indent=4))
 
     def test_ap_spine(self):
-        success, patient_info = self.patscan_db.get_patient_info(barcode="20052908")
+        success, patient_info = self.patscan_db.get_patient_info(barcode="")
         self.assertTrue(success)
 
         success, scan_analysis = self.patscan_db.get_scan_analysis(

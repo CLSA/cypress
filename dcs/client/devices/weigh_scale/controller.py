@@ -81,6 +81,11 @@ class WeighScaleController(Controller):
         self.logger.info("measure requested")
         self._write_device(b"p")
 
+    @override
+    def restore(self):
+        super().restore()
+        self.zero_device()
+
     def zero_device(self):
         self.logger.info("zero requested")
         self._write_device(b"z")
