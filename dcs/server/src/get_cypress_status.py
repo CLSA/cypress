@@ -23,11 +23,11 @@ if __name__ == "__main__":
 
     parser.add_argument("workstation", type=str)
     parser.add_argument("port", type=str)
-    parser.add_argument("continuous", action="store_true")
+    parser.add_argument("--repeat", action="store_true")
 
     args = parser.parse_args()
 
-    if args.continuous:
+    if args.repeat:
         while True:
             status = get_cypress_status(args.workstation, args.port, "status")
             print(status)
