@@ -5,7 +5,7 @@ import argparse
 
 def get_cypress_status(machine, port, path):
     try:
-        response = requests.get(f"{machine}:{port}/{path}")
+        response = requests.get(f"http://{machine}:{port}/{path}")
         if response.status_code == 200:
             status = response.json()
     except TimeoutError:
