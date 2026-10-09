@@ -155,7 +155,7 @@ class WeighScaleController(Controller):
         ):
             btn = self._show_message_box(
                 title="Entering manual entry mode",
-                msg="Automatic measurements exist, are you sure you'd like to enter manual entry? This will remove existing measurements",
+                msg="Automatic measurements exist, are you sure you'd like to enter manual entry?",
                 level="warning",
                 allow_cancel=True,
             )
@@ -170,6 +170,9 @@ class WeighScaleController(Controller):
     def _on_values_changed(self, data):
         self.model.set_manual_entry_data(data)
         self.measured.emit(self.model.to_response())
+
+        self.logger.debug(f"manual entry data: {self.model.is_valid()}")
+
         self.ready_to_submit.emit(self.model.is_valid())
 
     def _on_delete_measure(self, measure_index):

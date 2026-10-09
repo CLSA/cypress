@@ -37,6 +37,7 @@ router = APIRouter()
 # The device currently opened
 current_session: dict[str, multiprocessing.Process] | None = None
 
+started = datetime.datetime.now().isoformat()
 
 class DeviceEndpoints(str, Enum):
     CRT = "choice_reaction_test"
@@ -325,6 +326,7 @@ async def status():
     response = {
         "version": CYPRESS_VERSION,
         "last_updated": get_last_modified(),
+        "started": started
     }
 
     if current_session:

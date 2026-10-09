@@ -76,7 +76,7 @@ class GripStrengthModel(Model):
             grip_test_db = ParadoxDb(grip_test_db_path)
             tests = grip_test_db.read_records()
             if len(tests) != 1:
-                return False, "More than one test found"
+                return False, "No records found"
 
             grip_test_data_db = ParadoxDb(grip_test_data_db_path)
             measures = grip_test_data_db.read_records()

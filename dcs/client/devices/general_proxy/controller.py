@@ -1,5 +1,6 @@
 from typing import override
 from pathlib import Path
+from datetime import datetime
 
 from controller import Controller
 
@@ -48,8 +49,8 @@ class GeneralProxyController(Controller):
         self.logger.info("generating proxy form")
         generator = PDFGenerator(pdftk_exe_path=self.config.pdftk_executable)
         if not generator.prepare_form(
-            form_path=self.config.form_en,
-            fdf_path=self.config.fdf_en,
+            form_path=self.config.form_en if self.session.language == "en" else self.config.form_fr,
+            fdf_path=self.config.fdf_en if self.session.language == "en" else self.config.fdf_fr,
             input_data={"enrollmentId": self.session.uid},
             output_path=self.form_output_path,
         ):
@@ -59,6 +60,8 @@ class GeneralProxyController(Controller):
         if not self.form_output_path.exists():
             self.error.emit("Failed to find generated proxy form")
             return False
+
+        self.start_last_modified = self.form_output_path.stat().st_mtime
 
         self.logger.info("preparing adobe")
         self.process.setProgram(str(self.config.adobe_executable.resolve()))
@@ -78,6 +81,20 @@ class GeneralProxyController(Controller):
             self.logger.error("form output path does not exist")
             self._handle_error(store_backup=True)
             return False
+
+        self.end_last_modified = self.form_output_path.stat().st_mtime
+        form_created = datetime.fromtimestamp(self.start_last_modified)
+        form_saved = datetime.fromtimestamp(self.end_last_modified)
+
+        self.logger.info(f"form created: {form_created}, form saved: {form_saved}")
+
+        if form_saved <= form_created:
+            self.logger.error(f"proxy form was not saved before closing in adobe")
+            self._handle_error(
+                "The proxy consent form was not saved in Adobe before closing",
+                store_backup=False,
+            )
+            return
 
         if not self.model.read_results(self.form_output_path):
             self.logger.error("failed to read results")

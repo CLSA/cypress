@@ -23,7 +23,7 @@ class Ui_BloodPressureMeasurements(object):
     def setupUi(self, BloodPressureMeasurements):
         if not BloodPressureMeasurements.objectName():
             BloodPressureMeasurements.setObjectName(u"BloodPressureMeasurements")
-        BloodPressureMeasurements.resize(436, 332)
+        BloodPressureMeasurements.resize(445, 293)
         self.verticalLayout_2 = QVBoxLayout(BloodPressureMeasurements)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -76,14 +76,14 @@ class Ui_BloodPressureMeasurements(object):
 
         self.tableControls = QHBoxLayout()
         self.tableControls.setObjectName(u"tableControls")
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.tableControls.addItem(self.horizontalSpacer_2)
-
         self.deleteRow = QPushButton(self.groupBox)
         self.deleteRow.setObjectName(u"deleteRow")
 
         self.tableControls.addWidget(self.deleteRow)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.tableControls.addItem(self.horizontalSpacer_2)
 
         self.addRow = QPushButton(self.groupBox)
         self.addRow.setObjectName(u"addRow")

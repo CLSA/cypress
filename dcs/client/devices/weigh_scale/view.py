@@ -59,8 +59,6 @@ class WeighScaleView(View):
 
     @override
     def _on_manual_entry_clicked(self):
-        #super()._on_manual_entry_clicked()
-
         self.manual_entry.emit([])
 
     def _on_values_changed(self, data):
@@ -71,13 +69,12 @@ class WeighScaleView(View):
 
     @override
     def on_measured(self, output: dict):
-        self.logger.debug(f"view: {output}")
         self.measurement_form.on_measured(output)
 
     @override
     def on_ready_to_measure(self):
-        self.state = State.READY_TO_MEASURE
         self.logger.info("ready to measure")
+        self.state = State.READY_TO_MEASURE
         self.session_widget.statusValue.setText("Ready to measure")
         self.measure_button.setEnabled(True)
         self.submit_button.setEnabled(False)
@@ -91,6 +88,7 @@ class WeighScaleView(View):
         self.manual_entry_button.setEnabled(False)
         self.measurement_form.set_enabled(True)
         self.measure_button.setEnabled(False)
+        self.submit_button.setEnabled(False)
         self.state = State.MANUAL_ENTRY
 
     @override

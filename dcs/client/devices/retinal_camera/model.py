@@ -40,12 +40,10 @@ class RetinalCameraModel(Model):
 
     def read_results(self, output_directory: Path) -> tuple[bool, str]:
         if not output_directory.exists():
-            logger.error(f"{str(output_directory.resolve())} does not exist")
-            return False, "something went wrong"
+            return False, "export dir path does not exist"
 
         if not output_directory.is_dir():
-            logger.error(f"{str(output_directory.resolve())} is not a directory")
-            return False, "something went wrong"
+            return False, f"export dir path is not a directory"
 
         self.reset()
 
@@ -60,29 +58,19 @@ class RetinalCameraModel(Model):
             name_parts = name.strip().split("_")
 
             if len(name_parts) < 5:
-                logger.warning(f"filename: is incorrect {name}")
-                continue
+                return False, f"filename: length is incorrect {name}"
 
             barcode = name_parts[0]
             if barcode != self.session.barcode:
-                logger.error(
-                    f"filename: barcode {barcode} does not match session {self.session.barcode}"
-                )
                 return False, f"invalid barcode: {barcode}"
 
             side = name_parts[1]
             if side != self.session.side:
-                logger.warning(
-                    f"filename: side ({side}) does not match session {self.session.side}"
-                )
                 return False, f"incorrect eye captured: {side}"
 
             image_type = name_parts[2]
             if image_type != "OP" and image_type != "OPT":
-                logger.warning(
-                    f"filename: image type {image_type} does not match OP or OPT"
-                )
-                continue
+                return False, f"filename: image type {image_type} does not match OP or OPT"
 
             create_time = name_parts[3]
             sequence_number = name_parts[4]
@@ -105,7 +93,7 @@ class RetinalCameraModel(Model):
             )
 
         if not self.measures or len(self.measures) < 2:
-            return False, "no measures found"
+            return True, None
 
         self.measures = sorted(
             self.measures,
@@ -149,7 +137,6 @@ class RetinalCameraModel(Model):
         self.metadata["oct_sent"] = oct_measure.file_path.name
 
         logger.debug(f"last_oct: {oct_measure.file_path.name}")
-
 
         return True, None
 

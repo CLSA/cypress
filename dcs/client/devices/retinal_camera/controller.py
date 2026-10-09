@@ -61,8 +61,9 @@ class RetinalCameraController(Controller):
     def measure(self):
         self.logger.info("measure")
 
-        success = self.model.read_results(self.config.export_path)
+        success, error = self.model.read_results(self.config.export_path)
         if not success:
+            self.logger.error(error)
             self._handle_error(store_backup=True)
             return
 

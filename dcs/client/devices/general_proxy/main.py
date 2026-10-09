@@ -15,7 +15,7 @@ class GeneralProxySessionDialog(SessionDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        self.setWindowTitle("Weight setup")
+        self.setWindowTitle("General Proxy setup")
         self.setMinimumSize(350, 350)
 
 

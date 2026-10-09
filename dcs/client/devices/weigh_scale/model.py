@@ -14,6 +14,7 @@ from devices.weigh_scale.config import WeighScaleConfig
 
 logger = logging.getLogger(DEVICE_NAME)
 
+from utils import round_half_up
 
 class WeightMeasure(Record):
     field_map = {
@@ -63,19 +64,21 @@ class WeighScaleTest:
         self._update_average()
 
     def _update_average(self):
-        logger.debug("_update_average")
+        logger.debug("update_average")
 
         n = len(self.measures)
         if n < 1:
+            logger.debug(f"not enough measures {n} < 1")
             return
 
         total = sum([x.weight["value"] for x in self.measures])
-        logger.debug(total)
 
         self.metadata["average_weight"] = {
             "units": "kg",
-            "value": total / n,
+            "value": round_half_up(total / n, 1),
         }
+
+        logger.debug(f"avg: {self.metadata.get("average_weight", {}).get("value")}")
 
     def to_dict(self):
         return self.metadata.copy()
@@ -124,20 +127,23 @@ class WeighScaleModel(Model):
     def delete_measurement(self, index):
         self.test.remove_measurement(index)
 
-    def set_manual_entry_data(self, data: list[tuple[float, str]]):
+    def set_manual_entry_data(self, data: list[dict]):
         self.reset()
         self.manual_entry = True
 
-        timestamp = datetime.datetime.now().isoformat()
+        #timestamp = datetime.datetime.now().isoformat()
 
         measures: list[WeightMeasure] = []
         for measure in data:
+            if measure.get("weight") <= 0:
+                continue
+
             measures.append(
                 WeightMeasure(
                     {
-                        "weight": measure[0],
+                        "weight": measure.get("weight"),
                         "mode": "Gross",
-                        "timestamp": timestamp,
+                        "timestamp": measure.get("timestamp"),
                     }
                 )
             )

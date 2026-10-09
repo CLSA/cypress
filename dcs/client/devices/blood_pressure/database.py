@@ -2,7 +2,10 @@ import sys
 import logging
 
 from pathlib import Path
-from datetime import date
+
+from datetime import datetime, timezone, time, UTC
+
+import traceback
 
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtSql import QSqlDatabase, QSqlQuery
@@ -12,11 +15,24 @@ from devices.blood_pressure.settings import DEVICE_NAME
 
 logger = logging.getLogger(DEVICE_NAME)
 
+def datestring_to_epoch_s(date) -> int:
+    # Local time utc offset, BP app converts DOB UTC to local time..
+    utc_offset = datetime.now().astimezone().utcoffset().total_seconds()
 
-def datestring_to_epoch_s(date_str: str) -> int:
-    d = date.fromisoformat(date_str)
-    epoch = date(1970, 1, 1)
-    return (d - epoch).days * 86400
+    dob_dt = datetime(
+        date.year,
+        date.month,
+        date.day,
+        hour=1, #
+        minute=0,
+        second=0,
+        tzinfo=UTC
+    )
+
+    epoch = datetime(1970, 1, 1, tzinfo=UTC)
+    timestamp = (dob_dt - epoch).total_seconds() - utc_offset
+
+    return timestamp
 
 
 class BPDatabase:
@@ -58,12 +74,12 @@ class BPDatabase:
             (:name, :id, :gender, :dob, :physician);
         """)
 
+        dob_datetime = datestring_to_epoch_s(dob)
+
         query.bindValue(":name", name)
         query.bindValue(":id", barcode)
         query.bindValue(":gender", 1 if gender == "female" else 0)
-        query.bindValue(
-            ":dob", datestring_to_epoch_s(dob.strftime("%Y-%m-%d"))
-        )
+        query.bindValue(":dob", dob_datetime)
         query.bindValue(":physician", physician)
 
         if not query.exec():
@@ -83,9 +99,7 @@ class BPDatabase:
             return False, None
 
         if query.size() > 1:
-            logger.error(
-                f"query returned multiple patient keys for barcode {barcode}"
-            )
+            logger.error(f"query returned multiple patient keys for barcode {barcode}")
             return False, None
 
         if not query.first():

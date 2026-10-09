@@ -1,3 +1,5 @@
+import logging
+
 from typing import override
 
 from PySide6.QtCore import Qt, Signal
@@ -14,8 +16,11 @@ from ui.ui_blood_pressure_measurements import Ui_BloodPressureMeasurements
 
 from utils import IntegerSpinBoxDelegate
 
+logger = logging.getLogger("blood_pressure")
+
 class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
     values_changed = Signal(list)
+    delete_measure = Signal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -26,7 +31,11 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
 
         self._set_table()
 
-        self.table.setEnabled(False)
+        self.table.setEnabled(True)
+
+        self.deleteRow.setVisible(True)
+        self.deleteRow.setEnabled(False)
+
         self.table.itemSelectionChanged.connect(self._on_row_selected)
 
         self.addRow.pressed.connect(self.add_row)
@@ -48,17 +57,24 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         self.deleteRow.setVisible(False)
 
     def set_enabled(self, enabled: bool) -> None:
+        self.table.clearSelection()
+
         self.save_manual_entry.setVisible(enabled)
         self.save_manual_entry.setEnabled(enabled)
+
         self.addRow.setEnabled(enabled)
         self.addRow.setVisible(enabled)
+
+        self.deleteRow.setEnabled(False)
         self.deleteRow.setVisible(enabled)
-        self.submitButton.setEnabled(not enabled)
 
-        self.table.setEnabled(enabled)
-
-        if self.table.rowCount() < 1:
-            self.add_row()
+        if enabled:
+            self.table.setEditTriggers(
+                QAbstractItemView.DoubleClicked |
+                QAbstractItemView.SelectedClicked
+            )
+        else:
+            self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def on_save_manual_entry(self):
         self.table.clearSelection()
@@ -68,6 +84,9 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         self.manualEntryButton.setEnabled(True)
         self.submitButton.setEnabled(False)
 
+        self._update_values()
+
+    def _update_values(self):
         measures = []
         for row in range(self.table.rowCount()):
             measures.append(
@@ -123,9 +142,9 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         )
         reading_number_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        systolic_item = QTableWidgetItem()
-        diastolic_item = QTableWidgetItem()
-        pulse_item = QTableWidgetItem()
+        systolic_item = QTableWidgetItem(str(0))
+        diastolic_item = QTableWidgetItem(str(0))
+        pulse_item = QTableWidgetItem(str(0))
 
         self.table.insertRow(row_count)
         self.table.setItem(row_count, 0, reading_number_item)
@@ -149,19 +168,7 @@ class BloodPressureMeasurementsWidget(QWidget, Ui_BloodPressureMeasurements):
         for i in range(self.table.rowCount()):
             self.table.item(i, 0).setText(str(i + 1))
 
-
     def _set_table(self):
-        # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-
-        self.table.setStyleSheet("""
-            QTableWidget { outline: 0; }
-            QTableWidget::item:focus, QTableWidget::item:selected {
-                background-color: #2a82da;
-                color: white;
-            }
-            """)
-
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignLeft)
         self.table.setColumnCount(len(self.columns))
         self.table.setHorizontalHeaderLabels(self.columns)

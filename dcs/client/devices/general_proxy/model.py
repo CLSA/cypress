@@ -2,10 +2,14 @@ import logging
 from pathlib import Path
 
 from devices.general_proxy.pdf.pdf_generator import PDFGenerator
+from devices.general_proxy.config import GeneralProxyConfig
 
 from model import Model
 
+
+
 from pyhanko.pdf_utils.reader import PdfFileReader
+
 
 logger = logging.getLogger("general_proxy")
 
@@ -29,9 +33,10 @@ class GeneralProxyModel(Model):
             logger.error("no form data found")
             return False
 
-        self.results = form_results
+        self._set_results(form_results)
+
         if not self.has_signature():
-            logger.warning("pdf has not signature")
+            logger.warning("pdf has not been signed")
 
         return True
 
@@ -56,10 +61,8 @@ class GeneralProxyModel(Model):
             return num_signatures > 0
 
         except Exception as e:
-            logger.error(f'has_signature: {e}')
+            logger.error(f"has_signature: {e}")
             return False
-
-
 
     def _parse_form(self, file_path) -> dict:
         try:
@@ -101,3 +104,58 @@ class GeneralProxyModel(Model):
         except Exception as e:
             logger.error(e)
             return None
+
+    def _set_results(self, parsed_form_fields: list):
+        self.results = parsed_form_fields
+
+        for parsed_field in parsed_form_fields:
+            field_name = parsed_field.get("FieldName")
+            field_type = parsed_field.get("FieldType")
+            field_name_alt = parsed_field.get("FieldNameAlt")
+            field_value = parsed_field.get("FieldValue")
+
+            logger.debug(f"{field_name_alt}  - {field_value}")
+
+            if field_name is None:
+                logger.error(f"field name does not exist - {field_name_alt}")
+                continue
+
+            if not field_name:
+                logger.error(f"field name is empty")
+                continue
+
+            self.metadata[field_name.replace(".", "_")] = self._convert_type(
+                field_type, field_value
+            )
+
+    def _convert_type(self, field_type: str, field_value: str):
+        if field_type == "Button":
+            return (
+                True if field_value == "Yes" else False if field_value == "No" else None
+            )
+
+        if field_type == "Text":
+            return field_value
+
+        return None
+
+
+
+if __name__ == '__main__':
+    import json
+
+    file_paths = Path("C:/Users/hoarea/cypress/analysis/SHER_CONSENT_GP/fix")
+
+    config, errors = GeneralProxyConfig.from_ini()
+
+
+    for uid_folder in file_paths.iterdir():
+        if uid_folder.is_dir():
+            report = uid_folder / "general_proxy.pdf"
+
+            model = GeneralProxyModel(None, config)
+            model.read_results(report)
+
+            with open(uid_folder / "response.json", "w") as json_file:
+                json.dump(model.to_response(), json_file, indent=2)
+

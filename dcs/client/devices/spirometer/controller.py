@@ -38,7 +38,7 @@ class SpirometerController(Controller):
 
         self.backup_paths = [
             {"path": self.config.exchange_path, "arcname": "exchange"},
-            {"path": self.config.database_path, "arcname": "database"},
+            {"path": self.config.database_path, "arcname": "EasyOneConnect.sqlite"},
         ]
 
         self.start()
@@ -155,3 +155,30 @@ class SpirometerController(Controller):
         self.process.setProgram(str(self.config.executable.resolve()))
         self.process.setArguments([])
         self.process.setWorkingDirectory(str(self.config.working_directory.resolve()))
+
+        self.process.readyReadStandardOutput.connect(self._on_standard_output)
+        self.process.readyReadStandardError.connect(self._on_standard_error)
+
+    def _on_standard_output(self, output):
+        self.logger.debug(output)
+
+    def _on_standard_error(self, error):
+        self.logger.debug(error)
+
+    @override
+    def _on_process_started(self, *args):
+        self.logger.info("process started")
+        self.started.emit()
+
+    @override
+    def _on_process_finished(self, *args):
+        self.logger.info("process finished")
+        self.ready_to_measure.emit()
+
+    @override
+    def _on_process_destroyed(self, *args):
+        self.logger.info("process destroyed")
+
+    @override
+    def _on_process_error(self, *args):
+        self.logger.info("process error")

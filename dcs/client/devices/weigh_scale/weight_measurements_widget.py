@@ -61,9 +61,6 @@ class WeightMeasurementsWidget(QWidget, Ui_WeightMeasurements):
 
         self.set_enabled(False)
 
-        #self.deleteRow.setEnabled(False)
-        #self.deleteRow.setVisible(False)
-
     def set_enabled(self, enabled: bool) -> None:
         self.table.clearSelection()
 
@@ -74,41 +71,57 @@ class WeightMeasurementsWidget(QWidget, Ui_WeightMeasurements):
         self.zeroButton.setEnabled(not enabled)
 
         if enabled:
-            self.table.setEditTriggers(QAbstractItemView.DoubleClicked | QAbstractItemView.SelectedClicked)
+            self.table.setEditTriggers(
+                QAbstractItemView.DoubleClicked |
+                QAbstractItemView.SelectedClicked
+            )
         else:
             self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     def on_save_manual_entry(self):
+        self._deselect_row()
         self.set_enabled(False)
         self.manualEntryButton.setEnabled(True)
         self._handle_values_changed()
 
     def _handle_values_changed(self):
+        timestamp = datetime.datetime.now().isoformat()
+
         measures = []
         for row in range(self.table.rowCount()):
-            measures.append((float(self.table.item(row, 0).text()), str(self.table.item(row, 2))))
+            measures.append(
+                {
+                    "weight": float(self.table.item(row, 0).text()),
+                    "timestamp": timestamp
+                }
+            )
 
         self.values_changed.emit(measures)
 
     def on_measured(self, output: dict):
         try:
-            logger.debug(f"widget: {output}")
             self.table.clear()
             self._set_table()
 
             self.table.setRowCount(len(output["value"]["results"]))
 
-            logger.debug(len(output["value"]["results"]))
-
             for index, result in enumerate(output["value"]["results"]):
-                logger.debug(index, result)
-                weight = QTableWidgetItem(str(result["weight"].get("value")))
-                unit = QTableWidgetItem(str(result["weight"].get("units")))
-                time = QTableWidgetItem(str(result["timestamp"]))
+                weight_value = str(result["weight"].get("value"))
+                if self.config.locale == "fr":
+                    weight_value = weight_value
 
-                self.table.setItem(index, 0, weight)
-                self.table.setItem(index, 1, unit)
-                self.table.setItem(index, 2, time)
+                weight_item = QTableWidgetItem(weight_value)
+
+                unit_item = QTableWidgetItem(str(result["weight"].get("units")))
+                unit_item.setFlags(unit_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+
+                time_item = QTableWidgetItem(str(datetime.datetime.fromisoformat(result["timestamp"]).strftime("%#I:%M:%S %p")))
+                time_item.setFlags(time_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+
+                self.table.setItem(index, 0, weight_item)
+                self.table.setItem(index, 1, unit_item)
+                self.table.setItem(index, 2, time_item)
+
         except Exception as e:
             logger.error(e)
 
@@ -120,7 +133,7 @@ class WeightMeasurementsWidget(QWidget, Ui_WeightMeasurements):
         if row_count > MAX_ROWS - 1:
             return False
 
-        weight_item = QTableWidgetItem(str(0.00))
+        weight_item = QTableWidgetItem("0.0")
         unit_item = QTableWidgetItem("kg")
         unit_item.setFlags(unit_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
         time_item = QTableWidgetItem("---")
@@ -134,6 +147,10 @@ class WeightMeasurementsWidget(QWidget, Ui_WeightMeasurements):
     def _on_row_selected(self):
         self.row_selected = self.table.currentRow()
         self.deleteRow.setEnabled(True)
+
+    def _deselect_row(self):
+        self.row_selected = None
+        self.deleteRow.setEnabled(False)
 
     def delete_row(self):
         if self.row_selected is None:

@@ -84,16 +84,8 @@ class SpirometerModel(Model):
         for result in best_values:
             best_values_dict.update(result.to_dict())
 
-
-        if test.original_quality_grade:
-            res["value"]["metadata"]["original_quality_grade"] = test.original_quality_grade.lower()
-        else:
-            res["value"]["metadata"]["original_quality_grade"] = test.original_quality_grade
-
-        if test.quality_grade:
-            res["value"]["metadata"]["quality_grade"] = test.quality_grade.lower()
-        else:
-            res["value"]["metadata"]["quality_grade"] = test.quality_grade
+        res["value"]["metadata"]["original_quality_grade"] = test.original_quality_grade
+        res["value"]["metadata"]["quality_grade"] = test.quality_grade
 
         res["value"]["metadata"]["test_type"] = test.test_type
         res["value"]["metadata"]["test_date"] = test.test_date

@@ -1,5 +1,6 @@
 import psutil
 import json
+import math
 
 from pathlib import Path
 from dataclasses import dataclass
@@ -10,8 +11,9 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QSpinBox,
     QDoubleSpinBox,
-    QComboBox
+    QComboBox,
 )
+
 
 @dataclass(kw_only=True)
 class FileInfo:
@@ -24,6 +26,7 @@ class FileInfo:
 
     # pine preferred name (no extension)
     send_name: str | None
+
 
 @dataclass(kw_only=True)
 class DicomFileInfo(FileInfo):
@@ -48,6 +51,11 @@ def get_file_size(file_path: Path):
         size_bytes /= 1024.0
 
 
+def round_half_up(num: float, decimals=0) -> float:
+    multiplier = 10**decimals
+    return math.floor(num * multiplier + 0.5) / multiplier
+
+
 def get_file_info(file_path: Path):
     if not file_path:
         raise ValueError("file_path parameter is missing")
@@ -63,20 +71,17 @@ def get_file_info(file_path: Path):
         raw_size=file_path.stat().st_size,
         readable_size=get_file_size(file_path),
         file_name=file_path.name,
-        extension="".join(file_path.suffixes), # ignore period
+        extension="".join(file_path.suffixes),  # ignore period
         file_path=file_path,
-        send_name=None
+        send_name=None,
     )
+
 
 def file_dialog_save(data: dict, filename: str, ext: str):
     file_path, selected_filter = QFileDialog.getSaveFileName(
         None,
         "Select output file",
-        str(
-            (
-                Path.home() / f"{filename}.{ext}"
-            ).resolve()
-        ),
+        str((Path.home() / f"{filename}.{ext}").resolve()),
         "JSON files (*.json)",
     )
     if file_path:
@@ -91,6 +96,7 @@ def is_process_running(process_name: str):
         if process_name.lower() == process.info["name"].lower():
             return True
     return False
+
 
 def stop_process(process_name: str) -> bool:
     for process in psutil.process_iter(["name"]):
@@ -113,6 +119,7 @@ def clear_directory(directory: Path):
     for path in directory.iterdir():
         if path.is_file():
             path.unlink(missing_ok=True)
+
 
 class IntegerSpinBoxDelegate(QStyledItemDelegate):
 
@@ -139,6 +146,7 @@ class IntegerSpinBoxDelegate(QStyledItemDelegate):
 
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
+
 
 class ComboBoxDelegate(QStyledItemDelegate):
 
@@ -176,7 +184,8 @@ class DoubleSpinBoxDelegate(QStyledItemDelegate):
 
     def createEditor(self, parent, option, index):
         editor = QDoubleSpinBox(parent)
-        if self.locale == 'fr':
+        # print(editor.locale())
+        if self.locale == "fr":
             editor.setLocale(QLocale(QLocale.French, QLocale.Canada))
         editor.setRange(self.min_val, self.max_val)
         editor.setDecimals(self.decimals)

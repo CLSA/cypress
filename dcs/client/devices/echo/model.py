@@ -44,11 +44,8 @@ class ECHOModel(Model):
                 if not valid:
                     return False, error
 
-            if not has_us:
-                return False, "No US file found"
-
-            if not has_usm:
-                return False, "No USm file found"
+            if not has_us and not has_usm:
+                return False, "No US or USm files found"
 
             if not has_src:
                 return False, "No SRc file found"

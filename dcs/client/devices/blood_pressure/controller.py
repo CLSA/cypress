@@ -38,11 +38,23 @@ class BPController(Controller):
 
         self.db = BPDatabase(self.config.database)
 
-        #self.view.measurement_form.values_changed.connect(self.handle_manual_entry)
+        self.view.manual_entry.connect(self._on_manual_entry)
+        self.view.values_changed.connect(self._on_values_changed)
 
         self.backup_paths = [
             {"path": Path("C:/Microlife"), "arcname": "Microlife"}
         ]
+
+    def _on_values_changed(self, data):
+        self.model.set_manual_entry_data(data)
+        self.measured.emit(self.model.to_response())
+        self.ready_to_submit.emit(self.model.is_valid())
+
+    def _on_delete_measure(self, index):
+        self.model.delete_measurement(index)
+        self.measured.emit(self.model.to_response())
+
+        self.ready_to_submit.emit(self.model.is_valid())
 
     @override
     def start(self) -> bool:
@@ -107,6 +119,11 @@ class BPController(Controller):
                 self._handle_error(store_backup=True)
                 return False
 
+            if not self.model.is_valid():
+                self.logger.error("results are not valid")
+                self._handle_error(store_backup=True)
+                return False
+
         except Exception as e:
             self.logger.critical(e)
             self._handle_error(store_backup=True)
@@ -129,7 +146,7 @@ class BPController(Controller):
         ):
             btn = self._show_message_box(
                 title="Entering manual entry mode",
-                msg="Automatic measurements exist, are you sure you'd like to enter manual entry? This will remove existing measurements",
+                msg="Automatic measurements exist, are you sure you'd like to enter manual entry?",
                 level="warning",
                 allow_cancel=True
             )

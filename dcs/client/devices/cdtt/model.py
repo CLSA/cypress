@@ -126,8 +126,8 @@ class CDTTModel(Model):
             return False, f"Parsing error"
 
         except Exception as e:
-           logger.error(e)
-           return False, "Unknown exception"
+            logger.error(e)
+            return False, "Unknown exception"
 
         return True, None
 
@@ -193,10 +193,9 @@ class CDTTModel(Model):
 
     def _read_trial_data(self, wb, measure_records: list) -> tuple[bool, str | None]:
         # Read trials A13 from sheet [FR_CA | EN_CA]-[Male | Female]
-        #
-        language = "EN" if self.session.language == "en" else "FR"
+        logger.debug(wb.sheetnames)
 
-        sheet = wb[f"{language}_CA-Male"]
+        sheet = wb[wb.sheetnames[1]]
 
         query = sheet["A13:G36"]
 

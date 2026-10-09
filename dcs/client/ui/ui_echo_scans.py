@@ -26,6 +26,7 @@ class Ui_ECHOScansWidget(object):
         ECHOScansWidget.resize(400, 300)
         self.verticalLayout = QVBoxLayout(ECHOScansWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.controls = QHBoxLayout()
         self.controls.setObjectName(u"controls")
         self.manual_entry_button = QPushButton(ECHOScansWidget)

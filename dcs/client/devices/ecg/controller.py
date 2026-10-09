@@ -44,6 +44,8 @@ class ECGController(Controller):
         )
 
         self.file_receiver.files_received.connect(self._on_files_received)
+        self.file_receiver.files_received.connect(self.view._on_files_received)
+
         self.file_receiver.start()
 
         self.view.measure_button.setVisible(True)
@@ -70,19 +72,16 @@ class ECGController(Controller):
 
         found, result = self._get_file_from_list(files, "ecg")
         if not found:
-            #self._handle_error(result, store_backup=True)
             return
         ecg_path = result
 
         found, result = self._get_file_from_list(files, "pdf")
         if not found:
-            #self._handle_error(result, store_backup=True)
             return
         pdf_path = result
 
         found, result = self._get_file_from_list(files, "Xml")
         if not found:
-            #self._handle_error(result, store_backup=True)
             return
         xml_path = result
 
@@ -90,13 +89,15 @@ class ECGController(Controller):
             ecg_path=ecg_path, xml_path=xml_path, pdf_path=pdf_path
         )
         if not ok:
-            print("failed to add files")
+            self.logger.error("failed to add files")
             self._handle_error(store_backup=True)
             return
 
         self.ready_to_measure.emit()
 
-    def _get_file_from_list(self, files: list[Path], ext: str) -> tuple[bool, Path | str]:
+    def _get_file_from_list(
+        self, files: list[Path], ext: str
+    ) -> tuple[bool, Path | str]:
         paths = [file_path for file_path in files if file_path.suffix == f".{ext}"]
         if len(paths) != 1:
             return False, f"Incorrect number of {ext.upper()} files: {len(paths)}"
@@ -110,16 +111,26 @@ class ECGController(Controller):
     @override
     def measure(self):
         try:
-            self.model.read_results()
-            if self.model.barcode is None or self.model.barcode[1:] != self.session.barcode:
-                self.logger.error(f"invalid barcode: {self.model.barcode}")
-                self._handle_error(f"Invalid barcode: {self.model.barcode}", store_backup=True)
-                return
             if not self.model.is_valid():
+                self.logger.error("results not valid")
                 self._handle_error(store_backup=True)
+                return False
+
+            self.model.read_results()
+
+            if self.model.barcode is None or (
+                self.model.barcode != self.session.barcode
+                and self.model.barcode[1:] != self.session.barcode
+            ):
+                self.logger.error(f"invalid barcode: {self.model.barcode}")
+                self._handle_error(
+                    f"Invalid barcode: {self.model.barcode}", store_backup=True
+                )
                 return
+
             self.measured.emit(self.model.to_response())
             self.ready_to_submit.emit(True)
+
         except Exception as e:
             traceback.print_exc()
             self.logger.error(e)
@@ -140,6 +151,3 @@ class ECGController(Controller):
         except Exception as e:
             self.logger.error(e)
             return False
-
-
-

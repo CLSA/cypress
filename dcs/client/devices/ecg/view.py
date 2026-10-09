@@ -8,6 +8,8 @@ from view import View
 from devices.ecg.session import ECGSession
 from devices.ecg.config import ECGConfig
 
+from utils import get_file_size
+
 
 class ECGView(View):
     def __init__(
@@ -18,10 +20,10 @@ class ECGView(View):
         )
 
         self.session_widget.deviceStatusValue.setText("ECG")
+        self.measurement_table_widget.measurementsInfo.setTitle("Files")
         self.table = self.measurement_table_widget.measurementTable
-        self.table.setVisible(False)
+
         self.start_button.setVisible(False)
-        self.setFixedSize(400, 250)
 
     def _on_files_received(self, files: list[Path]):
         self.table.clear()
@@ -35,9 +37,9 @@ class ECGView(View):
         self.table.setColumnCount(len(columns))
         self.table.setHorizontalHeaderLabels(columns)
 
-        for index, file_info in enumerate(files):
-            name = QTableWidgetItem(file_info.name)
-            size = QTableWidgetItem(file_info.readable_size)
+        for index, file_path in enumerate(files):
+            name = QTableWidgetItem(file_path.name)
+            size = QTableWidgetItem(get_file_size(file_path))
 
             self.table.setItem(index, 0, name)
             self.table.setItem(index, 1, size)

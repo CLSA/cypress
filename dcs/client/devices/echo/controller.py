@@ -88,17 +88,21 @@ class ECHOController(Controller):
             self.scans_received.add(file_path)
 
         us_count = len([x for x in self.scans_received if x.name.split(".")[0] == "US"])
+
         usm_count = len(
             [x for x in self.scans_received if x.name.split(".")[0] == "USm"]
         )
+
         src_count = len(
             [x for x in self.scans_received if x.name.split(".")[0] == "SRc"]
         )
+
         total = len(self.scans_received)
 
-        self.files_received.emit(
-            {"us": us_count, "usm": usm_count, "src": src_count, "total": total}
-        )
+        self.logger.info(f"received files: us - {us_count}, usm - {usm_count}, src - {src_count}, total - {total}")
+
+        totals = {"us": us_count, "usm": usm_count, "src": src_count, "total": total}
+        self.files_received.emit(totals)
 
         try:
             self.model.set_scans(self.scans_received)
@@ -106,7 +110,7 @@ class ECHOController(Controller):
             self.logger.error(e)
             self._handle_error(store_backup=True)
 
-        if us_count >= 1 and usm_count >= 1 and src_count >= 1:
+        if (us_count >= 1 or usm_count >= 1) and src_count >= 1:
             self.ready_to_measure.emit()
 
         return True

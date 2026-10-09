@@ -21,7 +21,7 @@ class DXAView(View):
             parent=parent, session=session, config=config, detached=detached
         )
 
-        self.session_widget.deviceStatusValue.setText("DXA")
+        self.session_widget.deviceStatusValue.setText("DEXA")
 
         self.measure_button.setVisible(True)
         self.start_button.setVisible(False)

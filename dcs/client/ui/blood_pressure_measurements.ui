@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>436</width>
-    <height>332</height>
+    <width>445</width>
+    <height>293</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,6 +119,13 @@
       <item>
        <layout class="QHBoxLayout" name="tableControls">
         <item>
+         <widget class="QPushButton" name="deleteRow">
+          <property name="text">
+           <string>Delete Row</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
@@ -130,13 +137,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="deleteRow">
-          <property name="text">
-           <string>Delete Row</string>
-          </property>
-         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="addRow">

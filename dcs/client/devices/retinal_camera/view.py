@@ -19,9 +19,7 @@ class RetinalCameraView(View):
             parent=parent, session=session, config=config, detached=detached
         )
 
-
         self.table = self.measurement_table_widget.measurementTable
-
         self.session_widget.deviceStatusValue.setText(
             f"OCT {'(Left)' if self.session.side == "L" else '(Right)'}"
         )

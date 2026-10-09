@@ -21,6 +21,8 @@ class ECHOView(View):
 
         self.session_widget.deviceStatusValue.setText("ECHO")
 
+        self.start_button.setVisible(False)
+
     @override
     def _get_button_references(self):
         self.measure_button = self.echo_scans_widget.measure_button
