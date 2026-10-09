@@ -13,6 +13,10 @@ def get_cypress_status(machine, port, path):
         return {
             "error": "timeout"
         }
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
     else:
         return status
 
