@@ -6,7 +6,7 @@ from pathlib import Path
 def check_dxa_files(root_dir):
     if not root_dir.exists() or not root_dir.is_dir():
         print("No root dir found")
-        sys.exit(-1)
+        return
 
     for p in root_dir.iterdir():
         if p.exists() and p.is_dir():
@@ -41,4 +41,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     dxa_dir = args.dxa_dir
+
+    check_dxa_files(dxa_dir)
 
