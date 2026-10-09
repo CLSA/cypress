@@ -1,5 +1,25 @@
 import argparse
 import math
+import subprocess
+
+def scp(machine: str, directory: str, destination: str):
+    stdout, stderr = subprocess.Popen(
+        f"scp -r -T {machine}:'{directory}' {destination}",
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    ).communicate()
+
+    return stdout, stderr
+
+def command(machine, command: str):
+    stdout, stderr = subprocess.Popen(
+        f"ssh {machine} '{command}'",
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    return stdout, stderr
 
 def round_half_up(num: float, decimals=0) -> float:
     multiplier = 10**decimals
