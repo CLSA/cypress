@@ -209,6 +209,7 @@ class PineDB:
                         "JOIN question ON question.id = response.question_id "
                         "WHERE respondent.token = ? "
                         "ORDER BY respondent.start_datetime DESC",
+                        (token,)
                     )
 
                     columns = [col[0] for col in cursor.description]
