@@ -9,7 +9,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-tz = config["DEFAULT"].get("tz", "UTC")
+tz = config["DEFAULT"].get("TZ", "UTC")
 
 
 def get_today():
