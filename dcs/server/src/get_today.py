@@ -1,10 +1,19 @@
 from pine_db import PineDB
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import json
+import configparser
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+tz = config["DEFAULT"].get("tz", "UTC")
+
 
 def get_today():
+
     now = datetime.now()
 
     start = datetime(
@@ -13,7 +22,8 @@ def get_today():
         year=now.year,
         hour=0,
         minute=0,
-        second=0
+        second=0,
+        tzinfo=tz,
     )
 
     end = datetime(
@@ -22,20 +32,26 @@ def get_today():
         year=now.year,
         hour=23,
         minute=59,
-        second=59
+        second=59,
+        tzinfo=tz,
     )
 
-    return start.isoformat(), end.isoformat()
+    print(start, end)
 
-if __name__ == '__main__':
+    return (
+        start.astimezone(tz=ZoneInfo("UTC")).isoformat(),
+        end.astimezone(tz=ZoneInfo("UTC")).isoformat(),
+    )
+
+
+if __name__ == "__main__":
     db = PineDB(live=True)
 
     start, end = get_today()
+
+    print(start, end)
 
     interviews = db.get_interviews_from_range(start, end)
 
     if interviews:
         print(json.dumps(interviews, indent=2, default=str))
-
-
-
