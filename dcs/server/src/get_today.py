@@ -13,7 +13,6 @@ tz = config["DEFAULT"].get("TZ", "UTC")
 
 
 def get_today():
-
     now = datetime.now()
 
     start = datetime(
@@ -23,7 +22,7 @@ def get_today():
         hour=0,
         minute=0,
         second=0,
-        tzinfo=tz,
+        tzinfo=ZoneInfo(tz),
     )
 
     end = datetime(
@@ -33,7 +32,7 @@ def get_today():
         hour=23,
         minute=59,
         second=59,
-        tzinfo=tz,
+        tzinfo=ZoneInfo(tz),
     )
 
     print(start, end)
