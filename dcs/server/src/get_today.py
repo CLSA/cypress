@@ -7,7 +7,7 @@ import json
 def get_today():
     now = datetime.now()
 
-    today = datetime(
+    start = datetime(
         day=now.day,
         month=now.month,
         year=now.year,
@@ -16,14 +16,23 @@ def get_today():
         second=0
     )
 
-    return today.isoformat()
+    end = datetime(
+        day=now.day,
+        month=now.month,
+        year=now.year,
+        hour=23,
+        minute=59,
+        second=59
+    )
+
+    return start.isoformat(), end.isoformat()
 
 if __name__ == '__main__':
     db = PineDB(live=True)
 
-    today = get_today()
+    start, end = get_today()
 
-    interviews = db.get_interviews_from_date(today)
+    interviews = db.get_interviews_from_date(start, end)
 
     if interviews:
         print(json.dumps(interviews, indent=2))

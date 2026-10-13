@@ -176,13 +176,13 @@ class PineDB:
             print(e)
             return False
 
-    def get_interviews_from_date(self, iso_datetime: str):
+    def get_interviews_from_day(self, start: str, end: str):
         try:
             with mariadb.connect(**self.conn_params) as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "SELECT * FROM respondent WHERE start_datetime >= ?"
-                        (iso_datetime,)
+                        "SELECT * FROM respondent WHERE start_datetime >= ? AND start_datetime <= ?",
+                        (start, end)
                     )
 
                     columns = [col[0] for col in cursor.description]
@@ -190,7 +190,6 @@ class PineDB:
 
                     for row in cursor:
                         row_data = dict(zip(columns, row))
-                        row_data["value"] = json.loads(row_data.get("value", {}))
                         res.append(row_data)
 
                     return res
