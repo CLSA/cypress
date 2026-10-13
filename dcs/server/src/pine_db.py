@@ -181,7 +181,8 @@ class PineDB:
             with mariadb.connect(**self.conn_params) as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "SELECT * FROM respondent WHERE start_datetime >= ? AND start_datetime <= ?",
+                        "SELECT FROM respondent WHERE start_datetime >= ? AND start_datetime <= ? "
+                        "ORDER BY start_datetime DESC",
                         (start, end)
                     )
 
