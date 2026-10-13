@@ -198,3 +198,28 @@ class PineDB:
         except Exception as e:
             print(e)
             return False
+
+    def get_comments(self, token):
+        try:
+            with mariadb.connect(**self.conn_params) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT question.name, response.comments, response.start_datetime, response.end_datetime FROM response "
+                        "JOIN respondent ON response.respondent_id = respondent.id "
+                        "JOIN question ON question.id = response.question_id "
+                        "WHERE respondent.token = ? "
+                        "ORDER BY respondent.start_datetime DESC",
+                    )
+
+                    columns = [col[0] for col in cursor.description]
+                    res = []
+
+                    for row in cursor:
+                        row_data = dict(zip(columns, row))
+                        res.append(row_data)
+
+                    return res
+
+        except Exception as e:
+            print(e)
+            return False

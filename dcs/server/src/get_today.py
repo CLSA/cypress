@@ -35,8 +35,6 @@ def get_today():
         tzinfo=ZoneInfo(tz),
     )
 
-    print(start, end)
-
     return (
         start.astimezone(tz=ZoneInfo("UTC")).isoformat(),
         end.astimezone(tz=ZoneInfo("UTC")).isoformat(),
@@ -47,9 +45,6 @@ if __name__ == "__main__":
     db = PineDB(live=True)
 
     start, end = get_today()
-
-    print(start, end)
-
     interviews = db.get_interviews_from_range(start, end)
 
     if interviews:
