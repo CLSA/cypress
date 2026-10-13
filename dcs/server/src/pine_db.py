@@ -176,7 +176,7 @@ class PineDB:
             print(e)
             return False
 
-    def get_interviews_from_day(self, start: str, end: str):
+    def get_interviews_from_range(self, start: str, end: str):
         try:
             with mariadb.connect(**self.conn_params) as conn:
                 with conn.cursor() as cursor:

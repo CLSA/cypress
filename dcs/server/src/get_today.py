@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     start, end = get_today()
 
-    interviews = db.get_interviews_from_date(start, end)
+    interviews = db.get_interviews_from_range(start, end)
 
     if interviews:
         print(json.dumps(interviews, indent=2))
