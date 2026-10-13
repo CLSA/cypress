@@ -35,7 +35,7 @@ if __name__ == '__main__':
     interviews = db.get_interviews_from_range(start, end)
 
     if interviews:
-        print(json.dumps(interviews, indent=2))
+        print(json.dumps(interviews, indent=2, default=str))
 
 
 
