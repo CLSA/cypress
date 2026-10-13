@@ -199,14 +199,15 @@ class PineDB:
             print(e)
             return False
 
-    def get_comments(self, token):
+    def get_response_stages(self, token):
         try:
             with mariadb.connect(**self.conn_params) as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "SELECT question.name, response.comments FROM response "
+                        "SELECT stage.name, response_stage.status, response_stage.comments FROM response_stage "
+                        "JOIN stage ON response_stage.stage_id = stage.id "
+                        "JOIN response ON response_stage.response_id = response.id "
                         "JOIN respondent ON response.respondent_id = respondent.id "
-                        "JOIN question ON question.id = response.question_id "
                         "WHERE respondent.token = ? "
                         "ORDER BY respondent.start_datetime DESC",
                         (token,)

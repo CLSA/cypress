@@ -47,5 +47,13 @@ if __name__ == "__main__":
     start, end = get_today()
     interviews = db.get_interviews_from_range(start, end)
 
+    for interview in interviews:
+        token = interview.get("token")
+
+        stages = db.get_response_stages(token)
+
+        interview["stages"] = stages
+
     if interviews:
         print(json.dumps(interviews, indent=2, default=str))
+
