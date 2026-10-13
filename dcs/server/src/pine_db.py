@@ -204,7 +204,7 @@ class PineDB:
             with mariadb.connect(**self.conn_params) as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        "SELECT question.name, response.comments, response.start_datetime, response.end_datetime FROM response "
+                        "SELECT question.name, response.comments FROM response "
                         "JOIN respondent ON response.respondent_id = respondent.id "
                         "JOIN question ON question.id = response.question_id "
                         "WHERE respondent.token = ? "
