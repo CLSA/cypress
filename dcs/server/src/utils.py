@@ -2,9 +2,19 @@ import argparse
 import math
 import subprocess
 
-def scp(machine: str, directory: str, destination: str):
+def copy_to_machine(machine: str, src: str, destination: str):
     stdout, stderr = subprocess.Popen(
-        f"scp -r -T {machine}:'{directory}' {destination}",
+        f"scp -r -T {src} {machine}:'{destination}'",
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    ).communicate()
+
+    return stdout, stderr
+
+def copy_from_machine(machine: str, src: str, destination: str):
+    stdout, stderr = subprocess.Popen(
+        f"scp -r -T {machine}:'{src}' {destination}",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

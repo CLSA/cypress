@@ -175,3 +175,26 @@ class PineDB:
         except Exception as e:
             print(e)
             return False
+
+    def get_interviews_from_date(self, iso_datetime: str):
+        try:
+            with mariadb.connect(**self.conn_params) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT * FROM respondent WHERE start_datetime >= ?"
+                        (iso_datetime,)
+                    )
+
+                    columns = [col[0] for col in cursor.description]
+                    res = []
+
+                    for row in cursor:
+                        row_data = dict(zip(columns, row))
+                        row_data["value"] = json.loads(row_data.get("value", {}))
+                        res.append(row_data)
+
+                    return res
+
+        except Exception as e:
+            print(e)
+            return False

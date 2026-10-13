@@ -2,6 +2,7 @@ import requests
 import time
 import argparse
 import json
+import sys
 
 
 def get_cypress_status(machine, port, path):
@@ -9,9 +10,13 @@ def get_cypress_status(machine, port, path):
         response = requests.get(f"http://{machine}:{port}/{path}")
         if response.status_code == 200:
             status = response.json()
-    except TimeoutError:
+    except requests.exceptions.Timeout:
         return {
-            "error": "timeout"
+            "error": "Request timed out"
+        }
+    except requests.exceptions.ConnectionError as e:
+        return {
+            "error": "Connection error"
         }
     except Exception as e:
         return {
@@ -33,11 +38,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if not args.repeat:
+        status = get_cypress_status(args.workstation, args.port, "status")
+        print(json.dumps(status))
+        sys.exit(0)
+
     if args.repeat:
         while True:
             status = get_cypress_status(args.workstation, args.port, "status")
             print(json.dumps(status))
             time.sleep(1)
-    else:
-        status = get_cypress_status(args.workstation, args.port, "status")
-        print(json.dumps(status))
+
