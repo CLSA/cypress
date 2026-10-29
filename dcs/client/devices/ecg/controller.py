@@ -4,6 +4,7 @@ from typing import override
 from pathlib import Path
 
 from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QMessageBox
 
 from controller import Controller
 
@@ -51,6 +52,10 @@ class ECGController(Controller):
         self.view.measure_button.setVisible(True)
 
         self.start()
+
+        self.backup_paths = [
+            {"path": Path(self.config.storage_path), "arcname": "files"}
+        ]
 
     @override
     def start(self):
