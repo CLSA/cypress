@@ -33,6 +33,7 @@ config.ini
 
 **/fixtures/
 **/commands/
+**/corrections/
 
 __pycache__
 

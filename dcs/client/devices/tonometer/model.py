@@ -73,6 +73,14 @@ class EyeMeasure(Record):
         "sa_ws": {"attr": "sa_ws", "data_type": float, "units": None},
     }
 
+    def to_dict(self):
+        measure_json = super().to_dict()
+        measure_json["side"] = (
+            "left" if self.eye == "L" else "right" if self.eye == "R" else None
+        )
+
+        return measure_json
+
 
 class TonometerTest(Record):
     field_map = {

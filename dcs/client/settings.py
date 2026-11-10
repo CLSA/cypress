@@ -2,7 +2,7 @@ import base64
 
 from config import config
 
-CYPRESS_VERSION = "2.0.0"
+CYPRESS_VERSION = "2.0.1"
 
 ALLOWED_HOSTS = [host.strip() for host in config.allowed_hosts.split(",")]
 
