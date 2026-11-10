@@ -89,7 +89,7 @@ class FRAXSession(Session):
     weight: PositiveFloat
     height: PositiveFloat
 
-    femoral_neck_bmd: NonNegativeFloat
+    femoral_neck_bmd: PositiveFloat
 
     glucocorticoid_age: NonNegativeInt | PositiveFloat | None
     glucocorticoid_number: PositiveInt | PositiveFloat | None
